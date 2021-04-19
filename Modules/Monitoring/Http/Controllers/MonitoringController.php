@@ -633,6 +633,7 @@ class MonitoringController extends Controller
         }
         
     }
+
 public function tableSocailMonitoring(){
         $role_custom = @check_role_custom();
     
@@ -747,6 +748,7 @@ public function tableSocailMonitoring(){
         $data['page'] = langapp('social_feel');
         return view('monitoring::social_feel')->with($data);
     }
+
 
 
 }

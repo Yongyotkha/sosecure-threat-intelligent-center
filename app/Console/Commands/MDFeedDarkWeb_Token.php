@@ -43,19 +43,16 @@ class MDFeedDarkWeb_Token extends Command
      * @return mixed
      */
     public function handle()
-    {
-
-        
+    {    
         $q= $this->argument('q');
         $payload= $this->argument('payload');
-        $time_stamp_from= $this->argument('time_stamp_from');
-        $time_stamp_to= $this->argument('time_stamp_to');
+        $time_stamp_from_input = $this->argument('time_stamp_from');
+        $time_stamp_to_input = $this->argument('time_stamp_to');
         
-       // $time_stamp_from = Carbon::now('UTC')->subDays(120)->format('Y-m-d\\TH:i:s\\Z');
-       // $time_stamp_to = Carbon::now('UTC')->addDays(1)->format('Y-m-d\\TH:i:s\\Z');
-        $response = $this->perform_query($payload, $q,null,$time_stamp_from,$time_stamp_to);
-       //return "111";
-     
+       $time_stamp_from = Carbon::parse($time_stamp_from_input)->format('Y-m-d\\TH:i:s\\Z');
+       $time_stamp_to = Carbon::parse($time_stamp_to_input)->format('Y-m-d\\TH:i:s\\Z');
+       $response = $this->perform_query($payload, $q,null,$time_stamp_from,$time_stamp_to);
+    //    echo json_encode($response);
     }
 
     public function payloadToString($payload)
@@ -150,11 +147,11 @@ class MDFeedDarkWeb_Token extends Command
 
                // $authHeader_url = $this->generate_auth_header_URL($search,'GET');
                $_clientHttp = $this->getInitialNumbers($search, 'GET', $reconnectLimit);
-               foreach ($_clientHttp as $value) {
-
-
+               foreach ($_clientHttp["alldata"]["results"] as $value) {
+                    htmlspecialchars($value['body'], ENT_QUOTES, 'UTF-8');
                }
-              print_r($_clientHttp);
+            //    header('Content-type: application/json');
+               echo json_encode($_clientHttp);
             //  return  $authHeader_url;
          //     $result_json_e = json_encode($authHeader_url);
            //   echo $result_json_e;
@@ -191,7 +188,7 @@ class MDFeedDarkWeb_Token extends Command
        // }
         }
 
-        $this->info('SUCCESS ONE SEARCH');
+        // $this->info('SUCCESS ONE SEARCH');
 
     }
 
@@ -348,7 +345,7 @@ class MDFeedDarkWeb_Token extends Command
                     $this->info(" : INSERTED");
                     $insert_col_fx_transaction_darkweb_data = $col_fx_transaction_darkweb_data->insertOne([
                         'darkweb_id' => @$value["id"],
-                        'body_search' => @$body_search,
+                        'body_search' => htmlspecialchars(@$body_search, ENT_QUOTES, 'UTF-8'),
                             //'body' => @$value["body"],
                         'hackishness' => @$value["hackishness"],
                         'title' => @$value["title"],
