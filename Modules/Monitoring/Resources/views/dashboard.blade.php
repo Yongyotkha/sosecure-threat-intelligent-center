@@ -492,6 +492,7 @@
 @include('stacks.css.form')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @include('stacks.css.lightbox')
+@include('stacks.js.fullscreen')
 @endpush
 
 @push('pagescript')
