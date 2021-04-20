@@ -38,5 +38,16 @@ Route::group(
         Route::get('/darkweb', 'MonitoringController@monitor_darkweb')->name('monitoring.monitor_darkweb')->middleware('can:menu_items');
         Route::post('/search_darkweb', 'MonitoringController@monitor_search_darkweb')->name('monitoring.monitor_search_darkweb')->middleware('can:menu_items');
 
+        Route::post('/rss_feel_table_data', 'MonitoringController@tablerss_feel_data')->name('monitoring.rss_feel_table_data')->middleware('can:menu_items');
+        Route::post('/social_feel_table_data', 'MonitoringController@tablesocial_feel_data')->name('monitoring.social_feel_table_data')->middleware('can:menu_items');
+    }
+);
+Route::group(
+    ['middleware' => ['web', 'permission:role_center', 'permission:monitoring'], 'prefix' => 'tools'],
+    function () {
+ 
+        Route::get('/darkweb', 'MonitoringController@monitor_darkweb')->name('monitoring.monitor_darkweb')->middleware('can:menu_items');
+      
+
     }
 );

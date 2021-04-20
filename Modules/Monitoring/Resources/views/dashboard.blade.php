@@ -349,8 +349,8 @@
                                             <th>Last Date Feed</th>
                                             <th>Data Feed</th>
                                             <th>Data Error</th> --}}
-                                            <th>Last Feel</th>
-                                    <th>Last Count</th>
+                                            <th>Latest Recording</th>
+                                    <th>Latest Count</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -418,18 +418,36 @@
 
 
 <!-- Modal example -->
-<div class="modal in fixed-left" id="modal_example" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal in fixed-left" id="modal_view_count_data" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-aside" role="document">
         <div class="modal-content">
             <div class="modal-header bg-blue">
                 <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title text-white">
                     <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
-                    Name
+                    View Latest Data
                 </h4>
             </div>
             <form action="">
                 <div class="modal-body">
+                <span id="modal_view_count_data_body"></span>
+                <div class="table-responsive">
+                <table class="table table-striped" id="table-modal_view_count_data_body">
+                            <thead>
+                                <tr>
+                                     <th>No</th>
+                                    <th>Title</th>
+                                    <th>URL</th>
+                                
+                                    <th>Latest Recording</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                                        </div>
+              
                     
                 </div>
 
@@ -437,10 +455,6 @@
                     <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
                         <i class="fas fa-times"></i>
                         Close
-                    </button>
-                    <button type="submit" class="btn btn-info btn-rounded">
-                        <i class="fas fa-paper-plane"></i>
-                        Save
                     </button>
                 </div>
             </form>
@@ -1063,9 +1077,75 @@
 
 
     
+    function view_social_count_data(id){
 
+        $("#table-modal_view_count_data_body>tbody").empty();
+        $.ajax({
+            type:"POST",
+            url:"{{ route('monitoring.social_feel_table_data') }}?id="+id,
+            data:{id:id},
+            beforeSend: function(){
+            },
+            success:function(response) {
+                var i;
+                var html="";
+                for (i = 0; i < response.length; i++) {
+                  html+='<tr>';
+                  html+='<td>'+response[i].No+'</td>';
+                  html+='<td>'+response[i].feedcontent+'</td>';
+                  html+='<td><a target="_blank" href="'+response[i].feedlink+'">'+response[i].feedlink+'</a></td>';
+                  html+='<td>'+response[i].feedtimepost+'</td>';
+                  html+='</tr>';
+                }
+                $("#table-modal_view_count_data_body>tbody").append(html);
+                            
+            },
+            error: function (error){
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
+        $('#modal_view_count_data').modal('show');
+    }
 
+    function view_rss_count_data(id){
 
+            $("#table-modal_view_count_data_body>tbody").empty();
+            $.ajax({
+                type:"POST",
+                url:"{{ route('monitoring.rss_feel_table_data') }}?id="+id,
+                data:{id:id},
+                beforeSend: function(){
+                },
+                success:function(response) {
+                    var i;
+                    var html="";
+                    for (i = 0; i < response.length; i++) {
+                    html+='<tr>';
+                    html+='<td>'+response[i].No+'</td>';
+                    html+='<td>'+response[i].feedcontent+'</td>';
+                    html+='<td><a target="_blank" href="'+response[i].feedlink+'">'+response[i].feedlink+'</a></td>';
+                    html+='<td>'+response[i].feedtimepost+'</td>';
+                    html+='</tr>';
+                    }
+                    $("#table-modal_view_count_data_body>tbody").append(html);
+                                
+                },
+                error: function (error){
+                    var errors = error.response.data.errors;
+                    var errorsHtml = '';
+                    $.each(errors, function (key, value) {
+                        errorsHtml += '<li>' + value[0] + '</li>';
+                    });
+                    toastr.error(errorsHtml, '@langapp('response_status') ');
+                }
+            });
+            $('#modal_view_count_data').modal('show');
+}
 
 
 </script>

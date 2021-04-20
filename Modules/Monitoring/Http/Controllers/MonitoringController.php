@@ -18,7 +18,7 @@ use Modules\Monitoring\Entities\MonitoringSystem;
 
 use App\DataLeakSocial;
 
-
+use Modules\RSSFeedSettings\Entities\TransactionRssData;
 use MongoDB\BSON\Regex;
 use MongoDB\Client;
 use MongoDB\Client as MongoClient;
@@ -636,7 +636,7 @@ class MonitoringController extends Controller
 public function tableSocailMonitoring(){
         $role_custom = @check_role_custom();
     
-        $model = DataLeakSocial::where('deleted_at',null)->get();
+        $model = DataLeakSocial::where('deleted_at',null)->where('status',1)->get();
         return DataTables::of($model)
             ->editColumn('chk', function (DataLeakSocial $model) {
                     return '<label><input type="checkbox" name="rss_id" class="rss_id" value="' . $model->code . '"><span class="label-text"></span></label>';
@@ -668,7 +668,12 @@ public function tableSocailMonitoring(){
 
 
                 $html = '';
-                $html .= $cursor_count;
+                if($cursor_count > 0){
+                     $html .= '<a href="javascript:void(0);" onclick="view_social_count_data('.$model->id.');" >'.$cursor_count.'</a>';
+                }else{
+                    $html .='0';
+
+                }
                 return $html;
             })
             ->addColumn('feed_last_mongodb', function (DataLeakSocial $model) {
@@ -735,11 +740,72 @@ public function tableSocailMonitoring(){
                 </a></div>";
                 return $html;
             })
-            ->rawColumns(['chk','link','status','action'])
+            ->rawColumns(['chk','link','status','action','transactionRssData_count'])
             ->toJson();
     }
 
+    public function tablesocial_feel_data(Request $request){
+        try {
+            $sourceid = (int)$request->query('id');
+            $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+            $client = new \MongoDB\Client($DB_MONGO_KEY);
+            $db_name = 'social';
+            $db = $client->$db_name;
+            $collection = $db->DailyFeed;
+            $where = array(
+               'sourceid' => $sourceid,
+              
+            );
+            
+         $options = [
+            // 'skip' => 0,//10
+            'limit' => 10,//5
+            'sort' => ['feedtimestamp' => -1]
+            
+        ];
+    
+            $cursor = $collection->find($where,$options);   //This is the main line
+            $document_all = $cursor->toArray();
+            $data = array();
+            $order_number=0;
+            foreach ($document_all as  $value) {
 
+                $order_number++;
+                $nestedData['No'] = $order_number;
+                $nestedData['feedcontent'] = $value["feedcontent"];
+                $nestedData['feedtimepost'] = change_date_utc_to_thai($value['feedtimestamp']);
+                $nestedData['feedlink'] = $value["feedlink"];
+                $data[] = $nestedData;
+            }
+
+            return response()->json($data);
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage());
+        }
+    }
+    
+    public function tablerss_feel_data(Request $request){
+        try {
+            $sourceid = (int)$request->query('id');
+    
+            $document_all = TransactionRssData::where('rss_id', $sourceid)->orderBy('transcation_datetime', 'DESC')->take(10)->get();
+            $data = array();
+            $order_number=0;
+            foreach ($document_all as  $value) {
+
+                $order_number++;
+                $nestedData['No'] = $order_number;
+                $nestedData['feedcontent'] = $value["title"];
+                $nestedData['feedtimepost'] = $value['transcation_datetime'];
+                $nestedData['feedlink'] = $value["link"];
+                $data[] = $nestedData;
+            }
+
+            return response()->json($data);
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage());
+        }
+    }
     public function social_feel()
     {
    

@@ -847,7 +847,13 @@ class RSSFeedSettingsController extends Controller
             })
             ->addColumn('transactionRssData_count', function (RSSData $model) {
                 $html = '';
-                $html .= TransactionRssData::where('rss_id', $model->id)->count();
+                $cursor_count = TransactionRssData::where('rss_id', $model->id)->count();
+                if($cursor_count > 0){
+                    $html .= '<a href="javascript:void(0);" onclick="view_rss_count_data('.$model->id.');" >'.$cursor_count.'</a>';
+               }else{
+                   $html .='0';
+
+               }
                 return $html;
             })
             ->addColumn('status', function (RSSData $model) {
@@ -873,7 +879,7 @@ class RSSFeedSettingsController extends Controller
                 </a></div>";
                 return $html;
             })
-            ->rawColumns(['chk','link','status','action'])
+            ->rawColumns(['chk','link','status','action','transactionRssData_count'])
             ->toJson();
     }
 
