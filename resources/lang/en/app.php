@@ -1011,4 +1011,6 @@ return [
     'darkweb_data'                              => 'Dark Web Data',
     'data_dark'                                 => 'Data Dark',
     'apply'                                     => 'Apply',
+    'tools'                                     => 'Tools',
+    'darkweb_darkowl'                           => 'Darkweb(darkowl)',
 ];

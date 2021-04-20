@@ -151,7 +151,46 @@ class MDFeedDarkWeb_Token extends Command
                     htmlspecialchars($value['body'], ENT_QUOTES, 'UTF-8');
                }
             //    header('Content-type: application/json');
-               echo json_encode($_clientHttp);
+            // $d ='{
+            //     "resultCount": 20,
+            //     "total": 43,
+            //     "alldata": {
+            //       "total": 43,
+            //       "resultCount": 20,
+            //       "results": [
+            //         {
+            //           "id": "4b80d9fb2550c6391c165f1cfe791a8b4de332bb",
+            //           "body": "nitter\nBilaspur Airport Awareness Campaign (BAAC)\n@AirportBilaspur\n7 Oct 2020\n#बिलासपुर_माँगे_4c_एयरपोर्ट\nबिलासपुर एयरपोर्ट का निर्माण रायपुर एयरपोर्ट की तर्ज पर #4C एयरपोर्ट के रूप मे कराये जाने कीआवश्यकता है\nबिलासपुर की जनता की भावना का सम्मान हो।\n#बिलासपुर_माँगे_4c_एयरपोर्ट\n@ChhattisgarhCMO @bhupeshbaghel @iAtalShrivastav\n@shailesh30cvru @ArunSao3\n2:52 AM · Oct 7, 2020\n1\n20\n3\n38\nBilaspur Airport Awareness Campaign (BAAC)\n@AirportBilaspur\n7 Oct 2020\nयहाँ कोई भी काम उच्च स्तर पर नही होता\n#बिलासपुर_माँगे_4c_एयरपोर्ट\n1\n8\n1\n18",
+            //           "hackishness": 0,
+            //           "title": "Bilaspur Airport Awareness Campaign (BAAC) (@AirportBilaspur): \"#बिलासपुर_माँगे_4c_एयरपोर्ट\nबिलासपुर एयरपोर्ट का निर्माण रायपुर एयरपोर्ट की तर्ज पर #4C एयरपोर्ट के रूप मे कराये जाने कीआवश्यकता है\nबिलासपुर की जनता की भावना का सम्मान हो।\n#बिलासपुर_माँगे_4c_एयरपोर्ट\n@ChhattisgarhCMO @bhupeshbaghel @iAtalShrivastav\n@shailesh30cvru @ArunSao3\" | nitter",
+            //           "uri": "http://26oq3gioiwcmfojub37nz5gzbkdiqp7fue5kvye7d4txv4ny6fb4wwid.onion/AirportBilaspur/status/1313673427601874944",
+            //           "url": "http://26oq3gioiwcmfojub37nz5gzbkdiqp7fue5kvye7d4txv4ny6fb4wwid.onion/AirportBilaspur/status/1313673427601874944",
+            //           "location": "http://26oq3gioiwcmfojub37nz5gzbkdiqp7fue5kvye7d4txv4ny6fb4wwid.onion/AirportBilaspur/status/1313673427601874944",
+            //           "crawlDate": "2021-04-17T12:35:39Z",
+            //           "fileSize": 10644,
+            //           "network": "onion.v3",
+            //           "languages": [
+            //             "hi"
+            //           ],
+            //           "domain": "26oq3gioiwcmfojub37nz5gzbkdiqp7fue5kvye7d4txv4ny6fb4wwid.onion",
+            //           "headers": [
+            //             "date: Sat, 17 Apr 2021 12:35:38 GMT",
+            //             "content-length: 10644",
+            //             "httpstatus: HTTP/1.1 200 OK",
+            //             "x-xss-protection: 1; mode=block",
+            //             "x-content-type-options: nosniff",
+            //             "x-frame-options: DENY",
+            //             "referrer-policy: no-referrer",
+            //             "content-type: text/html;charset=utf-8",
+            //             "onion-location: http://3nzoldnxplag42gqjs23xvghtzf6t6yzssrtytnntc6ppc7xxuoneoad.onion/AirportBilaspur/status/1313673427601874944"
+            //           ]
+            //         }
+            //       ]
+            //     },
+            //     "success": true
+            //   }';
+            //   echo $d ;
+              echo json_encode($_clientHttp);
             //  return  $authHeader_url;
          //     $result_json_e = json_encode($authHeader_url);
            //   echo $result_json_e;
