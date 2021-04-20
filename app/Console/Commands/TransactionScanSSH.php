@@ -92,27 +92,27 @@ class TransactionScanSSH extends Command
                 );
                 flush();
 
-              //  for ($i=1; $i <= 3; $i++) { 
-                    try {
-                        $process_looking_for_subdomain_securitytrails  = proc_open($cmd_looking_for_subdomain_securitytrails, $descriptorspec, $pipes, realpath('./'), array());
-                        if (is_resource($process_looking_for_subdomain_securitytrails)) {
-                            while ($s = fgets($pipes[1])) {
-                                $current_looking_for_subdomain_securitytrails .= $s;
-                                echo $s;
-                                flush();
-                            }
-                        }
+            //    for ($i=1; $i <= 3; $i++) { 
+            //         try {
+            //             $process_looking_for_subdomain_securitytrails  = proc_open($cmd_looking_for_subdomain_securitytrails, $descriptorspec, $pipes, realpath('./'), array());
+            //             if (is_resource($process_looking_for_subdomain_securitytrails)) {
+            //                 while ($s = fgets($pipes[1])) {
+            //                     $current_looking_for_subdomain_securitytrails .= $s;
+            //                     echo $s;
+            //                     flush();
+            //                 }
+            //             }
                         
-                        $path = public_path().'/files/scans/'.$TransactionTimeStampScan->get_site->code.'/'.$TransactionTimeStampScan->get_domain->code;
-                        File::makeDirectory($path, $mode = 0777, true, true);
+            //             $path = public_path().'/files/scans/'.$TransactionTimeStampScan->get_site->code.'/'.$TransactionTimeStampScan->get_domain->code;
+            //             File::makeDirectory($path, $mode = 0777, true, true);
 
-                        $file = $path.'/looking_for_subdomain_securitytrails.txt';
-                        file_put_contents($file, $current_looking_for_subdomain_securitytrails);
-                        break;
-                    } catch (\Throwable $th) {
-                        //throw $th;
-                    }
-               // }
+            //             $file = $path.'/looking_for_subdomain_securitytrails.txt';
+            //             file_put_contents($file, $current_looking_for_subdomain_securitytrails);
+            //             break;
+            //         } catch (\Throwable $th) {
+            //             //throw $th;
+            //         }
+            //     }
 
                 for ($i=1; $i <= 3; $i++) { 
                     try {

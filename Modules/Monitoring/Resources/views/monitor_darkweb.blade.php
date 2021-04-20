@@ -93,9 +93,10 @@
                         <table class="table table-striped" id="table-monitoring-darkweb">
                             <thead>
                                 <tr>
-                                    <th width="30%">Title</th>
-                                    <th>Body</th>
-                                    <th width="20%">Date Time</th>
+                                   
+                                    <th>Title</th>
+                                    <th width="30px">hackishness</th>
+                                    <th width="150px">Date Time</th>
                                 </tr>
                             </thead>
                             <tbody id="body-monitoring-darkweb">
@@ -221,18 +222,52 @@
                     const element = jsonObj.alldata.results[index];
                     html += `
                     <tr>
-                        <td>${element.title}</td>
-                        <td><span id="body_text_${index}"></span></td>
+                        <td><a href="javascript:void(0);" onclick="view_body('body_text_${index}');"> `;
+                        if('title' in element){
+                            html +=     `${element.title}`;
+                        }else{
+                            var str =`${element.body}`;
+
+                            html +=    str.substring(0, 500);+'...';
+                        }
+
+
+                        html += `  </a></td>
+                        <td><span ><span class="badge badge-Warning" style="background-color: #ffc107;">${element.hackishness} </span></span>
+
+                        </td>
                         <td>${element.crawlDate}</td>
+                    <tr>
+                    <tr  id="body_text_${index}" class="body_text" style="display: none;">
+                      
+                        <td colspan="3">
+                         
+                            <div>`;
+                        if('domain' in element){
+                            html +=     `<b>Domain</b>: ${element.domain}`;
+                        }
+                            html +=     `</div>
+                            <pre style="background-color:#fff"><code>
+                            ${element.body}
+                            </code></pre> `;
+
+                       if('emails' in element){
+                        html +=     `   <pre style="background-color:#fff"><code>`;
+                            for (let index_email = 0; index_email < element.emails.length; index_email++) {
+                                html +=     element.emails[index_email]+'\n';
+                            }
+                        html +=     `  </code></pre> `;
+                        }
+
+
+                      html +=     `  </td>
+ 
                     <tr>
                     `;
                 }
                 $('#body-monitoring-darkweb').prepend($(html).fadeIn('slow'));
-
-                for (let index = 0; index < jsonObj.alldata.results.length; index++) {
-                    const element = jsonObj.alldata.results[index];
-                    $('#body_text_' + index).text(element.body);
-                }
+                $(".body_text").toggle();
+           
         
             },
             error: function (error){
@@ -242,6 +277,10 @@
         });
     }
 
+    function view_body(id){
+        $("#"+id).toggle();
+        
+    }
 </script>
 @endpush
 @endsection

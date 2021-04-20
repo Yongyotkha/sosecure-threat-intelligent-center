@@ -55,45 +55,45 @@ class TransactionSaveScan extends Command
         foreach($TransactionTimeStampScans as $TransactionTimeStampScan){
             $path = public_path().'/files/scans/'.$TransactionTimeStampScan->get_site->code.'/'.$TransactionTimeStampScan->get_domain->code;
 
-            try {
-                // looking_for_subdomain
-            $array = explode("\n", file_get_contents($path.'/looking_for_subdomain_securitytrails.txt'));
-            $arrays = [];
-            $arrays_final = [];
-            $arrays_last_final = [];
-            foreach ($array as $item) {
-                $arrays[] = explode("\t", $item);
-            }
-            foreach($arrays as $data){
-                $arrays_final[] = $data;
-            }
-            foreach($arrays_final as $item){
-                $arrays = [];
-                foreach($item as $data){
-                    if(!empty($data)){
-                        $arrays[] = trim($data);
-                    }
-                }
-                $arrays_last_final[] = $arrays;
-            }
-            $arrays_last_final = array_filter($arrays_last_final);
-            array_pop($arrays_last_final);
-            foreach($arrays_last_final as $item){
-                $CreateTransactionScanTemps = new TranSactionScanTemps;
-                $CreateTransactionScanTemps -> code = Str::uuid()->toString();
-                $CreateTransactionScanTemps -> created_by = $TransactionTimeStampScan -> created_by;
-                $CreateTransactionScanTemps -> site_id = $TransactionTimeStampScan->site_id;
-                $CreateTransactionScanTemps -> domain_id = $TransactionTimeStampScan->domain_id;
-                $CreateTransactionScanTemps -> module = $item[0];
-                $CreateTransactionScanTemps -> data_type = $item[1];
-                $CreateTransactionScanTemps -> raw_data = $item[2];
-                $CreateTransactionScanTemps -> status = 1;
-                $CreateTransactionScanTemps -> path = '/looking_for_subdomain_securitytrails.txt';
-                $CreateTransactionScanTemps -> save();
-            }
-        } catch (\Throwable $th) {
-                //throw $th;
-        }
+        //     try {
+        //         // looking_for_subdomain
+        //     $array = explode("\n", file_get_contents($path.'/looking_for_subdomain_securitytrails.txt'));
+        //     $arrays = [];
+        //     $arrays_final = [];
+        //     $arrays_last_final = [];
+        //     foreach ($array as $item) {
+        //         $arrays[] = explode("\t", $item);
+        //     }
+        //     foreach($arrays as $data){
+        //         $arrays_final[] = $data;
+        //     }
+        //     foreach($arrays_final as $item){
+        //         $arrays = [];
+        //         foreach($item as $data){
+        //             if(!empty($data)){
+        //                 $arrays[] = trim($data);
+        //             }
+        //         }
+        //         $arrays_last_final[] = $arrays;
+        //     }
+        //     $arrays_last_final = array_filter($arrays_last_final);
+        //     array_pop($arrays_last_final);
+        //     foreach($arrays_last_final as $item){
+        //         $CreateTransactionScanTemps = new TranSactionScanTemps;
+        //         $CreateTransactionScanTemps -> code = Str::uuid()->toString();
+        //         $CreateTransactionScanTemps -> created_by = $TransactionTimeStampScan -> created_by;
+        //         $CreateTransactionScanTemps -> site_id = $TransactionTimeStampScan->site_id;
+        //         $CreateTransactionScanTemps -> domain_id = $TransactionTimeStampScan->domain_id;
+        //         $CreateTransactionScanTemps -> module = $item[0];
+        //         $CreateTransactionScanTemps -> data_type = $item[1];
+        //         $CreateTransactionScanTemps -> raw_data = $item[2];
+        //         $CreateTransactionScanTemps -> status = 1;
+        //         $CreateTransactionScanTemps -> path = '/looking_for_subdomain_securitytrails.txt';
+        //         $CreateTransactionScanTemps -> save();
+        //     }
+        // } catch (\Throwable $th) {
+        //         //throw $th;
+        // }
             try {
                     // looking_for_subdomain
                 $array = explode("\n", file_get_contents($path.'/looking_for_subdomain.txt'));
