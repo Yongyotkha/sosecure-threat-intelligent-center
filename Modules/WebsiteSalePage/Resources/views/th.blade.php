@@ -322,6 +322,9 @@
             <div class="row">
                 <div class="col-xl-12">
                     <h1 class="primary-text-blue text-center font-weight-bold">Data Leak Detection</h1>
+                    <div class="d-sm-none d-block text-center">
+                        <img class="img-fluid" src="{{asset('asset_salepage/images/icebergline2.png')}}" alt="" style="max-width: 150px">
+                    </div>
                 </div>
             </div>
         </div>
@@ -387,8 +390,14 @@
                             <img class="img-fluid" src="{{asset('asset_salepage/images/iceberg.png')}}" alt="">
                         </div>
 
-                        <div class="order-xl-2 order-1 col-xl-4 d-flex align-items-center justify-content-xl-start justify-content-center">
-                            <h1 class="fz-70 text-white font-weight-500">Dark Web</h1>
+                        <div class="order-xl-2 order-1 col-xl-4 d-xl-flex align-items-center justify-content-xl-start justify-content-center">
+                            <div>
+                                <h1 class="fz-70 text-white font-weight-500 text-center">Dark Web</h1>
+                            </div>
+
+                            <div class="d-sm-none d-block text-center">
+                                <img class="img-fluid" src="{{asset('asset_salepage/images/icebergline1.png')}}" alt="" style="max-width: 150px">
+                            </div>
                         </div>
                     </div>
                 </div>
