@@ -10,7 +10,7 @@
         {{-- <meta property="og:description"        content="How much does culture influence creative thinking?" /> --}}
         <meta property="og:image"              content="https://insight.sosecure.co.th/asset_salepage/images/icon/cyber.png" />
 
-        <title>Intelligence Detection</title>
+        <title>SOSECURE Threat inSight</title>
 
         {{-- <link rel="icon" href="{{ asset('favicon.ico')}}"> --}}
 
