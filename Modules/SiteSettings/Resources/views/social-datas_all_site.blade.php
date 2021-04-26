@@ -280,11 +280,11 @@ use Carbon\Carbon;
                         <div class="panel-body" style="padding: 0 !important">
                         <div class="container-fluid" style="padding: 2rem;">
                             <div class="row">
-                                <div class="col-lg-4 mb-1">
-                                    <h5 class="font-weight-bold">Content</h5>
+                                <div class="col-lg-6 mb-1">
+                                    <h5 class="font-weight-bold">Keyword</h5>
                                         <input type="text" id="keyword" class="form-control">
                                 </div>
-                                <div class="col-lg-4 mb-1">
+                                {{-- <div class="col-lg-4 mb-1">
                                     <h5 class="font-weight-bold">Source</h5>
                                     <select id="source" class="select2-option form-control">
                                         <option value="">All</option>
@@ -297,8 +297,8 @@ use Carbon\Carbon;
         
                                         @endif
                                     </select>
-                                </div>
-                                <div class="col-lg-4 mb-1">
+                                </div> --}}
+                                <div class="col-lg-6 mb-1">
                                     <h5 class="font-weight-bold">Date</h5>
                                     <div id="social_datas_date" class="text-center form-control"
                                         style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
