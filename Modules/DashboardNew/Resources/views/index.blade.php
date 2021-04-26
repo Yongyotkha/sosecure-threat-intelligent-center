@@ -579,7 +579,6 @@ Highcharts.setOptions({
         endDate =  $("#date-rang").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
 
         t = $('#table-dashboard').DataTable({
-            searching: true,
             ordering: true,
             pagination: true,
             pageLength: 25,

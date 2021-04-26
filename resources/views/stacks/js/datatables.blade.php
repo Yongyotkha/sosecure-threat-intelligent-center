@@ -23,6 +23,7 @@
         "processing": true,
         "deferRender": true,
         "autoWidth": false,
+        "searching": false,
         "pagingType": "full_numbers",
         "pageLength": {{ get_option('rows_per_table') }},
         "language": {

@@ -728,7 +728,6 @@
     var t;
     function data_table(){
         t = $('#table-assets-template').DataTable({
-            searching: true,
             ordering: true,
             pagination: true,
             pageLength: 25,
