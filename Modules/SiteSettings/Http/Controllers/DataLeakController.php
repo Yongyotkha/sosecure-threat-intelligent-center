@@ -877,6 +877,7 @@ class DataLeakController extends Controller
                 $keywords = $request->keywords;
                 $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
                     $query->where('keyword', 'LIKE', '%' . $keywords . '%');
+                    $query->orwhere('feedcontent', 'LIKE', '%' . $keywords . '%');
                 });
             }
 
