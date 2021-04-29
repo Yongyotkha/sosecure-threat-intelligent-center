@@ -449,18 +449,18 @@ class RSSFeedSettingsController extends Controller
             // })
             ->addColumn('source', function (RSSNews $model) {
                 if($model -> source){
-                    // return '<div class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> source.'"><a href="javascript:void(0);" onclick="find_source(\''.$model -> source.'\')">'.$model -> source.'</a></div>';
-                    return '<div class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> source.'">'.$model -> source.'</div>';
+                    // return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'"><a href="javascript:void(0);" onclick="find_source(\''.$model -> source.'\')">'.$model -> source.'</a></div>';
+                    return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'">'.$model -> source.'</div>';
                 }else{
-                    return '<div class="text-elip max-w-fit" data-rel="tooltip" title="None">None</div>';
+                    return '<div class="text-elip" data-rel="tooltip" title="None">None</div>';
                 }
                 
             })
             ->addColumn('title', function (RSSNews $model) {
                 if($model -> title_th){
-                    return '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank" class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> title_th.'">'.$model -> title_th.'</a>';
+                    return '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_th.'">'.$model -> title_th.'</a>';
                 }else if($model -> title_en){
-                    return '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank" class="text-elip max-w-fit" data-rel="tooltip" title="'.$model -> title_en.'">'.$model -> title_en.'</a>';
+                    return '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_en.'">'.$model -> title_en.'</a>';
                 }else{
                     return '-';
                 }
