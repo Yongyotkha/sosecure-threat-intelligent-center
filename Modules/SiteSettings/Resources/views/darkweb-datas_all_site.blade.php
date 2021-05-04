@@ -631,7 +631,7 @@ use Carbon\Carbon;
                                     val = aData.get_data_leak_feed_one.source_name;
                                 }
                             }
-                    html_content+='<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 5px;;">'+ val+'</div>';
+                    html_content+='<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 5px;">'+ val+'</div>';
                     let val_type = aData.feel_type;
                             if(val_type) {
                                 val_type = get_word_leak_compromise(aData.feel_type,'compromise');
@@ -949,33 +949,31 @@ use Carbon\Carbon;
         val_id = [];
         $('.val_id:checked').each(function () {
             val_id.push(this.value);
-            
         });
 
         $('#delete_all').modal('show');
         $('.delete-all').click(function(){
-                $.ajax({
-                    type:"POST",
-                    url:"{{ route('darkweb.delete_select_process') }}",
-                    data:{id: val_id},
-                    beforeSend: function(){
-                        loading('load');
-                    },
-                    success:function(response) {
-                        toastr.success(response.message, '@langapp('response_status')');
-                        window.location.href = response.redirect;
-                    },
-                    error: function (error){
-                        loading('stop_load');
-                        var errors = error.response.data.errors;
-                        var errorsHtml = '';
-                        $.each(errors, function (key, value) {
-                            errorsHtml += '<li>' + value[0] + '</li>';
-                        });
-                        toastr.error(errorsHtml, '@langapp('response_status') ');
-                    }
-                
-                });
+            $.ajax({
+                type:"POST",
+                url:"{{ route('darkweb.delete_select_process') }}",
+                data:{id: val_id},
+                beforeSend: function(){
+                    loading('load');
+                },
+                success:function(response) {
+                    toastr.success(response.message, '@langapp('response_status')');
+                    window.location.href = response.redirect;
+                },
+                error: function (error){
+                    loading('stop_load');
+                    var errors = error.response.data.errors;
+                    var errorsHtml = '';
+                    $.each(errors, function (key, value) {
+                        errorsHtml += '<li>' + value[0] + '</li>';
+                    });
+                    toastr.error(errorsHtml, '@langapp('response_status') ');
+                }
+            });
         });
     });
      var click_type = null;
