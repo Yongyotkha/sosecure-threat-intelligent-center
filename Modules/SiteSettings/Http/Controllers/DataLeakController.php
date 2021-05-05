@@ -873,12 +873,29 @@ class DataLeakController extends Controller
 
             }
 
+            
+        
+           
             if ($request->keywords) {
                 $keywords = $request->keywords;
-                $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+                $DataLeakFeed_data  = DataLeakFeed::where('deleted_at', null)->where('status','1')->whereIn('feel_type', ['social','darkweb_public'])->get();
+                foreach ($DataLeakFeed_data as $value_data) {
+                      $value_data->feedcontent_decode = html_entity_decode($value_data->feedcontent);
+                }
+                $DataLeakFeed_data_id = array();
+                array_push($DataLeakFeed_data_id, 0);
+                foreach($DataLeakFeed_data as $a) {
+                    if(strpos($a->feedcontent_decode, $keywords) !== false) {
+                        array_push($DataLeakFeed_data_id, $a->id);
+                    } 
+                }
+              // dd(count($DataLeakFeed_data_id));
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords,$DataLeakFeed_data_id) {
                     $query->where('keyword', 'LIKE', '%' . $keywords . '%');
-                    $query->orwhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+                   // $query->orwhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+                      $query->orWhereIn('id', $DataLeakFeed_data_id);
                 });
+                
             }
 
 
