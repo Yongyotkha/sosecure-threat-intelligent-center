@@ -204,6 +204,7 @@ class IndicatorsController extends Controller
             }
             $data['countKey'] = $countKey;
             $data['countVal'] = $countVal;
+            
 
             $data['indicator_id'] = $request->id;
             
