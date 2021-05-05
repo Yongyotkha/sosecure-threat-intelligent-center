@@ -820,18 +820,22 @@
     </div>
   </footer>
   
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131014155-4"></script>
+    <!--  Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NZ0BXJ356B"></script>
     <script type="text/javascript">
-        function myFunction(x) {
-            if (x.matches) { 
-                let area_logo_os = document.getElementById("area_logo_os");
-                area_logo_os.style.gridTemplateColumns = "1fr 1fr";
-            } else {
-                area_logo_os.style.gridTemplateColumns = "1fr 1fr 1fr";
-            }
-        }
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-        var x = window.matchMedia("(max-width: 600px)");
-        myFunction(x);
-        x.addListener(myFunction);
-    </script>
+        gtag('config', 'UA-131014155-4');
+
+
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-NZ0BXJ356B');
+</script>
 @stop
