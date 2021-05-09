@@ -314,6 +314,12 @@
                     <img class="img-fluid" style="max-width: 70%" src="{{asset('asset_salepage/images/c.png')}}" alt="">
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <a href="https://line.me/ti/p/@sosecure" class="btn btn-dark">ติดต่อสอบถาม</a>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -544,6 +550,13 @@
                     </div>
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <a href="https://line.me/ti/p/@sosecure" class="btn btn-dark">ติดต่อสอบถาม</a>
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -763,6 +776,13 @@
                     </ul> --}}
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <a href="https://line.me/ti/p/@sosecure" class="btn btn-dark">ติดต่อสอบถาม</a>
+                </div>
+            </div>
+            
         </div>
     </section>
    

@@ -313,6 +313,13 @@
                     <img class="img-fluid" style="max-width: 70%" src="{{asset('asset_salepage/images/c.png')}}" alt="">
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <a href="https://line.me/ti/p/@sosecure" class="btn btn-dark">Contact us</a>
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -532,7 +539,7 @@
             <div class="row d-flex align-items-center">
                 <div class="col-xl-6 col-xl-6 mb-3 text-center order-xl-2 order-1">
                     <img class="img-fluid" src="{{asset('asset_salepage/images/icon/defaced.png')}}" alt="">
-          </div>
+                </div>
                 <div class="col-xl-6 col-xl-6 mb-3 order-xl-1 order-2 text-xl-left text-center">
                     <div class="mb-5">
                         <h1 class="primary-text d-xl-block d-none"> Web Defaced Detection </h1>
@@ -540,8 +547,13 @@
                             เฝ้าระวังการโจมตีด้วยเทคนิคการเปลี่ยนหน้าเว็บไซต์ (Web Defaced)<br> เพื่อรักษาความน่าเชื่อถือขององค์กร
                         </span>
                   </div>
+                </div>
               </div>
-              </div>
+              <div class="row">
+                <div class="col-md-12 text-center">
+                    <a href="https://line.me/ti/p/@sosecure" class="btn btn-dark">Contact us</a>
+                </div>
+            </div>
           </div>
     </section>
   
@@ -761,6 +773,13 @@
                     </ul> --}}
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <a href="https://line.me/ti/p/@sosecure" class="btn btn-dark">Contact us</a>
+                </div>
+            </div>
+
         </div>
     </section>
    
