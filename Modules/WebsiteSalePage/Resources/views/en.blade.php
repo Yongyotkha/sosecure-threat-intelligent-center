@@ -316,7 +316,7 @@
 
             <div class="row">
                 <div class="col-md-12 text-center">
-                    <a href="https://line.me/ti/p/@sosecure" class="btn btn-dark">Contact us</a>
+                    <a href="https://line.me/ti/p/@sosecure" class="btn btn-dark px-5 py-3">Contact us</a>
                 </div>
             </div>
 
@@ -551,7 +551,7 @@
               </div>
               <div class="row">
                 <div class="col-md-12 text-center">
-                    <a href="https://line.me/ti/p/@sosecure" class="btn btn-dark">Contact us</a>
+                    <a href="https://line.me/ti/p/@sosecure" class="btn btn-dark px-5 py-3">Contact us</a>
                 </div>
             </div>
           </div>
@@ -774,9 +774,9 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row d-sm-block d-none">
                 <div class="col-md-12 text-center">
-                    <a href="https://line.me/ti/p/@sosecure" class="btn btn-dark">Contact us</a>
+                    <a href="https://line.me/ti/p/@sosecure" class="btn btn-dark px-5 py-3">Contact us</a>
                 </div>
             </div>
 
@@ -794,8 +794,15 @@
         <div class="section-header">
           {{-- <h1  class="primary-text fontw-weight-bold text-center">Contact Sales</h1> --}}
             <h1 class="primary-text fontw-weight-bold text-center">Contact Us</h1>
+            <div class="row d-sm-none d-block">
+                <div class="col-md-12 text-center">
+                    <a href="https://line.me/ti/p/@sosecure" class="btn btn-dark px-5 py-3">ติดต่อสอบถาม</a>
+                </div>
+            </div>
         </div>
 
+    
+        
         <div class="row">
             <div class="col-xl-6">
                 <div class="contact-container">
