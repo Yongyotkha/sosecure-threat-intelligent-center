@@ -836,3 +836,11 @@ h6 {
       max-width: 1380px !important;
   }
 }
+
+
+@media (min-width: 767px){
+  #area_logo_os{
+    grid-template-columns: 1fr 1fr; 
+    text-align: center !important;
+  }
+}

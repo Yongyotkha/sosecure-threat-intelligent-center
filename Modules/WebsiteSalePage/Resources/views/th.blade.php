@@ -45,7 +45,7 @@
         display: grid;
         grid-auto-flow: row;
         grid-auto-rows: 1fr;
-        grid-gap: 32px;
+        grid-gap: 5px;
         max-width: 1168px;
         text-align: left;
         margin: 64px auto 0 auto;
@@ -619,7 +619,7 @@
                             <div class="css-nheav9">
                                 <h3 class="h3 darkblue css-1w5mdtx title">Detection Support System</h3>
                                 <p class="medium darkgrey css-o8e64g subtitle"></p>
-                               <div data-testid="cards_container" id="area_logo_os" class="css-2u2ye4" style="grid-template-columns: 1fr 1fr 1fr; text-align: center;">
+                               <div data-testid="cards_container" id="area_logo_os" class="css-2u2ye4">
                                     <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="javascript:void(0)">
                                         <div class="css-1iww2db">
                                         <div style="position: relative;"><img data-src="{{asset('asset_salepage/images/icon/microsoft-windows-23.svg')}}" src="{{asset('asset_salepage/images/icon/microsoft-windows-23.svg')}}" alt="card icon" class="null blur-up css-1pq2esu"></div>
