@@ -837,10 +837,14 @@ h6 {
   }
 }
 
+#area_logo_os{
+  grid-template-columns: 1fr 1fr 1fr !important; 
+  text-align: center !important;
+}
 
-@media (min-width: 767px){
+@media (max-width: 767px){
   #area_logo_os{
-    grid-template-columns: 1fr 1fr; 
+    grid-template-columns: 1fr 1fr !important; 
     text-align: center !important;
   }
 }

@@ -44,7 +44,7 @@
         <!-- Libraries CSS Files -->
         <link href="{{ asset('asset_salepage/lib/font-awesome/css/font-awesome.min.css')}}" rel="stylesheet preload">
         <!-- Main Stylesheet File -->
-        <link href="{{ asset('asset_salepage/css/style.css')}}" rel="stylesheet">
+        <link href="{{ asset('asset_salepage/css/style.css')}}?v=5" rel="stylesheet">
     </head>
     <body>
         @yield('content')
