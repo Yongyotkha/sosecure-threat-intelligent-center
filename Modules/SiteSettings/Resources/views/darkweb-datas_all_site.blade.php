@@ -600,8 +600,12 @@ use Carbon\Carbon;
                 initComplete : function( settings, json){
                     $('[data-rel="tooltip"]').tooltip();
                     {{--console.log(json);--}}
+                    $('#table_social_datas').show();
                 },
-                createdRow: function ( row, data, index ) {
+                "preDrawCallback": function( settings ) {
+               
+                    $('#table_social_datas').hide();
+                },atedRow: function ( row, data, index ) {
                     $(row).attr('id', 'tr' + data.id);
                 },
                 "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
