@@ -42,6 +42,209 @@
         </header>
         <section class="scrollable wrapper bg" id="clauses" style="padding: 8px !important">
 
+            <div class="int-lookup-main">
+                <div class="front-int">
+                    <img src="{{asset('images/logo_threat/logo_site.png')}}" style="max-width: 50%;"><br>
+                    <button class="btn-start-lookup">Inteligence Threat Lookup</button>
+                </div>
+                <div class="back-int">
+                    <section id="collection-overview">
+                        <h3 class="page-header">
+                            Unknown Files Collection
+                            <div class="pull-right">
+                                <a href="#" id="copy-sha256s" class="btn btn-default btn-xs">
+                                    <i class="fa fa-clipboard"></i> Copy SHA256s
+                                </a>                                              
+                            </div>
+                        </h3>
+                        <div id="overview-container" class="row">  
+                            <div class="col-xs-12 col-sm-8 col-md-9 main-content">
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-3 text-right-sm"><b>Number of files:</b></div>
+                                    <div class="col-xs-12 col-sm-9">
+                                        7
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-3 text-right-sm"><b>Overall Risk:</b></div>
+                                    <div class="col-xs-12 col-sm-9">
+                                        7
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-3 text-right-sm"><b>External Analytics:</b></div>
+                                    <div class="col-xs-12 col-sm-9">
+                                        5
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-3 text-right-sm"><b>Score :</b></div>
+                                    <div class="col-xs-12 col-sm-9" id="last-av-scan-label">
+                                        100
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-3 text-right-sm"><b>IP :</b></div>
+                                    <div class="col-xs-12 col-sm-9" id="last-av-scan-label">
+                                        xx.x.x.x..xxx
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-3 text-right-sm"><b>Created At :</b></div>
+                                    <div class="col-xs-12 col-sm-9" id="last-av-scan-label">
+                                        05/13/2021 22:15:14 (UTC)
+                                    </div>
+                                </div>
+                            </div>
+            
+                            <div class="col-xs-12 col-sm-4 col-md-3">
+                                <div id="basic-malware-detection-info" class="text-right small">
+                                    <div class="main-verdict">
+                                        <span class="label label-danger">
+                                            malicious
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+
+                    <section id="av-detection" class="hide-av-section">
+                        <h3 class="page-header">
+                            Anti-Virus Results
+                        </h3>
+                    
+                        <div id="show-chart-int" class="row av-results-wrapper has-falcon-button">
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                <div id="card-search-int1" class="main-int-card">
+                                    <div class="text-center av-container border-success" data-chart="chart-cs-ml">
+                                        <div class="title">CrowdStrike Falcon</div>
+                                        <div class="main-frame">
+
+                                            <div id="chart-md" style="height: 300px"></div>
+
+                                            <div class="details">
+                                                <div class="scan-result">No threat found</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                 </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                <div id="card-search-int2" class="main-int-card">
+                                    <div class="text-center av-container border-success" data-chart="chart-cs-ml">
+                                        <div class="title">VirusTotal</div>
+                                        <div class="main-frame">
+
+                                            <div id="chart-md2" style="height: 300px"></div>
+
+                                            <div class="details">
+                                                <div class="scan-result">4 of 7 are detected as malicious</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4">
+                                <div id="card-search-int3" class="main-int-card">
+                                    <div class="text-center av-container border-success" data-chart="chart-cs-ml">
+                                        <div class="title">CrowdStrike Falcon</div>
+                                        <div class="main-frame">
+
+                                            <div id="chart-md3" style="height: 300px"></div>
+
+                                            <div class="details">
+                                                <div class="scan-result">4 of 7 are detected as malicious</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </section>
+
+                    <section class="table-int" style="display: none">
+                        <table id="table-int" class="table">
+                            <thead>
+                                <tr>
+                                    <th>Filename</th>
+                                    <th>SHA256</th>
+                                    <th>Tags</th>
+                                    <th>AV Result</th>
+                                    <th>Sandbox Report</th>
+                                    <th>Verdict</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>ldap60.bin</td>
+                                    <td>4e753ef8...e0b17943</td>
+                                    <td>-</td>
+                                    <td>24% Zusy.Generic</td>
+                                    <td><i class="text-danger fas fa-times"></i></td>
+                                    <td>
+                                        <span class="label label-danger">
+                                            malicious
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>ldap60.bin</td>
+                                    <td>4e753ef8...e0b17943</td>
+                                    <td>-</td>
+                                    <td>24% Zusy.Generic</td>
+                                    <td><i class="text-success fas fa-check"></i></td>
+                                    <td>
+                                        <span class="label label-danger">
+                                            malicious
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>ldap60.bin</td>
+                                    <td>4e753ef8...e0b17943</td>
+                                    <td>-</td>
+                                    <td>24% Zusy.Generic</td>
+                                    <td><i class="text-success fas fa-check"></i></td>
+                                    <td>
+                                        <span class="label label-danger">
+                                            malicious
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>ldap60.bin</td>
+                                    <td>4e753ef8...e0b17943</td>
+                                    <td>-</td>
+                                    <td>24% Zusy.Generic</td>
+                                    <td><i class="text-success fas fa-check"></i></td>
+                                    <td>
+                                        <span class="label label-warning">
+                                            suspicious
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>ldap60.bin</td>
+                                    <td>4e753ef8...e0b17943</td>
+                                    <td>-</td>
+                                    <td>24% Zusy.Generic</td>
+                                    <td><i class="text-success fas fa-check"></i></td>
+                                    <td>
+                                        <span class="label label-info">
+                                            whitelisted
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+            </div>
+
             <section class="panel panel-default m-b-xs">
                 <div class="panel-body" id="table-container">
                     <div class="row">
@@ -198,14 +401,19 @@
                     @endforeach --}}
                 </ul>   
             </div>
+
         </section>
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 </section>
 @push('pagestyle')
+@include('stacks.css.highchart')
+@include('stacks.css.datatables')
 @endpush
 @push('pagescript')
 @include('stacks.js.activebutton')
+@include('stacks.js.highchart')
+@include('stacks.js.datatables')
 <script>
     active_btn('#fillter_click .btn-selector');
 
@@ -342,8 +550,75 @@
         });
     }
 
+    function chart(id) {
+        new Highcharts.chart(id, {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: 0,
+                plotShadow: false
+            },
+            title: {
+                text: null,
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>',
+                enabled:false
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            plotOptions: {
+                pie: {
+                    dataLabels: {
+                        enabled: true,
+                        distance: -30,
+                        style: {
+                            fontWeight: 'bold',
+                            color: 'white'
+                        },
+                        format: '{y}'
+                    },
+                    startAngle: 0,
+                    endAngle: 360,
+                    showInLegend: true
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: 'Browser share',
+                innerSize: '50%',
+                data: [
+                    ['malicious', 58.9],
+                    ['clean', 13.29]
+                ]
+            }]
+        });
+    }
+
+    chart('chart-md');
+    chart('chart-md2');
+    chart('chart-md3');
 
 
+    $('.btn-start-lookup').on('click',function(){
+        $('.front-int').remove();
+    });
+
+ 
+    $('.table-int').hide();
+
+    $('#show-chart-int .main-int-card').on('click',function(){
+        $(this).toggleClass('active');
+        if($('.main-int-card').hasClass('active')){
+            $('.table-int').show();
+        }else{
+            $('.table-int').hide();
+        }
+    });
+
+    $('#table-int').DataTable();
 
 </script>
 @endpush
