@@ -600,8 +600,12 @@ use Carbon\Carbon;
                 initComplete : function( settings, json){
                     $('[data-rel="tooltip"]').tooltip();
                     {{--console.log(json);--}}
+                    $('#table_social_datas').show();
                 },
-                createdRow: function ( row, data, index ) {
+                "preDrawCallback": function( settings ) {
+               
+                    $('#table_social_datas').hide();
+                },atedRow: function ( row, data, index ) {
                     $(row).attr('id', 'tr' + data.id);
                 },
                 "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
@@ -640,7 +644,11 @@ use Carbon\Carbon;
 
 
     
-                    html_content+='<div class="nowrap" style="padding-top: 22px;">'+ '<strong>Site </strong>'+aData.get_site.name+'&nbsp;&nbsp;&nbsp;<strong>Modified Date </strong>'+aData.get_data_leak_feed_one.feedtimepost+'</div>';
+                    html_content+='<div class="nowrap" style="padding-top: 22px;">'+ '<strong>Site </strong>'+aData.get_site.name+'&nbsp;&nbsp;&nbsp;<strong>Modified Date </strong>'+aData.get_data_leak_feed_one.feedtimepost;
+                    if(aData.get_data_leak_feed_one.feedlink){
+                         html_content+= '&nbsp;&nbsp;&nbsp;<b><strong><i class="fas fa-eye"></i>&nbsp;&nbsp;&nbsp; </strong><a href="'+aData.get_data_leak_feed_one.feedlink+'">'+'View Code'+'</a></b>';
+                    }
+                    html_content+='</div>';
 
                     $('td:eq(1)', nRow).html(html_content); 
                 },
