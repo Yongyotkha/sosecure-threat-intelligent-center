@@ -250,9 +250,9 @@ class ApiWebdefacementController extends ApiController
                     $response = [
                         "code" => @$code,
                         "webdefacement" => $WebdefacmentSetting,
-                        "webdefacment_data_original" => @$SiteSettings['webdefacement']->get_webdefacment_data_original_detail[0],
-                        "webdefacment_data_check" => @$SiteSettings['webdefacement']->get_webdefacment_data_check_detail[0],
-                        "webdefacment_data_log" => @$SiteSettings['webdefacement']->get_webdefacment_data_log_detail,
+                        "webdefacment_data_original" => $WebdefacmentSetting->get_webdefacment_data_original_detail[0],
+                        "webdefacment_data_check" =>$WebdefacmentSetting->get_webdefacment_data_check_detail[0],
+                        "webdefacment_data_log" => $WebdefacmentSetting->get_webdefacment_data_log_detail,
                         "site_code" => @$site_code,
                     ];
 
