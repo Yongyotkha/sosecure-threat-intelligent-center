@@ -10,7 +10,7 @@
         {{-- <meta property="og:description"        content="How much does culture influence creative thinking?" /> --}}
         <meta property="og:image"              content="https://insight.sosecure.co.th/asset_salepage/images/icon/cyber.png" />
 
-        <title>SOSECURE Threat inSight</title>
+        <title>SOSECURE Threat inSight บริการด้าน Threat Intelligence ,บริการตรวจจับข้อมูลรั่วไหล Data Leak ,บริการตรวจจับช่องโหว่ ,ตรวจจับภัยคุกคาม Threat Hunting</title>
 
         {{-- <link rel="icon" href="{{ asset('favicon.ico')}}"> --}}
 
