@@ -42,12 +42,96 @@
         </header>
         <section class="scrollable wrapper bg" id="clauses" style="padding: 8px !important">
 
-            <div class="int-lookup-main">
-                <div class="front-int">
-                    {{-- <img src="{{asset('images/logo_threat/logo_site.png')}}" style="max-width: 50%;"><br> --}}
-                    <button class="btn-start-lookup">Inteligence Threat Lookup</button>
-                </div>
+            <div class="front-int">
+                {{-- <img src="{{asset('images/logo_threat/logo_site.png')}}" style="max-width: 50%;"><br> --}}
+                <button class="btn-start-lookup">Inteligence Threat Lookup</button>
+            </div>
+
+            <div class="int-lookup-main" style="display: none">
+ 
                 <div class="back-int">
+
+                    <section id="overall-int">
+                        <h3 class="page-header">
+                            Overall Risk
+                        </h3>
+                        
+                        <div class="row">
+                            {{-- <div class="col-md-3">
+                                <div class="card-int">
+                                    <div class="card-int-body">
+                                        <div id="chart-high-level" style="width: 100%;height:158px;"></div>
+                                    </div>
+                                </div>
+                            </div> --}}
+
+                            <div class="col-md-3">
+                                <div class="card-int dark">
+                                    <div class="card-int-header">
+                                        <span>Summary Score</span>
+                                    </div>
+                                    <div class="card-int-body">
+                                        <div class="icon">
+                                              <i class="fas fa-sliders-h"></i> 
+                                        </div>
+                                        <div class="score">
+                                          5
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                       
+                          <div class="col-md-3">
+                            <div class="card-int green">
+                                <div class="card-int-header">
+                                    <span>Normal Risk</span>
+                                </div>
+                                <div class="card-int-body">
+                                    <div class="icon">
+                                          <i class="fas fa-sliders-h"></i> 
+                                    </div>
+                                    <div class="score">
+                                      5
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+
+                          <div class="col-md-3">
+                            <div class="card-int warning">
+                                <div class="card-int-header">
+                                    <span>Medium Risk</span>
+                                </div>
+                                <div class="card-int-body">
+                                    <div class="icon">
+                                          <i class="fas fa-sliders-h"></i> 
+                                    </div>
+                                    <div class="score">
+                                      5
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+
+                          <div class="col-md-3">
+                            <div class="card-int danger">
+                                <div class="card-int-header">
+                                    <span>High Risk</span>
+                                </div>
+                                <div class="card-int-body">
+                                    <div class="icon">
+                                          <i class="fas fa-sliders-h"></i> 
+                                    </div>
+                                    <div class="score">
+                                      5
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        </div>
+                    </section>
+
                     <section id="collection-overview">
                         <h3 class="page-header">
                             Unknown Files Collection
@@ -61,12 +145,6 @@
                             <div class="col-xs-12 col-sm-8 col-md-9 main-content">
                                 <div class="row">
                                     <div class="col-xs-12 col-sm-3 text-right-sm"><b>Number of files:</b></div>
-                                    <div class="col-xs-12 col-sm-9">
-                                        7
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-xs-12 col-sm-3 text-right-sm"><b>Overall Risk:</b></div>
                                     <div class="col-xs-12 col-sm-9">
                                         7
                                     </div>
@@ -110,7 +188,7 @@
                     </section>
 
 
-                    <section id="av-detection" class="hide-av-section">
+                    <section id="av-detection">
                         <h3 class="page-header">
                             Anti-Virus Results
                         </h3>
@@ -119,7 +197,9 @@
                             <div class="col-xs-12 col-sm-6 col-md-4">
                                 <div id="card-search-int1" class="main-int-card">
                                     <div class="text-center av-container border-success" data-chart="chart-cs-ml">
-                                        <div class="title">CrowdStrike Falcon</div>
+                                        <div class="title">
+                                            <img src="https://www.crowdstrike.com/wp-content/uploads/2020/08/FalconPro@2x.svg" alt="" class="icon">
+                                             CrowdStrike Falcon</div>
                                         <div class="main-frame">
 
                                             <div id="chart-md" style="height: 300px"></div>
@@ -134,7 +214,10 @@
                             <div class="col-xs-12 col-sm-6 col-md-4">
                                 <div id="card-search-int2" class="main-int-card">
                                     <div class="text-center av-container border-success" data-chart="chart-cs-ml">
-                                        <div class="title">VirusTotal</div>
+                                        <div class="title">
+                                            <img src="https://www.virustotal.com/gui/images/vt-enterprise.svg" alt="" class="icon">
+                                            VirusTotal
+                                        </div>
                                         <div class="main-frame">
 
                                             <div id="chart-md2" style="height: 300px"></div>
@@ -149,7 +232,11 @@
                             <div class="col-xs-12 col-sm-6 col-md-4">
                                 <div id="card-search-int3" class="main-int-card">
                                     <div class="text-center av-container border-success" data-chart="chart-cs-ml">
-                                        <div class="title">CrowdStrike Falcon</div>
+                                        <div class="title">
+                                            <img src="https://exchange.xforce.ibmcloud.com/images/shortcut-icons/apple-icon-114x114.png" alt="" class="icon">
+
+                                            IBM X-Force
+                                        </div>
                                         <div class="main-frame">
 
                                             <div id="chart-md3" style="height: 300px"></div>
@@ -165,7 +252,7 @@
                         </div>
 
                     </section>
-
+   
                     <section class="table-int" style="display: none">
                         <table id="table-int" class="table">
                             <thead>
@@ -550,6 +637,8 @@
         });
     }
 
+
+
     function chart(id) {
         new Highcharts.chart(id, {
             chart: {
@@ -578,11 +667,12 @@
                             fontWeight: 'bold',
                             color: 'white'
                         },
-                        format: '{y}'
+                        format: '{y}%'
                     },
                     startAngle: 0,
                     endAngle: 360,
-                    showInLegend: true
+                    showInLegend: true,
+                    colors: ['#e64732', '#65bd77'],
                 }
             },
             series: [{
@@ -590,8 +680,8 @@
                 name: 'Browser share',
                 innerSize: '50%',
                 data: [
-                    ['malicious', 58.9],
-                    ['clean', 13.29]
+                    {  name: 'malicious', y:58.9}, 
+                    {  name: 'clean',  y: 13.29}, 
                 ]
             }]
         });
@@ -602,7 +692,10 @@
     chart('chart-md3');
 
 
+    $('.int-lookup-main').hide();
+
     $('.btn-start-lookup').on('click',function(){
+        $('.int-lookup-main').show();
         $('.front-int').remove();
     });
 
@@ -619,6 +712,55 @@
     });
 
     $('#table-int').DataTable();
+
+
+
+    {{--
+    const chart_overall = new Highcharts.chart('chart-high-level', {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: 0,
+            plotShadow: false
+        },
+        title: {
+            text: '100%',
+            align: 'center',
+            verticalAlign: 'middle',
+            y: 20,
+            style: {
+                color: '#333',
+                fontWeight: 'bold',
+                fontSize:'20px'
+            }
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>',
+            enabled:false
+        },
+        accessibility: {
+            point: {
+                valueSuffix: '%'
+            }
+        },
+        plotOptions: {
+            pie: {
+                dataLabels: {
+                    enabled: false,
+                },
+                startAngle: -90,
+                endAngle: 90,
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: 'Browser share',
+            innerSize: '50%',
+            data: [
+                ['Chrome', 58.9],
+            ]
+        }]
+    });
+    --}}
 
 </script>
 @endpush
