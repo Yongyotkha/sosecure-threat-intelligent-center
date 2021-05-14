@@ -44,7 +44,7 @@
 
             <div class="int-lookup-main">
                 <div class="front-int">
-                    <img src="{{asset('images/logo_threat/logo_site.png')}}" style="max-width: 50%;"><br>
+                    {{-- <img src="{{asset('images/logo_threat/logo_site.png')}}" style="max-width: 50%;"><br> --}}
                     <button class="btn-start-lookup">Inteligence Threat Lookup</button>
                 </div>
                 <div class="back-int">
