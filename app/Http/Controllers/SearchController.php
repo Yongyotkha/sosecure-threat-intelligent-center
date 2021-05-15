@@ -84,7 +84,7 @@ class SearchController extends Controller
                 if(@get_role_custom()['superadmin'] == 1) {
                     $DataLeakFeed_compromised = DataLeakFeed::select('data_leak_feed.id', 'data_leak_feed.feedcontent as content', 'data_leak_feed.sourceid', 'data_leak_feed.keyword as name', DB::raw('CONCAT("/darkweb-datas") AS link'))->whereNull('data_leak_feed.deleted_at')->whereNull('data_leak_socail_ref.deleted_at')->where('data_leak_socail_ref.status',1)->whereIn('data_leak_feed.feel_type',['darkweb','webserver','compromise','compromised'])->where(function ($query) use ($keyword) {
                         $query->where('data_leak_feed.keyword', 'LIKE', $keyword)
-                            ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword);
+                            ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword) ->orWhere('data_leak_feed.feedcontent', 'LIKE', $keyword);
                     });
                     $DataLeakFeed_compromised = $DataLeakFeed_compromised->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
                         // if(isset($SiteSettings->id)){
@@ -97,7 +97,7 @@ class SearchController extends Controller
                 } else {
                     $DataLeakFeed_compromised = DataLeakFeed::select('data_leak_feed.id', 'data_leak_feed.feedcontent as content', 'data_leak_feed.sourceid', 'data_leak_feed.keyword as name', DB::raw('CONCAT("/darkweb-datas") AS link'))->whereNull('data_leak_feed.deleted_at')->whereNull('data_leak_socail_ref.deleted_at')->where('data_leak_socail_ref.status',1)->whereIn('data_leak_feed.feel_type',['darkweb','webserver','compromise','compromised'])->where(function ($query) use ($keyword) {
                         $query->where('data_leak_feed.keyword', 'LIKE', $keyword)
-                            ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword);
+                            ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword) ->orWhere('data_leak_feed.feedcontent', 'LIKE', $keyword);
                     });
                     $DataLeakFeed_compromised = $DataLeakFeed_compromised->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
                         // if(isset($SiteSettings->id)){
@@ -114,7 +114,7 @@ class SearchController extends Controller
                 if(@get_role_custom()['superadmin'] == 1) {
                     $DataLeakFeed_social = DataLeakFeed::select('data_leak_feed.id', 'data_leak_feed.feedcontent as content', 'data_leak_feed.sourceid', 'data_leak_feed.keyword as name', DB::raw('CONCAT("/socialdatas") AS link'))->whereNull('data_leak_feed.deleted_at')->whereNull('data_leak_socail_ref.deleted_at')->whereIn('data_leak_feed.feel_type',['social', 'darkweb_public'])->where(function ($query) use ($keyword) {
                         $query->where('data_leak_feed.keyword', 'LIKE', $keyword)
-                        ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword);
+                        ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword) ->orWhere('data_leak_feed.feedcontent', 'LIKE', $keyword);
                     });
                     $DataLeakFeed_social = $DataLeakFeed_social->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
                     $dataWait["queryData"] = $DataLeakFeed_social;
@@ -127,7 +127,7 @@ class SearchController extends Controller
                 } else {
                     $DataLeakFeed_social = DataLeakFeed::select('data_leak_feed.id', 'data_leak_feed.feedcontent as content', 'data_leak_feed.sourceid', 'data_leak_feed.keyword as name', DB::raw('CONCAT("/socialdatas") AS link'))->whereNull('data_leak_feed.deleted_at')->whereNull('data_leak_socail_ref.deleted_at')->whereIn('data_leak_feed.feel_type',['social', 'darkweb_public'])->where(function ($query) use ($keyword) {
                         $query->where('data_leak_feed.keyword', 'LIKE', $keyword)
-                        ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword);
+                        ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword) ->orWhere('data_leak_feed.feedcontent', 'LIKE', $keyword);
                     });
                     $DataLeakFeed_social = $DataLeakFeed_social->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
                     $dataWait["queryData"] = $DataLeakFeed_social->whereIn('site.id', $site_id_arr);
