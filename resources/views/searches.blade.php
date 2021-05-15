@@ -56,16 +56,38 @@
                             Overall Risk
                         </h3>
                         
-                        <div class="row">
-                            {{-- <div class="col-md-3">
-                                <div class="card-int">
-                                    <div class="card-int-body">
-                                        <div id="chart-high-level" style="width: 100%;height:158px;"></div>
+                        <div class="row" style="margin-bottom: 1.5rem">
+
+                            <div class="col-md-6">
+                                <div class="risk-level-box">
+                                    <div class="header-risk">
+                                        <h4 class="font-weight-bold text-danger">High Risk Level</h4>
+                                        <h4 class="font-weight-bold text-danger">100%</h4>
+                                    </div>
+                                    <hr>
+                                    <div class="risk-level-body">
+                                        <div class="high-risk-level">
+                                            <div>
+                                                <span class="circle-risk high"></span>
+                                                <span>High Risk</span>
+                                            </div>
+                                            <div>
+                                                <span class="circle-risk medium"></span>
+                                                <span>Medium Risk</span>
+                                            </div>
+                                            <div>
+                                                <span class="circle-risk low"></span>
+                                                <span>Low Risk</span>
+                                            </div>
+                                        </div>
+                                        <div class="risk-chart-box">
+                                            <div id="chart-risk-level" style="width:100%;height: 100%"></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div> --}}
+                            </div>
 
-                            <div class="col-md-3">
+                            {{-- <div class="col-md-3">
                                 <div class="card-int dark">
                                     <div class="card-int-header">
                                         <span>Summary Score</span>
@@ -81,53 +103,53 @@
                                 </div>
                             </div>
                        
-                          <div class="col-md-3">
-                            <div class="card-int green">
-                                <div class="card-int-header">
-                                    <span>Normal Risk</span>
-                                </div>
-                                <div class="card-int-body">
-                                    <div class="icon">
-                                          <i class="fas fa-sliders-h"></i> 
+                            <div class="col-md-3">
+                                <div class="card-int green">
+                                    <div class="card-int-header">
+                                        <span>Normal Risk</span>
                                     </div>
-                                    <div class="score">
-                                      5
+                                    <div class="card-int-body">
+                                        <div class="icon">
+                                            <i class="fas fa-sliders-h"></i> 
+                                        </div>
+                                        <div class="score">
+                                        5
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                          </div>
 
-                          <div class="col-md-3">
-                            <div class="card-int warning">
-                                <div class="card-int-header">
-                                    <span>Medium Risk</span>
-                                </div>
-                                <div class="card-int-body">
-                                    <div class="icon">
-                                          <i class="fas fa-sliders-h"></i> 
+                            <div class="col-md-3">
+                                <div class="card-int warning">
+                                    <div class="card-int-header">
+                                        <span>Medium Risk</span>
                                     </div>
-                                    <div class="score">
-                                      5
+                                    <div class="card-int-body">
+                                        <div class="icon">
+                                            <i class="fas fa-sliders-h"></i> 
+                                        </div>
+                                        <div class="score">
+                                        5
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                          </div>
 
-                          <div class="col-md-3">
-                            <div class="card-int danger">
-                                <div class="card-int-header">
-                                    <span>High Risk</span>
-                                </div>
-                                <div class="card-int-body">
-                                    <div class="icon">
-                                          <i class="fas fa-sliders-h"></i> 
+                            <div class="col-md-3">
+                                <div class="card-int danger">
+                                    <div class="card-int-header">
+                                        <span>High Risk</span>
                                     </div>
-                                    <div class="score">
-                                      5
+                                    <div class="card-int-body">
+                                        <div class="icon">
+                                            <i class="fas fa-sliders-h"></i> 
+                                        </div>
+                                        <div class="score">
+                                        5
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                            </div> --}}
 
                         </div>
                     </section>
@@ -715,18 +737,17 @@
 
 
 
-    {{--
-    const chart_overall = new Highcharts.chart('chart-high-level', {
+    const chart_overall = new Highcharts.chart('chart-risk-level', {
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: 0,
             plotShadow: false
         },
         title: {
-            text: '100%',
+            text: null,
             align: 'center',
             verticalAlign: 'middle',
-            y: 20,
+            y: 50,
             style: {
                 color: '#333',
                 fontWeight: 'bold',
@@ -735,7 +756,7 @@
         },
         tooltip: {
             pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>',
-            enabled:false
+            enabled:true
         },
         accessibility: {
             point: {
@@ -743,24 +764,22 @@
             }
         },
         plotOptions: {
-            pie: {
-                dataLabels: {
-                    enabled: false,
-                },
-                startAngle: -90,
-                endAngle: 90,
-            }
+            dataLabels: {
+                enabled: true,
+                format: '{y}%'
+            },
         },
         series: [{
             type: 'pie',
             name: 'Browser share',
             innerSize: '50%',
             data: [
-                ['Chrome', 58.9],
+                ['High Risk', 58.9],
+                ['Medium Risk', 58.9],
+                ['Low Risk', 58.9],
             ]
         }]
     });
-    --}}
 
 </script>
 @endpush
