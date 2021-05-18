@@ -4585,7 +4585,7 @@ section#av-detection .main-int-card.active .av-container.border-success{
     display: flex;
 }
 .st-dt.vrh{
-    background-color: #e64732;
+    background-color: #b93624;
     color: #fff;
 }
 .st-dt.high{
@@ -4613,7 +4613,9 @@ section#av-detection .main-int-card.active .av-container.border-success{
 }
 .box-st-tooltip.vrh{
     background-color: #b93624;
+    color: #fff;
 }
+
 .box-st-tooltip.high{
     background-color: #fcc838;
 }
@@ -4622,9 +4624,11 @@ section#av-detection .main-int-card.active .av-container.border-success{
 }
 .box-st-tooltip.low{
     background-color: #88ce4f;
+    color: #fff;
 }
 .box-st-tooltip.vrl{
     background-color: #00dcff;
+    color: #fff;
 }
 
 .text-st-tooltip{
