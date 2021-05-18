@@ -503,11 +503,11 @@ function get_CVSS_Severity_status($num_val,$status_id,$badg='') {
         } else if(strtolower($status_id) == strtolower("HIGH")) {
             $html = '<span class="badge badge-Warning" style="background-color: #fcc838;">'.$num_val.' HIGH</span>';
         } else if(strtolower($status_id) == strtolower("MEDIUM")) {
-            $html = '<span class="badge badge-Warning" style="background-color: #00dcff;">'.$num_val.' MEDIUM</span>';
+            $html = '<span class="badge badge-Warning" style="background-color: #f2ff15;color:#333;">'.$num_val.' MEDIUM</span>';
         } else if(strtolower($status_id) == strtolower("LOW")) {
             $html = '<span class="badge badge-Success" style="background-color: #88ce4f;">'.$num_val.' LOW</span>';
         } else if(strtolower($status_id) == strtolower("NONE")) {
-            $html = '<span class="badge badge-Success" style="background-color: #d3d3d3;">'.$num_val.' INFORMATION</span>';
+            $html = '<span class="badge badge-Success" style="background-color: #00dcff;">'.$num_val.' INFORMATION</span>';
         }
     } else {
         if(strtolower($status_id) == strtolower("CRITICAL")) {

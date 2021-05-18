@@ -501,15 +501,15 @@ active_btn('#btngroup_status .btn-grey');
                         render: function (data, type, full, meta) {
 
                             if(full.serverity=='critical'){
-                        return '<span class="badge" style="background-color: #e64732;">Critical</span>';
+                        return '<span class="badge" style="background-color: #b93624;">Critical</span>';
                             }else if(full.serverity=='high'){
                                 return '<span class="badge" style="background-color: #fcc838;">High</span>';
                             }else if(full.serverity=='medium'){
-                                return '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                                return '<span class="badge" style="background-color: #f2ff15;color:#333;">Medium</span>';
                             }else if(full.serverity=='low'){
                                 return '<span class="badge" style="background-color: #88ce4f;">Low</span>';
                             }else if(full.serverity=='information'){
-                                return '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                                return '<span class="badge" style="background-color: #00dcff;">Information</span>';
                             }else{
                                 return '-';
                             }

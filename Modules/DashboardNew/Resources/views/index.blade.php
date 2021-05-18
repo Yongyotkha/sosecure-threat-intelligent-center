@@ -176,9 +176,21 @@
                                                         <div class="loadding-text">Loading ...</div>
                                                     </div>
                                                     <div class="box-chart-color">
-                                                        <div class="d-flex align-items-center header-chart-p">
-                                                            <img src="{{asset('images/table.png')}}" alt="" height="30px">
-                                                            <h1 class="text-blue bold-500">Assets</h1>
+                                                        <div class="header-chart-p">
+                                                            <div class="d-flex align-items-center ">
+                                                                <img src="{{asset('images/table.png')}}" alt="" height="30px">
+                                                                <h1 class="text-blue bold-500">Assets</h1>
+                                                            </div>
+
+                                                            <div id="filter-chart-btn" class="btn-group pull-right" style="margin-top: -25px;">
+                                                                
+                                                                <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil active">
+                                                                    <i class="fas fa-laptop"></i> New Host
+                                                                </a>
+                                                                <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil">
+                                                                    <i class="fas fa-laptop"></i> New Port
+                                                                </a>
+                                                            </div>
                                                         </div>
                                                         <div class="divider-dark"></div>
                                                         <div class="table-responsive cve_assets h-table">

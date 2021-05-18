@@ -496,15 +496,15 @@ class RSSFeedSettingsController extends Controller
             ->addColumn('serverity', function (RSSNews $model) {
                 $html = '';
                 if($model->serverity=='critical'){
-                    $html = '<span class="badge" style="background-color: #e64732;">Critical</span>';
+                    $html = '<span class="badge" style="background-color: #b93624;">Critical</span>';
                 }else if($model->serverity=='high'){
                     $html = '<span class="badge" style="background-color: #fcc838;">High</span>';
                 }else if($model->serverity=='medium'){
-                    $html = '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                    $html = '<span class="badge" style="background-color: #f2ff15;color#333;">Medium</span>';
                 }else if($model->serverity=='low'){
                     $html = '<span class="badge" style="background-color: #88ce4f;">Low</span>';
                 }else if($model->serverity=='information'){
-                    $html = '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                    $html = '<span class="badge" style="background-color: #00dcff;">Information</span>';
                 }else{
                     $html = '-';
                 }

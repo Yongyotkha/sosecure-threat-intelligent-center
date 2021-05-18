@@ -968,15 +968,15 @@ class NewsController extends Controller
                     <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$data -> public_date.'</span>
                      <span> <b>Serverity: </b> ';
                     if($data->serverity=='critical'){
-                        $html .=  '<span class="badge" style="background-color: #e64732;">Critical</span>';
+                        $html .=  '<span class="badge" style="background-color: #b93624;">Critical</span>';
                     }else if($data->serverity=='high'){
                         $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
                     }else if($data->serverity=='medium'){
-                        $html .= '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                        $html .= '<span class="badge" style="background-color: #f2ff15;color:#333;">Medium</span>';
                     }else if($data->serverity=='low'){
                         $html .= '<span class="badge" style="background-color: #88ce4f;">Low</span>';
                     }else if($data->serverity=='information'){
-                        $html .= '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                        $html .= '<span class="badge" style="background-color: #00dcff;">Information</span>';
                     }else{
                         $html .= '-';
                     }
@@ -1416,15 +1416,15 @@ class NewsController extends Controller
                             <span class="entry-view"> <i class="fas fa-eye"></i> '.@$data -> news -> view.'</span>
                             <span> <b>Serverity: </b> ';
                             if($data->news->serverity=='critical'){
-                                $html .=  '<span class="badge" style="background-color: #fcc838;">Critical</span>';
+                                $html .=  '<span class="badge" style="background-color: #b93624;">Critical</span>';
                             }else if($data->news->serverity=='high'){
                                 $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
                             }else if($data->news->serverity=='medium'){
-                                $html .= '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                                $html .= '<span class="badge" style="background-color: #f2ff15;color#333;">Medium</span>';
                             }else if($data->news->serverity=='low'){
                                 $html .= '<span class="badge" style="background-color: #88ce4f;">Low</span>';
                             }else if($data->news->serverity=='information'){
-                                $html .= '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                                $html .= '<span class="badge" style="background-color: #00dcff;">Information</span>';
                             }else{
                                 $html .= '-';
                             }

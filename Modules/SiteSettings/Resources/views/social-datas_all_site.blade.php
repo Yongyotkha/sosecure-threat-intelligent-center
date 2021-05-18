@@ -433,17 +433,18 @@ use Carbon\Carbon;
                             </div>
                         </header>
                         <div class="panel-body">
-
-
-                            {{-- <div class="row">
+                            <div class="row">
                                 <div class="col-md-12">
-                                    <h5 class="font-weight-bold">Keyword</h5>
-                                    <div id="fillter_click_keyword" class="button-group">
-
+                                    <h5 class="font-weight-bold">Status</h5>
+                                    <div class="st-dt-leak">
+                                        <span class="st-dt vrh" data-toggle="tooltip" data-placement="right" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrh'>Critical</div><div class='text-st-tooltip'>Critical	ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Critical</span>
+                                        <span class="st-dt high" data-toggle="tooltip" data-placement="right" data-html="true"title="<div class='st-flex'><div class='box-st-tooltip high'>High</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">High</span>
+                                        <span class="st-dt md" data-toggle="tooltip" data-placement="right" data-html="true"  title="<div class='st-flex'><div class='box-st-tooltip md'>Medium</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Medium</span>
+                                        <span class="st-dt low" data-toggle="tooltip" data-placement="right" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip low'>Low</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของลูกค้าเช่น ข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">Low</span>
+                                        <span class="st-dt vrl" data-toggle="tooltip" data-placement="right" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrl'>Informational</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลที่เป็นข้อมูลทั่วไปหรือเป็นข่าวที่ยังไม่ได้รับการยืนยันว่าเป็นข้อมูลรั่วไหลจริง</div></div>">Very Low</span>
                                     </div>
                                 </div>
-                            </div> --}}
-
+                            </div>
                             <div class="table-responsive">
                                 <table  class="table table-striped" style="width: 100%;" id="table_social_datas">
                                     <thead>
@@ -995,15 +996,15 @@ $('.btn').click(function(){
                         render: function (data, type, full, meta) {
                 
                             if(full.serverity=='critical'){
-                        return '<span class="badge" style="background-color: #e64732;">Critical</span>';
+                        return '<span class="badge" style="background-color: #b93624;">Critical</span>';
                             }else if(full.serverity=='high'){
                                 return '<span class="badge" style="background-color: #fcc838;">High</span>';
                             }else if(full.serverity=='medium'){
-                                return '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                                return '<span class="badge" style="background-color: #f2ff15;color:#333;">Medium</span>';
                             }else if(full.serverity=='low'){
                                 return '<span class="badge" style="background-color: #88ce4f;">Low</span>';
                             }else if(full.serverity=='information'){
-                                return '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                                return '<span class="badge" style="background-color: #00dcff;">Information</span>';
                             }else{
                                 return '-';
                             }

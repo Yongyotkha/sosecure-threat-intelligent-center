@@ -448,15 +448,15 @@ class ApiNewsController extends ApiController
                                 <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$item -> public_date.'</span>
                                 <span> <b>Serverity: </b> ';
                                 if($item->serverity=='critical'){
-                                    $html .=  '<span class="badge" style="background-color: #e64732;">Critical</span>';
+                                    $html .=  '<span class="badge" style="background-color: #b93624;">Critical</span>';
                                 }else if($item->serverity=='high'){
                                     $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
                                 }else if($item->serverity=='medium'){
-                                    $html .= '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                                    $html .= '<span class="badge" style="background-color: #f2ff15;color:#333;">Medium</span>';
                                 }else if($item->serverity=='low'){
                                     $html .= '<span class="badge" style="background-color: #88ce4f;">Low</span>';
                                 }else if($item->serverity=='information'){
-                                    $html .= '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                                    $html .= '<span class="badge" style="background-color: #00dcff;">Information</span>';
                                 }else{
                                     $html .= '-';
                                 }
@@ -772,15 +772,15 @@ class ApiNewsController extends ApiController
                                         <span class="entry-view"> <i class="fas fa-eye"></i> '.@$item -> news -> view.'</span>
                                         <span> <b>Serverity: </b> ';
                                         if($item->news->serverity=='critical'){
-                                            $html .=  '<span class="badge" style="background-color: #fcc838;">Critical</span>';
+                                            $html .=  '<span class="badge" style="background-color: #b93624;">Critical</span>';
                                         }else if($item->news->serverity=='high'){
                                             $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
                                         }else if($item->news->serverity=='medium'){
-                                            $html .= '<span class="badge" style="background-color: #00dcff;">Medium</span>';
+                                            $html .= '<span class="badge" style="background-color: #f2ff15;color:#333;">Medium</span>';
                                         }else if($item->news->serverity=='low'){
                                             $html .= '<span class="badge" style="background-color: #88ce4f;">Low</span>';
                                         }else if($item->news->serverity=='information'){
-                                            $html .= '<span class="badge" style="background-color: #d3d3d3;">Information</span>';
+                                            $html .= '<span class="badge" style="background-color: #00dcff;">Information</span>';
                                         }else{
                                             $html .= '-';
                                         }
