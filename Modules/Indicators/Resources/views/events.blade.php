@@ -627,9 +627,11 @@
             },
             {
                 targets: 9,
+                className : 'nowrap',
                 render: function (data, type, row) {
                     var inner = '';
-                    inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                    inner +=  '<a href="{{route('indicators.modal_tag')}}" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Insert Tag</a>';
+                    inner +=  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
                     return inner;
                 }
 

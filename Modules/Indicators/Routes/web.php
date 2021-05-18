@@ -44,5 +44,7 @@ Route::group(
         Route::post('/tags/table_tags', 'IndicatorsController@table_tags')->name('indicators.table_tags')->middleware('can:menu_items');
         Route::get('/industries', 'IndicatorsController@indicator_industries')->name('indicators.industries')->middleware('can:menu_items');
         Route::get('/group', 'IndicatorsController@indicator_group')->name('indicators.indicator_group')->middleware('can:menu_items');
+
+        Route::get('/indicator_insert_tag', 'IndicatorsController@insert_tag')->name('indicators.modal_tag')->middleware('can:menu_items');
     }
 );

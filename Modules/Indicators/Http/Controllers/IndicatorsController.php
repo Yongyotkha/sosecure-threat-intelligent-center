@@ -2374,4 +2374,10 @@ public function tableEvents(Request $request)
         return response()->json($response_data);
     }
 
+    public function insert_tag()
+    {
+        $data['page'] = langapp('indicators');
+        return view('indicators::modal.insert_tag')->with($data);
+    }
+
 }
