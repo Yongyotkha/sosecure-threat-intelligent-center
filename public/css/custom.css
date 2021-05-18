@@ -4663,3 +4663,11 @@ section#av-detection .main-int-card.active .av-container.border-success{
 .tooltip-arrow {
     border-right-color: #ffffff !important;
 }
+
+.btnaction{
+    display: inline-block;
+}
+
+strong > p{
+    margin-bottom: 0 !important;
+}

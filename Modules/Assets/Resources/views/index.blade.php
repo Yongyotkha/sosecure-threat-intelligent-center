@@ -704,8 +704,9 @@
             pageLength: 25,
             processing: true,
             serverSide: false,
+            "searching": true,
             destroy: true,
-            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            "dom": '<"btnaction"><"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             order: [[ 0, "asc" ]],
             ajax: {
                 type: "POST",
@@ -853,7 +854,12 @@
         }else{
             searchTB(check,'ip_asset_id');
         }
+
+        $("div.btnaction").html('<button class="btn btn-info">Host Info</button> <button class="btn btn-info">Service / Port</button>');
     }
+
+
+
 </script>
 @endpush
 

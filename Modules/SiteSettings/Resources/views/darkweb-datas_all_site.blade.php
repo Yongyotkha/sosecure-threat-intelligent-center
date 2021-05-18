@@ -627,7 +627,6 @@ use Carbon\Carbon;
                     }
 
 
-                    var html_content=new_html+'<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 5px;color: #3869d4;font-weight: 800;"><strong>'+stripHtml(aData.get_data_leak_feed_one.feedcontent)+'</strong></div>';
                     let val = aData.get_data_leak_feed_one;
                             if(val) {
                                 val = aData.get_data_leak_feed_one;
@@ -635,18 +634,24 @@ use Carbon\Carbon;
                                     val = aData.get_data_leak_feed_one.source_name;
                                 }
                             }
-                    html_content+='<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 5px;">'+ val+'</div>';
+
+               
                     let val_type = aData.feel_type;
-                            if(val_type) {
-                                val_type = get_word_leak_compromise(aData.feel_type,'compromise');
-                            }
-                    html_content+='<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 5px;color: #3869d4;font-weight: 800;"><div class="img-icon-card"><img src="'+"{{url('/')}}"+'/images/icebergline2.png" alt=""></div><strong><span class="badge badge-Warning" style="background-color: #00dcff;    margin-top: 15px;">'+val_type+'</span></strong></div>';
+                        if(val_type) {
+                            val_type = get_word_leak_compromise(aData.feel_type,'compromise');
+                        }
+
+                    var html_img='<div style="display:inline-flex;align-items:center;margin-right:3px;"><div class="img-icon-card"><img src="'+"{{url('/')}}"+'/images/icebergline2.png" alt=""></div><strong><span class="badge badge-Warning" style="background-color: #00dcff;">'+val_type+'</span></strong></div>';
+                    var html_content='<div style="display:flex;align-items:center;">'+new_html+html_img+'<div class="nowrap" style="color: #3869d4;font-weight: 800;display:inline-block;"><strong>'+stripHtml(aData.get_data_leak_feed_one.feedcontent)+'</strong></div></div>';
+                
+                  
+                    html_content+= '<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 5px;">'+ val+'</div>';
 
 
     
                     html_content+='<div class="nowrap" style="padding-top: 22px;">'+ '<strong>Site </strong>'+aData.get_site.name+'&nbsp;&nbsp;&nbsp;<strong>Modified Date </strong>'+aData.get_data_leak_feed_one.feedtimepost;
                     if(aData.get_data_leak_feed_one.feedlink){
-                         html_content+= '&nbsp;&nbsp;&nbsp;<b><strong><i class="fas fa-eye"></i>&nbsp;&nbsp;&nbsp; </strong><a href="'+aData.get_data_leak_feed_one.feedlink+'">'+'View Code'+'</a></b>';
+                         html_content+= '&nbsp;&nbsp;&nbsp;<b><strong><i class="fas fa-eye"></i>&nbsp;&nbsp;&nbsp; </strong><a href="'+aData.get_data_leak_feed_one.feedlink+'" target="_blank">'+'View Code'+'</a></b>';
                     }
                     html_content+='</div>';
 
