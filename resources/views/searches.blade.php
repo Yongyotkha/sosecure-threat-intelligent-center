@@ -224,7 +224,14 @@
                                              CrowdStrike Falcon</div>
                                         <div class="main-frame">
 
-                                            <div id="chart-md" style="height: 300px"></div>
+                                            {{-- <div id="chart-md" style="height: 300px"></div> --}}
+                                            <div class="circle-score">
+                                                <div class="circle-score-inner">
+                                                    <div class="circle-text-score">
+                                                        100 <span>/ 80</span>
+                                                    </div>
+                                                </div>
+                                            </div>
 
                                             <div class="details">
                                                 <div class="scan-result">No threat found</div>
@@ -242,7 +249,15 @@
                                         </div>
                                         <div class="main-frame">
 
-                                            <div id="chart-md2" style="height: 300px"></div>
+                                            {{-- <div id="chart-md2" style="height: 300px"></div> --}}
+
+                                            <div class="circle-score">
+                                                <div class="circle-score-inner">
+                                                    <div class="circle-text-score">
+                                                        0 <span>/ 80</span>
+                                                    </div>
+                                                </div>
+                                            </div>
 
                                             <div class="details">
                                                 <div class="scan-result">4 of 7 are detected as malicious</div>
@@ -261,7 +276,15 @@
                                         </div>
                                         <div class="main-frame">
 
-                                            <div id="chart-md3" style="height: 300px"></div>
+                                            {{-- <div id="chart-md3" style="height: 300px"></div> --}}
+
+                                            <div class="circle-score">
+                                                <div class="circle-score-inner">
+                                                    <div class="circle-text-score">
+                                                        50 <span>/ 80</span>
+                                                    </div>
+                                                </div>
+                                            </div>
 
                                             <div class="details">
                                                 <div class="scan-result">4 of 7 are detected as malicious</div>
@@ -659,8 +682,8 @@
         });
     }
 
-
-
+    {{-- 
+    
     function chart(id) {
         new Highcharts.chart(id, {
             chart: {
@@ -713,30 +736,6 @@
     chart('chart-md2');
     chart('chart-md3');
 
-
-    $('.int-lookup-main').hide();
-
-    $('.btn-start-lookup').on('click',function(){
-        $('.int-lookup-main').show();
-        $('.front-int').remove();
-    });
-
- 
-    $('.table-int').hide();
-
-    $('#show-chart-int .main-int-card').on('click',function(){
-        $(this).toggleClass('active');
-        if($('.main-int-card').hasClass('active')){
-            $('.table-int').show();
-        }else{
-            $('.table-int').hide();
-        }
-    });
-
-    $('#table-int').DataTable();
-
-
-
     const chart_overall = new Highcharts.chart('chart-risk-level', {
         chart: {
             plotBackgroundColor: null,
@@ -780,6 +779,29 @@
             ]
         }]
     });
+
+    --}}
+
+    $('.int-lookup-main').hide();
+
+    $('.btn-start-lookup').on('click',function(){
+        $('.int-lookup-main').show();
+        $('.front-int').remove();
+    });
+
+
+    $('.table-int').hide();
+
+    $('#show-chart-int .main-int-card').on('click',function(){
+        $(this).toggleClass('active');
+        if($('.main-int-card').hasClass('active')){
+            $('.table-int').show();
+        }else{
+            $('.table-int').hide();
+        }
+    });
+
+    $('#table-int').DataTable();
 
 </script>
 @endpush
