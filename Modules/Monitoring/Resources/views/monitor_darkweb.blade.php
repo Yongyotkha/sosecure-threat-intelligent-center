@@ -10,8 +10,7 @@
                     </span>
                 </div>
 
-                <div class="ml-2 text-right">
-
+                <div class="ml-2 text-right d-none">
                     <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} m-l-xs">
                         <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                     </a>
@@ -21,7 +20,7 @@
 
 
         <section id="scrollable_news" class="scrollable wrapper">
-            <section class="panel panel-default" id="hide-advance-search" style="display: none">
+            <section class="panel panel-default" style="display: block">
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
                         <div class="col-md-12">
@@ -31,22 +30,20 @@
                 <div class="panel-body" style="padding: 0 !important">
                     <div class="container-fluid" style="padding: 2rem;">
                         <div class="row m-b-md">
-                            <div class="col-lg-6">
+                            <div class="col-lg-4 col-md-12 col-sm-12">
                                 <h5 class="font-weight-bold">payload</h5>
                                 <select name="payload" id="payload" class="form-control">
-                                    <option value="q" selected>Darkweb</option>
+                                    <option value="q" selected>Query Manual</option>
                                     <option value="domain">Domain</option>
                                     <option value="email">Email</option>
                                     <option value="ip">IP</option>
                                 </select>
                             </div>
-                            <div class="col-lg-6">
+                            <div class="col-lg-4 col-md-12 col-sm-12">
                                 <h5 class="font-weight-bold">Keyword</h5>
                                 <input type="text" id="Keywords" class="form-control">
                             </div>
-                        </div>
-                        <div class="row m-b-md">
-                            <div class="col-lg-12">
+                            <div class="col-lg-4 col-md-12 col-sm-12">
                                 <h5 class="font-weight-bold">Date</h5>
                                 <div id="newsrange" class="text-center"
                                     style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
