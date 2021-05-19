@@ -4699,8 +4699,14 @@ strong > p{
     text-align: center;
     color: #409967;
 }
+.circle-text-score.danger{
+    color: #e61d0f !important;
+}
+.circle-text-score.medium{
+    color: #fcc838 !important;
+}
 
-.circle-text-score span{
+.circle-text-score+span{
     display:block;
     font-size: 30px;
     color: #606060;
