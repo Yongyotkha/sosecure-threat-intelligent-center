@@ -296,8 +296,65 @@ class SearchController extends Controller
         // $data['tickets'] = \Modules\Tickets\Entities\Ticket::select('id', 'subject')->WithAnyTags($this->request->keyword)->get();
         // $data['milestones'] = \Modules\Milestones\Entities\Milestone::select('id', 'milestone_name')->WithAnyTags($this->request->keyword)->get();
 
+
         $data['page'] = langapp('search');
         $data['keyword'] = $this->request->keyword;
         return view('searches')->with($data);
+    }
+
+    public function loadSearchAPI(Request $request)
+    {
+        $role_custom = @check_role_custom();
+        $sourse =$request->sourse;
+        $keyword =$request->keyword;
+        $response = array();
+        if($sourse =="ibmcloud"){
+            $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
+            $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
+            $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/190.187.248.117";
+            $ch = curl_init();
+            header('Content-type: application/json');
+            curl_setopt($ch, CURLOPT_URL,$ibmcloud_url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+            curl_setopt($ch, CURLOPT_USERPWD, "$ibmcloud_API_Key:$ibmcloud_API_Key_Password");
+            $result = curl_exec($ch);
+            $response = $result;
+            curl_close($ch);  
+        }else if($sourse =="virustotal"){
+            $virustotal_API_Key = "8ed71053d254aa99c9a79b73c6f3223cac762c2c77628d075e62ec506a538267";
+            $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/190.187.248.117";
+            $virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
+            $headers = array(
+                 'X-Apikey: '.$virustotal_API_Key
+            );
+            // Send request to Server
+            $ch = curl_init($virustotal_url);
+            // To save response in a variable from server, set headers;
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            // Get response
+            $response = curl_exec($ch);
+            curl_close($ch);  
+        }else if($sourse =="hybrid"){
+
+
+
+        }else{
+
+        }
+          
+
+       
+
+        return ajaxResponse(
+            [
+                'message' => langapp('changes_saved_successful'),
+                'data' => $response,
+                'data' => $response,
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
 }
