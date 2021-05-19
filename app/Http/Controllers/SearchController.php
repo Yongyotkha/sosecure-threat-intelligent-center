@@ -345,16 +345,11 @@ class SearchController extends Controller
 
         }
           
-
-       
-
-        return ajaxResponse(
-            [
-                'message' => langapp('changes_saved_successful'),
-                'data' => $response,
-            ],
-            true,
-            Response::HTTP_OK
+        $response_data = array(
+            'status_code' => Response::HTTP_OK,
+            'message' => '',
+            'data' => json_decode($response, true)
         );
+        return response()->json($response_data);
     }
 }
