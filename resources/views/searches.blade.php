@@ -774,7 +774,8 @@
             beforeSend: function(){
                 $('.ajax-loading').show();
             },
-        }).done(function(data){
+        }).done(function(res){
+            let data = res.data;
             if(source == 'ibmcloud'){
                 if(data.score && data.score > 0){
                     $('#text_' + source).text(data.score * 10);
@@ -794,7 +795,7 @@
                                 ${history.geo.country} ${history.geo.countrycode}
                             </td>
                             <td>
-                                ${moment(new Date(history.created)).format('MM-DD-YYYY HH:MM:SS')}
+                                ${moment(new Date(history.created)).format('DD-MM-YYYY HH:MM:SS')}
                             </td>
                         </tr>
                         `;
@@ -834,7 +835,7 @@
                                     ${last_analysis_results.result}
                                 </span>`;
                             }else if(last_analysis_results.result == 'unrated'){
-                                html += `<span class="label label-defalut">
+                                html += `<span class="label label-secondary">
                                     ${last_analysis_results.result}
                                 </span>`;
                             }
