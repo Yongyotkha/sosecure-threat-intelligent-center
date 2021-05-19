@@ -310,10 +310,13 @@ class SearchController extends Controller
         $role_custom = @check_role_custom();
         $source = $request->source;
         $keyword = $request->keyword;
+        
         $validator = FacadesValidator::make($request->all(), [
             'keyword' => 'ip'
         ]);
-        if ($validator->fails()) {
+        $domain = $this->is_valid_domain($keyword);
+
+        if ($validator->fails() && !$domain) {
             $response_data = array(
                 'status_code' => 400,
                 'message' => '',
@@ -324,7 +327,12 @@ class SearchController extends Controller
         if($source =="ibmcloud"){
             $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
             $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
-            $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/" . $keyword;
+            if(!$validator->fails()){
+                $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/" . $keyword;
+            }else if($domain){
+                $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/url/" . $keyword;
+            }
+            
             $ch = curl_init();
             header('Content-type: application/json');
             curl_setopt($ch, CURLOPT_URL,$ibmcloud_url);
@@ -363,5 +371,33 @@ class SearchController extends Controller
             'data' => json_decode($response, true)
         );
         return response()->json($response_data);
+    }
+
+    private function is_valid_domain($url){
+
+        $validation = FALSE;
+        /*Parse URL*/    $urlparts = parse_url(filter_var($url, FILTER_SANITIZE_URL));
+        /*Check host exist else path assign to host*/    if(!isset($urlparts['host'])){
+            $urlparts['host'] = $urlparts['path'];
+        }
+    
+        if($urlparts['host']!=''){
+           /*Add scheme if not found*/        if (!isset($urlparts['scheme'])){
+                $urlparts['scheme'] = 'http';
+            }
+            /*Validation*/        if(checkdnsrr($urlparts['host'], 'A') && in_array($urlparts['scheme'],array('http','https')) && ip2long($urlparts['host']) === FALSE){ 
+                $urlparts['host'] = preg_replace('/^www\./', '', $urlparts['host']);
+                $url = $urlparts['scheme'].'://'.$urlparts['host']. "/";            
+                
+                if (filter_var($url, FILTER_VALIDATE_URL) !== false && @get_headers($url)) {
+                    $validation = TRUE;
+                }
+            }
+        }
+        if(!$validation){
+           return false;
+        }else{
+            return true;
+        }
     }
 }
