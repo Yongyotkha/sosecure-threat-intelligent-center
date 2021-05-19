@@ -56,7 +56,7 @@ Route::get('reset/2fa', 'TwoFactorAuthController@reset')->name('2fa.reset');
 Route::get('cron/schedule/{token}', 'ScheduleController@run')->name('artisan.schedule')->middleware('demo');
 
 Route::any('search', 'SearchController@search')->name('search.app');
-Route::post('loadSearchAPI', 'SearchController@loadSearchAPI')->name('search.app');
+Route::post('loadSearchAPI', 'SearchController@loadSearchAPI');
 
 Route::get('support', 'SupportController@ticket')->name('support.ticket')->middleware('cors');
 Route::post('stripe/webhook', '\Laravel\Cashier\Http\Controllers\WebhookController@handleWebhook');

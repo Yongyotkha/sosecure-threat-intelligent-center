@@ -404,68 +404,7 @@
                                     <th>Verdict</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>ldap60.bin</td>
-                                    <td>4e753ef8...e0b17943</td>
-                                    <td>-</td>
-                                    <td>24% Zusy.Generic</td>
-                                    <td><i class="text-danger fas fa-times"></i></td>
-                                    <td>
-                                        <span class="label label-danger">
-                                            malicious
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>ldap60.bin</td>
-                                    <td>4e753ef8...e0b17943</td>
-                                    <td>-</td>
-                                    <td>24% Zusy.Generic</td>
-                                    <td><i class="text-success fas fa-check"></i></td>
-                                    <td>
-                                        <span class="label label-danger">
-                                            malicious
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>ldap60.bin</td>
-                                    <td>4e753ef8...e0b17943</td>
-                                    <td>-</td>
-                                    <td>24% Zusy.Generic</td>
-                                    <td><i class="text-success fas fa-check"></i></td>
-                                    <td>
-                                        <span class="label label-danger">
-                                            malicious
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>ldap60.bin</td>
-                                    <td>4e753ef8...e0b17943</td>
-                                    <td>-</td>
-                                    <td>24% Zusy.Generic</td>
-                                    <td><i class="text-success fas fa-check"></i></td>
-                                    <td>
-                                        <span class="label label-warning">
-                                            suspicious
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>ldap60.bin</td>
-                                    <td>4e753ef8...e0b17943</td>
-                                    <td>-</td>
-                                    <td>24% Zusy.Generic</td>
-                                    <td><i class="text-success fas fa-check"></i></td>
-                                    <td>
-                                        <span class="label label-info">
-                                            whitelisted
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="tbody-hybrid"></tbody>
                         </table>
                     </section>
 
@@ -672,8 +611,9 @@
  
     });
 
-
+    var text_search_new = null;
     function click_search(text_search=null,btn_val=null){
+        text_search_new = text_search;
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -825,14 +765,21 @@
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            url: "/test_json/"+source+".json",
+            method: 'post',
+            url: "/loadSearchAPI",
+            data: ({
+                keyword:text_search_new,
+                source:source
+            }),
             beforeSend: function(){
                 $('.ajax-loading').show();
             },
         }).done(function(data){
-            
             if(source == 'ibmcloud'){
-                $('#text_' + source).text(data.score * 10);
+                if(data.score && data.score > 0){
+                    $('#text_' + source).text(data.score * 10);
+                }
+                
                 let html = ``;
                 let historyByCats = [];
                 for(let i in data.history){
@@ -864,8 +811,9 @@
                     "bAutoWidth": false ,
                 });
             }else if(source == 'virustotal'){
-                console.log(data.data.attributes);
-                $('#text_' + source).text(data.data.attributes.last_analysis_stats.harmless);
+                if(data.data.attributes.last_analysis_stats.harmless && data.data.attributes.last_analysis_stats.harmless > 0){
+                    $('#text_' + source).text(data.data.attributes.last_analysis_stats.harmless);
+                }
                 let html = ``;
                 for(let i in data.data.attributes.last_analysis_results){
                     const last_analysis_results = data.data.attributes.last_analysis_results[i];

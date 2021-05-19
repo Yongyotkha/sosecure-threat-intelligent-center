@@ -11,6 +11,7 @@ use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMappingAssets;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use MongoDB\Client as MongoClient;
+use Illuminate\Http\Response;
 
 class SearchController extends Controller
 {
@@ -305,10 +306,10 @@ class SearchController extends Controller
     public function loadSearchAPI(Request $request)
     {
         $role_custom = @check_role_custom();
-        $sourse =$request->sourse;
+        $source =$request->source;
         $keyword =$request->keyword;
         $response = array();
-        if($sourse =="ibmcloud"){
+        if($source =="ibmcloud"){
             $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
             $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
             $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/190.187.248.117";
@@ -321,7 +322,7 @@ class SearchController extends Controller
             $result = curl_exec($ch);
             $response = $result;
             curl_close($ch);  
-        }else if($sourse =="virustotal"){
+        }else if($source =="virustotal"){
             $virustotal_API_Key = "8ed71053d254aa99c9a79b73c6f3223cac762c2c77628d075e62ec506a538267";
             $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/190.187.248.117";
             $virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
@@ -336,7 +337,7 @@ class SearchController extends Controller
             // Get response
             $response = curl_exec($ch);
             curl_close($ch);  
-        }else if($sourse =="hybrid"){
+        }else if($source =="hybrid"){
 
 
 
@@ -350,7 +351,6 @@ class SearchController extends Controller
         return ajaxResponse(
             [
                 'message' => langapp('changes_saved_successful'),
-                'data' => $response,
                 'data' => $response,
             ],
             true,
