@@ -126,9 +126,8 @@
                             Overall Risk
                         </h3>
                         
-                        <div class="row" style="margin-bottom: 1.5rem">
-
-                            {{-- <div class="col-md-6">
+                        {{-- <div class="row" style="margin-bottom: 1.5rem">
+                            <div class="col-md-6">
                                 <div class="risk-level-box">
                                     <div class="header-risk">
                                         <h4 class="font-weight-bold text-danger">High Risk Level</h4>
@@ -155,8 +154,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div> --}}
-
+                            </div>
                             <div class="col-md-3">
                                 <div class="card-int dark">
                                     <div class="card-int-header">
@@ -172,7 +170,6 @@
                                     </div>
                                 </div>
                             </div>
-                       
                             <div class="col-md-3">
                                 <div class="card-int green">
                                     <div class="card-int-header">
@@ -188,7 +185,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="col-md-3">
                                 <div class="card-int warning">
                                     <div class="card-int-header">
@@ -204,7 +200,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="col-md-3">
                                 <div class="card-int danger">
                                     <div class="card-int-header">
@@ -220,11 +215,10 @@
                                     </div>
                                 </div>
                             </div>
-
-                        </div>
+                        </div> --}}
                     </section>
 
-                    <section id="collection-overview">
+                    {{-- <section id="collection-overview">
                         <h3 class="page-header">
                             Unknown Files Collection
                             <div class="pull-right">
@@ -277,8 +271,7 @@
                                 </div>
                             </div>
                         </div>
-                    </section>
-
+                    </section> --}}
 
                     <section id="av-detection">
                         <h3 class="page-header">
