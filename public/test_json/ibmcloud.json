@@ -1,0 +1,1118 @@
+{
+  "ip": "190.187.248.117",
+  "history": [
+    {
+      "created": "2012-03-22T07:26:00.000Z",
+      "reason": "Regional Internet Registry",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "ip": "190.187.128.0/17",
+      "categoryDescriptions": {},
+      "reasonDescription": "One of the five RIRs announced a (new) location mapping of the IP.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2017-07-26T06:24:00.000Z",
+      "reason": "Regional Internet Registry",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.128.0/17",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "categoryDescriptions": {},
+      "reasonDescription": "One of the five RIRs announced a (new) location mapping of the IP.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2017-10-10T06:23:00.000Z",
+      "reason": "Regional Internet Registry",
+      "ip": "190.187.128.0/17",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "categoryDescriptions": {},
+      "reasonDescription": "One of the five RIRs announced a (new) location mapping of the IP.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2017-10-18T06:23:00.000Z",
+      "reason": "Regional Internet Registry",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.128.0/17",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "categoryDescriptions": {},
+      "reasonDescription": "One of the five RIRs announced a (new) location mapping of the IP.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2020-03-21T07:52:00.000Z",
+      "reason": "Regional Internet Registry",
+      "ip": "190.187.128.0/17",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "categoryDescriptions": {},
+      "reasonDescription": "One of the five RIRs announced a (new) location mapping of the IP.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2020-03-22T07:54:00.000Z",
+      "reason": "Regional Internet Registry",
+      "ip": "190.187.128.0/17",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "categoryDescriptions": {},
+      "reasonDescription": "One of the five RIRs announced a (new) location mapping of the IP.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2020-03-28T07:52:00.000Z",
+      "reason": "Regional Internet Registry",
+      "asns": {
+        "19180": {
+          "Company": "UNALLOCATED",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.128.0/17",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "categoryDescriptions": {},
+      "reasonDescription": "One of the five RIRs announced a (new) location mapping of the IP.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2020-03-29T06:52:00.000Z",
+      "reason": "Regional Internet Registry",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.128.0/17",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "categoryDescriptions": {},
+      "reasonDescription": "One of the five RIRs announced a (new) location mapping of the IP.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2020-10-22T01:26:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 57
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 5.7
+    },
+    {
+      "created": "2020-10-26T10:54:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2020-10-29T01:00:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 57
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 5.7
+    },
+    {
+      "created": "2020-11-06T10:48:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2020-11-10T10:48:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "deleted": true,
+      "categoryDescriptions": {},
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2020-11-13T12:12:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 57
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 5.7
+    },
+    {
+      "created": "2020-11-21T10:41:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2020-11-25T10:43:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "deleted": true,
+      "categoryDescriptions": {},
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2020-11-26T23:14:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 57
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 5.7
+    },
+    {
+      "created": "2020-12-01T10:48:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2020-12-02T06:28:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 57
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 5.7
+    },
+    {
+      "created": "2020-12-06T10:48:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2020-12-10T10:38:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "deleted": true,
+      "categoryDescriptions": {},
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2020-12-22T18:28:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 57
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 5.7
+    },
+    {
+      "created": "2020-12-26T10:51:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2020-12-30T10:33:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "deleted": true,
+      "categoryDescriptions": {},
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2021-01-16T18:55:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 57
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 5.7
+    },
+    {
+      "created": "2021-01-20T10:38:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2021-01-22T19:26:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 57
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 5.7
+    },
+    {
+      "created": "2021-01-28T10:32:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2021-01-29T20:00:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 57
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 5.7
+    },
+    {
+      "created": "2021-02-02T10:33:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2021-02-06T10:30:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "deleted": true,
+      "categoryDescriptions": {},
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2021-02-07T20:53:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 57
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 5.7
+    },
+    {
+      "created": "2021-02-11T10:27:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2021-02-15T10:15:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 57
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 5.7
+    },
+    {
+      "created": "2021-02-19T10:30:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2021-02-23T10:32:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "deleted": true,
+      "categoryDescriptions": {},
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2021-02-24T23:34:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 71
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 7.1
+    },
+    {
+      "created": "2021-03-01T10:35:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2021-03-05T10:30:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "deleted": true,
+      "categoryDescriptions": {},
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2021-03-24T22:23:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 71
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 7.1
+    },
+    {
+      "created": "2021-04-01T09:30:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2021-04-07T09:27:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "deleted": true,
+      "categoryDescriptions": {},
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2021-04-12T15:24:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 71
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 7.1
+    },
+    {
+      "created": "2021-04-18T09:33:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2021-04-24T09:32:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "deleted": true,
+      "categoryDescriptions": {},
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 1,
+      "cats": {}
+    },
+    {
+      "created": "2021-04-28T05:26:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 71
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 7.1
+    },
+    {
+      "created": "2021-05-04T09:39:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2021-05-06T05:37:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 71
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 7.1
+    },
+    {
+      "created": "2021-05-12T09:40:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 43
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 4.3
+    },
+    {
+      "created": "2021-05-13T19:49:00.000Z",
+      "reason": "Firewall deny log analysis",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.248.117/32",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "cats": {
+        "Scanning IPs": 71
+      },
+      "categoryDescriptions": {
+        "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+      },
+      "reasonDescription": "This IP was involved in port scanning activities.",
+      "score": 7.1
+    }
+  ],
+  "subnets": [
+    {
+      "created": "2020-03-29T06:52:00.000Z",
+      "reason": "Regional Internet Registry",
+      "asns": {
+        "19180": {
+          "Company": "AMERICATEL PERU S.A., PE",
+          "cidr": 16
+        }
+      },
+      "ip": "190.187.0.0",
+      "categoryDescriptions": {},
+      "reasonDescription": "One of the five RIRs announced a (new) location mapping of the IP.",
+      "score": 1,
+      "cats": {},
+      "subnet": "190.187.0.0/16"
+    },
+    {
+      "created": "2012-03-22T07:26:00.000Z",
+      "reason": "Regional Internet Registry",
+      "geo": {
+        "country": "Peru",
+        "countrycode": "PE"
+      },
+      "ip": "190.187.128.0",
+      "categoryDescriptions": {},
+      "reasonDescription": "One of the five RIRs announced a (new) location mapping of the IP.",
+      "score": 1,
+      "cats": {},
+      "subnet": "190.187.128.0/17"
+    }
+  ],
+  "cats": {
+    "Scanning IPs": 71
+  },
+  "geo": {
+    "country": "Peru",
+    "countrycode": "PE"
+  },
+  "score": 7.1,
+  "reason": "Firewall deny log analysis",
+  "reasonDescription": "This IP was involved in port scanning activities.",
+  "categoryDescriptions": {
+    "Scanning IPs": "These IPs have been identified as illegally scanning networks for vulnerabilities."
+  },
+  "tags": []
+}
