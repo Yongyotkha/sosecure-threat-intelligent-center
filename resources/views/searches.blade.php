@@ -42,11 +42,81 @@
         </header>
         <section class="scrollable wrapper bg" id="clauses" style="padding: 8px !important">
 
-            <div class="front-int">
-                {{-- <img src="{{asset('images/logo_threat/logo_site.png')}}" style="max-width: 50%;"><br> --}}
+            {{-- <div class="front-int">
                 <button class="btn-start-lookup">Inteligence Threat Lookup</button>
-            </div>
+            </div> --}}
 
+            <section class="panel panel-default m-b-xs">
+                <div class="panel-body" id="table-container">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div id="fillter_click" class="button-group">
+                                <a href="javascript:void(0)" data-btn="all" class="btn btn-selector btn_filter active">All {{$count_all ? '('.$count_all.')':'(0)'}}</a>
+                                @if($role_custom['news'])
+                                    @if(!empty($count_val['news']))
+                                    <a href="javascript:void(0)" data-btn="news" class="btn btn-selector btn_filter">News {{@$count_val['news'] ? '('.$count_val["news"].')':'(0)'}}</a>
+                                    @endif
+                                @endif
+                                @if($role_custom['indicators'])
+                                    @if(!empty($count_val['events']))
+                                    <a href="javascript:void(0)" data-btn="events" class="btn btn-selector btn_filter">Event {{@$count_val['events'] ? '('.$count_val["events"].')':'(0)'}}</a>
+                                    @endif
+                                @endif
+                                @if($role_custom['data_leak'])
+                                    @if(!empty($count_val['data-leak']))
+                                    <a href="javascript:void(0)" data-btn="data-leak" class="btn btn-selector btn_filter">Data Leak {{@$count_val['data-leak'] ? '('.$count_val["data-leak"].')':'(0)'}}</a>
+                                    @endif
+                                @endif
+                                @if($role_custom['compromised'])
+                                    @if(!empty($count_val['compromised']))
+                                    <a href="javascript:void(0)" data-btn="compromised" class="btn btn-selector btn_filter">Compromised {{@$count_val['compromised'] ? '('.$count_val["compromised"].')':'(0)'}}</a>
+                                    @endif
+                                @endif
+                                @if($role_custom['vulnerabilities'])
+                                    @if(!empty($count_val['vulnerabilities']))
+                                    <a href="javascript:void(0)" data-btn="vulnerabilities" class="btn btn-selector btn_filter">Vulnerabilities {{@$count_val['vulnerabilities'] ? '('.$count_val["vulnerabilities"].')':'(0)'}}</a>
+                                    @endif
+                                @endif
+                                @if($role_custom['indicators'])
+                                    @if(!empty($count_val['indicators']))
+                                    <a href="javascript:void(0)" data-btn="indicators" class="btn btn-selector btn_filter">Indicators {{@$count_val['indicators'] ? '('.$count_val["indicators"].')':'(0)'}}</a>
+                                    @endif
+                                @endif
+                                {{-- <button class="btn btn-selector active">All</button>
+                                <button class="btn btn-selector">News</button>
+                                <button class="btn btn-selector">Event</button>
+                                <button class="btn btn-selector">Compromised</button>
+                                <button class="btn btn-selector">Vulnerabilities</button>
+                                <button class="btn btn-selector">Indicators</button> --}}
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <button class="btn btn-info lookup">Inteligence Threat Lookup</button>
+                        </div>
+                    </div>
+
+                    <div class="row type_indicator" style="display: none;">
+                        <div class="col-md-12">
+                            <label style="margin-top: 5px;"><b>Type</b></label>
+                        </div>
+                    </div>
+                    <div class="row type_indicator" style="display: none;">
+                        <div class="col-md-12">
+                            <div id="fillter_click" class="button-group">
+                                @if($indicators_type_unique)
+                                <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter_indicators_type active" data-btn_i_type="type_all">All</a>
+                                    @foreach($indicators_type_unique as $indicators_type_unique_val)
+                                        <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter_indicators_type" data-btn_i_type="type_{{$indicators_type_unique_val}}">{{$indicators_type_unique_val}}</a>
+                                    @endforeach
+                                @endif
+                                {{-- <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter active">All {{$count_all ? '('.$count_all.')':'(0)'}}</a> --}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+     
             <div class="int-lookup-main" style="display: none">
  
                 <div class="back-int">
@@ -58,7 +128,7 @@
                         
                         <div class="row" style="margin-bottom: 1.5rem">
 
-                            <div class="col-md-6">
+                            {{-- <div class="col-md-6">
                                 <div class="risk-level-box">
                                     <div class="header-risk">
                                         <h4 class="font-weight-bold text-danger">High Risk Level</h4>
@@ -85,9 +155,9 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
 
-                            {{-- <div class="col-md-3">
+                            <div class="col-md-3">
                                 <div class="card-int dark">
                                     <div class="card-int-header">
                                         <span>Summary Score</span>
@@ -149,7 +219,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div> --}}
+                            </div>
 
                         </div>
                     </section>
@@ -376,73 +446,6 @@
                     </section>
                 </div>
             </div>
-
-            <section class="panel panel-default m-b-xs">
-                <div class="panel-body" id="table-container">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div id="fillter_click" class="button-group">
-                                <a href="javascript:void(0)" data-btn="all" class="btn btn-selector btn_filter active">All {{$count_all ? '('.$count_all.')':'(0)'}}</a>
-                                @if($role_custom['news'])
-                                    @if(!empty($count_val['news']))
-                                    <a href="javascript:void(0)" data-btn="news" class="btn btn-selector btn_filter">News {{@$count_val['news'] ? '('.$count_val["news"].')':'(0)'}}</a>
-                                    @endif
-                                @endif
-                                @if($role_custom['indicators'])
-                                    @if(!empty($count_val['events']))
-                                    <a href="javascript:void(0)" data-btn="events" class="btn btn-selector btn_filter">Event {{@$count_val['events'] ? '('.$count_val["events"].')':'(0)'}}</a>
-                                    @endif
-                                @endif
-                                @if($role_custom['data_leak'])
-                                    @if(!empty($count_val['data-leak']))
-                                    <a href="javascript:void(0)" data-btn="data-leak" class="btn btn-selector btn_filter">Data Leak {{@$count_val['data-leak'] ? '('.$count_val["data-leak"].')':'(0)'}}</a>
-                                    @endif
-                                @endif
-                                @if($role_custom['compromised'])
-                                    @if(!empty($count_val['compromised']))
-                                    <a href="javascript:void(0)" data-btn="compromised" class="btn btn-selector btn_filter">Compromised {{@$count_val['compromised'] ? '('.$count_val["compromised"].')':'(0)'}}</a>
-                                    @endif
-                                @endif
-                                @if($role_custom['vulnerabilities'])
-                                    @if(!empty($count_val['vulnerabilities']))
-                                    <a href="javascript:void(0)" data-btn="vulnerabilities" class="btn btn-selector btn_filter">Vulnerabilities {{@$count_val['vulnerabilities'] ? '('.$count_val["vulnerabilities"].')':'(0)'}}</a>
-                                    @endif
-                                @endif
-                                @if($role_custom['indicators'])
-                                    @if(!empty($count_val['indicators']))
-                                    <a href="javascript:void(0)" data-btn="indicators" class="btn btn-selector btn_filter">Indicators {{@$count_val['indicators'] ? '('.$count_val["indicators"].')':'(0)'}}</a>
-                                    @endif
-                                @endif
-                                {{-- <button class="btn btn-selector active">All</button>
-                                <button class="btn btn-selector">News</button>
-                                <button class="btn btn-selector">Event</button>
-                                <button class="btn btn-selector">Compromised</button>
-                                <button class="btn btn-selector">Vulnerabilities</button>
-                                <button class="btn btn-selector">Indicators</button> --}}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row type_indicator" style="display: none;">
-                        <div class="col-md-12">
-                            <label style="margin-top: 5px;"><b>Type</b></label>
-                        </div>
-                    </div>
-                    <div class="row type_indicator" style="display: none;">
-                        <div class="col-md-12">
-                            <div id="fillter_click" class="button-group">
-                                @if($indicators_type_unique)
-                                <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter_indicators_type active" data-btn_i_type="type_all">All</a>
-                                    @foreach($indicators_type_unique as $indicators_type_unique_val)
-                                        <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter_indicators_type" data-btn_i_type="type_{{$indicators_type_unique_val}}">{{$indicators_type_unique_val}}</a>
-                                    @endforeach
-                                @endif
-                                {{-- <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter active">All {{$count_all ? '('.$count_all.')':'(0)'}}</a> --}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
 
             <div class="panel-group m-b" id="accordion2">
@@ -784,9 +787,8 @@
 
     $('.int-lookup-main').hide();
 
-    $('.btn-start-lookup').on('click',function(){
-        $('.int-lookup-main').show();
-        $('.front-int').remove();
+    $('.lookup').on('click',function(){
+        $('.int-lookup-main').toggle();
     });
 
 
