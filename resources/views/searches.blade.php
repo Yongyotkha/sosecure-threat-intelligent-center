@@ -229,7 +229,7 @@
                                              CrowdStrike Falcon</div>
                                         <div class="main-frame">
 
-                                            <div class="loadfixed backdrop-loader white">
+                                            <div class="load-hybrid loadfixed backdrop-loader white">
                                                 <div class="loader4 centerloader"></div>
                                                 <div class="loadding-text">Loading ...</div>
                                             </div>
@@ -259,7 +259,7 @@
                                         </div>
                                         <div class="main-frame">
 
-                                            <div class="loadfixed backdrop-loader white">
+                                            <div class="load-virustotal loadfixed backdrop-loader white">
                                                 <div class="loader4 centerloader"></div>
                                                 <div class="loadding-text">Loading ...</div>
                                             </div>
@@ -291,7 +291,7 @@
                                         </div>
                                         <div class="main-frame">
 
-                                            <div class="loadfixed backdrop-loader white">
+                                            <div class="load-ibmcloud loadfixed backdrop-loader white">
                                                 <div class="loader4 centerloader"></div>
                                                 <div class="loadding-text">Loading ...</div>
                                             </div>
@@ -767,6 +767,7 @@
                     "bInfo": false,
                     "bAutoWidth": false ,
                 });
+                $('.load-ibmcloud').remove();
             }else if(source == 'virustotal'){
                 if(data.data.attributes.last_analysis_stats.harmless && data.data.attributes.last_analysis_stats.harmless > 0){
                     $('#text_' + source).text(data.data.attributes.last_analysis_stats.harmless);
@@ -809,8 +810,9 @@
                     "bInfo": false,
                     "bAutoWidth": false ,
                 });
+                $('.load-virustotal').remove();
             }else if(source == 'hybrid'){
-
+                $('.load-hybrid').remove();
             }
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
