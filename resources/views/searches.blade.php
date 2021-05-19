@@ -291,14 +291,14 @@
                                             <div class="circle-score">
                                                 <div class="circle-score-inner">
                                                     <div class="circle-text-score">
-                                                        100 <span>/ 80</span>
+                                                        <span id="text_hybrid">0</span> <span>/ 100</span>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="details">
+                                            {{-- <div class="details">
                                                 <div class="scan-result">No threat found</div>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                     </div>
                                  </div>
@@ -317,14 +317,14 @@
                                             <div class="circle-score">
                                                 <div class="circle-score-inner">
                                                     <div class="circle-text-score">
-                                                        0 <span>/ 80</span>
+                                                        <span id="text_virustotal">0</span> <span>/ 100</span>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="details">
+                                            {{-- <div class="details">
                                                 <div class="scan-result">4 of 7 are detected as malicious</div>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                     </div>
                                 </div>
@@ -344,14 +344,14 @@
                                             <div class="circle-score">
                                                 <div class="circle-score-inner">
                                                     <div class="circle-text-score">
-                                                        50 <span>/ 80</span>
+                                                        <span id="text_ibmcloud">0</span> <span>/ 100</span>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="details">
+                                            {{-- <div class="details">
                                                 <div class="scan-result">4 of 7 are detected as malicious</div>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                     </div>
                                 </div>
@@ -361,8 +361,39 @@
 
                     </section>
    
-                    <section class="table-int" style="display: none">
-                        <table id="table-int" class="table">
+                    <section class="table-ibmcloud" style="display: none">
+                        <h3>IBM X-Force</h1>
+                        <table id="table-ibmcloud" class="table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Reason</th>
+                                    <th>Location</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-ibmcloud"></tbody>
+                        </table>
+                    </section>
+
+                    <section class="table-virustotal" style="display: none">
+                        <h3>VirusTotal</h1>
+                        <table id="table-virustotal" class="table">
+                            <thead>
+                                <tr>
+                                    <th>Engine Name</th>
+                                    <th>Category</th>
+                                    <th>Method</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-virustotal"></tbody>
+                        </table>
+                    </section>
+
+                    <section class="table-hybrid" style="display: none">
+                        <h3>CrowdStrike Falcon</h1>
+                        <table id="table-hybrid" class="table">
                             <thead>
                                 <tr>
                                     <th>Filename</th>
@@ -437,6 +468,8 @@
                             </tbody>
                         </table>
                     </section>
+
+
                 </div>
             </div>
 
@@ -782,23 +815,127 @@
 
     $('.lookup').on('click',function(){
         $('.int-lookup-main').toggle();
+        loadSearchAPI('ibmcloud');
+        loadSearchAPI('virustotal');
+        {{-- loadSearchAPI('hybrid'); --}}
     });
 
+    function loadSearchAPI(source){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/test_json/"+source+".json",
+            beforeSend: function(){
+                $('.ajax-loading').show();
+            },
+        }).done(function(data){
+            
+            if(source == 'ibmcloud'){
+                $('#text_' + source).text(data.score * 10);
+                let html = ``;
+                let historyByCats = [];
+                for(let i in data.history){
+                    const history = data.history[i];
+                    if(history.cats[Object.keys(history.cats)] != undefined && !historyByCats.includes(history.cats[Object.keys(history.cats)])){
+                        historyByCats.push(history.cats[Object.keys(history.cats)]);
+                        html += `
+                        <tr>
+                            <td>${Object.keys(history.cats)}</td>
+                            <td>${history.reason}</td>
+                            <td>
+                                ${history.geo.country} ${history.geo.countrycode}
+                            </td>
+                            <td>
+                                ${moment(new Date(history.created)).format('MM-DD-YYYY HH:MM:SS')}
+                            </td>
+                        </tr>
+                        `;
+                    }
+                }
+                document.getElementById("tbody-ibmcloud").innerHTML = html;
+                $('#table-ibmcloud').DataTable({
+                    "dom": 'tp',
+                    "searching": false,
+                    "bPaginate": true,
+                    "bLengthChange": false,
+                    "bFilter": false,
+                    "bInfo": false,
+                    "bAutoWidth": false ,
+                });
+            }else if(source == 'virustotal'){
+                console.log(data.data.attributes);
+                $('#text_' + source).text(data.data.attributes.last_analysis_stats.harmless);
+                let html = ``;
+                for(let i in data.data.attributes.last_analysis_results){
+                    const last_analysis_results = data.data.attributes.last_analysis_results[i];
+                    html += `
+                    <tr>
+                        <td>${last_analysis_results.engine_name}</td>
+                        <td>${last_analysis_results.category}</td>
+                        <td>
+                            ${last_analysis_results.method} 
+                        </td>
+                        <td>`;
+                            if(last_analysis_results.result == 'malicious'){
+                                html += `<span class="label label-danger">
+                                    ${last_analysis_results.result}
+                                </span>`; 
+                            }else if(last_analysis_results.result == 'clean'){
+                                html += `<span class="label label-success">
+                                    ${last_analysis_results.result}
+                                </span>`;
+                            }else if(last_analysis_results.result == 'unrated'){
+                                html += `<span class="label label-defalut">
+                                    ${last_analysis_results.result}
+                                </span>`;
+                            }
+                        html += `</td>
+                    </tr>
+                    `;
+                }
+                document.getElementById("tbody-virustotal").innerHTML = html;
+                $('#table-virustotal').DataTable({
+                    "dom": 'tp',
+                    "searching": false,
+                    "bPaginate": true,
+                    "bLengthChange": false,
+                    "bFilter": false,
+                    "bInfo": false,
+                    "bAutoWidth": false ,
+                });
+            }else if(source == 'hybrid'){
 
-    $('.table-int').hide();
+            }
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+    }
+
+
+
+    $('.table-hybrid').hide();
+    $('.table-virustotal').hide();
+    $('.table-ibmcloud').hide();
 
     $('#show-chart-int .main-int-card').on('click',function(){
         $(this).toggleClass('active');
-        if($('.main-int-card').hasClass('active')){
-            $('.table-int').show();
+        if($('#card-search-int1').hasClass('active')){
+            $('.table-hybrid').show();
         }else{
-            $('.table-int').hide();
+            $('.table-hybrid').hide();
+        }
+        if($('#card-search-int2').hasClass('active')){
+            $('.table-virustotal').show();
+        }else{
+            $('.table-virustotal').hide();
+        }
+        if($('#card-search-int3').hasClass('active')){
+            $('.table-ibmcloud').show();
+        }else{
+            $('.table-ibmcloud').hide();
         }
     });
-
-    $('#table-int').DataTable();
-
 </script>
 @endpush
 @endsection
-
