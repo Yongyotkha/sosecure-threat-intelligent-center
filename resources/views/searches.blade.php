@@ -611,9 +611,7 @@
  
     });
 
-    var text_search_new = null;
     function click_search(text_search=null,btn_val=null){
-        text_search_new = text_search;
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -760,6 +758,7 @@
         {{-- loadSearchAPI('hybrid'); --}}
     });
 
+    var text_search_new = '{{request()->keyword}}';
     function loadSearchAPI(source){
         $.ajax({
             headers: {

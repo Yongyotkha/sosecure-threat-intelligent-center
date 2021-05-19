@@ -12,6 +12,8 @@ use Modules\MonitoringVulnerabilitys\Entities\CVEMappingAssets;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use MongoDB\Client as MongoClient;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator as FacadesValidator;
+use Illuminate\Validation\Validator;
 
 class SearchController extends Controller
 {
@@ -306,13 +308,23 @@ class SearchController extends Controller
     public function loadSearchAPI(Request $request)
     {
         $role_custom = @check_role_custom();
-        $source =$request->source;
-        $keyword =$request->keyword;
+        $source = $request->source;
+        $keyword = $request->keyword;
+        $validator = FacadesValidator::make($request->all(), [
+            'keyword' => 'ip'
+        ]);
+        if ($validator->fails()) {
+            $response_data = array(
+                'status_code' => 400,
+                'message' => '',
+            );
+            return response()->json($response_data);
+        }
         $response = array();
         if($source =="ibmcloud"){
             $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
             $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
-            $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/190.187.248.117";
+            $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/" . $keyword;
             $ch = curl_init();
             header('Content-type: application/json');
             curl_setopt($ch, CURLOPT_URL,$ibmcloud_url);
@@ -324,7 +336,7 @@ class SearchController extends Controller
             curl_close($ch);  
         }else if($source =="virustotal"){
             $virustotal_API_Key = "8ed71053d254aa99c9a79b73c6f3223cac762c2c77628d075e62ec506a538267";
-            $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/190.187.248.117";
+            $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/" . $keyword;
             $virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
             $headers = array(
                  'X-Apikey: '.$virustotal_API_Key
