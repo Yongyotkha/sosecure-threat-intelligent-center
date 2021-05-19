@@ -126,96 +126,36 @@
                             Overall Risk
                         </h3>
                         
-                        {{-- <div class="row" style="margin-bottom: 1.5rem">
-                            <div class="col-md-6">
-                                <div class="risk-level-box">
-                                    <div class="header-risk">
-                                        <h4 class="font-weight-bold text-danger">High Risk Level</h4>
-                                        <h4 class="font-weight-bold text-danger">100%</h4>
-                                    </div>
-                                    <hr>
-                                    <div class="risk-level-body">
-                                        <div class="high-risk-level">
-                                            <div>
-                                                <span class="circle-risk high"></span>
-                                                <span>High Risk</span>
-                                            </div>
-                                            <div>
-                                                <span class="circle-risk medium"></span>
-                                                <span>Medium Risk</span>
-                                            </div>
-                                            <div>
-                                                <span class="circle-risk low"></span>
-                                                <span>Low Risk</span>
-                                            </div>
-                                        </div>
-                                        <div class="risk-chart-box">
-                                            <div id="chart-risk-level" style="width:100%;height: 100%"></div>
-                                        </div>
-                                    </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="ovr-text">
+                                    <p>Access Level</p>
+                                    <p>Public</p>
+                                </div>
+                                <div class="ovr-text">
+                                    <p>Request rate</p>
+                                    <p>172800 requests/minute</p>
+                                </div>
+                                <div class="ovr-text">
+                                    <p>Daily quota</p>
+                                    <p>172800 requests/day</p>
+                                </div>
+                                <div class="ovr-text">
+                                    <p>Monthly quota</p>
+                                    <p>172800 requests/month</p>
+                                </div>
+                                <div class="st-dt-leak">
+                                    <span class="st-dt vrh" data-toggle="tooltip" data-placement="right" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrh'>High</div><div class='text-st-tooltip'>High Risk	ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">High Risk</span>
+                                    <span class="st-dt high" data-toggle="tooltip" data-placement="right" data-html="true"  title="<div class='st-flex'><div class='box-st-tooltip md'>Medium</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Medium Risk</span>
+                                    <span class="st-dt low" data-toggle="tooltip" data-placement="right" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip low'>Low</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของลูกค้าเช่น ข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">Low Risk</span>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="card-int dark">
-                                    <div class="card-int-header">
-                                        <span>Summary Score</span>
-                                    </div>
-                                    <div class="card-int-body">
-                                        <div class="icon">
-                                              <i class="fas fa-sliders-h"></i> 
-                                        </div>
-                                        <div class="score">
-                                          5
-                                        </div>
-                                    </div>
+                            <div class="col-md-4">
+                                <div class="status-risk danger">
+                                   <span class="st-circle-ovr"></span> HIGH RISK
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="card-int green">
-                                    <div class="card-int-header">
-                                        <span>Normal Risk</span>
-                                    </div>
-                                    <div class="card-int-body">
-                                        <div class="icon">
-                                            <i class="fas fa-sliders-h"></i> 
-                                        </div>
-                                        <div class="score">
-                                        5
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card-int warning">
-                                    <div class="card-int-header">
-                                        <span>Medium Risk</span>
-                                    </div>
-                                    <div class="card-int-body">
-                                        <div class="icon">
-                                            <i class="fas fa-sliders-h"></i> 
-                                        </div>
-                                        <div class="score">
-                                        5
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card-int danger">
-                                    <div class="card-int-header">
-                                        <span>High Risk</span>
-                                    </div>
-                                    <div class="card-int-body">
-                                        <div class="icon">
-                                            <i class="fas fa-sliders-h"></i> 
-                                        </div>
-                                        <div class="score">
-                                        5
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> --}}
+                        </div>
                     </section>
 
                     {{-- <section id="collection-overview">

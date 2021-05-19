@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Storage;
 
-class SysChk extends Command
+class test_connect_search extends Command
 {
     /**
      * The name and signature of the console command.
