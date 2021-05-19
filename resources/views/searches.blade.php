@@ -229,6 +229,11 @@
                                              CrowdStrike Falcon</div>
                                         <div class="main-frame">
 
+                                            <div class="loadfixed backdrop-loader white">
+                                                <div class="loader4 centerloader"></div>
+                                                <div class="loadding-text">Loading ...</div>
+                                            </div>
+
                                             {{-- <div id="chart-md" style="height: 300px"></div> --}}
                                             <div class="circle-score">
                                                 <div class="circle-score-inner">
@@ -253,6 +258,11 @@
                                             VirusTotal
                                         </div>
                                         <div class="main-frame">
+
+                                            <div class="loadfixed backdrop-loader white">
+                                                <div class="loader4 centerloader"></div>
+                                                <div class="loadding-text">Loading ...</div>
+                                            </div>
 
                                             {{-- <div id="chart-md2" style="height: 300px"></div> --}}
 
@@ -280,6 +290,11 @@
                                             IBM X-Force
                                         </div>
                                         <div class="main-frame">
+
+                                            <div class="loadfixed backdrop-loader white">
+                                                <div class="loader4 centerloader"></div>
+                                                <div class="loadding-text">Loading ...</div>
+                                            </div>
 
                                             {{-- <div id="chart-md3" style="height: 300px"></div> --}}
 

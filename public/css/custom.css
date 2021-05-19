@@ -3539,6 +3539,7 @@ input.input-login:focus {
     align-items: center;
     justify-content: center;
     /* background: #2121216b; */
+    z-index: 999;
 }
  .centerloader{
     position: absolute;
@@ -4398,6 +4399,7 @@ section#av-detection .av-container .main-frame {
     overflow: hidden;
     text-overflow: ellipsis;
     flex: 1;
+    position: relative;
 }
 
 section#av-detection .av-container .details {
@@ -4934,3 +4936,8 @@ strong > p{
     background-color: #409967 !important;
     color: #409967 !important;
   }
+
+
+  .backdrop-loader.white{
+    background-color: #fff;
+}
