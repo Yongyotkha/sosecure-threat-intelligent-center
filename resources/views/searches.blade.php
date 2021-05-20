@@ -778,9 +778,9 @@
     let status_value_ibmcloud = 0;
     let status_value_virustotal = 0;
     let status_value_hybrid = 0;
-    let number = 0;
+    let number_risk = 0;
     function loadSearchAPI(source){
-        number++;
+        number_risk++;
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1082,7 +1082,7 @@
                     click_hybrid();
                 }
             }
-            if(number == 3){
+            if(number_risk == 3){
                 search_risk();
             }
         }).fail(function(jqXHR, ajaxOptions, thrownError){
