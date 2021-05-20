@@ -222,7 +222,7 @@
                     
                         <div id="show-chart-int" class="row av-results-wrapper has-falcon-button">
                             <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div id="card-search-int1">
+                                <div id="card-search-int1" class="main-int-card">
                                     <div class="text-center av-container border-success" data-chart="chart-cs-ml">
                                         <div class="title">
                                             <img src="https://www.crowdstrike.com/wp-content/uploads/2020/08/FalconPro@2x.svg" alt="" class="icon">
@@ -251,7 +251,7 @@
                                  </div>
                             </div>
                             <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div id="card-search-int2">
+                                <div id="card-search-int2" class="main-int-card">
                                     <div class="text-center av-container border-success" data-chart="chart-cs-ml">
                                         <div class="title">
                                             <img src="https://www.virustotal.com/gui/images/vt-enterprise.svg" alt="" class="icon">
@@ -282,7 +282,7 @@
                                 </div>
                             </div>
                             <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div id="card-search-int3">
+                                <div id="card-search-int3" class="main-int-card">
                                     <div class="text-center av-container border-success" data-chart="chart-cs-ml">
                                         <div class="title">
                                             <img src="https://exchange.xforce.ibmcloud.com/images/shortcut-icons/apple-icon-114x114.png" alt="" class="icon">
@@ -715,6 +715,39 @@
         {{-- loadSearchAPI('hybrid'); --}}
     });
 
+    function click_hybrid(){
+        $('#card-search-int1').on('click',function(){
+            $(this).toggleClass('active');
+            if($('#card-search-int1').hasClass('active')){
+                $('.table-hybrid').show();
+            }else{
+                $('.table-hybrid').hide();
+            }
+        });      
+    }
+    function click_virustotal(){
+        $('#card-search-int2').on('click',function(){
+            $(this).toggleClass('active');
+            if($('#card-search-int2').hasClass('active')){
+                $('.table-virustotal').show();
+            }else{
+                $('.table-virustotal').hide();
+            }
+ 
+        });      
+    }
+    function click_ibmcloud(){
+        $('#card-search-int3').on('click',function(){
+            $(this).toggleClass('active');
+            if($('#card-search-int3').hasClass('active')){
+                $('.table-ibmcloud').show();
+            }else{
+                $('.table-ibmcloud').hide();
+            }
+        });      
+    }
+
+
     var text_search_new = '{{request()->keyword}}';
     function loadSearchAPI(source){
         $.ajax({
@@ -768,6 +801,7 @@
                     "bAutoWidth": false ,
                 });
                 $('.load-ibmcloud').remove();
+                click_ibmcloud();
             }else if(source == 'virustotal'){
                 if(data.data.attributes.last_analysis_stats.harmless && data.data.attributes.last_analysis_stats.harmless > 0){
                     $('#text_' + source).text(data.data.attributes.last_analysis_stats.harmless);
@@ -811,40 +845,19 @@
                     "bAutoWidth": false ,
                 });
                 $('.load-virustotal').remove();
+                click_virustotal();
             }else if(source == 'hybrid'){
                 $('.load-hybrid').remove();
+                click_hybrid();
+
             }
-
-            $('#card-search-int1').addClass('main-int-card');
-            $('#card-search-int2').addClass('main-int-card');
-            $('#card-search-int3').addClass('main-int-card');
-
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
     }
 
 
-    $('#show-chart-int .main-int-card').on('click',function(){
-        $(this).toggleClass('active');
-        if($('#card-search-int1').hasClass('active')){
-            $('.table-hybrid').show();
-        }else{
-            $('.table-hybrid').hide();
-        }
-        if($('#card-search-int2').hasClass('active')){
-            $('.table-virustotal').show();
-        }else{
-            $('.table-virustotal').hide();
-        }
-        if($('#card-search-int3').hasClass('active')){
-            $('.table-ibmcloud').show();
-        }else{
-            $('.table-ibmcloud').hide();
-        }
-    });
-
-
+   
 
 
 
