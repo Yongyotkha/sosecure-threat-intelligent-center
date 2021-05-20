@@ -475,6 +475,12 @@ class SearchController extends Controller
                 }else if($type == 'Domain'){
                     $fields = [];
                     $postvars = '';
+                }else if($type == 'URL'){
+                    $fields = [];
+                    $postvars = '';
+                }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
+                    $fields = [];
+                    $postvars = '';
                 }
                 
                 // Send request to Server
