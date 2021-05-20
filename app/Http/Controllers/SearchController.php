@@ -16,6 +16,7 @@ use Modules\MonitoringVulnerabilitys\Entities\CVEMappingAssets;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use MongoDB\Client as MongoClient;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator as FacadesValidator;
 use Illuminate\Validation\Validator;
@@ -339,14 +340,18 @@ class SearchController extends Controller
             $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
             if($log_search){
                 $url = storage_path() .'/app/public/'.$log_search -> path;
-                $response = file_get_contents($url); 
+                if(!File::exists($url)){
+                    $response = null;
+                }else{
+                    $response = file_get_contents($url); 
+                }
             }else{
                 $check_limit_search = $this->check_limit_search($site_id, $source);
 
                 if(!$check_limit_search){
                     $response_data = array(
                         'status_code' => 400,
-                        'message' => '',
+                        'message' => 'เกิน limit การค้นหากรุณาติดต่อผู้ดูแลระบบ',
                     );
                     return response()->json($response_data);
                 }
@@ -384,22 +389,35 @@ class SearchController extends Controller
             }
             
         }else if($source =="virustotal"){
-            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
+            $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
             if($log_search){
-                $response = $log_search;
+                $url = storage_path() .'/app/public/'.$log_search -> path;
+                if(!File::exists($url)){
+                    $response = null;
+                }else{
+                    $response = file_get_contents($url); 
+                }
             }else{
                 $check_limit_search = $this->check_limit_search($site_id, $source);
 
                 if(!$check_limit_search){
                     $response_data = array(
                         'status_code' => 400,
-                        'message' => '',
+                        'message' => 'เกิน limit การค้นหากรุณาติดต่อผู้ดูแลระบบ',
                     );
                     return response()->json($response_data);
                 }
                 $virustotal_API_Key = "8ed71053d254aa99c9a79b73c6f3223cac762c2c77628d075e62ec506a538267";
-                $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/" . $keyword;
-                $virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
+                $type = 'ip';
+                if(!$validator->fails()){
+                    $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/" . $keyword;
+                }else if($domain){
+                    $type = 'domain';
+                    $virustotal_url='https://www.virustotal.com/api/v3/domains/' . $keyword;
+                }else{
+                    $type = 'string';
+                }
+
                 $headers = array(
                     'X-Apikey: '.$virustotal_API_Key
                 );
@@ -411,6 +429,16 @@ class SearchController extends Controller
                 // Get response
                 $response = curl_exec($ch);
                 curl_close($ch);  
+
+                $path = 'search_file/'.time().'.json';
+                if( Storage::disk('public')->put($path, $response)) {
+                    $log_search = new LogSearch();
+                    $log_search -> path = $path;
+                    $log_search -> keyword = $keyword;
+                    $log_search -> type = $type;
+                    $log_search -> source = $source;
+                    $log_search -> save();
+                }
             }
 
         }else if($source =="hybrid"){
