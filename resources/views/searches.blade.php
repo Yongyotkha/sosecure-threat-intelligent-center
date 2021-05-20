@@ -353,12 +353,15 @@
                         <table id="table-hybrid" class="table">
                             <thead>
                                 <tr>
-                                    <th>Filename</th>
+                                    <th>Environment Description</th>
+                                    <th>Job ID</th>
                                     <th>SHA256</th>
-                                    <th>Tags</th>
-                                    <th>AV Result</th>
-                                    <th>Sandbox Report</th>
+                                    <th>Size</th>
+                                    <th>Submit Name</th>
+                                    <th>Threat Score</th>
+                                    <th>Type Short</th>
                                     <th>Verdict</th>
+                                    <th>Date</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody-hybrid"></tbody>
@@ -703,7 +706,7 @@
             ]
         }]
     });
-
+    
     --}}
 
     $('.int-lookup-main').hide();
@@ -712,7 +715,7 @@
         $('.int-lookup-main').toggle();
         loadSearchAPI('ibmcloud');
         loadSearchAPI('virustotal');
-        {{-- loadSearchAPI('hybrid'); --}}
+        loadSearchAPI('hybrid');
     });
 
     var text_search_new = '{{request()->keyword}}';
@@ -721,8 +724,8 @@
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            method: 'post',
             url: "/loadSearchAPI",
+            method: 'post',
             data: ({
                 keyword:text_search_new,
                 source:source
@@ -812,6 +815,36 @@
                 });
                 $('.load-virustotal').remove();
             }else if(source == 'hybrid'){
+                if(data.count && data.count > 0){
+                    $('#text_' + source).text(data.count);
+                }
+                let html = ``;
+                for(let i in data.result){
+                    const results = data.result[i];
+                    html += `
+                    <tr>
+                        <td>${results.environment_description}</td>
+                        <td>${results.job_id}</td>
+                        <td>${results.sha256}</td>
+                        <td>${results.size}</td>
+                        <td>${results.submit_name}</td>
+                        <td>${results.threat_score}</td>
+                        <td>${results.type_short}</td>
+                        <td>${results.verdict}</td>
+                        <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
+                    </tr>
+                    `;
+                }
+                document.getElementById("tbody-hybrid").innerHTML = html;
+                $('#table-hybrid').DataTable({
+                    "dom": 'tp',
+                    "searching": false,
+                    "bPaginate": true,
+                    "bLengthChange": false,
+                    "bFilter": false,
+                    "bInfo": false,
+                    "bAutoWidth": false ,
+                });
                 $('.load-hybrid').remove();
             }
 
