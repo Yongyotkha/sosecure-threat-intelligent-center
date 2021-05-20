@@ -12,6 +12,7 @@ use Modules\SiteSettings\Entities\SiteConnectSystem;
 use Modules\SiteSettings\Http\Requests\SiteSettingsRequest;
 use Auth;
 use App\Classes\Fn_api;
+use App\SiteLimitApi;
 use App\transaction_client_site;
 use App\transaction_client_site_category;
 use Illuminate\Http\File;
@@ -236,6 +237,7 @@ class SiteSettingApiController extends Controller
             $transaction_client_site -> status = 1;
             $transaction_client_site -> save();
         }
+        
         $model->delete();
 
         $SiteCategory = SiteCategory::where('site_id',$model -> id)->get();

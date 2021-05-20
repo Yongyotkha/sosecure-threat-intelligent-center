@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\DataLeakFeed;
+use App\LogSearch;
 use App\R_s_s_news;
+use App\SiteLimitApi;
+use App\SiteRequestLimitApi;
+use App\SystemLimitApi;
 use App\Traits\Taggable;
 use DB;
 use Illuminate\Http\Request;
@@ -12,8 +16,10 @@ use Modules\MonitoringVulnerabilitys\Entities\CVEMappingAssets;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use MongoDB\Client as MongoClient;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator as FacadesValidator;
 use Illuminate\Validation\Validator;
+use Modules\SiteSettings\Entities\SiteSettings;
 
 class SearchController extends Controller
 {
@@ -310,7 +316,12 @@ class SearchController extends Controller
         $role_custom = @check_role_custom();
         $source = $request->source;
         $keyword = $request->keyword;
-        
+        $site_code = $request->code;
+        $site_id = 0;
+        if($site_code){
+            $site = SiteSettings::select('id')->where('code', $site_code)->first();
+            $site_id = $site -> id;
+        }
         $validator = FacadesValidator::make($request->all(), [
             'keyword' => 'ip'
         ]);
@@ -325,38 +336,83 @@ class SearchController extends Controller
         }
         $response = array();
         if($source =="ibmcloud"){
-            $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
-            $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
-            if(!$validator->fails()){
-                $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/" . $keyword;
-            }else if($domain){
-                $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/url/" . $keyword;
+            $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
+            if($log_search){
+                $url = storage_path() .'/app/public/'.$log_search -> path;
+                $response = file_get_contents($url); 
+            }else{
+                $check_limit_search = $this->check_limit_search($site_id, $source);
+
+                if(!$check_limit_search){
+                    $response_data = array(
+                        'status_code' => 400,
+                        'message' => '',
+                    );
+                    return response()->json($response_data);
+                }
+
+                $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
+                $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
+                $type = 'ip';
+                if(!$validator->fails()){
+                    $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/" . $keyword;
+                }else if($domain){
+                    $type = 'domain';
+                    $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/url/" . $keyword;
+                }else{
+                    $type = 'string';
+                }
+                
+                $ch = curl_init();
+                header('Content-type: application/json');
+                curl_setopt($ch, CURLOPT_URL,$ibmcloud_url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+                curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+                curl_setopt($ch, CURLOPT_USERPWD, "$ibmcloud_API_Key:$ibmcloud_API_Key_Password");
+                $result = curl_exec($ch);
+                $response = $result;
+                curl_close($ch);  
+                $path = 'search_file/'.time().'.json';
+                if( Storage::disk('public')->put($path, $response)) {
+                    $log_search = new LogSearch();
+                    $log_search -> path = $path;
+                    $log_search -> keyword = $keyword;
+                    $log_search -> type = $type;
+                    $log_search -> source = $source;
+                    $log_search -> save();
+                }
             }
             
-            $ch = curl_init();
-            header('Content-type: application/json');
-            curl_setopt($ch, CURLOPT_URL,$ibmcloud_url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            curl_setopt($ch, CURLOPT_USERPWD, "$ibmcloud_API_Key:$ibmcloud_API_Key_Password");
-            $result = curl_exec($ch);
-            $response = $result;
-            curl_close($ch);  
         }else if($source =="virustotal"){
-            $virustotal_API_Key = "8ed71053d254aa99c9a79b73c6f3223cac762c2c77628d075e62ec506a538267";
-            $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/" . $keyword;
-            $virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
-            $headers = array(
-                 'X-Apikey: '.$virustotal_API_Key
-            );
-            // Send request to Server
-            $ch = curl_init($virustotal_url);
-            // To save response in a variable from server, set headers;
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            // Get response
-            $response = curl_exec($ch);
-            curl_close($ch);  
+            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
+            if($log_search){
+                $response = $log_search;
+            }else{
+                $check_limit_search = $this->check_limit_search($site_id, $source);
+
+                if(!$check_limit_search){
+                    $response_data = array(
+                        'status_code' => 400,
+                        'message' => '',
+                    );
+                    return response()->json($response_data);
+                }
+                $virustotal_API_Key = "8ed71053d254aa99c9a79b73c6f3223cac762c2c77628d075e62ec506a538267";
+                $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/" . $keyword;
+                $virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
+                $headers = array(
+                    'X-Apikey: '.$virustotal_API_Key
+                );
+                // Send request to Server
+                $ch = curl_init($virustotal_url);
+                // To save response in a variable from server, set headers;
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                // Get response
+                $response = curl_exec($ch);
+                curl_close($ch);  
+            }
+
         }else if($source =="hybrid"){
 
 
@@ -372,6 +428,40 @@ class SearchController extends Controller
         );
         return response()->json($response_data);
     }
+
+    private function check_limit_search($site_id, $source){
+        $site_request_limit_api = SiteRequestLimitApi::where('site_id', $site_id)->where('mode', 'search')->where('source', $source)->first();
+        $system_limit_api = SystemLimitApi::select('limit')->where('mode', 'search')->where('source', $source)->first();
+        if($site_request_limit_api){
+            $site_limit_api = SiteLimitApi::select('limit')->where('site_id', $site_id)->where('source', $source)->where('mode', 'search')->first();
+            if($site_request_limit_api -> count < $site_limit_api -> limit){
+                $site_request_limit_api_sum = SiteRequestLimitApi::select('count')->where('mode', 'search')->where('source', $source)->sum('count');
+                if($site_request_limit_api_sum < $system_limit_api -> limit){
+                    $site_request_limit_api -> count = $site_request_limit_api -> count + 1;
+                    $site_request_limit_api -> save();
+                    $status = true;
+                }else{
+                    $status = false;
+                }
+            }
+        }else{
+            $site_request_limit_api_sum = SiteRequestLimitApi::select('count')->where('mode', 'search')->where('source', $source)->sum('count');
+            if($site_request_limit_api_sum < $system_limit_api -> limit){
+                $site_request_limit_api = new SiteRequestLimitApi();
+                $site_request_limit_api -> site_id = $site_id;
+                $site_request_limit_api -> source = $source;
+                $site_request_limit_api -> count = 1;
+                $site_request_limit_api -> mode = 'search';
+                $site_request_limit_api -> save();
+
+                $status = true;
+            }else{
+                $status = false;
+            }
+        }
+
+        return $status;
+    }   
 
     private function is_valid_domain($url){
 

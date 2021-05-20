@@ -21,6 +21,7 @@ use Modules\Users\Entities\UserSite;
 use Modules\Users\Entities\model_has_roles;
 use App\transaction_client_model_has_roles;
 use App\CredentialsController;
+use App\SiteLimitApi;
 use App\transaction_client_profiles;
 use App\transaction_client_site;
 use App\transaction_client_site_category;
@@ -202,6 +203,17 @@ class SiteSettingsController extends Controller
         $SiteSettings->mongo_user = str_random(10);
         $SiteSettings->mongo_password = str_random(15);
         $SiteSettings->save();
+        
+        $sources = ['ibmcloud', 'virustotal', 'hybrid'];
+        foreach($sources as  $source){
+            $site_limit_api = new SiteLimitApi();
+            $site_limit_api -> site_id = $SiteSettings->id;
+            $site_limit_api -> limit = 1000;
+            $site_limit_api -> source = $source;
+            $site_limit_api -> mode = 'search';
+            $site_limit_api->save();
+        }
+       
 
         $transaction_client_site = new transaction_client_site();
         $transaction_client_site -> site_id = $SiteSettings->id;
