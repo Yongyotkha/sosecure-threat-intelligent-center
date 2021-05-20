@@ -951,6 +951,10 @@
                                         html += `<span class="label label-secondary">
                                             ${last_analysis_results.result}
                                         </span>`;
+                                    }else if(last_analysis_results.result == null){
+                                        html += `<span class="label label-success">
+                                            undetected
+                                        </span>`;
                                     }else{
                                         html += `<span class="label label-danger">
                                             ${last_analysis_results.result}
