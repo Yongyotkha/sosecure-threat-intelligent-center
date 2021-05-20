@@ -235,6 +235,11 @@
                                                 <div class="loadding-text">Loading ...</div>
                                             </div>
 
+                                            
+                                            <div class="loadfixed backdrop-loader white">
+                                                <h1>No threat found</h1>
+                                            </div>
+
                                             {{-- <div id="chart-md" style="height: 300px"></div> --}}
                                             <div class="circle-score" id="circle-hybrid">
                                                 <div class="circle-score-inner">
