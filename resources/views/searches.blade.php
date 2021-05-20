@@ -769,77 +769,35 @@
         }).done(function(res){
             let data = res.data;
             if(source == 'ibmcloud'){
-                if(data.score && data.score > 0){
-                    $('#text_' + source).text(data.score * 10);
-                }
-                
-                let html = ``;
-                let historyByCats = [];
-                for(let i in data.history){
-                    const history = data.history[i];
-                    if(history.cats[Object.keys(history.cats)] != undefined && !historyByCats.includes(history.cats[Object.keys(history.cats)])){
-                        historyByCats.push(history.cats[Object.keys(history.cats)]);
-                        html += `
-                        <tr>
-                            <td>${Object.keys(history.cats)}</td>
-                            <td>${history.reason}</td>
-                            <td>
-                                ${history.geo.country} ${history.geo.countrycode}
-                            </td>
-                            <td>
-                                ${moment(new Date(history.created)).format('DD-MM-YYYY HH:MM:SS')}
-                            </td>
-                        </tr>
-                        `;
+                if(res.status_code == 400){
+                    $('.load-ibmcloud').remove();
+                }else{
+                    if(data.score && data.score > 0){
+                        $('#text_' + source).text(data.score * 10);
                     }
-                }
-                document.getElementById("tbody-ibmcloud").innerHTML = html;
-                $('#table-ibmcloud').DataTable({
-                    "dom": 'tp',
-                    "searching": false,
-                    "bPaginate": true,
-                    "bLengthChange": false,
-                    "bFilter": false,
-                    "bInfo": false,
-                    "bAutoWidth": false ,
-                });
-                $('.load-ibmcloud').remove();
-                click_ibmcloud();
-            }else if(source == 'virustotal'){
-                if(data.data){
-                    if(data.data.attributes.last_analysis_stats.harmless && data.data.attributes.last_analysis_stats.harmless > 0){
-                        $('#text_' + source).text(data.data.attributes.last_analysis_stats.harmless);
-                    }
+                    
                     let html = ``;
-                    for(let i in data.data.attributes.last_analysis_results){
-                        const last_analysis_results = data.data.attributes.last_analysis_results[i];
-                        html += `
-                        <tr>
-                            <td>${last_analysis_results.engine_name}</td>
-                            <td>${last_analysis_results.category}</td>
-                            <td>
-                                ${last_analysis_results.method} 
-                            </td>
-                            <td>`;
-                                if(last_analysis_results.result == 'malicious'){
-                                    html += `<span class="label label-danger">
-                                        ${last_analysis_results.result}
-                                    </span>`; 
-                                }else if(last_analysis_results.result == 'clean'){
-                                    html += `<span class="label label-success">
-                                        ${last_analysis_results.result}
-                                    </span>`;
-                                }else if(last_analysis_results.result == 'unrated'){
-                                    html += `<span class="label label-secondary">
-                                        ${last_analysis_results.result}
-                                    </span>`;
-                                }
-                            html += `</td>
-                        </tr>
-                        `;
+                    let historyByCats = [];
+                    for(let i in data.history){
+                        const history = data.history[i];
+                        if(history.cats[Object.keys(history.cats)] != undefined && !historyByCats.includes(history.cats[Object.keys(history.cats)])){
+                            historyByCats.push(history.cats[Object.keys(history.cats)]);
+                            html += `
+                            <tr>
+                                <td>${Object.keys(history.cats)}</td>
+                                <td>${history.reason}</td>
+                                <td>
+                                    ${history.geo.country} ${history.geo.countrycode}
+                                </td>
+                                <td>
+                                    ${moment(new Date(history.created)).format('DD-MM-YYYY HH:MM:SS')}
+                                </td>
+                            </tr>
+                            `;
+                        }
                     }
-                    document.getElementById("tbody-virustotal").innerHTML = html;
-                    $('#table-virustotal').DataTable({
+                    document.getElementById("tbody-ibmcloud").innerHTML = html;
+                    $('#table-ibmcloud').DataTable({
                         "dom": 'tp',
                         "searching": false,
                         "bPaginate": true,
@@ -848,45 +806,98 @@
                         "bInfo": false,
                         "bAutoWidth": false ,
                     });
+                    $('.load-ibmcloud').remove();
+                    click_ibmcloud();
                 }
-                $('.load-virustotal').remove();
-                click_virustotal();
+            }else if(source == 'virustotal'){
+                if(res.status_code == 400){
+                    $('.load-virustotal').remove();
+                }else{
+                    if(data.data){
+                        if(data.data.attributes.last_analysis_stats.harmless && data.data.attributes.last_analysis_stats.harmless > 0){
+                            $('#text_' + source).text(data.data.attributes.last_analysis_stats.harmless);
+                        }
+                        let html = ``;
+                        for(let i in data.data.attributes.last_analysis_results){
+                            const last_analysis_results = data.data.attributes.last_analysis_results[i];
+                            html += `
+                            <tr>
+                                <td>${last_analysis_results.engine_name}</td>
+                                <td>${last_analysis_results.category}</td>
+                                <td>
+                                    ${last_analysis_results.method} 
+                                </td>
+                                <td>`;
+                                    if(last_analysis_results.result == 'malicious'){
+                                        html += `<span class="label label-danger">
+                                            ${last_analysis_results.result}
+                                        </span>`; 
+                                    }else if(last_analysis_results.result == 'clean'){
+                                        html += `<span class="label label-success">
+                                            ${last_analysis_results.result}
+                                        </span>`;
+                                    }else if(last_analysis_results.result == 'unrated'){
+                                        html += `<span class="label label-secondary">
+                                            ${last_analysis_results.result}
+                                        </span>`;
+                                    }
+                                html += `</td>
+                            </tr>
+                            `;
+                        }
+                        document.getElementById("tbody-virustotal").innerHTML = html;
+                        $('#table-virustotal').DataTable({
+                            "dom": 'tp',
+                            "searching": false,
+                            "bPaginate": true,
+                            "bLengthChange": false,
+                            "bFilter": false,
+                            "bInfo": false,
+                            "bAutoWidth": false ,
+                        });
+                    }
+                    $('.load-virustotal').remove();
+                    click_virustotal();
+                }
             }else if(source == 'hybrid'){
-                let html = ``;
-                let total = 0;
-                for(let i in data.result){
-                    const results = data.result[i];
-                    total += results.threat_score;
-                    html += `
-                    <tr>
-                        <td>${results.environment_description}</td>
-                        <td>${results.job_id}</td>
-                        <td>${results.sha256}</td>
-                        <td>${results.size}</td>
-                        <td>${results.submit_name}</td>
-                        <td>${results.threat_score}</td>
-                        <td>${results.type_short}</td>
-                        <td>${results.verdict}</td>
-                        <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
-                    </tr>
-                    `;
+                if(res.status_code == 400){
+                    $('.load-hybrid').remove();
+                }else{
+                    let html = ``;
+                    let total = 0;
+                    for(let i in data.result){
+                        const results = data.result[i];
+                        total += results.threat_score;
+                        html += `
+                        <tr>
+                            <td>${results.environment_description}</td>
+                            <td>${results.job_id}</td>
+                            <td>${results.sha256}</td>
+                            <td>${results.size}</td>
+                            <td>${results.submit_name}</td>
+                            <td>${results.threat_score}</td>
+                            <td>${results.type_short}</td>
+                            <td>${results.verdict}</td>
+                            <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
+                        </tr>
+                        `;
+                    }
+                    if(data.count && data.count > 0){
+                        $('#text_' + source).text(total / data.count);
+                    }
+                    document.getElementById("tbody-hybrid").innerHTML = html;
+                    $('#table-hybrid').DataTable({
+                        "dom": 'tp',
+                        "searching": false,
+                        "bPaginate": true,
+                        "bLengthChange": false,
+                        "bFilter": false,
+                        "bInfo": false,
+                        "bAutoWidth": false ,
+                    });
+                    $('.load-hybrid').remove();
+                    click_hybrid();
                 }
-                if(data.count && data.count > 0){
-                    $('#text_' + source).text(total / data.count);
-                }
-                document.getElementById("tbody-hybrid").innerHTML = html;
-                $('#table-hybrid').DataTable({
-                    "dom": 'tp',
-                    "searching": false,
-                    "bPaginate": true,
-                    "bLengthChange": false,
-                    "bFilter": false,
-                    "bInfo": false,
-                    "bAutoWidth": false ,
-                });
-                $('.load-hybrid').remove();
-                click_hybrid();
-
             }
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
