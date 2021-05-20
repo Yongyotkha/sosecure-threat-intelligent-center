@@ -323,15 +323,11 @@ class SearchController extends Controller
             $site = SiteSettings::select('id')->where('code', $site_code)->first();
             $site_id = $site -> id;
         }
-        $validator = FacadesValidator::make($request->all(), [
-            'keyword' => 'ip'
-        ]);
-        $domain = $this->is_valid_domain($keyword);
-
-        if ($validator->fails() && !$domain) {
+        $type = $this->check_keyword_type($keyword);
+        if($type == ''){
             $response_data = array(
                 'status_code' => 400,
-                'message' => '',
+                'message' => 'allow only type ( IP,Domain,URL,MD5, SHA1 or SHA256 ) กรุณาติดต่อผู้ดูแลระบบ',
             );
             return response()->json($response_data);
         }
@@ -358,14 +354,10 @@ class SearchController extends Controller
 
                 $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
                 $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
-                $type = 'ip';
-                if(!$validator->fails()){
+                if($type == 'IP'){
                     $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/" . $keyword;
-                }else if($domain){
-                    $type = 'domain';
+                }else if($type == 'Domain'){
                     $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/url/" . $keyword;
-                }else{
-                    $type = 'string';
                 }
                 
                 $ch = curl_init();
@@ -408,14 +400,10 @@ class SearchController extends Controller
                     return response()->json($response_data);
                 }
                 $virustotal_API_Key = "8ed71053d254aa99c9a79b73c6f3223cac762c2c77628d075e62ec506a538267";
-                $type = 'ip';
-                if(!$validator->fails()){
+                if($type == 'IP'){
                     $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/" . $keyword;
-                }else if($domain){
-                    $type = 'domain';
+                }else if($type == 'Domain'){
                     $virustotal_url='https://www.virustotal.com/api/v3/domains/' . $keyword;
-                }else{
-                    $type = 'string';
                 }
 
                 $headers = array(
@@ -442,19 +430,68 @@ class SearchController extends Controller
             }
 
         }else if($source =="hybrid"){
+            $hybrid_API_Key = "kpy0ibau846587b1lnemkw4k082be03bncw1bkz140a16b6cs64sk6uzf0498e3f";
+            $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
+            //$virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
+            $headers = array(
+                 'api-key: '.$hybrid_API_Key,
+                 'accept: '.'application/json',
+                 'Content-Type: '.'application/x-www-form-urlencoded',
+                 'user-agent: '.'Falcon Sandbox',
+            );
+            //'host'=>'151.101.2.110','domain'=>'151.101.2.110','url'=>'151.101.2.110','url'=>'151.101.2.110','similar_to'=>'151.101.2.110','context'=>'151.101.2.110'
 
-
-
-        }else{
-
+            $fields = array( 'host'=>'165.227.87.17');
+            $postvars = '';
+            foreach($fields as $key=>$value) {
+                $postvars .= $key . "=" . $value . "&";
+              }
+            // Send request to Server
+            $ch = curl_init($hybrid_url);
+            // To save response in a variable from server, set headers;
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_POSTFIELDS,$postvars);
+            // Get response
+            $response = curl_exec($ch);
+            curl_close($ch);  
+            echo($response);
         }
-          
+    
         $response_data = array(
             'status_code' => Response::HTTP_OK,
             'message' => '',
             'data' => json_decode($response, true)
         );
         return response()->json($response_data);
+    }
+
+    private function check_keyword_type($keyword){
+        $type = '';
+        if (preg_match("/^([a-f0-9]{64})$/", $keyword) == 1) {
+            $type =  'SHA256';
+        }else if(preg_match('/^[a-f0-9]{32}$/', $keyword)) {
+            $type = 'MD5';
+        }else if(preg_match('/^[0-9a-f]{40}$/i', $keyword)) {
+            $type = 'SHA1';
+        }else if(filter_var($keyword, FILTER_VALIDATE_IP)) {
+            $type = 'IP';
+        }else if(filter_var($keyword, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $type = 'IP';
+        }else if(filter_var($keyword, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE)) {
+            $type = 'IP';
+        }else if(filter_var($keyword, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE)) {
+            $type = 'IP';
+        }else if(preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $keyword) //valid chars check
+        && preg_match("/^.{1,253}$/", $keyword) //overall length check
+        && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $keyword)   ) {
+            $type = 'Domain';
+        }else if(preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$keyword)) {
+            $type = 'URL';
+        }else if(preg_match("/\b(?:(?:http?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$keyword)) {
+            $type = 'URL';
+        }
+        return $type;
     }
 
     private function check_limit_search($site_id, $source){
