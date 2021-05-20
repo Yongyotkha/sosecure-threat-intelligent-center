@@ -817,17 +817,18 @@
                     if(data.data){
                         if(data.data.attributes.last_analysis_stats.malicious && data.data.attributes.last_analysis_stats.malicious > 0){
                             $('#text_' + source).text(data.data.attributes.last_analysis_stats.malicious);
+                            var last_analysis_stats = data.data.attributes.last_analysis_stats;
                             if(data.data.attributes.last_analysis_stats.malicious >= 3){
-                                
+
                             }else if(data.data.attributes.last_analysis_stats.malicious >= 5){
-                                $('#circle-virustotal').css('background-color', '#f2ff15 !important');
+                                $('#circle-virustotal').attr('style', 'background-color: #f2ff15 !important');
                             }else if(data.data.attributes.last_analysis_stats.malicious >= 7){
-                                $('#circle-virustotal').css('background-color', '#fcc838 !important');
+                                $('#circle-virustotal').attr('style', 'background-color: #fcc838 !important');
                             }else if(data.data.attributes.last_analysis_stats.malicious >= 10){
-                                $('#circle-virustotal').css('background-color', '#b93624 !important');
+                                $('#circle-virustotal').attr('style', 'background-color: #b93624 !important');
                             }
-                            let last_analysis_stats = data.data.attributes.last_analysis_stats;
-                            let total = (last_analysis_stats.harmless + last_analysis_stats.malicious + last_analysis_stats.suspicious + last_analysis_stats.timeout + last_analysis_stats.undetected)
+    
+                            let total = (parseInt(last_analysis_stats.harmless) + parseInt(last_analysis_stats.malicious) + parseInt(last_analysis_stats.suspicious) + parseInt(last_analysis_stats.timeout) + parseInt(last_analysis_stats.undetected));
                             $('#text_virustotal_sum').text(total);
                         }
                         
