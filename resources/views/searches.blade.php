@@ -1001,7 +1001,7 @@
                         </tr>
                         `;
                     }
-                    if(data.count == 0 || (total / data.count == 0)){
+                    if(data.count == 0 || (total / data.count == 0) || data.validation_errors){
                         $('#not-hybrid').show();
                     }
                     if(data.count && data.count > 0){
