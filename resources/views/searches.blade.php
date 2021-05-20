@@ -127,8 +127,9 @@
                                 Overall Risk
                             </h3>
                             <span class="st-dt-leak">
-                                <span class="st-dt vrh" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrh'>High</div><div class='text-st-tooltip'>High Risk	ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">High Risk</span>
-                                <span class="st-dt high" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip md'>Medium</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Medium Risk</span>
+                                <span class="st-dt vrh" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrh'>Very High</div><div class='text-st-tooltip'>High Risk	ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Very High Risk</span>
+                                <span class="st-dt high" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrh'>High</div><div class='text-st-tooltip'>High Risk	ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">High Risk</span>
+                                <span class="st-dt md" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip md'>Medium</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Medium Risk</span>
                                 <span class="st-dt low" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip low'>Low</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของลูกค้าเช่น ข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">Low Risk</span>
                             </span>
                         </div>
@@ -235,7 +236,7 @@
                                             </div>
 
                                             {{-- <div id="chart-md" style="height: 300px"></div> --}}
-                                            <div class="circle-score">
+                                            <div class="circle-score" id="circle-hybrid">
                                                 <div class="circle-score-inner">
                                                     <div class="circle-text-score">
                                                         <span id="text_hybrid">0</span> <span>/ 100</span>
@@ -266,10 +267,10 @@
 
                                             {{-- <div id="chart-md2" style="height: 300px"></div> --}}
 
-                                            <div class="circle-score">
+                                            <div class="circle-score" id="circle-virustotal">
                                                 <div class="circle-score-inner">
                                                     <div class="circle-text-score">
-                                                        <span id="text_virustotal">0</span> <span>/ 100</span>
+                                                        <span id="text_virustotal">0</span> <span id="text_virustotal_sum">/ 0</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -298,10 +299,10 @@
 
                                             {{-- <div id="chart-md3" style="height: 300px"></div> --}}
 
-                                            <div class="circle-score">
+                                            <div class="circle-score" id="circle-ibmcloud">
                                                 <div class="circle-score-inner">
                                                     <div class="circle-text-score">
-                                                        <span id="text_ibmcloud">0</span> <span>/ 100</span>
+                                                        <span id="text_ibmcloud">0</span> <span>/ 10</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -773,7 +774,7 @@
                     $('.load-ibmcloud').remove();
                 }else{
                     if(data.score && data.score > 0){
-                        $('#text_' + source).text(data.score * 10);
+                        $('#text_' + source).text(data.score);
                     }
                     
                     let html = ``;
@@ -814,9 +815,22 @@
                     $('.load-virustotal').remove();
                 }else{
                     if(data.data){
-                        if(data.data.attributes.last_analysis_stats.harmless && data.data.attributes.last_analysis_stats.harmless > 0){
-                            $('#text_' + source).text(data.data.attributes.last_analysis_stats.harmless);
+                        if(data.data.attributes.last_analysis_stats.malicious && data.data.attributes.last_analysis_stats.malicious > 0){
+                            $('#text_' + source).text(data.data.attributes.last_analysis_stats.malicious);
+                            if(data.data.attributes.last_analysis_stats.malicious >= 3){
+                                
+                            }else if(data.data.attributes.last_analysis_stats.malicious >= 5){
+                                $('#circle-virustotal').css('background-color', '#f2ff15 !important');
+                            }else if(data.data.attributes.last_analysis_stats.malicious >= 7){
+                                $('#circle-virustotal').css('background-color', '#fcc838 !important');
+                            }else if(data.data.attributes.last_analysis_stats.malicious >= 10){
+                                $('#circle-virustotal').css('background-color', '#b93624 !important');
+                            }
+                            let last_analysis_stats = data.data.attributes.last_analysis_stats;
+                            let total = (last_analysis_stats.harmless + last_analysis_stats.malicious + last_analysis_stats.suspicious + last_analysis_stats.timeout + last_analysis_stats.undetected)
+                            $('#text_virustotal_sum').text(total);
                         }
+                        
                         let html = ``;
                         for(let i in data.data.attributes.last_analysis_results){
                             const last_analysis_results = data.data.attributes.last_analysis_results[i];
@@ -828,10 +842,14 @@
                                     ${last_analysis_results.method} 
                                 </td>
                                 <td>`;
-                                    if(last_analysis_results.result == 'malicious'){
+                                    if(last_analysis_results.result == 'malicious' || last_analysis_results.result == 'phishing' || last_analysis_results.result == 'malware'){
                                         html += `<span class="label label-danger">
                                             ${last_analysis_results.result}
                                         </span>`; 
+                                    }else if(last_analysis_results.result == 'suspicious'){
+                                        html += `<span class="label label-warning">
+                                            ${last_analysis_results.result}
+                                        </span>`;
                                     }else if(last_analysis_results.result == 'clean'){
                                         html += `<span class="label label-success">
                                             ${last_analysis_results.result}
