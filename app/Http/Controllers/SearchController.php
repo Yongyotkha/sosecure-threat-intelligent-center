@@ -456,7 +456,7 @@ class SearchController extends Controller
                 }
 
                 $hybrid_API_Key = "kpy0ibau846587b1lnemkw4k082be03bncw1bkz140a16b6cs64sk6uzf0498e3f";
-                $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
+
                 //$virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
                 $headers = array(
                     'api-key: '.$hybrid_API_Key,
@@ -467,20 +467,33 @@ class SearchController extends Controller
                 //'host'=>'151.101.2.110','domain'=>'151.101.2.110','url'=>'151.101.2.110','url'=>'151.101.2.110','similar_to'=>'151.101.2.110','context'=>'151.101.2.110'
                 
                 if($type == 'IP'){
+                    $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
                     $fields = array('host'=>$keyword);
                     $postvars = '';
                     foreach($fields as $key=>$value) {
                         $postvars .= $key . "=" . $value . "&";
                     }
                 }else if($type == 'Domain'){
-                    $fields = [];
+                    $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
+                    $fields = array('domain'=>$keyword);
                     $postvars = '';
-                }else if($type == 'URL'){
-                    $fields = [];
+                    foreach($fields as $key=>$value) {
+                        $postvars .= $key . "=" . $value . "&";
+                    }
+                }else if($type == 'url'){
+                    $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
+                    $fields = array('domain'=>$keyword);
                     $postvars = '';
+                    foreach($fields as $key=>$value) {
+                        $postvars .= $key . "=" . $value . "&";
+                    }
                 }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
-                    $fields = [];
+                    $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/hash";
+                    $fields = array('hash'=>$keyword);
                     $postvars = '';
+                    foreach($fields as $key=>$value) {
+                        $postvars .= $key . "=" . $value . "&";
+                    }
                 }
                 
                 // Send request to Server
@@ -508,7 +521,8 @@ class SearchController extends Controller
         $response_data = array(
             'status_code' => Response::HTTP_OK,
             'message' => '',
-            'data' => json_decode($response, true)
+            'data' => json_decode($response, true),
+            'type' => $type,
         );
         return response()->json($response_data);
     }
