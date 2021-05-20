@@ -236,7 +236,7 @@
                                             </div>
 
                                             
-                                            <div class="loadfixed backdrop-loader white">
+                                            <div class="loadfixed backdrop-loader white" id="not-hybrid" style="display: none">
                                                 <h1>No threat found</h1>
                                             </div>
 
@@ -268,6 +268,10 @@
                                             <div class="load-virustotal loadfixed backdrop-loader white">
                                                 <div class="loader4 centerloader"></div>
                                                 <div class="loadding-text">Loading ...</div>
+                                            </div>
+
+                                            <div class="loadfixed backdrop-loader white" id="not-virustotal" style="display: none">
+                                                <h1>No threat found</h1>
                                             </div>
 
                                             {{-- <div id="chart-md2" style="height: 300px"></div> --}}
@@ -303,6 +307,10 @@
                                             </div>
 
                                             {{-- <div id="chart-md3" style="height: 300px"></div> --}}
+
+                                            <div class="loadfixed backdrop-loader white" id="not-ibmcloud" style="display: none">
+                                                <h1>No threat found</h1>
+                                            </div>
 
                                             <div class="circle-score" id="circle-ibmcloud">
                                                 <div class="circle-score-inner">
@@ -799,7 +807,10 @@
                         const malware = data.malware;
                         num_total = malware.origins.external.detectionCoverage == 0 ? 0 : malware.origins.external.detectionCoverage / 10;
                     }
-
+                    if(num_total == 0){
+                        $('#not-ibmcloud').show();
+                    }
+                    
                     $('#text_' + source).text(num_total);
                     const elem = $("#circle-ibmcloud");
                     if(num_total <= 3.9){
@@ -813,6 +824,7 @@
                         elem[0].style.setProperty('background-color', '#fcc838', 'important');
                         $('#text_' + source).css('color', '#fcc838');
                     }
+
                     
                     let html = ``;
                     let historyByCats = [];
@@ -886,6 +898,9 @@
                 }else{
                     if(data.data){
                         var last_analysis_stats = data.data.attributes.last_analysis_stats;
+                        if(last_analysis_stats.malicious == 0){
+                            $('#not-virustotal').show();
+                        }
                         if(data.data.attributes.last_analysis_stats.malicious && data.data.attributes.last_analysis_stats.malicious > 0){
                             $('#text_' + source).text(data.data.attributes.last_analysis_stats.malicious);
                             const elem = $("#circle-virustotal");
@@ -977,6 +992,9 @@
                             <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
                         </tr>
                         `;
+                    }
+                    if(data.count == 0 || (total / data.count == 0)){
+                        $('#not-hybrid').show();
                     }
                     if(data.count && data.count > 0){
                         $('#text_' + source).text(total / data.count);
