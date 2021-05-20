@@ -775,7 +775,12 @@
 
 
     var text_search_new = '{{request()->keyword}}';
+    let status_value_ibmcloud = 0;
+    let status_value_virustotal = 0;
+    let status_value_hybrid = 0;
+    let number = 0;
     function loadSearchAPI(source){
+        number++;
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -791,9 +796,6 @@
             },
         }).done(function(res){
             let data = res.data;
-            let status_value_ibmcloud = 0;
-            let status_value_virustotal = 0;
-            let status_value_hybrid = 0;
             $('#type_search').text(res.type);
             if(source == 'ibmcloud'){
                 if(res.status_code == 400){
@@ -1080,33 +1082,38 @@
                     click_hybrid();
                 }
             }
-            let summary_total = (status_value_ibmcloud + status_value_virustotal + status_value_hybrid) / 3;
-            let html_status = ``;
-            if(summary_total <= 1.9){
-                html_status += `<div class="status-risk success">
-                    <span class="st-circle-ovr"></span> LOW RISK
-                </div>`;
-            }else if(summary_total <= 2.6){
-                html_status += `<div class="status-risk success" style="color:#f2ff15">
-                    <span class="st-circle-ovr"></span> MEDIUM RISK
-                </div>`;
-            }else if(summary_total <= 3){
-                html_status += `<div class="status-risk warning">
-                    <span class="st-circle-ovr"></span> HIGH RISK
-                </div>`;
-            }else if(summary_total >= 3){
-                html_status += `<div class="status-risk danger">
-                    <span class="st-circle-ovr"></span> VERY HIGH RISK
-                </div>`;
+            if(number == 3){
+                search_risk();
             }
-            $('#text_status_risk').html(html_status);
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
     }
 
 
-   
+   function search_risk(){
+    let summary_total = (status_value_ibmcloud + status_value_virustotal + status_value_hybrid) / 3;
+    console.log(summary_total);
+    let html_status = ``;
+    if(summary_total <= 1.9){
+        html_status += `<div class="status-risk success">
+            <span class="st-circle-ovr"></span> LOW RISK
+        </div>`;
+    }else if(summary_total <= 2.6){
+        html_status += `<div class="status-risk info" style="color:#f2ff15">
+            <span class="st-circle-ovr"></span> MEDIUM RISK
+        </div>`;
+    }else if(summary_total <= 3){
+        html_status += `<div class="status-risk warning">
+            <span class="st-circle-ovr"></span> HIGH RISK
+        </div>`;
+    }else if(summary_total >= 3){
+        html_status += `<div class="status-risk danger">
+            <span class="st-circle-ovr"></span> VERY HIGH RISK
+        </div>`;
+    }
+    $('#text_status_risk').html(html_status);
+   }
 
 
 
