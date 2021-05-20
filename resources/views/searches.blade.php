@@ -951,6 +951,10 @@
                                         html += `<span class="label label-secondary">
                                             ${last_analysis_results.result}
                                         </span>`;
+                                    }else{
+                                        html += `<span class="label label-danger">
+                                            ${last_analysis_results.result}
+                                        </span>`; 
                                     }
                                 html += `</td>
                             </tr>

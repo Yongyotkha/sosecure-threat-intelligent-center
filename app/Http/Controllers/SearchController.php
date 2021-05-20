@@ -409,7 +409,7 @@ class SearchController extends Controller
                 }else if($type == 'URL'){
                     $virustotal_url='https://www.virustotal.com/api/v3/url/' . $keyword;
                 }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
-                    $virustotal_url='https://www.virustotal.com/api/v3/file/' . $keyword;
+                    $virustotal_url='https://www.virustotal.com/api/v3/files/' . $keyword;
                 }
 
                 $headers = array(
