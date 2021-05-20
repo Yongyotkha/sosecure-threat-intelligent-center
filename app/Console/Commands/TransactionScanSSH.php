@@ -92,7 +92,7 @@ class TransactionScanSSH extends Command
                 );
                 flush();
 
-        
+              //  for ($i=1; $i <= 3; $i++) { 
         
                     try {
                         $this->info($cmd_looking_for_subdomain_securitytrails);
@@ -110,14 +110,15 @@ class TransactionScanSSH extends Command
 
                         $file = $path.'/looking_for_subdomain_securitytrails.txt';
                         file_put_contents($file, $current_looking_for_subdomain_securitytrails);
-                        break;
+                        //break;
                     } catch (\Throwable $th) {
                         //throw $th;
                     }
-                
+              //  }
 
                 for ($i=1; $i <= 3; $i++) { 
                     try {
+                        $this->info($cmd_looking_for_subdomain);
                         $process_looking_for_subdomain = proc_open($cmd_looking_for_subdomain, $descriptorspec, $pipes, realpath('./'), array());
                         if (is_resource($process_looking_for_subdomain)) {
                             while ($s = fgets($pipes[1])) {
