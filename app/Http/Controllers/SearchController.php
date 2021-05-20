@@ -555,6 +555,8 @@ class SearchController extends Controller
                 }else{
                     $status = false;
                 }
+            }else{
+                $status = false;
             }
         }else{
             $site_request_limit_api_sum = SiteRequestLimitApi::select('count')->where('mode', 'search')->where('source', $source)->sum('count');
