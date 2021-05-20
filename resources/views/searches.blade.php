@@ -850,12 +850,11 @@
                 $('.load-virustotal').remove();
                 click_virustotal();
             }else if(source == 'hybrid'){
-                if(data.count && data.count > 0){
-                    $('#text_' + source).text(data.count);
-                }
                 let html = ``;
+                let total = 0;
                 for(let i in data.result){
                     const results = data.result[i];
+                    total += results.threat_score;
                     html += `
                     <tr>
                         <td>${results.environment_description}</td>
@@ -869,6 +868,9 @@
                         <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
                     </tr>
                     `;
+                }
+                if(data.count && data.count > 0){
+                    $('#text_' + source).text(total / data.count);
                 }
                 document.getElementById("tbody-hybrid").innerHTML = html;
                 $('#table-hybrid').DataTable({
