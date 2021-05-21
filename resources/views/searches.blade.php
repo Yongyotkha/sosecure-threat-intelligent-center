@@ -1107,8 +1107,8 @@
                                 <td>${results.sha256}</td>
                                 <td>${results.submit_name}</td>
                                 <td>${results.type_short}</td>
-                                <td>${results.threat_score}</td>
-                                <td>${results.av_detect}</td>
+                                <td>${results.threat_score ? results.threat_score : 0}</td>
+                                <td>${results.av_detect ? results.av_detect : 0}</td>
                                 <td>${results.verdict}</td>
                                 <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
                             </tr>
@@ -1162,8 +1162,8 @@
                                 <td>${results.sha256}</td>
                                 <td>${results.submit_name}</td>
                                 <td>${results.type_short}</td>
-                                <td>${results.threat_score}</td>
-                                <td>${results.av_detect}</td>
+                                <td>${results.threat_score ? results.threat_score : 0}</td>
+                                <td>${results.av_detect ? results.av_detect : 0}</td>
                                 <td>${results.verdict}</td>
                                 <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
                             </tr>
