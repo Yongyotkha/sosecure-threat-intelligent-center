@@ -3,8 +3,9 @@
 <div class="content">
     <section id="content" class="m-t-lg wrapper-md m-t-cust">
         <div id="login-darken"></div>
-        <div id="login-form" class="container aside-xxl animated fadeInUp">
-            <span class="navbar-brand block {{  (get_option('blur_login') == 'TRUE') ? 'text' : '' }}">
+        <div id="login-form" class="container aside-xxl animated fadeInUp" style="max-width: 800px !important">
+
+            {{-- <span class="navbar-brand block {{  (get_option('blur_login') == 'TRUE') ? 'text' : '' }}">
                 @php $display = get_option('logo_or_icon'); @endphp
                 @if ($display == 'logo' || $display == 'logo_title')
                 <img src="{{ getStorageUrl(config('system.media_dir').'/'.get_option('company_logo')) }}"
@@ -19,12 +20,31 @@
                 {{ get_option('website_name') }}
                 @endif
                 @endif
+            </span> --}}
+
+            <span class="nav-header-login navbar-brand">
+                <img src="{{asset('images/logo_threat/logo_site.png')}}" class="logo-sosecure mt-2" style="margin-bottom: 3rem;">
+                @php $display = get_option('logo_or_icon'); @endphp
+                {{-- @if ($display == 'logo' || $display == 'logo_title')
+                <img src="{{ getStorageUrl(config('system.media_dir').'/'.get_option('company_logo')) }}"
+                class="img-responsive logo-sosecure mt-2 {{ ($display == 'logo' ? '' : 'thumb-sm m-r-sm') }}"><br>
+                @elseif ($display == 'icon' || $display == 'icon_title')
+                <i class="{{ get_option('site_icon') }}"></i>
+                @endif
+                @if ($display == 'logo_title' || $display == 'icon_title')
+                @if (get_option('website_name') == '')
+                {{ get_option('company_name') }}
+                @else
+                {{ get_option('website_name') }}
+                @endif
+                @endif --}}
             </span>
+
+
             <section class="panel panel-default bg-white-cust m-t-lg b-r-cust">
-                <header class="panel-heading text-center"><strong>@langapp('2fa_authentication')</strong>
-                </header>
-                
-                <div class="panel-body">
+                <div class="panel-body text-center">
+                    <h1 style="margin-bottom: 2rem;color:#333;">Two-factor authentication</h1>
+                    <p style="font-size: 18px;margin-bottom: 2rem">Open Your authentication app and enter the code <br> for SOSECURE Threat inSight</p>
                     <form class="form-horizontal" method="POST" action="{{ route('2fa.auth') }}">
                         {{ csrf_field() }}
                         @if ($errors->has('message'))
@@ -33,16 +53,17 @@
                             {{ $errors->first('message') }}
                         </div>
                         @endif
-                        <p>@langapp('enter_auth_code')</p>
                         <div class="form-group">
                             <div class="col-md-12">
-                                <input id="one_time_password" type="text" class="form-control" name="one_time_password" required autofocus>
+                                <input id="one_time_password" type="text" class="form-control" name="one_time_password" placeholder="Enter 6 digits code" required autofocus style="height: 55px !important;">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block">@langapp('login')</button>
-                        <div class="m-sm">
-                            <a href="{{ url('/logout') }}">@langapp('cancel')</a> | <a href="{{ route('2fa.reset') }}">@langapp('reset_2fa')</a>
+                        <div style="margin: 2rem 0">
+                            <button type="submit" class="btn btn-info btn-block"><h3 style="margin: 1rem 0 !important">Verify</h3></button>
                         </div>
+                        {{-- <div class="m-sm">
+                            <a href="{{ url('/logout') }}">@langapp('cancel')</a> | <a href="{{ route('2fa.reset') }}">@langapp('verify')</a>
+                        </div> --}}
                         
                     </form>
                 </div>
