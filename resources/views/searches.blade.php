@@ -128,7 +128,7 @@
                             </h3>
                             <span class="st-dt-leak">
                                 <span class="st-dt vrh" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrh'>Very High</div><div class='text-st-tooltip'>Very High ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Very High</span>
-                                <span class="st-dt high" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrh'>High</div><div class='text-st-tooltip'>High ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">High</span>
+                                <span class="st-dt high" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip high'>High</div><div class='text-st-tooltip'>High ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">High</span>
                                 <span class="st-dt md" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip md'>Medium</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Medium</span>
                                 <span class="st-dt low" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip low'>Low</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของลูกค้าเช่น ข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">Low</span>
                             </span>
@@ -393,6 +393,8 @@
                                     <th>SHA256</th>
                                     <th>Submit Name</th>
                                     <th>Type Short</th>
+                                    <th>Threat Score</th>
+                                    <th>AV Detection</th>
                                     <th>Verdict</th>
                                     <th>Date</th>
                                 </tr>
@@ -820,32 +822,45 @@
                 if(res.status_code == 400){
                     $('.load-ibmcloud').remove();
                 }else{
-                    let num_total = 0;
-                    if(data.score && data.score > 0){
-                        num_total = data.score;
-                    }else if(data.malware){
-                        const malware = data.malware;
-                        num_total = malware.origins.external.detectionCoverage == 0 ? 0 : malware.origins.external.detectionCoverage / 10;
-                    }else if(data.result.score > 0){
-                        num_total = data.result.score;
+                    if(data.error){
+                        $('#not-ibmcloud').show();
+                        $('#table-ibmcloud').DataTable({
+                            "dom": 'tp',
+                            "searching": false,
+                            "bPaginate": true,
+                            "bLengthChange": false,
+                            "bFilter": false,
+                            "bInfo": false,
+                            "bAutoWidth": false ,
+                        });
+                    }else{
+                        let num_total = 0;
+                        if(data.score && data.score > 0){
+                            num_total = data.score;
+                        }else if(data.malware){
+                            const malware = data.malware;
+                            num_total = malware.origins.external.detectionCoverage == 0 ? 0 : malware.origins.external.detectionCoverage / 10;
+                        }else if(data.result.score > 0){
+                            num_total = data.result.score;
+                        }
+                        
+                        $('#text_' + source).text(num_total);
+                        const elem = $("#circle-ibmcloud");
+                        if(num_total <= 3.9){
+                            status_value_ibmcloud = 1;
+                        }else if(num_total <= 6.9){
+                            status_value_ibmcloud = 2;
+                            elem[0].style.removeProperty('background-color');
+                            elem[0].style.setProperty('background-color', '#f2ff15', 'important');
+                            $('#text_' + source).css('color', '#f2ff15');
+                        }else if(num_total >= 7.0){
+                            status_value_ibmcloud = 3;
+                            elem[0].style.removeProperty('background-color');
+                            elem[0].style.setProperty('background-color', '#fcc838', 'important');
+                            $('#text_' + source).css('color', '#fcc838');
+                        }
                     }
                     
-                    $('#text_' + source).text(num_total);
-                    const elem = $("#circle-ibmcloud");
-                    if(num_total <= 3.9){
-                        status_value_ibmcloud = 1;
-                    }else if(num_total <= 6.9){
-                        status_value_ibmcloud = 2;
-                        elem[0].style.removeProperty('background-color');
-                        elem[0].style.setProperty('background-color', '#f2ff15', 'important');
-                        $('#text_' + source).css('color', '#f2ff15');
-                    }else if(num_total >= 7.0){
-                        status_value_ibmcloud = 3;
-                        elem[0].style.removeProperty('background-color');
-                        elem[0].style.setProperty('background-color', '#fcc838', 'important');
-                        $('#text_' + source).css('color', '#fcc838');
-                    }
-
                     
                     let html = ``;
                     let historyByCats = [];
@@ -891,7 +906,7 @@
                             <td>${malware.type}</td>
                             <td>${moment(new Date(malware.origins.external.firstSeen)).format('DD-MM-YYYY HH:MM:SS')}</td>
                             <td>${moment(new Date(malware.origins.external.lastSeen)).format('DD-MM-YYYY HH:MM:SS')}</td>
-                            <td>${malware.origins.external.family[0]}</td>
+                            <td>${malware.origins.external.family ? malware.origins.external.family[0] : ''}</td>
                             <td>${malware.origins.external.malwareType}</td>
                             <td>${malware.origins.external.detectionCoverage}</td>
                             <td>${malware.origins.external.platform}</td>
@@ -946,83 +961,8 @@
                 if(res.status_code == 400){
                     $('.load-virustotal').remove();
                 }else{
-                    if(data.data){
-                        var last_analysis_stats = data.data.attributes.last_analysis_stats;
-                        if(data.data.attributes.last_analysis_stats.malicious && data.data.attributes.last_analysis_stats.malicious > 0){
-                            $('#text_' + source).text(data.data.attributes.last_analysis_stats.malicious);
-                            const elem = $("#circle-virustotal");
-                            if(last_analysis_stats.malicious > 0 && last_analysis_stats.malicious <= 3){
-                                status_value_virustotal = 1;
-                                elem[0].style.removeProperty('background-color');
-                                elem[0].style.setProperty('background-color', '#b93624', 'important');
-                                $('#text_' + source).css('color', '#b93624');
-                            }else if(last_analysis_stats.malicious <= 5){
-                                status_value_virustotal = 2;
-                                elem[0].style.removeProperty('background-color');
-                                elem[0].style.setProperty('background-color', '#b93624', 'important');
-                                $('#text_' + source).css('color', '#b93624');
-                            }else if(last_analysis_stats.malicious <= 7){
-                                status_value_virustotal = 3;
-                                elem[0].style.removeProperty('background-color');
-                                elem[0].style.setProperty('background-color', '#b93624', 'important');
-                                $('#text_' + source).css('color', '#b93624');
-                            }else if(last_analysis_stats.malicious >= 10){
-                                status_value_virustotal = 4;
-                                elem[0].style.removeProperty('background-color');
-                                elem[0].style.setProperty('background-color', '#b93624', 'important');
-                                $('#text_' + source).css('color', '#b93624');
-                            }
-                        }
-                        let total = (parseInt(last_analysis_stats.harmless) + parseInt(last_analysis_stats.malicious) + parseInt(last_analysis_stats.suspicious) + parseInt(last_analysis_stats.timeout) + parseInt(last_analysis_stats.undetected));
-                        $('#text_virustotal_sum').text('/ '+total);
-                        
-                        
-                        let html = ``;
-                        let count_data_virus = 0;
-                        for(let i in data.data.attributes.last_analysis_results){
-                            count_data_virus++;
-                            const last_analysis_results = data.data.attributes.last_analysis_results[i];
-                            html += `
-                            <tr>
-                                <td>${last_analysis_results.engine_name}</td>
-                                <td>${last_analysis_results.category}</td>
-                                <td>
-                                    ${last_analysis_results.method} 
-                                </td>
-                                <td>`;
-                                    if(last_analysis_results.result == 'malicious' || last_analysis_results.result == 'phishing' || last_analysis_results.result == 'malware'){
-                                        html += `<span class="label label-danger">
-                                            ${last_analysis_results.result}
-                                        </span>`; 
-                                    }else if(last_analysis_results.result == 'suspicious'){
-                                        html += `<span class="label label-warning">
-                                            ${last_analysis_results.result}
-                                        </span>`;
-                                    }else if(last_analysis_results.result == 'clean'){
-                                        html += `<span class="label label-success">
-                                            ${last_analysis_results.result}
-                                        </span>`;
-                                    }else if(last_analysis_results.result == 'unrated'){
-                                        html += `<span class="label label-secondary">
-                                            ${last_analysis_results.result}
-                                        </span>`;
-                                    }else if(last_analysis_results.result == null){
-                                        html += `<span class="label label-success">
-                                            undetected
-                                        </span>`;
-                                    }else{
-                                        html += `<span class="label label-danger">
-                                            ${last_analysis_results.result}
-                                        </span>`; 
-                                    }
-                                html += `</td>
-                            </tr>
-                            `;
-                        }
-                        if(count_data_virus == 0){
-                            $('#not-virustotal').show();
-                        }
-                        document.getElementById("tbody-virustotal").innerHTML = html;
+                    if(data.error){
+                        $('#not-virustotal').show();
                         $('#table-virustotal').DataTable({
                             "dom": 'tp',
                             "searching": false,
@@ -1032,6 +972,94 @@
                             "bInfo": false,
                             "bAutoWidth": false ,
                         });
+                    }else{
+                        if(data.data){
+                            var last_analysis_stats = data.data.attributes.last_analysis_stats;
+                            if(data.data.attributes.last_analysis_stats.malicious && data.data.attributes.last_analysis_stats.malicious > 0){
+                                $('#text_' + source).text(data.data.attributes.last_analysis_stats.malicious);
+                                const elem = $("#circle-virustotal");
+                                if(last_analysis_stats.malicious > 0 && last_analysis_stats.malicious <= 3){
+                                    status_value_virustotal = 1;
+                                    elem[0].style.removeProperty('background-color');
+                                    elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                    $('#text_' + source).css('color', '#b93624');
+                                }else if(last_analysis_stats.malicious <= 5){
+                                    status_value_virustotal = 2;
+                                    elem[0].style.removeProperty('background-color');
+                                    elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                    $('#text_' + source).css('color', '#b93624');
+                                }else if(last_analysis_stats.malicious <= 7){
+                                    status_value_virustotal = 3;
+                                    elem[0].style.removeProperty('background-color');
+                                    elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                    $('#text_' + source).css('color', '#b93624');
+                                }else if(last_analysis_stats.malicious >= 10){
+                                    status_value_virustotal = 4;
+                                    elem[0].style.removeProperty('background-color');
+                                    elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                    $('#text_' + source).css('color', '#b93624');
+                                }
+                            }
+                            let total = (parseInt(last_analysis_stats.harmless) + parseInt(last_analysis_stats.malicious) + parseInt(last_analysis_stats.suspicious) + parseInt(last_analysis_stats.timeout) + parseInt(last_analysis_stats.undetected));
+                            $('#text_virustotal_sum').text('/ '+total);
+                            
+                            
+                            let html = ``;
+                            let count_data_virus = 0;
+                            for(let i in data.data.attributes.last_analysis_results){
+                                count_data_virus++;
+                                const last_analysis_results = data.data.attributes.last_analysis_results[i];
+                                html += `
+                                <tr>
+                                    <td>${last_analysis_results.engine_name}</td>
+                                    <td>${last_analysis_results.category}</td>
+                                    <td>
+                                        ${last_analysis_results.method} 
+                                    </td>
+                                    <td>`;
+                                        if(last_analysis_results.result == 'malicious' || last_analysis_results.result == 'phishing' || last_analysis_results.result == 'malware'){
+                                            html += `<span class="label label-danger">
+                                                ${last_analysis_results.result}
+                                            </span>`; 
+                                        }else if(last_analysis_results.result == 'suspicious'){
+                                            html += `<span class="label label-warning">
+                                                ${last_analysis_results.result}
+                                            </span>`;
+                                        }else if(last_analysis_results.result == 'clean'){
+                                            html += `<span class="label label-success">
+                                                ${last_analysis_results.result}
+                                            </span>`;
+                                        }else if(last_analysis_results.result == 'unrated'){
+                                            html += `<span class="label label-secondary">
+                                                ${last_analysis_results.result}
+                                            </span>`;
+                                        }else if(last_analysis_results.result == null){
+                                            html += `<span class="label label-success">
+                                                undetected
+                                            </span>`;
+                                        }else{
+                                            html += `<span class="label label-danger">
+                                                ${last_analysis_results.result}
+                                            </span>`; 
+                                        }
+                                    html += `</td>
+                                </tr>
+                                `;
+                            }
+                            if(count_data_virus == 0){
+                                $('#not-virustotal').show();
+                            }
+                            document.getElementById("tbody-virustotal").innerHTML = html;
+                            $('#table-virustotal').DataTable({
+                                "dom": 'tp',
+                                "searching": false,
+                                "bPaginate": true,
+                                "bLengthChange": false,
+                                "bFilter": false,
+                                "bInfo": false,
+                                "bAutoWidth": false ,
+                            });
+                        }
                     }
                     $('.load-virustotal').remove();
                     click_virustotal();
@@ -1068,13 +1096,19 @@
                     }else if(data.result){
                         for(let i in data.result){
                             const results = data.result[i];
-                            total += results.threat_score;
+                            if(results.threat_score){
+                                total += results.threat_score;
+                            }else{
+                                total += results.av_detect;
+                            }
                             html += `
                             <tr>
                                 <td>${results.environment_description}</td>
                                 <td>${results.sha256}</td>
                                 <td>${results.submit_name}</td>
                                 <td>${results.type_short}</td>
+                                <td>${results.threat_score}</td>
+                                <td>${results.av_detect}</td>
                                 <td>${results.verdict}</td>
                                 <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
                             </tr>
@@ -1116,13 +1150,20 @@
                         for(let i in data){
                             count++;
                             const results = data[i];
-                            total += results.av_detect;
+                            if(results.threat_score){
+                                total += results.threat_score;
+                            }else{
+                                total += results.av_detect;
+                            }
+                            
                             html += `
                             <tr>
                                 <td>${results.environment_description}</td>
                                 <td>${results.sha256}</td>
                                 <td>${results.submit_name}</td>
                                 <td>${results.type_short}</td>
+                                <td>${results.threat_score}</td>
+                                <td>${results.av_detect}</td>
                                 <td>${results.verdict}</td>
                                 <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
                             </tr>
