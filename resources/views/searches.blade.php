@@ -800,6 +800,7 @@
     let status_value_virustotal = 0;
     let status_value_hybrid = 0;
     let number_risk = 0;
+    let number_new_row = 0;
     function loadSearchAPI(source){
         $.ajax({
             headers: {
@@ -834,6 +835,7 @@
                             "bAutoWidth": false ,
                         });
                     }else{
+                        number_new_row++;
                         let num_total = 0;
                         if(data.score && data.score > 0){
                             num_total = data.score;
@@ -973,6 +975,7 @@
                             "bAutoWidth": false ,
                         });
                     }else{
+                        number_new_row++;
                         if(data.data){
                             var last_analysis_stats = data.data.attributes.last_analysis_stats;
                             if(data.data.attributes.last_analysis_stats.malicious && data.data.attributes.last_analysis_stats.malicious > 0){
@@ -1202,6 +1205,7 @@
                             "bAutoWidth": false ,
                         });
                     }else{
+                        number_new_row++;
                         $('#not-hybrid').show();
                     }
                     
@@ -1219,7 +1223,7 @@
 
 
    function search_risk(){
-    let summary_total = (status_value_ibmcloud + status_value_virustotal + status_value_hybrid) / 3;
+    let summary_total = (status_value_ibmcloud + status_value_virustotal + status_value_hybrid) / number_new_row;
     let html_status = ``;
     if(summary_total <= 1.9){
         html_status += `<div class="status-risk success">
