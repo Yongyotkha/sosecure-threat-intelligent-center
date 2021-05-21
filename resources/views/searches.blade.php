@@ -137,26 +137,24 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="ovr-text">
-                                    <p>Access Level</p>
-                                    <p>Public</p>
+                                    <p>Analysis</p>
+                                    <p>{{ request()-> keyword }}</p>
                                 </div>
                                 <div class="ovr-text">
-                                    <p>Request rate</p>
-                                    <p>172800 requests/minute</p>
+                                    <p>Type</p>
+                                    <p id="type_search"></p>
                                 </div>
-                                <div class="ovr-text">
+                                {{-- <div class="ovr-text">
                                     <p>Daily quota</p>
                                     <p>172800 requests/day</p>
                                 </div>
                                 <div class="ovr-text">
                                     <p>Monthly quota</p>
                                     <p>172800 requests/month</p>
-                                </div>
+                                </div> --}}
                             </div>
                             <div class="col-md-4 text-right">
-                                <div class="status-risk danger">
-                                   <span class="st-circle-ovr"></span> HIGH RISK
-                                </div>
+                                <div id="text_status_risk"></div>
                             </div>
                         </div>
                     </section>
@@ -236,7 +234,7 @@
                                             </div>
 
                                             
-                                            <div class="loadfixed backdrop-loader white">
+                                            <div class="loadfixed backdrop-loader white" id="not-hybrid" style="display: none">
                                                 <h1>No threat found</h1>
                                             </div>
 
@@ -244,7 +242,7 @@
                                             <div class="circle-score" id="circle-hybrid">
                                                 <div class="circle-score-inner">
                                                     <div class="circle-text-score">
-                                                        <span id="text_hybrid">0</span> <span>/ 100</span>
+                                                        <span id="text_hybrid">0</span> <span>/ 1</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -268,6 +266,10 @@
                                             <div class="load-virustotal loadfixed backdrop-loader white">
                                                 <div class="loader4 centerloader"></div>
                                                 <div class="loadding-text">Loading ...</div>
+                                            </div>
+
+                                            <div class="loadfixed backdrop-loader white" id="not-virustotal" style="display: none">
+                                                <h1>No threat found</h1>
                                             </div>
 
                                             {{-- <div id="chart-md2" style="height: 300px"></div> --}}
@@ -304,6 +306,10 @@
 
                                             {{-- <div id="chart-md3" style="height: 300px"></div> --}}
 
+                                            <div class="loadfixed backdrop-loader white" id="not-ibmcloud" style="display: none">
+                                                <h1>No threat found</h1>
+                                            </div>
+
                                             <div class="circle-score" id="circle-ibmcloud">
                                                 <div class="circle-score-inner">
                                                     <div class="circle-text-score">
@@ -337,6 +343,20 @@
                             </thead>
                             <tbody id="tbody-ibmcloud"></tbody>
                         </table>
+                        <table id="table-ibmcloud-malware" class="table" style="display: none">
+                            <thead>
+                                <tr>
+                                    <th>Hash Type</th>
+                                    <th>First Seen</th>
+                                    <th>Last Seen</th>
+                                    <th>Family Name</th>
+                                    <th>Type</th>
+                                    <th>Community Coverage</th>
+                                    <th>Platform</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-ibmcloud-malware"></tbody>
+                        </table>
                     </section>
 
                     <section class="table-virustotal" style="display: none">
@@ -360,11 +380,8 @@
                             <thead>
                                 <tr>
                                     <th>Environment Description</th>
-                                    <th>Job ID</th>
                                     <th>SHA256</th>
-                                    <th>Size</th>
                                     <th>Submit Name</th>
-                                    <th>Threat Score</th>
                                     <th>Type Short</th>
                                     <th>Verdict</th>
                                     <th>Date</th>
@@ -758,6 +775,10 @@
 
 
     var text_search_new = '{{request()->keyword}}';
+    let status_value_ibmcloud = 0;
+    let status_value_virustotal = 0;
+    let status_value_hybrid = 0;
+    let number_risk = 0;
     function loadSearchAPI(source){
         $.ajax({
             headers: {
@@ -773,25 +794,57 @@
                 $('.ajax-loading').show();
             },
         }).done(function(res){
+            number_risk++;
             let data = res.data;
+            $('#type_search').text(res.type);
             if(source == 'ibmcloud'){
                 if(res.status_code == 400){
                     $('.load-ibmcloud').remove();
                 }else{
+                    let num_total = 0;
                     if(data.score && data.score > 0){
-                        $('#text_' + source).text(data.score);
+                        num_total = data.score;
+                    }else if(data.malware){
+                        const malware = data.malware;
+                        num_total = malware.origins.external.detectionCoverage == 0 ? 0 : malware.origins.external.detectionCoverage / 10;
                     }
+                    if(num_total == 0){
+                        $('#not-ibmcloud').show();
+                    }
+                    
+                    $('#text_' + source).text(num_total);
+                    const elem = $("#circle-ibmcloud");
+                    if(num_total <= 3.9){
+                        status_value_ibmcloud = 1;
+                    }else if(num_total <= 6.9){
+                        status_value_ibmcloud = 2;
+                        elem[0].style.removeProperty('background-color');
+                        elem[0].style.setProperty('background-color', '#f2ff15', 'important');
+                        $('#text_' + source).css('color', '#f2ff15');
+                    }else if(num_total >= 7.0){
+                        status_value_ibmcloud = 3;
+                        elem[0].style.removeProperty('background-color');
+                        elem[0].style.setProperty('background-color', '#fcc838', 'important');
+                        $('#text_' + source).css('color', '#fcc838');
+                    }
+
                     
                     let html = ``;
                     let historyByCats = [];
-                    for(let i in data.history){
-                        const history = data.history[i];
-                        if(history.cats[Object.keys(history.cats)] != undefined && !historyByCats.includes(history.cats[Object.keys(history.cats)])){
-                            historyByCats.push(history.cats[Object.keys(history.cats)]);
+                    if(data.history){
+                        for(let i in data.history){
+                            const history = data.history[i];
                             html += `
-                            <tr>
-                                <td>${Object.keys(history.cats)}</td>
-                                <td>${history.reason}</td>
+                            <tr>`;
+                                if(history.cats){
+                                    html += `<td>`;
+                                    for(const [key, value] of Object.entries(history.cats)){
+                                        html += ` ${key} (${value}%)`;
+                                    }
+                                    html += `</td>`;
+                                }
+                                
+                                html += `<td>${history.reason}</td>
                                 <td>
                                     ${history.geo.country} ${history.geo.countrycode}
                                 </td>
@@ -801,17 +854,44 @@
                             </tr>
                             `;
                         }
+                        document.getElementById("tbody-ibmcloud").innerHTML = html;
+                        $('#table-ibmcloud').DataTable({
+                            "dom": 'tp',
+                            "searching": false,
+                            "bPaginate": true,
+                            "bLengthChange": false,
+                            "bFilter": false,
+                            "bInfo": false,
+                            "bAutoWidth": false ,
+                        });
+                    }else if(data.malware){
+                        $('#table-ibmcloud').hide();
+                        $('#table-ibmcloud-malware').show();
+                        const malware = data.malware;
+                        html += `
+                        <tr>
+                            <td>${malware.type}</td>
+                            <td>${moment(new Date(malware.origins.external.firstSeen)).format('DD-MM-YYYY HH:MM:SS')}</td>
+                            <td>${moment(new Date(malware.origins.external.lastSeen)).format('DD-MM-YYYY HH:MM:SS')}</td>
+                            <td>${malware.origins.external.family[0]}</td>
+                            <td>${malware.origins.external.malwareType}</td>
+                            <td>${malware.origins.external.detectionCoverage}</td>
+                            <td>${malware.origins.external.platform}</td>
+                        </tr>
+                        `;
+                        document.getElementById("tbody-ibmcloud-malware").innerHTML = html;
+                        $('#table-ibmcloud-malware').DataTable({
+                            "dom": 'tp',
+                            "searching": false,
+                            "bPaginate": true,
+                            "bLengthChange": false,
+                            "bFilter": false,
+                            "bInfo": false,
+                            "bAutoWidth": false ,
+                        });
                     }
-                    document.getElementById("tbody-ibmcloud").innerHTML = html;
-                    $('#table-ibmcloud').DataTable({
-                        "dom": 'tp',
-                        "searching": false,
-                        "bPaginate": true,
-                        "bLengthChange": false,
-                        "bFilter": false,
-                        "bInfo": false,
-                        "bAutoWidth": false ,
-                    });
+                    
+                    
                     $('.load-ibmcloud').remove();
                     click_ibmcloud();
                 }
@@ -820,22 +900,35 @@
                     $('.load-virustotal').remove();
                 }else{
                     if(data.data){
+                        var last_analysis_stats = data.data.attributes.last_analysis_stats;
+                        if(last_analysis_stats.malicious == 0){
+                            $('#not-virustotal').show();
+                        }
                         if(data.data.attributes.last_analysis_stats.malicious && data.data.attributes.last_analysis_stats.malicious > 0){
                             $('#text_' + source).text(data.data.attributes.last_analysis_stats.malicious);
-                            var last_analysis_stats = data.data.attributes.last_analysis_stats;
-                            if(data.data.attributes.last_analysis_stats.malicious >= 3){
-
-                            }else if(data.data.attributes.last_analysis_stats.malicious >= 5){
-                                $('#circle-virustotal').attr('style', 'background-color: #f2ff15 !important');
-                            }else if(data.data.attributes.last_analysis_stats.malicious >= 7){
-                                $('#circle-virustotal').attr('style', 'background-color: #fcc838 !important');
-                            }else if(data.data.attributes.last_analysis_stats.malicious >= 10){
-                                $('#circle-virustotal').attr('style', 'background-color: #b93624 !important');
+                            const elem = $("#circle-virustotal");
+                            if(last_analysis_stats.malicious <= 3){
+                                status_value_virustotal = 1;
+                            }else if(last_analysis_stats.malicious <= 5){
+                                status_value_virustotal = 2;
+                                elem[0].style.removeProperty('background-color');
+                                elem[0].style.setProperty('background-color', '#f2ff15', 'important');
+                                $('#text_' + source).css('color', '#f2ff15');
+                            }else if(last_analysis_stats.malicious <= 7){
+                                status_value_virustotal = 3;
+                                elem[0].style.removeProperty('background-color');
+                                elem[0].style.setProperty('background-color', '#fcc838', 'important');
+                                $('#text_' + source).css('color', '#fcc838');
+                            }else if(last_analysis_stats.malicious >= 10){
+                                status_value_virustotal = 4;
+                                elem[0].style.removeProperty('background-color');
+                                elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                $('#text_' + source).css('color', '#b93624');
                             }
-    
-                            let total = (parseInt(last_analysis_stats.harmless) + parseInt(last_analysis_stats.malicious) + parseInt(last_analysis_stats.suspicious) + parseInt(last_analysis_stats.timeout) + parseInt(last_analysis_stats.undetected));
-                            $('#text_virustotal_sum').text(total);
                         }
+                        let total = (parseInt(last_analysis_stats.harmless) + parseInt(last_analysis_stats.malicious) + parseInt(last_analysis_stats.suspicious) + parseInt(last_analysis_stats.timeout) + parseInt(last_analysis_stats.undetected));
+                        $('#text_virustotal_sum').text('/ '+total);
+                        
                         
                         let html = ``;
                         for(let i in data.data.attributes.last_analysis_results){
@@ -864,6 +957,14 @@
                                         html += `<span class="label label-secondary">
                                             ${last_analysis_results.result}
                                         </span>`;
+                                    }else if(last_analysis_results.result == null){
+                                        html += `<span class="label label-success">
+                                            undetected
+                                        </span>`;
+                                    }else{
+                                        html += `<span class="label label-danger">
+                                            ${last_analysis_results.result}
+                                        </span>`; 
                                     }
                                 html += `</td>
                             </tr>
@@ -889,26 +990,84 @@
                 }else{
                     let html = ``;
                     let total = 0;
-                    for(let i in data.result){
-                        const results = data.result[i];
-                        total += results.threat_score;
-                        html += `
-                        <tr>
-                            <td>${results.environment_description}</td>
-                            <td>${results.job_id}</td>
-                            <td>${results.sha256}</td>
-                            <td>${results.size}</td>
-                            <td>${results.submit_name}</td>
-                            <td>${results.threat_score}</td>
-                            <td>${results.type_short}</td>
-                            <td>${results.verdict}</td>
-                            <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
-                        </tr>
-                        `;
+                    if(data.result){
+                        for(let i in data.result){
+                            const results = data.result[i];
+                            total += results.threat_score;
+                            html += `
+                            <tr>
+                                <td>${results.environment_description}</td>
+                                <td>${results.sha256}</td>
+                                <td>${results.submit_name}</td>
+                                <td>${results.type_short}</td>
+                                <td>${results.verdict}</td>
+                                <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
+                            </tr>
+                            `;
+                        }
+                        if(data.count == 0 || (total / data.count) == 0 || data.validation_errors){
+                            $('#not-hybrid').show();
+                        }
+                        let total_number = (total / (100 * data.count)).toFixed(2);
+                        if(data.count && data.count > 0){
+                            $('#text_' + source).text(total_number);
+                        }
+                        const elem = $("#circle-hybrid");
+                        if(total_number <= 0.39){
+                            status_value_hybrid = 1;
+                        }else if(total_number <= 0.69){
+                            status_value_hybrid = 2;
+                            elem[0].style.removeProperty('background-color');
+                            elem[0].style.setProperty('background-color', '#f2ff15', 'important');
+                            $('#text_' + source).css('color', '#f2ff15');
+                        }else if(total_number >= 0.70){
+                            status_value_hybrid = 3;
+                            elem[0].style.removeProperty('background-color');
+                            elem[0].style.setProperty('background-color', '#fcc838', 'important');
+                            $('#text_' + source).css('color', '#fcc838');
+                        }
+                    }else if(data){
+                        let count = 0;
+                        for(let i in data){
+                            count++;
+                            const results = data[i];
+                            total += results.av_detect;
+                            html += `
+                            <tr>
+                                <td>${results.environment_description}</td>
+                                <td>${results.sha256}</td>
+                                <td>${results.submit_name}</td>
+                                <td>${results.type_short}</td>
+                                <td>${results.verdict}</td>
+                                <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
+                            </tr>
+                            `;
+                        }
+                        if(count == 0 || (total / count) == 0 || data.validation_errors){
+                            $('#not-hybrid').show();
+                        }
+                        let total_number = (total / (100 * count)).toFixed(2);
+                        if(count && count > 0){
+                            $('#text_' + source).text(total_number);
+                        }
+
+                        const elem = $("#circle-hybrid");
+                        if(total_number <= 0.39){
+                            status_value_hybrid = 1;
+                        }else if(total_number <= 0.69){
+                            status_value_hybrid = 2;
+                            elem[0].style.removeProperty('background-color');
+                            elem[0].style.setProperty('background-color', '#f2ff15', 'important');
+                            $('#text_' + source).css('color', '#f2ff15');
+                        }else if(total_number >= 0.70){
+                            status_value_hybrid = 3;
+                            elem[0].style.removeProperty('background-color');
+                            elem[0].style.setProperty('background-color', '#fcc838', 'important');
+                            $('#text_' + source).css('color', '#fcc838');
+                        }
                     }
-                    if(data.count && data.count > 0){
-                        $('#text_' + source).text(total / data.count);
-                    }
+                    
+                    
                     document.getElementById("tbody-hybrid").innerHTML = html;
                     $('#table-hybrid').DataTable({
                         "dom": 'tp',
@@ -923,13 +1082,37 @@
                     click_hybrid();
                 }
             }
+            if(number_risk == 3){
+                search_risk();
+            }
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             console.log("No response from server");
         });
     }
 
 
-   
+   function search_risk(){
+    let summary_total = (status_value_ibmcloud + status_value_virustotal + status_value_hybrid) / 3;
+    let html_status = ``;
+    if(summary_total <= 1.9){
+        html_status += `<div class="status-risk success">
+            <span class="st-circle-ovr"></span> LOW RISK
+        </div>`;
+    }else if(summary_total <= 2.6){
+        html_status += `<div class="status-risk info" style="color:#f2ff15">
+            <span class="st-circle-ovr"></span> MEDIUM RISK
+        </div>`;
+    }else if(summary_total <= 3){
+        html_status += `<div class="status-risk warning">
+            <span class="st-circle-ovr"></span> HIGH RISK
+        </div>`;
+    }else if(summary_total >= 3){
+        html_status += `<div class="status-risk danger">
+            <span class="st-circle-ovr"></span> VERY HIGH RISK
+        </div>`;
+    }
+    $('#text_status_risk').html(html_status);
+   }
 
 
 
