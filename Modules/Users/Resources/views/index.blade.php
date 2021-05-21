@@ -304,6 +304,28 @@ var id_select_site = 'site';
         });
     }
 
+    function reset_2fa(email){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/system/reset/2fa",
+            method: 'post',
+            data: ({
+                email:email,
+            }),
+            beforeSend: function(){
+                
+            },
+        }).done(function(res){
+            if(res.status_code == 200){
+                toastr.success(res.message);
+            }
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+    }
+
     $('#users-table').on('click', '.select-chk', function () {
         if ($(this).is(':checked')) {
 

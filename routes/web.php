@@ -51,6 +51,7 @@ Route::get('accept/{token}', 'InviteController@accept')->name('invite.accept');
 Route::post('accepted', 'InviteController@accepted')->name('invite.accepted');
 
 Route::post('auth/2fa', 'TwoFactorAuthController@authenticate')->name('2fa.auth')->middleware('2fa');
+Route::post('/system/reset/2fa', 'TwoFactorAuthController@reset_2fa');
 Route::get('reset/2fa', 'TwoFactorAuthController@reset')->name('2fa.reset');
 
 Route::get('cron/schedule/{token}', 'ScheduleController@run')->name('artisan.schedule')->middleware('demo');

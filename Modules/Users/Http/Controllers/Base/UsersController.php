@@ -350,10 +350,10 @@ abstract class UsersController extends Controller
         $Roles = Roles::get()->keyBy('id')->toArray();
         if(!empty(get_role_custom()))
             if(get_role_custom()['superadmin'] == 1){
-                $model = User::select('users.code','users.id','email','users.created_at','name','site_role_id','model_has_roles.role_id AS model_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
+                $model = User::select('users.google2fa_enable','users.code','users.id','email','users.created_at','name','site_role_id','model_has_roles.role_id AS model_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
             }else if(get_role_custom()['site_admin'] == 1){
                 
-                $model = User::select('users.id','email','users.created_at','name','site_role_id','model_has_roles.role_id AS model_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
+                $model = User::select('users.google2fa_enable','users.id','email','users.created_at','name','site_role_id','model_has_roles.role_id AS model_role_id')->where('active', '1')->whereNull('deleted_at')->with('profile')->with('get_UserSite');
                 $model2 = UserSite::select('site_id')->where('user_id',@Auth::user()->id)->get()->toArray();
                 
                 $model = $model->whereHas('get_UserSite', function ($query) use ($model2) {
@@ -470,7 +470,10 @@ abstract class UsersController extends Controller
                         $html .= '<span><a href="'.route("users.delete_new_modal", ["user" => $model->id]).'" class="btn btn-xs btn-danger" data-toggle="ajaxModal"><i class="fas fa-trash"></i></a></span>';
                     }
                    
-                }            
+                } 
+                if($model -> google2fa_enable == 1){
+                    $html .= '<span><a href="javascript:void(0);" onclick="reset_2fa(\''.$model->email.'\')" class="btn btn-xs btn-success">Reset 2FA</a></span>';
+                }           
                 return $html;
                 
             })->addColumn('rolename', function ($model) use ($Roles){
