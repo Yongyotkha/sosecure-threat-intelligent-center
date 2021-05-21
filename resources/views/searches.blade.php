@@ -906,10 +906,10 @@
                             <td>${malware.type}</td>
                             <td>${moment(new Date(malware.origins.external.firstSeen)).format('DD-MM-YYYY HH:MM:SS')}</td>
                             <td>${moment(new Date(malware.origins.external.lastSeen)).format('DD-MM-YYYY HH:MM:SS')}</td>
-                            <td>${malware.origins.external.family ? malware.origins.external.family[0] : ''}</td>
-                            <td>${malware.origins.external.malwareType}</td>
-                            <td>${malware.origins.external.detectionCoverage}</td>
-                            <td>${malware.origins.external.platform}</td>
+                            <td>${malware.origins.external.family ? malware.origins.external.family[0] : '-'}</td>
+                            <td>${malware.origins.external.malwareType ? malware.origins.external.malwareType : '-'}</td>
+                            <td>${malware.origins.external.detectionCoverage ? malware.origins.external.detectionCoverage : '-'}</td>
+                            <td>${malware.origins.external.platform ? malware.origins.external.platform : '-'}</td>
                         </tr>
                         `;
                         document.getElementById("tbody-ibmcloud-malware").innerHTML = html;
@@ -1107,8 +1107,8 @@
                                 <td>${results.sha256}</td>
                                 <td>${results.submit_name}</td>
                                 <td>${results.type_short}</td>
-                                <td>${results.threat_score ? results.threat_score : 0}</td>
-                                <td>${results.av_detect ? results.av_detect : 0}</td>
+                                <td>${results.threat_score ? results.threat_score : 0}/100</td>
+                                <td>${results.av_detect ? results.av_detect : 0}%</td>
                                 <td>${results.verdict}</td>
                                 <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
                             </tr>
@@ -1162,8 +1162,8 @@
                                 <td>${results.sha256}</td>
                                 <td>${results.submit_name}</td>
                                 <td>${results.type_short}</td>
-                                <td>${results.threat_score ? results.threat_score : 0}</td>
-                                <td>${results.av_detect ? results.av_detect : 0}</td>
+                                <td>${results.threat_score ? results.threat_score : 0}/100</td>
+                                <td>${results.av_detect ? results.av_detect : 0}%</td>
                                 <td>${results.verdict}</td>
                                 <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
                             </tr>
@@ -1226,8 +1226,8 @@
             <span class="st-circle-ovr"></span> LOW
         </div>`;
     }else if(summary_total <= 2.6){
-        html_status += `<div class="status-risk warning" style="color:#f2ff15">
-            <span class="st-circle-ovr"></span> MEDIUM
+        html_status += `<div class="status-risk warning" style="color:#f2ff15 !important">
+            <span class="st-circle-ovr" style="color:#f2ff15 !important"></span> MEDIUM
         </div>`;
     }else if(summary_total <= 3){
         html_status += `<div class="status-risk warning">
