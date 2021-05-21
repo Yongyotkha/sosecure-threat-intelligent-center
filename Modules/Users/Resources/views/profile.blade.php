@@ -19,9 +19,9 @@ $user = Auth::user();
                                 {{-- <a href="{{ route('users.api') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right">
                                     @icon('solid/code') API Settings
                                 </a> --}}
-                                {{-- <a href="{{ route('users.2fa') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right" data-toggle="ajaxModal">
+                                <a href="{{ route('users.2fa') }}" class="btn btn-{{ get_option('theme_color') }} btn-sm pull-right" data-toggle="ajaxModal">
                                     @icon('solid/fingerprint') 2FAuth
-                                </a> --}}
+                                </a>
                             </p>
                         </div>
                     </div>
