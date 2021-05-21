@@ -780,7 +780,6 @@
     let status_value_hybrid = 0;
     let number_risk = 0;
     function loadSearchAPI(source){
-        number_risk++;
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -795,6 +794,7 @@
                 $('.ajax-loading').show();
             },
         }).done(function(res){
+            number_risk++;
             let data = res.data;
             $('#type_search').text(res.type);
             if(source == 'ibmcloud'){
@@ -1093,7 +1093,6 @@
 
    function search_risk(){
     let summary_total = (status_value_ibmcloud + status_value_virustotal + status_value_hybrid) / 3;
-    console.log(summary_total);
     let html_status = ``;
     if(summary_total <= 1.9){
         html_status += `<div class="status-risk success">
