@@ -127,10 +127,10 @@
                                 Overall Risk
                             </h3>
                             <span class="st-dt-leak">
-                                <span class="st-dt vrh" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrh'>Very High</div><div class='text-st-tooltip'>High Risk	ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Very High Risk</span>
-                                <span class="st-dt high" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrh'>High</div><div class='text-st-tooltip'>High Risk	ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">High Risk</span>
-                                <span class="st-dt md" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip md'>Medium</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Medium Risk</span>
-                                <span class="st-dt low" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip low'>Low</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของลูกค้าเช่น ข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">Low Risk</span>
+                                <span class="st-dt vrh" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrh'>Very High</div><div class='text-st-tooltip'>Very High ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Very High</span>
+                                <span class="st-dt high" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrh'>High</div><div class='text-st-tooltip'>High ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">High</span>
+                                <span class="st-dt md" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip md'>Medium</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Medium</span>
+                                <span class="st-dt low" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip low'>Low</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของลูกค้าเช่น ข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">Low</span>
                             </span>
                         </div>
 
@@ -357,6 +357,16 @@
                             </thead>
                             <tbody id="tbody-ibmcloud-malware"></tbody>
                         </table>
+                        <table id="table-ibmcloud-url" class="table" style="display: none">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>URL</th>
+                                    <th>Category DesCriptions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-ibmcloud-url"></tbody>
+                        </table>
                     </section>
 
                     <section class="table-virustotal" style="display: none">
@@ -388,6 +398,15 @@
                                 </tr>
                             </thead>
                             <tbody id="tbody-hybrid"></tbody>
+                        </table>
+                        <table id="table-hybrid-url" class="table" style="display: none">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>URL</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-hybrid-url"></tbody>
                         </table>
                     </section>
 
@@ -807,9 +826,8 @@
                     }else if(data.malware){
                         const malware = data.malware;
                         num_total = malware.origins.external.detectionCoverage == 0 ? 0 : malware.origins.external.detectionCoverage / 10;
-                    }
-                    if(num_total == 0){
-                        $('#not-ibmcloud').show();
+                    }else if(data.result.score > 0){
+                        num_total = data.result.score;
                     }
                     
                     $('#text_' + source).text(num_total);
@@ -889,8 +907,37 @@
                             "bInfo": false,
                             "bAutoWidth": false ,
                         });
+                    }else if(res.type == 'Domain'){
+                        $('#table-ibmcloud').hide();
+                        $('#table-ibmcloud-url').show();
+                        const domain = data.result;
+                        html += `
+                        <tr>
+                            <td>${res.type}</td>
+                            <td>${domain.url}</td>`;
+                                if(domain.categoryDescriptions){
+                                    html += `<td>`;
+                                    for(const [key, value] of Object.entries(domain.categoryDescriptions)){
+                                        html += `${value}`;
+                                    }
+                                    html += `</td>`;
+                                }
+                                
+                        html += `</tr>
+                        `;
+                        document.getElementById("tbody-ibmcloud-url").innerHTML = html;
+                        $('#table-ibmcloud-url').DataTable({
+                            "dom": 'tp',
+                            "searching": false,
+                            "bPaginate": true,
+                            "bLengthChange": false,
+                            "bFilter": false,
+                            "bInfo": false,
+                            "bAutoWidth": false ,
+                        });
+                    }else{
+                        $('#not-ibmcloud').show();
                     }
-                    
                     
                     $('.load-ibmcloud').remove();
                     click_ibmcloud();
@@ -901,24 +948,24 @@
                 }else{
                     if(data.data){
                         var last_analysis_stats = data.data.attributes.last_analysis_stats;
-                        if(last_analysis_stats.malicious == 0){
-                            $('#not-virustotal').show();
-                        }
                         if(data.data.attributes.last_analysis_stats.malicious && data.data.attributes.last_analysis_stats.malicious > 0){
                             $('#text_' + source).text(data.data.attributes.last_analysis_stats.malicious);
                             const elem = $("#circle-virustotal");
-                            if(last_analysis_stats.malicious <= 3){
+                            if(last_analysis_stats.malicious > 0 && last_analysis_stats.malicious <= 3){
                                 status_value_virustotal = 1;
+                                elem[0].style.removeProperty('background-color');
+                                elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                $('#text_' + source).css('color', '#b93624');
                             }else if(last_analysis_stats.malicious <= 5){
                                 status_value_virustotal = 2;
                                 elem[0].style.removeProperty('background-color');
-                                elem[0].style.setProperty('background-color', '#f2ff15', 'important');
-                                $('#text_' + source).css('color', '#f2ff15');
+                                elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                $('#text_' + source).css('color', '#b93624');
                             }else if(last_analysis_stats.malicious <= 7){
                                 status_value_virustotal = 3;
                                 elem[0].style.removeProperty('background-color');
-                                elem[0].style.setProperty('background-color', '#fcc838', 'important');
-                                $('#text_' + source).css('color', '#fcc838');
+                                elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                $('#text_' + source).css('color', '#b93624');
                             }else if(last_analysis_stats.malicious >= 10){
                                 status_value_virustotal = 4;
                                 elem[0].style.removeProperty('background-color');
@@ -931,7 +978,9 @@
                         
                         
                         let html = ``;
+                        let count_data_virus = 0;
                         for(let i in data.data.attributes.last_analysis_results){
+                            count_data_virus++;
                             const last_analysis_results = data.data.attributes.last_analysis_results[i];
                             html += `
                             <tr>
@@ -970,6 +1019,9 @@
                             </tr>
                             `;
                         }
+                        if(count_data_virus == 0){
+                            $('#not-virustotal').show();
+                        }
                         document.getElementById("tbody-virustotal").innerHTML = html;
                         $('#table-virustotal').DataTable({
                             "dom": 'tp',
@@ -990,7 +1042,30 @@
                 }else{
                     let html = ``;
                     let total = 0;
-                    if(data.result){
+                    if(res.type == 'Domain'){
+                        $('#table-hybrid').hide();
+                        $('#table-hybrid-url').show();
+                        for(let i in data.search_terms){
+                            const search_terms = data.search_terms[i];
+                            total += data.count;
+                            html += `
+                            <tr>
+                                <td>${search_terms.id}</td>
+                                <td>${search_terms.value}</td>
+                            </tr>
+                            `;
+                        }
+                        document.getElementById("tbody-hybrid-url").innerHTML = html;
+                        $('#table-hybrid-url').DataTable({
+                            "dom": 'tp',
+                            "searching": false,
+                            "bPaginate": true,
+                            "bLengthChange": false,
+                            "bFilter": false,
+                            "bInfo": false,
+                            "bAutoWidth": false ,
+                        });
+                    }else if(data.result){
                         for(let i in data.result){
                             const results = data.result[i];
                             total += results.threat_score;
@@ -1006,7 +1081,7 @@
                             `;
                         }
                         if(data.count == 0 || (total / data.count) == 0 || data.validation_errors){
-                            $('#not-hybrid').show();
+                            
                         }
                         let total_number = (total / (100 * data.count)).toFixed(2);
                         if(data.count && data.count > 0){
@@ -1026,6 +1101,16 @@
                             elem[0].style.setProperty('background-color', '#fcc838', 'important');
                             $('#text_' + source).css('color', '#fcc838');
                         }
+                        document.getElementById("tbody-hybrid").innerHTML = html;
+                        $('#table-hybrid').DataTable({
+                            "dom": 'tp',
+                            "searching": false,
+                            "bPaginate": true,
+                            "bLengthChange": false,
+                            "bFilter": false,
+                            "bInfo": false,
+                            "bAutoWidth": false ,
+                        });
                     }else if(data){
                         let count = 0;
                         for(let i in data){
@@ -1044,7 +1129,7 @@
                             `;
                         }
                         if(count == 0 || (total / count) == 0 || data.validation_errors){
-                            $('#not-hybrid').show();
+       
                         }
                         let total_number = (total / (100 * count)).toFixed(2);
                         if(count && count > 0){
@@ -1065,19 +1150,20 @@
                             elem[0].style.setProperty('background-color', '#fcc838', 'important');
                             $('#text_' + source).css('color', '#fcc838');
                         }
+                        document.getElementById("tbody-hybrid").innerHTML = html;
+                        $('#table-hybrid').DataTable({
+                            "dom": 'tp',
+                            "searching": false,
+                            "bPaginate": true,
+                            "bLengthChange": false,
+                            "bFilter": false,
+                            "bInfo": false,
+                            "bAutoWidth": false ,
+                        });
+                    }else{
+                        $('#not-hybrid').show();
                     }
                     
-                    
-                    document.getElementById("tbody-hybrid").innerHTML = html;
-                    $('#table-hybrid').DataTable({
-                        "dom": 'tp',
-                        "searching": false,
-                        "bPaginate": true,
-                        "bLengthChange": false,
-                        "bFilter": false,
-                        "bInfo": false,
-                        "bAutoWidth": false ,
-                    });
                     $('.load-hybrid').remove();
                     click_hybrid();
                 }
@@ -1096,19 +1182,19 @@
     let html_status = ``;
     if(summary_total <= 1.9){
         html_status += `<div class="status-risk success">
-            <span class="st-circle-ovr"></span> LOW RISK
+            <span class="st-circle-ovr"></span> LOW
         </div>`;
     }else if(summary_total <= 2.6){
-        html_status += `<div class="status-risk info" style="color:#f2ff15">
-            <span class="st-circle-ovr"></span> MEDIUM RISK
+        html_status += `<div class="status-risk warning" style="color:#f2ff15">
+            <span class="st-circle-ovr"></span> MEDIUM
         </div>`;
     }else if(summary_total <= 3){
         html_status += `<div class="status-risk warning">
-            <span class="st-circle-ovr"></span> HIGH RISK
+            <span class="st-circle-ovr"></span> HIGH
         </div>`;
     }else if(summary_total >= 3){
         html_status += `<div class="status-risk danger">
-            <span class="st-circle-ovr"></span> VERY HIGH RISK
+            <span class="st-circle-ovr"></span> VERY HIGH
         </div>`;
     }
     $('#text_status_risk').html(html_status);
