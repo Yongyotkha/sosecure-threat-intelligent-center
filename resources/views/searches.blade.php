@@ -331,6 +331,8 @@
                                 </div>
 
                             </div>
+
+                            
                         </div>
 
                     </section>
@@ -416,6 +418,125 @@
                             <tbody id="tbody-hybrid-url"></tbody>
                         </table>
                     </section>
+
+
+
+
+                   
+
+                    <section class="scrollable wrapper bg-white otx_indicators" style="padding:none;">
+                                <div class="row sticky-top-nav">
+                                    <div class="nav-menu-btn">
+                                        <ul>
+                                            <li class="nav-link active-link">
+                                            <a id="to_top" href="#general_details">Analysis Overview</a>
+                                            <div class="underline"></div>
+                                            </li>
+                                            <li class="nav-link" style="display: none;">
+                                            <a href="#related_event" id="event_tag">Event</a>
+                                            <div class="underline"></div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <section id="general_details" class="">
+                                    <div class="pd-15">
+                                        <div class="row m-b-lg">
+                                            <div id="indicator_basic_info" class="col-md-12">
+                                            <h1 class="b-b">Basic Information</h1>
+                                            <div id="otx_indicators_loadspinner_basic_info" class="content-spinner-loading" style="display: none;"></div>
+     
+                                                  <span id="otx_indicators_general"></span>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                                <section id="related_event" class="">
+                                    <div class="row header-badge-full">
+                                        <div class="col-md-12">
+                                            <span class="font-weight-bold">Related Event</span>
+                                        </div>
+                                    </div>
+                                    <section class="panel panel-default" style="margin: 10px;">
+                                        <header class="panel-heading font-bold panel-header-blue">
+                                            <div class="row">
+                                            <div class="col-md-12">
+                                                <div style="margin-top:5px;">
+                                                    <i class="fas fa-table">
+                                                    </i> Table Related 
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </header>
+                                        <div class="panel-body" style="padding: 0 !important">
+                                            <div class="container-fluid" style="padding:1rem;">
+                                            <div class="row m-b-md">
+                                                <div class="col-sm-12">
+                                                    <div class="table-responsive">
+
+                                                    <table class="table table-striped dataTable no-footer" id="table-related-event" role="grid" aria-describedby="table-related-event_info">
+                                                            <thead>
+                                                                <tr role="row">
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">No</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Event Name</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Group</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Tags</th>
+                                                                    <th class="sorting_disabled text-center" rowspan="1" colspan="1">Published</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Last Status</th>
+                                                                    <th style="width: 200px;" class="sorting_disabled" rowspan="1" colspan="1">DateTime</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Attribute</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr role="row" class="odd">
+                                                                    <td>1</td>
+                                                                    <td><a href="https://insight.sosecure.co.th/indicators/events/events_detail/5f928dbcad67e6227e78938c">Feed from AbuseIP</a></td>
+                                                                    <td>
+                                                                    <div><a href="https://insight.sosecure.co.th/indicators/groups/Malaz_Test">Malaz_Test</a> ,<a href="https://insight.sosecure.co.th/indicators/groups/%20Public%20Library%20Threat%20Intelligence"> Public Library Threat Intelligence</a> ,</div>
+                                                                    </td>
+                                                                    <td></td>
+                                                                    <td class=" text-center"><i class="fas fa-check text-success"></i></td>
+                                                                    <td>Modified</td>
+                                                                    <td>2021-05-22 11:01</td>
+                                                                    <td>145</td>
+                                                                    <td><a href="https://insight.sosecure.co.th/indicators/events/events_detail/5f928dbcad67e6227e78938c" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>
+                                                                </tr>
+                                                                <tr role="row" class="even">
+                                                                    <td>2</td>
+                                                                    <td><a href="https://insight.sosecure.co.th/indicators/events/events_detail/5df9fe49d8e86fb6a255d1f7">IOCs - 201912181123</a></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td class=" text-center"><i class="fas fa-check text-success"></i></td>
+                                                                    <td>Modified</td>
+                                                                    <td>2020-01-17 10:00</td>
+                                                                    <td>5930</td>
+                                                                    <td><a href="https://insight.sosecure.co.th/indicators/events/events_detail/5df9fe49d8e86fb6a255d1f7" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>
+                                                                </tr>
+                                                              
+                                                            </tbody>
+                                                        </table>
+                                                   
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </section>
+                     </section>
+
+
+
+            
+
+
+
+
+
+
+
+
 
 
                 </div>
@@ -762,9 +883,12 @@
 
     $('.lookup').on('click',function(){
         $('.int-lookup-main').toggle();
+        
+        $('#accordion2').toggle();
         loadSearchAPI('ibmcloud');
         loadSearchAPI('virustotal');
         loadSearchAPI('hybrid');
+        loadSearchAPI('otx_indicators');
     });
 
     function click_hybrid(){
@@ -807,6 +931,7 @@
     let number_risk = 0;
     let number_new_row = 0;
     function loadSearchAPI(source){
+
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1217,7 +1342,76 @@
                     $('.load-hybrid').remove();
                     click_hybrid();
                 }
+            }else if(source == 'otx_indicators'){
+                if(res.status_code == 400){
+
+                }else{
+                    $('#otx_indicators_loadspinner_basic_info').show();
+                        $('.otx_indicators').show();
+                        var html ="";
+                        if(res.type == 'IP'){
+                                html+='<div class="col-md-12"> LOCATION: <a>Minsk, Belarus </a></div>';
+                        }else if(res.type == 'Domain'){
+
+                        }else if(res.type == 'url'){
+
+                        }else if(res.type== 'SHA256' || res.type== 'MD5' || res.type== 'SHA1'){
+                            var header_analysis = res.data.analysis;
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Analysis Date:</b> '+header_analysis.datetime_int+'</div></div>';
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> File Type:</b> '+header_analysis.info.results.file_type+'</div></div>';
+                                var Antivirus_Detections = [];
+                 
+                                if(header_analysis.plugins.clamav){
+                                    if(header_analysis.plugins.clamav.results){
+                                        for (let index = 0; index < header_analysis.plugins.clamav.results.alerts.length; index++) {
+                                            const alert = header_analysis.plugins.clamav.results.alerts[index];
+                                            if(alert == 'Malware infection'){
+                                                Antivirus_Detections.push(header_analysis.plugins.clamav.results.detection);
+                                            }
+                                        }
+                                    }
+
+                                }
+                                if(header_analysis.plugins.msdefender){
+                                    if(header_analysis.plugins.msdefender.results){
+                                        for (let index = 0; index < header_analysis.plugins.msdefender.results.alerts.length; index++) {
+                                            const alert = header_analysis.plugins.msdefender.results.alerts[index];
+                                            if(alert == 'Malware infection'){
+                                                Antivirus_Detections.push(header_analysis.plugins.msdefender.results.detection);
+                                            }
+                                        }
+                                    }
+                                }
+
+
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Antivirus Detections:</b> '+Antivirus_Detections.join("</br>")+'</div></div>';
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Size:</b> '+header_analysis.info.results.filesize+' bytes</div></div>';
+                                
+                              
+                                var Yara_Detections = [];
+                                if(header_analysis.plugins.yarad){
+                                    if(header_analysis.plugins.yarad.results){
+                                        if(header_analysis.plugins.yarad.results.detection){
+                                            for (let index = 0; index <header_analysis.plugins.yarad.results.detection.length; index++) {
+                                                Yara_Detections.push(header_analysis.plugins.yarad.results.detection[index].rule_name);
+                                            }
+                                      }
+                                    }
+                                }
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Yara Detections :</b> '+Yara_Detections.join("</br>")+'</div></div>';
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> MD5:</b> '+header_analysis.info.results.md5+' bytes</div></div>';
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Alerts:</b> '+header_analysis.info.results.md5+' bytes</div></div>';
+                           
+                        }else{
+
+                        }
+                        $('#otx_indicators_loadspinner_basic_info').hide();
+                        $('#otx_indicators_general').html(html);
+                }
             }
+
+
+
             if(number_risk == 3){
                 search_risk();
             }

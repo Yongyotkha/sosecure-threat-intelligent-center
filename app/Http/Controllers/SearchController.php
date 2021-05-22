@@ -516,6 +516,44 @@ class SearchController extends Controller
                     $log_search -> save();
                 }
             }
+        }else if($source =="otx_indicators"){
+
+
+            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";
+       
+            if($type == 'IP'){
+                $otx_url = "https://otx.alienvault.com/api/v1/indicators/file/f9f18153cabf61699d838407dddd4e937bb2efeb";
+            }else if($type == 'Domain'){
+                $otx_url = "https://otx.alienvault.com/api/v1/indicators/file/f9f18153cabf61699d838407dddd4e937bb2efeb";
+            }else if($type == 'url'){
+                $otx_url = "https://otx.alienvault.com/api/v1/indicators/file/f9f18153cabf61699d838407dddd4e937bb2efeb";
+            }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
+                $otx_url = "https://otx.alienvault.com/api/v1/indicators/file/f9f18153cabf61699d838407dddd4e937bb2efeb/analysis";
+            }else{
+
+
+            }
+
+
+
+            $ch = curl_init();
+            $headers = array(
+                 'X-OTX-API-KEY: '.$otx_API_Key,
+                'accept: '.'application/json',
+                 'Content-Type: '.'application/x-www-form-urlencoded',
+            );
+            // Send request to Server
+            $ch = curl_init($otx_url);
+            // To save response in a variable from server, set headers;
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            // Get response
+            $response = curl_exec($ch);
+            curl_close($ch);  
+           // echo($response);
+
+
+
         }
     
         $response_data = array(
