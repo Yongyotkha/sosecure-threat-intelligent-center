@@ -4946,3 +4946,7 @@ strong > p{
   .backdrop-loader.white{
     background-color: #fff;
 }
+
+.btn {
+    border-radius: 30px;
+}
