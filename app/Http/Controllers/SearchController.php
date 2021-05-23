@@ -572,7 +572,50 @@ class SearchController extends Controller
 
 
 
+        }else if($source =="otx_puls"){
+        
+            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
+            $otx_url = "https://otx.alienvault.com/api/v1/pulses/".$keyword;
+           
+            $ch = curl_init();
+            $headers = array(
+                 'X-OTX-API-KEY: '.$otx_API_Key,
+                'accept: '.'application/json',
+                 'Content-Type: '.'application/x-www-form-urlencoded',
+            );
+            // Send request to Server
+            $ch = curl_init($otx_url);
+            // To save response in a variable from server, set headers;
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            // Get response
+            $response = curl_exec($ch);
+            curl_close($ch);  
+
+        
+        }else if($source =="otx_puls_indicator"){
+        
+            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
+            $otx_url = "https://otx.alienvault.com/api/v1/pulses/".$keyword.'/indicators';
+           
+            $ch = curl_init();
+            $headers = array(
+                 'X-OTX-API-KEY: '.$otx_API_Key,
+                'accept: '.'application/json',
+                 'Content-Type: '.'application/x-www-form-urlencoded',
+            );
+            // Send request to Server
+            $ch = curl_init($otx_url);
+            // To save response in a variable from server, set headers;
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            // Get response
+            $response = curl_exec($ch);
+            curl_close($ch);  
+
+        
         }
+        
   
         $response_data = array(
             'status_code' => Response::HTTP_OK,
