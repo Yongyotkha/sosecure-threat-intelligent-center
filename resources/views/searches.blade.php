@@ -424,7 +424,7 @@
 
                    
 
-                    <section class="scrollable wrapper bg-white otx_indicators" style="padding:none;">
+                    <section class="scrollable wrapper bg-white otx_indicators" style="padding:0;">
                                 <div class="row sticky-top-nav">
                                     <div class="nav-menu-btn">
                                         <ul>
@@ -440,10 +440,10 @@
                                     </div>
                                 </div>
                                 <section id="general_details" class="">
-                                    <div class="pd-15">
+                                    <div class="">
                                         <div class="row m-b-lg">
-                                            <div id="indicator_basic_info" class="col-md-12">
-                                            <h1 class="b-b">Basic Information</h1>
+                                            <div id="indicator_basic_info" class="">
+                                            <h1 class="b-b">&nbsp;&nbsp;&nbsp;Basic Information</h1>
                                             <div id="otx_indicators_loadspinner_basic_info" class="content-spinner-loading" style="display: none;"></div>
      
                                                   <span id="otx_indicators_general"></span>
@@ -453,12 +453,8 @@
                                     </div>
                                 </section>
                                 <section id="related_event" class="">
-                                    <div class="row header-badge-full">
-                                        <div class="col-md-12">
-                                            <span class="font-weight-bold">Related Event</span>
-                                        </div>
-                                    </div>
-                                    <section class="panel panel-default" style="margin: 10px;">
+                                   <h1 class="b-b">Related Event</h1>
+                                    <section class="panel panel-default" style="margin: 0px;">
                                         <header class="panel-heading font-bold panel-header-blue">
                                             <div class="row">
                                             <div class="col-md-12">
@@ -479,7 +475,7 @@
                                                             <thead>
                                                                 <tr role="row">
                                                                     <th class="sorting_disabled" rowspan="1" colspan="1">No</th>
-                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Related</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Event</th>
                                                                     <th class="sorting_disabled" rowspan="1" colspan="1"></th>
                                                                     <th class="sorting_disabled" rowspan="1" colspan="1"></th>
                                                                     <th class="sorting_disabled text-center" rowspan="1" colspan="1"></th>
@@ -506,7 +502,7 @@
 
 
 
-                     <section class="scrollable wrapper bg-white otx_event" style="padding:none;display:none">
+                     <section class="scrollable wrapper bg-white otx_event" style="padding:0;display:none">
                                 <div class="row sticky-top-nav">
                                     <div class="nav-menu-btn">
                                         <ul>
@@ -524,7 +520,7 @@
                                 <section id="general_details" class="">
                                     <div class="pd-15">
                                         <div class="row m-b-lg">
-                                            <div id="indicator_basic_info" class="col-md-12">
+                                            <div id="indicator_basic_info" class="">
                                             <div id="otx_event_loadspinner_basic_info" class="content-spinner-loading" style="display: none;"></div>
      
                                                  
@@ -549,12 +545,8 @@
                                     </div>
                                 </section>
                                 <section id="related_event" class="">
-                                    <div class="row header-badge-full">
-                                        <div class="col-md-12">
-                                            <span class="font-weight-bold">Related Indicator</span>
-                                        </div>
-                                    </div>
-                                    <section class="panel panel-default" style="margin: 10px;">
+                                 <h1 class="b-b">Related Indicator</h1>
+                                    <section class="panel panel-default" style="margin: 0px;">
                                         <header class="panel-heading font-bold panel-header-blue">
                                             <div class="row">
                                             <div class="col-md-12">
@@ -599,6 +591,86 @@
                      </section>
 
 
+                     <section class="scrollable wrapper bg-white otx_tag" style="padding:0;display:none">
+                                <div class="row sticky-top-nav">
+                                    <div class="nav-menu-btn">
+                                        <ul>
+                                            <li class="nav-link active-link">
+                                            <a id="to_top" href="#general_details">Tags</a>
+                                            <div class="underline"></div>
+                                            </li>
+                                            <li class="nav-link" style="display: none;">
+                                            <a href="#related_event" id="event_tag">Event</a>
+                                            <div class="underline"></div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <section id="general_details" class="">
+                                    <div class="pd-15">
+                                        <div class="row ">
+                                            <div id="indicator_basic_info" class="">
+                                            <div id="otx_tag_loadspinner_basic_info" class="content-spinner-loading" style="display: none;"></div>
+     
+                                                 
+               
+                                            <span id="otx_tag_general"></span>
+
+
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                                <section id="related_event" class="">
+                                    <section class="panel panel-default" style="margin: 0px;">
+                                        <header class="panel-heading font-bold panel-header-blue">
+                                            <div class="row">
+                                            <div class="col-md-12">
+                                                <div style="margin-top:5px;">
+                                                    <i class="fas fa-table">
+                                                    </i> Table Tags 
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </header>
+                                        <div class="panel-body" style="padding: 0 !important">
+                                            <div class="container-fluid" style="padding:1rem;">
+                                            <div class="row m-b-md">
+                                                <div class="col-sm-12">
+                                                    <div class="table-responsive">
+                                                    <div id="otx_tag_loadspinner_basic_info_table" class="content-spinner-loading" style="display: none;"></div>
+                                                    <table class="table table-striped dataTable no-footer" id="table-related-tag" role="grid" aria-describedby="table-related-event_info" style="display: none;" >
+                                                            <thead>
+                                                                <tr role="row">
+                                                                  <th class="sorting_disabled" rowspan="1" colspan="1">No</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Event</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1"></th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1"></th>
+                                                                    <th class="sorting_disabled text-center" rowspan="1" colspan="1"></th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1"></th>
+                                                                    <th style="width: 200px;" class="sorting_disabled" rowspan="1" colspan="1"></th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1"></th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                     
+                                                          
+                                                              
+                                                            </tbody>
+                                                        </table>
+                                                        <div id="otx_tag_more_loadspinner_basic_info_table" class="content-spinner-loading" style="display: none;"></div>
+                                                        <a href="javascript:void(0);" id="btn_load_tag_nextpag" onclick="f_load_tag_nextpage();" class="btn btn-xs btn-info" style="width: 100%;margin-right: 0px;margin-top: 10px;display:none">Load Data More</a>
+                                                   
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </section>
+                     </section>
 
 
 
@@ -1604,7 +1676,7 @@
                                                 if(pulse.tags){
                                                   for (let index2 = 0; index2 < pulse.tags.length; index2++) {
                                                         const tag = pulse.tags[index2];
-                                                        Tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\')">'+tag+'</a>');  
+                                                        Tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\',\'\')">'+tag+'</a>');  
                                                   }
                                                 }
                                                 var public ="";
@@ -1680,6 +1752,7 @@
     function f_load_puls(puls_id){
         $('.otx_indicators').hide();
         $('.otx_event').show();
+        $('.otx_tag').hide();
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1708,7 +1781,7 @@
             if(data.tags){
                   for (let index = 0; index < data.tags.length; index++) {
                       const tag = data.tags[index];
-                      tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\')">'+tag+'</a>');  
+                      tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\',\'\')">'+tag+'</a>');  
                   }
                 
             }
@@ -1841,7 +1914,133 @@
         });
 
     }
+    var tag_name_old = "";
+    function f_load_puls_tag(tag_name,nextpage){
 
+        $('.otx_indicators').hide();
+        $('.otx_event').hide();
+        $('.otx_tag').show();
+        $("#otx_tag_loadspinner_basic_info_table").show();
+        $("#otx_tag_loadspinner_basic_info").show();
+        $('#btn_load_tag_nextpag').hide();
+
+        if(tag_name){
+            if(tag_name_old != tag_name){
+                $("#table-related-tag tbody").empty();
+                $('#btn_load_tag_nextpag').hide();
+             }
+             tag_name_old = tag_name;
+        }
+    
+       
+        var url_next =   $('#btn_load_tag_nextpag').data('url');
+       if(url_next){
+          nextpage =url_next;
+       }
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/loadSearchAPI?tags="+tag_name,
+            method: 'post',
+            data: ({
+                keyword:tag_name,
+                source:'otx_puls_tag',
+                nextpage:nextpage
+            }),
+            beforeSend: function(){
+                $('.ajax-loading').show();
+            },
+        }).done(function(res){
+        
+            
+            var header = res.data;
+            var search = "found "+header.count+" results for \"tag:"+tag_name+"\"";
+            $('#otx_tag_general').html('<h1 class="b-b">'+search+'</h1>');
+            $("#otx_tag_loadspinner_basic_info").hide();
+            if(header.next){
+
+                $('#btn_load_tag_nextpag').data('url',header.next);
+                $('#btn_load_tag_nextpag').show();
+            }else{
+                $('#btn_load_tag_nextpag').data('url','');
+                $('#btn_load_tag_nextpag').show();
+            }
+            $('#otx_tag_more_loadspinner_basic_info_table').hide();
+            var tag_row =  $("#table-related-tag tbody tr").length;
+            var table_pulse = "";
+                              if(header.results){
+                                      
+                                               for (let index = 0; index < header.results.length; index++) {
+                                                var pulse = header.results[index];
+                                                var Groups = [];
+                                                if(pulse.groups){
+                                                  for (let index2 = 0; index2 < pulse.groups.length; index2++) {
+                                                        const group = pulse.groups[index2];
+                                                        Groups.push('<a href="javascript:void(0);" onclick="f_load_puls_group( \' '+group+'\')">'+group+'</a>');  
+                                                  }
+                                                }
+                                                var Tags = [];
+                                                if(pulse.tags){
+                                                  for (let index2 = 0; index2 < pulse.tags.length; index2++) {
+                                                        const tag = pulse.tags[index2];
+                                                        Tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\',\'\')">'+tag+'</a>');  
+                                                  }
+                                                }
+                                                var public ="";
+                                                if(pulse.public == 1){
+                                                        public='<i class="fas fa-check text-success"></i>';
+
+                                                }else{
+
+                                                }
+                                                var indicator_type = [];
+                                                if(pulse.indicator_count){
+                                             
+
+                                                    $.each(pulse.indicator_type_counts, function(key, value) {
+                                                        indicator_type.push('<b>'+key+':</b>'+value);  
+                                                    });
+                                                }
+                                             
+                                                tag_row++;
+                                                table_pulse+='  <tr role="row">';
+                                                table_pulse+='      <td style="width:10px;">'+(tag_row)+'</td>';
+                                                table_pulse+='     <td colspan="6"><a href="javascript:void(0);" onclick="f_load_puls(\''+pulse.id+'\');">'+pulse.name+'</a>';
+                                                table_pulse+='     </br> <span>'+indicator_type.join("|")+'</span>';
+                                                table_pulse+='     </br> <span>'+pulse.description+'</span>';
+                                                table_pulse+='      </br>';
+                                                if(Groups.length > 0){
+                                                  table_pulse+='     </br> <span><b>Groups:</b>'+Groups.join(", ")+'</span>';
+                                                }
+                                                if(Tags.length > 0){
+                                                table_pulse+='     </br> <span><b>Tags:</b>'+Tags.join(", ")+'</span>';
+                                                }
+                                                table_pulse+=' </br> <span> <b>Created:</b>'+pulse.created+' <b>Modified:</b>'+pulse.modified+'</span>';
+                                                table_pulse+='      <td>';
+                               
+                                                table_pulse+='   <td style="width:10px;"><a href="javascript:void(0);"  onclick="f_load_puls(\''+pulse.id+'\');" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
+                                                table_pulse+=' </tr>';
+                                                
+                                               }                                      
+                                
+                              }
+                              $("#table-related-tag tbody").append(table_pulse);
+                              $("#table-related-tag").show();
+                              $("#otx_tag_loadspinner_basic_info_table").hide();
+
+
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+
+    }
+
+    function f_load_tag_nextpage(){
+        $('#otx_tag_more_loadspinner_basic_info_table').show();
+        f_load_puls_tag('','');
+        
+    }
    function search_risk(){
     let summary_total = (status_value_ibmcloud + status_value_virustotal + status_value_hybrid) / number_new_row;
     let html_status = ``;

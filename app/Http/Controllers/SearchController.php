@@ -324,6 +324,10 @@ class SearchController extends Controller
             $site_id = $site -> id;
         }
         $type = $this->check_keyword_type($keyword);
+        if($source =="otx_puls_tag"){
+            $type="tags";
+        }
+
         if($type == ''){
             $response_data = array(
                 'status_code' => 400,
@@ -614,8 +618,34 @@ class SearchController extends Controller
             curl_close($ch);  
 
         
-        }
+        }else if($source =="otx_puls_tag"){
         
+            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
+            if(!$request->nextpage){
+                $otx_url = "https://otx.alienvault.com/otxapi/pulses/?limit=20&page=1&sort=-modified&q=tag:".trim($keyword);
+            }else{
+                $otx_url =$request->nextpage;
+            }
+         
+           
+            $ch = curl_init();
+            $headers = array(
+                 'X-OTX-API-KEY: '.$otx_API_Key,
+                'accept: '.'application/json',
+                 'Content-Type: '.'application/x-www-form-urlencoded',
+            );
+            // Send request to Server
+            $ch = curl_init($otx_url);
+            // To save response in a variable from server, set headers;
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            // Get response
+            $response = curl_exec($ch);
+            curl_close($ch);  
+
+        
+        }
+     
   
         $response_data = array(
             'status_code' => Response::HTTP_OK,
@@ -623,6 +653,7 @@ class SearchController extends Controller
             'data' => json_decode($response, true),
             'data2' => json_decode($response2, true),
             'type' => $type,
+            'source' => $source,
         );
         return response()->json($response_data);
     }
