@@ -125,7 +125,7 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <h3 class="page-header">
-                                    Overall Risk
+                                    Overall
                                 </h3>
                             </div>
                             <div class="col-md-4 text-right">
@@ -429,7 +429,7 @@
                                     <div class="nav-menu-btn">
                                         <ul>
                                             <li class="nav-link active-link">
-                                            <a id="to_top" href="#general_details">Analysis Overview</a>
+                                            <a id="to_top" href="#general_details">Indicator</a>
                                             <div class="underline"></div>
                                             </li>
                                             <li class="nav-link" style="display: none;">
@@ -474,8 +474,8 @@
                                             <div class="row m-b-md">
                                                 <div class="col-sm-12">
                                                     <div class="table-responsive">
-
-                                                    <table class="table table-striped dataTable no-footer" id="table-related-event" role="grid" aria-describedby="table-related-event_info">
+                                                    <div id="otx_indicators_loadspinner_basic_info_table" class="content-spinner-loading" style="display: none;"></div>
+                                                    <table class="table table-striped dataTable no-footer" id="table-related-event" role="grid" aria-describedby="table-related-event_info" style="display: none;" >
                                                             <thead>
                                                                 <tr role="row">
                                                                     <th class="sorting_disabled" rowspan="1" colspan="1">No</th>
@@ -491,7 +491,7 @@
                                                             </thead>
                                                             <tbody>
                                                      
-                               
+                                                          
                                                               
                                                             </tbody>
                                                         </table>
@@ -506,7 +506,97 @@
 
 
 
-            
+                     <section class="scrollable wrapper bg-white otx_event" style="padding:none;display:none">
+                                <div class="row sticky-top-nav">
+                                    <div class="nav-menu-btn">
+                                        <ul>
+                                            <li class="nav-link active-link">
+                                            <a id="to_top" href="#general_details">Event</a>
+                                            <div class="underline"></div>
+                                            </li>
+                                            <li class="nav-link" style="display: none;">
+                                            <a href="#related_event" id="event_tag">Event</a>
+                                            <div class="underline"></div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <section id="general_details" class="">
+                                    <div class="pd-15">
+                                        <div class="row m-b-lg">
+                                            <div id="indicator_basic_info" class="col-md-12">
+                                            <div id="otx_event_loadspinner_basic_info" class="content-spinner-loading" style="display: none;"></div>
+     
+                                                 
+               
+                                                  <div class="row">
+                                                                <div class="col-md-6">
+                                                                <span id="otx_event_general"></span>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <h1 class="text-center">Type Attributes </h1>
+                                                                    <div id="otx_event_chart-show-bar">
+                                                          
+                                                                    </div>
+                                                                </div>
+                                                        </div>
+
+
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                                <section id="related_event" class="">
+                                    <div class="row header-badge-full">
+                                        <div class="col-md-12">
+                                            <span class="font-weight-bold">Related Indicator</span>
+                                        </div>
+                                    </div>
+                                    <section class="panel panel-default" style="margin: 10px;">
+                                        <header class="panel-heading font-bold panel-header-blue">
+                                            <div class="row">
+                                            <div class="col-md-12">
+                                                <div style="margin-top:5px;">
+                                                    <i class="fas fa-table">
+                                                    </i> Table Related 
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </header>
+                                        <div class="panel-body" style="padding: 0 !important">
+                                            <div class="container-fluid" style="padding:1rem;">
+                                            <div class="row m-b-md">
+                                                <div class="col-sm-12">
+                                                    <div class="table-responsive">
+                                                    <div id="otx_event_loadspinner_basic_info_table" class="content-spinner-loading" style="display: none;"></div>
+                                                    <table class="table table-striped dataTable no-footer" id="table-related-indicator" role="grid" aria-describedby="table-related-event_info" style="display: none;" >
+                                                            <thead>
+                                                                <tr role="row">
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Type</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Indicator</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Role</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Title</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Status</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Date</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                     
+                                                          
+                                                              
+                                                            </tbody>
+                                                        </table>
+                                                   
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </section>
+                     </section>
 
 
 
@@ -622,6 +712,7 @@
 @include('stacks.js.activebutton')
 @include('stacks.js.highchart')
 @include('stacks.js.datatables')
+@include('stacks.js.chart')
 <script>
     active_btn('#fillter_click .btn-selector');
 
@@ -860,13 +951,25 @@
     $('.int-lookup-main').hide();
 
     $('.lookup').on('click',function(){
+        $('#table-container').hide();
         $('.int-lookup-main').toggle();
         
         $('#accordion2').toggle();
         loadSearchAPI('ibmcloud');
         loadSearchAPI('virustotal');
         loadSearchAPI('hybrid');
+        $('#otx_indicators_loadspinner_basic_info').show();
+        $('#otx_indicators_loadspinner_basic_info_table').show();
+        $("#table-related-event").hide();
+
+        $('#otx_event_loadspinner_basic_info').show();
+        $('#otx_event_loadspinner_basic_info_table').show();
+        $("#table-related-indicator").hide();
         loadSearchAPI('otx_indicators');
+
+
+
+        
     });
 
     function click_hybrid(){
@@ -927,6 +1030,8 @@
             number_risk++;
             let data = res.data;
             $('#type_search').text(res.type);
+
+
             if(source == 'ibmcloud'){
                 if(res.status_code == 400){
                     $('.load-ibmcloud').remove();
@@ -1325,7 +1430,7 @@
 
                 }else{
                     $('#otx_indicators_loadspinner_basic_info').show();
-                        $('.otx_indicators').show();
+                       
                         var html ="";
                         if(res.type == 'IP'){
                                 html+='<div class="col-md-12"> LOCATION: <a>Minsk, Belarus </a></div>';
@@ -1521,7 +1626,7 @@
 
                                                 table_pulse+='  <tr role="row">';
                                                 table_pulse+='      <td style="width:10px;">'+(index+1)+'</td>';
-                                                table_pulse+='     <td colspan="6"><a href="javascript:void(0);" onclick="f_load_puls('+pulse.id+');">'+pulse.name+'</a>';
+                                                table_pulse+='     <td colspan="6"><a href="javascript:void(0);" onclick="f_load_puls(\''+pulse.id+'\');">'+pulse.name+'</a>';
                                                 table_pulse+='     </br> <span>'+indicator_type.join("|")+'</span>';
                                                 table_pulse+='     </br> <span>'+pulse.description+'</span>';
                                                 table_pulse+='      </br>';
@@ -1534,7 +1639,7 @@
                                                 table_pulse+=' </br> <span> <b>Created:</b>'+pulse.created+' <b>Modified:</b>'+pulse.modified+'</span>';
                                                 table_pulse+='      <td>';
                                
-                                                table_pulse+='   <td style="width:10px;"><a href="javascript:void(0);" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
+                                                table_pulse+='   <td style="width:10px;"><a href="javascript:void(0);"  onclick="f_load_puls(\''+pulse.id+'\');" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
                                                 table_pulse+=' </tr>';
 
                                                }                                      
@@ -1555,8 +1660,9 @@
 
 
 
-
                         $('#otx_indicators_loadspinner_basic_info').hide();
+                        $('#otx_indicators_loadspinner_basic_info_table').hide();
+                        $("#table-related-event").show();
                         $('#otx_indicators_general').html(html);
                 }
             }
@@ -1571,6 +1677,170 @@
         });
     }
 
+    function f_load_puls(puls_id){
+        $('.otx_indicators').hide();
+        $('.otx_event').show();
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/loadSearchAPI",
+            method: 'post',
+            data: ({
+                keyword:puls_id,
+                source:'otx_puls'
+            }),
+            beforeSend: function(){
+                $('.ajax-loading').show();
+            },
+        }).done(function(res){
+            var data = res.data;
+
+            var referencess = [];
+            if(data.references){
+                  for (let index = 0; index < data.references.length; index++) {
+                      const reference = data.references[index];
+                      referencess.push('<a href="'+reference+'"  target="_blank">'+reference+'</a>');  
+                  }
+                
+            }
+            var tags = [];
+            if(data.tags){
+                  for (let index = 0; index < data.tags.length; index++) {
+                      const tag = data.tags[index];
+                      tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\')">'+tag+'</a>');  
+                  }
+                
+            }
+            var industries = [];
+            if(data.industries){
+                  for (let index = 0; index < data.industries.length; index++) {
+                      const industrie = data.industries[index];
+                      industries.push('<a href="javascript:void(0);" onclick="f_load_puls_industrie( \' '+industrie+'\')">'+industrie+'</a>');  
+                  }
+                
+            }
+            var targeted_countries = [];
+            if(data.targeted_countries){
+                  for (let index = 0; index < data.targeted_countries.length; index++) {
+                      const targeted_countrie = data.targeted_countries[index];
+                      targeted_countries.push('<a href="javascript:void(0);" onclick="f_load_puls_targeted_countries( \' '+targeted_countrie+'\')">'+targeted_countrie+'</a>');  
+                  }
+                
+            }
+            var attack_ids = [];
+            if(data.attack_ids){
+                  for (let index = 0; index < data.attack_ids.length; index++) {
+                      const attack_id = data.attack_ids[index];
+                      attack_ids.push(attack_id);  
+                  }
+                
+            }
+
+            
+            var html="";
+            html+=' <h1>'+data.name+'</h1>';
+            html+=' <p>'+data.description+'</p>';
+            html+=' <p><b>Reference:</b>'+referencess.join(", ")+'</p>';
+            html+=' <p><b>Tags:</b>'+tags.join(", ")+'</p>';
+            html+='<p><b>Industry:</b>'+industries.join(", ")+'</p>';
+            html+=' <p><b>Targeted Countries:</b>'+targeted_countries.join(", ")+'</p>';
+            html+=' <b>ATT&CK IDS:</b>'+attack_ids.join(", ")+'</p>';
+            $('#otx_event_general').html(html);
+
+            var indicators = [];
+            var indicators_data = [];
+            if(data.indicators){
+                  for (let index = 0; index < data.indicators.length; index++) {
+                    const indicator = data.indicators[index].type;
+                    if (jQuery.inArray(indicator, indicators) == -1) {
+                        indicators.push(indicator);  
+                        var count = 0;
+                        for (let index2 = 0; index2 < data.indicators.length; index2++) {
+                            if(indicator == data.indicators[index2].type){
+                                count++;
+                            }
+                        }
+                        indicators_data.push(count);  
+                    }
+                   
+                  }
+                
+            }
+          
+            $('#otx_event_loadspinner_basic_info').hide();
+
+            const chart = new frappe.Chart("#otx_event_chart-show-bar", { 
+                    title: "",
+                    data:{
+                        labels:indicators,
+                        datasets: [
+                        { values:indicators_data}
+                        ]
+                    },
+                    type: 'percentage',
+                    colors: ['#743ee2']
+                });
+                f_load_puls_indictor(puls_id)
+             
+
+    
+
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+    }
+
+    function f_load_puls_indictor(puls_id){
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "/loadSearchAPI",
+            method: 'post',
+            data: ({
+                keyword:puls_id,
+                source:'otx_puls_indicator'
+            }),
+            beforeSend: function(){
+                $('.ajax-loading').show();
+            },
+        }).done(function(res){
+            var data = res.data;
+
+                var table_indicator ="";
+               if(data.results){
+                  for (let index = 0; index < data.results.length; index++) {
+                      var indicator = data.results[index];
+                      var role ="";
+                      if(indicator.role){
+                        role = indicator.role;
+                      }
+                      var is_active = "";
+                      if(indicator.is_active == 1){
+                        is_active ="Active";
+                      }
+                        table_indicator+='  <tr role="row">';
+                        table_indicator+='      <td style="width:100px;">'+indicator.type+'</td>';
+                        table_indicator+='     <td><a href="javascript:void(0);" onclick="f_load_indicator(\''+indicator.indicator+'\');">'+indicator.indicator+'</a>';
+                        table_indicator+='     <td>'+role+'</td>';
+                        table_indicator+='     <td>'+indicator.title+'</td>';
+                        table_indicator+='     <td>'+is_active+'</td>';
+                        table_indicator+='     <td>'+indicator.created+'</td>';
+                                        
+                        table_indicator+='   <td style="width:10px;"><a href="javascript:void(0);" onclick="f_load_indicator(\''+indicator.indicator+'\');" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
+                        table_indicator+=' </tr>';
+                    }
+                }
+                $("#table-related-indicator tbody").append(table_indicator);
+                $("#table-related-indicator").show();
+                $("#otx_event_loadspinner_basic_info_table").hide();
+
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            console.log("No response from server");
+        });
+
+    }
 
    function search_risk(){
     let summary_total = (status_value_ibmcloud + status_value_virustotal + status_value_hybrid) / number_new_row;
