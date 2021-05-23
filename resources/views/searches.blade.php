@@ -1505,128 +1505,31 @@
                        
                         var html ="";
                         if(res.type == 'IP'){
-                                html+='<div class="col-md-12"> LOCATION: <a>Minsk, Belarus </a></div>';
-                        }else if(res.type == 'Domain'){
+                            var header = res.data;
+                            var header2 = res.data2;
 
-                        }else if(res.type == 'url'){
-
-                        }else if(res.type== 'SHA256' || res.type== 'MD5' || res.type== 'SHA1'){
-                            $("#table-related-event tbody").append('');
-                            var header_analysis = res.data.analysis;
-                            var header = res.data2;
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Analysis Date:</b> '+header_analysis.datetime_int+'</div></div>';
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> File Type:</b> '+header_analysis.info.results.file_type+'</div></div>';
-                            
-                                var Antivirus_Detections = [];
-                 
-                                if(header_analysis.plugins.clamav){
-                                    if(header_analysis.plugins.clamav.results){
-                                        if( header_analysis.plugins.clamav.results.alerts){
-                                        for (let index = 0; index < header_analysis.plugins.clamav.results.alerts.length; index++) {
-                                            const alert = header_analysis.plugins.clamav.results.alerts[index];
-                                            if(alert == 'Malware infection'){
-                                                Antivirus_Detections.push(header_analysis.plugins.clamav.results.detection);
-                                            }
-                                        }
-                                        }
+                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> ASN:</b> '+header.asn+'</div></div>';
+                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Indicator Facts:</b> '+''+'</div></div>';
+                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Country:</b> '+header.country_name+'</div></div>';
+                            var open_ports="";
+                            var issuer = [];
+                            var subject =[];
+                            if(header2.facts){
+                                if(header2.facts.open_ports){
+                                    open_ports = header2.facts.open_ports.join(", ")
+                                }
+                                if(header2.facts.ssl_certificates){
+                                    for (let index = 0; index < header2.facts.ssl_certificates.length; index++) {
+                                        const element = header2.facts.ssl_certificates[index];
+                                        issuer.push(element.issuer);
+                                        subject.push(element.subject);
                                     }
 
                                 }
-                                if(header_analysis.plugins.msdefender){
-                                    if(header_analysis.plugins.msdefender.results){
-                                        if( header_analysis.plugins.msdefender.results.alerts){
-                                        for (let index = 0; index < header_analysis.plugins.msdefender.results.alerts.length; index++) {
-                                            const alert = header_analysis.plugins.msdefender.results.alerts[index];
-                                            if(alert == 'Malware infection'){
-                                                Antivirus_Detections.push(header_analysis.plugins.msdefender.results.detection);
-                                            }
-                                        }
-                                        }
-                                    }
-                                }
+                            }
+                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Open Ports:</b> '+open_ports+'</div></div>';
 
-
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Antivirus Detections:</b> '+Antivirus_Detections.join(",")+'</div></div>';
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Size:</b> '+header_analysis.info.results.filesize+' bytes</div></div>';
-                                
-                              
-                                var Yara_Detections = [];
-                                if(header_analysis.plugins.yarad){
-                                    if(header_analysis.plugins.yarad.results){
-                                        if(header_analysis.plugins.yarad.results.detection){
-                                            for (let index = 0; index <header_analysis.plugins.yarad.results.detection.length; index++) {
-                                                Yara_Detections.push(header_analysis.plugins.yarad.results.detection[index].rule_name);
-                                            }
-                                      }
-                                    }
-                                }
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Yara Detections :</b> '+Yara_Detections.join("</br>")+'</div></div>';
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> MD5:</b> '+header_analysis.info.results.md5+' </div></div>';
-
-
-                                var Alerts = [];
-                                if(header_analysis.plugins.cuckoo){
-                                    if(header_analysis.plugins.cuckoo.result){
-                           
-                                        if(header_analysis.plugins.cuckoo.result.signatures){
-
-                                            for (let index = 0; index <header_analysis.plugins.cuckoo.result.signatures.length; index++) {
-                                              
-                                                if(header_analysis.plugins.cuckoo.result.signatures[index].severity >=3){
-                                                    Alerts.push('<span class="badge" style="background-color: #b93624;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
-                                                }else if(header_analysis.plugins.cuckoo.result.signatures[index].severity >=2){
-                                                    Alerts.push('<span class="badge" style="background-color: #ffb000;color:#333;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
-
-                                                }else{
-                                                    Alerts.push('<span class="badge" style="background-color: #88ce4f;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
-                                                }
-                                             
-                                            }
-                                      }
-                                    }
-                                }
-
-
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Alerts:</b> '+Alerts.join("")+' </div></div>';
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> SHA1:</b> '+header_analysis.info.results.sha1+' </div></div>';
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> SHA256:</b> '+header_analysis.info.results.sha256+' </div></div>';
-                                var host_name = [];
-                                if(header_analysis.plugins.cuckoo){
-                                    if(header_analysis.plugins.cuckoo.result){
-                           
-                                        if(header_analysis.plugins.cuckoo.result.network){
-
-                                           if(header_analysis.plugins.cuckoo.result.network.hosts){
-                                               for (let index = 0; index < header_analysis.plugins.cuckoo.result.network.hosts.length; index++) {
-                                                   const ip = header_analysis.plugins.cuckoo.result.network.hosts[index].ip;
-                                                   host_name.push(ip);
-                                               }
-
-                                           }
-                                      }
-                                    }
-                                }
-
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> External Hosts:</b> '+host_name.join(",")+' </div></div>';
-
-
-                                var imphash = "";
-                                var pehash="";
-                                if(header_analysis.plugins.pe32info){
-                                    if(header_analysis.plugins.pe32info.results){
-                                        if(header_analysis.plugins.pe32info.results.imphash){
-                                              imphash = header_analysis.plugins.pe32info.results.imphash;
-                                        }
-                                        if(header_analysis.plugins.pe32info.results.pehash){
-                                            pehash = header_analysis.plugins.pe32info.results.pehash;
-                                        }
-                                    }
-                                }
-
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> IMPHASH:</b> '+imphash+' </div></div>';
-
-
-                              var Tags = [];
+                            var Tags = [];
                               if(header.pulse_info){
                                 if(header.pulse_info.pulses){               
                                                for (let index = 0; index < header.pulse_info.pulses.length; index++) {
@@ -1638,27 +1541,258 @@
                                                 }
                                                }                                      
                                 }
+
+                          
                               }
                               if(Tags.length > 0){
                                 html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Tags:</b> '+Tags.join(",")+' </div></div>';
                               }
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> PEHASH:</b> '+pehash+' </div></div>';
-                                var Groups = [];
+                              html+=' <div class="m-b-xs"><div class="col-md-6"><b> Certificate Issuer:</b> '+issuer.join(", ")+'</div></div>';
+                              html+=' <div class="m-b-xs"><div class="col-md-6"><b> Certificate Subject:</b> '+subject.join(", ")+'</div></div>';
+
+                            var table_pulse = "";
                               if(header.pulse_info){
                                 if(header.pulse_info.pulses){               
                                                for (let index = 0; index < header.pulse_info.pulses.length; index++) {
-                                                if(header.pulse_info.pulses[index].groups){
-                                                  for (let index2 = 0; index2 < header.pulse_info.pulses[index].groups.length; index2++) {
-                                                        const groups = header.pulse_info.pulses[index].groups[index2];
-                                                        Groups.push(groups);  
+                                                var pulse = header.pulse_info.pulses[index];
+                                                var Groups = [];
+                                                if(pulse.groups){
+                                                  for (let index2 = 0; index2 < pulse.groups.length; index2++) {
+                                                        const group = pulse.groups[index2];
+                                                        Groups.push('<a href="javascript:void(0);" onclick="f_load_puls_group( \' '+group+'\')">'+group+'</a>');  
                                                   }
                                                 }
+                                                var Tags = [];
+                                                if(pulse.tags){
+                                                  for (let index2 = 0; index2 < pulse.tags.length; index2++) {
+                                                        const tag = pulse.tags[index2];
+                                                        Tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\',\'\')">'+tag+'</a>');  
+                                                  }
+                                                }
+                                                var public ="";
+                                                if(pulse.public == 1){
+                                                        public='<i class="fas fa-check text-success"></i>';
+
+                                                }else{
+
+                                                }
+                                                var indicator_type = [];
+                                                if(pulse.indicator_count){
+                                             
+
+                                                    $.each(pulse.indicator_type_counts, function(key, value) {
+                                                        indicator_type.push('<b>'+key+':</b>'+value);  
+                                                    });
+                                                }
+
+
+                                                table_pulse+='  <tr role="row">';
+                                                table_pulse+='      <td style="width:10px;">'+(index+1)+'</td>';
+                                                table_pulse+='     <td colspan="6"><a href="javascript:void(0);" onclick="f_load_puls(\''+pulse.id+'\');">'+pulse.name+'</a>';
+                                                table_pulse+='     </br> <span>'+pulse.description+'</span>';
+                                                table_pulse+='      </br>';
+                                                if(Groups.length > 0){
+                                                  table_pulse+='     </br> <span><b>Groups:</b>'+Groups.join(", ")+'</span>';
+                                                }
+                                                if(Tags.length > 0){
+                                                table_pulse+='     </br> <span><b>Tags:</b>'+Tags.join(", ")+'</span>';
+                                                }
+                                                table_pulse+=' </br> <span> <b>Created:</b>'+pulse.created+' <b>Modified:</b>'+pulse.modified+'</span>';
+                                                table_pulse+='      <td>';
+                               
+                                                table_pulse+='   <td style="width:10px;"><a href="javascript:void(0);"  onclick="f_load_puls(\''+pulse.id+'\');" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
+                                                table_pulse+=' </tr>';
+
                                                }                                      
                                 }
                               }
-                              if(Groups.length > 0){
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Groups:</b> '+Groups.join(",")+' </div></div>';
-                              }
+                              $("#table-related-event tbody").append(table_pulse);
+
+
+
+
+
+
+
+                        }else if(res.type == 'Domain'){
+
+                        }else if(res.type == 'url'){
+
+                        }else if(res.type== 'SHA256' || res.type== 'MD5' || res.type== 'SHA1'){
+                            $("#table-related-event tbody").empty();
+                            var header_analysis = res.data.analysis;
+                            var header = res.data2;
+                            if(!jQuery.isEmptyObject(header_analysis)){
+                                
+                                        if(header_analysis){
+                                            if(header_analysis.datetime_int){
+                                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Analysis Date:</b> '+header_analysis.datetime_int+'</div></div>';
+                                            }
+                                            if(header_analysis.info.results.file_type){
+                                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> File Type:</b> '+header_analysis.info.results.file_type+'</div></div>';
+                                            }
+                                        }
+                                        
+                                        
+                                            var Antivirus_Detections = [];
+                                            if(header_analysis){
+                                                    if(header_analysis.plugins.clamav){
+                                                        if(header_analysis.plugins.clamav.results){
+                                                            if( header_analysis.plugins.clamav.results.alerts){
+                                                            for (let index = 0; index < header_analysis.plugins.clamav.results.alerts.length; index++) {
+                                                                const alert = header_analysis.plugins.clamav.results.alerts[index];
+                                                                if(alert == 'Malware infection'){
+                                                                    Antivirus_Detections.push(header_analysis.plugins.clamav.results.detection);
+                                                                }
+                                                            }
+                                                            }
+                                                        }
+
+                                                    }
+                                            
+                                                if(header_analysis.plugins.msdefender){
+                                                    if(header_analysis.plugins.msdefender.results){
+                                                        if( header_analysis.plugins.msdefender.results.alerts){
+                                                        for (let index = 0; index < header_analysis.plugins.msdefender.results.alerts.length; index++) {
+                                                            const alert = header_analysis.plugins.msdefender.results.alerts[index];
+                                                            if(alert == 'Malware infection'){
+                                                                Antivirus_Detections.push(header_analysis.plugins.msdefender.results.detection);
+                                                            }
+                                                        }
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+
+                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Antivirus Detections:</b> '+Antivirus_Detections.join(",")+'</div></div>';
+                                            if(header_analysis){
+                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Size:</b> '+header_analysis.info.results.filesize+' bytes</div></div>';
+                                            }
+                                            
+                                        
+                                            var Yara_Detections = [];
+                                            if(header_analysis){
+                                                if(header_analysis.plugins.yarad){
+                                                    if(header_analysis.plugins.yarad.results){
+                                                        if(header_analysis.plugins.yarad.results.detection){
+                                                            for (let index = 0; index <header_analysis.plugins.yarad.results.detection.length; index++) {
+                                                                Yara_Detections.push(header_analysis.plugins.yarad.results.detection[index].rule_name);
+                                                            }
+                                                    }
+                                                    }
+                                                }
+                                            }
+                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Yara Detections :</b> '+Yara_Detections.join("</br>")+'</div></div>';
+                                            if(header_analysis){
+                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> MD5:</b> '+header_analysis.info.results.md5+' </div></div>';
+                                            }
+
+
+                                            var Alerts = [];
+                                            if(header_analysis){
+                                                if(header_analysis.plugins.cuckoo){
+                                                    if(header_analysis.plugins.cuckoo.result){
+                                        
+                                                        if(header_analysis.plugins.cuckoo.result.signatures){
+
+                                                            for (let index = 0; index <header_analysis.plugins.cuckoo.result.signatures.length; index++) {
+                                                            
+                                                                if(header_analysis.plugins.cuckoo.result.signatures[index].severity >=3){
+                                                                    Alerts.push('<span class="badge" style="background-color: #b93624;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
+                                                                }else if(header_analysis.plugins.cuckoo.result.signatures[index].severity >=2){
+                                                                    Alerts.push('<span class="badge" style="background-color: #ffb000;color:#333;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
+
+                                                                }else{
+                                                                    Alerts.push('<span class="badge" style="background-color: #88ce4f;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
+                                                                }
+                                                            
+                                                            }
+                                                    }
+                                                    }
+                                                }
+                                            }
+
+
+                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Alerts:</b> '+Alerts.join("")+' </div></div>';
+                                            if(header_analysis){
+                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> SHA1:</b> '+header_analysis.info.results.sha1+' </div></div>';
+                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> SHA256:</b> '+header_analysis.info.results.sha256+' </div></div>';
+                                            }
+                                            var host_name = [];
+                                            if(header_analysis){
+                                                if(header_analysis.plugins.cuckoo){
+                                                    if(header_analysis.plugins.cuckoo.result){
+                                        
+                                                        if(header_analysis.plugins.cuckoo.result.network){
+
+                                                        if(header_analysis.plugins.cuckoo.result.network.hosts){
+                                                            for (let index = 0; index < header_analysis.plugins.cuckoo.result.network.hosts.length; index++) {
+                                                                const ip = header_analysis.plugins.cuckoo.result.network.hosts[index].ip;
+                                                                host_name.push(ip);
+                                                            }
+
+                                                        }
+                                                    }
+                                                    }
+                                                }
+                                            }
+
+                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> External Hosts:</b> '+host_name.join(",")+' </div></div>';
+
+
+                                            var imphash = "";
+                                            var pehash="";
+                                            if(header_analysis){
+                                            if(header_analysis.plugins.pe32info){
+                                                if(header_analysis.plugins.pe32info.results){
+                                                    if(header_analysis.plugins.pe32info.results.imphash){
+                                                        imphash = header_analysis.plugins.pe32info.results.imphash;
+                                                    }
+                                                    if(header_analysis.plugins.pe32info.results.pehash){
+                                                        pehash = header_analysis.plugins.pe32info.results.pehash;
+                                                    }
+                                                }
+                                            }
+                                            }
+
+                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> IMPHASH:</b> '+imphash+' </div></div>';
+
+
+                                        var Tags = [];
+                                        if(header.pulse_info){
+                                            if(header.pulse_info.pulses){               
+                                                        for (let index = 0; index < header.pulse_info.pulses.length; index++) {
+                                                            if(header.pulse_info.pulses[index].tags){
+                                                            for (let index2 = 0; index2 < header.pulse_info.pulses[index].tags.length; index2++) {
+                                                                const tag = header.pulse_info.pulses[index].tags[index2];
+                                                                Tags.push(tag);
+                                                            }
+                                                            }
+                                                        }                                      
+                                            }
+                                        }
+                                        if(Tags.length > 0){
+                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Tags:</b> '+Tags.join(",")+' </div></div>';
+                                        }
+                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> PEHASH:</b> '+pehash+' </div></div>';
+                                            var Groups = [];
+                                        if(header.pulse_info){
+                                            if(header.pulse_info.pulses){               
+                                                        for (let index = 0; index < header.pulse_info.pulses.length; index++) {
+                                                            if(header.pulse_info.pulses[index].groups){
+                                                            for (let index2 = 0; index2 < header.pulse_info.pulses[index].groups.length; index2++) {
+                                                                    const groups = header.pulse_info.pulses[index].groups[index2];
+                                                                    Groups.push(groups);  
+                                                            }
+                                                            }
+                                                        }                                      
+                                            }
+                                        }
+                                        if(Groups.length > 0){
+                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Groups:</b> '+Groups.join(",")+' </div></div>';
+                                        }
+                            }
 
                               var table_pulse = "";
                               if(header.pulse_info){
@@ -1748,8 +1882,13 @@
             console.log("No response from server");
         });
     }
-
+    function hasName(prop, value, data) {
+        return data.some(function(obj) {
+            return prop in obj && obj[prop] === value;
+        });
+    }
     function f_load_puls(puls_id){
+        $('#otx_event_general').html('');
         $('.otx_indicators').hide();
         $('.otx_event').show();
         $('.otx_tag').hide();
@@ -1928,6 +2067,7 @@
             if(tag_name_old != tag_name){
                 $("#table-related-tag tbody").empty();
                 $('#btn_load_tag_nextpag').hide();
+                $('#otx_tag_general').html('');
              }
              tag_name_old = tag_name;
         }
@@ -2040,6 +2180,26 @@
         $('#otx_tag_more_loadspinner_basic_info_table').show();
         f_load_puls_tag('','');
         
+    }
+
+    function f_load_indicator(indicator_id){
+
+        $('.otx_event').hide();
+        $('.otx_tage').hide();
+        $('.otx_indicators').show();
+        $('#otx_indicators_general').html('');
+
+        $('#otx_indicators_loadspinner_basic_info').show();
+        $('#otx_indicators_loadspinner_basic_info_table').show();
+        $("#table-related-event").hide();
+
+        $('#otx_event_loadspinner_basic_info').show();
+        $('#otx_event_loadspinner_basic_info_table').show();
+        $("#table-related-indicator").hide();
+        text_search_new = indicator_id;
+        loadSearchAPI('otx_indicators');
+
+
     }
    function search_risk(){
     let summary_total = (status_value_ibmcloud + status_value_virustotal + status_value_hybrid) / number_new_row;

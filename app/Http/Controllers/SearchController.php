@@ -525,13 +525,15 @@ class SearchController extends Controller
 
 
             $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";
-       
+            $otx_general_url ="";
+            $otx_analysis_url ="";
             if($type == 'IP'){
-                $otx_url = "https://otx.alienvault.com/api/v1/indicators/file/f9f18153cabf61699d838407dddd4e937bb2efeb";
+                $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/IPv4/".$keyword."/general";
+                $otx_general_url = "https://otx.alienvault.com/otxapi/indicator/ip/analysis/".$keyword;
             }else if($type == 'Domain'){
-                $otx_url = "https://otx.alienvault.com/api/v1/indicators/file/f9f18153cabf61699d838407dddd4e937bb2efeb";
+                $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/file/f9f18153cabf61699d838407dddd4e937bb2efeb";
             }else if($type == 'url'){
-                $otx_url = "https://otx.alienvault.com/api/v1/indicators/file/f9f18153cabf61699d838407dddd4e937bb2efeb";
+                $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/file/f9f18153cabf61699d838407dddd4e937bb2efeb";
             }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
 
                 $otx_general_url = "https://otx.alienvault.com/api/v1/indicators/file/".$keyword."/general";
@@ -540,7 +542,6 @@ class SearchController extends Controller
 
 
             }
-
 
 
             $ch = curl_init();
@@ -558,20 +559,22 @@ class SearchController extends Controller
             $response = curl_exec($ch);
             curl_close($ch);  
 
-            $ch = curl_init();
-            $headers = array(
-                 'X-OTX-API-KEY: '.$otx_API_Key,
-                'accept: '.'application/json',
-                 'Content-Type: '.'application/x-www-form-urlencoded',
-            );
-            // Send request to Server
-            $ch = curl_init($otx_general_url);
-            // To save response in a variable from server, set headers;
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            // Get response
-            $response2 = curl_exec($ch);
-            curl_close($ch);  
+            if($otx_general_url){
+                    $ch = curl_init();
+                    $headers = array(
+                        'X-OTX-API-KEY: '.$otx_API_Key,
+                        'accept: '.'application/json',
+                        'Content-Type: '.'application/x-www-form-urlencoded',
+                    );
+                    // Send request to Server
+                    $ch = curl_init($otx_general_url);
+                    // To save response in a variable from server, set headers;
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    // Get response
+                    $response2 = curl_exec($ch);
+                    curl_close($ch);  
+             }
   
 
 
