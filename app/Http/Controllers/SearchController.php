@@ -622,10 +622,11 @@ class SearchController extends Controller
 
         
         }else if($source =="otx_puls_tag"){
-        
+            $keyword =str_replace(' ', '%20', trim($keyword));
+
             $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
             if(!$request->nextpage){
-                $otx_url = "https://otx.alienvault.com/otxapi/pulses/?limit=20&page=1&sort=-modified&q=tag:".trim($keyword);
+                $otx_url = "https://otx.alienvault.com/otxapi/pulses/?limit=20&page=1&sort=-modified&q=tag:".$keyword;
             }else{
                 $otx_url =$request->nextpage;
             }

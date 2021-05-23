@@ -2063,11 +2063,12 @@
         $("#otx_tag_loadspinner_basic_info").show();
         $('#btn_load_tag_nextpag').hide();
 
-        if(tag_name){
+        if(tag_name !=''){
             if(tag_name_old != tag_name){
                 $("#table-related-tag tbody").empty();
                 $('#btn_load_tag_nextpag').hide();
                 $('#otx_tag_general').html('');
+                $('#btn_load_tag_nextpag').data('');
              }
              tag_name_old = tag_name;
         }
