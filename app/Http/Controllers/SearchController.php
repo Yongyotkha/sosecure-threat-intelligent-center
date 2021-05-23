@@ -331,7 +331,8 @@ class SearchController extends Controller
             );
             return response()->json($response_data);
         }
-        $response = array();
+        $response = '{}';
+        $response2 = "{}";
         if($source =="ibmcloud"){
             $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
             if($log_search){
@@ -528,7 +529,9 @@ class SearchController extends Controller
             }else if($type == 'url'){
                 $otx_url = "https://otx.alienvault.com/api/v1/indicators/file/f9f18153cabf61699d838407dddd4e937bb2efeb";
             }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
-                $otx_url = "https://otx.alienvault.com/api/v1/indicators/file/f9f18153cabf61699d838407dddd4e937bb2efeb/analysis";
+
+                $otx_general_url = "https://otx.alienvault.com/api/v1/indicators/file/".$keyword."/general";
+                $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/file/".$keyword."/analysis";
             }else{
 
 
@@ -543,23 +546,39 @@ class SearchController extends Controller
                  'Content-Type: '.'application/x-www-form-urlencoded',
             );
             // Send request to Server
-            $ch = curl_init($otx_url);
+            $ch = curl_init($otx_analysis_url);
             // To save response in a variable from server, set headers;
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             // Get response
             $response = curl_exec($ch);
             curl_close($ch);  
-           // echo($response);
+
+            $ch = curl_init();
+            $headers = array(
+                 'X-OTX-API-KEY: '.$otx_API_Key,
+                'accept: '.'application/json',
+                 'Content-Type: '.'application/x-www-form-urlencoded',
+            );
+            // Send request to Server
+            $ch = curl_init($otx_general_url);
+            // To save response in a variable from server, set headers;
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            // Get response
+            $response2 = curl_exec($ch);
+            curl_close($ch);  
+  
 
 
 
         }
-    
+  
         $response_data = array(
             'status_code' => Response::HTTP_OK,
             'message' => '',
             'data' => json_decode($response, true),
+            'data2' => json_decode($response2, true),
             'type' => $type,
         );
         return response()->json($response_data);

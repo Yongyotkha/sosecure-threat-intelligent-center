@@ -479,41 +479,19 @@
                                                             <thead>
                                                                 <tr role="row">
                                                                     <th class="sorting_disabled" rowspan="1" colspan="1">No</th>
-                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Event Name</th>
-                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Group</th>
-                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Tags</th>
-                                                                    <th class="sorting_disabled text-center" rowspan="1" colspan="1">Published</th>
-                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Last Status</th>
-                                                                    <th style="width: 200px;" class="sorting_disabled" rowspan="1" colspan="1">DateTime</th>
-                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Attribute</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Related</th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1"></th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1"></th>
+                                                                    <th class="sorting_disabled text-center" rowspan="1" colspan="1"></th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1"></th>
+                                                                    <th style="width: 200px;" class="sorting_disabled" rowspan="1" colspan="1"></th>
+                                                                    <th class="sorting_disabled" rowspan="1" colspan="1"></th>
                                                                     <th class="sorting_disabled" rowspan="1" colspan="1">Action</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                <tr role="row" class="odd">
-                                                                    <td>1</td>
-                                                                    <td><a href="https://insight.sosecure.co.th/indicators/events/events_detail/5f928dbcad67e6227e78938c">Feed from AbuseIP</a></td>
-                                                                    <td>
-                                                                    <div><a href="https://insight.sosecure.co.th/indicators/groups/Malaz_Test">Malaz_Test</a> ,<a href="https://insight.sosecure.co.th/indicators/groups/%20Public%20Library%20Threat%20Intelligence"> Public Library Threat Intelligence</a> ,</div>
-                                                                    </td>
-                                                                    <td></td>
-                                                                    <td class=" text-center"><i class="fas fa-check text-success"></i></td>
-                                                                    <td>Modified</td>
-                                                                    <td>2021-05-22 11:01</td>
-                                                                    <td>145</td>
-                                                                    <td><a href="https://insight.sosecure.co.th/indicators/events/events_detail/5f928dbcad67e6227e78938c" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>
-                                                                </tr>
-                                                                <tr role="row" class="even">
-                                                                    <td>2</td>
-                                                                    <td><a href="https://insight.sosecure.co.th/indicators/events/events_detail/5df9fe49d8e86fb6a255d1f7">IOCs - 201912181123</a></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td class=" text-center"><i class="fas fa-check text-success"></i></td>
-                                                                    <td>Modified</td>
-                                                                    <td>2020-01-17 10:00</td>
-                                                                    <td>5930</td>
-                                                                    <td><a href="https://insight.sosecure.co.th/indicators/events/events_detail/5df9fe49d8e86fb6a255d1f7" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>
-                                                                </tr>
+                                                     
+                               
                                                               
                                                             </tbody>
                                                         </table>
@@ -1356,35 +1334,42 @@
                         }else if(res.type == 'url'){
 
                         }else if(res.type== 'SHA256' || res.type== 'MD5' || res.type== 'SHA1'){
+                            $("#table-related-event tbody").append('');
                             var header_analysis = res.data.analysis;
+                            var header = res.data2;
                                 html+=' <div class="m-b-xs"><div class="col-md-6"><b> Analysis Date:</b> '+header_analysis.datetime_int+'</div></div>';
                                 html+=' <div class="m-b-xs"><div class="col-md-6"><b> File Type:</b> '+header_analysis.info.results.file_type+'</div></div>';
+                            
                                 var Antivirus_Detections = [];
                  
                                 if(header_analysis.plugins.clamav){
                                     if(header_analysis.plugins.clamav.results){
+                                        if( header_analysis.plugins.clamav.results.alerts){
                                         for (let index = 0; index < header_analysis.plugins.clamav.results.alerts.length; index++) {
                                             const alert = header_analysis.plugins.clamav.results.alerts[index];
                                             if(alert == 'Malware infection'){
                                                 Antivirus_Detections.push(header_analysis.plugins.clamav.results.detection);
                                             }
                                         }
+                                        }
                                     }
 
                                 }
                                 if(header_analysis.plugins.msdefender){
                                     if(header_analysis.plugins.msdefender.results){
+                                        if( header_analysis.plugins.msdefender.results.alerts){
                                         for (let index = 0; index < header_analysis.plugins.msdefender.results.alerts.length; index++) {
                                             const alert = header_analysis.plugins.msdefender.results.alerts[index];
                                             if(alert == 'Malware infection'){
                                                 Antivirus_Detections.push(header_analysis.plugins.msdefender.results.detection);
                                             }
                                         }
+                                        }
                                     }
                                 }
 
 
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Antivirus Detections:</b> '+Antivirus_Detections.join("</br>")+'</div></div>';
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Antivirus Detections:</b> '+Antivirus_Detections.join(",")+'</div></div>';
                                 html+=' <div class="m-b-xs"><div class="col-md-6"><b> Size:</b> '+header_analysis.info.results.filesize+' bytes</div></div>';
                                 
                               
@@ -1399,12 +1384,178 @@
                                     }
                                 }
                                 html+=' <div class="m-b-xs"><div class="col-md-6"><b> Yara Detections :</b> '+Yara_Detections.join("</br>")+'</div></div>';
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> MD5:</b> '+header_analysis.info.results.md5+' bytes</div></div>';
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Alerts:</b> '+header_analysis.info.results.md5+' bytes</div></div>';
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> MD5:</b> '+header_analysis.info.results.md5+' </div></div>';
+
+
+                                var Alerts = [];
+                                if(header_analysis.plugins.cuckoo){
+                                    if(header_analysis.plugins.cuckoo.result){
+                           
+                                        if(header_analysis.plugins.cuckoo.result.signatures){
+
+                                            for (let index = 0; index <header_analysis.plugins.cuckoo.result.signatures.length; index++) {
+                                              
+                                                if(header_analysis.plugins.cuckoo.result.signatures[index].severity >=3){
+                                                    Alerts.push('<span class="badge" style="background-color: #b93624;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
+                                                }else if(header_analysis.plugins.cuckoo.result.signatures[index].severity >=2){
+                                                    Alerts.push('<span class="badge" style="background-color: #ffb000;color:#333;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
+
+                                                }else{
+                                                    Alerts.push('<span class="badge" style="background-color: #88ce4f;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
+                                                }
+                                             
+                                            }
+                                      }
+                                    }
+                                }
+
+
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Alerts:</b> '+Alerts.join("")+' </div></div>';
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> SHA1:</b> '+header_analysis.info.results.sha1+' </div></div>';
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> SHA256:</b> '+header_analysis.info.results.sha256+' </div></div>';
+                                var host_name = [];
+                                if(header_analysis.plugins.cuckoo){
+                                    if(header_analysis.plugins.cuckoo.result){
+                           
+                                        if(header_analysis.plugins.cuckoo.result.network){
+
+                                           if(header_analysis.plugins.cuckoo.result.network.hosts){
+                                               for (let index = 0; index < header_analysis.plugins.cuckoo.result.network.hosts.length; index++) {
+                                                   const ip = header_analysis.plugins.cuckoo.result.network.hosts[index].ip;
+                                                   host_name.push(ip);
+                                               }
+
+                                           }
+                                      }
+                                    }
+                                }
+
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> External Hosts:</b> '+host_name.join(",")+' </div></div>';
+
+
+                                var imphash = "";
+                                var pehash="";
+                                if(header_analysis.plugins.pe32info){
+                                    if(header_analysis.plugins.pe32info.results){
+                                        if(header_analysis.plugins.pe32info.results.imphash){
+                                              imphash = header_analysis.plugins.pe32info.results.imphash;
+                                        }
+                                        if(header_analysis.plugins.pe32info.results.pehash){
+                                            pehash = header_analysis.plugins.pe32info.results.pehash;
+                                        }
+                                    }
+                                }
+
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> IMPHASH:</b> '+imphash+' </div></div>';
+
+
+                              var Tags = [];
+                              if(header.pulse_info){
+                                if(header.pulse_info.pulses){               
+                                               for (let index = 0; index < header.pulse_info.pulses.length; index++) {
+                                                if(header.pulse_info.pulses[index].tags){
+                                                  for (let index2 = 0; index2 < header.pulse_info.pulses[index].tags.length; index2++) {
+                                                      const tag = header.pulse_info.pulses[index].tags[index2];
+                                                      Tags.push(tag);
+                                                  }
+                                                }
+                                               }                                      
+                                }
+                              }
+                              if(Tags.length > 0){
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Tags:</b> '+Tags.join(",")+' </div></div>';
+                              }
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> PEHASH:</b> '+pehash+' </div></div>';
+                                var Groups = [];
+                              if(header.pulse_info){
+                                if(header.pulse_info.pulses){               
+                                               for (let index = 0; index < header.pulse_info.pulses.length; index++) {
+                                                if(header.pulse_info.pulses[index].groups){
+                                                  for (let index2 = 0; index2 < header.pulse_info.pulses[index].groups.length; index2++) {
+                                                        const groups = header.pulse_info.pulses[index].groups[index2];
+                                                        Groups.push(groups);  
+                                                  }
+                                                }
+                                               }                                      
+                                }
+                              }
+                              if(Groups.length > 0){
+                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Groups:</b> '+Groups.join(",")+' </div></div>';
+                              }
+
+                              var table_pulse = "";
+                              if(header.pulse_info){
+                                if(header.pulse_info.pulses){               
+                                               for (let index = 0; index < header.pulse_info.pulses.length; index++) {
+                                                var pulse = header.pulse_info.pulses[index];
+                                                var Groups = [];
+                                                if(pulse.groups){
+                                                  for (let index2 = 0; index2 < pulse.groups.length; index2++) {
+                                                        const group = pulse.groups[index2];
+                                                        Groups.push('<a href="javascript:void(0);" onclick="f_load_puls_group( \' '+group+'\')">'+group+'</a>');  
+                                                  }
+                                                }
+                                                var Tags = [];
+                                                if(pulse.tags){
+                                                  for (let index2 = 0; index2 < pulse.tags.length; index2++) {
+                                                        const tag = pulse.tags[index2];
+                                                        Tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\')">'+tag+'</a>');  
+                                                  }
+                                                }
+                                                var public ="";
+                                                if(pulse.public == 1){
+                                                        public='<i class="fas fa-check text-success"></i>';
+
+                                                }else{
+
+                                                }
+                                                var indicator_type = [];
+                                                if(pulse.indicator_count){
+                                             
+
+                                                    $.each(pulse.indicator_type_counts, function(key, value) {
+                                                        indicator_type.push('<b>'+key+':</b>'+value);  
+                                                    });
+                                                }
+
+
+                                                table_pulse+='  <tr role="row">';
+                                                table_pulse+='      <td style="width:10px;">'+(index+1)+'</td>';
+                                                table_pulse+='     <td colspan="6"><a href="javascript:void(0);" onclick="f_load_puls('+pulse.id+');">'+pulse.name+'</a>';
+                                                table_pulse+='     </br> <span>'+indicator_type.join("|")+'</span>';
+                                                table_pulse+='     </br> <span>'+pulse.description+'</span>';
+                                                table_pulse+='      </br>';
+                                                if(Groups.length > 0){
+                                                  table_pulse+='     </br> <span><b>Groups:</b>'+Groups.join(", ")+'</span>';
+                                                }
+                                                if(Tags.length > 0){
+                                                table_pulse+='     </br> <span><b>Tags:</b>'+Tags.join(", ")+'</span>';
+                                                }
+                                                table_pulse+=' </br> <span> <b>Created:</b>'+pulse.created+' <b>Modified:</b>'+pulse.modified+'</span>';
+                                                table_pulse+='      <td>';
+                               
+                                                table_pulse+='   <td style="width:10px;"><a href="javascript:void(0);" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
+                                                table_pulse+=' </tr>';
+
+                                               }                                      
+                                }
+                              }
+                              $("#table-related-event tbody").append(table_pulse);
+
+
+
+
+                                
                            
                         }else{
 
                         }
+
+
+
+
+
+
                         $('#otx_indicators_loadspinner_basic_info').hide();
                         $('#otx_indicators_general').html(html);
                 }
