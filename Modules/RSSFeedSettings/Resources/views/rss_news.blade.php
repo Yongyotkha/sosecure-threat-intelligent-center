@@ -291,15 +291,16 @@ use Carbon\Carbon;
                                                     </label>
                                                 </th>
                                                 {{-- <th>Site Name</th> --}}
-                                                <th>Source</th>
+                                                <th>Content</th>
+                                                {{-- <th>Source</th>
                                                 <th>Title</th>
                                                 <th>Category</th>
                                                 <th>Serverity</th>
                                                 <th>Data Status</th>
-                                                <th>Public Date</th>
+                                                <th>Public Date</th> --}}
                                                 {{-- <th width="30px">Modified Date</th> --}}
-                                                <th>View Count</th>
-                                                <th>Link</th>
+                                                {{-- <th>View Count</th>
+                                                <th>Link</th> --}}
                                                 <th>Status</th>
                                                 <th width="5%">Action</th>
                                             </tr>
@@ -364,6 +365,8 @@ use Carbon\Carbon;
 @include('stacks.js.advanced_search')
 @include('stacks.js.highchart')
 @include('stacks.js.multitext')
+
+
 <script>
 
     active_btn('#groupby-btn .btn-grey');
@@ -650,7 +653,6 @@ $(function() {
             serverSide: true,
             destroy: true,
             "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
-            order: [[ 6, "desc" ]],
             ajax: {
 
                 type: "POST",
@@ -686,10 +688,10 @@ $(function() {
                     name: 'site_name'
                 },--}}
                 {
-                    data: 'source',
-                    name: 'source'
+                    data: 'content_detail',
+                    name: 'content_detail'
                 },
-                {
+                {{--{
                     data: 'title',
                     name: 'title',
                 },
@@ -722,7 +724,7 @@ $(function() {
                     data: 'link',
                     name: 'link',
                     className: 'no-wrap'
-                },
+                },--}}
                 {
                     data: 'status',
                     name: 'status',
@@ -733,8 +735,12 @@ $(function() {
                     name: 'action',
                     className: 'no-wrap'
                 },
-            ],
-                columnDefs: [
+            ]
+        });
+    }
+
+
+    {{-- columnDefs: [
                     {
                         targets: 2,
                         render: function (data, type, full, meta) {
@@ -752,7 +758,7 @@ $(function() {
                             }
                             
                             if ((date_day) == (date_now_day)) {
-                                {{--new_html += `<img src="{{asset('images/icon/new.png')}}" style="width:40px; border-radius: 10px;">`;--}}
+                                new_html += `<img src="{{asset('images/icon/new.png')}}" style="width:40px; border-radius: 10px;">`;
                                 new_html += `<span class="badge" style="background-color: #2196f3;">New</span>`;
                                 console.log(new_html);
                             }
@@ -760,10 +766,7 @@ $(function() {
                             return new_html+full.title;
                         },
                     },
-                ]
-        });
-    }
-
+                ] --}}
 
 $(document).ready(function(){
        
