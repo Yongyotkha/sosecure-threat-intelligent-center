@@ -45,7 +45,7 @@ class SearchController extends Controller
         $role_custom = @check_role_custom();
         $site_id_arr = @get_role_custom()['site_id_arr'];
 
-        if ($this->request->keyword) {
+        if ($this->request->keyword && $this->request->mode !== 'lookup') {
 
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);

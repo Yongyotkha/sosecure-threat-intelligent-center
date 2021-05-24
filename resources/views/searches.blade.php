@@ -731,11 +731,13 @@
                             @endif
                         @endforeach
                     @else
-                        <div class="notfound">
-                            <img src="{{asset('images/notfound.png')}}" alt="" style="max-width: 500px;width:100%:">
-                            <h1>Sorry. no result found</h1>
-                            <p>What you searched was unfortunately <br>not found or doesn't exist.</p>
-                        </div>
+                        @if(request()->mode !== 'lookup')
+                            <div class="notfound">
+                                <img src="{{asset('images/notfound.png')}}" alt="" style="max-width: 500px;width:100%:">
+                                <h1>Sorry. no result found</h1>
+                                <p>What you searched was unfortunately <br>not found or doesn't exist.</p>
+                            </div>
+                        @endif
                     @endif
                     {{-- @foreach (Modules\Contracts\Entities\Clause::orderBy('id', 'desc')->get() as $clause)
                     <li class="panel panel-default" id="clause-{{ $clause->id }}">
@@ -769,7 +771,7 @@
 @include('stacks.js.chart')
 <script>
     active_btn('#fillter_click .btn-selector');
-
+    var mode_search = '{{ request()->mode }}';
     var btn_val;
     var btn_filter_indicators_type;
     $(".btn_filter").click(function() {
@@ -846,6 +848,25 @@
         } 
     });
 
+$(function(){
+    if(mode_search == 'lookup'){
+        $('#table-container').hide();
+        $('.int-lookup-main').toggle();
+        
+        $('#accordion2').toggle();
+        loadSearchAPI('ibmcloud');
+        loadSearchAPI('virustotal');
+        loadSearchAPI('hybrid');
+        $('#otx_indicators_loadspinner_basic_info').show();
+        $('#otx_indicators_loadspinner_basic_info_table').show();
+        $("#table-related-event").hide();
+
+        $('#otx_event_loadspinner_basic_info').show();
+        $('#otx_event_loadspinner_basic_info_table').show();
+        $("#table-related-indicator").hide();
+        loadSearchAPI('otx_indicators');
+    }
+});
 
     $(".btn_filter_indicators_type").click(function() {
         $("#indicators").collapse("show");
@@ -895,6 +916,7 @@
                 $('#count_news').text(data.count);
                 $('.ajax-loading').hide();
                 $("#list_news").append(data.html); 
+                
             }
 
         }).fail(function(jqXHR, ajaxOptions, thrownError){

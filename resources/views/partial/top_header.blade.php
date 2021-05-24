@@ -59,7 +59,7 @@
                                 <input type="text" id="search_input" class="form-control form-transparent" name="keyword" placeholder="Type tag keyword" style="margin-top: 2px;margin-left: 1rem;" value="{{@$keyword}}">
                                 <div class="input-group-prepend-custom">
                                    <button class="btn btn-dark">Search</button>
-                                   <a href="{{ route('search.app',['mode'=>'lookup']) }}" class="btn btn-dark lookup"><i class="fas fa-search"></i> Threat Lookup</a>
+                                   <button type="button" class="btn btn-dark lookup"><i class="fas fa-search"></i> Threat Lookup</button>
                                 </div>
                             </div>
                         </div>
@@ -122,3 +122,12 @@
         </ul>
     </div>
 </header>
+
+@push('pagescript')
+    <script>
+        $('.lookup').click(function(){
+            let keyword = $('#search_input').val();
+            window.location.href = '/search?keyword=' + keyword + '&mode=lookup';
+        })
+    </script>
+@endpush
