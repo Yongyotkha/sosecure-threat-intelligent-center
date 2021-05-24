@@ -2438,20 +2438,20 @@ function search_risk(){
 let summary_total = (status_value_ibmcloud + status_value_virustotal + status_value_hybrid) / number_new_row;
 let html_status = ``;
 if(summary_total <= 1.9){
-html_status += `<div class="status-risk success">
+html_status += `<div class="status-risk success" style="color: #fff;color: #fff !important;">
     Low
 </div>`;
 }else if(summary_total <= 2.6){
-html_status += `<div class="status-risk warning" style="color:#f2ff15 !important">
+html_status += `<div class="status-risk warning"  style="color: #fff;color: #fff !important;">
     Medium
 </div>`;
 }else if(summary_total <= 3){
-html_status += `<div class="status-risk danger">
+html_status += `<div class="status-risk danger" style="color: #fff;color: #fff !important;">
      High
 </div>`;
 }else if(summary_total >= 3){
-html_status += `<div class="status-risk danger">
-     Very High
+html_status += `<div class="status-risk danger" style="color: #fff;color: #fff !important;">
+     High
 </div>`;
 }
 $('#text_status_risk').html(html_status);
