@@ -33,7 +33,7 @@
                             <div class="col-lg-4 col-md-12 col-sm-12">
                                 <h5 class="font-weight-bold">payload</h5>
                                 <select name="payload" id="payload" class="form-control">
-                                    <option value="q" selected>Query Manual</option>
+                                    <option value="q" selected>Manual Query</option>
                                     <option value="domain">Domain</option>
                                     <option value="email">Email</option>
                                     <option value="ip">IP</option>
