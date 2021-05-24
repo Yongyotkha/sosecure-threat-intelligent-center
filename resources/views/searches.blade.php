@@ -1038,10 +1038,6 @@
         $('#otx_event_loadspinner_basic_info_table').show();
         $("#table-related-indicator").hide();
         loadSearchAPI('otx_indicators');
-
-
-
-        
     });
 
     function click_hybrid(){
