@@ -16,6 +16,8 @@ Route::group(
         Route::get('all', 'AssetsController@index_all_asset')->name('assets.index_setting')->middleware('can:menu_items');
         Route::get('/', 'AssetsController@index')->name('assets.index')->middleware('can:menu_items');
         Route::post('table_asset', 'AssetsController@table_asset')->name('assets.table_asset')->middleware('can:menu_items');
+        Route::post('table_asset_host', 'AssetsController@table_asset_host')->name('assets.table_asset_host')->middleware('can:menu_items');
+        // Modal
         // Modal
         Route::get('assets_redirect_add', 'AssetsController@assets_redirect_add')->name('assets.assets_redirect_add_modal');
         Route::get('assets_add_cpe/{id}/{menu}/{idip}', 'AssetsController@assets_add_cpe')->name('assets.assets_add_cpe');

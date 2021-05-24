@@ -852,6 +852,7 @@
                 },
             ],
 
+
         });
 
         let check = {!!json_encode($Search_Link_All)!!};
@@ -861,12 +862,227 @@
             searchTB(check,'ip_asset_id');
         }
 
-        $("div.btnaction").html('<button class="btn btn-info">Host Info</button> <button class="btn btn-info">Service / Port</button>');
+        $("div.btnaction").html('<button id="btn_view_1" class="btn btn-info" onclick="btn_view(1)" >Host Info</button> <button  id="btn_view_2" onclick="btn_view(2)" class="btn">Service / Port</button>');
     }
 
 
+    function data_table_host(){
+        t = $('#table-assets-template').DataTable({
+            ordering: true,
+            pagination: true,
+            pageLength: 25,
+            processing: true,
+            serverSide: false,
+            "searching": true,
+            destroy: true,
+            "dom": '<"btnaction"><"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            order: [[ 0, "asc" ]],
+            ajax: {
+                type: "POST",
+                url: '{!! route('assets.table_asset_host')!!}',
+                data:function(d){
+                    d.menu = "{{$menu}}";
+                    d.site = $('#site_code').val();
+                }
+            },
+            initComplete : function( settings, json){
+                $('#count_assets').html(json.countAssets+"");
+                $('#count_windows').html(json.countWindows+"");
+                $('#count_linux').html(json.countLinux+"");
+                $('#count_other').html(json.countOther+"");
+                
+            },
+            columns: [
+                {{--{
+                    width: '1%',
+                    data: 'chk',
+                    name: 'chk',
+                },--}}
+                {
+                    width: '25%',
+                    data: 'site_name',
+                    name: 'site_name',
+                    className: 'no-wrap'
+                },
+                {
+                    width: '20%',
+                    data: 'domain',
+                    name: 'domain',
+                },
+                {
+                    width: '20%',
+                    data: 'ip',
+                    name: 'ip',
+                },
+                {
+                    data: 'port',
+                    name: 'port',
+                    className: 'no-wrap',
+                    "visible": false,
+                    
+                },
+                
+                {
+                    data: 'CPE_Vendor',
+                    name: 'CPE_Vendor',
+                    className: 'padingtablezero text-center no-wrap',
+                    visible:false
+                },
+                {
+                    data: 'CPE_Title',
+                    name: 'CPE_Title',
+                    className: 'padingtablezero text-center no-wrap',
+                    visible:false
+                },
+                {
+                    data: 'CPE_Version',
+                    name: 'CPE_Version',
+                    className: 'padingtablezero text-center no-wrap',
+                    visible:false
+                },
+                {
+                    data: 'CPE_Edition',
+                    name: 'CPE_Edition',
+                    className: 'padingtablezero text-center no-wrap',
+                    visible:false
+                },
+                {
+                    data: 'CPE_Remark',
+                    name: 'CPE_Remark',
+                    className: 'padingtablezero text-center no-wrap',
+                    visible:false
+                },
+                {
+                    data: 'CPE_Ostype',
+                    name: 'CPE_Ostype',
+                    className: 'padingtablezero text-center no-wrap',
+                    visible:false
+                },
+                {
+                    data: 'CPE_Del',
+                    name: 'CPE_Del',
+                    className: 'padingtablezero text-center no-wrap',
+                    visible:{{(TYPE_WEB=='center'?json_encode(true):json_encode(false))}},
+                    visible:false
+                },
+                {
+                    orderable: false,
+                    width: '3%',
+                    data: 'status',
+                    name: 'status',
+                    className: 'text-center',
+                    visible:false
+                },  
+                {
+                    orderable: false,
+                    width: '3%',
+                    data: 'action',
+                    name: 'action',
+                    className: 'text-center no-wrap',
+                    visible:{{(TYPE_WEB=='center'?json_encode(true):json_encode(false))}},
+                    visible:false
+                },
+                {
+                    data: 'CPE',
+                    name: 'CPE',
+                    visible:false
+                },
+                {
+                    data: 'ip_asset_id',
+                    name: 'ip_asset_id',
+                    visible:false
+                },
+                {
+                    data: 'CPE_OtherCheck',
+                    name: 'CPE_OtherCheck',
+                    visible:false
+                },
+            ],
+            columnDefs: [
+                {{--{
+                    
+                    targets: 0,
+                    searchable: false,
+                    orderable: false,
+                    width: '10px',
+                    render: function (data, type, row, meta) {
+                        return '<label><input type="checkbox" name="checked" class="select-chk asset_id" value="' + row.code + '"><span class="label-text"></span></label>';
+                    }
+                   
+                },--}}
+                {
+                    targets: 12,
+                    render: function (data, type, row, meta) {
+                        return row.cpe+row.action;
+                        
+                    }
+                   
+                },
+                {
+                    targets: 11,
+                    render: function (data, type, row, meta) {
+                        if(row.status==1){
+                            return '<span class="badge badge-success">Active</span>';
+                        }else{
+                            return '<span class="badge badge-danger">Inactive</span>';
+                        }
+                        
+                    }
+                   
+                },
+            ],
+            "drawCallback": function ( settings ) {
+            var api = this.api();
+            var rows = api.rows( {page:'current'} ).nodes();
+            var last=null;
+ 
+            api.column(3, {page:'current'} ).data().each( function ( group, i ) {
+                if ( last !== group ) {
+                    $(rows).eq( i ).before(
+                        '<tr class="group"><td colspan="4">'+group+'</td></tr>'
+                    );
+ 
+                    last = group;
+                }
+            } );
+        }
+
+
+        });
+
+        let check = {!!json_encode($Search_Link_All)!!};
+        if(check===""){
+            searchTB();
+        }else{
+            searchTB(check,'ip_asset_id');
+        }
+
+        $("div.btnaction").html('<button id="btn_view_1" class="btn btn-info" onclick="btn_view(1)" >Host Info</button> <button  id="btn_view_2" onclick="btn_view(2)" class="btn">Service / Port</button>');
+    }
+    function btn_view(mode){
+            if(mode == 2){
+                data_table_host();
+                $('#btn_view_1').removeClass( "btn-info" );
+                $('#btn_view_2').addClass( "btn-info" );
+            }else{
+                data_table();
+                $('#btn_view_2').removeClass( "btn-info" );
+                $('#btn_view_1').addClass( "btn-info" );
+            }
+    }
 
 </script>
+<style>
+tr.group,
+tr.group:hover {
+    background-color: #ddd !important;
+}
+tr.group td,
+tr.group td:hover {
+    background-color: #ddd !important;
+}
+
+</style>
 @endpush
 
 @endsection
