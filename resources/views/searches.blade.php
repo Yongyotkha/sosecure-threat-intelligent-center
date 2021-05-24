@@ -49,7 +49,7 @@
             <section class="panel panel-default m-b-xs">
                 <div class="panel-body" id="table-container">
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-12">
                             <div id="fillter_click" class="button-group">
                                 <a href="javascript:void(0)" data-btn="all" class="btn btn-selector btn_filter active">All {{$count_all ? '('.$count_all.')':'(0)'}}</a>
                                 @if($role_custom['news'])
@@ -90,9 +90,6 @@
                                 <button class="btn btn-selector">Indicators</button> --}}
                             </div>
                         </div>
-                        <div class="col-md-4 text-right">
-                            <button class="btn btn-info lookup">Inteligence Threat Lookup</button>
-                        </div>
                     </div>
 
                     <div class="row type_indicator" style="display: none;">
@@ -118,14 +115,12 @@
 
      
             <div class="int-lookup-main" style="display: none">
- 
                 <div class="back-int">
-
                     <section id="overall-int">
                         <div class="row">
                             <div class="col-md-8">
                                 <h3 class="page-header">
-                                    Overall
+                                    Information ( 100 / 1000 )
                                 </h3>
                             </div>
                             <div class="col-md-4 text-right">
@@ -229,8 +224,7 @@
                                 <div id="card-search-int1" class="main-int-card">
                                     <div class="text-center av-container border-success" data-chart="chart-cs-ml">
                                         <div class="title">
-                                            <img src="{{asset('images/hybrid.svg')}}" alt="" class="icon" style="width: 105px;">
-                                             Hybrid Analysis</div>
+                                            <img src="{{asset('images/hybrid.svg')}}" alt="" class="icon" style="width: 105px;"></div>
                                         <div class="main-frame">
 
                                             <div class="load-hybrid loadfixed backdrop-loader white">
@@ -264,7 +258,6 @@
                                     <div class="text-center av-container border-success" data-chart="chart-cs-ml">
                                         <div class="title">
                                             <img src="{{asset('images/virus.jpg')}}" alt="" class="icon">
-                                            VirusTotal
                                         </div>
                                         <div class="main-frame">
 
@@ -419,85 +412,79 @@
                         </table>
                     </section>
 
-
-
-
-                   
-
                     <section class="scrollable wrapper bg-white otx_indicators" style="padding:0;">
-                                <div class="row sticky-top-nav">
-                                    <div class="nav-menu-btn">
-                                        <ul>
-                                            <li class="nav-link active-link">
-                                            <a id="to_top" href="#general_details">Indicator</a>
-                                            <div class="underline"></div>
-                                            </li>
-                                            <li class="nav-link" style="display: none;">
-                                            <a href="#related_event" id="event_tag">Event</a>
-                                            <div class="underline"></div>
-                                            </li>
-                                        </ul>
+                        <div class="row sticky-top-nav">
+                            <div class="nav-menu-btn" style="display: none">
+                                <ul>
+                                    <li class="nav-link active-link">
+                                    <a id="to_top" href="#general_details">Indicator</a>
+                                    <div class="underline"></div>
+                                    </li>
+                                    <li class="nav-link" style="display: none;">
+                                    <a href="#related_event" id="event_tag">Event</a>
+                                    <div class="underline"></div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <section id="general_details" class="">
+                            <div class="">
+                                <div class="row m-b-lg">
+                                    <div id="indicator_basic_info" class="">
+                                    <h1 class="b-b">&nbsp;&nbsp;&nbsp;Basic Information</h1>
+                                    <div id="otx_indicators_loadspinner_basic_info" class="content-spinner-loading" style="display: none;"></div>
+                                        <span id="otx_indicators_general"></span>
                                     </div>
                                 </div>
-                                <section id="general_details" class="">
-                                    <div class="">
-                                        <div class="row m-b-lg">
-                                            <div id="indicator_basic_info" class="">
-                                            <h1 class="b-b">&nbsp;&nbsp;&nbsp;Basic Information</h1>
-                                            <div id="otx_indicators_loadspinner_basic_info" class="content-spinner-loading" style="display: none;"></div>
-     
-                                                  <span id="otx_indicators_general"></span>
-
-                                            </div>
+                            </div>
+                        </section>
+                        <section id="related_event" class="">
+                            <h1 class="b-b">Related Event</h1>
+                            <section class="panel panel-default" style="margin: 0px;">
+                                <header class="panel-heading font-bold panel-header-blue">
+                                    <div class="row">
+                                    <div class="col-md-12">
+                                        <div style="margin-top:5px;">
+                                            <i class="fas fa-table">
+                                            </i> Table Related 
                                         </div>
                                     </div>
-                                </section>
-                                <section id="related_event" class="">
-                                   <h1 class="b-b">Related Event</h1>
-                                    <section class="panel panel-default" style="margin: 0px;">
-                                        <header class="panel-heading font-bold panel-header-blue">
-                                            <div class="row">
-                                            <div class="col-md-12">
-                                                <div style="margin-top:5px;">
-                                                    <i class="fas fa-table">
-                                                    </i> Table Related 
-                                                </div>
-                                            </div>
-                                            </div>
-                                        </header>
-                                        <div class="panel-body" style="padding: 0 !important">
-                                            <div class="container-fluid" style="padding:1rem;">
-                                            <div class="row m-b-md">
-                                                <div class="col-sm-12">
-                                                    <div class="table-responsive">
-                                                    <div id="otx_indicators_loadspinner_basic_info_table" class="content-spinner-loading" style="display: none;"></div>
-                                                    <table class="table table-striped dataTable no-footer" id="table-related-event" role="grid" aria-describedby="table-related-event_info" style="display: none;" >
-                                                            <thead>
-                                                                <tr role="row">
-                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">No</th>
-                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Event</th>
-                                                                    <th class="sorting_disabled" rowspan="1" colspan="1"></th>
-                                                                    <th class="sorting_disabled" rowspan="1" colspan="1"></th>
-                                                                    <th class="sorting_disabled text-center" rowspan="1" colspan="1"></th>
-                                                                    <th class="sorting_disabled" rowspan="1" colspan="1"></th>
-                                                                    <th style="width: 200px;" class="sorting_disabled" rowspan="1" colspan="1"></th>
-                                                                    <th class="sorting_disabled" rowspan="1" colspan="1"></th>
-                                                                    <th class="sorting_disabled" rowspan="1" colspan="1">Action</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                     
-                                                          
-                                                              
-                                                            </tbody>
-                                                        </table>
-                                                   
-                                                </div>
-                                            </div>
-                                            </div>
+                                    </div>
+                                </header>
+                                <div class="panel-body" style="padding: 0 !important">
+                                    <div class="container-fluid" style="padding:1rem;">
+                                    <div class="row m-b-md">
+                                        <div class="col-sm-12">
+                                            <div class="table-responsive">
+                                            <div id="otx_indicators_loadspinner_basic_info_table" class="content-spinner-loading" style="display: none;"></div>
+                                            <table class="table table-striped dataTable no-footer" id="table-related-event" role="grid" aria-describedby="table-related-event_info" style="display: none;" >
+                                                    <thead>
+                                                        <tr role="row">
+                                                            <th class="sorting_disabled" rowspan="1" colspan="1">No</th>
+                                                            <th class="sorting_disabled" rowspan="1" colspan="1">Event</th>
+                                                            <th class="sorting_disabled" rowspan="1" colspan="1"></th>
+                                                            <th class="sorting_disabled" rowspan="1" colspan="1"></th>
+                                                            <th class="sorting_disabled text-center" rowspan="1" colspan="1"></th>
+                                                            <th class="sorting_disabled" rowspan="1" colspan="1"></th>
+                                                            <th style="width: 200px;" class="sorting_disabled" rowspan="1" colspan="1"></th>
+                                                            <th class="sorting_disabled" rowspan="1" colspan="1"></th>
+                                                            <th class="sorting_disabled" rowspan="1" colspan="1">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                
+                                                    
+                                                        
+                                                    </tbody>
+                                                </table>
+                                            
                                         </div>
-                                    </section>
-                                </section>
+                                    </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </section>
                      </section>
 
 
@@ -1604,7 +1591,7 @@
                               }
                               $("#table-related-event tbody").append(table_pulse);
 
-
+                              
 
 
 

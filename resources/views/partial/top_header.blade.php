@@ -65,7 +65,11 @@
                     </div>
                 </form>
             </li>
-            
+
+            <li class="dropdown hidden-xs" style="margin-left: 5px">
+                <a href="{{ route('search.lookup',['mode'=>'lookup']) }}" class="btn btn-info lookup"><i class="fas fa-search"></i> Threat Lookup</a>
+            </li>
+
         </ul>
 
         <ul class="nav navbar-nav navbar-right hidden-xs nav-user" style="margin-top: 1rem;">

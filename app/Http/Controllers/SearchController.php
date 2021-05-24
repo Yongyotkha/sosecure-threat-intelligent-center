@@ -35,9 +35,8 @@ class SearchController extends Controller
         $this->request = $request;
     }
 
-    public function search()
+    public function search(Request $mode)
     {
-
         // dd(json_encode($this->request->keyword));
         // $this->request->validate(['keyword' => 'required']);
         $data['dataSearch'] = array();
