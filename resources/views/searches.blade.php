@@ -38,6 +38,7 @@
             <div class="bc-head">@langapp('search_results_for_tag',['keyword' => $keyword])</div>
             <span class="pull-right" style="margin-top: 1.2rem;font-size: 16px;font-weight: bold;">
                 Total Result : {{@$count_all}} 
+                <button class="btn btn-info lookup" style="display:none;"><i class="fas fa-search"></i> Threat Lookup</button>
             </span>
         </header>
         <section class="scrollable wrapper bg" id="clauses" style="padding: 8px !important">
@@ -486,7 +487,7 @@
 
 
 
-                     <section class="scrollable wrapper bg-white otx_event" style="padding:0;display:none">
+                     <section class="scrollable wrapper bg-white otx_event" style="padding:0;display:none;margin-top:1rem;">
                                 <div class="row sticky-top-nav">
                                     <div class="nav-menu-btn" style="display: none">
                                         <ul>
