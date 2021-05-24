@@ -4947,6 +4947,6 @@ strong > p{
     background-color: #fff;
 }
 
-.btn {
+.btn:not(.btn-login-cus) {
     border-radius: 30px;
 }
