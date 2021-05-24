@@ -35,7 +35,7 @@ class SearchController extends Controller
         $this->request = $request;
     }
 
-    public function search(Request $mode)
+    public function search($mode)
     {
         // dd(json_encode($this->request->keyword));
         // $this->request->validate(['keyword' => 'required']);
@@ -308,7 +308,7 @@ class SearchController extends Controller
 
         $data['page'] = langapp('search');
         $data['keyword'] = $this->request->keyword;
-        return view('searches')->with($data);
+        return view('searches')->with($data,compact('mode'));
     }
 
     public function loadSearchAPI(Request $request)

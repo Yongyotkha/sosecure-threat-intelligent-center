@@ -436,8 +436,8 @@ ul.show-comments li{
 
 .navbar-center{
     position: absolute;
-    left: 60%;
-    transform: translateX(-60%);
+    left: 55%;
+    transform: translateX(-55%);
     display: flex;
     align-items: center;
     height: 100%;
@@ -4303,7 +4303,7 @@ li.placeholder{
 }
 
 .av-container img.icon{
-    max-height: 30px;
+    max-height: 50px;
 }
 
 
@@ -4390,7 +4390,7 @@ section#av-detection .av-container {
 
 section#av-detection .av-container .title {
     color: #333;
-    font-size: 20px;
+    font-size: 30px;
     font-weight: bold;
     text-align: center;
     margin: 1rem 0;
@@ -4584,6 +4584,7 @@ section#av-detection .main-int-card.active .av-container.border-success{
     position: relative;
     text-align: center;
     cursor: pointer;
+    width: 70px;
 }
 
 .st-flex{
@@ -4907,18 +4908,23 @@ strong > p{
   }
 
   .status-risk.danger{
-    color: #e61d0f !important;
+    color: #333 !important;
+    background-color:#e61d0f ;
   }
   .status-risk.warning{
-    color: #fcc838 !important;
+    color: #333 !important;
+    background-color: #fcc838 !important;
   }
   .status-risk.success{
-    color: #409967 !important;
+    color: #fff !important;
+    background-color: #409967 !important;
   }
 
   .status-risk{
       font-size: 5rem;
       font-weight: 700;
+      width: 210px;
+      margin: 0 0 0 auto;
   }
  
   .st-circle-ovr{

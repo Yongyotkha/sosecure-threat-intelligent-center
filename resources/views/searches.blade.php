@@ -46,8 +46,8 @@
                 <button class="btn-start-lookup">Inteligence Threat Lookup</button>
             </div> --}}
 
-            <section class="panel panel-default m-b-xs">
-                <div class="panel-body" id="table-container">
+            <section class="panel panel-default m-b-xs" id="table-container">
+                <div class="panel-body">
                     <div class="row">
                         <div class="col-md-12">
                             <div id="fillter_click" class="button-group">
@@ -125,8 +125,8 @@
                             </div>
                             <div class="col-md-4 text-right">
                                 <span class="st-dt-leak">
-                                    <span class="st-dt vrh" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrh'>Very</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Very</span>
-                                    <span class="st-dt high" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip high'>High</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">High</span>
+                                    <span class="st-dt vrh" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrh'>High</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">High</span>
+                                    {{-- <span class="st-dt high" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip high'>High</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">High</span> --}}
                                     <span class="st-dt md" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip md'>Medium</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Medium</span>
                                     <span class="st-dt low" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip low'>Low</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของลูกค้าเช่น ข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">Low</span>
                                 </span>
@@ -224,7 +224,8 @@
                                 <div id="card-search-int1" class="main-int-card">
                                     <div class="text-center av-container border-success" data-chart="chart-cs-ml">
                                         <div class="title">
-                                            <img src="{{asset('images/hybrid.svg')}}" alt="" class="icon" style="width: 105px;"></div>
+                                            <img src="{{asset('images/hybrid.svg')}}" alt="" class="icon">
+                                        </div>
                                         <div class="main-frame">
 
                                             <div class="load-hybrid loadfixed backdrop-loader white">
@@ -412,7 +413,7 @@
                         </table>
                     </section>
 
-                    <section class="scrollable wrapper bg-white otx_indicators" style="padding:0;">
+                    <section class="scrollable wrapper bg-white otx_indicators" style="padding:0;margin-top: 1.5rem">
                         <div class="row sticky-top-nav">
                             <div class="nav-menu-btn" style="display: none">
                                 <ul>
@@ -429,14 +430,10 @@
                         </div>
 
                         <section id="general_details" class="">
-                            <div class="">
-                                <div class="row m-b-lg">
-                                    <div id="indicator_basic_info" class="">
-                                    <h1 class="b-b">&nbsp;&nbsp;&nbsp;Basic Information</h1>
-                                    <div id="otx_indicators_loadspinner_basic_info" class="content-spinner-loading" style="display: none;"></div>
-                                        <span id="otx_indicators_general"></span>
-                                    </div>
-                                </div>
+                            <div id="indicator_basic_info" class="row m-b-lg">
+                            <h1 class="b-b">&nbsp;&nbsp;&nbsp;Basic Information</h1>
+                            <div id="otx_indicators_loadspinner_basic_info" class="content-spinner-loading" style="display: none;"></div>
+                                <span id="otx_indicators_general"></span>
                             </div>
                         </section>
                         <section id="related_event" class="">
@@ -491,7 +488,7 @@
 
                      <section class="scrollable wrapper bg-white otx_event" style="padding:0;display:none">
                                 <div class="row sticky-top-nav">
-                                    <div class="nav-menu-btn">
+                                    <div class="nav-menu-btn" style="display: none">
                                         <ul>
                                             <li class="nav-link active-link">
                                             <a id="to_top" href="#general_details">Event</a>
@@ -509,9 +506,6 @@
                                         <div class="row m-b-lg">
                                             <div id="indicator_basic_info" class="">
                                             <div id="otx_event_loadspinner_basic_info" class="content-spinner-loading" style="display: none;"></div>
-     
-                                                 
-               
                                                   <div class="row">
                                                                 <div class="col-md-6">
                                                                 <span id="otx_event_general"></span>
@@ -1491,9 +1485,9 @@ $.ajax({
                     var header = res.data;
                     var header2 = res.data2;
 
-                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> ASN:</b> '+header.asn+'</div></div>';
-                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Indicator Facts:</b> '+''+'</div></div>';
-                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Country:</b> '+header.country_name+'</div></div>';
+                    html+='<div class="col-md-6 m-b-xs"><b> ASN:</b> '+header.asn+'</div>';
+                    html+='<div class="col-md-6 m-b-xs"><b> Indicator Facts:</b> '+''+'</div>';
+                    html+='<div class="col-md-6 m-b-xs"><b> Country:</b> '+header.country_name+'</div>';
                     var open_ports="";
                     var issuer = [];
                     var subject =[];
@@ -1512,7 +1506,7 @@ $.ajax({
                         }
                         reverse_dns = header2.facts.reverse_dns;
                     }
-                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Open Ports:</b> '+open_ports+'</div></div>';
+                    html+=' <div class="col-md-6 m-b-xs"><b> Open Ports:</b> '+open_ports+'</div>';
 
                     var Tags = [];
                       if(header.pulse_info){
@@ -1530,14 +1524,14 @@ $.ajax({
                   
                       }
                       if(Tags.length > 0){
-                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Tags:</b> '+Tags.join(",")+' </div></div>';
+                        html+=' <div class="col-md-6 m-b-xs"><b> Related Tags:</b> '+Tags.join(",")+' </div>';
                       }
                       if(header.type =="IPv6"){
-                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> Reverse DNS:</b> '+reverse_dns+'</div></div>';
+                        html+=' <div class="col-md-6 m-b-xs"><b> Reverse DNS:</b> '+reverse_dns+'</div>';
 
                       }else{
-                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> Certificate Issuer:</b> '+issuer.join(", ")+'</div></div>';
-                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> Certificate Subject:</b> '+subject.join(", ")+'</div></div>';
+                        html+=' <div class="col-md-6 m-b-xs"><b> Certificate Issuer:</b> '+issuer.join(", ")+'</div>';
+                        html+=' <div class="col-md-6 m-b-xs"><b> Certificate Subject:</b> '+subject.join(", ")+'</div>';
                       }
                      
 
@@ -1626,9 +1620,9 @@ $.ajax({
                     }
                     
 
-                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> IP Address:</b> '+IP+'</div></div>';
-                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> WHOIS:</b> '+WHOIS+'</div></div>';
-                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Country:</b> '+country_name+'</div></div>';
+                    html+=' <div class="col-md-6 m-b-xs"><b> IP Address:</b> '+IP+'</div>';
+                    html+=' <div class="col-md-6 m-b-xs"><b> WHOIS:</b> '+WHOIS+'</div>';
+                    html+=' <div class="col-md-6 m-b-xs"><b> Country:</b> '+country_name+'</div>';
                     var open_ports="";
                     var issuer = [];
                     var subject =[];
@@ -1651,7 +1645,7 @@ $.ajax({
                   
                       }
                       if(Tags.length > 0){
-                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Tags:</b> '+Tags.join(",")+' </div></div>';
+                        html+=' <div class="col-md-6 m-b-xs"><b> Related Tags:</b> '+Tags.join(",")+' </div>';
                       }
      
 
@@ -1719,8 +1713,8 @@ $.ajax({
                     var header = res.data;
                     var header2 = res.data2;
 
-                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Hostname:</b> '+header.hostname+'</div></div>';
-                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Domain:</b> '+header.domain+'</div></div>';
+                    html+=' <div class="col-md-6 m-b-xs"><b> Hostname:</b> '+header.hostname+'</div>';
+                    html+=' <div class="col-md-6 m-b-xs"><b> Domain:</b> '+header.domain+'</div>';
 
                     var WHOIS ="";
                     if(header.whois){
@@ -1729,7 +1723,7 @@ $.ajax({
                     }
                     
 
-                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Country:</b> '+WHOIS+'</div></div>';
+                    html+=' <div class="col-md-6 m-b-xs"><b> Country:</b> '+WHOIS+'</div>';
                     var open_ports="";
                     var issuer = [];
                     var subject =[];
@@ -1748,7 +1742,7 @@ $.ajax({
                         }
                         reverse_dns = header2.facts.reverse_dns;
                     }
-                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Open Ports:</b> '+open_ports+'</div></div>';
+                    html+=' <div class="col-md-6 m-b-xs"><b> Open Ports:</b> '+open_ports+'</div>';
 
                     var Tags = [];
                       if(header.pulse_info){
@@ -1766,7 +1760,7 @@ $.ajax({
                   
                       }
                       if(Tags.length > 0){
-                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Tags:</b> '+Tags.join(",")+' </div></div>';
+                        html+=' <div class="col-md-6 m-b-xs"><b> Related Tags:</b> '+Tags.join(",")+' </div>';
                       }
                   
                      
@@ -1841,10 +1835,10 @@ $.ajax({
                         
                                 if(header_analysis){
                                     if(header_analysis.datetime_int){
-                                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> Analysis Date:</b> '+header_analysis.datetime_int+'</div></div>';
+                                        html+=' <div class="col-md-6 m-b-xs"><b> Analysis Date:</b> '+header_analysis.datetime_int+'</div>';
                                     }
                                     if(header_analysis.info.results.file_type){
-                                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> File Type:</b> '+header_analysis.info.results.file_type+'</div></div>';
+                                        html+=' <div class="col-md-6 m-b-xs"><b> File Type:</b> '+header_analysis.info.results.file_type+'</div>';
                                     }
                                 }
                                 
@@ -1880,9 +1874,9 @@ $.ajax({
                                     }
 
 
-                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Antivirus Detections:</b> '+Antivirus_Detections.join(",")+'</div></div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><b> Antivirus Detections:</b> '+Antivirus_Detections.join(",")+'</div>';
                                     if(header_analysis){
-                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Size:</b> '+header_analysis.info.results.filesize+' bytes</div></div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><b> Size:</b> '+header_analysis.info.results.filesize+' bytes</div>';
                                     }
                                     
                                 
@@ -1898,9 +1892,9 @@ $.ajax({
                                             }
                                         }
                                     }
-                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Yara Detections :</b> '+Yara_Detections.join("</br>")+'</div></div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><b> Yara Detections :</b> '+Yara_Detections.join("</br>")+'</div>';
                                     if(header_analysis){
-                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> MD5:</b> '+header_analysis.info.results.md5+' </div></div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><b> MD5:</b> '+header_analysis.info.results.md5+' </div>';
                                     }
 
 
@@ -1929,10 +1923,10 @@ $.ajax({
                                     }
 
 
-                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Alerts:</b> '+Alerts.join("")+' </div></div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><b> Alerts:</b> '+Alerts.join("")+' </div>';
                                     if(header_analysis){
-                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> SHA1:</b> '+header_analysis.info.results.sha1+' </div></div>';
-                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> SHA256:</b> '+header_analysis.info.results.sha256+' </div></div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><b> SHA1:</b> '+header_analysis.info.results.sha1+' </div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><b> SHA256:</b> '+header_analysis.info.results.sha256+' </div>';
                                     }
                                     var host_name = [];
                                     if(header_analysis){
@@ -1953,7 +1947,7 @@ $.ajax({
                                         }
                                     }
 
-                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> External Hosts:</b> '+host_name.join(",")+' </div></div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><b> External Hosts:</b> '+host_name.join(",")+' </div>';
 
 
                                     var imphash = "";
@@ -1971,7 +1965,7 @@ $.ajax({
                                     }
                                     }
 
-                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> IMPHASH:</b> '+imphash+' </div></div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><b> IMPHASH:</b> '+imphash+' </div>';
 
 
                                 var Tags = [];
@@ -1988,9 +1982,9 @@ $.ajax({
                                     }
                                 }
                                 if(Tags.length > 0){
-                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Tags:</b> '+Tags.join(",")+' </div></div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><b> Related Tags:</b> '+Tags.join(",")+' </div>';
                                 }
-                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> PEHASH:</b> '+pehash+' </div></div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><b> PEHASH:</b> '+pehash+' </div>';
                                     var Groups = [];
                                 if(header.pulse_info){
                                     if(header.pulse_info.pulses){               
@@ -2005,7 +1999,7 @@ $.ajax({
                                     }
                                 }
                                 if(Groups.length > 0){
-                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Groups:</b> '+Groups.join(",")+' </div></div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><b> Related Groups:</b> '+Groups.join(",")+' </div>';
                                 }
                     }
 
@@ -2422,19 +2416,19 @@ let summary_total = (status_value_ibmcloud + status_value_virustotal + status_va
 let html_status = ``;
 if(summary_total <= 1.9){
 html_status += `<div class="status-risk success">
-    <span class="st-circle-ovr"></span> LOW
+    Low
 </div>`;
 }else if(summary_total <= 2.6){
 html_status += `<div class="status-risk warning" style="color:#f2ff15 !important">
-    <span class="st-circle-ovr" style="color:#f2ff15 !important"></span> MEDIUM
+    Medium
 </div>`;
 }else if(summary_total <= 3){
-html_status += `<div class="status-risk warning">
-    <span class="st-circle-ovr"></span> HIGH
+html_status += `<div class="status-risk danger">
+     High
 </div>`;
 }else if(summary_total >= 3){
 html_status += `<div class="status-risk danger">
-    <span class="st-circle-ovr"></span> VERY HIGH
+     Very High
 </div>`;
 }
 $('#text_status_risk').html(html_status);
