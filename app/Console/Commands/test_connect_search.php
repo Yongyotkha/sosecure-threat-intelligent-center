@@ -81,33 +81,101 @@ class test_connect_search extends Command
 
 
               //virustotal=======================================================
-            $hybrid_API_Key = "kpy0ibau846587b1lnemkw4k082be03bncw1bkz140a16b6cs64sk6uzf0498e3f";
-            $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
-            //$virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
-            $headers = array(
-                 'api-key: '.$hybrid_API_Key,
-                 'accept: '.'application/json',
-                 'Content-Type: '.'application/x-www-form-urlencoded',
-                 'user-agent: '.'Falcon Sandbox',
-            );
+            // $hybrid_API_Key = "kpy0ibau846587b1lnemkw4k082be03bncw1bkz140a16b6cs64sk6uzf0498e3f";
+            // $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
+            // //$virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
+            // $headers = array(
+            //      'api-key: '.$hybrid_API_Key,
+            //      'accept: '.'application/json',
+            //      'Content-Type: '.'application/x-www-form-urlencoded',
+            //      'user-agent: '.'Falcon Sandbox',
+            // );
+            //'host'=>'151.101.2.110','domain'=>'151.101.2.110','url'=>'151.101.2.110','url'=>'151.101.2.110','similar_to'=>'151.101.2.110','context'=>'151.101.2.110'
 
-            $fields = array( 'domain'=>'151.101.2.110');
-            $postvars = '';
-            foreach($fields as $key=>$value) {
-                $postvars .= $key . "=" . $value . "&";
-              }
+            // $fields = array( 'host'=>'165.227.87.17');
+            // $postvars = '';
+            // foreach($fields as $key=>$value) {
+            //     $postvars .= $key . "=" . $value . "&";
+            //   }
+            // // Send request to Server
+            // $ch = curl_init($hybrid_url);
+            // // To save response in a variable from server, set headers;
+            // curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            // curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            // curl_setopt($ch, CURLOPT_POSTFIELDS,$postvars);
+            // // Get response
+            // $response = curl_exec($ch);
+            // curl_close($ch);  
+            // echo($response);
+            // $keyword="https://stackoverflow.com/questions/1755144/how-to-validate-domain-name-in-php";
+            // $type ="";
+            // if (preg_match("/^([a-f0-9]{64})$/", $keyword) == 1) {
+            //     $type =  'SHA256';
+            //  }else if(preg_match('/^[a-f0-9]{32}$/', $keyword)) {
+            //     $type = 'MD5';
+                
+            //  }else if(preg_match('/^[0-9a-f]{40}$/i', $keyword)) {
+            //     $type = 'SHA1';
+                
+            //  }
+            //  else if(filter_var($keyword, FILTER_VALIDATE_IP)) {
+            //     $type = 'IP';
+                
+            //  }
+            //  else if(filter_var($keyword, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            //     $type = 'IP';
+                
+            //  }
+            //  else if(filter_var($keyword, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE)) {
+            //     $type = 'IP';
+                
+            //  }
+            //  else if(filter_var($keyword, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE)) {
+            //     $type = 'IP';
+                
+            //  }
+            //  else if(preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $keyword) //valid chars check
+            //  && preg_match("/^.{1,253}$/", $keyword) //overall length check
+            //  && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $keyword)   ) {
+            //     $type = 'Domain';
+                
+            //  }
+            //  else if(preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$keyword)) {
+            //     $type = 'URL';
+                
+            //  }
+            //  else if(preg_match("/\b(?:(?:http?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$keyword)) {
+            //     $type = 'URL';
+                
+            //  }else{
+
+            //  }
+
+            //OTX
+            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";
+            $otx_url = "https://otx.alienvault.com/api/v1/indicators/file/f9f18153cabf61699d838407dddd4e937bb2efeb/analysis";
+            $ch = curl_init();
+            $headers = array(
+                 'X-OTX-API-KEY: '.$otx_API_Key,
+                'accept: '.'application/json',
+                 'Content-Type: '.'application/x-www-form-urlencoded',
+            );
             // Send request to Server
-            $ch = curl_init($hybrid_url);
+            $ch = curl_init($otx_url);
             // To save response in a variable from server, set headers;
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_POSTFIELDS,$postvars);
             // Get response
             $response = curl_exec($ch);
             curl_close($ch);  
-            echo($response);
+           // echo($response);
+           $myfile = fopen("/var/www/html/insight.sosecure.co.th/threat-intelligent-center/app/Console/Commands/search_oxt.txt", "w") or die("Unable to open file!");
+$txt = $response;
+fwrite($myfile, $txt);
 
-        $this->info('Purchase verified successfully');
+
+fclose($myfile);
+       // $this->info($type);
     }
 
 }

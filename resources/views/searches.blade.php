@@ -1068,1151 +1068,1383 @@
     let number_new_row = 0;
     function loadSearchAPI(source){
 
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: "/loadSearchAPI",
-            method: 'post',
-            data: ({
-                keyword:text_search_new,
-                source:source
-            }),
-            beforeSend: function(){
-                $('.ajax-loading').show();
-            },
-        }).done(function(res){
-            number_risk++;
-            let data = res.data;
-            $('#type_search').text(res.type);
+$.ajax({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    },
+    url: "/loadSearchAPI",
+    method: 'post',
+    data: ({
+        keyword:text_search_new,
+        source:source
+    }),
+    beforeSend: function(){
+        $('.ajax-loading').show();
+    },
+}).done(function(res){
+    number_risk++;
+    let data = res.data;
+    $('#type_search').text(res.type);
 
 
-            if(source == 'ibmcloud'){
-                if(res.status_code == 400){
-                    $('.load-ibmcloud').remove();
-                }else{
-                    if(data.error){
-                        $('#not-ibmcloud').show();
-                        $('#table-ibmcloud').DataTable({
-                            "dom": 'tp',
-                            "searching": false,
-                            "bPaginate": true,
-                            "bLengthChange": false,
-                            "bFilter": false,
-                            "bInfo": false,
-                            "bAutoWidth": false ,
-                        });
-                    }else{
-                        number_new_row++;
-                        let num_total = 0;
-                        if(data.score && data.score > 0){
-                            num_total = data.score;
-                        }else if(data.malware){
-                            const malware = data.malware;
-                            num_total = malware.origins.external.detectionCoverage == 0 ? 0 : malware.origins.external.detectionCoverage / 10;
-                        }else if(data.result.score > 0){
-                            num_total = data.result.score;
+    if(source == 'ibmcloud'){
+        if(res.status_code == 400){
+            $('.load-ibmcloud').remove();
+        }else{
+            if(data.error){
+                $('#not-ibmcloud').show();
+                $('#table-ibmcloud').DataTable({
+                    "dom": 'tp',
+                    "searching": false,
+                    "bPaginate": true,
+                    "bLengthChange": false,
+                    "bFilter": false,
+                    "bInfo": false,
+                    "bAutoWidth": false ,
+                });
+            }else{
+                number_new_row++;
+                let num_total = 0;
+                if(data.score && data.score > 0){
+                    num_total = data.score;
+                }else if(data.malware){
+                    const malware = data.malware;
+                    num_total = malware.origins.external.detectionCoverage == 0 ? 0 : malware.origins.external.detectionCoverage / 10;
+                }else if(data.result.score > 0){
+                    num_total = data.result.score;
+                }
+                
+                $('#text_' + source).text(num_total);
+                const elem = $("#circle-ibmcloud");
+                if(num_total <= 3.9){
+                    status_value_ibmcloud = 1;
+                }else if(num_total <= 6.9){
+                    status_value_ibmcloud = 2;
+                    elem[0].style.removeProperty('background-color');
+                    elem[0].style.setProperty('background-color', '#f2ff15', 'important');
+                    $('#text_' + source).css('color', '#f2ff15');
+                }else if(num_total >= 7.0){
+                    status_value_ibmcloud = 3;
+                    elem[0].style.removeProperty('background-color');
+                    elem[0].style.setProperty('background-color', '#fcc838', 'important');
+                    $('#text_' + source).css('color', '#fcc838');
+                }
+            }
+            
+            
+            let html = ``;
+            let historyByCats = [];
+            if(data.history){
+                for(let i in data.history){
+                    const history = data.history[i];
+                    html += `
+                    <tr>`;
+                        if(history.cats){
+                            html += `<td>`;
+                            for(const [key, value] of Object.entries(history.cats)){
+                                html += ` ${key} (${value}%)`;
+                            }
+                            html += `</td>`;
                         }
                         
-                        $('#text_' + source).text(num_total);
-                        const elem = $("#circle-ibmcloud");
-                        if(num_total <= 3.9){
-                            status_value_ibmcloud = 1;
-                        }else if(num_total <= 6.9){
-                            status_value_ibmcloud = 2;
+                        html += `<td>${history.reason}</td>
+                        <td>
+                            ${history.geo.country} ${history.geo.countrycode}
+                        </td>
+                        <td>
+                            ${moment(new Date(history.created)).format('DD-MM-YYYY HH:MM:SS')}
+                        </td>
+                    </tr>
+                    `;
+                }
+                document.getElementById("tbody-ibmcloud").innerHTML = html;
+                $('#table-ibmcloud').DataTable({
+                    "dom": 'tp',
+                    "searching": false,
+                    "bPaginate": true,
+                    "bLengthChange": false,
+                    "bFilter": false,
+                    "bInfo": false,
+                    "bAutoWidth": false ,
+                });
+            }else if(data.malware){
+                $('#table-ibmcloud').hide();
+                $('#table-ibmcloud-malware').show();
+                const malware = data.malware;
+                html += `
+                <tr>
+                    <td>${malware.type}</td>
+                    <td>${moment(new Date(malware.origins.external.firstSeen)).format('DD-MM-YYYY HH:MM:SS')}</td>
+                    <td>${moment(new Date(malware.origins.external.lastSeen)).format('DD-MM-YYYY HH:MM:SS')}</td>
+                    <td>${malware.origins.external.family ? malware.origins.external.family[0] : '-'}</td>
+                    <td>${malware.origins.external.malwareType ? malware.origins.external.malwareType : '-'}</td>
+                    <td>${malware.origins.external.detectionCoverage ? malware.origins.external.detectionCoverage : '-'}</td>
+                    <td>${malware.origins.external.platform ? malware.origins.external.platform : '-'}</td>
+                </tr>
+                `;
+                document.getElementById("tbody-ibmcloud-malware").innerHTML = html;
+                $('#table-ibmcloud-malware').DataTable({
+                    "dom": 'tp',
+                    "searching": false,
+                    "bPaginate": true,
+                    "bLengthChange": false,
+                    "bFilter": false,
+                    "bInfo": false,
+                    "bAutoWidth": false ,
+                });
+            }else if(res.type == 'Domain'){
+                $('#table-ibmcloud').hide();
+                $('#table-ibmcloud-url').show();
+                const domain = data.result;
+                html += `
+                <tr>
+                    <td>${res.type}</td>
+                    <td>${domain.url}</td>`;
+                        if(domain.categoryDescriptions){
+                            html += `<td>`;
+                            for(const [key, value] of Object.entries(domain.categoryDescriptions)){
+                                html += `${value}`;
+                            }
+                            html += `</td>`;
+                        }
+                        
+                html += `</tr>
+                `;
+                document.getElementById("tbody-ibmcloud-url").innerHTML = html;
+                $('#table-ibmcloud-url').DataTable({
+                    "dom": 'tp',
+                    "searching": false,
+                    "bPaginate": true,
+                    "bLengthChange": false,
+                    "bFilter": false,
+                    "bInfo": false,
+                    "bAutoWidth": false ,
+                });
+            }else{
+                $('#not-ibmcloud').show();
+            }
+            
+            $('.load-ibmcloud').remove();
+            click_ibmcloud();
+        }
+    }else if(source == 'virustotal'){
+        if(res.status_code == 400){
+            $('.load-virustotal').remove();
+        }else{
+            if(data.error){
+                $('#not-virustotal').show();
+                $('#table-virustotal').DataTable({
+                    "dom": 'tp',
+                    "searching": false,
+                    "bPaginate": true,
+                    "bLengthChange": false,
+                    "bFilter": false,
+                    "bInfo": false,
+                    "bAutoWidth": false ,
+                });
+            }else{
+                number_new_row++;
+                if(data.data){
+                    var last_analysis_stats = data.data.attributes.last_analysis_stats;
+                    if(data.data.attributes.last_analysis_stats.malicious && data.data.attributes.last_analysis_stats.malicious > 0){
+                        $('#text_' + source).text(data.data.attributes.last_analysis_stats.malicious);
+                        const elem = $("#circle-virustotal");
+                        if(last_analysis_stats.malicious > 0 && last_analysis_stats.malicious <= 3){
+                            status_value_virustotal = 1;
                             elem[0].style.removeProperty('background-color');
-                            elem[0].style.setProperty('background-color', '#f2ff15', 'important');
-                            $('#text_' + source).css('color', '#f2ff15');
-                        }else if(num_total >= 7.0){
-                            status_value_ibmcloud = 3;
+                            elem[0].style.setProperty('background-color', '#b93624', 'important');
+                            $('#text_' + source).css('color', '#b93624');
+                        }else if(last_analysis_stats.malicious <= 5){
+                            status_value_virustotal = 2;
                             elem[0].style.removeProperty('background-color');
-                            elem[0].style.setProperty('background-color', '#fcc838', 'important');
-                            $('#text_' + source).css('color', '#fcc838');
+                            elem[0].style.setProperty('background-color', '#b93624', 'important');
+                            $('#text_' + source).css('color', '#b93624');
+                        }else if(last_analysis_stats.malicious <= 7){
+                            status_value_virustotal = 3;
+                            elem[0].style.removeProperty('background-color');
+                            elem[0].style.setProperty('background-color', '#b93624', 'important');
+                            $('#text_' + source).css('color', '#b93624');
+                        }else if(last_analysis_stats.malicious >= 10){
+                            status_value_virustotal = 4;
+                            elem[0].style.removeProperty('background-color');
+                            elem[0].style.setProperty('background-color', '#b93624', 'important');
+                            $('#text_' + source).css('color', '#b93624');
                         }
                     }
+                    let total = (parseInt(last_analysis_stats.harmless) + parseInt(last_analysis_stats.malicious) + parseInt(last_analysis_stats.suspicious) + parseInt(last_analysis_stats.timeout) + parseInt(last_analysis_stats.undetected));
+                    $('#text_virustotal_sum').text('/ '+total);
                     
                     
                     let html = ``;
-                    let historyByCats = [];
-                    if(data.history){
-                        for(let i in data.history){
-                            const history = data.history[i];
-                            html += `
-                            <tr>`;
-                                if(history.cats){
-                                    html += `<td>`;
-                                    for(const [key, value] of Object.entries(history.cats)){
-                                        html += ` ${key} (${value}%)`;
-                                    }
-                                    html += `</td>`;
-                                }
-                                
-                                html += `<td>${history.reason}</td>
-                                <td>
-                                    ${history.geo.country} ${history.geo.countrycode}
-                                </td>
-                                <td>
-                                    ${moment(new Date(history.created)).format('DD-MM-YYYY HH:MM:SS')}
-                                </td>
-                            </tr>
-                            `;
-                        }
-                        document.getElementById("tbody-ibmcloud").innerHTML = html;
-                        $('#table-ibmcloud').DataTable({
-                            "dom": 'tp',
-                            "searching": false,
-                            "bPaginate": true,
-                            "bLengthChange": false,
-                            "bFilter": false,
-                            "bInfo": false,
-                            "bAutoWidth": false ,
-                        });
-                    }else if(data.malware){
-                        $('#table-ibmcloud').hide();
-                        $('#table-ibmcloud-malware').show();
-                        const malware = data.malware;
+                    let count_data_virus = 0;
+                    for(let i in data.data.attributes.last_analysis_results){
+                        count_data_virus++;
+                        const last_analysis_results = data.data.attributes.last_analysis_results[i];
                         html += `
                         <tr>
-                            <td>${malware.type}</td>
-                            <td>${moment(new Date(malware.origins.external.firstSeen)).format('DD-MM-YYYY HH:MM:SS')}</td>
-                            <td>${moment(new Date(malware.origins.external.lastSeen)).format('DD-MM-YYYY HH:MM:SS')}</td>
-                            <td>${malware.origins.external.family ? malware.origins.external.family[0] : '-'}</td>
-                            <td>${malware.origins.external.malwareType ? malware.origins.external.malwareType : '-'}</td>
-                            <td>${malware.origins.external.detectionCoverage ? malware.origins.external.detectionCoverage : '-'}</td>
-                            <td>${malware.origins.external.platform ? malware.origins.external.platform : '-'}</td>
+                            <td>${last_analysis_results.engine_name}</td>
+                            <td>${last_analysis_results.category}</td>
+                            <td>
+                                ${last_analysis_results.method} 
+                            </td>
+                            <td>`;
+                                if(last_analysis_results.result == 'malicious' || last_analysis_results.result == 'phishing' || last_analysis_results.result == 'malware'){
+                                    html += `<span class="label label-danger">
+                                        ${last_analysis_results.result}
+                                    </span>`; 
+                                }else if(last_analysis_results.result == 'suspicious'){
+                                    html += `<span class="label label-warning">
+                                        ${last_analysis_results.result}
+                                    </span>`;
+                                }else if(last_analysis_results.result == 'clean'){
+                                    html += `<span class="label label-success">
+                                        ${last_analysis_results.result}
+                                    </span>`;
+                                }else if(last_analysis_results.result == 'unrated'){
+                                    html += `<span class="label label-secondary">
+                                        ${last_analysis_results.result}
+                                    </span>`;
+                                }else if(last_analysis_results.result == null){
+                                    html += `<span class="label label-success">
+                                        undetected
+                                    </span>`;
+                                }else{
+                                    html += `<span class="label label-danger">
+                                        ${last_analysis_results.result}
+                                    </span>`; 
+                                }
+                            html += `</td>
                         </tr>
                         `;
-                        document.getElementById("tbody-ibmcloud-malware").innerHTML = html;
-                        $('#table-ibmcloud-malware').DataTable({
-                            "dom": 'tp',
-                            "searching": false,
-                            "bPaginate": true,
-                            "bLengthChange": false,
-                            "bFilter": false,
-                            "bInfo": false,
-                            "bAutoWidth": false ,
-                        });
-                    }else if(res.type == 'Domain'){
-                        $('#table-ibmcloud').hide();
-                        $('#table-ibmcloud-url').show();
-                        const domain = data.result;
-                        html += `
-                        <tr>
-                            <td>${res.type}</td>
-                            <td>${domain.url}</td>`;
-                                if(domain.categoryDescriptions){
-                                    html += `<td>`;
-                                    for(const [key, value] of Object.entries(domain.categoryDescriptions)){
-                                        html += `${value}`;
-                                    }
-                                    html += `</td>`;
-                                }
-                                
-                        html += `</tr>
-                        `;
-                        document.getElementById("tbody-ibmcloud-url").innerHTML = html;
-                        $('#table-ibmcloud-url').DataTable({
-                            "dom": 'tp',
-                            "searching": false,
-                            "bPaginate": true,
-                            "bLengthChange": false,
-                            "bFilter": false,
-                            "bInfo": false,
-                            "bAutoWidth": false ,
-                        });
-                    }else{
-                        $('#not-ibmcloud').show();
                     }
-                    
-                    $('.load-ibmcloud').remove();
-                    click_ibmcloud();
-                }
-            }else if(source == 'virustotal'){
-                if(res.status_code == 400){
-                    $('.load-virustotal').remove();
-                }else{
-                    if(data.error){
+                    if(count_data_virus == 0){
                         $('#not-virustotal').show();
-                        $('#table-virustotal').DataTable({
-                            "dom": 'tp',
-                            "searching": false,
-                            "bPaginate": true,
-                            "bLengthChange": false,
-                            "bFilter": false,
-                            "bInfo": false,
-                            "bAutoWidth": false ,
-                        });
-                    }else{
-                        number_new_row++;
-                        if(data.data){
-                            var last_analysis_stats = data.data.attributes.last_analysis_stats;
-                            if(data.data.attributes.last_analysis_stats.malicious && data.data.attributes.last_analysis_stats.malicious > 0){
-                                $('#text_' + source).text(data.data.attributes.last_analysis_stats.malicious);
-                                const elem = $("#circle-virustotal");
-                                if(last_analysis_stats.malicious > 0 && last_analysis_stats.malicious <= 3){
-                                    status_value_virustotal = 1;
-                                    elem[0].style.removeProperty('background-color');
-                                    elem[0].style.setProperty('background-color', '#b93624', 'important');
-                                    $('#text_' + source).css('color', '#b93624');
-                                }else if(last_analysis_stats.malicious <= 5){
-                                    status_value_virustotal = 2;
-                                    elem[0].style.removeProperty('background-color');
-                                    elem[0].style.setProperty('background-color', '#b93624', 'important');
-                                    $('#text_' + source).css('color', '#b93624');
-                                }else if(last_analysis_stats.malicious <= 7){
-                                    status_value_virustotal = 3;
-                                    elem[0].style.removeProperty('background-color');
-                                    elem[0].style.setProperty('background-color', '#b93624', 'important');
-                                    $('#text_' + source).css('color', '#b93624');
-                                }else if(last_analysis_stats.malicious >= 10){
-                                    status_value_virustotal = 4;
-                                    elem[0].style.removeProperty('background-color');
-                                    elem[0].style.setProperty('background-color', '#b93624', 'important');
-                                    $('#text_' + source).css('color', '#b93624');
-                                }
-                            }
-                            let total = (parseInt(last_analysis_stats.harmless) + parseInt(last_analysis_stats.malicious) + parseInt(last_analysis_stats.suspicious) + parseInt(last_analysis_stats.timeout) + parseInt(last_analysis_stats.undetected));
-                            $('#text_virustotal_sum').text('/ '+total);
-                            
-                            
-                            let html = ``;
-                            let count_data_virus = 0;
-                            for(let i in data.data.attributes.last_analysis_results){
-                                count_data_virus++;
-                                const last_analysis_results = data.data.attributes.last_analysis_results[i];
-                                html += `
-                                <tr>
-                                    <td>${last_analysis_results.engine_name}</td>
-                                    <td>${last_analysis_results.category}</td>
-                                    <td>
-                                        ${last_analysis_results.method} 
-                                    </td>
-                                    <td>`;
-                                        if(last_analysis_results.result == 'malicious' || last_analysis_results.result == 'phishing' || last_analysis_results.result == 'malware'){
-                                            html += `<span class="label label-danger">
-                                                ${last_analysis_results.result}
-                                            </span>`; 
-                                        }else if(last_analysis_results.result == 'suspicious'){
-                                            html += `<span class="label label-warning">
-                                                ${last_analysis_results.result}
-                                            </span>`;
-                                        }else if(last_analysis_results.result == 'clean'){
-                                            html += `<span class="label label-success">
-                                                ${last_analysis_results.result}
-                                            </span>`;
-                                        }else if(last_analysis_results.result == 'unrated'){
-                                            html += `<span class="label label-secondary">
-                                                ${last_analysis_results.result}
-                                            </span>`;
-                                        }else if(last_analysis_results.result == null){
-                                            html += `<span class="label label-success">
-                                                undetected
-                                            </span>`;
-                                        }else{
-                                            html += `<span class="label label-danger">
-                                                ${last_analysis_results.result}
-                                            </span>`; 
-                                        }
-                                    html += `</td>
-                                </tr>
-                                `;
-                            }
-                            if(count_data_virus == 0){
-                                $('#not-virustotal').show();
-                            }
-                            document.getElementById("tbody-virustotal").innerHTML = html;
-                            $('#table-virustotal').DataTable({
-                                "dom": 'tp',
-                                "searching": false,
-                                "bPaginate": true,
-                                "bLengthChange": false,
-                                "bFilter": false,
-                                "bInfo": false,
-                                "bAutoWidth": false ,
-                            });
-                        }
                     }
-                    $('.load-virustotal').remove();
-                    click_virustotal();
+                    document.getElementById("tbody-virustotal").innerHTML = html;
+                    $('#table-virustotal').DataTable({
+                        "dom": 'tp',
+                        "searching": false,
+                        "bPaginate": true,
+                        "bLengthChange": false,
+                        "bFilter": false,
+                        "bInfo": false,
+                        "bAutoWidth": false ,
+                    });
                 }
-            }else if(source == 'hybrid'){
-                if(res.status_code == 400){
-                    $('.load-hybrid').remove();
-                }else{
-                    let html = ``;
-                    let total = 0;
-                    if(res.type == 'Domain'){
-                        $('#table-hybrid').hide();
-                        $('#table-hybrid-url').show();
-                        for(let i in data.search_terms){
-                            const search_terms = data.search_terms[i];
-                            total += data.count;
-                            html += `
-                            <tr>
-                                <td>${search_terms.id}</td>
-                                <td>${search_terms.value}</td>
-                            </tr>
-                            `;
-                        }
-                        document.getElementById("tbody-hybrid-url").innerHTML = html;
-                        $('#table-hybrid-url').DataTable({
-                            "dom": 'tp',
-                            "searching": false,
-                            "bPaginate": true,
-                            "bLengthChange": false,
-                            "bFilter": false,
-                            "bInfo": false,
-                            "bAutoWidth": false ,
-                        });
-                    }else if(data.result){
-                        for(let i in data.result){
-                            const results = data.result[i];
-                            if(results.threat_score){
-                                total += results.threat_score;
-                            }else{
-                                total += results.av_detect;
-                            }
-                            html += `
-                            <tr>
-                                <td>${results.environment_description}</td>
-                                <td>${results.sha256}</td>
-                                <td>${results.submit_name}</td>
-                                <td>${results.type_short}</td>
-                                <td>${results.threat_score ? results.threat_score : 0}/100</td>
-                                <td>${results.av_detect ? results.av_detect : 0}%</td>
-                                <td>${results.verdict}</td>
-                                <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
-                            </tr>
-                            `;
-                        }
-                        if(data.count == 0 || (total / data.count) == 0 || data.validation_errors){
-                            
-                        }
-                        let total_number = (total / (100 * data.count)).toFixed(2);
-                        if(data.count && data.count > 0){
-                            $('#text_' + source).text(total_number);
-                        }
-                        const elem = $("#circle-hybrid");
-                        if(total_number <= 0.39){
-                            status_value_hybrid = 1;
-                        }else if(total_number <= 0.69){
-                            status_value_hybrid = 2;
-                            elem[0].style.removeProperty('background-color');
-                            elem[0].style.setProperty('background-color', '#f2ff15', 'important');
-                            $('#text_' + source).css('color', '#f2ff15');
-                        }else if(total_number >= 0.70){
-                            status_value_hybrid = 3;
-                            elem[0].style.removeProperty('background-color');
-                            elem[0].style.setProperty('background-color', '#fcc838', 'important');
-                            $('#text_' + source).css('color', '#fcc838');
-                        }
-                        document.getElementById("tbody-hybrid").innerHTML = html;
-                        $('#table-hybrid').DataTable({
-                            "dom": 'tp',
-                            "searching": false,
-                            "bPaginate": true,
-                            "bLengthChange": false,
-                            "bFilter": false,
-                            "bInfo": false,
-                            "bAutoWidth": false ,
-                        });
-                    }else if(data){
-                        let count = 0;
-                        for(let i in data){
-                            count++;
-                            const results = data[i];
-                            if(results.threat_score){
-                                total += results.threat_score;
-                            }else{
-                                total += results.av_detect;
-                            }
-                            
-                            html += `
-                            <tr>
-                                <td>${results.environment_description}</td>
-                                <td>${results.sha256}</td>
-                                <td>${results.submit_name}</td>
-                                <td>${results.type_short}</td>
-                                <td>${results.threat_score ? results.threat_score : 0}/100</td>
-                                <td>${results.av_detect ? results.av_detect : 0}%</td>
-                                <td>${results.verdict}</td>
-                                <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
-                            </tr>
-                            `;
-                        }
-                        if(count == 0 || (total / count) == 0 || data.validation_errors){
-       
-                        }
-                        let total_number = (total / (100 * count)).toFixed(2);
-                        if(count && count > 0){
-                            $('#text_' + source).text(total_number);
-                        }
-
-                        const elem = $("#circle-hybrid");
-                        if(total_number <= 0.39){
-                            status_value_hybrid = 1;
-                        }else if(total_number <= 0.69){
-                            status_value_hybrid = 2;
-                            elem[0].style.removeProperty('background-color');
-                            elem[0].style.setProperty('background-color', '#f2ff15', 'important');
-                            $('#text_' + source).css('color', '#f2ff15');
-                        }else if(total_number >= 0.70){
-                            status_value_hybrid = 3;
-                            elem[0].style.removeProperty('background-color');
-                            elem[0].style.setProperty('background-color', '#fcc838', 'important');
-                            $('#text_' + source).css('color', '#fcc838');
-                        }
-                        document.getElementById("tbody-hybrid").innerHTML = html;
-                        $('#table-hybrid').DataTable({
-                            "dom": 'tp',
-                            "searching": false,
-                            "bPaginate": true,
-                            "bLengthChange": false,
-                            "bFilter": false,
-                            "bInfo": false,
-                            "bAutoWidth": false ,
-                        });
+            }
+            $('.load-virustotal').remove();
+            click_virustotal();
+        }
+    }else if(source == 'hybrid'){
+        if(res.status_code == 400){
+            $('.load-hybrid').remove();
+        }else{
+            let html = ``;
+            let total = 0;
+            if(res.type == 'Domain'){
+                $('#table-hybrid').hide();
+                $('#table-hybrid-url').show();
+                for(let i in data.search_terms){
+                    const search_terms = data.search_terms[i];
+                    total += data.count;
+                    html += `
+                    <tr>
+                        <td>${search_terms.id}</td>
+                        <td>${search_terms.value}</td>
+                    </tr>
+                    `;
+                }
+                document.getElementById("tbody-hybrid-url").innerHTML = html;
+                $('#table-hybrid-url').DataTable({
+                    "dom": 'tp',
+                    "searching": false,
+                    "bPaginate": true,
+                    "bLengthChange": false,
+                    "bFilter": false,
+                    "bInfo": false,
+                    "bAutoWidth": false ,
+                });
+            }else if(data.result){
+                for(let i in data.result){
+                    const results = data.result[i];
+                    if(results.threat_score){
+                        total += results.threat_score;
                     }else{
-                        number_new_row++;
-                        $('#not-hybrid').show();
+                        total += results.av_detect;
+                    }
+                    html += `
+                    <tr>
+                        <td>${results.environment_description}</td>
+                        <td>${results.sha256}</td>
+                        <td>${results.submit_name}</td>
+                        <td>${results.type_short}</td>
+                        <td>${results.threat_score ? results.threat_score : 0}/100</td>
+                        <td>${results.av_detect ? results.av_detect : 0}%</td>
+                        <td>${results.verdict}</td>
+                        <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
+                    </tr>
+                    `;
+                }
+                if(data.count == 0 || (total / data.count) == 0 || data.validation_errors){
+                    
+                }
+                let total_number = (total / (100 * data.count)).toFixed(2);
+                if(data.count && data.count > 0){
+                    $('#text_' + source).text(total_number);
+                }
+                const elem = $("#circle-hybrid");
+                if(total_number <= 0.39){
+                    status_value_hybrid = 1;
+                }else if(total_number <= 0.69){
+                    status_value_hybrid = 2;
+                    elem[0].style.removeProperty('background-color');
+                    elem[0].style.setProperty('background-color', '#f2ff15', 'important');
+                    $('#text_' + source).css('color', '#f2ff15');
+                }else if(total_number >= 0.70){
+                    status_value_hybrid = 3;
+                    elem[0].style.removeProperty('background-color');
+                    elem[0].style.setProperty('background-color', '#fcc838', 'important');
+                    $('#text_' + source).css('color', '#fcc838');
+                }
+                document.getElementById("tbody-hybrid").innerHTML = html;
+                $('#table-hybrid').DataTable({
+                    "dom": 'tp',
+                    "searching": false,
+                    "bPaginate": true,
+                    "bLengthChange": false,
+                    "bFilter": false,
+                    "bInfo": false,
+                    "bAutoWidth": false ,
+                });
+            }else if(data){
+                let count = 0;
+                for(let i in data){
+                    count++;
+                    const results = data[i];
+                    if(results.threat_score){
+                        total += results.threat_score;
+                    }else{
+                        total += results.av_detect;
                     }
                     
-                    $('.load-hybrid').remove();
-                    click_hybrid();
+                    html += `
+                    <tr>
+                        <td>${results.environment_description}</td>
+                        <td>${results.sha256}</td>
+                        <td>${results.submit_name}</td>
+                        <td>${results.type_short}</td>
+                        <td>${results.threat_score ? results.threat_score : 0}/100</td>
+                        <td>${results.av_detect ? results.av_detect : 0}%</td>
+                        <td>${results.verdict}</td>
+                        <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
+                    </tr>
+                    `;
                 }
-            }else if(source == 'otx_indicators'){
-                if(res.status_code == 400){
+                if(count == 0 || (total / count) == 0 || data.validation_errors){
 
-                }else{
-                    $('#otx_indicators_loadspinner_basic_info').show();
-                       
-                        var html ="";
-                        if(res.type == 'IP'){
-                            var header = res.data;
-                            var header2 = res.data2;
+                }
+                let total_number = (total / (100 * count)).toFixed(2);
+                if(count && count > 0){
+                    $('#text_' + source).text(total_number);
+                }
 
-                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> ASN:</b> '+header.asn+'</div></div>';
-                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Indicator Facts:</b> '+''+'</div></div>';
-                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Country:</b> '+header.country_name+'</div></div>';
-                            var open_ports="";
-                            var issuer = [];
-                            var subject =[];
-                            if(header2.facts){
-                                if(header2.facts.open_ports){
-                                    open_ports = header2.facts.open_ports.join(", ")
-                                }
-                                if(header2.facts.ssl_certificates){
-                                    for (let index = 0; index < header2.facts.ssl_certificates.length; index++) {
-                                        const element = header2.facts.ssl_certificates[index];
-                                        issuer.push(element.issuer);
-                                        subject.push(element.subject);
-                                    }
+                const elem = $("#circle-hybrid");
+                if(total_number <= 0.39){
+                    status_value_hybrid = 1;
+                }else if(total_number <= 0.69){
+                    status_value_hybrid = 2;
+                    elem[0].style.removeProperty('background-color');
+                    elem[0].style.setProperty('background-color', '#f2ff15', 'important');
+                    $('#text_' + source).css('color', '#f2ff15');
+                }else if(total_number >= 0.70){
+                    status_value_hybrid = 3;
+                    elem[0].style.removeProperty('background-color');
+                    elem[0].style.setProperty('background-color', '#fcc838', 'important');
+                    $('#text_' + source).css('color', '#fcc838');
+                }
+                document.getElementById("tbody-hybrid").innerHTML = html;
+                $('#table-hybrid').DataTable({
+                    "dom": 'tp',
+                    "searching": false,
+                    "bPaginate": true,
+                    "bLengthChange": false,
+                    "bFilter": false,
+                    "bInfo": false,
+                    "bAutoWidth": false ,
+                });
+            }else{
+                number_new_row++;
+                $('#not-hybrid').show();
+            }
+            
+            $('.load-hybrid').remove();
+            click_hybrid();
+        }
+    }else if(source == 'otx_indicators'){
+        if(res.status_code == 400){
 
-                                }
+        }else{
+            $('#otx_indicators_loadspinner_basic_info').show();
+               
+                var html ="";
+                if(res.type == 'IP'){
+                    var header = res.data;
+                    var header2 = res.data2;
+
+                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> ASN:</b> '+header.asn+'</div></div>';
+                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Indicator Facts:</b> '+''+'</div></div>';
+                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Country:</b> '+header.country_name+'</div></div>';
+                    var open_ports="";
+                    var issuer = [];
+                    var subject =[];
+                    var reverse_dns ="";
+                    if(header2.facts){
+                        if(header2.facts.open_ports){
+                            open_ports = header2.facts.open_ports.join(", ")
+                        }
+                        if(header2.facts.ssl_certificates){
+                            for (let index = 0; index < header2.facts.ssl_certificates.length; index++) {
+                                const element = header2.facts.ssl_certificates[index];
+                                issuer.push(element.issuer);
+                                subject.push(element.subject);
                             }
-                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Open Ports:</b> '+open_ports+'</div></div>';
 
-                            var Tags = [];
-                              if(header.pulse_info){
-                                if(header.pulse_info.pulses){               
-                                               for (let index = 0; index < header.pulse_info.pulses.length; index++) {
-                                                if(header.pulse_info.pulses[index].tags){
-                                                  for (let index2 = 0; index2 < header.pulse_info.pulses[index].tags.length; index2++) {
-                                                      const tag = header.pulse_info.pulses[index].tags[index2];
-                                                      Tags.push(tag);
-                                                  }
-                                                }
-                                               }                                      
-                                }
+                        }
+                        reverse_dns = header2.facts.reverse_dns;
+                    }
+                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Open Ports:</b> '+open_ports+'</div></div>';
 
-                          
-                              }
-                              if(Tags.length > 0){
-                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Tags:</b> '+Tags.join(",")+' </div></div>';
-                              }
-                              html+=' <div class="m-b-xs"><div class="col-md-6"><b> Certificate Issuer:</b> '+issuer.join(", ")+'</div></div>';
-                              html+=' <div class="m-b-xs"><div class="col-md-6"><b> Certificate Subject:</b> '+subject.join(", ")+'</div></div>';
-
-                            var table_pulse = "";
-                              if(header.pulse_info){
-                                if(header.pulse_info.pulses){               
-                                               for (let index = 0; index < header.pulse_info.pulses.length; index++) {
-                                                var pulse = header.pulse_info.pulses[index];
-                                                var Groups = [];
-                                                if(pulse.groups){
-                                                  for (let index2 = 0; index2 < pulse.groups.length; index2++) {
-                                                        const group = pulse.groups[index2];
-                                                        Groups.push('<a href="javascript:void(0);" onclick="f_load_puls_group( \' '+group+'\')">'+group+'</a>');  
-                                                  }
-                                                }
-                                                var Tags = [];
-                                                if(pulse.tags){
-                                                  for (let index2 = 0; index2 < pulse.tags.length; index2++) {
-                                                        const tag = pulse.tags[index2];
-                                                        Tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\',\'\')">'+tag+'</a>');  
-                                                  }
-                                                }
-                                                var public ="";
-                                                if(pulse.public == 1){
-                                                        public='<i class="fas fa-check text-success"></i>';
-
-                                                }else{
-
-                                                }
-                                                var indicator_type = [];
-                                                if(pulse.indicator_count){
-                                             
-
-                                                    $.each(pulse.indicator_type_counts, function(key, value) {
-                                                        indicator_type.push('<b>'+key+':</b>'+value);  
-                                                    });
-                                                }
-
-
-                                                table_pulse+='  <tr role="row">';
-                                                table_pulse+='      <td style="width:10px;">'+(index+1)+'</td>';
-                                                table_pulse+='     <td colspan="6"><a href="javascript:void(0);" onclick="f_load_puls(\''+pulse.id+'\');">'+pulse.name+'</a>';
-                                                table_pulse+='     </br> <span>'+pulse.description+'</span>';
-                                                table_pulse+='      </br>';
-                                                if(Groups.length > 0){
-                                                  table_pulse+='     </br> <span><b>Groups:</b>'+Groups.join(", ")+'</span>';
-                                                }
-                                                if(Tags.length > 0){
-                                                table_pulse+='     </br> <span><b>Tags:</b>'+Tags.join(", ")+'</span>';
-                                                }
-                                                table_pulse+=' </br> <span> <b>Created:</b>'+pulse.created+' <b>Modified:</b>'+pulse.modified+'</span>';
-                                                table_pulse+='      <td>';
-                               
-                                                table_pulse+='   <td style="width:10px;"><a href="javascript:void(0);"  onclick="f_load_puls(\''+pulse.id+'\');" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
-                                                table_pulse+=' </tr>';
-
-                                               }                                      
-                                }
-                              }
-                              $("#table-related-event tbody").append(table_pulse);
-
-                              
-
-
-
-
-
-                        }else if(res.type == 'Domain'){
-
-                        }else if(res.type == 'url'){
-
-                        }else if(res.type== 'SHA256' || res.type== 'MD5' || res.type== 'SHA1'){
-                            $("#table-related-event tbody").empty();
-                            var header_analysis = res.data.analysis;
-                            var header = res.data2;
-                            if(!jQuery.isEmptyObject(header_analysis)){
-                                
-                                        if(header_analysis){
-                                            if(header_analysis.datetime_int){
-                                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> Analysis Date:</b> '+header_analysis.datetime_int+'</div></div>';
-                                            }
-                                            if(header_analysis.info.results.file_type){
-                                                html+=' <div class="m-b-xs"><div class="col-md-6"><b> File Type:</b> '+header_analysis.info.results.file_type+'</div></div>';
-                                            }
+                    var Tags = [];
+                      if(header.pulse_info){
+                        if(header.pulse_info.pulses){               
+                                       for (let index = 0; index < header.pulse_info.pulses.length; index++) {
+                                        if(header.pulse_info.pulses[index].tags){
+                                          for (let index2 = 0; index2 < header.pulse_info.pulses[index].tags.length; index2++) {
+                                              const tag = header.pulse_info.pulses[index].tags[index2];
+                                              Tags.push(tag);
+                                          }
                                         }
-                                        
-                                        
-                                            var Antivirus_Detections = [];
-                                            if(header_analysis){
-                                                    if(header_analysis.plugins.clamav){
-                                                        if(header_analysis.plugins.clamav.results){
-                                                            if( header_analysis.plugins.clamav.results.alerts){
-                                                            for (let index = 0; index < header_analysis.plugins.clamav.results.alerts.length; index++) {
-                                                                const alert = header_analysis.plugins.clamav.results.alerts[index];
-                                                                if(alert == 'Malware infection'){
-                                                                    Antivirus_Detections.push(header_analysis.plugins.clamav.results.detection);
-                                                                }
-                                                            }
-                                                            }
-                                                        }
+                                       }                                      
+                        }
 
-                                                    }
-                                            
-                                                if(header_analysis.plugins.msdefender){
-                                                    if(header_analysis.plugins.msdefender.results){
-                                                        if( header_analysis.plugins.msdefender.results.alerts){
-                                                        for (let index = 0; index < header_analysis.plugins.msdefender.results.alerts.length; index++) {
-                                                            const alert = header_analysis.plugins.msdefender.results.alerts[index];
-                                                            if(alert == 'Malware infection'){
-                                                                Antivirus_Detections.push(header_analysis.plugins.msdefender.results.detection);
-                                                            }
-                                                        }
-                                                        }
-                                                    }
-                                                }
-                                            }
+                  
+                      }
+                      if(Tags.length > 0){
+                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Tags:</b> '+Tags.join(",")+' </div></div>';
+                      }
+                      if(header.type =="IPv6"){
+                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> Reverse DNS:</b> '+reverse_dns+'</div></div>';
 
+                      }else{
+                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> Certificate Issuer:</b> '+issuer.join(", ")+'</div></div>';
+                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> Certificate Subject:</b> '+subject.join(", ")+'</div></div>';
+                      }
+                     
 
-                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Antivirus Detections:</b> '+Antivirus_Detections.join(",")+'</div></div>';
-                                            if(header_analysis){
-                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Size:</b> '+header_analysis.info.results.filesize+' bytes</div></div>';
-                                            }
-                                            
-                                        
-                                            var Yara_Detections = [];
-                                            if(header_analysis){
-                                                if(header_analysis.plugins.yarad){
-                                                    if(header_analysis.plugins.yarad.results){
-                                                        if(header_analysis.plugins.yarad.results.detection){
-                                                            for (let index = 0; index <header_analysis.plugins.yarad.results.detection.length; index++) {
-                                                                Yara_Detections.push(header_analysis.plugins.yarad.results.detection[index].rule_name);
-                                                            }
-                                                    }
-                                                    }
-                                                }
-                                            }
-                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Yara Detections :</b> '+Yara_Detections.join("</br>")+'</div></div>';
-                                            if(header_analysis){
-                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> MD5:</b> '+header_analysis.info.results.md5+' </div></div>';
-                                            }
-
-
-                                            var Alerts = [];
-                                            if(header_analysis){
-                                                if(header_analysis.plugins.cuckoo){
-                                                    if(header_analysis.plugins.cuckoo.result){
-                                        
-                                                        if(header_analysis.plugins.cuckoo.result.signatures){
-
-                                                            for (let index = 0; index <header_analysis.plugins.cuckoo.result.signatures.length; index++) {
-                                                            
-                                                                if(header_analysis.plugins.cuckoo.result.signatures[index].severity >=3){
-                                                                    Alerts.push('<span class="badge" style="background-color: #b93624;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
-                                                                }else if(header_analysis.plugins.cuckoo.result.signatures[index].severity >=2){
-                                                                    Alerts.push('<span class="badge" style="background-color: #ffb000;color:#333;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
-
-                                                                }else{
-                                                                    Alerts.push('<span class="badge" style="background-color: #88ce4f;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
-                                                                }
-                                                            
-                                                            }
-                                                    }
-                                                    }
-                                                }
-                                            }
-
-
-                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Alerts:</b> '+Alerts.join("")+' </div></div>';
-                                            if(header_analysis){
-                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> SHA1:</b> '+header_analysis.info.results.sha1+' </div></div>';
-                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> SHA256:</b> '+header_analysis.info.results.sha256+' </div></div>';
-                                            }
-                                            var host_name = [];
-                                            if(header_analysis){
-                                                if(header_analysis.plugins.cuckoo){
-                                                    if(header_analysis.plugins.cuckoo.result){
-                                        
-                                                        if(header_analysis.plugins.cuckoo.result.network){
-
-                                                        if(header_analysis.plugins.cuckoo.result.network.hosts){
-                                                            for (let index = 0; index < header_analysis.plugins.cuckoo.result.network.hosts.length; index++) {
-                                                                const ip = header_analysis.plugins.cuckoo.result.network.hosts[index].ip;
-                                                                host_name.push(ip);
-                                                            }
-
-                                                        }
-                                                    }
-                                                    }
-                                                }
-                                            }
-
-                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> External Hosts:</b> '+host_name.join(",")+' </div></div>';
-
-
-                                            var imphash = "";
-                                            var pehash="";
-                                            if(header_analysis){
-                                            if(header_analysis.plugins.pe32info){
-                                                if(header_analysis.plugins.pe32info.results){
-                                                    if(header_analysis.plugins.pe32info.results.imphash){
-                                                        imphash = header_analysis.plugins.pe32info.results.imphash;
-                                                    }
-                                                    if(header_analysis.plugins.pe32info.results.pehash){
-                                                        pehash = header_analysis.plugins.pe32info.results.pehash;
-                                                    }
-                                                }
-                                            }
-                                            }
-
-                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> IMPHASH:</b> '+imphash+' </div></div>';
-
-
+                    var table_pulse = "";
+                      if(header.pulse_info){
+                        if(header.pulse_info.pulses){               
+                                       for (let index = 0; index < header.pulse_info.pulses.length; index++) {
+                                        var pulse = header.pulse_info.pulses[index];
+                                        var Groups = [];
+                                        if(pulse.groups){
+                                          for (let index2 = 0; index2 < pulse.groups.length; index2++) {
+                                                const group = pulse.groups[index2];
+                                                Groups.push('<a href="javascript:void(0);" onclick="f_load_puls_group( \' '+group+'\')">'+group+'</a>');  
+                                          }
+                                        }
                                         var Tags = [];
-                                        if(header.pulse_info){
-                                            if(header.pulse_info.pulses){               
-                                                        for (let index = 0; index < header.pulse_info.pulses.length; index++) {
-                                                            if(header.pulse_info.pulses[index].tags){
-                                                            for (let index2 = 0; index2 < header.pulse_info.pulses[index].tags.length; index2++) {
-                                                                const tag = header.pulse_info.pulses[index].tags[index2];
-                                                                Tags.push(tag);
-                                                            }
-                                                            }
-                                                        }                                      
-                                            }
+                                        if(pulse.tags){
+                                          for (let index2 = 0; index2 < pulse.tags.length; index2++) {
+                                                const tag = pulse.tags[index2];
+                                                Tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\',\'\')">'+tag+'</a>');  
+                                          }
+                                        }
+                                        var public ="";
+                                        if(pulse.public == 1){
+                                                public='<i class="fas fa-check text-success"></i>';
+
+                                        }else{
+
+                                        }
+                                        var indicator_type = [];
+                                        if(pulse.indicator_count){
+                                     
+
+                                            $.each(pulse.indicator_type_counts, function(key, value) {
+                                                indicator_type.push('<b>'+key+':</b>'+value);  
+                                            });
+                                        }
+
+
+                                        table_pulse+='  <tr role="row">';
+                                        table_pulse+='      <td style="width:10px;">'+(index+1)+'</td>';
+                                        table_pulse+='     <td colspan="6"><a href="javascript:void(0);" onclick="f_load_puls(\''+pulse.id+'\');">'+pulse.name+'</a>';
+                                        table_pulse+='     </br> <span>'+pulse.description+'</span>';
+                                        table_pulse+='      </br>';
+                                        if(Groups.length > 0){
+                                          table_pulse+='     </br> <span><b>Groups:</b>'+Groups.join(", ")+'</span>';
                                         }
                                         if(Tags.length > 0){
-                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Tags:</b> '+Tags.join(",")+' </div></div>';
+                                        table_pulse+='     </br> <span><b>Tags:</b>'+Tags.join(", ")+'</span>';
                                         }
-                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> PEHASH:</b> '+pehash+' </div></div>';
-                                            var Groups = [];
-                                        if(header.pulse_info){
-                                            if(header.pulse_info.pulses){               
-                                                        for (let index = 0; index < header.pulse_info.pulses.length; index++) {
-                                                            if(header.pulse_info.pulses[index].groups){
-                                                            for (let index2 = 0; index2 < header.pulse_info.pulses[index].groups.length; index2++) {
-                                                                    const groups = header.pulse_info.pulses[index].groups[index2];
-                                                                    Groups.push(groups);  
-                                                            }
-                                                            }
-                                                        }                                      
+                                        table_pulse+=' </br> <span> <b>Created:</b>'+pulse.created+' <b>Modified:</b>'+pulse.modified+'</span>';
+                                        table_pulse+='      <td>';
+                       
+                                        table_pulse+='   <td style="width:10px;"><a href="javascript:void(0);"  onclick="f_load_puls(\''+pulse.id+'\');" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
+                                        table_pulse+=' </tr>';
+
+                                       }                                      
+                        }
+                      }
+                      $("#table-related-event tbody").append(table_pulse);
+
+
+
+
+
+
+
+                }else if(res.type == 'Domain'){
+
+                    var header = res.data;
+                    var header2 = res.data2;
+                    var IP ="";
+                    var country_name ="";
+                    if(header2.indicators){
+                        if(header2.indicators.ip){
+                            IP = header2.indicators.ip.indicator;
+                            country_name = header2.indicators.ip.country_name;
+
+                        }
+
+                    }
+                    var WHOIS ="";
+                    if(header.whois){
+                        WHOIS ='<a target="_blank" href="'+header.whois+'">'+'WHOIS'+'</a>';
+
+                    }
+                    
+
+                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> IP Address:</b> '+IP+'</div></div>';
+                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> WHOIS:</b> '+WHOIS+'</div></div>';
+                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Country:</b> '+country_name+'</div></div>';
+                    var open_ports="";
+                    var issuer = [];
+                    var subject =[];
+            
+               
+
+                    var Tags = [];
+                      if(header.pulse_info){
+                        if(header.pulse_info.pulses){               
+                                       for (let index = 0; index < header.pulse_info.pulses.length; index++) {
+                                        if(header.pulse_info.pulses[index].tags){
+                                          for (let index2 = 0; index2 < header.pulse_info.pulses[index].tags.length; index2++) {
+                                              const tag = header.pulse_info.pulses[index].tags[index2];
+                                              Tags.push(tag);
+                                          }
+                                        }
+                                       }                                      
+                        }
+
+                  
+                      }
+                      if(Tags.length > 0){
+                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Tags:</b> '+Tags.join(",")+' </div></div>';
+                      }
+     
+
+                    var table_pulse = "";
+                      if(header.pulse_info){
+                        if(header.pulse_info.pulses){               
+                                       for (let index = 0; index < header.pulse_info.pulses.length; index++) {
+                                        var pulse = header.pulse_info.pulses[index];
+                                        var Groups = [];
+                                        if(pulse.groups){
+                                          for (let index2 = 0; index2 < pulse.groups.length; index2++) {
+                                                const group = pulse.groups[index2];
+                                                Groups.push('<a href="javascript:void(0);" onclick="f_load_puls_group( \' '+group+'\')">'+group+'</a>');  
+                                          }
+                                        }
+                                        var Tags = [];
+                                        if(pulse.tags){
+                                          for (let index2 = 0; index2 < pulse.tags.length; index2++) {
+                                                const tag = pulse.tags[index2];
+                                                Tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\',\'\')">'+tag+'</a>');  
+                                          }
+                                        }
+                                        var public ="";
+                                        if(pulse.public == 1){
+                                                public='<i class="fas fa-check text-success"></i>';
+
+                                        }else{
+
+                                        }
+                                        var indicator_type = [];
+                                        if(pulse.indicator_count){
+                                     
+
+                                            $.each(pulse.indicator_type_counts, function(key, value) {
+                                                indicator_type.push('<b>'+key+':</b>'+value);  
+                                            });
+                                        }
+
+
+                                        table_pulse+='  <tr role="row">';
+                                        table_pulse+='      <td style="width:10px;">'+(index+1)+'</td>';
+                                        table_pulse+='     <td colspan="6"><a href="javascript:void(0);" onclick="f_load_puls(\''+pulse.id+'\');">'+pulse.name+'</a>';
+                                        table_pulse+='     </br> <span>'+pulse.description+'</span>';
+                                        table_pulse+='      </br>';
+                                        if(Groups.length > 0){
+                                          table_pulse+='     </br> <span><b>Groups:</b>'+Groups.join(", ")+'</span>';
+                                        }
+                                        if(Tags.length > 0){
+                                        table_pulse+='     </br> <span><b>Tags:</b>'+Tags.join(", ")+'</span>';
+                                        }
+                                        table_pulse+=' </br> <span> <b>Created:</b>'+pulse.created+' <b>Modified:</b>'+pulse.modified+'</span>';
+                                        table_pulse+='      <td>';
+                       
+                                        table_pulse+='   <td style="width:10px;"><a href="javascript:void(0);"  onclick="f_load_puls(\''+pulse.id+'\');" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
+                                        table_pulse+=' </tr>';
+
+                                       }                                      
+                        }
+                      }
+                      $("#table-related-event tbody").append(table_pulse);
+
+
+                }else if(res.type == 'URL'){
+
+                    var header = res.data;
+                    var header2 = res.data2;
+
+                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Hostname:</b> '+header.hostname+'</div></div>';
+                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Domain:</b> '+header.domain+'</div></div>';
+
+                    var WHOIS ="";
+                    if(header.whois){
+                        WHOIS ='<a target="_blank" href="'+header.whois+'">'+'WHOIS'+'</a>';
+
+                    }
+                    
+
+                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Country:</b> '+WHOIS+'</div></div>';
+                    var open_ports="";
+                    var issuer = [];
+                    var subject =[];
+                    var reverse_dns ="";
+                    if(header2.facts){
+                        if(header2.facts.open_ports){
+                            open_ports = header2.facts.open_ports.join(", ")
+                        }
+                        if(header2.facts.ssl_certificates){
+                            for (let index = 0; index < header2.facts.ssl_certificates.length; index++) {
+                                const element = header2.facts.ssl_certificates[index];
+                                issuer.push(element.issuer);
+                                subject.push(element.subject);
+                            }
+
+                        }
+                        reverse_dns = header2.facts.reverse_dns;
+                    }
+                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Open Ports:</b> '+open_ports+'</div></div>';
+
+                    var Tags = [];
+                      if(header.pulse_info){
+                        if(header.pulse_info.pulses){               
+                                       for (let index = 0; index < header.pulse_info.pulses.length; index++) {
+                                        if(header.pulse_info.pulses[index].tags){
+                                          for (let index2 = 0; index2 < header.pulse_info.pulses[index].tags.length; index2++) {
+                                              const tag = header.pulse_info.pulses[index].tags[index2];
+                                              Tags.push(tag);
+                                          }
+                                        }
+                                       }                                      
+                        }
+
+                  
+                      }
+                      if(Tags.length > 0){
+                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Tags:</b> '+Tags.join(",")+' </div></div>';
+                      }
+                  
+                     
+
+                    var table_pulse = "";
+                      if(header.pulse_info){
+                        if(header.pulse_info.pulses){               
+                                       for (let index = 0; index < header.pulse_info.pulses.length; index++) {
+                                        var pulse = header.pulse_info.pulses[index];
+                                        var Groups = [];
+                                        if(pulse.groups){
+                                          for (let index2 = 0; index2 < pulse.groups.length; index2++) {
+                                                const group = pulse.groups[index2];
+                                                Groups.push('<a href="javascript:void(0);" onclick="f_load_puls_group( \' '+group+'\')">'+group+'</a>');  
+                                          }
+                                        }
+                                        var Tags = [];
+                                        if(pulse.tags){
+                                          for (let index2 = 0; index2 < pulse.tags.length; index2++) {
+                                                const tag = pulse.tags[index2];
+                                                Tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\',\'\')">'+tag+'</a>');  
+                                          }
+                                        }
+                                        var public ="";
+                                        if(pulse.public == 1){
+                                                public='<i class="fas fa-check text-success"></i>';
+
+                                        }else{
+
+                                        }
+                                        var indicator_type = [];
+                                        if(pulse.indicator_count){
+                                     
+
+                                            $.each(pulse.indicator_type_counts, function(key, value) {
+                                                indicator_type.push('<b>'+key+':</b>'+value);  
+                                            });
+                                        }
+
+
+                                        table_pulse+='  <tr role="row">';
+                                        table_pulse+='      <td style="width:10px;">'+(index+1)+'</td>';
+                                        table_pulse+='     <td colspan="6"><a href="javascript:void(0);" onclick="f_load_puls(\''+pulse.id+'\');">'+pulse.name+'</a>';
+                                        table_pulse+='     </br> <span>'+pulse.description+'</span>';
+                                        table_pulse+='      </br>';
+                                        if(Groups.length > 0){
+                                          table_pulse+='     </br> <span><b>Groups:</b>'+Groups.join(", ")+'</span>';
+                                        }
+                                        if(Tags.length > 0){
+                                        table_pulse+='     </br> <span><b>Tags:</b>'+Tags.join(", ")+'</span>';
+                                        }
+                                        table_pulse+=' </br> <span> <b>Created:</b>'+pulse.created+' <b>Modified:</b>'+pulse.modified+'</span>';
+                                        table_pulse+='      <td>';
+                       
+                                        table_pulse+='   <td style="width:10px;"><a href="javascript:void(0);"  onclick="f_load_puls(\''+pulse.id+'\');" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
+                                        table_pulse+=' </tr>';
+
+                                       }                                      
+                        }
+                      }
+                      $("#table-related-event tbody").append(table_pulse);
+           
+
+
+
+
+                }else if(res.type== 'SHA256' || res.type== 'MD5' || res.type== 'SHA1'){
+                    $("#table-related-event tbody").empty();
+                    var header_analysis = res.data.analysis;
+                    var header = res.data2;
+                    if(!jQuery.isEmptyObject(header_analysis)){
+                        
+                                if(header_analysis){
+                                    if(header_analysis.datetime_int){
+                                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> Analysis Date:</b> '+header_analysis.datetime_int+'</div></div>';
+                                    }
+                                    if(header_analysis.info.results.file_type){
+                                        html+=' <div class="m-b-xs"><div class="col-md-6"><b> File Type:</b> '+header_analysis.info.results.file_type+'</div></div>';
+                                    }
+                                }
+                                
+                                
+                                    var Antivirus_Detections = [];
+                                    if(header_analysis){
+                                            if(header_analysis.plugins.clamav){
+                                                if(header_analysis.plugins.clamav.results){
+                                                    if( header_analysis.plugins.clamav.results.alerts){
+                                                    for (let index = 0; index < header_analysis.plugins.clamav.results.alerts.length; index++) {
+                                                        const alert = header_analysis.plugins.clamav.results.alerts[index];
+                                                        if(alert == 'Malware infection'){
+                                                            Antivirus_Detections.push(header_analysis.plugins.clamav.results.detection);
+                                                        }
+                                                    }
+                                                    }
+                                                }
+
+                                            }
+                                    
+                                        if(header_analysis.plugins.msdefender){
+                                            if(header_analysis.plugins.msdefender.results){
+                                                if( header_analysis.plugins.msdefender.results.alerts){
+                                                for (let index = 0; index < header_analysis.plugins.msdefender.results.alerts.length; index++) {
+                                                    const alert = header_analysis.plugins.msdefender.results.alerts[index];
+                                                    if(alert == 'Malware infection'){
+                                                        Antivirus_Detections.push(header_analysis.plugins.msdefender.results.detection);
+                                                    }
+                                                }
+                                                }
                                             }
                                         }
-                                        if(Groups.length > 0){
-                                            html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Groups:</b> '+Groups.join(",")+' </div></div>';
+                                    }
+
+
+                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Antivirus Detections:</b> '+Antivirus_Detections.join(",")+'</div></div>';
+                                    if(header_analysis){
+                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Size:</b> '+header_analysis.info.results.filesize+' bytes</div></div>';
+                                    }
+                                    
+                                
+                                    var Yara_Detections = [];
+                                    if(header_analysis){
+                                        if(header_analysis.plugins.yarad){
+                                            if(header_analysis.plugins.yarad.results){
+                                                if(header_analysis.plugins.yarad.results.detection){
+                                                    for (let index = 0; index <header_analysis.plugins.yarad.results.detection.length; index++) {
+                                                        Yara_Detections.push(header_analysis.plugins.yarad.results.detection[index].rule_name);
+                                                    }
+                                            }
+                                            }
                                         }
-                            }
+                                    }
+                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Yara Detections :</b> '+Yara_Detections.join("</br>")+'</div></div>';
+                                    if(header_analysis){
+                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> MD5:</b> '+header_analysis.info.results.md5+' </div></div>';
+                                    }
 
-                              var table_pulse = "";
-                              if(header.pulse_info){
-                                if(header.pulse_info.pulses){               
-                                               for (let index = 0; index < header.pulse_info.pulses.length; index++) {
-                                                var pulse = header.pulse_info.pulses[index];
-                                                var Groups = [];
-                                                if(pulse.groups){
-                                                  for (let index2 = 0; index2 < pulse.groups.length; index2++) {
-                                                        const group = pulse.groups[index2];
-                                                        Groups.push('<a href="javascript:void(0);" onclick="f_load_puls_group( \' '+group+'\')">'+group+'</a>');  
-                                                  }
+
+                                    var Alerts = [];
+                                    if(header_analysis){
+                                        if(header_analysis.plugins.cuckoo){
+                                            if(header_analysis.plugins.cuckoo.result){
+                                
+                                                if(header_analysis.plugins.cuckoo.result.signatures){
+
+                                                    for (let index = 0; index <header_analysis.plugins.cuckoo.result.signatures.length; index++) {
+                                                    
+                                                        if(header_analysis.plugins.cuckoo.result.signatures[index].severity >=3){
+                                                            Alerts.push('<span class="badge" style="background-color: #b93624;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
+                                                        }else if(header_analysis.plugins.cuckoo.result.signatures[index].severity >=2){
+                                                            Alerts.push('<span class="badge" style="background-color: #ffb000;color:#333;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
+
+                                                        }else{
+                                                            Alerts.push('<span class="badge" style="background-color: #88ce4f;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
+                                                        }
+                                                    
+                                                    }
+                                            }
+                                            }
+                                        }
+                                    }
+
+
+                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Alerts:</b> '+Alerts.join("")+' </div></div>';
+                                    if(header_analysis){
+                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> SHA1:</b> '+header_analysis.info.results.sha1+' </div></div>';
+                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> SHA256:</b> '+header_analysis.info.results.sha256+' </div></div>';
+                                    }
+                                    var host_name = [];
+                                    if(header_analysis){
+                                        if(header_analysis.plugins.cuckoo){
+                                            if(header_analysis.plugins.cuckoo.result){
+                                
+                                                if(header_analysis.plugins.cuckoo.result.network){
+
+                                                if(header_analysis.plugins.cuckoo.result.network.hosts){
+                                                    for (let index = 0; index < header_analysis.plugins.cuckoo.result.network.hosts.length; index++) {
+                                                        const ip = header_analysis.plugins.cuckoo.result.network.hosts[index].ip;
+                                                        host_name.push(ip);
+                                                    }
+
                                                 }
-                                                var Tags = [];
-                                                if(pulse.tags){
-                                                  for (let index2 = 0; index2 < pulse.tags.length; index2++) {
-                                                        const tag = pulse.tags[index2];
-                                                        Tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\',\'\')">'+tag+'</a>');  
-                                                  }
-                                                }
-                                                var public ="";
-                                                if(pulse.public == 1){
-                                                        public='<i class="fas fa-check text-success"></i>';
+                                            }
+                                            }
+                                        }
+                                    }
 
-                                                }else{
-
-                                                }
-                                                var indicator_type = [];
-                                                if(pulse.indicator_count){
-                                             
-
-                                                    $.each(pulse.indicator_type_counts, function(key, value) {
-                                                        indicator_type.push('<b>'+key+':</b>'+value);  
-                                                    });
-                                                }
+                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> External Hosts:</b> '+host_name.join(",")+' </div></div>';
 
 
-                                                table_pulse+='  <tr role="row">';
-                                                table_pulse+='      <td style="width:10px;">'+(index+1)+'</td>';
-                                                table_pulse+='     <td colspan="6"><a href="javascript:void(0);" onclick="f_load_puls(\''+pulse.id+'\');">'+pulse.name+'</a>';
-                                                table_pulse+='     </br> <span>'+indicator_type.join("|")+'</span>';
-                                                table_pulse+='     </br> <span>'+pulse.description+'</span>';
-                                                table_pulse+='      </br>';
-                                                if(Groups.length > 0){
-                                                  table_pulse+='     </br> <span><b>Groups:</b>'+Groups.join(", ")+'</span>';
-                                                }
-                                                if(Tags.length > 0){
-                                                table_pulse+='     </br> <span><b>Tags:</b>'+Tags.join(", ")+'</span>';
-                                                }
-                                                table_pulse+=' </br> <span> <b>Created:</b>'+pulse.created+' <b>Modified:</b>'+pulse.modified+'</span>';
-                                                table_pulse+='      <td>';
-                               
-                                                table_pulse+='   <td style="width:10px;"><a href="javascript:void(0);"  onclick="f_load_puls(\''+pulse.id+'\');" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
-                                                table_pulse+=' </tr>';
+                                    var imphash = "";
+                                    var pehash="";
+                                    if(header_analysis){
+                                    if(header_analysis.plugins.pe32info){
+                                        if(header_analysis.plugins.pe32info.results){
+                                            if(header_analysis.plugins.pe32info.results.imphash){
+                                                imphash = header_analysis.plugins.pe32info.results.imphash;
+                                            }
+                                            if(header_analysis.plugins.pe32info.results.pehash){
+                                                pehash = header_analysis.plugins.pe32info.results.pehash;
+                                            }
+                                        }
+                                    }
+                                    }
 
-                                               }                                      
+                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> IMPHASH:</b> '+imphash+' </div></div>';
+
+
+                                var Tags = [];
+                                if(header.pulse_info){
+                                    if(header.pulse_info.pulses){               
+                                                for (let index = 0; index < header.pulse_info.pulses.length; index++) {
+                                                    if(header.pulse_info.pulses[index].tags){
+                                                    for (let index2 = 0; index2 < header.pulse_info.pulses[index].tags.length; index2++) {
+                                                        const tag = header.pulse_info.pulses[index].tags[index2];
+                                                        Tags.push(tag);
+                                                    }
+                                                    }
+                                                }                                      
+                                    }
                                 }
-                              }
-                              $("#table-related-event tbody").append(table_pulse);
-
-
-
-
-                                
-                           
-                        }else{
-
-                        }
-
-
-
-
-
-                        $('#otx_indicators_loadspinner_basic_info').hide();
-                        $('#otx_indicators_loadspinner_basic_info_table').hide();
-                        $("#table-related-event").show();
-                        $('#otx_indicators_general').html(html);
-                }
-            }
-
-
-
-            if(number_risk == 3){
-                search_risk();
-            }
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-            console.log("No response from server");
-        });
-    }
-    function hasName(prop, value, data) {
-        return data.some(function(obj) {
-            return prop in obj && obj[prop] === value;
-        });
-    }
-    function f_load_puls(puls_id){
-        $('#otx_event_general').html('');
-        $('.otx_indicators').hide();
-        $('.otx_event').show();
-        $('.otx_tag').hide();
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: "/loadSearchAPI",
-            method: 'post',
-            data: ({
-                keyword:puls_id,
-                source:'otx_puls'
-            }),
-            beforeSend: function(){
-                $('.ajax-loading').show();
-            },
-        }).done(function(res){
-            var data = res.data;
-
-            var referencess = [];
-            if(data.references){
-                  for (let index = 0; index < data.references.length; index++) {
-                      const reference = data.references[index];
-                      referencess.push('<a href="'+reference+'"  target="_blank">'+reference+'</a>');  
-                  }
-                
-            }
-            var tags = [];
-            if(data.tags){
-                  for (let index = 0; index < data.tags.length; index++) {
-                      const tag = data.tags[index];
-                      tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\',\'\')">'+tag+'</a>');  
-                  }
-                
-            }
-            var industries = [];
-            if(data.industries){
-                  for (let index = 0; index < data.industries.length; index++) {
-                      const industrie = data.industries[index];
-                      industries.push('<a href="javascript:void(0);" onclick="f_load_puls_industrie( \' '+industrie+'\')">'+industrie+'</a>');  
-                  }
-                
-            }
-            var targeted_countries = [];
-            if(data.targeted_countries){
-                  for (let index = 0; index < data.targeted_countries.length; index++) {
-                      const targeted_countrie = data.targeted_countries[index];
-                      targeted_countries.push('<a href="javascript:void(0);" onclick="f_load_puls_targeted_countries( \' '+targeted_countrie+'\')">'+targeted_countrie+'</a>');  
-                  }
-                
-            }
-            var attack_ids = [];
-            if(data.attack_ids){
-                  for (let index = 0; index < data.attack_ids.length; index++) {
-                      const attack_id = data.attack_ids[index];
-                      attack_ids.push(attack_id);  
-                  }
-                
-            }
-
-            
-            var html="";
-            html+=' <h1>'+data.name+'</h1>';
-            html+=' <p>'+data.description+'</p>';
-            html+=' <p><b>Reference:</b>'+referencess.join(", ")+'</p>';
-            html+=' <p><b>Tags:</b>'+tags.join(", ")+'</p>';
-            html+='<p><b>Industry:</b>'+industries.join(", ")+'</p>';
-            html+=' <p><b>Targeted Countries:</b>'+targeted_countries.join(", ")+'</p>';
-            html+=' <b>ATT&CK IDS:</b>'+attack_ids.join(", ")+'</p>';
-            $('#otx_event_general').html(html);
-
-            var indicators = [];
-            var indicators_data = [];
-            if(data.indicators){
-                  for (let index = 0; index < data.indicators.length; index++) {
-                    const indicator = data.indicators[index].type;
-                    if (jQuery.inArray(indicator, indicators) == -1) {
-                        indicators.push(indicator);  
-                        var count = 0;
-                        for (let index2 = 0; index2 < data.indicators.length; index2++) {
-                            if(indicator == data.indicators[index2].type){
-                                count++;
-                            }
-                        }
-                        indicators_data.push(count);  
+                                if(Tags.length > 0){
+                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Tags:</b> '+Tags.join(",")+' </div></div>';
+                                }
+                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> PEHASH:</b> '+pehash+' </div></div>';
+                                    var Groups = [];
+                                if(header.pulse_info){
+                                    if(header.pulse_info.pulses){               
+                                                for (let index = 0; index < header.pulse_info.pulses.length; index++) {
+                                                    if(header.pulse_info.pulses[index].groups){
+                                                    for (let index2 = 0; index2 < header.pulse_info.pulses[index].groups.length; index2++) {
+                                                            const groups = header.pulse_info.pulses[index].groups[index2];
+                                                            Groups.push(groups);  
+                                                    }
+                                                    }
+                                                }                                      
+                                    }
+                                }
+                                if(Groups.length > 0){
+                                    html+=' <div class="m-b-xs"><div class="col-md-6"><b> Related Groups:</b> '+Groups.join(",")+' </div></div>';
+                                }
                     }
+
+                      var table_pulse = "";
+                      if(header.pulse_info){
+                        if(header.pulse_info.pulses){               
+                                       for (let index = 0; index < header.pulse_info.pulses.length; index++) {
+                                        var pulse = header.pulse_info.pulses[index];
+                                        var Groups = [];
+                                        if(pulse.groups){
+                                          for (let index2 = 0; index2 < pulse.groups.length; index2++) {
+                                                const group = pulse.groups[index2];
+                                                Groups.push('<a href="javascript:void(0);" onclick="f_load_puls_group( \' '+group+'\')">'+group+'</a>');  
+                                          }
+                                        }
+                                        var Tags = [];
+                                        if(pulse.tags){
+                                          for (let index2 = 0; index2 < pulse.tags.length; index2++) {
+                                                const tag = pulse.tags[index2];
+                                                Tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\',\'\')">'+tag+'</a>');  
+                                          }
+                                        }
+                                        var public ="";
+                                        if(pulse.public == 1){
+                                                public='<i class="fas fa-check text-success"></i>';
+
+                                        }else{
+
+                                        }
+                                        var indicator_type = [];
+                                        if(pulse.indicator_count){
+                                     
+
+                                            $.each(pulse.indicator_type_counts, function(key, value) {
+                                                indicator_type.push('<b>'+key+':</b>'+value);  
+                                            });
+                                        }
+
+
+                                        table_pulse+='  <tr role="row">';
+                                        table_pulse+='      <td style="width:10px;">'+(index+1)+'</td>';
+                                        table_pulse+='     <td colspan="6"><a href="javascript:void(0);" onclick="f_load_puls(\''+pulse.id+'\');">'+pulse.name+'</a>';
+                                        table_pulse+='     </br> <span>'+indicator_type.join("|")+'</span>';
+                                        table_pulse+='     </br> <span>'+pulse.description+'</span>';
+                                        table_pulse+='      </br>';
+                                        if(Groups.length > 0){
+                                          table_pulse+='     </br> <span><b>Groups:</b>'+Groups.join(", ")+'</span>';
+                                        }
+                                        if(Tags.length > 0){
+                                        table_pulse+='     </br> <span><b>Tags:</b>'+Tags.join(", ")+'</span>';
+                                        }
+                                        table_pulse+=' </br> <span> <b>Created:</b>'+pulse.created+' <b>Modified:</b>'+pulse.modified+'</span>';
+                                        table_pulse+='      <td>';
+                       
+                                        table_pulse+='   <td style="width:10px;"><a href="javascript:void(0);"  onclick="f_load_puls(\''+pulse.id+'\');" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
+                                        table_pulse+=' </tr>';
+
+                                       }                                      
+                        }
+                      }
+                      $("#table-related-event tbody").append(table_pulse);
+
+
+
+
+                        
                    
-                  }
-                
-            }
-          
-            $('#otx_event_loadspinner_basic_info').hide();
+                }else{
 
-            const chart = new frappe.Chart("#otx_event_chart-show-bar", { 
-                    title: "",
-                    data:{
-                        labels:indicators,
-                        datasets: [
-                        { values:indicators_data}
-                        ]
-                    },
-                    type: 'percentage',
-                    colors: ['#743ee2']
-                });
-                f_load_puls_indictor(puls_id)
-             
+                }
 
-    
 
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-            console.log("No response from server");
-        });
+
+
+
+                $('#otx_indicators_loadspinner_basic_info').hide();
+                $('#otx_indicators_loadspinner_basic_info_table').hide();
+                $("#table-related-event").show();
+                $('#otx_indicators_general').html(html);
+        }
     }
 
-    function f_load_puls_indictor(puls_id){
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: "/loadSearchAPI",
-            method: 'post',
-            data: ({
-                keyword:puls_id,
-                source:'otx_puls_indicator'
-            }),
-            beforeSend: function(){
-                $('.ajax-loading').show();
-            },
-        }).done(function(res){
-            var data = res.data;
 
-                var table_indicator ="";
-               if(data.results){
-                  for (let index = 0; index < data.results.length; index++) {
-                      var indicator = data.results[index];
-                      var role ="";
-                      if(indicator.role){
-                        role = indicator.role;
-                      }
-                      var is_active = "";
-                      if(indicator.is_active == 1){
-                        is_active ="Active";
-                      }
-                        table_indicator+='  <tr role="row">';
-                        table_indicator+='      <td style="width:100px;">'+indicator.type+'</td>';
-                        table_indicator+='     <td><a href="javascript:void(0);" onclick="f_load_indicator(\''+indicator.indicator+'\');">'+indicator.indicator+'</a>';
-                        table_indicator+='     <td>'+role+'</td>';
-                        table_indicator+='     <td>'+indicator.title+'</td>';
-                        table_indicator+='     <td>'+is_active+'</td>';
-                        table_indicator+='     <td>'+indicator.created+'</td>';
-                                        
-                        table_indicator+='   <td style="width:10px;"><a href="javascript:void(0);" onclick="f_load_indicator(\''+indicator.indicator+'\');" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
-                        table_indicator+=' </tr>';
+
+    if(number_risk == 3){
+        search_risk();
+    }
+}).fail(function(jqXHR, ajaxOptions, thrownError){
+    console.log("No response from server");
+});
+}
+function hasName(prop, value, data) {
+return data.some(function(obj) {
+    return prop in obj && obj[prop] === value;
+});
+}
+function f_load_puls(puls_id){
+$('#otx_event_general').html('');
+$('.otx_indicators').hide();
+$('.otx_event').show();
+$('.otx_tag').hide();
+$.ajax({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    },
+    url: "/loadSearchAPI",
+    method: 'post',
+    data: ({
+        keyword:puls_id,
+        source:'otx_puls'
+    }),
+    beforeSend: function(){
+        $('.ajax-loading').show();
+    },
+}).done(function(res){
+    var data = res.data;
+
+    var referencess = [];
+    if(data.references){
+          for (let index = 0; index < data.references.length; index++) {
+              const reference = data.references[index];
+              referencess.push('<a href="'+reference+'"  target="_blank">'+reference+'</a>');  
+          }
+        
+    }
+    var tags = [];
+    if(data.tags){
+          for (let index = 0; index < data.tags.length; index++) {
+              const tag = data.tags[index];
+              tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\',\'\')">'+tag+'</a>');  
+          }
+        
+    }
+    var industries = [];
+    if(data.industries){
+          for (let index = 0; index < data.industries.length; index++) {
+              const industrie = data.industries[index];
+              industries.push('<a href="javascript:void(0);" onclick="f_load_puls_industrie( \' '+industrie+'\')">'+industrie+'</a>');  
+          }
+        
+    }
+    var targeted_countries = [];
+    if(data.targeted_countries){
+          for (let index = 0; index < data.targeted_countries.length; index++) {
+              const targeted_countrie = data.targeted_countries[index];
+              targeted_countries.push('<a href="javascript:void(0);" onclick="f_load_puls_targeted_countries( \' '+targeted_countrie+'\')">'+targeted_countrie+'</a>');  
+          }
+        
+    }
+    var attack_ids = [];
+    if(data.attack_ids){
+          for (let index = 0; index < data.attack_ids.length; index++) {
+              const attack_id = data.attack_ids[index];
+              attack_ids.push(attack_id);  
+          }
+        
+    }
+
+    
+    var html="";
+    html+=' <h1>'+data.name+'</h1>';
+    html+=' <p>'+data.description+'</p>';
+    html+=' <p><b>Reference:</b>'+referencess.join(", ")+'</p>';
+    html+=' <p><b>Tags:</b>'+tags.join(", ")+'</p>';
+    html+='<p><b>Industry:</b>'+industries.join(", ")+'</p>';
+    html+=' <p><b>Targeted Countries:</b>'+targeted_countries.join(", ")+'</p>';
+    html+=' <b>ATT&CK IDS:</b>'+attack_ids.join(", ")+'</p>';
+    $('#otx_event_general').html(html);
+
+    var indicators = [];
+    var indicators_data = [];
+    if(data.indicators){
+          for (let index = 0; index < data.indicators.length; index++) {
+            const indicator = data.indicators[index].type;
+            if (jQuery.inArray(indicator, indicators) == -1) {
+                indicators.push(indicator);  
+                var count = 0;
+                for (let index2 = 0; index2 < data.indicators.length; index2++) {
+                    if(indicator == data.indicators[index2].type){
+                        count++;
                     }
                 }
-                $("#table-related-indicator tbody").append(table_indicator);
-                $("#table-related-indicator").show();
-                $("#otx_event_loadspinner_basic_info_table").hide();
-
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-            console.log("No response from server");
-        });
-
-    }
-    var tag_name_old = "";
-    function f_load_puls_tag(tag_name,nextpage){
-
-        $('.otx_indicators').hide();
-        $('.otx_event').hide();
-        $('.otx_tag').show();
-        $("#otx_tag_loadspinner_basic_info_table").show();
-        $("#otx_tag_loadspinner_basic_info").show();
-        $('#btn_load_tag_nextpag').hide();
-
-        if(tag_name !=''){
-            if(tag_name_old != tag_name){
-                $("#table-related-tag tbody").empty();
-                $('#btn_load_tag_nextpag').hide();
-                $('#otx_tag_general').html('');
-                $('#btn_load_tag_nextpag').data('');
-             }
-             tag_name_old = tag_name;
-        }
-    
-       
-        var url_next =   $('#btn_load_tag_nextpag').data('url');
-       if(url_next){
-          nextpage =url_next;
-       }
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: "/loadSearchAPI?tags="+tag_name,
-            method: 'post',
-            data: ({
-                keyword:tag_name,
-                source:'otx_puls_tag',
-                nextpage:nextpage
-            }),
-            beforeSend: function(){
-                $('.ajax-loading').show();
-            },
-        }).done(function(res){
-        
-            
-            var header = res.data;
-            var search = "found "+header.count+" results for \"tag:"+tag_name+"\"";
-            $('#otx_tag_general').html('<h1 class="b-b">'+search+'</h1>');
-            $("#otx_tag_loadspinner_basic_info").hide();
-            if(header.next){
-
-                $('#btn_load_tag_nextpag').data('url',header.next);
-                $('#btn_load_tag_nextpag').show();
-            }else{
-                $('#btn_load_tag_nextpag').data('url','');
-                $('#btn_load_tag_nextpag').show();
+                indicators_data.push(count);  
             }
-            $('#otx_tag_more_loadspinner_basic_info_table').hide();
-            var tag_row =  $("#table-related-tag tbody tr").length;
-            var table_pulse = "";
-                              if(header.results){
-                                      
-                                               for (let index = 0; index < header.results.length; index++) {
-                                                var pulse = header.results[index];
-                                                var Groups = [];
-                                                if(pulse.groups){
-                                                  for (let index2 = 0; index2 < pulse.groups.length; index2++) {
-                                                        const group = pulse.groups[index2];
-                                                        Groups.push('<a href="javascript:void(0);" onclick="f_load_puls_group( \' '+group+'\')">'+group+'</a>');  
-                                                  }
-                                                }
-                                                var Tags = [];
-                                                if(pulse.tags){
-                                                  for (let index2 = 0; index2 < pulse.tags.length; index2++) {
-                                                        const tag = pulse.tags[index2];
-                                                        Tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\',\'\')">'+tag+'</a>');  
-                                                  }
-                                                }
-                                                var public ="";
-                                                if(pulse.public == 1){
-                                                        public='<i class="fas fa-check text-success"></i>';
-
-                                                }else{
-
-                                                }
-                                                var indicator_type = [];
-                                                if(pulse.indicator_count){
-                                             
-
-                                                    $.each(pulse.indicator_type_counts, function(key, value) {
-                                                        indicator_type.push('<b>'+key+':</b>'+value);  
-                                                    });
-                                                }
-                                             
-                                                tag_row++;
-                                                table_pulse+='  <tr role="row">';
-                                                table_pulse+='      <td style="width:10px;">'+(tag_row)+'</td>';
-                                                table_pulse+='     <td colspan="6"><a href="javascript:void(0);" onclick="f_load_puls(\''+pulse.id+'\');">'+pulse.name+'</a>';
-                                                table_pulse+='     </br> <span>'+indicator_type.join("|")+'</span>';
-                                                table_pulse+='     </br> <span>'+pulse.description+'</span>';
-                                                table_pulse+='      </br>';
-                                                if(Groups.length > 0){
-                                                  table_pulse+='     </br> <span><b>Groups:</b>'+Groups.join(", ")+'</span>';
-                                                }
-                                                if(Tags.length > 0){
-                                                table_pulse+='     </br> <span><b>Tags:</b>'+Tags.join(", ")+'</span>';
-                                                }
-                                                table_pulse+=' </br> <span> <b>Created:</b>'+pulse.created+' <b>Modified:</b>'+pulse.modified+'</span>';
-                                                table_pulse+='      <td>';
-                               
-                                                table_pulse+='   <td style="width:10px;"><a href="javascript:void(0);"  onclick="f_load_puls(\''+pulse.id+'\');" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
-                                                table_pulse+=' </tr>';
-                                                
-                                               }                                      
-                                
-                              }
-                              $("#table-related-tag tbody").append(table_pulse);
-                              $("#table-related-tag").show();
-                              $("#otx_tag_loadspinner_basic_info_table").hide();
-
-
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-            console.log("No response from server");
-        });
-
-    }
-
-    function f_load_tag_nextpage(){
-        $('#otx_tag_more_loadspinner_basic_info_table').show();
-        f_load_puls_tag('','');
+           
+          }
         
     }
+  
+    $('#otx_event_loadspinner_basic_info').hide();
 
-    function f_load_indicator(indicator_id){
-
-        $('.otx_event').hide();
-        $('.otx_tage').hide();
-        $('.otx_indicators').show();
-        $('#otx_indicators_general').html('');
-
-        $('#otx_indicators_loadspinner_basic_info').show();
-        $('#otx_indicators_loadspinner_basic_info_table').show();
-        $("#table-related-event").hide();
-
-        $('#otx_event_loadspinner_basic_info').show();
-        $('#otx_event_loadspinner_basic_info_table').show();
-        $("#table-related-indicator").hide();
-        text_search_new = indicator_id;
-        loadSearchAPI('otx_indicators');
+    const chart = new frappe.Chart("#otx_event_chart-show-bar", { 
+            title: "",
+            data:{
+                labels:indicators,
+                datasets: [
+                { values:indicators_data}
+                ]
+            },
+            type: 'percentage',
+            colors: ['#743ee2']
+        });
+        f_load_puls_indictor(puls_id)
+     
 
 
+
+}).fail(function(jqXHR, ajaxOptions, thrownError){
+    console.log("No response from server");
+});
+}
+
+function f_load_puls_indictor(puls_id){
+$.ajax({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    },
+    url: "/loadSearchAPI",
+    method: 'post',
+    data: ({
+        keyword:puls_id,
+        source:'otx_puls_indicator'
+    }),
+    beforeSend: function(){
+        $('.ajax-loading').show();
+    },
+}).done(function(res){
+    var data = res.data;
+
+        var table_indicator ="";
+       if(data.results){
+          for (let index = 0; index < data.results.length; index++) {
+              var indicator = data.results[index];
+              var role ="";
+              if(indicator.role){
+                role = indicator.role;
+              }
+              var is_active = "";
+              if(indicator.is_active == 1){
+                is_active ="Active";
+              }
+                table_indicator+='  <tr role="row">';
+                table_indicator+='      <td style="width:100px;">'+indicator.type+'</td>';
+                table_indicator+='     <td><a href="javascript:void(0);" onclick="f_load_indicator(\''+indicator.indicator+'\');">'+indicator.indicator+'</a>';
+                table_indicator+='     <td>'+role+'</td>';
+                table_indicator+='     <td>'+indicator.title+'</td>';
+                table_indicator+='     <td>'+is_active+'</td>';
+                table_indicator+='     <td>'+indicator.created+'</td>';
+                                
+                table_indicator+='   <td style="width:10px;"><a href="javascript:void(0);" onclick="f_load_indicator(\''+indicator.indicator+'\');" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
+                table_indicator+=' </tr>';
+            }
+        }
+        $("#table-related-indicator tbody").append(table_indicator);
+        $("#table-related-indicator").show();
+        $("#otx_event_loadspinner_basic_info_table").hide();
+
+}).fail(function(jqXHR, ajaxOptions, thrownError){
+    console.log("No response from server");
+});
+
+}
+var tag_name_old = "";
+function f_load_puls_tag(tag_name,nextpage){
+
+$('.otx_indicators').hide();
+$('.otx_event').hide();
+$('.otx_tag').show();
+$("#otx_tag_loadspinner_basic_info_table").show();
+$("#otx_tag_loadspinner_basic_info").show();
+$('#btn_load_tag_nextpag').hide();
+
+if(tag_name !=''){
+    if(tag_name_old != tag_name){
+        $("#table-related-tag tbody").empty();
+        $('#btn_load_tag_nextpag').hide();
+        $('#otx_tag_general').html('');
+        $('#btn_load_tag_nextpag').data('');
+     }
+     tag_name_old = tag_name;
+}
+
+
+var url_next =   $('#btn_load_tag_nextpag').data('url');
+if(url_next){
+  nextpage =url_next;
+}
+$.ajax({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    },
+    url: "/loadSearchAPI?tags="+tag_name,
+    method: 'post',
+    data: ({
+        keyword:tag_name,
+        source:'otx_puls_tag',
+        nextpage:nextpage
+    }),
+    beforeSend: function(){
+        $('.ajax-loading').show();
+    },
+}).done(function(res){
+
+    
+    var header = res.data;
+    var search = "found "+header.count+" results for \"tag:"+tag_name+"\"";
+    $('#otx_tag_general').html('<h1 class="b-b">'+search+'</h1>');
+    $("#otx_tag_loadspinner_basic_info").hide();
+    if(header.next){
+
+        $('#btn_load_tag_nextpag').data('url',header.next);
+        $('#btn_load_tag_nextpag').show();
+    }else{
+        $('#btn_load_tag_nextpag').data('url','');
+        $('#btn_load_tag_nextpag').show();
     }
-   function search_risk(){
-    let summary_total = (status_value_ibmcloud + status_value_virustotal + status_value_hybrid) / number_new_row;
-    let html_status = ``;
-    if(summary_total <= 1.9){
-        html_status += `<div class="status-risk success">
-            <span class="st-circle-ovr"></span> LOW
-        </div>`;
-    }else if(summary_total <= 2.6){
-        html_status += `<div class="status-risk warning" style="color:#f2ff15 !important">
-            <span class="st-circle-ovr" style="color:#f2ff15 !important"></span> MEDIUM
-        </div>`;
-    }else if(summary_total <= 3){
-        html_status += `<div class="status-risk warning">
-            <span class="st-circle-ovr"></span> HIGH
-        </div>`;
-    }else if(summary_total >= 3){
-        html_status += `<div class="status-risk danger">
-            <span class="st-circle-ovr"></span> VERY HIGH
-        </div>`;
-    }
-    $('#text_status_risk').html(html_status);
-   }
+    $('#otx_tag_more_loadspinner_basic_info_table').hide();
+    var tag_row =  $("#table-related-tag tbody tr").length;
+    var table_pulse = "";
+                      if(header.results){
+                              
+                                       for (let index = 0; index < header.results.length; index++) {
+                                        var pulse = header.results[index];
+                                        var Groups = [];
+                                        if(pulse.groups){
+                                          for (let index2 = 0; index2 < pulse.groups.length; index2++) {
+                                                const group = pulse.groups[index2];
+                                                Groups.push('<a href="javascript:void(0);" onclick="f_load_puls_group( \' '+group+'\')">'+group+'</a>');  
+                                          }
+                                        }
+                                        var Tags = [];
+                                        if(pulse.tags){
+                                          for (let index2 = 0; index2 < pulse.tags.length; index2++) {
+                                                const tag = pulse.tags[index2];
+                                                Tags.push('<a href="javascript:void(0);" onclick="f_load_puls_tag( \' '+tag+'\',\'\')">'+tag+'</a>');  
+                                          }
+                                        }
+                                        var public ="";
+                                        if(pulse.public == 1){
+                                                public='<i class="fas fa-check text-success"></i>';
+
+                                        }else{
+
+                                        }
+                                        var indicator_type = [];
+                                        if(pulse.indicator_count){
+                                     
+
+                                            $.each(pulse.indicator_type_counts, function(key, value) {
+                                                indicator_type.push('<b>'+key+':</b>'+value);  
+                                            });
+                                        }
+                                     
+                                        tag_row++;
+                                        table_pulse+='  <tr role="row">';
+                                        table_pulse+='      <td style="width:10px;">'+(tag_row)+'</td>';
+                                        table_pulse+='     <td colspan="6"><a href="javascript:void(0);" onclick="f_load_puls(\''+pulse.id+'\');">'+pulse.name+'</a>';
+                                        table_pulse+='     </br> <span>'+indicator_type.join("|")+'</span>';
+                                        table_pulse+='     </br> <span>'+pulse.description+'</span>';
+                                        table_pulse+='      </br>';
+                                        if(Groups.length > 0){
+                                          table_pulse+='     </br> <span><b>Groups:</b>'+Groups.join(", ")+'</span>';
+                                        }
+                                        if(Tags.length > 0){
+                                        table_pulse+='     </br> <span><b>Tags:</b>'+Tags.join(", ")+'</span>';
+                                        }
+                                        table_pulse+=' </br> <span> <b>Created:</b>'+pulse.created+' <b>Modified:</b>'+pulse.modified+'</span>';
+                                        table_pulse+='      <td>';
+                       
+                                        table_pulse+='   <td style="width:10px;"><a href="javascript:void(0);"  onclick="f_load_puls(\''+pulse.id+'\');" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a></td>';
+                                        table_pulse+=' </tr>';
+                                        
+                                       }                                      
+                        
+                      }
+                      $("#table-related-tag tbody").append(table_pulse);
+                      $("#table-related-tag").show();
+                      $("#otx_tag_loadspinner_basic_info_table").hide();
+
+
+}).fail(function(jqXHR, ajaxOptions, thrownError){
+    console.log("No response from server");
+});
+
+}
+
+function f_load_tag_nextpage(){
+$('#otx_tag_more_loadspinner_basic_info_table').show();
+f_load_puls_tag('','');
+
+}
+
+function f_load_indicator(indicator_id){
+
+$('.otx_event').hide();
+$('.otx_tage').hide();
+$('.otx_indicators').show();
+$('#otx_indicators_general').html('');
+
+$('#otx_indicators_loadspinner_basic_info').show();
+$('#otx_indicators_loadspinner_basic_info_table').show();
+$("#table-related-event").hide();
+
+$('#otx_event_loadspinner_basic_info').show();
+$('#otx_event_loadspinner_basic_info_table').show();
+$("#table-related-indicator").hide();
+text_search_new = indicator_id;
+loadSearchAPI('otx_indicators');
+
+
+}
+function search_risk(){
+let summary_total = (status_value_ibmcloud + status_value_virustotal + status_value_hybrid) / number_new_row;
+let html_status = ``;
+if(summary_total <= 1.9){
+html_status += `<div class="status-risk success">
+    <span class="st-circle-ovr"></span> LOW
+</div>`;
+}else if(summary_total <= 2.6){
+html_status += `<div class="status-risk warning" style="color:#f2ff15 !important">
+    <span class="st-circle-ovr" style="color:#f2ff15 !important"></span> MEDIUM
+</div>`;
+}else if(summary_total <= 3){
+html_status += `<div class="status-risk warning">
+    <span class="st-circle-ovr"></span> HIGH
+</div>`;
+}else if(summary_total >= 3){
+html_status += `<div class="status-risk danger">
+    <span class="st-circle-ovr"></span> VERY HIGH
+</div>`;
+}
+$('#text_status_risk').html(html_status);
+}
 
 
 
-    $('.table-hybrid').hide();
-    $('.table-virustotal').hide();
-    $('.table-ibmcloud').hide();
+$('.table-hybrid').hide();
+$('.table-virustotal').hide();
+$('.table-ibmcloud').hide();
 
 </script>
 @endpush

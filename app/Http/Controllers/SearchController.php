@@ -484,7 +484,7 @@ class SearchController extends Controller
                     foreach($fields as $key=>$value) {
                         $postvars .= $key . "=" . $value . "&";
                     }
-                }else if($type == 'url'){
+                }else if($type == 'URL'){
                     $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
                     $fields = array('domain'=>$keyword);
                     $postvars = '';
@@ -527,12 +527,21 @@ class SearchController extends Controller
             $otx_general_url ="";
             $otx_analysis_url ="";
             if($type == 'IP'){
-                $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/IPv4/".$keyword."/general";
-                $otx_general_url = "https://otx.alienvault.com/otxapi/indicator/ip/analysis/".$keyword;
+                if (!filter_var($keyword, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                    $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/IPv4/".$keyword."/general";
+                    $otx_general_url = "https://otx.alienvault.com/otxapi/indicator/ip/analysis/".$keyword;
+                } else {
+                    $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/IPv6/".$keyword."/general";
+                    $otx_general_url = "https://otx.alienvault.com/otxapi/indicator/ip/analysis/".$keyword;
+                }
+
             }else if($type == 'Domain'){
-                $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/file/f9f18153cabf61699d838407dddd4e937bb2efeb";
-            }else if($type == 'url'){
-                $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/file/f9f18153cabf61699d838407dddd4e937bb2efeb";
+                $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/domain/".$keyword."/general";
+                $otx_general_url = "https://otx.alienvault.com/otxapi/indicator/url/analysis/".$keyword;
+               
+            }else if($type == 'URL'){
+                $otx_analysis_url = "https://otx.alienvault.com/otxapi/indicator/url/general/".rawurlencode($keyword);
+                $otx_general_url = "https://otx.alienvault.com/otxapi/indicator/url/analysis/".rawurlencode($keyword);
             }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
 
                 $otx_general_url = "https://otx.alienvault.com/api/v1/indicators/file/".$keyword."/general";
