@@ -4950,3 +4950,11 @@ strong > p{
 .btn:not(.btn-login-cus) {
     border-radius: 30px;
 }
+
+.bg-port{
+    background: #618deb;
+    color: #fff;
+    display: inline-block;
+    padding: .5rem;
+    margin: 0 .2rem;
+}

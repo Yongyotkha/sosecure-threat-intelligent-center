@@ -607,6 +607,7 @@ class AssetsController extends Controller
                         $Assets_data_list['ip_asset_id'] = $IP_Listvalue->asset_id;
                         $Assets_data_list['site_code'] = @$SiteSettings[$IP_Listvalue->site_id]["code"];
                         $Assets_data_list['site_name'] = @$SiteSettings[$IP_Listvalue->site_id]["name"];
+                        $Assets_data_list['port'] = '<div> <span class="bg-port">80</span> <span class="bg-port">443</span> </div>';
                         $Assets_data_list['status'] = $IP_Listvalue->status;
                         $Assets_data_list['created_at'] = $IP_Listvalue->created_at;
                         $Assets_data_list['updated_at'] = $IP_Listvalue->updated_at;
@@ -640,6 +641,7 @@ class AssetsController extends Controller
                             $Assets_data_list['ip_asset_id'] = $IP_Listvalue->asset_id;
                             $Assets_data_list['site_code'] = @$SiteSettings[$IP_Listvalue->site_id]["code"];
                             $Assets_data_list['site_name'] = @$SiteSettings[$IP_Listvalue->site_id]["name"];
+                            $Assets_data_list['port'] = '<div> <span class="bg-port">80</span> <span class="bg-port">443</span> </div>';
                             $Assets_data_list['status'] = $IP_Listvalue->status;
                             $Assets_data_list['created_at'] = $IP_Listvalue->created_at;
                             $Assets_data_list['updated_at'] = $IP_Listvalue->updated_at;
