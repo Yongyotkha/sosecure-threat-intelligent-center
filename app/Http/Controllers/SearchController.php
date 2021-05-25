@@ -320,7 +320,7 @@ class SearchController extends Controller
         $site_id = 0;
         $site = null;
         if($site_code){
-            $site = SiteSettings::select('id')->where('code', $site_code)->first();
+            $site = SiteSettings::where('code', $site_code)->first();
             $site_id = $site -> id;
 
 
