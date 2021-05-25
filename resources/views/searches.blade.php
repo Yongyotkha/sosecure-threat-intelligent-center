@@ -755,12 +755,14 @@
 @push('pagestyle')
 @include('stacks.css.highchart')
 @include('stacks.css.datatables')
+@include('stacks.css.multitext')
 @endpush
 @push('pagescript')
 @include('stacks.js.activebutton')
 @include('stacks.js.highchart')
 @include('stacks.js.datatables')
 @include('stacks.js.chart')
+@include('stacks.js.multitext')
 <script>
     active_btn('#fillter_click .btn-selector');
     var mode_search = '{{ request()->mode }}';
@@ -908,7 +910,6 @@ $(function(){
                 $('#count_news').text(data.count);
                 $('.ajax-loading').hide();
                 $("#list_news").append(data.html); 
-                
             }
 
         }).fail(function(jqXHR, ajaxOptions, thrownError){
@@ -1094,7 +1095,6 @@ $.ajax({
     number_risk++;
     let data = res.data;
     $('#type_search').text(res.type);
-
 
     if(source == 'ibmcloud'){
         if(res.status_code == 400){
@@ -1494,7 +1494,6 @@ $.ajax({
 
         }else{
             $('#otx_indicators_loadspinner_basic_info').show();
-               
                 var html ="";
                 if(res.type == 'IP'){
                     var header = res.data;
@@ -1539,7 +1538,7 @@ $.ajax({
                   
                       }
                       if(Tags.length > 0){
-                        html+=' <div class="col-md-6 m-b-xs"><b> Related Tags:</b> '+Tags.join(",")+' </div>';
+                        html+=' <div class="col-md-6 m-b-xs"><b> Related Tags:</b> <div class="text-trucate-ovf">'+Tags.join(",")+' </div></div>';
                       }
                       if(header.type =="IPv6"){
                         html+=' <div class="col-md-6 m-b-xs"><b> Reverse DNS:</b> '+reverse_dns+'</div>';
@@ -1613,7 +1612,6 @@ $.ajax({
 
 
 
-
                 }else if(res.type == 'Domain'){
 
                     var header = res.data;
@@ -1660,7 +1658,7 @@ $.ajax({
                   
                       }
                       if(Tags.length > 0){
-                        html+=' <div class="col-md-6 m-b-xs"><b> Related Tags:</b> '+Tags.join(",")+' </div>';
+                        html+=' <div class="col-md-6 m-b-xs"><b> Related Tags:</b> <div class="text-trucate-ovf">'+Tags.join(",")+'</div> </div>';
                       }
      
 
@@ -1722,7 +1720,6 @@ $.ajax({
                       }
                       $("#table-related-event tbody").append(table_pulse);
 
-
                 }else if(res.type == 'URL'){
 
                     var header = res.data;
@@ -1775,10 +1772,9 @@ $.ajax({
                   
                       }
                       if(Tags.length > 0){
-                        html+=' <div class="col-md-6 m-b-xs"><b> Related Tags:</b> '+Tags.join(",")+' </div>';
+                        html+=' <div class="col-md-6 m-b-xs"><b> Related Tags:</b> <div class="text-trucate-ovf">'+Tags.join(",")+'</div> </div>';
                       }
                   
-                     
 
                     var table_pulse = "";
                       if(header.pulse_info){
@@ -1837,7 +1833,6 @@ $.ajax({
                         }
                       }
                       $("#table-related-event tbody").append(table_pulse);
-           
 
 
 
@@ -1850,10 +1845,10 @@ $.ajax({
                         
                                 if(header_analysis){
                                     if(header_analysis.datetime_int){
-                                        html+=' <div class="col-md-6 m-b-xs"><b> Analysis Date:</b> '+header_analysis.datetime_int+'</div>';
+                                        html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"> <b> Analysis Date:</b></div>  <div class="col-xl-10 col-md-9">'+header_analysis.datetime_int+'</div></div></div>';
                                     }
                                     if(header_analysis.info.results.file_type){
-                                        html+=' <div class="col-md-6 m-b-xs"><b> File Type:</b> '+header_analysis.info.results.file_type+'</div>';
+                                        html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"> <b> File Type:</b></div>  <div class="col-xl-10 col-md-9">'+header_analysis.info.results.file_type+'</div></div></div>';
                                     }
                                 }
                                 
@@ -1889,9 +1884,9 @@ $.ajax({
                                     }
 
 
-                                    html+=' <div class="col-md-6 m-b-xs"><b> Antivirus Detections:</b> '+Antivirus_Detections.join(",")+'</div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"> <b> Antivirus Detections:</b></div> <div class="col-xl-10 col-md-9">'+Antivirus_Detections.join(",")+'</div></div></div>';
                                     if(header_analysis){
-                                    html+=' <div class="col-md-6 m-b-xs"><b> Size:</b> '+header_analysis.info.results.filesize+' bytes</div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"> <b> Size:</b></div> <div class="col-xl-10 col-md-9">'+header_analysis.info.results.filesize+' bytes</div></div></div>';
                                     }
                                     
                                 
@@ -1907,9 +1902,9 @@ $.ajax({
                                             }
                                         }
                                     }
-                                    html+=' <div class="col-md-6 m-b-xs"><b> Yara Detections :</b> '+Yara_Detections.join("</br>")+'</div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"> <b>Yara Detections</b></div> <div class="col-xl-10 col-md-9">'+Yara_Detections.join("</br>")+'</div></div></div>';
                                     if(header_analysis){
-                                    html+=' <div class="col-md-6 m-b-xs"><b> MD5:</b> '+header_analysis.info.results.md5+' </div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"> <b> MD5:</b></div> <div class="col-xl-10 col-md-9">'+header_analysis.info.results.md5+' </div></div></div>';
                                     }
 
 
@@ -1923,12 +1918,12 @@ $.ajax({
                                                     for (let index = 0; index <header_analysis.plugins.cuckoo.result.signatures.length; index++) {
                                                     
                                                         if(header_analysis.plugins.cuckoo.result.signatures[index].severity >=3){
-                                                            Alerts.push('<span class="badge" style="background-color: #b93624;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
+                                                            Alerts.push('<span class="badge" style="background-color: #b93624;margin:2px;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
                                                         }else if(header_analysis.plugins.cuckoo.result.signatures[index].severity >=2){
-                                                            Alerts.push('<span class="badge" style="background-color: #ffb000;color:#333;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
+                                                            Alerts.push('<span class="badge" style="background-color: #ffb000;color:#333;margin:2px;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
 
                                                         }else{
-                                                            Alerts.push('<span class="badge" style="background-color: #88ce4f;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
+                                                            Alerts.push('<span class="badge" style="background-color: #88ce4f;margin:2px;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
                                                         }
                                                     
                                                     }
@@ -1938,10 +1933,10 @@ $.ajax({
                                     }
 
 
-                                    html+=' <div class="col-md-6 m-b-xs"><b> Alerts:</b> '+Alerts.join("")+' </div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b> Alerts:</b> </div><div class="col-xl-10 col-md-9">'+Alerts.join("")+'</div> </div></div>';
                                     if(header_analysis){
-                                    html+=' <div class="col-md-6 m-b-xs"><b> SHA1:</b> '+header_analysis.info.results.sha1+' </div>';
-                                    html+=' <div class="col-md-6 m-b-xs"><b> SHA256:</b> '+header_analysis.info.results.sha256+' </div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b> SHA1:</b> </div><div class="col-xl-10 col-md-9">'+header_analysis.info.results.sha1+'</div> </div></div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b> SHA256:</b> </div> <div class="col-xl-10 col-md-9">'+header_analysis.info.results.sha256+'</div> </div></div>';
                                     }
                                     var host_name = [];
                                     if(header_analysis){
@@ -1962,7 +1957,7 @@ $.ajax({
                                         }
                                     }
 
-                                    html+=' <div class="col-md-6 m-b-xs"><b> External Hosts:</b> '+host_name.join(",")+' </div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b> External Hosts:</b></div><div class="col-xl-10 col-md-9"><p class="text-trucate-ovf" style="display:inline-block;word-break: break-word;">'+host_name.join(",")+'</p></div></div></div>';
 
 
                                     var imphash = "";
@@ -1980,7 +1975,7 @@ $.ajax({
                                     }
                                     }
 
-                                    html+=' <div class="col-md-6 m-b-xs"><b> IMPHASH:</b> '+imphash+' </div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b>IMPHASH:</b>  </div><div class="col-xl-10 col-md-9"> '+imphash+'</div> </div></div>';
 
 
                                 var Tags = [];
@@ -1997,9 +1992,9 @@ $.ajax({
                                     }
                                 }
                                 if(Tags.length > 0){
-                                    html+=' <div class="col-md-6 m-b-xs"><b> Related Tags:</b> '+Tags.join(",")+' </div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b> Related Tags:</b> </div> <div class="col-xl-10 col-md-9"><div class="text-trucate-ovf"> '+Tags.join(",")+'</div></div> </div></div>';
                                 }
-                                    html+=' <div class="col-md-6 m-b-xs"><b> PEHASH:</b> '+pehash+' </div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b> PEHASH:</b> </div><div class="col-xl-10 col-md-9"> '+pehash+'</div></div></div>';
                                     var Groups = [];
                                 if(header.pulse_info){
                                     if(header.pulse_info.pulses){               
@@ -2014,7 +2009,7 @@ $.ajax({
                                     }
                                 }
                                 if(Groups.length > 0){
-                                    html+=' <div class="col-md-6 m-b-xs"><b> Related Groups:</b> '+Groups.join(",")+' </div>';
+                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b> Related Groups:</b> </div> <div class="col-xl-10 col-md-9"> '+Groups.join(",")+'</div> </div></div>';
                                 }
                     }
 
@@ -2095,16 +2090,15 @@ $.ajax({
                 $("#table-related-event").show();
                 $('#otx_indicators_general').html(html);
         }
+        multi_readmore_text();
     }
-
-
 
     if(number_risk == 3){
         search_risk();
     }
-}).fail(function(jqXHR, ajaxOptions, thrownError){
-    console.log("No response from server");
-});
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
 }
 function hasName(prop, value, data) {
 return data.some(function(obj) {
@@ -2205,7 +2199,6 @@ $.ajax({
     }
   
     $('#otx_event_loadspinner_basic_info').hide();
-
     const chart = new frappe.Chart("#otx_event_chart-show-bar", { 
             title: "",
             data:{
@@ -2217,10 +2210,7 @@ $.ajax({
             type: 'percentage',
             colors: ['#743ee2']
         });
-        f_load_puls_indictor(puls_id)
-     
-
-
+        f_load_puls_indictor(puls_id);
 
 }).fail(function(jqXHR, ajaxOptions, thrownError){
     console.log("No response from server");
@@ -2286,7 +2276,6 @@ $('.otx_tag').show();
 $("#otx_tag_loadspinner_basic_info_table").show();
 $("#otx_tag_loadspinner_basic_info").show();
 $('#btn_load_tag_nextpag').hide();
-
 if(tag_name !=''){
     if(tag_name_old != tag_name){
         $("#table-related-tag tbody").empty();
@@ -2394,7 +2383,6 @@ $.ajax({
                       $("#table-related-tag").show();
                       $("#otx_tag_loadspinner_basic_info_table").hide();
 
-
 }).fail(function(jqXHR, ajaxOptions, thrownError){
     console.log("No response from server");
 });
@@ -2423,8 +2411,6 @@ $('#otx_event_loadspinner_basic_info_table').show();
 $("#table-related-indicator").hide();
 text_search_new = indicator_id;
 loadSearchAPI('otx_indicators');
-
-
 }
 function search_risk(){
 let summary_total = (status_value_ibmcloud + status_value_virustotal + status_value_hybrid) / number_new_row;
@@ -2455,6 +2441,7 @@ $('.table-hybrid').hide();
 $('.table-virustotal').hide();
 $('.table-ibmcloud').hide();
 
+multi_readmore_text();
 </script>
 @endpush
 @endsection

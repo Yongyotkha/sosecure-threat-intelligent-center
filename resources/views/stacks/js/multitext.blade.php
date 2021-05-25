@@ -8,5 +8,14 @@
             });
         });
     }
+
+
+    function multi_readmore_text() {
+        $( ".text-trucate-ovf").each(function() {
+        $(this).multiTextToggleCollapse({
+            line: 1
+            });
+        });
+    }
         
 </script>

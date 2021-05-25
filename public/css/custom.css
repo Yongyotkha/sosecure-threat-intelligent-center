@@ -4584,7 +4584,7 @@ section#av-detection .main-int-card.active .av-container.border-success{
     position: relative;
     text-align: center;
     cursor: pointer;
-    width: 70px;
+    min-width: 70px;
 }
 
 .st-flex{
