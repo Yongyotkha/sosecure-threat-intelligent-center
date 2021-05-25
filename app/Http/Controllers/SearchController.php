@@ -339,7 +339,7 @@ class SearchController extends Controller
 
        //format
        $type = $this->check_keyword_type($keyword);
-       if($type == '' && $source !="check_api_search_limit"){
+       if($type == ''){
         $response_data = array(
             'status_code' => 400,
             'search_api_loookup_allow' =>0,

@@ -841,8 +841,7 @@
 
 $(function(){
     if(mode_search == 'lookup'){
-        $('#table-container').hide();
-        $('.int-lookup-main').toggle();
+  
         
         $.ajax({
                 headers: {
@@ -861,8 +860,9 @@ $(function(){
 
                 $('#l_api_limit').html('('+res.site_request_limit_api_count+'/'+res.center_search_api_loookup_limit+')');
                 if(res.search_api_loookup_allow ==1){
-
-                    loadSearchAPI('ibmcloud');
+                    $('#table-container').hide();
+        $('.int-lookup-main').toggle();
+                         loadSearchAPI('ibmcloud');
                             loadSearchAPI('virustotal');
                             loadSearchAPI('hybrid');
                             $('#otx_indicators_loadspinner_basic_info').show();
@@ -875,7 +875,8 @@ $(function(){
                             loadSearchAPI('otx_indicators');
 
                 }else{
-                    alert(res.message);
+                
+                    swal.fire(res.message);
 
                 }
         
@@ -1046,6 +1047,7 @@ $(function(){
     $('.lookup').on('click',function(){
      
 
+              
         $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1063,8 +1065,9 @@ $(function(){
 
                 $('#l_api_limit').html('('+res.site_request_limit_api_count+'/'+res.center_search_api_loookup_limit+')');
                 if(res.search_api_loookup_allow ==1){
-
-                    loadSearchAPI('ibmcloud');
+                    $('#table-container').hide();
+                $('.int-lookup-main').toggle();
+                         loadSearchAPI('ibmcloud');
                             loadSearchAPI('virustotal');
                             loadSearchAPI('hybrid');
                             $('#otx_indicators_loadspinner_basic_info').show();
@@ -1077,9 +1080,16 @@ $(function(){
                             loadSearchAPI('otx_indicators');
 
                 }else{
-                    alert(res.message);
+                
+                    swal.fire(res.message);
 
                 }
+        
+       
+                    }).fail(function(jqXHR, ajaxOptions, thrownError){
+                console.log("No response from server");
+        });
+    }
         
        
                     }).fail(function(jqXHR, ajaxOptions, thrownError){
