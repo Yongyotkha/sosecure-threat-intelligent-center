@@ -395,7 +395,7 @@ class SearchController extends Controller
                     $center_search_api_loookup_allow = 1;
                   
                     if($site_code){
-                        $site->search_api_loookup_use =$site->search_api_loookup_Use++;
+                        $site->search_api_loookup_Use =$site->search_api_loookup_Use++;
                         $site->save();
                         $site_request_limit_api_count = $site_request_limit_api_count+1;
                     }else{
