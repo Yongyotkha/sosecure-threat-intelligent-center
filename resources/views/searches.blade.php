@@ -1089,13 +1089,10 @@ $(function(){
                     }).fail(function(jqXHR, ajaxOptions, thrownError){
                 console.log("No response from server");
         });
-    }
+    
         
        
-                    }).fail(function(jqXHR, ajaxOptions, thrownError){
-                console.log("No response from server");
-        });
-        
+  
        
 
 
