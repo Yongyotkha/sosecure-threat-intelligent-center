@@ -316,13 +316,34 @@ class SearchController extends Controller
         $role_custom = @check_role_custom();
         $source = $request->source;
         $keyword = $request->keyword;
+        $site_code = $request->code;
+        $site_id = 0;
+        $site = null;
+        if($site_code){
+            $site = SiteSettings::select('id')->where('code', $site_code)->first();
+            $site_id = $site -> id;
+
+
+            if(!$site->allow_api_api_loookup=="Y"){
+
+                $response_data = array(
+                    'status_code' => 400,
+                    'search_api_loookup_allow' =>0,
+                    'message' => 'Please contact the system administrator.',
+                );
+                return response()->json($response_data);
+
+            }
+        }
+    
+
        //format
        $type = $this->check_keyword_type($keyword);
        if($type == '' && $source !="check_api_search_limit"){
         $response_data = array(
             'status_code' => 400,
             'search_api_loookup_allow' =>0,
-            'message' => 'allow only type ( IP,Domain,URL,MD5, SHA1 or SHA256 ) กรุณาติดต่อผู้ดูแลระบบ',
+            'message' => 'allow only type ( IP,Domain,URL,MD5, SHA1 or SHA256 ) Please contact the system administrator.',
         );
         return response()->json($response_data);
        }else{
@@ -351,14 +372,7 @@ class SearchController extends Controller
        }
        
 
-        $site_code = $request->code;
-        $site_id = 0;
-        $site = null;
-        if($site_code){
-            $site = SiteSettings::select('id')->where('code', $site_code)->first();
-            $site_id = $site -> id;
-        }
-
+     
         $center_search_api_loookup_limit = 0;
         $center_search_api_loookup_allow = 0;
         $log_search = LogSearch::where('keyword', $keyword)->count();
@@ -422,7 +436,7 @@ class SearchController extends Controller
                 if(!$check_limit_search){
                     $response_data = array(
                         'status_code' => 400,
-                        'message' => 'เกิน limit การค้นหากรุณาติดต่อผู้ดูแลระบบ',
+                        'message' => 'เกิน limit การค้นหาPlease contact the system administrator.',
                     );
                     return response()->json($response_data);
                 }
@@ -472,7 +486,7 @@ class SearchController extends Controller
                 if(!$check_limit_search){
                     $response_data = array(
                         'status_code' => 400,
-                        'message' => 'เกิน limit การค้นหากรุณาติดต่อผู้ดูแลระบบ',
+                        'message' => 'เกิน limit การค้นหาPlease contact the system administrator.',
                     );
                     return response()->json($response_data);
                 }
@@ -529,7 +543,7 @@ class SearchController extends Controller
                 if(!$check_limit_search){
                     $response_data = array(
                         'status_code' => 400,
-                        'message' => 'เกิน limit การค้นหากรุณาติดต่อผู้ดูแลระบบ',
+                        'message' => 'เกิน limit การค้นหาPlease contact the system administrator.',
                     );
                     return response()->json($response_data);
                 }
