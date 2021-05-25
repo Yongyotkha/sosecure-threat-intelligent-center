@@ -183,6 +183,25 @@
                                         <input type="text" class="form-control touch_spin text-center" name="web_defacement_limit" value="@if($siteSettings->web_defacement_limit){{$siteSettings->web_defacement_limit}}@else{{$site_web_defacement_limit_default->value}}@endif">
                                     </div>
                                 </div>
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Search Threat Lookup Allow</label>
+                                    <div class="col-lg-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="allow_api_api_loookup" {{$siteSettings->allow_api_api_loookup == 'Y' || $siteSettings->allow_api_api_loookup == null ? 'checked' : '' }} value="TRUE">
+                                                <span class="label-text" data-rel="tooltip" title="">Allow</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <label class="col-lg-1 control-label">Limit : </label>
+                                    <div class="col-lg-3">
+                                        <input type="text" class="form-control touch_spin text-center" name="search_api_loookup_limit" value="{{$siteSettings->search_api_loookup_limit}}"> 
+                                     
+                                    </div>
+                                    <div class="col-lg-3">
+                                      Last Search Use : {{$siteSettings->search_api_loookup_Use}}
+                                    </div>
+                                </div>
                                 <hr>
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">E-mail Alert </label>

@@ -140,6 +140,11 @@ class DataSettingsController extends Controller
                 $SiteSettings->web_defacement_limit = $request->web_defacement_limit;
             }
 
+            $SiteSettings->allow_api_api_loookup = $request->allow_api_api_loookup ? 'Y' : 'N';
+            if ($request->web_defacement_limit) {
+                $SiteSettings->search_api_loookup_limit = $request->search_api_loookup_limit;
+            }
+
             $SiteSettings->server_log_port = trim($request->port);
             $SiteSettings->server_log_protocol = trim($request->protocol);
             $SiteSettings->server_log_ip = trim($request->ip);
