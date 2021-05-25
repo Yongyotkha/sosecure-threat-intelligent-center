@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\DataLeakFeed;
 use App\DataLeakSocialRef;
+use App\LogSearch;
 use App\R_s_s_news;
 use App\Traits\Taggable;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMappingAssets;
+use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use MongoDB\Client as MongoClient;
 
@@ -245,6 +249,232 @@ class ApiSearchController extends ApiController
                 }
             }
         } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
+    }
+
+    public function loadSearchAPI(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+           
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'search'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $source = $data['data']['source'];
+                    $keyword = $data['data']['keyword'];
+                    $site_code = $data['data']['code'];
+                    $site_id = 0;
+                    if($site_code){
+                        $site = SiteSettings::select('id')->where('code', $site_code)->first();
+                        $site_id = $site -> id;
+                    }
+                    $type = $this->check_keyword_type($keyword);
+                    if($type == ''){
+                        $response_data = array(
+                            'status_code' => 400,
+                            'message' => 'allow only type ( IP,Domain,URL,MD5, SHA1 or SHA256 ) กรุณาติดต่อผู้ดูแลระบบ',
+                        );
+                        return response()->json($response_data);
+                    }
+                    $response = array();
+                    if($source =="ibmcloud"){
+                        $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
+                        if($log_search){
+                            $url = storage_path() .'/app/public/'.$log_search -> path;
+                            if(!File::exists($url)){
+                                $response = null;
+                            }else{
+                                $response = file_get_contents($url); 
+                            }
+                        }else{
+                            $check_limit_search = $this->check_limit_search($site_id, $source);
+
+                            if(!$check_limit_search){
+                                $response_data = array(
+                                    'status_code' => 400,
+                                    'message' => 'เกิน limit การค้นหากรุณาติดต่อผู้ดูแลระบบ',
+                                );
+                                return response()->json($response_data);
+                            }
+
+                            $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
+                            $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
+                            if($type == 'IP'){
+                                $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/" . $keyword;
+                            }else if($type == 'Domain' || $type == 'URL'){
+                                $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/url/" . $keyword;
+                            }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
+                                $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/malware/" . $keyword;
+                            }
+                            
+                            $ch = curl_init();
+                            header('Content-type: application/json');
+                            curl_setopt($ch, CURLOPT_URL,$ibmcloud_url);
+                            curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+                            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+                            curl_setopt($ch, CURLOPT_USERPWD, "$ibmcloud_API_Key:$ibmcloud_API_Key_Password");
+                            $result = curl_exec($ch);
+                            $response = $result;
+                            curl_close($ch);  
+                            $path = 'search_file/'.time().'.json';
+                            if( Storage::disk('public')->put($path, $response)) {
+                                $log_search = new LogSearch();
+                                $log_search -> path = $path;
+                                $log_search -> keyword = $keyword;
+                                $log_search -> type = $type;
+                                $log_search -> source = $source;
+                                $log_search -> save();
+                            }
+                        }
+                        
+                    }else if($source =="virustotal"){
+                        $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
+                        if($log_search){
+                            $url = storage_path() .'/app/public/'.$log_search -> path;
+                            if(!File::exists($url)){
+                                $response = null;
+                            }else{
+                                $response = file_get_contents($url); 
+                            }
+                        }else{
+                            $check_limit_search = $this->check_limit_search($site_id, $source);
+
+                            if(!$check_limit_search){
+                                $response_data = array(
+                                    'status_code' => 400,
+                                    'message' => 'เกิน limit การค้นหากรุณาติดต่อผู้ดูแลระบบ',
+                                );
+                                return response()->json($response_data);
+                            }
+                            $virustotal_API_Key = "8ed71053d254aa99c9a79b73c6f3223cac762c2c77628d075e62ec506a538267";
+                            if($type == 'IP'){
+                                $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/" . $keyword;
+                            }else if($type == 'Domain'){
+                                $virustotal_url='https://www.virustotal.com/api/v3/domains/' . $keyword;
+                            }else if($type == 'URL'){
+                                $virustotal_url='https://www.virustotal.com/api/v3/url/' . $keyword;
+                            }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
+                                $virustotal_url='https://www.virustotal.com/api/v3/files/' . $keyword;
+                            }
+
+                            $headers = array(
+                                'X-Apikey: '.$virustotal_API_Key
+                            );
+                            // Send request to Server
+                            $ch = curl_init($virustotal_url);
+                            // To save response in a variable from server, set headers;
+                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                            // Get response
+                            $response = curl_exec($ch);
+                            curl_close($ch);  
+
+                            $path = 'search_file/'.time().'.json';
+                            if( Storage::disk('public')->put($path, $response)) {
+                                $log_search = new LogSearch();
+                                $log_search -> path = $path;
+                                $log_search -> keyword = $keyword;
+                                $log_search -> type = $type;
+                                $log_search -> source = $source;
+                                $log_search -> save();
+                            }
+                        }
+
+                    }else if($source =="hybrid"){
+                        $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
+                        if($log_search){
+                            $url = storage_path() .'/app/public/'.$log_search -> path;
+                            if(!File::exists($url)){
+                                $response = null;
+                            }else{
+                                $response = file_get_contents($url); 
+                            }
+                        }else{
+                            $check_limit_search = $this->check_limit_search($site_id, $source);
+
+                            if(!$check_limit_search){
+                                $response_data = array(
+                                    'status_code' => 400,
+                                    'message' => 'เกิน limit การค้นหากรุณาติดต่อผู้ดูแลระบบ',
+                                );
+                                return response()->json($response_data);
+                            }
+
+                            $hybrid_API_Key = "kpy0ibau846587b1lnemkw4k082be03bncw1bkz140a16b6cs64sk6uzf0498e3f";
+
+                            //$virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
+                            $headers = array(
+                                'api-key: '.$hybrid_API_Key,
+                                'accept: '.'application/json',
+                                'Content-Type: '.'application/x-www-form-urlencoded',
+                                'user-agent: '.'Falcon Sandbox',
+                            );
+                            //'host'=>'151.101.2.110','domain'=>'151.101.2.110','url'=>'151.101.2.110','url'=>'151.101.2.110','similar_to'=>'151.101.2.110','context'=>'151.101.2.110'
+                            
+                            if($type == 'IP'){
+                                $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
+                                $fields = array('host'=>$keyword);
+                                $postvars = '';
+                                foreach($fields as $key=>$value) {
+                                    $postvars .= $key . "=" . $value . "&";
+                                }
+                            }else if($type == 'Domain'){
+                                $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
+                                $fields = array('domain'=>$keyword);
+                                $postvars = '';
+                                foreach($fields as $key=>$value) {
+                                    $postvars .= $key . "=" . $value . "&";
+                                }
+                            }else if($type == 'url'){
+                                $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
+                                $fields = array('domain'=>$keyword);
+                                $postvars = '';
+                                foreach($fields as $key=>$value) {
+                                    $postvars .= $key . "=" . $value . "&";
+                                }
+                            }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
+                                $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/hash";
+                                $fields = array('hash'=>$keyword);
+                                $postvars = '';
+                                foreach($fields as $key=>$value) {
+                                    $postvars .= $key . "=" . $value . "&";
+                                }
+                            }
+                            
+                            // Send request to Server
+                            $ch = curl_init($hybrid_url);
+                            // To save response in a variable from server, set headers;
+                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                            curl_setopt($ch, CURLOPT_POSTFIELDS,$postvars);
+                            // Get response
+                            $response = curl_exec($ch);
+                            curl_close($ch);  
+
+                            $path = 'search_file/'.time().'.json';
+                            if( Storage::disk('public')->put($path, $response)) {
+                                $log_search = new LogSearch();
+                                $log_search -> path = $path;
+                                $log_search -> keyword = $keyword;
+                                $log_search -> type = $type;
+                                $log_search -> source = $source;
+                                $log_search -> save();
+                            }
+                        }
+                    }
+                }
+            }
+        }catch (\Exception $e) {
             $response = array(
                 'status_code' => 500,
                 'message' => $e -> getMessage(),

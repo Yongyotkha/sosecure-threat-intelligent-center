@@ -127,6 +127,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('check/log_site', 'Api\TransactionLogsite@transaction_log_site');
     
     Route::post('search/searchAll', 'Api\ApiSearchController@searchAll');
+    Route::post('search/loadSearchAPI', 'Api\ApiSearchController@loadSearchAPI');
 
     Route::post('transaction_send_log_error', 'Api\ReciveLogErrorController@recive_log_error');
 });
