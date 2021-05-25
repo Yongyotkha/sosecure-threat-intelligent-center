@@ -1924,7 +1924,7 @@ $.ajax({
                                                             Alerts.push('<span class="badge" style="background-color: #ffb000;color:#333;margin:2px;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
 
                                                         }else{
-                                                            Alerts.push('<span class="badge" style="background-color: #88ce4f;margin:2px;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
+                                                            Alerts.push('<span class="badge" style="background-color: #409967;margin:2px;">'+header_analysis.plugins.cuckoo.result.signatures[index].name+'</span>');
                                                         }
                                                     
                                                     }
