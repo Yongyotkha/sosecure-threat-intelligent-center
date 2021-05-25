@@ -617,14 +617,16 @@ class ApiSearchController extends ApiController
                     }
 
                     $response_data = array(
-                        'status_code' => 200,
-                        'message' => '',
                         'data' => json_decode($response, true),
                         'data2' => json_decode($response2, true),
                         'type' => $type,
                         'source' => $source,
                     );
-                    return response()->json($response_data);
+                
+                    $data_transcation = json_encode($response_data);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+
                 }
             }
         }catch (\Exception $e) {
