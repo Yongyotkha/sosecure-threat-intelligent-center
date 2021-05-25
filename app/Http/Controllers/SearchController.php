@@ -802,38 +802,38 @@ class SearchController extends Controller
     }
 
     private function check_limit_search($site_id, $source){
-        $site_request_limit_api = SiteRequestLimitApi::where('site_id', $site_id)->where('mode', 'search')->where('source', $source)->first();
-        $system_limit_api = SystemLimitApi::select('limit')->where('mode', 'search')->where('source', $source)->first();
-        if($site_request_limit_api){
-            $site_limit_api = SiteLimitApi::select('limit')->where('site_id', $site_id)->where('source', $source)->where('mode', 'search')->first();
-            if($site_request_limit_api -> count < $site_limit_api -> limit){
-                $site_request_limit_api_sum = SiteRequestLimitApi::select('count')->where('mode', 'search')->where('source', $source)->sum('count');
-                if($site_request_limit_api_sum < $system_limit_api -> limit){
-                    $site_request_limit_api -> count = $site_request_limit_api -> count + 1;
-                    $site_request_limit_api -> save();
-                    $status = true;
-                }else{
-                    $status = false;
-                }
-            }else{
-                $status = false;
-            }
-        }else{
-            $site_request_limit_api_sum = SiteRequestLimitApi::select('count')->where('mode', 'search')->where('source', $source)->sum('count');
-            if($site_request_limit_api_sum < $system_limit_api -> limit){
-                $site_request_limit_api = new SiteRequestLimitApi();
-                $site_request_limit_api -> site_id = $site_id;
-                $site_request_limit_api -> source = $source;
-                $site_request_limit_api -> count = 1;
-                $site_request_limit_api -> mode = 'search';
-                $site_request_limit_api -> save();
+        // $site_request_limit_api = SiteRequestLimitApi::where('site_id', $site_id)->where('mode', 'search')->where('source', $source)->first();
+        // $system_limit_api = SystemLimitApi::select('limit')->where('mode', 'search')->where('source', $source)->first();
+        // if($site_request_limit_api){
+        //     $site_limit_api = SiteLimitApi::select('limit')->where('site_id', $site_id)->where('source', $source)->where('mode', 'search')->first();
+        //     if($site_request_limit_api -> count < $site_limit_api -> limit){
+        //         $site_request_limit_api_sum = SiteRequestLimitApi::select('count')->where('mode', 'search')->where('source', $source)->sum('count');
+        //         if($site_request_limit_api_sum < $system_limit_api -> limit){
+        //             $site_request_limit_api -> count = $site_request_limit_api -> count + 1;
+        //             $site_request_limit_api -> save();
+        //             $status = true;
+        //         }else{
+        //             $status = false;
+        //         }
+        //     }else{
+        //         $status = false;
+        //     }
+        // }else{
+        //     $site_request_limit_api_sum = SiteRequestLimitApi::select('count')->where('mode', 'search')->where('source', $source)->sum('count');
+        //     if($site_request_limit_api_sum < $system_limit_api -> limit){
+        //         $site_request_limit_api = new SiteRequestLimitApi();
+        //         $site_request_limit_api -> site_id = $site_id;
+        //         $site_request_limit_api -> source = $source;
+        //         $site_request_limit_api -> count = 1;
+        //         $site_request_limit_api -> mode = 'search';
+        //         $site_request_limit_api -> save();
 
-                $status = true;
-            }else{
-                $status = false;
-            }
-        }
-
+        //         $status = true;
+        //     }else{
+        //         $status = false;
+        //     }
+        // }
+        $status = true;
         return $status;
     }   
 

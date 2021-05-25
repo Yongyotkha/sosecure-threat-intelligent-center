@@ -1044,21 +1044,53 @@ $(function(){
     $('.int-lookup-main').hide();
 
     $('.lookup').on('click',function(){
-        $('#table-container').hide();
-        $('.int-lookup-main').toggle();
-        
-        $('#accordion2').toggle();
-        loadSearchAPI('ibmcloud');
-        loadSearchAPI('virustotal');
-        loadSearchAPI('hybrid');
-        $('#otx_indicators_loadspinner_basic_info').show();
-        $('#otx_indicators_loadspinner_basic_info_table').show();
-        $("#table-related-event").hide();
+     
 
-        $('#otx_event_loadspinner_basic_info').show();
-        $('#otx_event_loadspinner_basic_info_table').show();
-        $("#table-related-indicator").hide();
-        loadSearchAPI('otx_indicators');
+        $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: "/loadSearchAPI?mode=check_api_search_limit",
+                method: 'post',
+                data: ({
+                    keyword:text_search_new,
+                    source:'check_api_search_limit'
+                }),
+                beforeSend: function(){
+                    $('.ajax-loading').show();
+                },
+            }).done(function(res){
+
+                $('#l_api_limit').html('('+res.site_request_limit_api_count+'/'+res.center_search_api_loookup_limit+')');
+                if(res.search_api_loookup_allow ==1){
+
+                    loadSearchAPI('ibmcloud');
+                            loadSearchAPI('virustotal');
+                            loadSearchAPI('hybrid');
+                            $('#otx_indicators_loadspinner_basic_info').show();
+                            $('#otx_indicators_loadspinner_basic_info_table').show();
+                            $("#table-related-event").hide();
+
+                            $('#otx_event_loadspinner_basic_info').show();
+                            $('#otx_event_loadspinner_basic_info_table').show();
+                            $("#table-related-indicator").hide();
+                            loadSearchAPI('otx_indicators');
+
+                }else{
+                    alert(res.message);
+
+                }
+        
+       
+                    }).fail(function(jqXHR, ajaxOptions, thrownError){
+                console.log("No response from server");
+        });
+        
+       
+
+
+
+
     });
 
     function click_hybrid(){
