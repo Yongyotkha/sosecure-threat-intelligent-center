@@ -291,6 +291,7 @@
                                         <th rowspan="2" class="align-middle">Site</th>
                                         <th rowspan="2" class="align-middle">Host</th>
                                         <th rowspan="2" class="align-middle">Assets</th>
+                                        <th rowspan="2" class="align-middle">Open Ports</th>
                                         <th colspan="7" class="text-center">CPE</th>
                                         <th rowspan="2" class="align-middle">Status</th>
                                         <th rowspan="2" class="align-middle">Action</th>
@@ -746,6 +747,11 @@
                     name: 'ip',
                 },
                 {
+                    data: 'port',
+                    name: 'port',
+                    className: 'no-wrap'
+                },
+                {
                     data: 'CPE_Vendor',
                     name: 'CPE_Vendor',
                     className: 'padingtablezero text-center no-wrap'
@@ -825,7 +831,7 @@
                    
                 },--}}
                 {
-                    targets: 11,
+                    targets: 12,
                     render: function (data, type, row, meta) {
                         return row.cpe+row.action;
                         
@@ -833,7 +839,7 @@
                    
                 },
                 {
-                    targets: 10,
+                    targets: 11,
                     render: function (data, type, row, meta) {
                         if(row.status==1){
                             return '<span class="badge badge-success">Active</span>';

@@ -51,7 +51,7 @@
                 <form action="{{ route('search.app') }}" method="GET" role="search">
                     {!! csrf_field() !!}
                     <div class="form-group form-custom" style="margin-bottom:0;">
-                        <div class="input-group w-400px" style="width:400px;padding: .8rem;">
+                        <div class="input-group w-400px" style="width:500px;padding: .8rem;">
                             <span class="input-group-btn icon-search">
                                 <i class="fas fa-search"></i>
                             </span>
@@ -59,13 +59,16 @@
                                 <input type="text" id="search_input" class="form-control form-transparent" name="keyword" placeholder="Type tag keyword" style="margin-top: 2px;margin-left: 1rem;" value="{{@$keyword}}">
                                 <div class="input-group-prepend-custom">
                                    <button class="btn btn-dark">Search</button>
+                                   <button type="button" class="btn btn-dark lookup"><i class="fas fa-search"></i> Threat Lookup</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </form>
             </li>
-            
+
+
+
         </ul>
 
         <ul class="nav navbar-nav navbar-right hidden-xs nav-user" style="margin-top: 1rem;">
@@ -119,3 +122,12 @@
         </ul>
     </div>
 </header>
+
+@push('pagescript')
+    <script>
+        $('.lookup').click(function(){
+            let keyword = $('#search_input').val();
+            window.location.href = '/search?keyword=' + keyword + '&mode=lookup';
+        })
+    </script>
+@endpush

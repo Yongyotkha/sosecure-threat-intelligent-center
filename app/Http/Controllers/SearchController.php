@@ -35,9 +35,8 @@ class SearchController extends Controller
         $this->request = $request;
     }
 
-    public function search()
+    public function search(Request $mode)
     {
-
         // dd(json_encode($this->request->keyword));
         // $this->request->validate(['keyword' => 'required']);
         $data['dataSearch'] = array();
@@ -46,7 +45,7 @@ class SearchController extends Controller
         $role_custom = @check_role_custom();
         $site_id_arr = @get_role_custom()['site_id_arr'];
 
-        if ($this->request->keyword) {
+        if ($this->request->keyword && $this->request->mode !== 'lookup') {
 
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
@@ -309,7 +308,7 @@ class SearchController extends Controller
 
         $data['page'] = langapp('search');
         $data['keyword'] = $this->request->keyword;
-        return view('searches')->with($data);
+        return view('searches')->with($data,compact('mode'));
     }
 
     public function loadSearchAPI(Request $request)
@@ -324,6 +323,10 @@ class SearchController extends Controller
             $site_id = $site -> id;
         }
         $type = $this->check_keyword_type($keyword);
+        if($source =="otx_puls_tag"){
+            $type="tags";
+        }
+
         if($type == ''){
             $response_data = array(
                 'status_code' => 400,
@@ -331,7 +334,8 @@ class SearchController extends Controller
             );
             return response()->json($response_data);
         }
-        $response = array();
+        $response = '{}';
+        $response2 = "{}";
         if($source =="ibmcloud"){
             $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
             if($log_search){
@@ -480,7 +484,7 @@ class SearchController extends Controller
                     foreach($fields as $key=>$value) {
                         $postvars .= $key . "=" . $value . "&";
                     }
-                }else if($type == 'url'){
+                }else if($type == 'URL'){
                     $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
                     $fields = array('domain'=>$keyword);
                     $postvars = '';
@@ -516,13 +520,152 @@ class SearchController extends Controller
                     $log_search -> save();
                 }
             }
+        }else if($source =="otx_indicators"){
+
+
+            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";
+            $otx_general_url ="";
+            $otx_analysis_url ="";
+            if($type == 'IP'){
+                if (!filter_var($keyword, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                    $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/IPv4/".$keyword."/general";
+                    $otx_general_url = "https://otx.alienvault.com/otxapi/indicator/ip/analysis/".$keyword;
+                } else {
+                    $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/IPv6/".$keyword."/general";
+                    $otx_general_url = "https://otx.alienvault.com/otxapi/indicator/ip/analysis/".$keyword;
+                }
+
+            }else if($type == 'Domain'){
+                $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/domain/".$keyword."/general";
+                $otx_general_url = "https://otx.alienvault.com/otxapi/indicator/url/analysis/".$keyword;
+               
+            }else if($type == 'URL'){
+                $otx_analysis_url = "https://otx.alienvault.com/otxapi/indicator/url/general/".rawurlencode($keyword);
+                $otx_general_url = "https://otx.alienvault.com/otxapi/indicator/url/analysis/".rawurlencode($keyword);
+            }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
+
+                $otx_general_url = "https://otx.alienvault.com/api/v1/indicators/file/".$keyword."/general";
+                $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/file/".$keyword."/analysis";
+            }else{
+
+
+            }
+
+
+            $ch = curl_init();
+            $headers = array(
+                 'X-OTX-API-KEY: '.$otx_API_Key,
+                'accept: '.'application/json',
+                 'Content-Type: '.'application/x-www-form-urlencoded',
+            );
+            // Send request to Server
+            $ch = curl_init($otx_analysis_url);
+            // To save response in a variable from server, set headers;
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            // Get response
+            $response = curl_exec($ch);
+            curl_close($ch);  
+
+            if($otx_general_url){
+                    $ch = curl_init();
+                    $headers = array(
+                        'X-OTX-API-KEY: '.$otx_API_Key,
+                        'accept: '.'application/json',
+                        'Content-Type: '.'application/x-www-form-urlencoded',
+                    );
+                    // Send request to Server
+                    $ch = curl_init($otx_general_url);
+                    // To save response in a variable from server, set headers;
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    // Get response
+                    $response2 = curl_exec($ch);
+                    curl_close($ch);  
+             }
+  
+
+
+
+        }else if($source =="otx_puls"){
+        
+            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
+            $otx_url = "https://otx.alienvault.com/api/v1/pulses/".$keyword;
+           
+            $ch = curl_init();
+            $headers = array(
+                 'X-OTX-API-KEY: '.$otx_API_Key,
+                'accept: '.'application/json',
+                 'Content-Type: '.'application/x-www-form-urlencoded',
+            );
+            // Send request to Server
+            $ch = curl_init($otx_url);
+            // To save response in a variable from server, set headers;
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            // Get response
+            $response = curl_exec($ch);
+            curl_close($ch);  
+
+        
+        }else if($source =="otx_puls_indicator"){
+        
+            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
+            $otx_url = "https://otx.alienvault.com/api/v1/pulses/".$keyword.'/indicators';
+           
+            $ch = curl_init();
+            $headers = array(
+                 'X-OTX-API-KEY: '.$otx_API_Key,
+                'accept: '.'application/json',
+                 'Content-Type: '.'application/x-www-form-urlencoded',
+            );
+            // Send request to Server
+            $ch = curl_init($otx_url);
+            // To save response in a variable from server, set headers;
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            // Get response
+            $response = curl_exec($ch);
+            curl_close($ch);  
+
+        
+        }else if($source =="otx_puls_tag"){
+            $keyword =str_replace(' ', '%20', trim($keyword));
+
+            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
+            if(!$request->nextpage){
+                $otx_url = "https://otx.alienvault.com/otxapi/pulses/?limit=20&page=1&sort=-modified&q=tag:".$keyword;
+            }else{
+                $otx_url =$request->nextpage;
+            }
+         
+           
+            $ch = curl_init();
+            $headers = array(
+                 'X-OTX-API-KEY: '.$otx_API_Key,
+                'accept: '.'application/json',
+                 'Content-Type: '.'application/x-www-form-urlencoded',
+            );
+            // Send request to Server
+            $ch = curl_init($otx_url);
+            // To save response in a variable from server, set headers;
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            // Get response
+            $response = curl_exec($ch);
+            curl_close($ch);  
+
+        
         }
-    
+     
+  
         $response_data = array(
             'status_code' => Response::HTTP_OK,
             'message' => '',
             'data' => json_decode($response, true),
+            'data2' => json_decode($response2, true),
             'type' => $type,
+            'source' => $source,
         );
         return response()->json($response_data);
     }

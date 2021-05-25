@@ -447,100 +447,193 @@ class RSSFeedSettingsController extends Controller
             //     }
             //     return rtrim($html, ' , ');
             // })
-            ->addColumn('source', function (RSSNews $model) {
+            ->addColumn('content_detail', function (RSSNews $model) {
+                $html = '';
                 if($model -> source){
                     // return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'"><a href="javascript:void(0);" onclick="find_source(\''.$model -> source.'\')">'.$model -> source.'</a></div>';
-                    return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'">'.$model -> source.'</div>';
+                    $html .= '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'">'.$model -> source.'</div>';
                 }else{
-                    return '<div class="text-elip" data-rel="tooltip" title="None">None</div>';
+                    $html .= '<div class="text-elip" data-rel="tooltip" title="None">None</div>';
                 }
-                
-            })
-            ->addColumn('title', function (RSSNews $model) {
+
                 if($model -> title_th){
-                    return '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_th.'">'.$model -> title_th.'</a>';
+                    $html .= '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_th.'">'.$model -> title_th.'</a>';
                 }else if($model -> title_en){
-                    return '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_en.'">'.$model -> title_en.'</a>';
+                    $html .= '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_en.'">'.$model -> title_en.'</a>';
                 }else{
-                    return '-';
+                    $html .= '-';
                 }
-            })
-            ->addColumn('cate', function (RSSNews $model) {
-         
-                $html = '';
+
                 $html .= '<div class="text-trucate-ovf">';
                 if($model->get_cate=="[]"){
-                    $html = 'None';
+                    $html .= 'None';
                 }else{
-
+                    $htmls = '';
                     foreach($model->get_cate as $cate_val) {
                         if($cate_val->get_cate_name_news){
                             // $html .= '<a href="javascript:void(0);" onclick="find_category(\''.$cate_val -> get_cate_name_news -> id.'\')">'.$cate_val->get_cate_name_news->name.', </a>';
-                            $html .= $cate_val->get_cate_name_news->name.',';
+                            $htmls .= $cate_val->get_cate_name_news->name.',';
                         }else{
-                            $html .= 'None-delete0';
+                            $htmls .= 'None-delete0';
                         }
                         
                     }
-                    if($html=='None-delete0'){
-                        $html = str_replace('-delete0','', $html);
+                    if($htmls =='None-delete0'){
+                        $html .= str_replace('-delete0','', $htmls);
                     }else{
-                        $html = str_replace('None-delete0','', $html);
+                        $html .= str_replace('None-delete0','', $htmls);
                     }
                     
-                    $html = rtrim($html,", ");
+                    $html .= rtrim($html,", ");
                 }
                 $html .= '</div>';
-                return $html;
-            })
-            ->addColumn('serverity', function (RSSNews $model) {
-                $html = '';
+
                 if($model->serverity=='critical'){
-                    $html = '<span class="badge" style="background-color: #b93624;">Critical</span>';
+                    $html .= ' <br><b>Serverity</b> <span class="badge" style="background-color: #b93624;">Critical</span>';
                 }else if($model->serverity=='high'){
-                    $html = '<span class="badge" style="background-color: #fcc838;">High</span>';
+                    $html .= ' <br><b>Serverity</b> <span class="badge" style="background-color: #fcc838;">High</span>';
                 }else if($model->serverity=='medium'){
-                    $html = '<span class="badge" style="background-color: #f2ff15;color#333;">Medium</span>';
+                    $html .= ' <br><b>Serverity</b> <span class="badge" style="background-color: #f2ff15;color#333;">Medium</span>';
                 }else if($model->serverity=='low'){
-                    $html = '<span class="badge" style="background-color: #88ce4f;">Low</span>';
+                    $html .= ' <br><b>Serverity</b> <span class="badge" style="background-color: #88ce4f;">Low</span>';
                 }else if($model->serverity=='information'){
-                    $html = '<span class="badge" style="background-color: #00dcff;">Information</span>';
+                    $html .= ' <br><b>Serverity</b> <span class="badge" style="background-color: #00dcff;">Information</span>';
                 }else{
-                    $html = '-';
+                    $html .= ' - ';
                 }
-                return $html;
-            })
-            ->addColumn('data_status', function (RSSNews $model) {
-                $html = '';
-                if($model -> save_draft == 1){
-                    $html .= '<span class="badge badge-danger" style="background-color: #ea2e49;">Darft</span>';
-                }else if($model -> save_draft == 0){
-                    $html .= '<span class="badge badge-success">Public</span>';
-                }else{
-                    $html .= '<span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
-                }  
-                return $html;
-            })
-            ->addColumn('link', function (RSSNews $model) {
-                $html = '';
-                $html_th = '';
-                $html_en = '';
-                $html_line = '';
-                if($model->title_th) {
-                    $html_th = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank">TH</a>';
+
+                // $html_th = '';
+                // $html_en = '';
+                // $html_line = '';
+                // if($model->title_th) {
+                //     $html_th = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank">TH</a>';
                     
-                }
-                if($model->title_en) {
-                    $html_en = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank">EN</a>';
-                    $html_line = ' | ';
-                }
+                // }
+                // if($model->title_en) {
+                //     $html_en = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank">EN</a>';
+                //     $html_line = ' | ';
+                // }
                 
-                
+                // $html .= $html_th . $html_line . $html_en;
 
-                $html .= $html_th . $html_line . $html_en;
+                // $html_th_n = '';
+                // $html_en_n = '';
+                // $html_line_n = '';
+                // if($model->title_th) {
+                //     $html_th_n = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank">TH</a>';
+                    
+                // }
+                // if($model->title_en) {
+                //     $html_en_n = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank">EN</a>';
+                //     $html_line_n = ' | ';
+                // }
+
+                // $html .= $html_th_n . $html_line_n . $html_en_n;
+
+                if($model -> save_draft == 1){
+                    $html .= ' <br><b>Data Status</b> <span class="badge badge-danger" style="background-color: #ea2e49;">Darft</span>';
+                }else if($model -> save_draft == 0){
+                    $html .= ' <br><b>Data Status</b> <span class="badge badge-success">Public</span>';
+                }else{
+                    $html .= ' <br><b>Data Status</b> <span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
+                }  
 
                 return $html;
             })
+            // ->addColumn('source', function (RSSNews $model) {
+            //     if($model -> source){
+            //         // return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'"><a href="javascript:void(0);" onclick="find_source(\''.$model -> source.'\')">'.$model -> source.'</a></div>';
+            //         return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'">'.$model -> source.'</div>';
+            //     }else{
+            //         return '<div class="text-elip" data-rel="tooltip" title="None">None</div>';
+            //     }
+                
+            // })
+            // ->addColumn('title', function (RSSNews $model) {
+            //     if($model -> title_th){
+            //         return '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_th.'">'.$model -> title_th.'</a>';
+            //     }else if($model -> title_en){
+            //         return '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_en.'">'.$model -> title_en.'</a>';
+            //     }else{
+            //         return '-';
+            //     }
+            // })
+            // ->addColumn('cate', function (RSSNews $model) {
+         
+            //     $html = '';
+            //     $html .= '<div class="text-trucate-ovf">';
+            //     if($model->get_cate=="[]"){
+            //         $html = 'None';
+            //     }else{
+
+            //         foreach($model->get_cate as $cate_val) {
+            //             if($cate_val->get_cate_name_news){
+            //                 // $html .= '<a href="javascript:void(0);" onclick="find_category(\''.$cate_val -> get_cate_name_news -> id.'\')">'.$cate_val->get_cate_name_news->name.', </a>';
+            //                 $html .= $cate_val->get_cate_name_news->name.',';
+            //             }else{
+            //                 $html .= 'None-delete0';
+            //             }
+                        
+            //         }
+            //         if($html=='None-delete0'){
+            //             $html = str_replace('-delete0','', $html);
+            //         }else{
+            //             $html = str_replace('None-delete0','', $html);
+            //         }
+                    
+            //         $html = rtrim($html,", ");
+            //     }
+            //     $html .= '</div>';
+            //     return $html;
+            // })
+            // ->addColumn('serverity', function (RSSNews $model) {
+            //     $html = '';
+            //     if($model->serverity=='critical'){
+            //         $html = '<span class="badge" style="background-color: #b93624;">Critical</span>';
+            //     }else if($model->serverity=='high'){
+            //         $html = '<span class="badge" style="background-color: #fcc838;">High</span>';
+            //     }else if($model->serverity=='medium'){
+            //         $html = '<span class="badge" style="background-color: #f2ff15;color#333;">Medium</span>';
+            //     }else if($model->serverity=='low'){
+            //         $html = '<span class="badge" style="background-color: #88ce4f;">Low</span>';
+            //     }else if($model->serverity=='information'){
+            //         $html = '<span class="badge" style="background-color: #00dcff;">Information</span>';
+            //     }else{
+            //         $html = '-';
+            //     }
+            //     return $html;
+            // })
+            // ->addColumn('data_status', function (RSSNews $model) {
+            //     $html = '';
+            //     if($model -> save_draft == 1){
+            //         $html .= '<span class="badge badge-danger" style="background-color: #ea2e49;">Darft</span>';
+            //     }else if($model -> save_draft == 0){
+            //         $html .= '<span class="badge badge-success">Public</span>';
+            //     }else{
+            //         $html .= '<span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
+            //     }  
+            //     return $html;
+            // })
+            // ->addColumn('link', function (RSSNews $model) {
+            //     $html = '';
+            //     $html_th = '';
+            //     $html_en = '';
+            //     $html_line = '';
+            //     if($model->title_th) {
+            //         $html_th = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank">TH</a>';
+                    
+            //     }
+            //     if($model->title_en) {
+            //         $html_en = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank">EN</a>';
+            //         $html_line = ' | ';
+            //     }
+                
+                
+
+            //     $html .= $html_th . $html_line . $html_en;
+
+            //     return $html;
+            // })
             ->addColumn('status', function (RSSNews $model) {
                 if($model->status == '1') {
                     $checked_val = 'checked';
@@ -566,7 +659,7 @@ class RSSFeedSettingsController extends Controller
                 return $html;
                
             })
-            ->rawColumns(['chk','site_name','source','title','cate','serverity','data_status','link','status','action'])
+            ->rawColumns(['chk','content_detail','status','action'])
             ->toJson();
     }
 
