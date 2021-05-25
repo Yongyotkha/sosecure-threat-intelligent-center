@@ -6,6 +6,9 @@ use App\DataLeakFeed;
 use App\DataLeakSocialRef;
 use App\LogSearch;
 use App\R_s_s_news;
+use App\SiteLimitApi;
+use App\SiteRequestLimitApi;
+use App\SystemLimitApi;
 use App\Traits\Taggable;
 use DB;
 use Illuminate\Http\Request;
@@ -274,11 +277,16 @@ class ApiSearchController extends ApiController
                     $keyword = $data['data']['keyword'];
                     $site_code = $data['data']['code'];
                     $site_id = 0;
+                    
                     if($site_code){
                         $site = SiteSettings::select('id')->where('code', $site_code)->first();
                         $site_id = $site -> id;
                     }
                     $type = $this->check_keyword_type($keyword);
+                    if($source =="otx_puls_tag"){
+                        $type="tags";
+                    }
+            
                     if($type == ''){
                         $response_data = array(
                             'status_code' => 400,
@@ -286,7 +294,8 @@ class ApiSearchController extends ApiController
                         );
                         return response()->json($response_data);
                     }
-                    $response = array();
+                    $response = '{}';
+                    $response2 = "{}";
                     if($source =="ibmcloud"){
                         $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
                         if($log_search){
@@ -298,7 +307,7 @@ class ApiSearchController extends ApiController
                             }
                         }else{
                             $check_limit_search = $this->check_limit_search($site_id, $source);
-
+            
                             if(!$check_limit_search){
                                 $response_data = array(
                                     'status_code' => 400,
@@ -306,7 +315,7 @@ class ApiSearchController extends ApiController
                                 );
                                 return response()->json($response_data);
                             }
-
+            
                             $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
                             $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
                             if($type == 'IP'){
@@ -348,7 +357,7 @@ class ApiSearchController extends ApiController
                             }
                         }else{
                             $check_limit_search = $this->check_limit_search($site_id, $source);
-
+            
                             if(!$check_limit_search){
                                 $response_data = array(
                                     'status_code' => 400,
@@ -366,7 +375,7 @@ class ApiSearchController extends ApiController
                             }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
                                 $virustotal_url='https://www.virustotal.com/api/v3/files/' . $keyword;
                             }
-
+            
                             $headers = array(
                                 'X-Apikey: '.$virustotal_API_Key
                             );
@@ -378,7 +387,7 @@ class ApiSearchController extends ApiController
                             // Get response
                             $response = curl_exec($ch);
                             curl_close($ch);  
-
+            
                             $path = 'search_file/'.time().'.json';
                             if( Storage::disk('public')->put($path, $response)) {
                                 $log_search = new LogSearch();
@@ -389,7 +398,7 @@ class ApiSearchController extends ApiController
                                 $log_search -> save();
                             }
                         }
-
+            
                     }else if($source =="hybrid"){
                         $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
                         if($log_search){
@@ -401,7 +410,7 @@ class ApiSearchController extends ApiController
                             }
                         }else{
                             $check_limit_search = $this->check_limit_search($site_id, $source);
-
+            
                             if(!$check_limit_search){
                                 $response_data = array(
                                     'status_code' => 400,
@@ -409,9 +418,9 @@ class ApiSearchController extends ApiController
                                 );
                                 return response()->json($response_data);
                             }
-
+            
                             $hybrid_API_Key = "kpy0ibau846587b1lnemkw4k082be03bncw1bkz140a16b6cs64sk6uzf0498e3f";
-
+            
                             //$virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
                             $headers = array(
                                 'api-key: '.$hybrid_API_Key,
@@ -435,7 +444,7 @@ class ApiSearchController extends ApiController
                                 foreach($fields as $key=>$value) {
                                     $postvars .= $key . "=" . $value . "&";
                                 }
-                            }else if($type == 'url'){
+                            }else if($type == 'URL'){
                                 $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
                                 $fields = array('domain'=>$keyword);
                                 $postvars = '';
@@ -460,7 +469,7 @@ class ApiSearchController extends ApiController
                             // Get response
                             $response = curl_exec($ch);
                             curl_close($ch);  
-
+            
                             $path = 'search_file/'.time().'.json';
                             if( Storage::disk('public')->put($path, $response)) {
                                 $log_search = new LogSearch();
@@ -471,7 +480,151 @@ class ApiSearchController extends ApiController
                                 $log_search -> save();
                             }
                         }
+                    }else if($source =="otx_indicators"){
+            
+            
+                        $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";
+                        $otx_general_url ="";
+                        $otx_analysis_url ="";
+                        if($type == 'IP'){
+                            if (!filter_var($keyword, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                                $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/IPv4/".$keyword."/general";
+                                $otx_general_url = "https://otx.alienvault.com/otxapi/indicator/ip/analysis/".$keyword;
+                            } else {
+                                $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/IPv6/".$keyword."/general";
+                                $otx_general_url = "https://otx.alienvault.com/otxapi/indicator/ip/analysis/".$keyword;
+                            }
+            
+                        }else if($type == 'Domain'){
+                            $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/domain/".$keyword."/general";
+                            $otx_general_url = "https://otx.alienvault.com/otxapi/indicator/url/analysis/".$keyword;
+                           
+                        }else if($type == 'URL'){
+                            $otx_analysis_url = "https://otx.alienvault.com/otxapi/indicator/url/general/".rawurlencode($keyword);
+                            $otx_general_url = "https://otx.alienvault.com/otxapi/indicator/url/analysis/".rawurlencode($keyword);
+                        }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
+            
+                            $otx_general_url = "https://otx.alienvault.com/api/v1/indicators/file/".$keyword."/general";
+                            $otx_analysis_url = "https://otx.alienvault.com/api/v1/indicators/file/".$keyword."/analysis";
+                        }else{
+            
+            
+                        }
+            
+            
+                        $ch = curl_init();
+                        $headers = array(
+                             'X-OTX-API-KEY: '.$otx_API_Key,
+                            'accept: '.'application/json',
+                             'Content-Type: '.'application/x-www-form-urlencoded',
+                        );
+                        // Send request to Server
+                        $ch = curl_init($otx_analysis_url);
+                        // To save response in a variable from server, set headers;
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                        // Get response
+                        $response = curl_exec($ch);
+                        curl_close($ch);  
+            
+                        if($otx_general_url){
+                                $ch = curl_init();
+                                $headers = array(
+                                    'X-OTX-API-KEY: '.$otx_API_Key,
+                                    'accept: '.'application/json',
+                                    'Content-Type: '.'application/x-www-form-urlencoded',
+                                );
+                                // Send request to Server
+                                $ch = curl_init($otx_general_url);
+                                // To save response in a variable from server, set headers;
+                                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                                // Get response
+                                $response2 = curl_exec($ch);
+                                curl_close($ch);  
+                         }
+              
+            
+            
+            
+                    }else if($source =="otx_puls"){
+                    
+                        $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
+                        $otx_url = "https://otx.alienvault.com/api/v1/pulses/".$keyword;
+                       
+                        $ch = curl_init();
+                        $headers = array(
+                             'X-OTX-API-KEY: '.$otx_API_Key,
+                            'accept: '.'application/json',
+                             'Content-Type: '.'application/x-www-form-urlencoded',
+                        );
+                        // Send request to Server
+                        $ch = curl_init($otx_url);
+                        // To save response in a variable from server, set headers;
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                        // Get response
+                        $response = curl_exec($ch);
+                        curl_close($ch);  
+            
+                    
+                    }else if($source =="otx_puls_indicator"){
+                    
+                        $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
+                        $otx_url = "https://otx.alienvault.com/api/v1/pulses/".$keyword.'/indicators';
+                       
+                        $ch = curl_init();
+                        $headers = array(
+                             'X-OTX-API-KEY: '.$otx_API_Key,
+                            'accept: '.'application/json',
+                             'Content-Type: '.'application/x-www-form-urlencoded',
+                        );
+                        // Send request to Server
+                        $ch = curl_init($otx_url);
+                        // To save response in a variable from server, set headers;
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                        // Get response
+                        $response = curl_exec($ch);
+                        curl_close($ch);  
+            
+                    
+                    }else if($source =="otx_puls_tag"){
+                        $keyword =str_replace(' ', '%20', trim($keyword));
+            
+                        $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
+                        if(!$request->nextpage){
+                            $otx_url = "https://otx.alienvault.com/otxapi/pulses/?limit=20&page=1&sort=-modified&q=tag:".$keyword;
+                        }else{
+                            $otx_url =$request->nextpage;
+                        }
+                     
+                       
+                        $ch = curl_init();
+                        $headers = array(
+                             'X-OTX-API-KEY: '.$otx_API_Key,
+                            'accept: '.'application/json',
+                             'Content-Type: '.'application/x-www-form-urlencoded',
+                        );
+                        // Send request to Server
+                        $ch = curl_init($otx_url);
+                        // To save response in a variable from server, set headers;
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                        // Get response
+                        $response = curl_exec($ch);
+                        curl_close($ch);  
                     }
+
+                    $response_data = array(
+                        'status_code' => 200,
+                        'message' => '',
+                        'data' => json_decode($response, true),
+                        'data2' => json_decode($response2, true),
+                        'type' => $type,
+                        'source' => $source,
+                    );
+                    return response()->json($response_data);
                 }
             }
         }catch (\Exception $e) {
@@ -480,6 +633,98 @@ class ApiSearchController extends ApiController
                 'message' => $e -> getMessage(),
             );
             return response()->json($response);
+        }
+    }
+
+    private function check_keyword_type($keyword){
+        $type = '';
+        if (preg_match("/^([a-f0-9]{64})$/", $keyword) == 1) {
+            $type =  'SHA256';
+        }else if(preg_match('/^[a-f0-9]{32}$/', $keyword)) {
+            $type = 'MD5';
+        }else if(preg_match('/^[0-9a-f]{40}$/i', $keyword)) {
+            $type = 'SHA1';
+        }else if(filter_var($keyword, FILTER_VALIDATE_IP)) {
+            $type = 'IP';
+        }else if(filter_var($keyword, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $type = 'IP';
+        }else if(filter_var($keyword, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE)) {
+            $type = 'IP';
+        }else if(filter_var($keyword, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE)) {
+            $type = 'IP';
+        }else if(preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $keyword) //valid chars check
+        && preg_match("/^.{1,253}$/", $keyword) //overall length check
+        && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $keyword)   ) {
+            $type = 'Domain';
+        }else if(preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$keyword)) {
+            $type = 'URL';
+        }else if(preg_match("/\b(?:(?:http?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$keyword)) {
+            $type = 'URL';
+        }
+        return $type;
+    }
+
+    private function check_limit_search($site_id, $source){
+        $site_request_limit_api = SiteRequestLimitApi::where('site_id', $site_id)->where('mode', 'search')->where('source', $source)->first();
+        $system_limit_api = SystemLimitApi::select('limit')->where('mode', 'search')->where('source', $source)->first();
+        if($site_request_limit_api){
+            $site_limit_api = SiteLimitApi::select('limit')->where('site_id', $site_id)->where('source', $source)->where('mode', 'search')->first();
+            if($site_request_limit_api -> count < $site_limit_api -> limit){
+                $site_request_limit_api_sum = SiteRequestLimitApi::select('count')->where('mode', 'search')->where('source', $source)->sum('count');
+                if($site_request_limit_api_sum < $system_limit_api -> limit){
+                    $site_request_limit_api -> count = $site_request_limit_api -> count + 1;
+                    $site_request_limit_api -> save();
+                    $status = true;
+                }else{
+                    $status = false;
+                }
+            }else{
+                $status = false;
+            }
+        }else{
+            $site_request_limit_api_sum = SiteRequestLimitApi::select('count')->where('mode', 'search')->where('source', $source)->sum('count');
+            if($site_request_limit_api_sum < $system_limit_api -> limit){
+                $site_request_limit_api = new SiteRequestLimitApi();
+                $site_request_limit_api -> site_id = $site_id;
+                $site_request_limit_api -> source = $source;
+                $site_request_limit_api -> count = 1;
+                $site_request_limit_api -> mode = 'search';
+                $site_request_limit_api -> save();
+
+                $status = true;
+            }else{
+                $status = false;
+            }
+        }
+
+        return $status;
+    }   
+
+    private function is_valid_domain($url){
+
+        $validation = FALSE;
+        /*Parse URL*/    $urlparts = parse_url(filter_var($url, FILTER_SANITIZE_URL));
+        /*Check host exist else path assign to host*/    if(!isset($urlparts['host'])){
+            $urlparts['host'] = $urlparts['path'];
+        }
+    
+        if($urlparts['host']!=''){
+           /*Add scheme if not found*/        if (!isset($urlparts['scheme'])){
+                $urlparts['scheme'] = 'http';
+            }
+            /*Validation*/        if(checkdnsrr($urlparts['host'], 'A') && in_array($urlparts['scheme'],array('http','https')) && ip2long($urlparts['host']) === FALSE){ 
+                $urlparts['host'] = preg_replace('/^www\./', '', $urlparts['host']);
+                $url = $urlparts['scheme'].'://'.$urlparts['host']. "/";            
+                
+                if (filter_var($url, FILTER_VALIDATE_URL) !== false && @get_headers($url)) {
+                    $validation = TRUE;
+                }
+            }
+        }
+        if(!$validation){
+           return false;
+        }else{
+            return true;
         }
     }
 
