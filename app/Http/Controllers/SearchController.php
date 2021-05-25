@@ -394,15 +394,19 @@ class SearchController extends Controller
                 if((int)$center_search_api_loookup_limit > $site_request_limit_api_count){
                     $center_search_api_loookup_allow = 1;
                   
-                    if($site_code){
-                        $site->search_api_loookup_use =$site->search_api_loookup_Use++;
-                        $site->save();
-                        $site_request_limit_api_count = $site_request_limit_api_count+1;
-                    }else{
-                        $site_request_limit_api_query->count = $site_request_limit_api_count+1;
-                        $site_request_limit_api_query->save();
-                        $site_request_limit_api_count = $site_request_limit_api_count+1;
-
+                    if($source == 'check_api_search_limit'){
+                        if($site_code){
+                            FacadesDB::table('site')
+                            ->where('code', $site_code)
+                            ->update(['search_api_loookup_Use' => $site->search_api_loookup_Use++]);
+                            $site -> save();
+                            $site_request_limit_api_count = $site->search_api_loookup_Use;
+                        }else{
+                            $site_request_limit_api_query->count = $site_request_limit_api_count+1;
+                            $site_request_limit_api_query->save();
+                            $site_request_limit_api_count = $site_request_limit_api_count+1;
+    
+                        }
                     }
 
 
