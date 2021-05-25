@@ -487,7 +487,7 @@
 
 
 
-                     <section class="scrollable wrapper bg-white otx_event" style="padding:0;display:none;margin-top:1rem;">
+                     <section class="bg-white otx_event" style="padding:0;display:none;margin-top:1rem;">
                                 <div class="row sticky-top-nav">
                                     <div class="nav-menu-btn" style="display: none">
                                         <ul>
@@ -573,7 +573,7 @@
                      </section>
 
 
-                     <section class="scrollable wrapper bg-white otx_tag" style="padding:0;display:none">
+                     <section class="bg-white otx_tag" style="padding:0;display:none">
                                 <div class="row sticky-top-nav">
                                     <div class="nav-menu-btn">
                                         <ul>
@@ -653,14 +653,6 @@
                                     </section>
                                 </section>
                      </section>
-
-
-
-
-
-
-
-
                 </div>
             </div>
 
