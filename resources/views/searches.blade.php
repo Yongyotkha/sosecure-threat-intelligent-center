@@ -1496,9 +1496,9 @@ $.ajax({
                     var header = res.data;
                     var header2 = res.data2;
 
-                    html+='<div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> ASN:</b> '+header.asn+'</div></div>';
-                    html+='<div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Indicator Facts:</b> '+''+'</div></div>';
-                    html+='<div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Country:</b> '+header.country_name+'</div></div>';
+                    html+='<div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> ASN:</b></div> <div class="col-xl-10 col-lg-10 col-md-9">'+header.asn+'</div></div></div>';
+                    html+='<div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Indicator Facts:</b></div> <div class="col-xl-10 col-lg-10 col-md-9">'+''+'</div></div></div>';
+                    html+='<div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Country:</b></div> <div class="col-xl-10 col-lg-10 col-md-9">'+header.country_name+'</div></div></div>';
                     var open_ports="";
                     var issuer = [];
                     var subject =[];
@@ -1517,7 +1517,7 @@ $.ajax({
                         }
                         reverse_dns = header2.facts.reverse_dns;
                     }
-                    html+=' <div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Open Ports:</b> '+open_ports+'</div></div>';
+                    html+=' <div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Open Ports:</b></div> <div class="col-xl-10 col-lg-10 col-md-9">'+open_ports+'</div></div></div>';
 
                     var Tags = [];
                       if(header.pulse_info){
@@ -1535,14 +1535,14 @@ $.ajax({
                   
                       }
                       if(Tags.length > 0){
-                        html+=' <div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Related Tags:</b> <div class="text-trucate-ovf">'+Tags.join(",")+' </div></div></div>';
+                        html+=' <div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Related Tags:</b></div><div class="col-xl-10 col-lg-10 col-md-9"> <div class="text-trucate-ovf">'+Tags.join(",")+' </div></div></div></div>';
                       }
                       if(header.type =="IPv6"){
-                        html+=' <div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Reverse DNS:</b> '+reverse_dns+'</div></div>';
+                        html+=' <div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Reverse DNS:</b></div> <div class="col-xl-10 col-lg-10 col-md-9"> '+reverse_dns+'</div></div></div>';
 
                       }else{
-                        html+=' <div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Certificate Issuer:</b> '+issuer.join(", ")+'</div></div>';
-                        html+=' <div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Certificate Subject:</b> '+subject.join(", ")+'</div></div>';
+                        html+=' <div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Certificate Issuer:</b></div><div class="col-xl-10 col-lg-10 col-md-9"> '+issuer.join(", ")+'</div></div></div>';
+                        html+=' <div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Certificate Subject:</b></div><div class="col-xl-10 col-lg-10 col-md-9"> '+subject.join(", ")+'</div></div></div>';
                       }
                      
 
