@@ -504,26 +504,22 @@
                                     </div>
                                 </div>
                                 <section id="general_details" class="">
-                                    <div class="pd-15">
-                                        <div class="row m-b-lg">
-                                            <div id="indicator_basic_info" class="">
-                                            <div id="otx_event_loadspinner_basic_info" class="content-spinner-loading" style="display: none;"></div>
-                                                  <div class="row">
-                                                                <div class="col-md-6">
-                                                                <span id="otx_event_general"></span>
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <h1 class="text-center">Type Attributes </h1>
-                                                                    <div id="otx_event_chart-show-bar">
-                                                          
-                                                                    </div>
-                                                                </div>
-                                                        </div>
-
-
-
-
+                                    <div class="m-b-lg">
+                                        <div id="indicator_basic_info" class="">
+                                        <div id="otx_event_loadspinner_basic_info" class="content-spinner-loading" style="display: none;"></div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <span id="otx_event_general"></span>
+                                                </div>
+                                                    <div class="col-md-6">
+                                                        <h1 class="text-center">Type Attributes </h1>
+                                                        <div id="otx_event_chart-show-bar"></div>
+                                                    </div>
                                             </div>
+
+
+
+
                                         </div>
                                     </div>
                                 </section>
