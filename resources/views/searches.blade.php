@@ -121,7 +121,7 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <h3 class="page-header">
-                                    Information ( 100 / 1000 )
+                                Information <span id="l_api_limit"></span>
                                 </h3>
                             </div>
                             <div class="col-md-4 text-right">
@@ -844,18 +844,45 @@ $(function(){
         $('#table-container').hide();
         $('.int-lookup-main').toggle();
         
-        $('#accordion2').toggle();
-        loadSearchAPI('ibmcloud');
-        loadSearchAPI('virustotal');
-        loadSearchAPI('hybrid');
-        $('#otx_indicators_loadspinner_basic_info').show();
-        $('#otx_indicators_loadspinner_basic_info_table').show();
-        $("#table-related-event").hide();
+        $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: "/loadSearchAPI?mode=check_api_search_limit",
+                method: 'post',
+                data: ({
+                    keyword:text_search_new,
+                    source:'check_api_search_limit'
+                }),
+                beforeSend: function(){
+                    $('.ajax-loading').show();
+                },
+            }).done(function(res){
 
-        $('#otx_event_loadspinner_basic_info').show();
-        $('#otx_event_loadspinner_basic_info_table').show();
-        $("#table-related-indicator").hide();
-        loadSearchAPI('otx_indicators');
+                $('#l_api_limit').html('('+res.site_request_limit_api_count+'/'+res.center_search_api_loookup_limit+')');
+                if(res.search_api_loookup_allow ==1){
+
+                    loadSearchAPI('ibmcloud');
+                            loadSearchAPI('virustotal');
+                            loadSearchAPI('hybrid');
+                            $('#otx_indicators_loadspinner_basic_info').show();
+                            $('#otx_indicators_loadspinner_basic_info_table').show();
+                            $("#table-related-event").hide();
+
+                            $('#otx_event_loadspinner_basic_info').show();
+                            $('#otx_event_loadspinner_basic_info_table').show();
+                            $("#table-related-indicator").hide();
+                            loadSearchAPI('otx_indicators');
+
+                }else{
+                    alert(res.message);
+
+                }
+        
+       
+                    }).fail(function(jqXHR, ajaxOptions, thrownError){
+                console.log("No response from server");
+        });
     }
 });
 
@@ -2417,7 +2444,7 @@ html_status += `<div class="status-risk success" style="color: #fff;color: #fff 
     Low
 </div>`;
 }else if(summary_total <= 2.6){
-html_status += `<div class="status-risk warning"  style="color: #fff;color: #fff !important;">
+    html_status += `<div class="status-risk warning"  style="background-color: #f2ff15!important;color: #000 !important;">
     Medium
 </div>`;
 }else if(summary_total <= 3){
