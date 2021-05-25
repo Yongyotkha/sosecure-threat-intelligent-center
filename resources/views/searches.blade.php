@@ -1499,9 +1499,9 @@ $.ajax({
                     var header = res.data;
                     var header2 = res.data2;
 
-                    html+='<div class="col-md-6 m-b-xs"><b> ASN:</b> '+header.asn+'</div>';
-                    html+='<div class="col-md-6 m-b-xs"><b> Indicator Facts:</b> '+''+'</div>';
-                    html+='<div class="col-md-6 m-b-xs"><b> Country:</b> '+header.country_name+'</div>';
+                    html+='<div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> ASN:</b> '+header.asn+'</div></div>';
+                    html+='<div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Indicator Facts:</b> '+''+'</div></div>';
+                    html+='<div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Country:</b> '+header.country_name+'</div></div>';
                     var open_ports="";
                     var issuer = [];
                     var subject =[];
@@ -1520,7 +1520,7 @@ $.ajax({
                         }
                         reverse_dns = header2.facts.reverse_dns;
                     }
-                    html+=' <div class="col-md-6 m-b-xs"><b> Open Ports:</b> '+open_ports+'</div>';
+                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Open Ports:</b> '+open_ports+'</div></div>';
 
                     var Tags = [];
                       if(header.pulse_info){
@@ -1538,14 +1538,14 @@ $.ajax({
                   
                       }
                       if(Tags.length > 0){
-                        html+=' <div class="col-md-6 m-b-xs"><b> Related Tags:</b> <div class="text-trucate-ovf">'+Tags.join(",")+' </div></div>';
+                        html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Related Tags:</b> <div class="text-trucate-ovf">'+Tags.join(",")+' </div></div></div>';
                       }
                       if(header.type =="IPv6"){
-                        html+=' <div class="col-md-6 m-b-xs"><b> Reverse DNS:</b> '+reverse_dns+'</div>';
+                        html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Reverse DNS:</b> '+reverse_dns+'</div></div>';
 
                       }else{
-                        html+=' <div class="col-md-6 m-b-xs"><b> Certificate Issuer:</b> '+issuer.join(", ")+'</div>';
-                        html+=' <div class="col-md-6 m-b-xs"><b> Certificate Subject:</b> '+subject.join(", ")+'</div>';
+                        html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Certificate Issuer:</b> '+issuer.join(", ")+'</div></div>';
+                        html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Certificate Subject:</b> '+subject.join(", ")+'</div></div>';
                       }
                      
 
@@ -1633,9 +1633,9 @@ $.ajax({
                     }
                     
 
-                    html+=' <div class="col-md-6 m-b-xs"><b> IP Address:</b> '+IP+'</div>';
-                    html+=' <div class="col-md-6 m-b-xs"><b> WHOIS:</b> '+WHOIS+'</div>';
-                    html+=' <div class="col-md-6 m-b-xs"><b> Country:</b> '+country_name+'</div>';
+                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> IP Address:</b></div><div class="col-xl-10 col-md-9"> '+IP+'</div></div></div>';
+                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> WHOIS:</b></div><div class="col-xl-10 col-md-9"> '+WHOIS+'</div></div></div>';
+                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Country:</b></div><div class="col-xl-10 col-md-9"> '+country_name+'</div></div></div>';
                     var open_ports="";
                     var issuer = [];
                     var subject =[];
@@ -1658,7 +1658,7 @@ $.ajax({
                   
                       }
                       if(Tags.length > 0){
-                        html+=' <div class="col-md-6 m-b-xs"><b> Related Tags:</b> <div class="text-trucate-ovf">'+Tags.join(",")+'</div> </div>';
+                        html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Related Tags:</b></div> <div class="col-xl-10 col-md-9"> <div class="text-trucate-ovf">'+Tags.join(",")+'</div></div></div></div>';
                       }
      
 
@@ -1725,8 +1725,8 @@ $.ajax({
                     var header = res.data;
                     var header2 = res.data2;
 
-                    html+=' <div class="col-md-6 m-b-xs"><b> Hostname:</b> '+header.hostname+'</div>';
-                    html+=' <div class="col-md-6 m-b-xs"><b> Domain:</b> '+header.domain+'</div>';
+                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Hostname:</b></div> <div class="col-xl-10 col-md-9">'+header.hostname+'</div></div></div>';
+                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Domain:</b></div> <div class="col-xl-10 col-md-9">'+header.domain+'</div></div>';
 
                     var WHOIS ="";
                     if(header.whois){
@@ -1735,7 +1735,7 @@ $.ajax({
                     }
                     
 
-                    html+=' <div class="col-md-6 m-b-xs"><b> Country:</b> '+WHOIS+'</div>';
+                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Country:</b></div> <div class="col-xl-10 col-md-9">'+WHOIS+'</div></div></div>';
                     var open_ports="";
                     var issuer = [];
                     var subject =[];
@@ -1754,7 +1754,7 @@ $.ajax({
                         }
                         reverse_dns = header2.facts.reverse_dns;
                     }
-                    html+=' <div class="col-md-6 m-b-xs"><b> Open Ports:</b> '+open_ports+'</div>';
+                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Open Ports:</b></div> <div class="col-xl-10 col-md-9">'+open_ports+'</div></div></div>';
 
                     var Tags = [];
                       if(header.pulse_info){
@@ -1772,7 +1772,7 @@ $.ajax({
                   
                       }
                       if(Tags.length > 0){
-                        html+=' <div class="col-md-6 m-b-xs"><b> Related Tags:</b> <div class="text-trucate-ovf">'+Tags.join(",")+'</div> </div>';
+                        html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Related Tags:</b></div> <div class="col-xl-10 col-md-9"><div class="text-trucate-ovf">'+Tags.join(",")+'</div></div></div></div>';
                       }
                   
 
@@ -1845,10 +1845,10 @@ $.ajax({
                         
                                 if(header_analysis){
                                     if(header_analysis.datetime_int){
-                                        html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"> <b> Analysis Date:</b></div>  <div class="col-xl-10 col-md-9">'+header_analysis.datetime_int+'</div></div></div>';
+                                        html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"> <b> Analysis Date:</b></div>  <div class="col-xl-10 col-md-9">'+header_analysis.datetime_int+'</div></div></div>';
                                     }
                                     if(header_analysis.info.results.file_type){
-                                        html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"> <b> File Type:</b></div>  <div class="col-xl-10 col-md-9">'+header_analysis.info.results.file_type+'</div></div></div>';
+                                        html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"> <b> File Type:</b></div>  <div class="col-xl-10 col-md-9">'+header_analysis.info.results.file_type+'</div></div></div>';
                                     }
                                 }
                                 
@@ -1884,9 +1884,9 @@ $.ajax({
                                     }
 
 
-                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"> <b> Antivirus Detections:</b></div> <div class="col-xl-10 col-md-9">'+Antivirus_Detections.join(",")+'</div></div></div>';
+                                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"> <b> Antivirus Detections:</b></div> <div class="col-xl-10 col-md-9">'+Antivirus_Detections.join(",")+'</div></div></div>';
                                     if(header_analysis){
-                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"> <b> Size:</b></div> <div class="col-xl-10 col-md-9">'+header_analysis.info.results.filesize+' bytes</div></div></div>';
+                                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"> <b> Size:</b></div> <div class="col-xl-10 col-md-9">'+header_analysis.info.results.filesize+' bytes</div></div></div>';
                                     }
                                     
                                 
@@ -1902,9 +1902,9 @@ $.ajax({
                                             }
                                         }
                                     }
-                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"> <b>Yara Detections</b></div> <div class="col-xl-10 col-md-9">'+Yara_Detections.join("</br>")+'</div></div></div>';
+                                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"> <b>Yara Detections</b></div> <div class="col-xl-10 col-md-9">'+Yara_Detections.join("</br>")+'</div></div></div>';
                                     if(header_analysis){
-                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"> <b> MD5:</b></div> <div class="col-xl-10 col-md-9">'+header_analysis.info.results.md5+' </div></div></div>';
+                                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"> <b> MD5:</b></div> <div class="col-xl-10 col-md-9">'+header_analysis.info.results.md5+' </div></div></div>';
                                     }
 
 
@@ -1933,10 +1933,10 @@ $.ajax({
                                     }
 
 
-                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b> Alerts:</b> </div><div class="col-xl-10 col-md-9">'+Alerts.join("")+'</div> </div></div>';
+                                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Alerts:</b> </div><div class="col-xl-10 col-md-9">'+Alerts.join("")+'</div> </div></div>';
                                     if(header_analysis){
-                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b> SHA1:</b> </div><div class="col-xl-10 col-md-9">'+header_analysis.info.results.sha1+'</div> </div></div>';
-                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b> SHA256:</b> </div> <div class="col-xl-10 col-md-9">'+header_analysis.info.results.sha256+'</div> </div></div>';
+                                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> SHA1:</b> </div><div class="col-xl-10 col-md-9">'+header_analysis.info.results.sha1+'</div> </div></div>';
+                                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> SHA256:</b> </div> <div class="col-xl-10 col-md-9">'+header_analysis.info.results.sha256+'</div> </div></div>';
                                     }
                                     var host_name = [];
                                     if(header_analysis){
@@ -1957,7 +1957,7 @@ $.ajax({
                                         }
                                     }
 
-                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b> External Hosts:</b></div><div class="col-xl-10 col-md-9"><p class="text-trucate-ovf" style="display:inline-block;word-break: break-word;">'+host_name.join(",")+'</p></div></div></div>';
+                                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> External Hosts:</b></div><div class="col-xl-10 col-md-9"><p class="text-trucate-ovf" style="display:inline-block;word-break: break-word;">'+host_name.join(",")+'</p></div></div></div>';
 
 
                                     var imphash = "";
@@ -1975,7 +1975,7 @@ $.ajax({
                                     }
                                     }
 
-                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b>IMPHASH:</b>  </div><div class="col-xl-10 col-md-9"> '+imphash+'</div> </div></div>';
+                                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b>IMPHASH:</b>  </div><div class="col-xl-10 col-md-9"> '+imphash+'</div> </div></div>';
 
 
                                 var Tags = [];
@@ -1992,9 +1992,9 @@ $.ajax({
                                     }
                                 }
                                 if(Tags.length > 0){
-                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b> Related Tags:</b> </div> <div class="col-xl-10 col-md-9"><div class="text-trucate-ovf"> '+Tags.join(",")+'</div></div> </div></div>';
+                                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Related Tags:</b> </div> <div class="col-xl-10 col-md-9"><div class="text-trucate-ovf"> '+Tags.join(",")+'</div></div> </div></div>';
                                 }
-                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b> PEHASH:</b> </div><div class="col-xl-10 col-md-9"> '+pehash+'</div></div></div>';
+                                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> PEHASH:</b> </div><div class="col-xl-10 col-md-9"> '+pehash+'</div></div></div>';
                                     var Groups = [];
                                 if(header.pulse_info){
                                     if(header.pulse_info.pulses){               
@@ -2009,7 +2009,7 @@ $.ajax({
                                     }
                                 }
                                 if(Groups.length > 0){
-                                    html+=' <div class="col-md-6 m-b-xs"><div class="row"><div class="col-xl-2 col-md-3"><b> Related Groups:</b> </div> <div class="col-xl-10 col-md-9"> '+Groups.join(",")+'</div> </div></div>';
+                                    html+=' <div class="col-md-6 m-b-md"><div class="row"><div class="col-xl-2 col-md-3"><b> Related Groups:</b> </div> <div class="col-xl-10 col-md-9"> '+Groups.join(",")+'</div> </div></div>';
                                 }
                     }
 
