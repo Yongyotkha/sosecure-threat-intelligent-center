@@ -316,24 +316,95 @@ class SearchController extends Controller
         $role_custom = @check_role_custom();
         $source = $request->source;
         $keyword = $request->keyword;
+       //format
+       $type = $this->check_keyword_type($keyword);
+       if($type == '' && $source !="check_api_search_limit"){
+        $response_data = array(
+            'status_code' => 400,
+            'search_api_loookup_allow' =>0,
+            'message' => 'allow only type ( IP,Domain,URL,MD5, SHA1 or SHA256 ) กรุณาติดต่อผู้ดูแลระบบ',
+        );
+        return response()->json($response_data);
+       }else{
+
+         if($type == 'SHA256'){
+             if(strlen($keyword) !=64){
+                $response_data = array(
+                    'status_code' => 400,
+                    'search_api_loookup_allow' =>0,
+                    'message' => 'Incorrect format',
+                );
+                return response()->json($response_data);
+             }
+         }
+         if($type == 'SHA1'){
+            if(strlen($keyword) !=40){
+               $response_data = array(
+                   'status_code' => 400,
+                   'search_api_loookup_allow' =>0,
+                   'message' => 'Incorrect format',
+               );
+               return response()->json($response_data);
+            }
+        }
+
+       }
+       
+
         $site_code = $request->code;
         $site_id = 0;
+        $site = null;
         if($site_code){
             $site = SiteSettings::select('id')->where('code', $site_code)->first();
             $site_id = $site -> id;
         }
-        $type = $this->check_keyword_type($keyword);
+
+        $center_search_api_loookup_limit = 0;
+        $center_search_api_loookup_allow = 0;
+        $log_search = LogSearch::where('keyword', $keyword)->count();
+        $site_request_limit_api_query = null;
+        if($site_code){
+               //$site
+               $center_search_api_loookup_limit =$site->search_api_loookup_limit;
+               $site_request_limit_api_count = $site->search_api_loookup_Use;
+   
+        }else{
+               $center_search_api_loookup_limit = env('center_search_api_loookup_limit', 1000);
+               $site_request_limit_api_query = SiteRequestLimitApi::where('mode', 'api_limit')->where('site_id',0)->first();
+               $site_request_limit_api_count =$site_request_limit_api_query->count;
+        }
+        if($log_search> 0){
+            $center_search_api_loookup_allow = 1;
+
+        }else{
+                if((int)$center_search_api_loookup_limit > $site_request_limit_api_count){
+                    $center_search_api_loookup_allow = 1;
+                  
+                    if($site_code){
+                        $site->search_api_loookup_use =$site->search_api_loookup_Use++;
+                        $site->save();
+                        $site_request_limit_api_count = $site_request_limit_api_count+1;
+                    }else{
+                        $site_request_limit_api_query->count = $site_request_limit_api_count+1;
+                        $site_request_limit_api_query->save();
+                        $site_request_limit_api_count = $site_request_limit_api_count+1;
+
+                    }
+
+
+                }else{
+
+                
+                }
+
+        }
+
+  
         if($source =="otx_puls_tag"){
             $type="tags";
         }
 
-        if($type == ''){
-            $response_data = array(
-                'status_code' => 400,
-                'message' => 'allow only type ( IP,Domain,URL,MD5, SHA1 or SHA256 ) กรุณาติดต่อผู้ดูแลระบบ',
-            );
-            return response()->json($response_data);
-        }
+   
         $response = '{}';
         $response2 = "{}";
         if($source =="ibmcloud"){
@@ -437,6 +508,10 @@ class SearchController extends Controller
                     $log_search -> source = $source;
                     $log_search -> save();
                 }
+
+
+            
+
             }
 
         }else if($source =="hybrid"){
@@ -656,9 +731,21 @@ class SearchController extends Controller
             curl_close($ch);  
 
         
+        }else if($source =="check_api_search_limit"){
+            // if($site_code){
+            //     $center_search_api_loookup_limit =$site->search_api_loookup_limit;
+            //     $site_request_limit_api_count = SiteRequestLimitApi::orderBy('id', 'desc')->select('count')->where('mode', 'search')->where('site_id',$site_id)->first();
+    
+            // }else{
+            //     $center_search_api_loookup_limit = env('center_search_api_loookup_limit', 1000);
+            //     $site_request_limit_api_count = SiteRequestLimitApi::orderBy('id', 'desc')->select('count')->where('mode', 'search')->where('site_id',0)->first();
+            // }
+
+
         }
-     
-  
+   
+
+    
         $response_data = array(
             'status_code' => Response::HTTP_OK,
             'message' => '',
@@ -666,6 +753,10 @@ class SearchController extends Controller
             'data2' => json_decode($response2, true),
             'type' => $type,
             'source' => $source,
+            'site_code' =>$site_code,
+            'center_search_api_loookup_limit' =>$center_search_api_loookup_limit,
+            'site_request_limit_api_count' =>$site_request_limit_api_count,
+            'search_api_loookup_allow' =>$center_search_api_loookup_allow
         );
         return response()->json($response_data);
     }
@@ -686,9 +777,7 @@ class SearchController extends Controller
             $type = 'IP';
         }else if(filter_var($keyword, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE)) {
             $type = 'IP';
-        }else if(preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $keyword) //valid chars check
-        && preg_match("/^.{1,253}$/", $keyword) //overall length check
-        && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $keyword)   ) {
+        }else if(ctype_alnum(str_replace('-', '', $keyword)) && $keyword[0] != '-' && $keyword[strlen($keyword) - 1] != '-') {
             $type = 'Domain';
         }else if(preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$keyword)) {
             $type = 'URL';
