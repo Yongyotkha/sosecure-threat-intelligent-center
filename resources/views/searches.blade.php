@@ -677,12 +677,12 @@
                     @if (!empty($dataSearch))
                         @foreach ($dataSearch as $key => $value)
                             @if (isset($value["count"])&&$value["count"] > 0)
-                                <li id="{{slugify($key)}}_head" class="panel panel-default">
-                                    <div class="panel-heading fontw-weight-bold">
+                                <li id="{{slugify($key)}}_head" class="panel-default">
+                                    {{-- <div class="panel-heading fontw-weight-bold">
                                         <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify($key) }}">
                                             @icon('solid/caret-right') {{ humanize($key) }} ({{!empty($value["count"]) ? number_format($value["count"]) : 0}})
                                         </a>
-                                    </div>
+                                    </div> --}}
                                     <div id="{{ slugify($key) }}" class="panel-collapse collapse in">
                                         @foreach ($value["queryData"] as $key2 => $value2)
                                             @php
@@ -692,14 +692,23 @@
                                                 }
                                             @endphp
                                             <div class="panel-body clause {{@$class_indicator}}" data-div_i_type="{!!@$slug!!}">
-                                                <a href="{{$value2["link"]}}" target="_blank">
-                                                    {{$value2["name"]}}
-                                                </a>
-                                                <div style="
-                                                max-height:100px;
-                                                overflow:hidden;
-                                                text-overflow: ellipsis;
-                                                -webkit-box-orient: vertical;">{!!$value2["content"]!!}</div>
+                                                <div class="item-search">
+                                                    <div style="width: 90%;">
+                                                        <div class="badege-search">{{ humanize($key) }}</div>
+                                                        <a href="{{$value2["link"]}}" target="_blank" class="fz-search-20px">
+                                                            {{$value2["name"]}}
+                                                        </a>
+                                                        <div style="
+                                                        white-space: nowrap;
+                                                        overflow:hidden;
+                                                        text-overflow: ellipsis;
+                                                        -webkit-box-orient: vertical;">{!!$value2["content"]!!}</div>
+                                                    </div>
+                                                    <div style="width: 10%" class="text-center">
+                                                        <a href="{{$value2["link"]}}" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                                    </div>
+                                                </div>
+                                               
                                             </div>
                                         @endforeach
                                         
