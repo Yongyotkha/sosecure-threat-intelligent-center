@@ -43,8 +43,8 @@
                                 <p>Last Status : {{check_last_status(@$otx_events[0]['is_modified'])}} | Public :
                                 {!!check_publish(@$otx_events[0]['public'])!!}</p>
 
-                                <p>Created : {{change_date_utc_to_thai(@$otx_events[0]['created_at'])}} | Modified :
-                                {{change_date_utc_to_thai(@$otx_events[0]['modified'])}}</p>
+                                {{-- <p>Created : {{change_date_utc_to_thai(@$otx_events[0]['created_at'])}} | Modified :
+                                {{change_date_utc_to_thai(@$otx_events[0]['modified'])}}</p>--}}
 
                                 <p>Tags : {!!explode_val(@$otx_events[0]['tags'],'tags')!!}</p>
                                 <p>Groups : {!!explode_val(@$otx_events[0]['groups'],'groups')!!}</p>

@@ -6,9 +6,15 @@
     $count_val = [];
     $count_all = 0;
  foreach (@$dataSearch as $key => $value) {
+    
     if (isset($value["count"])&&$value["count"] > 0) {
         $count_all = @$count_all+@$value["count"];
-        $count_val[slugify($key)] = !empty($value["count"]) ? number_format($value["count"]) : 0;
+        if(slugify($key) =="Adversaries"){
+            $count_val['Threat Actor'] = !empty($value["count"]) ? number_format($value["count"]) : 0;
+        }else{
+            $count_val[slugify($key)] = !empty($value["count"]) ? number_format($value["count"]) : 0;
+        }
+        
     }
 
     if(!empty($count_all)) {
@@ -78,9 +84,23 @@
                                     <a href="javascript:void(0)" data-btn="vulnerabilities" class="btn btn-selector btn_filter">Vulnerabilities {{@$count_val['vulnerabilities'] ? '('.$count_val["vulnerabilities"].')':'(0)'}}</a>
                                     @endif
                                 @endif
+                                
                                 @if($role_custom['indicators'])
                                     @if(!empty($count_val['indicators']))
                                     <a href="javascript:void(0)" data-btn="indicators" class="btn btn-selector btn_filter">Indicators {{@$count_val['indicators'] ? '('.$count_val["indicators"].')':'(0)'}}</a>
+                                    @endif
+                                @endif
+
+                                     
+                                @if($role_custom['indicators'])
+                                    @if(!empty($count_val['adversaries']))
+                                    <a href="javascript:void(0)" data-btn="adversaries" class="btn btn-selector btn_filter">Threat Actor {{@$count_val['adversaries'] ? '('.$count_val["adversaries"].')':'(0)'}}</a>
+                                    @endif
+                                @endif
+                                     
+                                @if($role_custom['indicators'])
+                                    @if(!empty($count_val['malware']))
+                                    <a href="javascript:void(0)" data-btn="malware" class="btn btn-selector btn_filter">Malware {{@$count_val['malware'] ? '('.$count_val["malware"].')':'(0)'}}</a>
                                     @endif
                                 @endif
                                 {{-- <button class="btn btn-selector active">All</button>
@@ -680,7 +700,14 @@
                                 <li id="{{slugify($key)}}_head" class="panel panel-default">
                                     <div class="panel-heading fontw-weight-bold">
                                         <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify($key) }}">
-                                            @icon('solid/caret-right') {{ humanize($key) }} ({{!empty($value["count"]) ? number_format($value["count"]) : 0}})
+                                            @icon('solid/caret-right') 
+                                                @if(humanize($key)=='Adversaries')   
+                                                         Threat Actor
+                                                @else
+                                                      {{ humanize($key) }}  
+                                                 @endif
+                                            
+                                             ({{!empty($value["count"]) ? number_format($value["count"]) : 0}})
                                         </a>
                                     </div>
                                     <div id="{{ slugify($key) }}" class="panel-collapse collapse in">
@@ -715,22 +742,24 @@
                                                             {{$value2["name"]}}
                                                         </a>
                                                         <div class="text-elips-ct"></div>
-                                                        <p class="">Last Status : Modified | Public : <i class="fas fa-check"></i></p>
-                                                        <p>Created : 2021-02-04 23:13 | Modified : 2021-05-26 22:50</p>
-                                                        <p>Tags :  
-                                                            <a href="#">webscanner</a> ,
-                                                            <a href="#"> bruteforce</a> ,
-                                                            <a href="#"> web app attack</a> ,
-                                                            <a href="#">probing</a> ,
-                                                            <a href="#"> webscan</a> ,
-                                                            <a href="#"> scanning</a> ,
-                                                        </p>
-                                                        <p>Groups : 
-                                                            <a href="#">Bad Bots</a> ,
-                                                            <a href="#"> Blue Team Intelligence - Open Forum</a> ,
-                                                            <a href="#"> MISP FEED</a> ,
-                                                            <a href="#"> Nuisances which waste server time and bandwidth</a> ,
-                                                        </p>
+
+                                                       
+                                                        @if(humanize($key)=='Events')       
+                                                          
+                                                                <p class="">Last Status : {{check_last_status($value2['is_modified'])}} | Public : {!!check_publish($value2['public'])!!}</p>
+                                                           
+                                                                <p>Tags : {!!explode_val($value2['tags'],'tags')!!}</p>
+                                                                <p>Groups : {!!explode_val($value2['groups'],'groups')!!}</p>
+                                                                <p>Industries : {!!explode_val($value2['industries'],'industries')!!}</p>
+                                                        @else
+                                                        {{$value2["content"]}}
+                                                            
+                                                        @endif
+
+                                                        
+
+
+
                                                     </div>
                                                     <div style="width: 10%" class="text-center">
                                                         <a href="{{$value2["link"]}}" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
@@ -811,7 +840,8 @@
             $("#compromised_head").show();
             $("#vulnerabilities_head").show();
             $("#indicators_head").show();
-
+            $("#malware_head").hide();
+            $("#adversaries_head").hide();
             $(".type_indicator").hide();
         } else if (btn_val == 'news') {
             $("#news_head").show();
@@ -821,7 +851,8 @@
             $("#compromised_head").hide();
             $("#vulnerabilities_head").hide();
             $("#indicators_head").hide();
-
+            $("#malware_head").hide();
+            $("#adversaries_head").hide();
             $(".type_indicator").hide();
         } else if (btn_val == 'events') {
             $("#news_head").hide();
@@ -831,7 +862,8 @@
             $("#compromised_head").hide();
             $("#vulnerabilities_head").hide();
             $("#indicators_head").hide();
-
+            $("#malware_head").hide();
+            $("#adversaries_head").hide();
             $(".type_indicator").hide();
         } else if (btn_val == 'data-leak') {
             $("#news_head").hide();
@@ -841,7 +873,8 @@
             $("#compromised_head").hide();
             $("#vulnerabilities_head").hide();
             $("#indicators_head").hide();
-
+            $("#malware_head").hide();
+            $("#adversaries_head").hide();
             $(".type_indicator").hide();
         } else if (btn_val == 'compromised') {
             $("#news_head").hide();
@@ -851,7 +884,8 @@
             $("#compromised").collapse("show");
             $("#vulnerabilities_head").hide();
             $("#indicators_head").hide();
-
+            $("#malware_head").hide();
+            $("#adversaries_head").hide();
             $(".type_indicator").hide();
         } else if (btn_val == 'vulnerabilities') {
             $("#news_head").hide();
@@ -861,7 +895,8 @@
             $("#vulnerabilities_head").show();
             $("#vulnerabilities").collapse("show");
             $("#indicators_head").hide();
-
+            $("#malware_head").hide();
+            $("#adversaries_head").hide();
             $(".type_indicator").hide();
         } else if (btn_val == 'indicators') {
             $("#news_head").hide();
@@ -871,6 +906,31 @@
             $("#vulnerabilities_head").hide();
             $("#indicators_head").show();
             $("#indicators").collapse("show");
+
+            $(".type_indicator").show();
+            $("#malware_head").hide();
+            $("#adversaries_head").hide();
+        } else if (btn_val == 'adversaries') {
+            $("#news_head").hide();
+            $("#events_head").hide();
+            $("#data-leak_head").hide();
+            $("#compromised_head").hide();
+            $("#vulnerabilities_head").hide();
+            $("#malware_head").hide();
+            $("#adversaries_head").show();
+            $("#adversaries").collapse("show");
+
+            $(".type_indicator").show();
+        } else if (btn_val == 'malware') {
+            $("#news_head").hide();
+            $("#events_head").hide();
+            $("#data-leak_head").hide();
+            $("#compromised_head").hide();
+            $("#vulnerabilities_head").hide();
+            $("#adversaries_head").hide();
+            $("#malware_head").show();
+            $("#malwere").collapse("show");
+            
 
             $(".type_indicator").show();
         } 

@@ -10,7 +10,7 @@
                         class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                         @icon('solid/arrow-left')
                     </a>
-                    Adversary : {{ $adversary[0] -> name }}
+                    Threat Actor : {{ $adversary[0] -> name }}
                 </div>
 
                 &nbsp;
@@ -55,9 +55,7 @@
                                     <b>POSSIBLE LOCATION</b> : <a>{{ $adversary[0] -> country == null ? '-' :  $adversary[0] -> country }}</a>
                                 </p>
                             </div>
-                            <div class="col-md-12">
-                                <p>These adversary details are provided by the MISP Project.</p>
-                            </div>
+
                         </div>
                     </div>
                 </section>
@@ -146,7 +144,7 @@
     });
     var count_page = -1;
     var count_page2 = -1;
-    let pulse_id = '{{ request()->pulse_id }}';
+    let pulse_id = '{{ request()->adversary_uuid }}';
     function related_event(){
         $('#table-related-event').DataTable({
             searching: false,
@@ -160,7 +158,7 @@
             ajax: {
                 async:true,
                 type: "POST",
-                url: '{!! route('indicators.events_pulse_table')!!}',
+                url: '{!! route('indicators.load_adversary_tb')!!}',
                 dataSrc: function ( json ) {
                     count_page2 = json.recordsTotal;
                     return json.data;

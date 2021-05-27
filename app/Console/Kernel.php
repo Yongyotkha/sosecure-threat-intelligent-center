@@ -95,6 +95,9 @@ class Kernel extends ConsoleKernel
       //$schedule->command('app:test_indicator_update_ref')->everyMinute()->withoutOverlapping(5);
       $schedule->command('rm -rf /var/www/html/insight.sosecure.co.th/threat-intelligent-center/public/screenshot/screen-master-v2/jobs/')->cron('0 */12 * * *')->withoutOverlapping(5);
       $schedule->command('app:TransactionCenterReset')->cron('5 0 * * *')->withoutOverlapping(5);
+      $schedule->command('app:MDAdversaries')->cron('0 0 */2 * *')->withoutOverlapping(5);
+      $schedule->command('app:MDMalware')->cron('0 0 */2 * *')->withoutOverlapping(5);
+
     }
 
     /**

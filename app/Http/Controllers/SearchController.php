@@ -225,6 +225,13 @@ class SearchController extends Controller
                                 '_id' => 0,
                                 'id' => '$pulse_id',
                                 'name' => '$name',
+                                'is_modified' => '$is_modified',
+                                'public' => '$public',
+                                'created_at' => '$created_at',
+                                'modified' => '$modified',
+                                'tags' => '$tags',
+                                'groups' => '$groups',
+                                'industries' => '$industries',
                                 'content' => [ '$concat' => ['source: ','$source']],
                                 'link' => [ '$concat' => ['/indicators/events/events_detail/','$pulse_id']],
                             ]
@@ -278,10 +285,415 @@ class SearchController extends Controller
                             '$limit' => $limit
                         ]
                     ];
-                    $dataWait['queryData'] = $col_fx_transaction_otx_indicators_data->aggregate($pipeline,$options);
+
+
+                 
+
+                                        //ให้แสดง Event แทน=========================================================
+                                        $dataWait['queryData'] = $col_fx_transaction_otx_indicators_data->aggregate($pipeline,$options);
+                                        $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                                        $event_ids = [];
+                                  
+                                        foreach($dataWait['queryData'] as $key => $value){
+
+
+   
+                                            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+                                     
+                                    
+                                            $query = [
+                                                'indicator_id' => $value['id'],
+                                                
+                                            ];
+                                    
+                                    
+                                            $options = [
+                                                'sort' => [
+                                                    // $order => $dir
+                                                ],
+                                                'skip' =>  0,
+                                                'limit' => 20,
+                                            ];
+                                    
+                                            $cursor = $col_fx_otx_events_indicator_ref->find($query,$options);    
+                                            $document_all = $cursor->toArray();
+
+                                           
+                                                    foreach($document_all as $key_plus => $value_plus){
+                                                     
+                                                           if(!in_array($value_plus['pulse_id'],$event_ids ) )
+                                                            {
+                                                                array_push($event_ids,$value_plus['pulse_id']);
+                                                             
+                                                            }
+                                                    }
+
+
+
+                                        }
+                                     
+                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                                        $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
+                                        $dataWait['count'] =count($event_ids);
+                                       
+                                        if($dataWait['count']>0){
+                                            $options = [
+                                                'allowDiskUse' => TRUE
+                                            ];
+                                            $pipeline = [
+                                                [
+                                                    '$match' => [
+                                                        'pulse_id'  => ['$in'=>$event_ids],
+                                                    ]
+                                                ],
+                                                [
+                                                    '$project' => [
+                                                        '_id' => 0,
+                                                        'id' => '$pulse_id',
+                                                        'name' => '$name',
+                                                        'is_modified' => '$is_modified',
+                                                        'public' => '$public',
+                                                        'created_at' => '$created_at',
+                                                        'modified' => '$modified',
+                                                        'tags' => '$tags',
+                                                        'groups' => '$groups',
+                                                        'industries' => '$industries',
+                                                        'content' => [ '$concat' => ['source: ','$source']],
+                                                        'link' => [ '$concat' => ['/indicators/events/events_detail/','$pulse_id']],
+                                                    ]
+                                                ],
+                                                [
+                                                    '$sort' => [
+                                                        'modified'  => -1,
+                                                    ]
+                                                ],
+                                                [
+                                                    '$limit' => $limit
+                                                ]
+                                            ];
+                                             $dataWait['queryData'] = $col_fx_otx_events->aggregate($pipeline,$options);
+                                         
+                                             $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                                             $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
+                                             $data['dataSearch']["Events"] = $dataWait;
+                                        }
+                                        //===============================================================
+
+                    // $dataWait['queryData'] = $col_fx_transaction_otx_indicators_data->aggregate($pipeline,$options);
+                    // $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                    // $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
+                    // $data['dataSearch']["indicators"] = $dataWait;
+                }
+            }
+            if(@$role_custom['indicators']) {
+                //Malware
+                $this->request->keyword = trim($this->request->keyword);
+                $dataWait = null;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_malware_related;
+                $pipeLine = array('malware_name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
+                $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
+                if($dataWait['count']>0){
+                    $options = [
+                        'allowDiskUse' => TRUE
+                    ];
+                    $pipeline = [
+                        [
+                            '$match' => [
+                                'malware_name'  => ['$regex'=>$this->request->keyword, '$options' => 'i'],
+                            ]
+                        ],
+                        [
+                            '$project' => [
+                                '_id' => 0,
+                                'malware_uuid' => '$malware_uuid',
+                                'pulse_id' => '$pulse_id',
+                            ]
+                        ],
+                        [
+                            '$sort' => [
+                                'updated_at'  => -1,
+                            ]
+                        ],
+                        [
+                            '$limit' => $limit
+                        ]
+                    ];
+
+
+                 
+
+                                        //ให้แสดง Event แทน=========================================================
+                                        $dataWait['queryData'] = $col_fx_otx_malware_related->aggregate($pipeline,$options);
+                                        $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                                        $event_ids = [];
+                                  
+                                        foreach($dataWait['queryData'] as $key_plus => $value_plus){
+                                                     
+                                            if(!in_array($value_plus['pulse_id'],$event_ids ) )
+                                             {
+                                                 array_push($event_ids,$value_plus['pulse_id']);
+                                              
+                                             }
+                                       }
+
+
+                                     
+                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                                        $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
+                                        $dataWait['count'] =count($event_ids);
+                                       
+                                        if($dataWait['count']>0){
+                                            $options = [
+                                                'allowDiskUse' => TRUE
+                                            ];
+                                            $pipeline = [
+                                                [
+                                                    '$match' => [
+                                                        'pulse_id'  => ['$in'=>$event_ids],
+                                                    ]
+                                                ],
+                                                [
+                                                    '$project' => [
+                                                        '_id' => 0,
+                                                        'id' => '$pulse_id',
+                                                        'name' => '$name',
+                                                        'is_modified' => '$is_modified',
+                                                        'public' => '$public',
+                                                        'created_at' => '$created_at',
+                                                        'modified' => '$modified',
+                                                        'tags' => '$tags',
+                                                        'groups' => '$groups',
+                                                        'industries' => '$industries',
+                                                        'content' => [ '$concat' => ['source: ','$source']],
+                                                        'link' => [ '$concat' => ['/indicators/events/events_detail/','$pulse_id']],
+                                                    ]
+                                                ],
+                                                [
+                                                    '$sort' => [
+                                                        'modified'  => -1,
+                                                    ]
+                                                ],
+                                                [
+                                                    '$limit' => $limit
+                                                ]
+                                            ];
+                                             $dataWait['queryData'] = $col_fx_otx_events->aggregate($pipeline,$options);
+                                         
+                                             $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                                             $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
+                                             $data['dataSearch']["Events"] = $dataWait;
+                                        }
+                                        //===============================================================
+
+                    // $dataWait['queryData'] = $col_fx_transaction_otx_indicators_data->aggregate($pipeline,$options);
+                    // $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                    // $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
+                    // $data['dataSearch']["indicators"] = $dataWait;
+                }
+            }
+
+            if(@$role_custom['indicators']) {
+                //Adversaries
+              
+                $this->request->keyword = trim($this->request->keyword);
+                $dataWait = null;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+                $pipeLine = array('adversary_name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
+                $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
+             
+                if($dataWait['count']>0){
+                    $options = [
+                        'allowDiskUse' => TRUE
+                    ];
+                    $pipeline = [
+                        [
+                            '$match' => [
+                                'adversary_name'  => ['$regex'=>$this->request->keyword, '$options' => 'i'],
+                            ]
+                        ],
+                        [
+                            '$project' => [
+                                '_id' => 0,
+                                'adversary_uuid' => '$adversary_uuid',
+                                'pulse_id' => '$pulse_id',
+                            ]
+                        ],
+                        [
+                            '$sort' => [
+                                'updated_at'  => -1,
+                            ]
+                        ],
+                        [
+                            '$limit' => $limit
+                        ]
+                    ];
+
+
+               
+
+                                        //ให้แสดง Event แทน=========================================================
+                                     $dataWait['queryData'] = $col_fx_otx_malware_related->aggregate($pipeline,$options);
+                                     $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                                        $event_ids = [];
+                                       
+                                        foreach($dataWait['queryData'] as $key_plus => $value_plus){
+                                                     
+                                            if(!in_array($value_plus['pulse_id'],$event_ids ) )
+                                             {
+                                                 array_push($event_ids,$value_plus['pulse_id']);
+                                              
+                                             }
+                                       }
+
+
+                                     
+                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                                        $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
+                                        $dataWait['count'] =count($event_ids);
+                                       
+                                        if($dataWait['count']>0){
+                                            $options = [
+                                                'allowDiskUse' => TRUE
+                                            ];
+                                            $pipeline = [
+                                                [
+                                                    '$match' => [
+                                                        'pulse_id'  => ['$in'=>$event_ids],
+                                                    ]
+                                                ],
+                                                [
+                                                    '$project' => [
+                                                        '_id' => 0,
+                                                        'id' => '$pulse_id',
+                                                        'name' => '$name',
+                                                        'is_modified' => '$is_modified',
+                                                        'public' => '$public',
+                                                        'created_at' => '$created_at',
+                                                        'modified' => '$modified',
+                                                        'tags' => '$tags',
+                                                        'groups' => '$groups',
+                                                        'industries' => '$industries',
+                                                        'content' => [ '$concat' => ['source: ','$source']],
+                                                        'link' => [ '$concat' => ['/indicators/events/events_detail/','$pulse_id']],
+                                                    ]
+                                                ],
+                                                [
+                                                    '$sort' => [
+                                                        'modified'  => -1,
+                                                    ]
+                                                ],
+                                                [
+                                                    '$limit' => $limit
+                                                ]
+                                            ];
+                                             $dataWait['queryData'] = $col_fx_otx_events->aggregate($pipeline,$options);
+                                          
+                                             $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                                          
+                                             $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
+                                             $data['dataSearch']["Events"] = $dataWait;
+                                            
+                                        }
+                                        //===============================================================
+
+                    // $dataWait['queryData'] = $col_fx_transaction_otx_indicators_data->aggregate($pipeline,$options);
+                    // $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                    // $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
+                    // $data['dataSearch']["indicators"] = $dataWait;
+                }
+            }
+
+            if(@$role_custom['indicators']) {
+                //Malware
+                $this->request->keyword = trim($this->request->keyword);
+                $dataWait = null;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_malware;
+                $pipeLine = array('malware_uuid' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
+                $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
+                if($dataWait['count']>0){
+                    $options = [
+                        'allowDiskUse' => TRUE
+                    ];
+                    $pipeline = [
+                        [
+                            '$match' => [
+                                'malware_uuid'  => ['$regex'=>$this->request->keyword, '$options' => 'i'],
+                            ]
+                        ],
+                        [
+                            '$project' => [
+                                '_id' => 0,
+                                'id' => '$malware_uuid',
+                                'name' => '$malware_uuid',
+                                'content' => [ '$concat' => ['category: ', '$category' ]],
+                                'link' => [ '$concat' => ['/indicators/malware/?id=','$adversary_uuid','&name=','$name']],
+                            ]
+                        ],
+                        [
+                            '$sort' => [
+                                'updated_at'  => -1,
+                            ]
+                        ],
+                        [
+                            '$limit' => $limit
+                        ]
+                    ];
+
+
+                 
+
+                    $dataWait['queryData'] = $col_fx_otx_malware_related->aggregate($pipeline,$options);
                     $dataWait['queryData'] = $dataWait['queryData']->toArray();
-                    $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
-                    $data['dataSearch']["indicators"] = $dataWait;
+                    $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/malware?Search_Link_All=".$this->request->keyword;
+                    $data['dataSearch']["malware"] = $dataWait;
+                }
+            }
+
+            if(@$role_custom['indicators']) {
+                //Adversaries
+              
+                $this->request->keyword = trim($this->request->keyword);
+                $dataWait = null;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
+                $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
+                $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
+                
+                if($dataWait['count']>0){
+                    $options = [
+                        'allowDiskUse' => TRUE
+                    ];
+                    $pipeline = [
+                        [
+                            '$match' => [
+                                'name'  => ['$regex'=>$this->request->keyword, '$options' => 'i'],
+                            ]
+                        ],
+                        [
+                            '$project' => [
+                                '_id' => 0,
+                                'id' => '$adversary_uuid',
+                                'name' => '$name',
+                                'content' => [ '$concat' => ['description: ', '$description' ]],
+                                'link' => [ '$concat' => ['/indicators/detail_adversary/','$adversary_uuid','?name=','$name']],
+                            ]
+                        ],
+                        [
+                            '$sort' => [
+                                'updated_at'  => -1,
+                            ]
+                        ],
+                        [
+                            '$limit' => $limit
+                        ]
+                    ];
+
+
+
+
+                    $dataWait['queryData'] = $col_fx_otx_malware_related->aggregate($pipeline,$options);
+                    $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                    $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/detail_adversary?Search_Link_All=".$this->request->keyword;
+                    $data['dataSearch']["Adversaries"] = $dataWait;
                 }
             }
 
