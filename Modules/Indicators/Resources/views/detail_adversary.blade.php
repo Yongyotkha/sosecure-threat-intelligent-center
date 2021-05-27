@@ -153,16 +153,7 @@
     });
     
 
-    $('#table-related-event').DataTable({
-        searching: false,
-        ordering: false,
-        pageLength: 25,
-        processing: true,
-        serverSide: true,
-        destroy: true,
-        order: [[ 6, "desc" ]],
-        "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">'
-    });
+    $('#table-related-event').DataTable();
 
 
     function copy_clipboard(id) {

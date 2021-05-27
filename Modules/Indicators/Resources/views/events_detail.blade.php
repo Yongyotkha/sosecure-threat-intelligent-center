@@ -70,7 +70,7 @@
                         </li>
                         <li id="tab-attributes">
                             <a href="#tab_malware" data-toggle="tab">
-                                Malware Families ( 23K )
+                                Malware ( 23K )
                             </a>
                         </li>
                         <li id="tab-attributes">
@@ -186,10 +186,7 @@
                                     
                                     <div class="panel-body clause shadow">
                                         <div class="item-search">
-                                            <div style="width: 10%" class="text-center">
-                                                <span class="circle-adversary" style="background: #d9534f"></span>
-                                             </div>
-                                            <div style="width: 90%;">
+                                            <div style="width: 100%;">
                                                 <a href="{{route('indicators.detail_adversary')}}" class="fz-search-20px">
                                                     APT 29
                                                 </a>
@@ -203,10 +200,7 @@
 
                                     <div class="panel-body clause shadow">
                                         <div class="item-search">
-                                            <div style="width: 10%" class="text-center">
-                                                <span class="circle-adversary" style="background: #2582d8"></span>
-                                             </div>
-                                            <div style="width: 90%;">
+                                            <div style="width: 100%;">
                                                 <a href="{{route('indicators.detail_adversary')}}" class="fz-search-20px">
                                                     APT 29
                                                 </a>
