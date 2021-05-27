@@ -48,7 +48,7 @@
             </div> --}}
 
             <section class="panel panel-default m-b-xs">
-                <div class="panel-body hide" id="table-container">
+                <div class="panel-body" id="table-container">
                     <div class="row">
                         <div class="col-md-12">
                             <div id="fillter_click" class="button-group">
@@ -677,12 +677,12 @@
                     @if (!empty($dataSearch))
                         @foreach ($dataSearch as $key => $value)
                             @if (isset($value["count"])&&$value["count"] > 0)
-                                <li id="{{slugify($key)}}_head" class="panel-default">
-                                    {{-- <div class="panel-heading fontw-weight-bold">
+                                <li id="{{slugify($key)}}_head" class="panel panel-default">
+                                    <div class="panel-heading fontw-weight-bold">
                                         <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#{{ slugify($key) }}">
                                             @icon('solid/caret-right') {{ humanize($key) }} ({{!empty($value["count"]) ? number_format($value["count"]) : 0}})
                                         </a>
-                                    </div> --}}
+                                    </div>
                                     <div id="{{ slugify($key) }}" class="panel-collapse collapse in">
                                         @foreach ($value["queryData"] as $key2 => $value2)
                                             @php
