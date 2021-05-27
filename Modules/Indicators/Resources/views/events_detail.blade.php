@@ -75,7 +75,7 @@
                         </li>
                         <li id="tab-attributes">
                             <a href="#tab_adversaries" data-toggle="tab">
-                                Adversaries ( 314 )
+                                Adversaries ( <span id="number_adversaries">0</span> )
                             </a>
                         </li>
                         <li id="tab-event">
@@ -183,8 +183,8 @@
                                             </div>
                                         </div>
                                     </header>
-                                    
-                                    <div class="panel-body clause shadow">
+                                    <div id="body_adversaries"></div>
+                                    {{-- <div class="panel-body clause shadow">
                                         <div class="item-search">
                                             <div style="width: 100%;">
                                                 <a href="{{route('indicators.detail_adversary')}}" class="fz-search-20px">
@@ -210,7 +210,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                 </section>
                             </div>
@@ -339,13 +339,43 @@
 
                 $(function() {
                     load_table_attributes();
-
+                    load_adversaries();
                 });
 
-                $(function() {
-
-
-                });
+                function load_adversaries(){
+                    $('#body_adversaries').empty();
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        url: "/indicators/adversaries",
+                        type: "get",
+                        data: ({
+                            pulse_id:{!! json_encode($pulse_id) !!},
+                        }),
+                        beforeSend: function(){
+                        },
+                    }).done(function(data){
+                        let number_adversaries = data.data.length;
+                        $('#number_adversaries').text(number_adversaries);
+                        let html = ``;
+                        for(let row in data.data){
+                            const element = data.data[i];
+                            html += `<div class="panel-body clause shadow">
+                                <div class="item-search">
+                                    <div style="width: 100%;">
+                                        <a href="/indicators/detail_adversary/${element.adversary_uuid}" class="fz-search-20px">
+                                            ${element.adversary_name}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>`;
+                        }
+                        $('#body_adversaries').html(html);
+                    }).fail(function(jqXHR, ajaxOptions, thrownError){
+                        console.log("No response from server");
+                    });
+                }
 
                 function load_table_attributes(){
 

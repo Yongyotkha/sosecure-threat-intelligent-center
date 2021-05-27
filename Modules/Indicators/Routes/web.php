@@ -25,7 +25,7 @@ Route::group(
 
 
         Route::get('/detail_malware', 'IndicatorsController@show_detail_malware')->name('indicators.detail_malware')->middleware('can:menu_items');
-        Route::get('/detail_adversary', 'IndicatorsController@show_detail_adversary')->name('indicators.detail_adversary')->middleware('can:menu_items');
+        Route::get('/detail_adversary/{adversary_uuid}', 'IndicatorsController@show_detail_adversary')->name('indicators.detail_adversary')->middleware('can:menu_items');
 
 
 
@@ -51,5 +51,7 @@ Route::group(
         Route::get('/group', 'IndicatorsController@indicator_group')->name('indicators.indicator_group')->middleware('can:menu_items');
 
         Route::get('/indicator_insert_tag', 'IndicatorsController@insert_tag')->name('indicators.modal_tag')->middleware('can:menu_items');
+
+        Route::get('/adversaries', 'IndicatorsController@adversaries')->name('indicators.adversaries');
     }
 );

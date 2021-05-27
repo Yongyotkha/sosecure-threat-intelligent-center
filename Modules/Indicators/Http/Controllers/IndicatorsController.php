@@ -256,6 +256,23 @@ class IndicatorsController extends Controller
         }
     }
 
+    public function adversaries(Request $request){
+        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $client = new \MongoDB\Client($DB_MONGO_KEY);
+        $db_name = 'sosecure_threatintelligent';
+        $db = $client->$db_name;
+        $collection = $db->fx_otx_adversaries_related;
+        $where = array(
+            'pulse_id' => $request -> pulse_id,
+        );
+
+        $cursor = $collection->find($where); 
+        $data = [
+            "data" => $cursor,
+        ];
+        return response()->json($data);
+    }
+
     public function attributes()
     {
         $role_custom = @check_role_custom();
@@ -331,6 +348,17 @@ class IndicatorsController extends Controller
         $data['otxtype'] = $request->type;
         $data['otxindicator'] = $request->indicator;
 
+        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $client = new \MongoDB\Client($DB_MONGO_KEY);
+        $db_name = 'sosecure_threatintelligent';
+        $db = $client->$db_name;
+        $collection = $db->fx_otx_adversaries;
+        $where = array(
+            'adversary_uuid' => $request -> adversary_uuid,
+        );
+
+        $cursor = $collection->find($where); 
+        $data['adversary'] = $cursor;
         $data['page'] = 'Adversary';
         return view('indicators::detail_adversary')->with($data);
     }

@@ -10,7 +10,7 @@
                         class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                         @icon('solid/arrow-left')
                     </a>
-                    Adversary : Apt 16
+                    Adversary : {{ $adversary -> name }}
                 </div>
 
                 &nbsp;
@@ -36,18 +36,12 @@
                     <div class="pd-15">
                         <div class="row m-b-xs">
                             <div class="col-md-12">
-                                <h1> Apt 16</h1>
+                                <h1> {{ $adversary -> name }}</h1>
                             </div>
                             <div class="col-md-12">
                                 <b> Description</b>
                                 <p>
-                                    Between November 26, 2015, and December 1, 2015, known and suspected China-based APT
-                                    groups launched several spear-phishing attacks targeting Japanese and Taiwanese organizations 
-                                    in the high-tech, government services, media and financial services industries. Each campaign 
-                                    delivered a malicious Microsoft Word document   exploiting the aforementioned EPS dict copy 
-                                    use-after-free vulnerability, and the local Windows privilege escalation vulnerability CVE-2015-1701. 
-                                    The successful exploitation of both vulnerabilities led to the delivery of either a downloader 
-                                    that we refer to as IRONHALO, or a backdoor that we refer to as ELMER.
+                                    {!! $adversary -> description !!}
                                 </p>
                             </div>
                     
