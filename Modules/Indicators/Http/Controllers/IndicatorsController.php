@@ -265,10 +265,10 @@ class IndicatorsController extends Controller
         $where = array(
             'pulse_id' => $request -> pulse_id,
         );
-
-        $cursor = $collection->find($where); 
+        $options = [];
+        $cursor = $collection->find($where, $options); 
         $data = [
-            "data" => $cursor,
+            "data" => $cursor->toArray(),
         ];
         return response()->json($data);
     }
@@ -356,9 +356,9 @@ class IndicatorsController extends Controller
         $where = array(
             'adversary_uuid' => $request -> adversary_uuid,
         );
-
-        $cursor = $collection->find($where); 
-        $data['adversary'] = $cursor;
+        $options = [];
+        $cursor = $collection->find($where, $options); 
+        $data['adversary'] = $cursor->toArray();
         $data['page'] = 'Adversary';
         return view('indicators::detail_adversary')->with($data);
     }

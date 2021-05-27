@@ -10,7 +10,7 @@
                         class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                         @icon('solid/arrow-left')
                     </a>
-                    Adversary : {{ $adversary -> name }}
+                    Adversary : {{ $adversary[0] -> name }}
                 </div>
 
                 &nbsp;
@@ -36,23 +36,23 @@
                     <div class="pd-15">
                         <div class="row m-b-xs">
                             <div class="col-md-12">
-                                <h1> {{ $adversary -> name }}</h1>
+                                <h1> {{ $adversary[0] -> name }}</h1>
                             </div>
                             <div class="col-md-12">
                                 <b> Description</b>
                                 <p>
-                                    {!! $adversary -> description !!}
+                                    {!! $adversary[0] -> description !!}
                                 </p>
                             </div>
                     
                             <div class="col-md-12">
                                 <p>
-                                    <b> ALSO KNOWN AS</b> : <a>APT16,  SVCMONDR</a>
+                                    <b> ALSO KNOWN AS</b> : <a>{{ $adversary[0] -> synonyms == null ? '-' :  $adversary[0] -> synonyms }}</a>
                                 </p>
                             </div>
                             <div class="col-md-12">
                                 <p>
-                                    <b>POSSIBLE LOCATION</b> : <a>CN</a>
+                                    <b>POSSIBLE LOCATION</b> : <a>{{ $adversary[0] -> country == null ? '-' :  $adversary[0] -> country }}</a>
                                 </p>
                             </div>
                             <div class="col-md-12">
@@ -95,7 +95,6 @@
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
-
                                             </table>
                                             {{--<div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>--}}
                                         </div>
@@ -142,14 +141,125 @@
         $("#copy_button").click(function(){
             copy_clipboard("otxindicator_text");
         });
-
+        related_event();
 
     });
+    var count_page = -1;
+    var count_page2 = -1;
+    let pulse_id = '{{ request()->pulse_id }}';
+    function related_event(){
+        $('#table-related-event').DataTable({
+            searching: false,
+            ordering: false,
+            pageLength: 25,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            order: [[ 6, "desc" ]],
+            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            ajax: {
+                async:true,
+                type: "POST",
+                url: '{!! route('indicators.events_pulse_table')!!}',
+                dataSrc: function ( json ) {
+                    count_page2 = json.recordsTotal;
+                    return json.data;
+                },
+                data:function(d){
+                    d.pulse_id = pulse_id;
+                    d.count_page = count_page2;
+                }
+            },
+            initComplete : function( settings, json){
+                datatable = json.cursor;
+                $('[data-toggle="tooltip"]').tooltip();
+            },
+
+            columns: [
+                {
+                    data: 'No',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                },
+                {
+                    data: 'name',
+                },
+                {
+                    data: 'groups',
+                },
+                {
+                    data: 'tags',
+                },
+                {
+                    data: 'public',
+                },
+                {
+                    data: 'is_modified',
+                },
+                {
+                    data: 'modified',
+                },
+                {
+                    data: 'attrCount',
+                },
+                {
+                    data: 'pulse_id',
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
+                },
+            ],
+            columnDefs: [
+            {
+                targets: 1,
+                render: function (data, type, row) {
+                    var inner = '';
+                    inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a>';
+                    return inner;
+                }
+
+            },
+            {
+                targets: 4,
+                render: function (data, type, row) {
+                    var inner = '';
+                    if(row.public==1) {
+                        inner = '<i class="fas fa-check"></i>';
+                    } else {
+                        inner = '<i class="fas fa-times"></i>';
+                    }
+                    return inner;
+                }
+
+            },
+            {
+                targets: 5,
+                render: function (data, type, row) {
+                    var inner = '';
+                    if(row.is_modified == true) {
+                        inner = 'Modified';
+                    } else {
+                        inner = 'Created';
+                    }
+                    return inner;
+                }
+
+            },
+            {
+                targets: 8,
+                render: function (data, type, row) {
+                    var inner = '';
+                    inner =  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                    return inner;
+                }
+
+            }
+
+            ]
+        });
+    }
     
-
-    $('#table-related-event').DataTable();
-
-
     function copy_clipboard(id) {
         var copyText = document.getElementById(id);
         var textArea = document.createElement("textarea");
