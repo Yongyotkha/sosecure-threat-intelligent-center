@@ -691,25 +691,53 @@
                                                     $class_indicator = 'div_i_type';
                                                 }
                                             @endphp
-                                            <div class="panel-body clause {{@$class_indicator}}" data-div_i_type="{!!@$slug!!}">
+                                            {{-- <div class="panel-body clause {{@$class_indicator}}" data-div_i_type="{!!@$slug!!}">
                                                 <div class="item-search">
                                                     <div style="width: 90%;">
                                                         <div class="badege-search">{{ humanize($key) }}</div>
                                                         <a href="{{$value2["link"]}}" target="_blank" class="fz-search-20px">
                                                             {{$value2["name"]}}
                                                         </a>
-                                                        <div style="
-                                                        white-space: nowrap;
-                                                        overflow:hidden;
-                                                        text-overflow: ellipsis;
-                                                        -webkit-box-orient: vertical;">{!!$value2["content"]!!}</div>
+                                                        <div class="text-elips-ct">{!!$value2["content"]!!}</div>
+
+                                                        
+                                                        
                                                     </div>
                                                     <div style="width: 10%" class="text-center">
                                                         <a href="{{$value2["link"]}}" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
                                                     </div>
                                                 </div>
-                                               
+                                            </div> --}}
+                                            <div class="panel-body clause {{@$class_indicator}}" data-div_i_type="{!!@$slug!!}">
+                                                <div class="item-search">
+                                                    <div style="width: 90%;">
+                                                        <a href="{{$value2["link"]}}" target="_blank" class="fz-search-20px">
+                                                            {{$value2["name"]}}
+                                                        </a>
+                                                        <div class="text-elips-ct"></div>
+                                                        <p class="">Last Status : Modified | Public : <i class="fas fa-check"></i></p>
+                                                        <p>Created : 2021-02-04 23:13 | Modified : 2021-05-26 22:50</p>
+                                                        <p>Tags :  
+                                                            <a href="#">webscanner</a> ,
+                                                            <a href="#"> bruteforce</a> ,
+                                                            <a href="#"> web app attack</a> ,
+                                                            <a href="#">probing</a> ,
+                                                            <a href="#"> webscan</a> ,
+                                                            <a href="#"> scanning</a> ,
+                                                        </p>
+                                                        <p>Groups : 
+                                                            <a href="#">Bad Bots</a> ,
+                                                            <a href="#"> Blue Team Intelligence - Open Forum</a> ,
+                                                            <a href="#"> MISP FEED</a> ,
+                                                            <a href="#"> Nuisances which waste server time and bandwidth</a> ,
+                                                        </p>
+                                                    </div>
+                                                    <div style="width: 10%" class="text-center">
+                                                        <a href="{{$value2["link"]}}" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                                    </div>
+                                                </div>
                                             </div>
+
                                         @endforeach
                                         
                                         @if ($key == "Events" && $value["count"] > 100)

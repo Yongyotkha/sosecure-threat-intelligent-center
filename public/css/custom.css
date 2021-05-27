@@ -5006,3 +5006,10 @@ strong > p{
     display: inline-block;
     border-radius: 50%;
 }
+
+.text-elips-ct{
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+}
