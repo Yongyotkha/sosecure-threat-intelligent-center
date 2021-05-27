@@ -24,6 +24,11 @@ Route::group(
         Route::get('/events/events_detail/{id}', 'IndicatorsController@events_detail_select')->name('indicators.events_detail_select')->middleware('can:menu_items');
 
 
+        Route::get('/detail_malware', 'IndicatorsController@show_detail_malware')->name('indicators.detail_malware')->middleware('can:menu_items');
+        Route::get('/detail_adversary', 'IndicatorsController@show_detail_adversary')->name('indicators.detail_adversary')->middleware('can:menu_items');
+
+
+
         Route::get('/attributes', 'IndicatorsController@attributes')->name('indicators.attributes')->middleware('can:menu_items');
         // Route::get('/details', 'IndicatorsController@show_detail_indicators')->name('indicators.detail_indicators')->middleware('can:menu_items');
         Route::get('/LoadMoreOTX', 'IndicatorsController@LoadMoreOTX')->name('LoadMoreOTX');

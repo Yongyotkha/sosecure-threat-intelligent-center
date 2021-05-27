@@ -63,10 +63,26 @@
 
                 <div class="tabbable">
                     <ul class="nav nav-tabs nav-tabs-highlight">
-                        <li id="tab-attributes" class="active"><a href="#tab_attributes" data-toggle="tab">Attributes
-                        ({{@$otx_events[0]['indicator_count']}})</a></li>
-                        <li id="tab-event"><a href="#tab_related_event" data-toggle="tab">Related Event
-                        ({{@$count_related_pulse}})</a></li>
+                        <li id="tab-attributes" class="active">
+                            <a href="#tab_attributes" data-toggle="tab">
+                                Attributes  ({{@$otx_events[0]['indicator_count']}})
+                            </a>
+                        </li>
+                        <li id="tab-attributes">
+                            <a href="#tab_malware" data-toggle="tab">
+                                Malware Families ( 23K )
+                            </a>
+                        </li>
+                        <li id="tab-attributes">
+                            <a href="#tab_adversaries" data-toggle="tab">
+                                Adversaries ( 314 )
+                            </a>
+                        </li>
+                        <li id="tab-event">
+                            <a href="#tab_related_event" data-toggle="tab">
+                                Related Event ({{@$count_related_pulse}})
+                            </a>
+                        </li>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab_attributes">
@@ -109,52 +125,151 @@
                                     </div>
                                 </section>
                             </div>
-                            <div class="tab-pane" id="tab_related_event">
-                                <section class="panel panel-default">
-                                    <header class="panel-heading font-bold panel-header-blue">
+
+
+                            <div class="tab-pane" id="tab_malware">
+                                <section class="panel-default">
+                                    <header class="panel-heading font-bold panel-header-blue" style="margin-bottom: 1rem">
                                         <div class="row">
                                             <div class="col-xs-12">
-                                                <i class="fas fa-table"></i> Table Related Event
+                                                <i class="fas fa-table"></i> Malware Families
                                             </div>
                                         </div>
                                     </header>
-                                    <div class="panel-body">
-                                        <div class="row m-b-md">
-                                            <div class="col-sm-12">
-                                                <div class="table-responsive">
-                                                    <table class="table table-striped" id="table-related-event">
-                                                        <thead>
-                                                            <tr>
-
-                                                                <th>No</th>
-                                                                <th>Event Name</th>
-                                                                <th>Group</th>
-                                                                <th>Tags</th>
-                                                                <th>Published</th>
-                                                                <th>Last Status</th>
-                                                                <th style="width: 200px;">DateTime</th>
-                                                                <th>Attribute</th>
-                                                                <th>Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                <div id="showing_amount_text_pulse" class="pull-left"
-                                                style="margin-top: 5px; margin-left: 15px;"></div>
-                                                <div class="pull-right" style="padding-right: 10px;" id="pagination_custom_pulse">
+                                    
+                                    <div class="panel-body clause shadow">
+                                        <div class="item-search">
+                                            <div style="width: 90%;">
+                                                <a href="{{route('indicators.detail_malware')}}" class="fz-search-20px">
+                                                    (?W_1_20
+                                                </a>
+                                                <div>
+                                                    Category: Backdoor
                                                 </div>
                                             </div>
-
+                                            <div style="width: 10%" class="text-center">
+                                               1<br>
+                                               PULSE
+                                            </div>
                                         </div>
                                     </div>
+
+                                    <div class="panel-body clause shadow">
+                                        <div class="item-search">
+                                            <div style="width: 90%;">
+                                                <a href="{{route('indicators.detail_malware')}}" class="fz-search-20px">
+                                                    #ADFI20120327_0000
+                                                </a>
+                                                <div>
+                                                    Category: Backdoor
+                                                </div>
+                                            </div>
+                                            <div style="width: 10%" class="text-center">
+                                               1<br>
+                                               PULSE
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </section>
                             </div>
+
+                            <div class="tab-pane" id="tab_adversaries">
+                                <section class="panel-default">
+                                    <header class="panel-heading font-bold panel-header-blue" style="margin-bottom: 1rem">
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <i class="fas fa-table"></i> Adversaries
+                                            </div>
+                                        </div>
+                                    </header>
+                                    
+                                    <div class="panel-body clause shadow">
+                                        <div class="item-search">
+                                            <div style="width: 10%" class="text-center">
+                                                <span class="circle-adversary" style="background: #d9534f"></span>
+                                             </div>
+                                            <div style="width: 90%;">
+                                                <a href="{{route('indicators.detail_adversary')}}" class="fz-search-20px">
+                                                    APT 29
+                                                </a>
+                                                <div>
+                                                    Also known as: Dukes,  Group 100,  Cozy Duke,  CozyDuke,  EuroAPT,  CozyBear,  CozyCar,  Cozer,  Office Monkeys,  OfficeMonkeys, 
+                                                    APT29,  Cozy Bear,  The Dukes,  Minidionis,  SeaDuke,  Hammer Toss,  YTTRIUM,  Iron Hemlock,  Grizzly Steppe, 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="panel-body clause shadow">
+                                        <div class="item-search">
+                                            <div style="width: 10%" class="text-center">
+                                                <span class="circle-adversary" style="background: #2582d8"></span>
+                                             </div>
+                                            <div style="width: 90%;">
+                                                <a href="{{route('indicators.detail_adversary')}}" class="fz-search-20px">
+                                                    APT 29
+                                                </a>
+                                                <div>
+                                                    Also known as: Dukes,  Group 100,  Cozy Duke,  CozyDuke,  EuroAPT,  CozyBear,  CozyCar,  Cozer,  Office Monkeys,  OfficeMonkeys, 
+                                                    APT29,  Cozy Bear,  The Dukes,  Minidionis,  SeaDuke,  Hammer Toss,  YTTRIUM,  Iron Hemlock,  Grizzly Steppe, 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </section>
+                            </div>
+
+
+                        <div class="tab-pane" id="tab_related_event">
+                            <section class="panel panel-default">
+                                <header class="panel-heading font-bold panel-header-blue">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <i class="fas fa-table"></i> Table Related Event
+                                        </div>
+                                    </div>
+                                </header>
+                                <div class="panel-body">
+                                    <div class="row m-b-md">
+                                        <div class="col-sm-12">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped" id="table-related-event">
+                                                    <thead>
+                                                        <tr>
+
+                                                            <th>No</th>
+                                                            <th>Event Name</th>
+                                                            <th>Group</th>
+                                                            <th>Tags</th>
+                                                            <th>Published</th>
+                                                            <th>Last Status</th>
+                                                            <th style="width: 200px;">DateTime</th>
+                                                            <th>Attribute</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div id="showing_amount_text_pulse" class="pull-left"
+                                            style="margin-top: 5px; margin-left: 15px;"></div>
+                                            <div class="pull-right" style="padding-right: 10px;" id="pagination_custom_pulse">
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </section>
                         </div>
-                    </section>
+
+
+                    </div>
                 </section>
+            </section>
 
                 <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
             </section>

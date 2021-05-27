@@ -304,6 +304,39 @@ class IndicatorsController extends Controller
     }
 
 
+
+    public function show_detail_malware(Request $request)
+    {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['indicators']) {
+            check_permission403();
+        }
+        $data['otxid'] = $request->id;
+        $data['otxtype'] = $request->type;
+        $data['otxindicator'] = $request->indicator;
+
+        $data['page'] = 'Malware Families';
+        return view('indicators::detail_malware')->with($data);
+    }
+
+
+
+    public function show_detail_adversary(Request $request)
+    {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['indicators']) {
+            check_permission403();
+        }
+        $data['otxid'] = $request->id;
+        $data['otxtype'] = $request->type;
+        $data['otxindicator'] = $request->indicator;
+
+        $data['page'] = 'Adversary';
+        return view('indicators::detail_adversary')->with($data);
+    }
+
+
+
     public function load_general(Request $request)
     {
         $role_custom = @check_role_custom();

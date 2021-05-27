@@ -193,7 +193,7 @@
                             <option value="0" disabled="disabled">Selected</option>
                             <option></option>
                             <option value="1">Industries</option>
-                            <option value="2">Group</option>
+                            {{-- <option value="2">Group</option> --}}
                         </select>
                     </div>
                     <div class="col-md-10">
