@@ -47,8 +47,8 @@
                 <button class="btn-start-lookup">Inteligence Threat Lookup</button>
             </div> --}}
 
-            <section class="panel panel-default m-b-xs hide" id="table-container">
-                <div class="panel-body">
+            <section class="panel panel-default m-b-xs">
+                <div class="panel-body hide" id="table-container">
                     <div class="row">
                         <div class="col-md-12">
                             <div id="fillter_click" class="button-group">
