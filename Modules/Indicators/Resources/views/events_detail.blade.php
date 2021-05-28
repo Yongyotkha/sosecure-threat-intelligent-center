@@ -137,40 +137,6 @@
                                         </div>
                                     </header>
                                     <div id="body_malware"></div>
-                                    {{-- <div class="panel-body clause shadow">
-                                        <div class="item-search">
-                                            <div style="width: 90%;">
-                                                <a href="{{route('indicators.detail_malware')}}" class="fz-search-20px">
-                                                    (?W_1_20
-                                                </a>
-                                                <div>
-                                                    Category: Backdoor
-                                                </div>
-                                            </div>
-                                            <div style="width: 10%" class="text-center">
-                                               1<br>
-                                               PULSE
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="panel-body clause shadow">
-                                        <div class="item-search">
-                                            <div style="width: 90%;">
-                                                <a href="{{route('indicators.detail_malware')}}" class="fz-search-20px">
-                                                    #ADFI20120327_0000
-                                                </a>
-                                                <div>
-                                                    Category: Backdoor
-                                                </div>
-                                            </div>
-                                            <div style="width: 10%" class="text-center">
-                                               1<br>
-                                               PULSE
-                                            </div>
-                                        </div>
-                                    </div> --}}
-
                                 </section>
                             </div>
 
@@ -184,34 +150,6 @@
                                         </div>
                                     </header>
                                     <div id="body_adversaries"></div>
-                                    {{-- <div class="panel-body clause shadow">
-                                        <div class="item-search">
-                                            <div style="width: 100%;">
-                                                <a href="{{route('indicators.detail_adversary')}}" class="fz-search-20px">
-                                                    APT 29
-                                                </a>
-                                                <div>
-                                                    Also known as: Dukes,  Group 100,  Cozy Duke,  CozyDuke,  EuroAPT,  CozyBear,  CozyCar,  Cozer,  Office Monkeys,  OfficeMonkeys, 
-                                                    APT29,  Cozy Bear,  The Dukes,  Minidionis,  SeaDuke,  Hammer Toss,  YTTRIUM,  Iron Hemlock,  Grizzly Steppe, 
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="panel-body clause shadow">
-                                        <div class="item-search">
-                                            <div style="width: 100%;">
-                                                <a href="{{route('indicators.detail_adversary')}}" class="fz-search-20px">
-                                                    APT 29
-                                                </a>
-                                                <div>
-                                                    Also known as: Dukes,  Group 100,  Cozy Duke,  CozyDuke,  EuroAPT,  CozyBear,  CozyCar,  Cozer,  Office Monkeys,  OfficeMonkeys, 
-                                                    APT29,  Cozy Bear,  The Dukes,  Minidionis,  SeaDuke,  Hammer Toss,  YTTRIUM,  Iron Hemlock,  Grizzly Steppe, 
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> --}}
-
                                 </section>
                             </div>
 
@@ -401,7 +339,7 @@
                                 <div class="panel-body clause shadow">
                                     <div class="item-search">
                                         <div style="width: 90%;">
-                                            <a href="/indicators/detail_malware/${encodeURIComponent(element.malware_uuid)}/${element.pulse_id}" class="fz-search-20px">
+                                            <a href="/indicators/detail_malware/?malware_uuid=${encodeURIComponent(element.malware_uuid)}&pulse_id=${element.pulse_id}" class="fz-search-20px">
                                                 ${element.malware_name}
                                             </a>
                                             <div>
