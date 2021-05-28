@@ -273,6 +273,23 @@ class IndicatorsController extends Controller
         return response()->json($data);
     }
 
+    public function malware(Request $request){
+        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $client = new \MongoDB\Client($DB_MONGO_KEY);
+        $db_name = 'sosecure_threatintelligent';
+        $db = $client->$db_name;
+        $collection = $db->fx_otx_malware_related;
+        $where = array(
+            'pulse_id' => $request -> pulse_id,
+        );
+        $options = [];
+        $cursor = $collection->find($where, $options); 
+        $data = [
+            "data" => $cursor->toArray(),
+        ];
+        return response()->json($data);
+    }
+
     public function attributes()
     {
         $role_custom = @check_role_custom();
@@ -331,6 +348,18 @@ class IndicatorsController extends Controller
         $data['otxid'] = $request->id;
         $data['otxtype'] = $request->type;
         $data['otxindicator'] = $request->indicator;
+
+        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $client = new \MongoDB\Client($DB_MONGO_KEY);
+        $db_name = 'sosecure_threatintelligent';
+        $db = $client->$db_name;
+        $collection = $db->fx_otx_malware;
+        $where = array(
+            'malware_uuid' => urldecode($request -> malware_uuid),
+        );
+        $options = [];
+        $cursor = $collection->find($where, $options); 
+        $data['detail_malware'] = $cursor->toArray();
 
         $data['page'] = 'Malware Families';
         return view('indicators::detail_malware')->with($data);

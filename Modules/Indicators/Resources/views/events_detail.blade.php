@@ -70,7 +70,7 @@
                         </li>
                         <li id="tab-attributes">
                             <a href="#tab_malware" data-toggle="tab">
-                                Malware ( 23K )
+                                Malware ( <span id="number_malware">0</span> )
                             </a>
                         </li>
                         <li id="tab-attributes">
@@ -136,8 +136,8 @@
                                             </div>
                                         </div>
                                     </header>
-                                    
-                                    <div class="panel-body clause shadow">
+                                    <div id="body_malware"></div>
+                                    {{-- <div class="panel-body clause shadow">
                                         <div class="item-search">
                                             <div style="width: 90%;">
                                                 <a href="{{route('indicators.detail_malware')}}" class="fz-search-20px">
@@ -169,7 +169,7 @@
                                                PULSE
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                 </section>
                             </div>
@@ -340,6 +340,7 @@
                 $(function() {
                     load_table_attributes();
                     load_adversaries();
+                    load_malware();
                 });
 
                 function load_adversaries(){
@@ -372,6 +373,46 @@
                             </div>`;
                         }
                         $('#body_adversaries').html(html);
+                    }).fail(function(jqXHR, ajaxOptions, thrownError){
+                        console.log("No response from server");
+                    });
+                }
+
+                function load_malware(){
+                    $('#body_malware').empty();
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        url: "/indicators/malware",
+                        type: "get",
+                        data: ({
+                            pulse_id:{!! json_encode($pulse_id) !!},
+                        }),
+                        beforeSend: function(){
+                        },
+                    }).done(function(data){
+                        let number_malware = data.data.length;
+                        $('#number_malware').text(number_malware);
+                        let html = ``;
+                        for(let row in data.data){
+                            const element = data.data[row];
+                            html += `
+                                <div class="panel-body clause shadow">
+                                    <div class="item-search">
+                                        <div style="width: 90%;">
+                                            <a href="/indicators/detail_malware/${encodeURIComponent(element.malware_uuid)}/${element.pulse_id}" class="fz-search-20px">
+                                                ${element.malware_name}
+                                            </a>
+                                            <div>
+                                                Category: ${element.malware_catogry}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        $('#body_malware').html(html);
                     }).fail(function(jqXHR, ajaxOptions, thrownError){
                         console.log("No response from server");
                     });

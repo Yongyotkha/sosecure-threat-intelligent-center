@@ -10,7 +10,7 @@
                         class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                         @icon('solid/arrow-left')
                     </a>
-                    Threat Actor : {{ $adversary[0] -> name }}
+                    Threat Actor : {{ @$adversary[0] -> name }}
                 </div>
 
                 &nbsp;
@@ -36,23 +36,23 @@
                     <div class="pd-15">
                         <div class="row m-b-xs">
                             <div class="col-md-12">
-                                <h1> {{ $adversary[0] -> name }}</h1>
+                                <h1> {{ @$adversary[0] -> name }}</h1>
                             </div>
                             <div class="col-md-12">
                                 <b> Description</b>
                                 <p>
-                                    {!! $adversary[0] -> description !!}
+                                    {!! @$adversary[0] -> description !!}
                                 </p>
                             </div>
                     
                             <div class="col-md-12">
                                 <p>
-                                    <b> ALSO KNOWN AS</b> : <a>{{ $adversary[0] -> synonyms == null ? '-' :  $adversary[0] -> synonyms }}</a>
+                                    <b> ALSO KNOWN AS</b> : <a>{{ @$adversary[0] -> synonyms == null ? '-' :  $adversary[0] -> synonyms }}</a>
                                 </p>
                             </div>
                             <div class="col-md-12">
                                 <p>
-                                    <b>POSSIBLE LOCATION</b> : <a>{{ $adversary[0] -> country == null ? '-' :  $adversary[0] -> country }}</a>
+                                    <b>POSSIBLE LOCATION</b> : <a>{{ @$adversary[0] -> country == null ? '-' :  $adversary[0] -> country }}</a>
                                 </p>
                             </div>
 
@@ -144,7 +144,7 @@
     });
     var count_page = -1;
     var count_page2 = -1;
-    let pulse_id = '{{ request()->adversary_uuid }}';
+    let pulse_id = '{{ request()->pulse_id }}';
     function related_event(){
         $('#table-related-event').DataTable({
             searching: false,
