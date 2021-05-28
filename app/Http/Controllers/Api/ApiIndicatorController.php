@@ -1320,6 +1320,260 @@ class ApiIndicatorController extends ApiController
             return response()->json($response);
         }
     }
+
+    public function load_adversary_tb(Request $request)(){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'indicators'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+
+                    $draw = $data['data']['draw'];
+                    $row = $data['data']['row'];
+                    $rowperpage = $data['data']['rowperpage'];
+                    $start =  $row;
+                    $reqId = $data['data']['reqId'];
+        
+                    $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+                    $clientMD = new MongoClient($DB_MONGO_KEY);
+                    $html = '';
+                    $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+        
+                    $query = [
+                        'adversary_uuid' => $reqId,
+        
+                    ];
+        
+                    $options = [
+                    'skip' => $start,//10
+                    'limit' => $rowperpage//5
+                    ];
+            
+                    if($request->count_page==-1){
+                        $cursor_count = $fx_otx_events_event_ref->count($query); 
+                        $count_filter = $cursor_count;
+                    }else{
+                        $cursor_count = $request->count_page;
+                        $count_filter = $cursor_count;
+                    }
+                    
+            
+                    
+                    $cursor = $fx_otx_events_event_ref->find($query,$options);       
+                    $document_all = $cursor->toArray();
+            
+                        // set_time_limit(500); 
+                    
+                        // $count_doc = count($document_all);
+            
+                    $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                    $options = array(
+                        'typeMap' => array(
+                            'root' => 'array',
+                            'document' => 'array',
+                        ),
+                    );
+                    $data = array();
+                    $order_number = $start;
+            
+                    if($document_all){
+                        foreach ($document_all as  $value) {
+                            $query = [
+                                'pulse_id' => $value->pulse_id     
+                            ];
+                            $document = $col_fx_otx_events->findOne($query,$options);
+                            
+                            $order_number++;
+                            $nestedData['No'] = $order_number;
+                            $nestedData['name'] = $document["name"];
+                            $nestedData['groups'] = explode_val($document["groups"],'groups');
+                            $nestedData['tags'] = explode_val($document["tags"],'tags');
+                            $nestedData['attr'] = '';
+                            $nestedData['attrCount'] = $document["indicator_count"];
+                            $nestedData['public'] = ($document["public"]);
+                            $nestedData['is_modified'] = ($document["is_modified"]);
+            
+                            try {
+                                $nestedData['modified'] =@$document['modified'];
+                            } catch (Exception $e) {
+                                $nestedData['modified'] =$document['modified'];
+                            } finally {
+                                $nestedData['modified'] =$document['modified'];
+                            }
+            
+            
+                            $nestedData['count_view'] = @$document["count_view"];
+                            $nestedData['pulse_id'] = @$document["pulse_id"];
+            
+                            $data[] = $nestedData;
+            
+                        }
+                    }
+                    
+                    $dataOut["draw"] = $draw;
+                    $dataOut["recordsTotal"] = $cursor_count;
+                    $dataOut["recordsFiltered"] = $count_filter;
+                    $dataOut["data"] = $data;
+                    $dataOut["cursor"] = $cursor;
+
+                    $data_transcation = json_encode($dataOut);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function load_malware_tb(Request $request)(){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'indicators'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+
+                    $draw = $data['data']['draw'];
+                    $row = $data['data']['row'];
+                    $rowperpage = $data['data']['rowperpage'];
+                    $start =  $row;
+                    $reqId = $data['data']['reqId'];
+        
+                    $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+                    $clientMD = new MongoClient($DB_MONGO_KEY);
+                    $html = '';
+                    $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_malware_related;
+        
+                    $query = [
+                        'malware_uuid' => $reqId,
+        
+                    ];
+        
+                    $options = [
+                    'skip' => $start,//10
+                    'limit' => $rowperpage//5
+                    ];
+            
+                    if($request->count_page==-1){
+                        $cursor_count = $fx_otx_events_event_ref->count($query); 
+                        $count_filter = $cursor_count;
+                    }else{
+                        $cursor_count = $request->count_page;
+                        $count_filter = $cursor_count;
+                    }
+                    
+            
+                    
+                    $cursor = $fx_otx_events_event_ref->find($query,$options);       
+                    $document_all = $cursor->toArray();
+            
+                        // set_time_limit(500); 
+                    
+                        // $count_doc = count($document_all);
+            
+                    $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                    $options = array(
+                        'typeMap' => array(
+                            'root' => 'array',
+                            'document' => 'array',
+                        ),
+                    );
+                    $data = array();
+                    $order_number = $start;
+            
+                    if($document_all){
+                        foreach ($document_all as  $value) {
+                            $query = [
+                                'pulse_id' => $value->pulse_id     
+                            ];
+                            $document = $col_fx_otx_events->findOne($query,$options);
+                            
+                            $order_number++;
+                            $nestedData['No'] = $order_number;
+                            $nestedData['name'] = $document["name"];
+                            $nestedData['groups'] = explode_val($document["groups"],'groups');
+                            $nestedData['tags'] = explode_val($document["tags"],'tags');
+                            $nestedData['attr'] = '';
+                            $nestedData['attrCount'] = $document["indicator_count"];
+                            $nestedData['public'] = ($document["public"]);
+                            $nestedData['is_modified'] = ($document["is_modified"]);
+            
+                            try {
+                                $nestedData['modified'] =@$document['modified'];
+                            } catch (Exception $e) {
+                                $nestedData['modified'] =$document['modified'];
+                            } finally {
+                                $nestedData['modified'] =$document['modified'];
+                            }
+            
+            
+                            $nestedData['count_view'] = @$document["count_view"];
+                            $nestedData['pulse_id'] = @$document["pulse_id"];
+            
+                            $data[] = $nestedData;
+            
+                        }
+                    }
+                    
+                    $dataOut["draw"] = $draw;
+                    $dataOut["recordsTotal"] = $cursor_count;
+                    $dataOut["recordsFiltered"] = $count_filter;
+                    $dataOut["data"] = $data;
+                    $dataOut["cursor"] = $cursor;
+
+                    $data_transcation = json_encode($dataOut);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
     
     private function dataFalse($bearerToken, $mode, $data){
         try {
