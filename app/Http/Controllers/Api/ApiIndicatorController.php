@@ -1321,7 +1321,7 @@ class ApiIndicatorController extends ApiController
         }
     }
 
-    public function load_adversary_tb(Request $request)(){
+    public function load_adversary_tb(Request $request){
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
@@ -1384,7 +1384,7 @@ class ApiIndicatorController extends ApiController
                             'document' => 'array',
                         ),
                     );
-                    $data = array();
+                    $data_s = array();
                     $order_number = $start;
             
                     if($document_all){
@@ -1416,7 +1416,7 @@ class ApiIndicatorController extends ApiController
                             $nestedData['count_view'] = @$document["count_view"];
                             $nestedData['pulse_id'] = @$document["pulse_id"];
             
-                            $data[] = $nestedData;
+                            $data_s[] = $nestedData;
             
                         }
                     }
@@ -1424,7 +1424,7 @@ class ApiIndicatorController extends ApiController
                     $dataOut["draw"] = $draw;
                     $dataOut["recordsTotal"] = $cursor_count;
                     $dataOut["recordsFiltered"] = $count_filter;
-                    $dataOut["data"] = $data;
+                    $dataOut["data"] = $data_s;
                     $dataOut["cursor"] = $cursor;
 
                     $data_transcation = json_encode($dataOut);
@@ -1448,7 +1448,7 @@ class ApiIndicatorController extends ApiController
         }
     }
 
-    public function load_malware_tb(Request $request)(){
+    public function load_malware_tb(Request $request){
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
@@ -1511,7 +1511,7 @@ class ApiIndicatorController extends ApiController
                             'document' => 'array',
                         ),
                     );
-                    $data = array();
+                    $data_s = array();
                     $order_number = $start;
             
                     if($document_all){
@@ -1543,7 +1543,7 @@ class ApiIndicatorController extends ApiController
                             $nestedData['count_view'] = @$document["count_view"];
                             $nestedData['pulse_id'] = @$document["pulse_id"];
             
-                            $data[] = $nestedData;
+                            $data_s[] = $nestedData;
             
                         }
                     }
@@ -1551,7 +1551,7 @@ class ApiIndicatorController extends ApiController
                     $dataOut["draw"] = $draw;
                     $dataOut["recordsTotal"] = $cursor_count;
                     $dataOut["recordsFiltered"] = $count_filter;
-                    $dataOut["data"] = $data;
+                    $dataOut["data"] = $data_s;
                     $dataOut["cursor"] = $cursor;
 
                     $data_transcation = json_encode($dataOut);
