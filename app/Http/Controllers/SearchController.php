@@ -626,7 +626,7 @@ class SearchController extends Controller
                                 'id' => '$malware_uuid',
                                 'name' => '$malware_uuid',
                                 'content' => [ '$concat' => ['category: ', '$category' ]],
-                                'link' => [ '$concat' => ['/indicators/malware/?id=','$adversary_uuid','&name=','$name']],
+                                'link' => [ '$concat' => ['/indicators/detail_malware?malware_uuid=','$malware_uuid','&name=','$malware_uuid']],
                             ]
                         ],
                         [

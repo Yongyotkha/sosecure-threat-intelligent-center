@@ -2543,11 +2543,11 @@ public function tableEvents(Request $request)
                         $nestedData['is_modified'] = ($document["is_modified"]);
 
                         try {
-                            $nestedData['modified'] =@$document['modified'];
+                            $nestedData['modified']  = change_date_utc_to_thai($document['modified']);
                         } catch (Exception $e) {
                             $nestedData['modified'] =$document['modified'];
                         } finally {
-                            $nestedData['modified'] =$document['modified'];
+                          //  $nestedData['modified'] =$document['modified'];
                         }
 
 
@@ -2669,11 +2669,11 @@ public function tableEvents(Request $request)
                     $nestedData['is_modified'] = ($document["is_modified"]);
 
                     try {
-                        $nestedData['modified'] =@$document['modified'];
+                        $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
                     } catch (Exception $e) {
                         $nestedData['modified'] =$document['modified'];
                     } finally {
-                        $nestedData['modified'] =$document['modified'];
+                       // $nestedData['modified'] =$document['modified'];
                     }
 
 
