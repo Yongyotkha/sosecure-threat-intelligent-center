@@ -167,7 +167,7 @@ class ApiIndicatorController extends ApiController
                             $nestedData['public'] = ($document["public"]);
                             $nestedData['is_modified'] = ($document["is_modified"]);
                             $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
-                            $nestedData['count_view'] = $document["count_view"];
+                            $nestedData['count_view'] = @$document["count_view"];
                             $nestedData['pulse_id'] = $document["pulse_id"];
                         
                             // <a href="'.rou   te('indicators.events_detail_select',['id' => $document['pulse_id']]).'" 
@@ -337,7 +337,7 @@ class ApiIndicatorController extends ApiController
                         $nestedData['public'] = ($document["public"]);
                         $nestedData['is_modified'] = ($document["is_modified"]);
                         $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
-                        $nestedData['count_view'] = $document["count_view"];
+                        $nestedData['count_view'] = @$document["count_view"];
                         $nestedData['pulse_id'] = $document["pulse_id"];
 
                                     // <a href="'.route('indicators.events_detail_select',['id' => $document['pulse_id']]).'" 
@@ -509,7 +509,7 @@ class ApiIndicatorController extends ApiController
                             $nestedData['public'] = ($document["public"]);
                             $nestedData['is_modified'] = ($document["is_modified"]);
                             $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
-                            $nestedData['count_view'] = $document["count_view"];
+                            $nestedData['count_view'] = @$document["count_view"];
                             $nestedData['pulse_id'] = $document["pulse_id"];
             
                                         // <a href="'.route('indicators.events_detail_select',['id' => $document['pulse_id']]).'" 
@@ -908,7 +908,7 @@ class ApiIndicatorController extends ApiController
                         $nestedData['is_modified'] = ($cursor_2["is_modified"]);
                         $nestedData['attrCount'] = $cursor_2["indicator_count"];
                         $nestedData['modified'] = change_date_utc_to_thai($cursor_2['modified']);
-                        $nestedData['count_view'] = $cursor_2["count_view"];
+                        $nestedData['count_view'] = @$cursor_2["count_view"];
                         $nestedData['pulse_id'] = $cursor_2["pulse_id"];
                         $data_send[] = $nestedData;
                     }
@@ -1234,7 +1234,7 @@ class ApiIndicatorController extends ApiController
                         $nestedData['public'] = ($document["public"]);
                         $nestedData['is_modified'] = ($document["is_modified"]);
                         $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
-                        $nestedData['count_view'] = $document["count_view"];
+                        $nestedData['count_view'] = @$document["count_view"];
                         $nestedData['pulse_id'] = $document["pulse_id"];
 
                         $data_res[] = $nestedData;

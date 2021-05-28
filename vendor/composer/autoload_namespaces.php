@@ -17,7 +17,6 @@ return array(
     'OAuth' => array($vendorDir . '/lusitanian/oauth/src'),
     'Mockery' => array($vendorDir . '/mockery/mockery/library'),
     'Hautelook' => array($vendorDir . '/hautelook/phpass/src'),
-    'HTMLPurifier' => array($vendorDir . '/ezyang/htmlpurifier/library'),
     'Eluceo\\iCal' => array($vendorDir . '/eluceo/ical/src'),
     'Braintree' => array($vendorDir . '/braintree/braintree_php/lib'),
     'BaconQrCode' => array($vendorDir . '/bacon/bacon-qr-code/src'),
