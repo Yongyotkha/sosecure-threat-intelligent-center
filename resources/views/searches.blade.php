@@ -939,7 +939,7 @@
 $(function(){
     if(mode_search == 'lookup'){
   
-        
+        $('#table-container').hide();
         $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -958,7 +958,7 @@ $(function(){
                 $('#l_api_limit').html('('+res.site_request_limit_api_count+'/'+res.center_search_api_loookup_limit+')');
                 if(res.search_api_loookup_allow ==1){
                     $('#table-container').hide();
-        $('.int-lookup-main').toggle();
+                        $('.int-lookup-main').toggle();
                          loadSearchAPI('ibmcloud');
                             loadSearchAPI('virustotal');
                             loadSearchAPI('hybrid');
@@ -972,8 +972,18 @@ $(function(){
                             loadSearchAPI('otx_indicators');
 
                 }else{
-                
-                    swal.fire(res.message);
+                        
+                        if(res.status_code ==401){
+                            window.location.href = "/search?keyword="+text_search_new;
+                        }else{
+                            if(res.message == 'allow only type ( IP,Domain,URL,MD5, SHA1 or SHA256 ) Please contact the system administrator.'){
+
+                            }else{
+                                swal.fire(res.message);
+                            }
+                     
+                        }
+                   
 
                 }
         
