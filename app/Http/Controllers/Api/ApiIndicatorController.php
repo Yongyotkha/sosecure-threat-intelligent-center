@@ -627,6 +627,209 @@ class ApiIndicatorController extends ApiController
         }
     }
 
+    public function adversaries(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'indicators'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+                    
+                    $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+                    $client = new \MongoDB\Client($DB_MONGO_KEY);
+                    $db_name = 'sosecure_threatintelligent';
+                    $db = $client->$db_name;
+                    $collection = $db->fx_otx_adversaries_related;
+                    $where = array(
+                        'pulse_id' => $data['data']['pulse_id'],
+                    );
+                    $options = [];
+                    $cursor = $collection->find($where, $options); 
+
+                    $data_transcation = json_encode($cursor->toArray());
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function malware(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'indicators'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+                    
+                    $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+                    $client = new \MongoDB\Client($DB_MONGO_KEY);
+                    $db_name = 'sosecure_threatintelligent';
+                    $db = $client->$db_name;
+                    $collection = $db->fx_otx_malware_related;
+                    $where = array(
+                        'pulse_id' => $data['data']['pulse_id'],
+                    );
+                    $options = [];
+                    $cursor = $collection->find($where, $options); 
+
+                    $data_transcation = json_encode($cursor->toArray());
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function show_detail_malware(Request $request)
+    {
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'indicators'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+                    $client = new \MongoDB\Client($DB_MONGO_KEY);
+                    $db_name = 'sosecure_threatintelligent';
+                    $db = $client->$db_name;
+                    $collection = $db->fx_otx_malware;
+                    $where = array(
+                        'malware_uuid' => urldecode($data['data']['malware_uuid']),
+                    );
+                    $options = [];
+                    $cursor = $collection->find($where, $options); 
+                    $dataOut['detail_malware'] = $cursor->toArray();
+
+                    $data_transcation = json_encode($dataOut);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+
+
+    public function show_detail_adversary(Request $request)
+    {
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'indicators'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+                    $client = new \MongoDB\Client($DB_MONGO_KEY);
+                    $db_name = 'sosecure_threatintelligent';
+                    $db = $client->$db_name;
+                    $collection = $db->fx_otx_adversaries;
+                    $where = array(
+                        'adversary_uuid' => $data['data']['adversary_uuid'],
+                    );
+                    $options = [];
+                    $cursor = $collection->find($where, $options); 
+                    $dataOut['adversary'] = $cursor->toArray();
+
+                    $data_transcation = json_encode($dataOut);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+
     public function load_relatedPulse(Request $request){
         try{
             $header = $request->bearerToken();

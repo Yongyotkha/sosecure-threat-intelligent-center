@@ -144,7 +144,7 @@
     });
     var count_page = -1;
     var count_page2 = -1;
-    let pulse_id = '{{ request()->pulse_id }}';
+    let adversary_uuid = '{{ request()->adversary_uuid }}';
     function related_event(){
         $('#table-related-event').DataTable({
             searching: false,
@@ -164,7 +164,7 @@
                     return json.data;
                 },
                 data:function(d){
-                    d.pulse_id = pulse_id;
+                    d.adversary_uuid = adversary_uuid;
                     d.count_page = count_page2;
                 }
             },
