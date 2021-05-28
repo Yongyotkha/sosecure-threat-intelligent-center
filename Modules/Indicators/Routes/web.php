@@ -25,7 +25,6 @@ Route::group(
 
 
         Route::get('/detail_malware', 'IndicatorsController@show_detail_malware')->name('indicators.detail_malware')->middleware('can:menu_items');
-        Route::get('/detail_adversary/{adversary_uuid}/{pulse_id}', 'IndicatorsController@show_detail_adversary')->name('indicators.detail_adversary')->middleware('can:menu_items');
         Route::get('/detail_adversary/{adversary_uuid}', 'IndicatorsController@show_detail_adversary')->name('indicators.detail_adversary')->middleware('can:menu_items');
 
         Route::post('/related_event', 'IndicatorsController@related_event')->name('indicators.related_event');
@@ -42,6 +41,7 @@ Route::group(
         Route::post('events_attributes_table', 'IndicatorsController@load_attributes_tb')->name('indicators.events_attributes_table')->middleware('can:menu_items');
         Route::post('events_pulse_table', 'IndicatorsController@events_pulse_table')->name('indicators.events_pulse_table')->middleware('can:menu_items');
         Route::post('load_adversary_tb', 'IndicatorsController@load_adversary_tb')->name('indicators.load_adversary_tb')->middleware('can:menu_items');
+        Route::post('load_malware_tb', 'IndicatorsController@load_malware_tb')->name('indicators.load_malware_tb')->middleware('can:menu_items');
         Route::post('events_table_search', 'IndicatorsController@datatableEvent_search')->name('indicators.events_table_search')->middleware('can:menu_items');
         Route::get('/count_view_event', 'IndicatorsController@count_view')->name('indicators.count_view_event');
 
@@ -57,6 +57,8 @@ Route::group(
         
         Route::get('/adversaries', 'IndicatorsController@adversaries')->name('indicators.adversaries');
         Route::get('/malware', 'IndicatorsController@malware')->name('indicators.malware');
+
+        
 
 
     }

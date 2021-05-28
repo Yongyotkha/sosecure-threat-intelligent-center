@@ -339,7 +339,7 @@
                                 <div class="panel-body clause shadow">
                                     <div class="item-search">
                                         <div style="width: 90%;">
-                                            <a href="/indicators/detail_malware/?malware_uuid=${encodeURIComponent(element.malware_uuid)}&pulse_id=${element.pulse_id}" class="fz-search-20px">
+                                            <a href="/indicators/detail_malware?malware_uuid=${encodeURIComponent(element.malware_uuid)}" class="fz-search-20px">
                                                 ${element.malware_name}
                                             </a>
                                             <div>
