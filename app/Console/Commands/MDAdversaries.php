@@ -75,7 +75,7 @@ class MDAdversaries extends Command
                         curl_close($ch);  
                         $response = json_decode($response);
     
-                        foreach($response->results as $key=>$valus){
+                        foreach(@$response->results as $key=>$valus){
                             $this->saveAdversaries($valus);
                                 $otx_pulse_url="https://otx.alienvault.com/otxapi/pulses/?page1&limit=20&sort=-modified&q=adversary:".rawurlencode($valus->value);
                                 $this->info($otx_pulse_url);
@@ -100,7 +100,7 @@ class MDAdversaries extends Command
                                                     curl_close($ch);  
                                                     $response_pulse = json_decode($response_pulse,true);
                                                     $this->info('   Pulse count:'.$response_pulse['count']);
-                                                    foreach($response_pulse['results'] as $response_pulsekey=>$response_pulse_valus){
+                                                    foreach(@$response_pulse['results'] as $response_pulsekey=>$response_pulse_valus){
                                                         $this->info('    Pulse:'.$response_pulse_valus['name']);
                                                         $this->savePulse($response_pulse_valus,$valus->uuid,$valus->value);
 

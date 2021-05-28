@@ -693,7 +693,7 @@ class SearchController extends Controller
                     $dataWait['queryData'] = $col_fx_otx_malware_related->aggregate($pipeline,$options);
                     $dataWait['queryData'] = $dataWait['queryData']->toArray();
                     $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/detail_adversary?Search_Link_All=".$this->request->keyword;
-                    $data['dataSearch']["Adversaries"] = $dataWait;
+                    $data['dataSearch']["adversaries"] = $dataWait;
                 }
             }
 
@@ -753,7 +753,7 @@ class SearchController extends Controller
        $type = $this->check_keyword_type($keyword);
        if($type == ''){
         $response_data = array(
-            'status_code' => 400,
+            'status_code' => 401,
             'search_api_loookup_allow' =>0,
             'message' => 'allow only type ( IP,Domain,URL,MD5, SHA1 or SHA256 ) Please contact the system administrator.',
         );
@@ -1207,7 +1207,7 @@ class SearchController extends Controller
             $type = 'IP';
         }else if(filter_var($keyword, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE)) {
             $type = 'IP';
-        }else if(ctype_alnum(str_replace('-', '', $keyword)) && $keyword[0] != '-' && $keyword[strlen($keyword) - 1] != '-') {
+        }else if($this->is_valid_domain($keyword)) {
             $type = 'Domain';
         }else if(preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$keyword)) {
             $type = 'URL';
@@ -1216,6 +1216,7 @@ class SearchController extends Controller
         }
         return $type;
     }
+    
 
     private function check_limit_search($site_id, $source){
         // $site_request_limit_api = SiteRequestLimitApi::where('site_id', $site_id)->where('mode', 'search')->where('source', $source)->first();
