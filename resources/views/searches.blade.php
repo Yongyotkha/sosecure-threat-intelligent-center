@@ -738,9 +738,18 @@
                                             <div class="panel-body clause {{@$class_indicator}}" data-div_i_type="{!!@$slug!!}">
                                                 <div class="item-search">
                                                     <div style="width: 90%;">
-                                                        <a href="{{$value2["link"]}}" target="_blank" class="fz-search-20px">
-                                                            {{$value2["name"]}}
-                                                        </a>
+
+
+                                                        @if(humanize($key)=='Malware')  
+                                                                <a href="<?php   echo '/indicators/detail_malware?malware_uuid='.rawurlencode($value2["name"]);  ?>" target="_blank" class="fz-search-20px">
+                                                                    {{$value2["name"]}}
+                                                                </a>
+
+                                                        @else
+                                                                <a href="{{$value2["link"]}}" target="_blank" class="fz-search-20px">
+                                                                    {{$value2["name"]}}
+                                                                </a>
+                                                        @endif
                                                         <div class="text-elips-ct"></div>
 
                                                        
@@ -762,7 +771,11 @@
 
                                                     </div>
                                                     <div style="width: 10%" class="text-center">
-                                                        <a href="{{$value2["link"]}}" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                                         @if(humanize($key)=='Malware')  
+                                                                 <a href="<?php   echo '/indicators/detail_malware?malware_uuid='.rawurlencode($value2["name"]);  ?>" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                                        @else
+                                                                <a href="{{$value2["link"]}}" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>
