@@ -34,15 +34,15 @@
                         <form action="">
                             <div class="form-group">
                                 <h4>Current Password</h4>
-                                <input type="password" name="" class="form-control form-policy">
+                                <input type="password" id="old_password" name="old_password" class="form-control form-policy">
                             </div>
                             <div class="form-group">
                                 <h4>New Password</h4>
-                                <input type="password" id="password" name="" class="form-control form-policy" autocomplete="new-password" onKeyUp="checkPasswordStrength();">
+                                <input type="password" id="password" name="password" class="form-control form-policy" autocomplete="new-password" onKeyUp="checkPasswordStrength();">
                             </div>
                             <div class="form-group">
                                 <h4>Re-enter Password</h4>
-                                <input type="password" name="" class="form-control form-policy">
+                                <input type="password" id="password_confirmation" name="password_confirmation" class="form-control form-policy">
                             </div>
 
                             <div id="password_st" style="display:none">
@@ -62,7 +62,7 @@
                             </ul>
 
                             <div class="text-center m-b-xs">
-                                <button class="btn btn-info">
+                                <button type="button" class="btn btn-info" onclick="resetPasswordExpire()">
                                    <h2 style="margin: 0;color:#fff;">Confirm</h2> 
                                 </button>
                             </div>
@@ -185,6 +185,36 @@ function checkPasswordStrength() {
         }
     }
 }
+
+function resetPasswordExpire(){
+    let old_password = $('#old_password').val();
+    let password = $('#password').val();
+    let password_confirmation = $('#password_confirmation').val();
+
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        dataType: "json",
+        contentType:"application/json; charset=utf8",
+        url: "/policypassword/resetPasswordExpire",
+        type: "post",
+        data: ({
+            old_password:old_password,
+            password:password,
+            password_confirmation:password_confirmation,
+        }),
+        beforeSend: function(){
+            $('.ajax-loading').show();
+        },
+    }).done(function(res){
+        $('.ajax-loading').hide();
+        console.log(res);
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
 </script>
 @endpush
 @endsection

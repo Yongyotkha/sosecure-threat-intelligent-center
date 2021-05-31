@@ -5,6 +5,7 @@ namespace Modules\PolicyPassword\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class PolicyPasswordController extends Controller
 {
@@ -34,6 +35,18 @@ class PolicyPasswordController extends Controller
     {
         $data['page'] = 'Policy';
         return view('policypassword::index')->with($data);
+    }
+
+    public function resetPasswordExpire(Request $request){
+        $validate = Validator::make($request, [
+            'old_password' => ['required'],
+            'password' => ['required', 'string', 'min:8', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/' ,'confirmed'],
+        ]);
+        
+        $response = [
+            'validate' => $validate
+        ];
+        return response()->json($response);
     }
 
     /**
