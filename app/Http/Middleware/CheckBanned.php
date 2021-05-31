@@ -2,7 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use Carbon\Carbon;
 use Closure;
+use Illuminate\Support\Facades\Redirect;
+use Modules\Users\Entities\User;
 
 class CheckBanned
 {
@@ -12,6 +15,13 @@ class CheckBanned
             auth()->logout();
             toastr()->warning('Your account has been suspended. Please contact administrator.', langapp('response_status'));
             return redirect()->route('login');
+        }
+
+        $user = User::find(auth()->user()->id);
+        if($user){
+            if(Carbon::parse($user->password_start_reset)->addDays($user->password_days_expire) <= Carbon::now() && $request->path() !== 'policypassword'){
+                return Redirect::to('policypassword');
+            }
         }
 
         return $next($request);
