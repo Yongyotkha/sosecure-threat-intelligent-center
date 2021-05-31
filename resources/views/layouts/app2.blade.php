@@ -260,7 +260,7 @@
 <section class="vbox" id="app">
 
 
-    @include('partial.top_header')
+    @include('partial.top_header_2')
 
     <section class="">
         <section class="hbox stretch">

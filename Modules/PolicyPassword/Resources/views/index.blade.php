@@ -1,79 +1,55 @@
 @extends('layouts.app2')
 @section('content')
-<style>
-.bg-danger{
-    background: orangered !important;
-    width:25% !important;
-}  
-.bg-warning{
-    background: orange !important;
-    width:50% !important;
-}  
-.bg-info{
-    background: rgb(0, 174, 255) !important;
-    width:75% !important;
-}  
-.bg-success{
-    background: rgb(21, 255, 0) !important;
-    width:100% !important;
-}  
-</style>            
+       
 <section id="content">
-    <section class="vbox">
-        <section class="scrollable wrapper bg">
-
-            <div class="policy-container">
-                <div class="policy-inner policy-shadow">
-                    <div class="policy-header">
-                        <img src="{{asset('images/lockerpass.png')}}" alt="" style="max-height: 115px">
-                        <h1>Your Password has expired</h1>
-                        <p>You must change your password now and login again!</p>
-                    </div>
-
-                    <div class="policy-body">
-                        <form action="">
-                            <div class="form-group">
-                                <h4>Current Password</h4>
-                                <input type="password" name="" class="form-control form-policy">
-                            </div>
-                            <div class="form-group">
-                                <h4>New Password</h4>
-                                <input type="password" id="password" name="" class="form-control form-policy" autocomplete="new-password" onKeyUp="checkPasswordStrength();">
-                            </div>
-                            <div class="form-group">
-                                <h4>Re-enter Password</h4>
-                                <input type="password" name="" class="form-control form-policy">
-                            </div>
-
-                            <div id="password_st" style="display:none">
-                                <p class="st-pass">Password Strength</p>
-                                <div class="progress-pass" >
-                                    <div id="password-strength-status" class="progress-pass-inner"></div>
-                                    <div id="password-strength-text" class="progress-pass-text"></div>
-                                </div>
-                            </div>
-
-                            <ul class="condition-policy">
-                                <li class="minimum">Be a minimum of 8 characters</li>
-                                <li class="lowercase">Include at least one lowercase letter (a-z)</li>
-                                <li class="uppercase">Include at least one uppercase letter (A-Z)</li>
-                                <li class="number">Include at least one number (0-9)</li>
-                                <li class="special">Include at least one special character</li>
-                            </ul>
-
-                            <div class="text-center m-b-xs">
-                                <button class="btn btn-info">
-                                   <h2 style="margin: 0;color:#fff;">Confirm</h2> 
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+    <div class="policy-container" style="background: #eee;padding: 2rem 0">
+        <div class="policy-inner policy-shadow">
+            <div class="policy-header">
+                <img src="{{asset('images/lockerpass.png')}}" alt="" style="max-height: 115px">
+                <h1>Your Password has expired</h1>
+                <p>You must change your password now and login again!</p>
             </div>
 
+            <div class="policy-body">
+                <form action="">
+                    <div class="form-group">
+                        <h4>Current Password</h4>
+                        <input type="password" name="" class="form-control form-policy">
+                    </div>
+                    <div class="form-group">
+                        <h4>New Password</h4>
+                        <input type="password" id="password" name="" class="form-control form-policy" autocomplete="new-password" onKeyUp="checkPasswordStrength();">
+                    </div>
+                    <div class="form-group">
+                        <h4>Re-enter Password</h4>
+                        <input type="password" name="" class="form-control form-policy">
+                    </div>
 
-        </section>
-    </section>
+                    <div id="password_st" style="display:none">
+                        <p class="st-pass">Password Strength</p>
+                        <div class="progress-pass" >
+                            <div id="password-strength-status" class="progress-pass-inner"></div>
+                            <div id="password-strength-text" class="progress-pass-text"></div>
+                        </div>
+                    </div>
+
+                    <ul class="condition-policy">
+                        <li class="minimum">Be a minimum of 8 characters</li>
+                        <li class="lowercase">Include at least one lowercase letter (a-z)</li>
+                        <li class="uppercase">Include at least one uppercase letter (A-Z)</li>
+                        <li class="number">Include at least one number (0-9)</li>
+                        <li class="special">Include at least one special character</li>
+                    </ul>
+
+                    <div class="text-center m-b-xs">
+                        <button class="btn btn-info">
+                           <h2 style="margin: 0;color:#fff;">Confirm</h2> 
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 </section>
 
