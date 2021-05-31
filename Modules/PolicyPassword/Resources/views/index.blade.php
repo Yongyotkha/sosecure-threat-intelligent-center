@@ -8,7 +8,7 @@
             <div class="policy-container">
                 <div class="policy-inner policy-shadow">
                     <div class="policy-header">
-                        <img src="{{asset('images/lockerpass.png')}}" alt="" style="max-height: 150px">
+                        <img src="{{asset('images/lockerpass.png')}}" alt="" style="max-height: 115px">
                         <h1>Your Password has expired</h1>
                         <p>You must change your password now and login again!</p>
                     </div>
@@ -16,11 +16,15 @@
                     <div class="policy-body">
                         <form action="">
                             <div class="form-group">
-                                <h4>Old Password</h4>
+                                <h4>Current Password</h4>
                                 <input type="password" name="" class="form-control form-policy">
                             </div>
                             <div class="form-group">
                                 <h4>New Password</h4>
+                                <input type="password" name="" class="form-control form-policy">
+                            </div>
+                            <div class="form-group">
+                                <h4>Re-enter Password</h4>
                                 <input type="password" name="" class="form-control form-policy">
                             </div>
 
@@ -40,7 +44,7 @@
                                 <li>Include at least one special character</li>
                             </ul>
 
-                            <div class="text-center">
+                            <div class="text-center m-b-xs">
                                 <button class="btn btn-info">
                                    <h2 style="margin: 0;color:#fff;">Confirm</h2> 
                                 </button>
