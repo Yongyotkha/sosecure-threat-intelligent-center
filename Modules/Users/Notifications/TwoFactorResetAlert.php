@@ -44,7 +44,9 @@ class TwoFactorResetAlert extends Notification
         return (new MailMessage)
             ->greeting('Hi '.$notifiable->name.',')
             ->subject(get_option('company_name').' 2FA Authentication')
-            ->line('Enter this code '.$this->secret.' into your Google Authenticator App')
+            ->line('Enter this code')
+            ->line('<div style="font-size: 22px;margin-bottom: 1rem;"><b>'.$this->secret.'</b></div>')
+            ->line('into your Authenticator App')
             ->line('Thank you for using our portal!');
     }
 

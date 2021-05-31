@@ -5,6 +5,7 @@
             {{ get_option('company_name') }}
         @endcomponent
     @endslot
+    
 
     {{-- Body --}}
     {{ $slot }}
