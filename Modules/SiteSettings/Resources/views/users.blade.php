@@ -125,6 +125,15 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="form-group row">
+                        <label class="col-lg-4 control-label"> Login Expire Date <span class="text-danger">*</span> </label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control">
+                            <span class="input-group-addon">Day</span>
+                        </div>
+                    </div>
+
                     <div class="form-group row">
                         <label class="col-lg-4 control-label">Status </label>
                         <div class="col-lg-8">

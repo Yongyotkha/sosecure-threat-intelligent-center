@@ -71,8 +71,8 @@
 
 
             <div class="form-group row">
-                <label class="col-lg-2 control-label">Permission Menu <span class="text-danger">*</span> </label>
-                <div class="col-lg-10">
+                <label class="col-lg-4 control-label">Permission Menu <span class="text-danger">*</span> </label>
+                <div class="col-lg-8">
                     <ul class="role-group">
                         @php  $i=1;  @endphp
                         @foreach(@$menus AS $menu)
@@ -123,6 +123,16 @@
                 </div>
             </div>
 
+
+            <div class="form-group row">
+                <label class="col-lg-4 control-label"> Login Expire Date <span class="text-danger">*</span> </label>
+                <div class="col-lg-8">
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="90">
+                        <span class="input-group-addon">Day</span>
+                    </div>
+                </div>
+            </div>
 
 
             <div class="form-group row">

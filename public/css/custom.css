@@ -5013,3 +5013,89 @@ strong > p{
     text-overflow: ellipsis;
     -webkit-box-orient: vertical;
 }
+
+.progress-pass{
+    position: relative;
+    height: 15px;
+    border-radius: 25px;
+    background: #d6d6d6;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.progress-pass-inner{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+}
+
+.progress-pass-text{
+    position: absolute;
+    right: 10px;
+    font-size: 11px;
+}
+
+.condition-policy{
+    padding: 0;
+}
+
+.policy-header{
+    text-align: center;
+}
+.policy-header h1{
+    font-size: 32px;
+    margin: 0;
+    margin-bottom: 1rem;
+}
+.policy-header p{
+    font-size: 18px;
+    margin: 0;
+    margin-bottom: 1rem;
+}
+.policy-container{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.policy-inner{
+    max-width: 550px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.policy-inner.policy-shadow{
+    box-shadow: 0 2px 10px rgb(0 0 0 / 10%);
+    border-radius: 5px;
+    background: #fff;
+    padding: 1rem 2rem;
+}
+.policy-body{
+    width: 100%;
+}
+.condition-policy{
+    margin: 2rem 0;
+    padding-left: 2rem;
+}
+
+.st-pass{
+    font-size: 11px;
+    margin-bottom: 0;
+    font-weight: bold;
+}
+
+input.form-control.form-policy{
+    height: 45px !important;
+}
+input.form-policy[type=password] {
+    font-size: 3.3rem !important;
+}

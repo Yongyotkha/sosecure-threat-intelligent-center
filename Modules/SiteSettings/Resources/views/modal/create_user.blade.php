@@ -11,38 +11,38 @@
         {!! Form::open(['route' => ['user.save',$code], 'class' => 'ajaxifyForm_custom','files' => true]) !!}
         <div class="modal-body">
             {{-- <div class="form-group row">
-                <label class="col-lg-2 control-label">Username (e-mail) <span class="text-danger">*</span> </label>
-                <div class="col-lg-10">
+                <label class="col-lg-3 control-label">Username (e-mail) <span class="text-danger">*</span> </label>
+                <div class="col-lg-9">
                     <input type="email" class="form-control" name="username">
                 </div>
             </div> --}}
             <div class="form-group row">
-                <label class="col-lg-2 control-label">Name <!--<span class="text-danger">*</span>--> </label>
-                <div class="col-lg-10">
+                <label class="col-lg-3 control-label">Name <!--<span class="text-danger">*</span>--> </label>
+                <div class="col-lg-9">
                     <input type="text" class="form-control" name="name" required>
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-lg-2 control-label">Email <span class="text-danger">*</span> </label>
-                <div class="col-lg-10">
+                <label class="col-lg-3 control-label">Email <span class="text-danger">*</span> </label>
+                <div class="col-lg-9">
                     <input type="email" class="form-control" name="email" required>
                 </div>
             </div>
             {{-- <div class="form-group row">
-                <label class="col-lg-2 control-label">Set Password <span class="text-danger">*</span> </label>
-                <div class="col-lg-10">
+                <label class="col-lg-3 control-label">Set Password <span class="text-danger">*</span> </label>
+                <div class="col-lg-9">
                     <input type="password" class="form-control" name="password">
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-lg-2 control-label">Re-enter Password <span class="text-danger">*</span> </label>
-                <div class="col-lg-10">
+                <label class="col-lg-3 control-label">Re-enter Password <span class="text-danger">*</span> </label>
+                <div class="col-lg-9">
                     <input type="password" class="form-control" name="password_re">
                 </div>
             </div> --}}
             <div class="form-group row">
-                <label class="col-lg-2 control-label">Role <span class="text-danger">*</span> </label>
-                <div class="col-lg-10">
+                <label class="col-lg-3 control-label">Role <span class="text-danger">*</span> </label>
+                <div class="col-lg-9">
                     <select name="role_id" id="role" class="select2-option form-control" required>
                         {{-- <option value="1">Admin</option>
                         <option value="2">User</option> --}}
@@ -60,9 +60,12 @@
             </div>
 
 
+
+
+
             <div class="form-group row">
-                <label class="col-lg-2 control-label">Permission Menu <span class="text-danger">*</span> </label>
-                <div class="col-lg-10">
+                <label class="col-lg-3 control-label">Permission Menu <span class="text-danger">*</span> </label>
+                <div class="col-lg-9">
                     <ul class="role-group">
                         @php  $i=1;  @endphp
                         @foreach(@$menus AS $menu)
@@ -105,8 +108,18 @@
 
 
             <div class="form-group row">
-                <label class="col-lg-2 control-label">Status </label>
-                <div class="col-lg-10">
+                <label class="col-lg-3 control-label"> Login Expire Date <span class="text-danger">*</span> </label>
+                <div class="col-lg-9">
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="90">
+                        <span class="input-group-addon">Day</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-lg-3 control-label">Status </label>
+                <div class="col-lg-9">
                     <label class="switch">
                         <input type="hidden" value="FALSE" name="">
                         <input type="checkbox" name="active" value="TRUE" checked>
