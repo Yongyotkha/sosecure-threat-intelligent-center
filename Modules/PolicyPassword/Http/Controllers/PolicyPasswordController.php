@@ -37,18 +37,6 @@ class PolicyPasswordController extends Controller
         return view('policypassword::index')->with($data);
     }
 
-    public function resetPasswordExpire(Request $request){
-        $validate = Validator::make($request, [
-            'old_password' => ['required'],
-            'password' => ['required', 'string', 'min:8', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/' ,'confirmed'],
-        ]);
-        
-        $response = [
-            'validate' => $validate
-        ];
-        return response()->json($response);
-    }
-
     /**
      * Show the form for creating a new resource.
      * @return Response
@@ -107,5 +95,17 @@ class PolicyPasswordController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function resetPasswordExpire(){
+        $validate = Validator::make($this->request, [
+            'old_password' => ['required'],
+            'password' => ['required', 'string', 'min:8', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/' ,'confirmed'],
+        ]);
+        
+        $response = [
+            'validate' => $validate
+        ];
+        return Response::json($response);
     }
 }
