@@ -17,10 +17,13 @@ class CheckBanned
             return redirect()->route('login');
         }
 
-        $user = User::find(auth()->user()->id);
-        if($user){
-            if(Carbon::parse($user->password_start_reset)->addDays($user->password_days_expire) <= Carbon::now() && $request->path() !== 'policypassword'){
-                return Redirect::to('policypassword');
+        if(auth()->check()){
+            $user = User::find(auth()->user()->id);
+            if($user){
+                if((Carbon::parse($user->password_start_reset)->addDays($user->password_days_expire) <= Carbon::now() || $user->password_start_reset == '') && $request->path() !== 'resetPasswordExpire'){
+                    $page = 'Policy';
+                    return response()->view('policypassword::index', compact('page'))->setStatusCode(200);
+                }
             }
         }
 

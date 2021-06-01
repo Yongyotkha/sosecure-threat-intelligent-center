@@ -1,6 +1,23 @@
 @extends('layouts.app2')
 @section('content')
-       
+<style>
+    .bg-danger{
+        background: orangered !important;
+        width:25% !important;
+    }  
+    .bg-warning{
+        background: orange !important;
+        width:50% !important;
+    }  
+    .bg-info{
+        background: rgb(0, 174, 255) !important;
+        width:75% !important;
+    }  
+    .bg-success{
+        background: rgb(21, 255, 0) !important;
+        width:100% !important;
+    }  
+</style>            
 <section id="content">
     <div class="policy-container" style="background: #eee;padding: 2rem 0">
         <div class="policy-inner policy-shadow">
@@ -10,67 +27,48 @@
                 <p>You must change your password now and login again!</p>
             </div>
 
-                    <div class="policy-body">
-                        <form action="">
-                            <div class="form-group">
-                                <h4>Current Password</h4>
-                                <input type="password" id="old_password" name="old_password" class="form-control form-policy">
-                            </div>
-                            <div class="form-group">
-                                <h4>New Password</h4>
-                                <input type="password" id="password" name="password" class="form-control form-policy" autocomplete="new-password" onKeyUp="checkPasswordStrength();">
-                            </div>
-                            <div class="form-group">
-                                <h4>Re-enter Password</h4>
-                                <input type="password" id="password_confirmation" name="password_confirmation" class="form-control form-policy">
-                            </div>
-
-                            <div id="password_st" style="display:none">
-                                <p class="st-pass">Password Strength</p>
-                                <div class="progress-pass" >
-                                    <div id="password-strength-status" class="progress-pass-inner"></div>
-                                    <div id="password-strength-text" class="progress-pass-text"></div>
-                                </div>
-                            </div>
-
-                            <ul class="condition-policy">
-                                <li class="minimum">Be a minimum of 8 characters</li>
-                                <li class="lowercase">Include at least one lowercase letter (a-z)</li>
-                                <li class="uppercase">Include at least one uppercase letter (A-Z)</li>
-                                <li class="number">Include at least one number (0-9)</li>
-                                <li class="special">Include at least one special character</li>
-                            </ul>
-
-                            <div class="text-center m-b-xs">
-                                <button type="button" class="btn btn-info" onclick="resetPasswordExpire()">
-                                   <h2 style="margin: 0;color:#fff;">Confirm</h2> 
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div id="password_st" style="display:none">
-                        <p class="st-pass">Password Strength</p>
-                        <div class="progress-pass" >
-                            <div id="password-strength-status" class="progress-pass-inner"></div>
-                            <div id="password-strength-text" class="progress-pass-text"></div>
+                <div class="policy-body">
+                    <form action="">
+                        <div class="form-group">
+                            <h4>Current Password</h4>
+                            <input type="password" id="old_password" name="current_password" class="form-control form-policy">
+                            <ul id="error_current_password" class="condition-policy" style="color:red"></ul>
                         </div>
-                    </div>
+                        <div class="form-group">
+                            <h4>New Password</h4>
+                            <input type="password" id="password" name="password" class="form-control form-policy" autocomplete="new-password" onKeyUp="checkPasswordStrength();">
+                            <ul id="error_password_first" class="condition-policy" style="color:red"></ul>
+                        </div>
 
-                    <ul class="condition-policy">
-                        <li class="minimum">Be a minimum of 8 characters</li>
-                        <li class="lowercase">Include at least one lowercase letter (a-z)</li>
-                        <li class="uppercase">Include at least one uppercase letter (A-Z)</li>
-                        <li class="number">Include at least one number (0-9)</li>
-                        <li class="special">Include at least one special character</li>
-                    </ul>
+                        <div class="form-group">
+                            <h4>Re-enter Password</h4>
+                            <input type="password" id="password_confirmation" name="password_confirmation" class="form-control form-policy">
+                            <ul id="error_password" class="condition-policy" style="color:red"></ul>
+                        </div>
 
-                    <div class="text-center m-b-xs">
-                        <button class="btn btn-info">
-                           <h2 style="margin: 0;color:#fff;">Confirm</h2> 
-                        </button>
-                    </div>
-                </form>
+                        <div id="password_st" style="display:none">
+                            <p class="st-pass">Password Strength</p>
+                            <div class="progress-pass" >
+                                <div id="password-strength-status" class="progress-pass-inner"></div>
+                                <div id="password-strength-text" class="progress-pass-text"></div>
+                            </div>
+                        </div>
+
+                        <ul class="condition-policy">
+                            <li class="minimum">Be a minimum of 8 characters</li>
+                            <li class="lowercase">Include at least one lowercase letter (a-z)</li>
+                            <li class="uppercase">Include at least one uppercase letter (A-Z)</li>
+                            <li class="number">Include at least one number (0-9)</li>
+                            <li class="special">Include at least one special character</li>
+                        </ul>
+
+                        <div class="text-center m-b-xs">
+                            <button type="button" class="btn btn-info" onclick="resetPasswordExpire()">
+                                <h2 style="margin: 0;color:#fff;">Confirm</h2> 
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -90,7 +88,15 @@ function checkPasswordStrength() {
     var lowercase = /([a-z])/;
     var uppercase = /([A-Z])/;
     var special_characters = /([~,!,@,#,$,%,^,&,*,-,_,+,=,?,>,<])/;
-    if ($('#password').val().length < 8) {
+    if ($('#password').val().length == 0) {
+        $('#password_st').hide();
+
+        $('.minimum').css('color', '');
+        $('.number').css('color', '');
+        $('.lowercase').css('color', '');
+        $('.uppercase').css('color', '');
+        $('.special').css('color', '');
+    }else if ($('#password').val().length < 8) {
         $('#password-strength-status').removeClass();
         $('#password-strength-text').empty();
         $('#password-strength-status').addClass('progress-pass-inner bg-danger');
@@ -191,25 +197,71 @@ function resetPasswordExpire(){
     let password = $('#password').val();
     let password_confirmation = $('#password_confirmation').val();
 
+    if(old_password == ''){
+        $('#error_current_password').append(`<li>The current password field is required.</li>`);
+    } else{
+        $('#error_current_password').empty();
+    } 
+
+    if(password == ''){
+        $('#error_password_first').append(`<li>The password field is required.</li>`);
+    } else{
+        $('#error_password_first').empty();
+    }  
+
+    if(password_confirmation == ''){
+        $('#error_password').append(`<li>The re-enter password field is required.</li>`);
+    } else{
+        $('#error_password').empty();
+    }   
+
+    if(old_password == '' || password == '' || password_confirmation == ''){
+        return false;
+    }
     $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        dataType: "json",
-        contentType:"application/json; charset=utf8",
-        url: "/policypassword/resetPasswordExpire",
-        type: "post",
+        url: "/resetPasswordExpire",
+        method: 'post',
         data: ({
-            old_password:old_password,
+            current_password:old_password,
             password:password,
-            password_confirmation:password_confirmation,
+            password_confirmation:password_confirmation
         }),
         beforeSend: function(){
             $('.ajax-loading').show();
+            $('#error_current_password').empty();
+            $('#error_password').empty();
         },
     }).done(function(res){
-        $('.ajax-loading').hide();
-        console.log(res);
+        if(res.errors || res.error_current){
+            if(res.error_current){
+                $('#error_current_password').append(`<li>${res.error_current}</li>`);
+            }
+
+            if(res.errors.current_password){
+                let html_2 = ``;
+                res.errors.current_password.forEach(element => {
+                    html_2 += `
+                        <li>${element}</li>
+                    `;
+                });
+                $('#error_current_password').append(html_2);
+            }
+
+            if(res.errors.password.length > 0){
+                let html = ``;
+                res.errors.password.forEach(element => {
+                    html += `
+                        <li>${element}</li>
+                    `;
+                });
+                $('#error_password').append(html);
+            }
+        }else if(res.success){
+            window.location.href = '/';
+        }
     }).fail(function(jqXHR, ajaxOptions, thrownError){
         console.log("No response from server");
     });

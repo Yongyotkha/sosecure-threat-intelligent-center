@@ -26,6 +26,7 @@ class Locale
         }
         App::setLocale($locale);
         Carbon::setLocale($locale);
+
         return $next($request);
     }
 }
