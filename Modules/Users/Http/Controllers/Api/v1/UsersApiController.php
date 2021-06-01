@@ -27,6 +27,8 @@ use Modules\Users\Entities\user_menu_permission;
 use Modules\Users\Entities\user_menu_sub_permission;
 use App\Menu;
 use App\Menu_sub;
+use Carbon\Carbon;
+
 class UsersApiController extends Controller
 {
     /**
@@ -110,6 +112,8 @@ class UsersApiController extends Controller
         if($request->site) {
             $user->site_id = $request->site;
         }
+        $user->password_days_expire = $request->password_days_expire ? $request->password_days_expire : '90';
+        $user->password_start_reset = Carbon::now()->addDays($request->password_days_expire ? $request->password_days_expire : '90');
         $user->save();
         $user->profile->update($request->except(['email', 'roles', 'name', 'site', 'active']));
 
@@ -440,6 +444,8 @@ class UsersApiController extends Controller
         $user->active = $active ? 1 : 0;
         $user->email = $email;
         $user->username = $email;
+        $user->password_days_expire = $request->password_days_expire ? $request->password_days_expire : '90';
+        $user->password_start_reset = Carbon::now()->addDays($request->password_days_expire ? $request->password_days_expire : '90');
         $user->save();
 
         if($request->role_id) {

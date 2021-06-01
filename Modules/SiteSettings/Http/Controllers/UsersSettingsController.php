@@ -216,6 +216,8 @@ class UsersSettingsController extends Controller
                     $User->active = $request->active ? 1 : 0;
                     $User->site_id = $SiteSettings->id;
                     $User->site_add_user_token = generator_uuid();
+                    $User->password_days_expire = $request->password_days_expire ? $request->password_days_expire : '90';
+                    $User->password_start_reset = Carbon::now()->addDays($request->password_days_expire ? $request->password_days_expire : '90');
                     $User->save();
 
                     $transaction_client_users = new transaction_client_users();
@@ -480,6 +482,8 @@ class UsersSettingsController extends Controller
             $user->active = $request->active ? 1 : 0;
         }
         $user->site_role_id = $role_id;
+        $user->password_days_expire = $request->password_days_expire ? $request->password_days_expire : '90';
+        $user->password_start_reset = Carbon::now()->addDays($request->password_days_expire ? $request->password_days_expire : '90');
         $user->save();
 
 
@@ -1319,6 +1323,3 @@ class UsersSettingsController extends Controller
         );
     }
 }
-
-
-

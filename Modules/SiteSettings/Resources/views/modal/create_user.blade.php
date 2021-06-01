@@ -111,7 +111,7 @@
                 <label class="col-lg-3 control-label"> Login Expire Date <span class="text-danger">*</span> </label>
                 <div class="col-lg-9">
                     <div class="input-group">
-                        <input type="text" class="form-control" value="90">
+                        <input type="text" class="form-control" value="90" name="password_days_expire">
                         <span class="input-group-addon">Day</span>
                     </div>
                 </div>

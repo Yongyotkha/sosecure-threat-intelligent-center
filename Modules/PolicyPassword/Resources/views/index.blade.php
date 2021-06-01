@@ -230,7 +230,7 @@ function resetPasswordExpire(){
             password_confirmation:password_confirmation
         }),
         beforeSend: function(){
-            $('.ajax-loading').show();
+            loading('load');
             $('#error_current_password').empty();
             $('#error_password').empty();
         },
@@ -262,7 +262,9 @@ function resetPasswordExpire(){
         }else if(res.success){
             window.location.href = '/';
         }
+        loading('stop_load');
     }).fail(function(jqXHR, ajaxOptions, thrownError){
+        loading('stop_load');
         console.log("No response from server");
     });
 }
