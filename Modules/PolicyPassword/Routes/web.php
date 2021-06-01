@@ -15,5 +15,6 @@ Route::group(
     ['middleware' => 'web', 'prefix' => 'policypassword'],
     function () {
         Route::get('/', 'PolicyPasswordController@index')->name('policypassword.index')->middleware('can:menu_items');
+        Route::post('/resetPasswordExpire', 'PolicyPasswordController@resetPasswordExpire')->name('policypassword.resetPasswordExpire')->middleware('can:menu_items');
     }
 );

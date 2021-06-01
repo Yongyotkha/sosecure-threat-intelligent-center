@@ -10,19 +10,43 @@
                 <p>You must change your password now and login again!</p>
             </div>
 
-            <div class="policy-body">
-                <form action="">
-                    <div class="form-group">
-                        <h4>Current Password</h4>
-                        <input type="password" name="" class="form-control form-policy">
-                    </div>
-                    <div class="form-group">
-                        <h4>New Password</h4>
-                        <input type="password" id="password" name="" class="form-control form-policy" autocomplete="new-password" onKeyUp="checkPasswordStrength();">
-                    </div>
-                    <div class="form-group">
-                        <h4>Re-enter Password</h4>
-                        <input type="password" name="" class="form-control form-policy">
+                    <div class="policy-body">
+                        <form action="">
+                            <div class="form-group">
+                                <h4>Current Password</h4>
+                                <input type="password" id="old_password" name="old_password" class="form-control form-policy">
+                            </div>
+                            <div class="form-group">
+                                <h4>New Password</h4>
+                                <input type="password" id="password" name="password" class="form-control form-policy" autocomplete="new-password" onKeyUp="checkPasswordStrength();">
+                            </div>
+                            <div class="form-group">
+                                <h4>Re-enter Password</h4>
+                                <input type="password" id="password_confirmation" name="password_confirmation" class="form-control form-policy">
+                            </div>
+
+                            <div id="password_st" style="display:none">
+                                <p class="st-pass">Password Strength</p>
+                                <div class="progress-pass" >
+                                    <div id="password-strength-status" class="progress-pass-inner"></div>
+                                    <div id="password-strength-text" class="progress-pass-text"></div>
+                                </div>
+                            </div>
+
+                            <ul class="condition-policy">
+                                <li class="minimum">Be a minimum of 8 characters</li>
+                                <li class="lowercase">Include at least one lowercase letter (a-z)</li>
+                                <li class="uppercase">Include at least one uppercase letter (A-Z)</li>
+                                <li class="number">Include at least one number (0-9)</li>
+                                <li class="special">Include at least one special character</li>
+                            </ul>
+
+                            <div class="text-center m-b-xs">
+                                <button type="button" class="btn btn-info" onclick="resetPasswordExpire()">
+                                   <h2 style="margin: 0;color:#fff;">Confirm</h2> 
+                                </button>
+                            </div>
+                        </form>
                     </div>
 
                     <div id="password_st" style="display:none">
@@ -161,6 +185,36 @@ function checkPasswordStrength() {
         }
     }
 }
+
+function resetPasswordExpire(){
+    let old_password = $('#old_password').val();
+    let password = $('#password').val();
+    let password_confirmation = $('#password_confirmation').val();
+
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        dataType: "json",
+        contentType:"application/json; charset=utf8",
+        url: "/policypassword/resetPasswordExpire",
+        type: "post",
+        data: ({
+            old_password:old_password,
+            password:password,
+            password_confirmation:password_confirmation,
+        }),
+        beforeSend: function(){
+            $('.ajax-loading').show();
+        },
+    }).done(function(res){
+        $('.ajax-loading').hide();
+        console.log(res);
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
 </script>
 @endpush
 @endsection
