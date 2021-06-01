@@ -105,7 +105,16 @@ class PolicyPasswordController extends Controller
     public function resetPasswordExpire(Request $request){
         $validator = Validator::make($request->all(), [
             'current_password' => 'required',
-            'password' => array('required', 'string', 'min:8', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/', 'confirmed'),
+            'password' => array(
+                'required', 
+                'string', 
+                'min:8',  
+                'regex:/[a-z]/', 
+                'regex:/[A-Z]/', 
+                'regex:/[0-9]/',
+                'regex:/[~!@#$%^&*-_+=?><]/', 
+                'confirmed'
+            ),
         ]);
         if ($validator->fails()){
             $validation = $validator->getMessageBag()->toArray();

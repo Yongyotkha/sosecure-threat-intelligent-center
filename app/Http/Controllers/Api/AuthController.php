@@ -11,6 +11,7 @@ use App\Menu;
 use App\Menu_sub;
 use App\Menu_permission_site;
 use App\Menu_sub_permission_site;
+use App\transaction_client_users;
 use Auth;
 use Carbon\Carbon;
 use Hautelook\Phpass\PasswordHash;
@@ -162,25 +163,37 @@ class AuthController extends ApiController
         if($data === false){
             return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
         }else{
+            $error_current = false;
             $data_key = json_decode($data, true);
             $user = User::find($data_key['user_id']);
-            if(empty($user->password_days_expire)){
-                $user->password_days_expire = '90';
-                $user -> password_start_reset = Carbon::now()->addDays(90);
+            if(!Hash::check($data_key['current_password'], $user->password)){
+                $error_current = true;
             }else{
-                $user -> password_start_reset = Carbon::now()->addDays($user->password_days_expire);
+                if(empty($user->password_days_expire)){
+                    $user->password_days_expire = '90';
+                    $user -> password_start_reset = Carbon::now()->addDays(90);
+                }else{
+                    $user -> password_start_reset = Carbon::now()->addDays($user->password_days_expire);
+                }
+                $user->password = $data_key['password'];
+                $user -> save();
+    
+                event(new PasswordReset($user));
+                
+                $response = array(
+                    'data' => $user
+                );
+    
             }
-            $user->password = $request->password;
-            $user -> save();
-            event(new PasswordReset($user));
+            if($error_current){
+                return response()->json(['message' => '', 'error' => 'error current password', 'status_code' => '400']);
+            }else{
+                $data_transcation = json_encode($response);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+               
+            }
             
-            $response = array(
-                'data' => $user
-            );
-
-            $data_transcation = json_encode($response);
-            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
-            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
         }
     }
 
