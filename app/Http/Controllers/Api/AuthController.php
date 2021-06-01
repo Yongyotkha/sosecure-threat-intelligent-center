@@ -12,9 +12,11 @@ use App\Menu_sub;
 use App\Menu_permission_site;
 use App\Menu_sub_permission_site;
 use Auth;
+use Carbon\Carbon;
 use Hautelook\Phpass\PasswordHash;
 use Illuminate\Support\Facades\Hash;
 use Firebase\JWT\JWT;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Response;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Modules\Users\Entities\model_has_roles;
@@ -122,6 +124,65 @@ class AuthController extends ApiController
 
         }
     } 
+
+    public function get_user(Request $request){
+        $header = $request->bearerToken();
+        $site = $this->AuthorizationLogin($header, $request->mode, $request->code);
+        if($site['status_code'] !== '200'){
+            return $this->AuthorizationLogin($header, $request->mode, $request->code);
+        }
+        
+        $value = $request -> data;
+        $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+        if($data === false){
+            return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+        }else{
+            $data_key = json_decode($data, true);
+            $user = User::find($data_key['user_id']);
+        
+            $response = array(
+                'data' => $user
+            );
+
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+        }
+    }
+
+    public function update_user(Request $request){
+        $header = $request->bearerToken();
+        $site = $this->AuthorizationLogin($header, $request->mode, $request->code);
+        if($site['status_code'] !== '200'){
+            return $this->AuthorizationLogin($header, $request->mode, $request->code);
+        }
+        
+        $value = $request -> data;
+        $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+        if($data === false){
+            return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+        }else{
+            $data_key = json_decode($data, true);
+            $user = User::find($data_key['user_id']);
+            if(empty($user->password_days_expire)){
+                $user->password_days_expire = '90';
+                $user -> password_start_reset = Carbon::now()->addDays(90);
+            }else{
+                $user -> password_start_reset = Carbon::now()->addDays($user->password_days_expire);
+            }
+            $user->password = $request->password;
+            $user -> save();
+            event(new PasswordReset($user));
+            
+            $response = array(
+                'data' => $user
+            );
+
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+        }
+    }
 
     /*
     |--------------------------------------------------------------------------
