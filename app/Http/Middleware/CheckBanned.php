@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\Google2FAAuthenticator;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Support\Facades\Redirect;
@@ -22,7 +23,10 @@ class CheckBanned
             if($user){
                 if((Carbon::parse($user->password_start_reset)->addDays($user->password_days_expire) <= Carbon::now() || $user->password_start_reset == '') && $request->path() !== 'resetPasswordExpire'){
                     $page = 'Policy';
-                    return response()->view('policypassword::index', compact('page'))->setStatusCode(200);
+                    $authenticator = app(Google2FAAuthenticator::class)->boot($request);
+                    if ($authenticator->isAuthenticated()) {
+                        return response()->view('policypassword::index', compact('page'))->setStatusCode(200);
+                    }
                 }
             }
         }
