@@ -1339,11 +1339,15 @@ $.ajax({
                             html += `</td>`;
                         }
                         
-                        html += `<td>${history.reason}</td>
-                        <td>
-                            ${history.geo.country} ${history.geo.countrycode}
-                        </td>
-                        <td>
+                        html += `<td>${history.reason}</td>`;
+                       
+                        if(history.geo){
+                            html += `<td>${history.geo.country} ${history.geo.countrycode}</td>`;
+                        }else{
+                            html += `<td></td>`;
+                        }
+                        
+                        html += `<td>
                             ${moment(new Date(history.created)).format('DD-MM-YYYY HH:MM:SS')}
                         </td>
                     </tr>
