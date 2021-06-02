@@ -3,7 +3,7 @@
         <div class="modal-header bg-blue">
             <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
             <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();"
-                    datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Add Assets </h4>
+                    datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Import Assets </h4>
         </div>
         <div class="modal-body">
             <div class="form-group row">

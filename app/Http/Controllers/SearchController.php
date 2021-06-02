@@ -852,7 +852,7 @@ class SearchController extends Controller
                 if(!$check_limit_search){
                     $response_data = array(
                         'status_code' => 400,
-                        'message' => 'เกิน limit การค้นหาPlease contact the system administrator.',
+                        'message' => 'เกิน limit การค้นหา Please contact the system administrator.',
                     );
                     return response()->json($response_data);
                 }
