@@ -771,10 +771,10 @@ class ApiSearchController extends ApiController
                            $site_request_limit_api_query = SiteRequestLimitApi::where('mode', 'api_limit')->where('site_id',0)->first();
                            $site_request_limit_api_count =$site_request_limit_api_query->count;
                     }
-                    if($log_search> 0){
-                        $center_search_api_loookup_allow = 1;
+                    // if($log_search> 0){
+                    //     $center_search_api_loookup_allow = 1;
             
-                    }else{
+                    // }else{
                             if((int)$center_search_api_loookup_limit > $site_request_limit_api_count){
                                 $center_search_api_loookup_allow = 1;
                                 if($source == 'check_api_search_limit'){
@@ -799,7 +799,7 @@ class ApiSearchController extends ApiController
                             
                             }
             
-                    }
+                    // }
             
               
                     if($source =="otx_puls_tag"){
