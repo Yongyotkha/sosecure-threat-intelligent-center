@@ -2,7 +2,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Set up Google Authenticator <span class="badge bg-info">{{ Auth::user()->google2fa_enable ? 'Enabled' : 'Disabled' }}</span></h4>
+                <h4 class="modal-title">Set up 2 Factor Authentication <span class="badge bg-info">{{ Auth::user()->google2fa_enable ? 'Enabled' : 'Disabled' }}</span></h4>
             </div>
     
     
@@ -21,7 +21,7 @@
                      <div class="row">
                          <div class="col-md-6"><img src="{{ $QR_Image }}"></div>
                          <div class="col-md-6">
-                            <p>You must set up your Google Authenticator app before continuing. </p>
+                            <p>You must set up your Authenticator app before continuing. </p>
                                 <p>You will be unable to login otherwise</p>
                         </div>
                         <div class="col-md-12 text-center">
