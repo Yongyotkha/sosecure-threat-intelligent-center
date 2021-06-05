@@ -43,7 +43,7 @@
 
             <section class="panel panel-default bg-white-cust m-t-lg b-r-cust">
                 <div class="panel-body text-center">
-                    <h1 style="margin-bottom: 2rem;color:#333;">Two-factor authentication</h1>
+                    <h2 style="margin-bottom: 2rem;color:#333;">Two-factor authentication</h2>
                     <form class="form-horizontal" method="POST" action="{{ route('2fa.auth') }}">
                         {{ csrf_field() }}
                         @if ($errors->has('message'))
@@ -54,7 +54,7 @@
                         @endif
                         <div class="form-group">
                             <div class="col-md-12">
-                                <input id="one_time_password" type="text" class="form-control" name="one_time_password" required autofocus style="height: 55px !important;">
+                                <input id="one_time_password" type="text" class="form-control" name="one_time_password" required autofocus style="font-size:2.3rem;height: 55px !important;">
                             </div>
                         </div>
                         <div style="margin:4rem 0 2rem 0">
