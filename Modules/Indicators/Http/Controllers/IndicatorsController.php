@@ -212,7 +212,7 @@ class IndicatorsController extends Controller
             $data['indicator'] = $request->indicator;
 
             $data['pulse_id'] = $id;
-            return view('indicators::events_detail')->with($data);
+            return view('indicators::events_detail')->withHeaders('X-Frame-Options', 'ALLOWALL')->with($data);
         }else{
             $ip = $this->ip;
             $mac = $this->mac;
@@ -254,6 +254,10 @@ class IndicatorsController extends Controller
                 abort(404);
             }
         }
+    }
+
+    public function iframe(){
+        return view('indicators::events_detail_2');
     }
 
     public function adversaries(Request $request){

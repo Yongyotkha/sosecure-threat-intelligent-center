@@ -1,5 +1,27 @@
 @extends('layouts.app')
 @section('content')
+<style>
+    .modal-dialog {
+        width: 100% !important;
+        max-width: none !important;
+        height: 100% !important;
+        margin: 0 !important;
+    }
+
+    .modal-content {
+        height: 100% !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    .modal-body {
+        overflow-y: auto !important;
+    }
+
+    .modal, .modal.fade.in {
+        overflow-y: auto !important;
+    }
+</style>
 @php $role_custom = @check_role_custom(); @endphp
 @php 
     $indicators_type = [];
@@ -741,12 +763,12 @@
 
 
                                                         @if(humanize($key)=='Malware')  
-                                                                <a href="<?php   echo '/indicators/detail_malware?malware_uuid='.rawurlencode($value2["name"]);  ?>" target="_blank" class="fz-search-20px">
+                                                                <a href="javascript:void(0);" onclick="modal_iframe_source('/indicators/detail_malware?malware_uuid={{rawurlencode($value2['name'])}}')" class="fz-search-20px">
                                                                     {{$value2["name"]}}
                                                                 </a>
 
                                                         @else
-                                                                <a href="{{$value2["link"]}}" target="_blank" class="fz-search-20px">
+                                                                <a href="javascript:void(0);" onclick="modal_iframe_source('{{$value2['link']}}')" class="fz-search-20px">
                                                                     {{$value2["name"]}}
                                                                 </a>
                                                         @endif
@@ -772,9 +794,9 @@
                                                     </div>
                                                     <div style="width: 10%" class="text-center">
                                                          @if(humanize($key)=='Malware')  
-                                                                 <a href="<?php   echo '/indicators/detail_malware?malware_uuid='.rawurlencode($value2["name"]);  ?>" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                                                 <a href="javascript:void(0);" onclick="modal_iframe_source('/indicators/detail_malware?malware_uuid='.rawurlencode($value2["name"]))"class="btn btn-info"><i class="fas fa-eye"></i> View</a>
                                                         @else
-                                                                <a href="{{$value2["link"]}}" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                                                <a href="javascript:void(0);" class="btn btn-info" onclick="modal_iframe_source('{{$value2['link']}}')"><i class="fas fa-eye"></i> View</a>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -828,6 +850,24 @@
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 </section>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                <div class="header-flex-overflow m-t-10 float-right">
+                    <div class="fwb-16">
+                        <a href="javascript:void(0);" onclick="close_modal_frame();"
+                                class="btn btn-danger btn-sm btn-responsive m-r-5">
+                                @icon('solid/times')
+                    </div>
+                </div>
+            </header>
+            <iframe id="iframe_source" onload="load_frame()" name="iframe_source" frameborder="0" width="100%" height="100%" allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
+
 @push('pagestyle')
 @include('stacks.css.highchart')
 @include('stacks.css.datatables')
@@ -948,6 +988,23 @@
             $(".type_indicator").show();
         } 
     });
+
+
+    function modal_iframe_source(url){
+        loading('load');
+        $('#iframe_source').attr('src', url);
+        $('#exampleModal').modal('show');
+    }
+
+    function load_frame(){
+        loading('stop_load');
+    }
+
+    function close_modal_frame(){
+        $('#exampleModal').modal('hide');
+        $('#iframe_source').attr('src', '');
+        loading('stop_load');
+    }
 
 $(function(){
     if(mode_search == 'lookup'){

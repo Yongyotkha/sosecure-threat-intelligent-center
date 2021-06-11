@@ -40,7 +40,7 @@ return [
      * Available Value: 'deny', 'sameorigin', 'allow-from <uri>'
      */
 
-    'x-frame-options'                   => 'sameorigin',
+    'x-frame-options'                   => 'deny', 'sameorigin', 'allow-from *',
 
     /*
      * X-Permitted-Cross-Domain-Policies
@@ -152,17 +152,7 @@ return [
             ],
         ],
         'frame-src'                            => [
-            'allow' => [
-                'https://*.stripe.com',
-                'https://*.twitter.com',
-                'https://onesignal.com',
-                'https://*.paypal.com',
-                'https://*.razorpay.com',
-                'https://*.braintreegateway.com',
-                'https://*.driftt.com',
-                'https://va.tawk.to',
-                'https://*.google.com',
-            ],
+            'allow' => ['*'],
         ],
 
         'script-src'                           => [
@@ -289,16 +279,15 @@ return [
 
         'form-action'                          => [
             'allow' => [
-                'https://*.twitter.com',
-                'https://*.paypal.com',
-                'https://*.mollie.com',
-                'https://va.tawk.to',
+                '*',
             ],
             'self'  => true,
         ],
 
         'frame-ancestors'                      => [
-            //
+            'allow' => [
+                '*',
+            ],
         ],
 
         'media-src'                            => [

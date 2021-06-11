@@ -58,7 +58,7 @@ Route::group(
         Route::get('/adversaries', 'IndicatorsController@adversaries')->name('indicators.adversaries');
         Route::get('/malware', 'IndicatorsController@malware')->name('indicators.malware');
 
-        
+        Route::get('/iframe', 'IndicatorsController@iframe')->name('indicators.iframe');
 
 
     }

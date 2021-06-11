@@ -3,22 +3,22 @@
 @endphp
 
 
-@extends('layouts.app')
+@extends('layouts.app3')
 @section('content')
 <section id="content" class="bg">
     <section class="vbox">
 
-        <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+        {{-- <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
             <div class="header-flex-overflow m-t-10">
                 <div class="fwb-16">
                         @if ($indicator)
-                            <a href="{{ route('indicators.detail_indicator').'?id='.$indicator_id.'&type='.$type.'&indicator='.$indicator }}"
+                            <a href="javascript:void(0);" data-bs-dismiss="modal" aria-label="Close"
                             class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                             @icon('solid/arrow-left')
                         </a>
                           <span>{{@$indicator}} > {{@$otx_events[0]['name']}} </span>
                         @else
-                            <a href="{{ route('indicators.events') }}"
+                            <a href="javascript:void(0);" data-bs-dismiss="modal" aria-label="Close"
                             class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
                             @icon('solid/arrow-left')
                         </a>
@@ -26,7 +26,7 @@
                     @endif
                 </div>
             </div>
-        </header>
+        </header> --}}
 
 
         <section class="scrollable wrapper">
