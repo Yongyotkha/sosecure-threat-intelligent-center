@@ -12,7 +12,7 @@ use Modules\Assets\Entities\OSType;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\Scans\Entities\AssetsData;
 use Modules\Scans\Entities\Assets;
-use Modules\Scans\Entities\Assets_port;
+use Modules\Assets\Entities\Assets_port;
 class Asset_Scan_Port extends Command
 {
     /**
@@ -70,7 +70,7 @@ class Asset_Scan_Port extends Command
                                     array_push($IP_List, $AssetsData_datavalue);
                                     $this->info($AssetsData_datavalue->value);
 
-                                    $cmd = 'ssh -t root@10.104.0.12  nmap sosecure.co.th';
+                                    $cmd = 'ssh -t root@10.104.0.12  nmap '.$AssetsData_datavalue->value;
                                     $current_port = ''; 
                                     $current_port_line_port = 0; 
                                     $descriptorspec = array(
@@ -104,28 +104,31 @@ class Asset_Scan_Port extends Command
                                foreach(preg_split("/((\r?\n)|(\r\n?))/", $current_port) as $line){
                                 $count++;
                                 if($count > 1){
-
+                                   
                                    $pizza  = $line;
                                    $this->info($pizza);
                                    $pieces = explode("/", $pizza);
                                    if(count($pieces) > 0){
                                     $port = $pieces[0];
-                                    $Assets_port_data =  Assets_port::where('asset_id',$value->site_id)->where('asset_name',$AssetsData_datavalue->value)->where('port',$port)->first();
-                                    if($Assets_port_data){
-                                        $Assets_port_data->port = $port;
-                                        $Assets_port_data->status =1;
-                                        $Assets_port_data->updated_at =date("Y-m-d H:i:s");
-                                        $Assets_port_data->save(); 
-                                    }else{
-                                        $Assets_port_data  = new Assets_port;
-                                        $Assets_port_data->asset_id = $value->site_id;
-                                        $Assets_port_data->asset_name = $AssetsData_datavalue->value;
-                                        $Assets_port_data->port = $port;
-                                        $Assets_port_data->status =1;
-                                        $Assets_port_data->created_at =date("Y-m-d H:i:s");
-                                        $Assets_port_data->save(); 
+                                    $this->info("  ".$port);
+                                    if($port){
+                                        $Assets_port_data =  Assets_port::where('site_id',$value->site_id)->where('asset_name',$AssetsData_datavalue->value)->where('port',$port)->first();
+                                        if($Assets_port_data){
+                                            $Assets_port_data->port = $port;
+                                            $Assets_port_data->status =1;
+                                            $Assets_port_data->updated_at =date("Y-m-d H:i:s");
+                                            $Assets_port_data->save(); 
+                                        }else{
+                                            $Assets_port_data  = new Assets_port;
+                                            $Assets_port_data->site_id = $value->site_id;
+                                            $Assets_port_data->asset_name = $AssetsData_datavalue->value;
+                                            $Assets_port_data->port = $port;
+                                            $Assets_port_data->status =1;
+                                            $Assets_port_data->created_at =date("Y-m-d H:i:s");
+                                            $Assets_port_data->save(); 
 
-                                    }
+                                        }
+                                   }
                                  
  
 

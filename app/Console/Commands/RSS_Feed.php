@@ -97,6 +97,7 @@ class RSS_Feed extends Command
             }
         }
         $feed = array();
+        print_r($rss->getElementsByTagName('item'));
         foreach ($rss->getElementsByTagName('item') as $node) {
             $item = array(
                 'title' => $node->getElementsByTagName('title')->item(0)->nodeValue,

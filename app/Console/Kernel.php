@@ -80,7 +80,7 @@ class Kernel extends ConsoleKernel
       $schedule->command('app:news_permission')->cron('0 */6 * * *')->withoutOverlapping(5);
 
       $schedule->command('app:MDCVEDataYear')->dailyAt('03:00')->name('lang.progress')->withoutOverlapping(5);
-      $schedule->command('app:MDCVEBatchJob')->dailyAt('8:00')->name('lang.progress')->withoutOverlapping(5);
+      $schedule->command('app:MDCVEBatchJob')->dailyAt('0 */8 * * *')->name('lang.progress')->withoutOverlapping(5);
 
       $schedule->command('app:OTXMDFeedIndicator')->cron('0 */12 * * *')->withoutOverlapping(5);
       $schedule->command('app:OTXMDFeedPulse')->cron('0 */12 * * *')->withoutOverlapping(5);
@@ -95,8 +95,8 @@ class Kernel extends ConsoleKernel
       //$schedule->command('app:test_indicator_update_ref')->everyMinute()->withoutOverlapping(5);
       $schedule->command('rm -rf /var/www/html/insight.sosecure.co.th/threat-intelligent-center/public/screenshot/screen-master-v2/jobs/')->cron('0 */12 * * *')->withoutOverlapping(5);
       $schedule->command('app:TransactionCenterReset')->cron('5 0 * * *')->withoutOverlapping(5);
-      $schedule->command('app:MDAdversaries')->cron('0 0 */2 * *')->withoutOverlapping(5);
-      $schedule->command('app:MDMalware')->cron('0 0 */2 * *')->withoutOverlapping(5);
+      $schedule->command('app:MDAdversaries')->cron('0 */8 * * *')->withoutOverlapping(5);
+      $schedule->command('app:MDMalware')->cron('0 */8 * * *')->withoutOverlapping(5);
 
     }
 

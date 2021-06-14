@@ -48,7 +48,7 @@ class test_indicator extends Command
     {
 
 
-        $site_id = 74;
+        $site_id = 76;
         $Logs_setting_data = Logs_setting::where('site_id',$site_id)->where('type','indicator')->first();
 
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
@@ -139,6 +139,8 @@ class test_indicator extends Command
             $format_str = str_replace("[[Event name]]", $docs_eventvalue->name,$format_str);
             $format_str = str_replace("[[Attribute Type]]", $data -> type,$format_str);
             $format_str = str_replace("[[Attribute Name]]", $data -> indicator_name,$format_str);
+            $format_str = str_replace("[[Tags]]", $docs_eventvalue->tags,$format_str);
+            $format_str = str_replace("[[Attribute DateTime]]", change_date_utc_to_thai($docs_eventvalue->modified),$format_str);
             $Logs_sent_transaction_save = new Logs_sent_transaction;
             $Logs_sent_transaction_save->site_id = $site_id;
             $Logs_sent_transaction_save->content = $format_str ;
