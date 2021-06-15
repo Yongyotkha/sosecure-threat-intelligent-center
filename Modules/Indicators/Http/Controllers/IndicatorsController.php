@@ -2468,10 +2468,55 @@ public function tableEvents(Request $request)
         return response()->json($response_data);
     }
 
-    public function insert_tag()
+    public function insert_tag(Request $request)
     {
+        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+        $clientMD = new MongoClient($DB_MONGO_KEY);
+
+        $fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+
+        $query = [
+            'pulse_id' => $request -> pulse_id,
+        ];
+
+        $options = [];
+        
+        $cursor = $fx_otx_events->find($query,$options);       
+        $events = $cursor->toArray();
+        $data['events'] = $events;
         $data['page'] = langapp('indicators');
         return view('indicators::modal.insert_tag')->with($data);
+    }
+
+    public function save_table_tags(Request $request){
+        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+        $clientMD = new MongoClient($DB_MONGO_KEY);
+        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $options = array(
+            'typeMap' => array(
+                'root' => 'array',
+                'document' => 'array',
+            ),
+        );
+        $document = $col_fx_otx_indicator_detail->findOne(array('pulse_id' => $request->pulse_id),$options);
+        if($document){
+            $update_fx_otx_events_indicator_ref = $col_fx_otx_indicator_detail->updateOne(
+                ['_id' => $document['_id']],
+                ['$set' => [
+                    'tags' => $request->tags_events,
+                ]
+                ]
+            );
+        }
+
+        return ajaxResponse(
+            [
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('indicators.events'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
 
 
