@@ -264,7 +264,7 @@
                     
                         <div id="show-chart-int" class="row av-results-wrapper has-falcon-button">
                             <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div id="card-search-int1" class="main-int-card">
+                                <div id="card-search-int1" class="main-int-card active">
                                     <div class="text-center av-container border-success" data-chart="chart-cs-ml">
                                         <div class="title">
                                             <img src="{{asset('images/hybrid.svg')}}" alt="" class="icon">
@@ -298,7 +298,7 @@
                                  </div>
                             </div>
                             <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div id="card-search-int2" class="main-int-card">
+                                <div id="card-search-int2" class="main-int-card active">
                                     <div class="text-center av-container border-success" data-chart="chart-cs-ml">
                                         <div class="title">
                                             <img src="{{asset('images/virus.jpg')}}" alt="" class="icon">
@@ -332,7 +332,7 @@
                                 </div>
                             </div>
                             <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div id="card-search-int3" class="main-int-card">
+                                <div id="card-search-int3" class="main-int-card active">
                                     <div class="text-center av-container border-success" data-chart="chart-cs-ml">
                                         <div class="title">
                                             <img src="{{asset('images/ibm.png')}}" alt="" class="icon">
@@ -2681,9 +2681,9 @@ $('#text_status_risk').html(html_status);
 
 
 
-$('.table-hybrid').hide();
-$('.table-virustotal').hide();
-$('.table-ibmcloud').hide();
+$('.table-hybrid').show();
+$('.table-virustotal').show();
+$('.table-ibmcloud').show();
 
 multi_readmore_text();
 </script>
