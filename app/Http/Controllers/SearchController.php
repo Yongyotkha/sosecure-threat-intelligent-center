@@ -731,6 +731,10 @@ class SearchController extends Controller
         $site_code = $request->code;
         $site_id = 0;
         $site = null;
+        
+       //format
+       $type = $this->check_keyword_type($keyword);
+
         if($site_code){
             $site = SiteSettings::where('code', $site_code)->first();
             $site_id = $site -> id;
@@ -749,8 +753,6 @@ class SearchController extends Controller
         }
     
 
-       //format
-       $type = $this->check_keyword_type($keyword);
        if($type == ''){
         $response_data = array(
             'status_code' => 401,
@@ -1254,31 +1256,10 @@ class SearchController extends Controller
         return $status;
     }   
 
-    private function is_valid_domain($url){
+    private function is_valid_domain($domain_name){
 
-        $validation = FALSE;
-        /*Parse URL*/    $urlparts = parse_url(filter_var($url, FILTER_SANITIZE_URL));
-        /*Check host exist else path assign to host*/    if(!isset($urlparts['host'])){
-            $urlparts['host'] = $urlparts['path'];
-        }
-    
-        if($urlparts['host']!=''){
-           /*Add scheme if not found*/        if (!isset($urlparts['scheme'])){
-                $urlparts['scheme'] = 'http';
-            }
-            /*Validation*/        if(checkdnsrr($urlparts['host'], 'A') && in_array($urlparts['scheme'],array('http','https')) && ip2long($urlparts['host']) === FALSE){ 
-                $urlparts['host'] = preg_replace('/^www\./', '', $urlparts['host']);
-                $url = $urlparts['scheme'].'://'.$urlparts['host']. "/";            
-                
-                if (filter_var($url, FILTER_VALIDATE_URL) !== false && @get_headers($url)) {
-                    $validation = TRUE;
-                }
-            }
-        }
-        if(!$validation){
-           return false;
-        }else{
-            return true;
-        }
+        return (preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $domain_name) //valid chars check
+            && preg_match("/^.{1,253}$/", $domain_name) //overall length check
+            && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $domain_name)   );
     }
 }
