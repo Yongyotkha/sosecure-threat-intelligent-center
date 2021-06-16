@@ -992,7 +992,7 @@
 
     function modal_iframe_source(url){
         loading('load');
-        $('#iframe_source').attr('src', url);
+        $('#iframe_source').attr('src', url + '?iframe=1');
         $('#exampleModal').modal('show');
     }
 

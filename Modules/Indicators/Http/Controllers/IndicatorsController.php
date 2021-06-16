@@ -212,7 +212,12 @@ class IndicatorsController extends Controller
             $data['indicator'] = $request->indicator;
 
             $data['pulse_id'] = $id;
-            return view('indicators::events_detail')->withHeaders('X-Frame-Options', 'ALLOWALL')->with($data);
+            if($request->iframe){
+                return view('indicators::events_detail_search')->withHeaders('X-Frame-Options', 'ALLOWALL')->with($data);
+            }else{
+                return view('indicators::events_detail')->withHeaders('X-Frame-Options', 'ALLOWALL')->with($data);
+            }
+           
         }else{
             $ip = $this->ip;
             $mac = $this->mac;
