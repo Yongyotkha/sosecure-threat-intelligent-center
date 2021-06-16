@@ -5099,3 +5099,11 @@ input.form-control.form-policy{
 input.form-policy[type=password] {
     font-size: 3.3rem !important;
 }
+
+.text-primary-head{
+    color: #008bc5;
+    font-size: 3rem;
+    font-weight: bold;
+    background: #eee;
+    padding: 1rem;
+}

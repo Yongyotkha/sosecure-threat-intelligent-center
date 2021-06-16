@@ -375,7 +375,7 @@
                     </section>
    
                     <section class="table-ibmcloud" style="display: none">
-                        <h3>IBM X-Force</h1>
+                        <h3 class="text-primary-head">IBM X-Force</h1>
                         <table id="table-ibmcloud" class="table">
                             <thead>
                                 <tr>
@@ -414,7 +414,7 @@
                     </section>
 
                     <section class="table-virustotal" style="display: none">
-                        <h3>VirusTotal</h1>
+                        <h3 class="text-primary-head">VirusTotal</h1>
                         <table id="table-virustotal" class="table">
                             <thead>
                                 <tr>
@@ -429,7 +429,7 @@
                     </section>
 
                     <section class="table-hybrid" style="display: none">
-                        <h3>CrowdStrike Falcon</h1>
+                        <h3 class="text-primary-head">CrowdStrike Falcon</h1>
                         <table id="table-hybrid" class="table">
                             <thead>
                                 <tr>
