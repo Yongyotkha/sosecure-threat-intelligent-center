@@ -49,30 +49,82 @@
                             </div>
                         </div>
                         <br>
+
                         <div class="form-group row">
-                        <label for="" class="col-lg-12 control-label" id="label_source">Source {{--<span class="text-danger">*</span>--}}</label>
-                        <div class="col-lg-12">
-                            <select name="source" id="source_create" class="select2-option form-control">
-                                <option value="">Select Source</option>
-                                @if(@$get_source)
-                                    
-                                @foreach (@$get_source as $item)
-                                    @php
-                                        $source_checked = '';  
-                                    @endphp
-                                    @if(@$RSSNews) 
-                                        @if($RSSNews->source == $item->name)
-                                            @php 
-                                                $source_checked = 'selected';  
-                                            @endphp
-                                        @endif
-                                    @endif
-                                    <option value="{{ $item -> name }}" value="{{@$item->name}}" {{$source_checked}}>{{ $item -> name }}</option>
-                                @endforeach
-                                @endif
-                            </select>
+                            <label for="" class="col-lg-12 control-label" id="labelactor">Actor</label>
                         </div>
-                    </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-10">
+                                <select name="actor" id="actor" class="select2-option form-control">
+                                    <option value=""></option>
+                                </select>
+                            </div>
+                            <div class="col-sm-2">
+                                <button class="btn btn-info"><i class="fas fa-plus"></i> Add Now</button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <p class="font-weight-bold">Add Actor</p>
+                                <hr>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="" class="col-lg-2 control-label" id="">Name <span class="text-danger">*</span></label>
+                            <div class="col-lg-10">
+                                <input type="text" class="form-control">
+                             </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="" class="col-lg-2 control-label" id="">Description</label>
+                            <div class="col-lg-10">
+                                <input type="text" class="form-control">
+                             </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="" class="col-lg-2 control-label" id="category_actor">Category</label>
+                            <div class="col-lg-10">
+                                <select name="category_actor" id="category_actor" class="select2-option form-control">
+                                    <option value=""></option>
+                                </select>
+                             </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <hr>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="" class="col-lg-12 control-label" id="label_source">Source {{--<span class="text-danger">*</span>--}}</label>
+                            <div class="col-lg-12">
+                                <select name="source" id="source_create" class="select2-option form-control">
+                                    <option value="">Select Source</option>
+                                    @if(@$get_source)
+                                        
+                                    @foreach (@$get_source as $item)
+                                        @php
+                                            $source_checked = '';  
+                                        @endphp
+                                        @if(@$RSSNews) 
+                                            @if($RSSNews->source == $item->name)
+                                                @php 
+                                                    $source_checked = 'selected';  
+                                                @endphp
+                                            @endif
+                                        @endif
+                                        <option value="{{ $item -> name }}" value="{{@$item->name}}" {{$source_checked}}>{{ $item -> name }}</option>
+                                    @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
 
                     <div class="form-group row">
                         <label class="col-lg-12 control-label">Serverity</label>
