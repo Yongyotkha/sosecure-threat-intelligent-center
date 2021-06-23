@@ -72,3 +72,5 @@ Route::get('phpinfo', function () {
 });
 
 Route::get('emailtest', 'Welcome@emailtest');
+
+Route::post('news/add_actor', 'RSSFeedSettingsController@news_add_actor')->name('actor.actor_add');

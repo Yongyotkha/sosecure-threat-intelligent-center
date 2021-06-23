@@ -650,7 +650,7 @@ class RSSFeedSettingsController extends Controller
             ->addColumn('action', function (RSSNews $model) {
                 $html = '';
                 $html .= "
-                <a href='". route("actor.actor_add") ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                <a href='". route('actor.actor_add', ['id' => $model->id]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
                     <i class='fas fa-plus'></i> Add Actor 
                 </a>
                 <a href='". route('rssfeedsettings.rss_news_edit_news', ['code' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
@@ -2658,6 +2658,14 @@ class RSSFeedSettingsController extends Controller
             true,
             Response::HTTP_OK
         );
+    }
+
+    public function news_add_actor(Request $request){
+
+        $input = $request->all();
+
+        dd($input);
+
     }
 
 
