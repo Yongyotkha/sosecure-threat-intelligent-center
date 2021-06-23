@@ -5,6 +5,7 @@ namespace Spatie\Dropbox;
 use Exception;
 use GrahamCampbell\GuzzleFactory\GuzzleFactory;
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7;
@@ -30,8 +31,10 @@ class Client
     const UPLOAD_SESSION_START = 0;
     const UPLOAD_SESSION_APPEND = 1;
 
-    /** @var string */
-    protected $accessToken;
+    /**
+     * @var TokenProvider
+     */
+    private $tokenProvider;
 
     /** @var string */
     protected $teamMemberId;
@@ -58,13 +61,16 @@ class Client
      * @param int $maxUploadChunkRetries How many times to retry an upload session start or append after RequestException.
      * @param string $teamMemberID The team member ID to be specified for Dropbox business accounts
      */
-    public function __construct($accessTokenOrAppCredentials = null, GuzzleClient $client = null, int $maxChunkSize = self::MAX_CHUNK_SIZE, int $maxUploadChunkRetries = 0, string $teamMemberId = null)
+    public function __construct($accessTokenOrAppCredentials = null, ClientInterface $client = null, int $maxChunkSize = self::MAX_CHUNK_SIZE, int $maxUploadChunkRetries = 0, string $teamMemberId = null)
     {
         if (is_array($accessTokenOrAppCredentials)) {
             [$this->appKey, $this->appSecret] = $accessTokenOrAppCredentials;
         }
+        if ($accessTokenOrAppCredentials instanceof TokenProvider) {
+            $this->tokenProvider = $accessTokenOrAppCredentials;
+        }
         if (is_string($accessTokenOrAppCredentials)) {
-            $this->accessToken = $accessTokenOrAppCredentials;
+            $this->tokenProvider = new InMemoryTokenProvider($accessTokenOrAppCredentials);
         }
 
         if ($teamMemberId !== null) {
@@ -330,11 +336,12 @@ class Client
      *
      * @link https://www.dropbox.com/developers/documentation/http/documentation#files-move_v2
      */
-    public function move(string $fromPath, string $toPath): array
+    public function move(string $fromPath, string $toPath, bool $autorename = false): array
     {
         $parameters = [
             'from_path' => $this->normalizePath($fromPath),
             'to_path' => $this->normalizePath($toPath),
+            'autorename' => $autorename,
         ];
 
         return $this->rpcEndpointRequest('files/move_v2', $parameters);
@@ -385,10 +392,11 @@ class Client
      * @param string $path
      * @param string|resource $contents
      * @param string $mode
+     * @param bool $autorename
      *
      * @return array
      */
-    public function upload(string $path, $contents, $mode = 'add'): array
+    public function upload(string $path, $contents, $mode = 'add', $autorename = false): array
     {
         if ($this->shouldUploadChunked($contents)) {
             return $this->uploadChunked($path, $contents, $mode);
@@ -397,6 +405,7 @@ class Client
         $arguments = [
             'path' => $this->normalizePath($path),
             'mode' => $mode,
+            'autorename' => $autorename,
         ];
 
         $response = $this->contentEndpointRequest('files/upload', $arguments, $contents);
@@ -475,6 +484,7 @@ class Client
                 $stream->seek($pos, SEEK_SET);
                 goto tryUpload;
             }
+
             throw $exception;
         }
     }
@@ -687,7 +697,7 @@ class Client
      */
     public function getAccessToken(): string
     {
-        return $this->accessToken;
+        return $this->tokenProvider->getToken();
     }
 
     /**
@@ -695,7 +705,7 @@ class Client
      */
     public function setAccessToken(string $accessToken): self
     {
-        $this->accessToken = $accessToken;
+        $this->tokenProvider = new InMemoryTokenProvider($accessToken);
 
         return $this;
     }
@@ -706,8 +716,10 @@ class Client
     protected function getHeaders(array $headers = []): array
     {
         $auth = [];
-        if ($this->accessToken || ($this->appKey && $this->appSecret)) {
-            $auth = $this->accessToken ? $this->getHeadersForBearerToken() : $this->getHeadersForCredentials();
+        if ($this->tokenProvider || ($this->appKey && $this->appSecret)) {
+            $auth = $this->tokenProvider
+                ? $this->getHeadersForBearerToken($this->tokenProvider->getToken())
+                : $this->getHeadersForCredentials();
         }
 
         if ($this->teamMemberId) {
@@ -725,10 +737,10 @@ class Client
     /**
      * @return array
      */
-    protected function getHeadersForBearerToken()
+    protected function getHeadersForBearerToken($token)
     {
         return [
-            'Authorization' => "Bearer {$this->accessToken}",
+            'Authorization' => "Bearer {$token}",
         ];
     }
 

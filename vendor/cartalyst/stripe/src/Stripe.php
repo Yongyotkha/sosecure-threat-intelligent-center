@@ -11,10 +11,10 @@
  * bundled with this package in the LICENSE file.
  *
  * @package    Stripe
- * @version    2.4.2
+ * @version    2.4.5
  * @author     Cartalyst LLC
  * @license    BSD License (3-clause)
- * @copyright  (c) 2011-2020, Cartalyst LLC
+ * @copyright  (c) 2011-2021, Cartalyst LLC
  * @link       https://cartalyst.com
  */
 
@@ -29,7 +29,7 @@ class Stripe
      *
      * @var string
      */
-    const VERSION = '2.4.2';
+    const VERSION = '2.4.5';
 
     /**
      * The Config repository instance.
@@ -151,7 +151,7 @@ class Stripe
     /**
      * Sets the idempotency key.
      *
-     * @param  string  $idempotencyKey
+     * @param  string|null  $idempotencyKey
      * @return $this
      */
     public function idempotent($idempotencyKey)
@@ -164,7 +164,7 @@ class Stripe
     /**
      * Sets the account id.
      *
-     * @param  string  $accountId
+     * @param  string|null  $accountId
      * @return $this
      */
     public function accountId($accountId)
