@@ -2,7 +2,7 @@ Nette Schema
 ************
 
 [![Downloads this Month](https://img.shields.io/packagist/dm/nette/schema.svg)](https://packagist.org/packages/nette/schema)
-[![Build Status](https://travis-ci.org/nette/schema.svg?branch=master)](https://travis-ci.org/nette/schema)
+[![Tests](https://github.com/nette/schema/workflows/Tests/badge.svg?branch=master)](https://github.com/nette/schema/actions)
 [![Coverage Status](https://coveralls.io/repos/github/nette/schema/badge.svg?branch=master)](https://coveralls.io/github/nette/schema?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/nette/schema/v/stable)](https://github.com/nette/schema/releases)
 [![License](https://img.shields.io/badge/license-New%20BSD-blue.svg)](https://github.com/nette/schema/blob/master/license.md)
@@ -13,7 +13,7 @@ Introduction
 
 A practical library for validation and normalization of data structures against a given schema with a smart & easy-to-understand API.
 
-Documentation can be found on the [website](https://doc.nette.org/schema). If you like it, **[please make a donation now](https://github.com/sponsors/dg)**. Thank you!
+Documentation can be found on the [website](https://doc.nette.org/schema).
 
 Installation:
 
@@ -24,12 +24,14 @@ composer require nette/schema
 It requires PHP version 7.1 and supports PHP up to 8.0.
 
 
-Support Project
----------------
+[Support Me](https://github.com/sponsors/dg)
+--------------------------------------------
 
-Do you like Schema? Are you looking forward to the new features?
+Do you like Nette DI? Are you looking forward to the new features?
 
-[![Donate](https://files.nette.org/icons/donation-1.svg?)](https://nette.org/make-donation?to=schema)
+[![Buy me a coffee](https://files.nette.org/icons/donation-3.svg)](https://github.com/sponsors/dg)
+
+Thank you!
 
 
 Basic Usage
@@ -48,6 +50,9 @@ try {
 	echo 'Data is invalid: ' . $e->getMessage();
 }
 ```
+
+Method `$e->getMessages()` returns array of all message strings and `$e->getMessageObjects()` return all messages as [Nette\Schema\Message](https://api.nette.org/3.1/Nette/Schema/Message.html) objects.
+
 
 Defining Schema
 ---------------
@@ -164,7 +169,7 @@ The parameter can also be a schema, so we can write:
 Expect::arrayOf(Expect::bool())
 ```
 
-The default value is an empty array.
+The default value is an empty array. If you specify default value, it will be merged with the passed data. This can be disabled using `mergeDefaults(false)`.
 
 
 Enumeration: anyOf()
@@ -211,7 +216,7 @@ $schema = Expect::structure([
 ]);
 
 $processor->process($schema, ['optional' => '']);
-// ERROR: option 'required' is missing
+// ERROR: item 'required' is missing
 
 $processor->process($schema, ['required' => 'foo']);
 // OK, returns {'required' => 'foo', 'optional' => null}
@@ -240,7 +245,7 @@ $schema = Expect::structure([
 ]);
 
 $processor->process($schema, ['additional' => 1]);
-// ERROR: Unexpected option 'additional'
+// ERROR: Unexpected item 'additional'
 ```
 
 Which we can change with `otherItems()`. As a parameter, we will specify the schema for each extra element:
@@ -252,6 +257,20 @@ $schema = Expect::structure([
 
 $processor->process($schema, ['additional' => 1]); // OK
 $processor->process($schema, ['additional' => true]); // ERROR
+```
+
+Deprecations
+------------
+
+You can deprecate property using the `deprecated([string $message])` method. Deprecation notices are returned by `$processor->getWarnings()` (since v1.1):
+
+```php
+$schema = Expect::structure([
+	'old' => Expect::int()->deprecated('The item %path% is deprecated'),
+]);
+
+$processor->process($schema, ['old' => 1]); // OK
+$processor->getWarnings(); // ["The item 'old' is deprecated"]
 ```
 
 Ranges: min() max()
@@ -325,7 +344,7 @@ $schema = Expect::arrayOf('string')
 	->assert($countIsEven, 'Even items in array');
 
 $processor->process($schema, ['a', 'b', 'c']);
-// Failed assertion "Even items in array" for option with value array.
+// Failed assertion "Even items in array" for item with value array.
 ```
 
 The method can be called repeatedly to add more assertions.
