@@ -740,6 +740,52 @@ class AssetsController extends Controller
         }
     }
 
+    public function select_cpe(Request $request)
+    {
+        $input = $request->all();
+        // dd($input);
+        $os_id = $request->get('os_type');
+        $term = $request->get('term');
+
+        if($term){
+
+            $search = $term;
+
+            if($os_id == 4) {
+                // $CPEData = data_cveven::select('rawtext as cpe')->where('rawtext','!=',null)->get();
+                $CPEData = data_cveven::
+                    select('rawtext as cpe')
+                    ->where('rawtext', 'like', '%'.$search.'%')
+                    ->distinct()
+                    ->get();
+            }else{
+                $OSType = OSType::
+                    select('name')
+                    ->where('id', $os_id)
+                    ->first();
+
+                $os_name = $OSType->name;
+
+                // dd($os_name);
+
+                $CPEData = CPEData::
+                    select('cpe')
+                    ->where('os_type', $os_name)
+                    ->where('cpe', 'like', '%'.$search.'%')
+                    ->get();
+            }
+
+            // dd($CPEData);
+
+            // microsoft:.net_framework
+            // linux:10
+
+            return response()->json($CPEData);
+        }
+
+
+    }
+
 
     public function table_asset_host(Request $request)
     {
@@ -1072,7 +1118,7 @@ class AssetsController extends Controller
            
         }
     }
-
+//-------------------------------------------------------------------------------------------------
     public function selectCPE_by(Request $request)
     {
         $os_id = $request->os_id;
@@ -1183,7 +1229,7 @@ class AssetsController extends Controller
         $assets = $request->assets;
         $idip = AssetsData::where('code', $request->idip)->first();
 
-        if(isset($request->iddomain)){
+        if(isset($request->iddomain) && $request->iddomain != null){
             $iddomainVal = AssetsData::where('code', $request->iddomain)->first();
             $domainValue = $iddomainVal->value;
         }else{
