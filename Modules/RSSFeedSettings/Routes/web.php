@@ -55,6 +55,7 @@ Route::group(
         Route::post('rssfeedsettings/change_status_news', 'RSSFeedSettingsController@change_status_news')->name('rssfeedsettings.change_status_news')->middleware('can:menu_items');
         Route::post('/rss_data/source', 'RSSFeedSettingsController@rss_data_source')->name('rssfeedsettings.rss_data_source');
         Route::post('rss_data/news/store/create', 'RSSFeedSettingsController@rss_data_store_news_create')->name('rssfeedsettings.rss_data_store_news_create');
+        Route::post('rss_data/news/store/select_actor', 'RSSFeedSettingsController@rss_select_actor_news_create')->name('rssfeedsettings.rss_select_actor_news_create');
 
         Route::post('rss_data/load_top_source', 'RSSFeedSettingsController@load_top_source')->name('rssfeedsettings.load_top_source')->middleware('can:menu_items');
         Route::post('rss_data/load_top_category', 'RSSFeedSettingsController@load_top_category')->name('rssfeedsettings.load_top_category')->middleware('can:menu_items');

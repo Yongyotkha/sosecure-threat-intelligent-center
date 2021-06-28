@@ -12,6 +12,8 @@ use App\TransactionClientNews;
 use Modules\RSSFeedSettings\Http\Requests\CreateRssRequest;
 use Auth;
 use Carbon\Carbon;
+use MongoDB\Client;
+use MongoDB\Client as MongoClient;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -650,7 +652,7 @@ class RSSFeedSettingsController extends Controller
             ->addColumn('action', function (RSSNews $model) {
                 $html = '';
                 $html .= "
-                <a href='". route('actor.actor_add', ['id' => $model->id]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
+                <a href='". route('actor.actor_add') ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
                     <i class='fas fa-plus'></i> Add Actor 
                 </a>
                 <a href='". route('rssfeedsettings.rss_news_edit_news', ['code' => $model->code]) ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
@@ -1297,6 +1299,54 @@ class RSSFeedSettingsController extends Controller
     }
 
 
+    public function rss_select_actor_news_create(Request $request)
+    {
+        if($request->has('q')){
+            $search = $request->q;
+
+            $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+            $client = new MongoClient($DB_MONGO_KEY);
+            $db_name = 'sosecure_threatintelligent';
+            $db = $client->$db_name;
+            $collection = $db->fx_otx_adversaries;
+            
+            $query = [
+
+                'name' => new \MongoDB\BSON\Regex($search)
+                
+            ];
+
+            $option = [];
+
+            $final = $collection->find($query,$option);
+            $result = $final->toArray();
+
+            // dd($result);
+            
+            // $data = array();
+            
+            // if($result){
+            //     $i = 1 ;
+            //     foreach($result as $datas){
+            //         // $data['id'] = $datas->id;
+            //         $data['name'][$i] = $datas->name;
+            //         // $data['des'][$i] = $datas->description;
+            //         $i++;
+            //     }
+            // }
+            // else{
+            //     // $data['id'] = '';
+            //     $data['name'] = '';
+            //     // $data['des'] = '';
+            // }
+            // CobaltGoblin
+            // dd($result->description);
+            // dd($data);
+        }
+
+        return response()->json($result);
+
+    }
 
     public function rss_data_store_news_create(Request $request){
         $role_custom = @check_role_custom();
@@ -1304,7 +1354,7 @@ class RSSFeedSettingsController extends Controller
             check_permission403();
         }
 
-        
+
         if ($request->hasFile('logo')) {
                 $request->validate([
                     'logo' => 'mimes:jpg,png,jpeg,gif,svg|max:2048',
@@ -2659,14 +2709,4 @@ class RSSFeedSettingsController extends Controller
             Response::HTTP_OK
         );
     }
-
-    public function news_add_actor(Request $request){
-
-        $input = $request->all();
-
-        dd($input);
-
-    }
-
-
 }

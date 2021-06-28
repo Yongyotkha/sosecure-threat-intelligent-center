@@ -52,20 +52,18 @@
 
                         <div class="form-group row">
                             <label for="" class="col-lg-12 control-label" id="labelactor">Actor</label>
-                        </div>
 
-                        <div class="form-group row">
-                            <div class="col-sm-10">
+                            <div class="col-sm-12">
                                 <select name="actor" id="actor" class="select2-option form-control">
-                                    <option value=""></option>
+
                                 </select>
                             </div>
-                            <div class="col-sm-2">
+                            {{-- <div class="col-sm-2">
                                 <button class="btn btn-info"><i class="fas fa-plus"></i> Add Now</button>
-                            </div>
+                            </div> --}}
                         </div>
 
-                        <div class="row">
+                        {{-- <div class="row">
                             <div class="col-sm-12">
                                 <p class="font-weight-bold">Add Actor</p>
                                 <hr>
@@ -93,7 +91,7 @@
                                     <option value=""></option>
                                 </select>
                              </div>
-                        </div>
+                        </div> --}}
 
                         <div class="row">
                             <div class="col-sm-12">
@@ -322,6 +320,32 @@ $('form').each(function () {
 $('#source_create').select2({
             tags: true,
             tokenSeparators: [' ']
+});
+
+
+
+$('#actor').select2({
+    tags: true,
+    tokenSeparators: [' '],
+    placeholder: 'select actor',
+    minimumInputLength: 1,
+    ajax: {
+        url: "{!! route('rssfeedsettings.rss_select_actor_news_create'); !!}",
+        dataType: 'json',
+        method: 'post',
+        delay: 250,
+        processResults: function (data) {
+            return {
+                results:  $.map(data, function (item) {
+                    return {
+                        text: item.name,
+                        id: item.name
+                    }
+                })
+            };
+        },
+        cache: true
+    }
 });
 
 function readLogo(input) {
