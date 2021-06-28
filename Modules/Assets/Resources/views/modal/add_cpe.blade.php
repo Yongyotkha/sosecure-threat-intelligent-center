@@ -265,6 +265,43 @@
 @include('partial.ajaxify')
 
 <script>
+
+    $('#cpe').select2({
+        tag: true,
+        tokenSeparators: [' '],
+        placeholder: 'select cpe',
+        minimumInputLength: 1,
+        ajax: {
+            url: "{!! route('assets.select_cpe'); !!}",
+            dataType: 'json',
+            method: 'post',
+            delay: 250,
+            data: function (term) {
+                var os_type = $("#os_type").val();
+                return {
+                    os_type: os_type,
+                    term: term['term']
+                };
+            },
+            processResults: function(data){
+                return {
+                    results: $.map(data, function(item){
+                        return {
+                            text: item.cpe,
+                            id: item.cpe
+                        }
+                    })
+                };
+            },
+            cache: true
+        }
+    });
+
+    $('#os_type').change(function(){
+        $('#cpe').val('');
+        $('#cpe').text('');
+    });
+
     $(function () {
         $('.check_test_select').select2();
         $('#chk-add').hide();
@@ -323,7 +360,7 @@
 
         });
 
-        $("#os_type").change(function() {
+        {{-- $("#os_type").change(function() {
             let os_id = this.value;
             if(os_id){
                 $('#check_os').html('');
@@ -365,7 +402,7 @@
                 $('#cpe').html(text_select);
             }
             
-        });
+        }); --}}
 
 
         $("#cpe").change(function() {
@@ -489,15 +526,17 @@
 
         if(os_type==''){
             $('#check_os').html('Please select os type.');
-        }else if(res.length==1){           
+        {{-- }else if(res.length==0){ --}}
+        }else if(cpe == null){
             $('#check_cpe').html('Please select cpe.');
         }else{
+            {{-- <td>${res[1]}</td> --}}
             html=``;
             html+=`<tr>
-            <td>${res[1]}</td>
+            <td>${cpe}</td>
             <td>${add_remark}</td>
             <td style="display:none;">${os_type}</td>
-            <td style="display:none;">${res[0]}</td>
+            <td style="display:none;">${cpe}</td>
             <td><button class="btn btn-xs btn-danger" onclick="del_row(this)"><i class="fas fa-trash"></i></button></td>
             </tr>`;
 
