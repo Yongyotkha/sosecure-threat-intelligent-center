@@ -1013,4 +1013,5 @@ return [
     'apply'                                     => 'Apply',
     'tools'                                     => 'Tools',
     'darkweb_darkowl'                           => 'Darkweb(darkowl)',
+    'actor'                                     => 'Actor',
 ];
