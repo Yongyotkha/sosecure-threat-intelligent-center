@@ -527,7 +527,7 @@
         if(os_type==''){
             $('#check_os').html('Please select os type.');
         {{-- }else if(res.length==0){ --}}
-        }else if(cpe == null){
+        }else if(cpe == ''){
             $('#check_cpe').html('Please select cpe.');
         }else{
             {{-- <td>${res[1]}</td> --}}

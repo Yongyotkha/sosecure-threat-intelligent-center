@@ -743,7 +743,7 @@ class AssetsController extends Controller
     public function select_cpe(Request $request)
     {
         $input = $request->all();
-        // dd($input);
+
         $os_id = $request->get('os_type');
         $term = $request->get('term');
 
@@ -766,8 +766,6 @@ class AssetsController extends Controller
 
                 $os_name = $OSType->name;
 
-                // dd($os_name);
-
                 $CPEData = CPEData::
                     select('cpe')
                     ->where('os_type', $os_name)
@@ -775,15 +773,8 @@ class AssetsController extends Controller
                     ->get();
             }
 
-            // dd($CPEData);
-
-            // microsoft:.net_framework
-            // linux:10
-
             return response()->json($CPEData);
         }
-
-
     }
 
 
