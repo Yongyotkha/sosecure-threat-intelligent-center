@@ -301,6 +301,9 @@ use Carbon\Carbon;
                                                 {{-- <th width="30px">Modified Date</th> --}}
                                                 {{-- <th>View Count</th>
                                                 <th>Link</th> --}}
+                                                <th>Category</th>
+                                                <th>Serverity</th>
+                                                <th>Actor</th>
                                                 <th>Status</th>
                                                 <th width="5%">Action</th>
                                             </tr>
@@ -725,6 +728,21 @@ $(function() {
                     name: 'link',
                     className: 'no-wrap'
                 },--}}
+                {
+                    data: 'category',
+                    name: 'category',
+                    className: 'w-10 text-center'
+                },
+                {
+                    data: 'serverity',
+                    name: 'serverity',
+                    className: 'w-10 text-center'
+                },
+                {
+                    data: 'actor',
+                    name: 'actor',
+                    className: 'no-wrap text-center'
+                },
                 {
                     data: 'status',
                     name: 'status',

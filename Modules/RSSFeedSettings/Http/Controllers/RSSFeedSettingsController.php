@@ -9,6 +9,7 @@ use App\siteNewsRelated;
 use App\Topic;
 use App\transaction_client_rss;
 use App\TransactionClientNews;
+use App\FXCategories;
 use Modules\RSSFeedSettings\Http\Requests\CreateRssRequest;
 use Auth;
 use Carbon\Carbon;
@@ -430,6 +431,52 @@ class RSSFeedSettingsController extends Controller
         }
         $model = $model ->orderBy('public_date', 'desc');
         $model = $model -> get();
+
+        // dd(count($model));
+        $count_row = count($model);
+
+        $i = 0;
+        foreach($model as $id)
+        {
+            $check_id = $id->id;
+
+            $query_id_cate = RSSNewsCategory::where('rss_news_id', $check_id)->select('news_category_id')->get();
+            $id_cate = $query_id_cate[0]['news_category_id'];
+            
+            $query_name_cate = FXCategories::where('id', $id_cate)->select('name')->first();
+            $name_cate = $query_name_cate['name'];
+
+            $model[$i]['category'] = $name_cate;
+
+            $DB_MONGO_KEY = config('app.DB_MONGO_DEV');
+            $client = new MongoClient($DB_MONGO_KEY);
+            $collection = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+
+            $query_actor = [
+                'pulse_id' => $check_id
+            ];
+
+            $option_actor = [];
+
+            $final_actor = $collection->find($query_actor, $option_actor);
+            $result_actor = $final_actor->toArray();
+
+            if(count($result_actor) != 0)
+            {
+                foreach($result_actor as $data)
+                {
+                    $name_actor = $data['adversary_name'];
+                    $model[$i]['actor'] = $name_actor;
+                }
+            }
+            else
+            {
+                $model[$i]['actor'] = '';
+            }
+
+            $i++;
+        }
+        // dd($model);
         
 
         // $model = RSSNews::all();
@@ -636,6 +683,16 @@ class RSSFeedSettingsController extends Controller
 
             //     return $html;
             // })
+            ->addColumn('category', function (RSSNews $model) {
+                $html = '';
+                $html .= '<label>'.$model->category.'</label>';
+                return $html;
+            })
+            ->addColumn('actor', function (RSSNews $model) {
+                $html = '';
+                $html .= '<label>'.$model->actor.'</label>';
+                return $html;
+            })
             ->addColumn('status', function (RSSNews $model) {
                 if($model->status == '1') {
                     $checked_val = 'checked';
@@ -664,7 +721,7 @@ class RSSFeedSettingsController extends Controller
                 return $html;
                
             })
-            ->rawColumns(['chk','content_detail','status','action'])
+            ->rawColumns(['chk','content_detail','category','serverity','actor','status','action'])
             ->toJson();
     }
 
@@ -1306,14 +1363,15 @@ class RSSFeedSettingsController extends Controller
 
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $client = new MongoClient($DB_MONGO_KEY);
-            $db_name = 'sosecure_threatintelligent';
+            $db_name = 'sosecure_threatintelligent_test';
             $db = $client->$db_name;
             $collection = $db->fx_otx_adversaries;
             
             $query = [
 
-                'name' => new \MongoDB\BSON\Regex($search)
-                
+                'name' => new \MongoDB\BSON\Regex($search),
+                'delete_at' => null
+
             ];
 
             $option = [];
@@ -1332,6 +1390,9 @@ class RSSFeedSettingsController extends Controller
             check_permission403();
         }
 
+        $input = $request->all();
+
+        // dd($input);
 
         if ($request->hasFile('logo')) {
                 $request->validate([
@@ -1573,7 +1634,7 @@ class RSSFeedSettingsController extends Controller
             // }
             
             if($request->formsubmit !== 'formDraft'){
-                if ($request->sent_mail == 1) {
+                if ($request->sent_mail == 1 && $request->sent_mail == 10) {
                     if($email_site_alert) {
                         foreach($email_site_alert as $data){
                             // var_dump($data);
@@ -1746,6 +1807,73 @@ class RSSFeedSettingsController extends Controller
                 }
             }
 
+            if(!empty($request -> actor)){
+
+                $new_id = $RSSNews->id;
+                $new_code = $RSSNews->code;
+                $new_title_th = $request->title_th;
+                $new_actor = $request->actor;
+
+                // dd($new_actor);
+
+                $checkSuccess = true;
+                $date_now = date("Y-m-d H:i:s");
+
+                $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+                $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+                $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
+
+                $query = [
+                    'name' => $new_actor
+                ];
+                $option = [];
+
+                $result = $col_fx_otx_adversaries->find($query,$option);
+
+                $data_result = array();
+
+                foreach($result as $data){
+                    $data_result['id'] = $data->_id;
+                    $data_result['uuid'] = $data->uuid;
+                    // $data_result['uuid'] = $data->adversary_uuid;
+                }
+
+                // dd($result);
+                // dd($data_result['uuid']);
+
+                $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+
+                $data_adv_related = array(
+                    'adversary_uuid' => $data_result['uuid'],
+                    'adversary_name' => $new_actor,
+                    'pulse_id' => $new_id,
+                    'pulse_name' => $new_title_th,
+                    'mode' => 'news',
+                    'created_at' => $date_now,
+                    'created_by' => 'system',
+                    'updated_at' => $date_now,
+                    'updated_by' => 'system'
+                );
+
+                $update_fx_otx_adversaries_related = $col_fx_otx_adversaries_related->insertOne($data_adv_related);
+
+                // $update_fx_otx_adversaries_related = $col_fx_otx_adversaries_related->updateOne(
+                //     ['adversary_uuid' => $uuid,'pulse_id' => $value["id"]],
+                //     ['$set' => [
+                //         'updated_at' => $date_now ,
+                //         'updated_by' => "system",
+                //         'adversary_name' => $adversary_name,
+                //         'pulse_name' => isset($value["name"])?$value["name"]:"",
+                //     ],
+                //         '$setOnInsert' => [
+                //         'created_at' => $date_now ,
+                //         'created_by' => "system",
+                //         ],
+                //     ],
+                //     ['upsert' => true]
+                // );
+            }
+
 
             // if(!empty($request -> tags)){
             //     foreach($request -> tags as $item){
@@ -1798,7 +1926,7 @@ class RSSFeedSettingsController extends Controller
             //     }
             // }
             if($request->formsubmit !== 'formDraft'){
-                if ($request->sent_mail == 1) {
+                if ($request->sent_mail == 1 && $request->sent_mail == 10) {
                     if($email_site_alert) {
                         foreach($email_site_alert as $data){
                             $news = [
