@@ -127,6 +127,11 @@ class ApiDataLeakController extends ApiController
                     $click_key = $data['data']['click_key'];
 
 
+                    $check_serverity = $data['data']['check_serverity'];
+                    $check_monitoring = $data['data']['check_monitoring'];
+                    $check_social = $data['data']['check_social'];
+
+
                     $model = DataLeakSocialRef::where('deleted_at', null)
                     ->where('status',1)
                     ->whereHas('get_data_leak_feed_one', function ($query) {
@@ -204,8 +209,28 @@ class ApiDataLeakController extends ApiController
                             });
             
                         }
-
+                  
+                        if ($check_social && $check_type =="social") {
+              
+                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($check_social) {
+                                if($check_social =="other"){
+                                    $query->whereNotIn('keyword', ['Mobile','Facebook','Line','Twitter','Website']);
+                                }else{
+                                    $query->where('keyword', $check_social);
+                                }
+                              
+                            });
             
+                        }
+                        if ($check_serverity) {
+                            $model = $model->where('serverity', $check_serverity);
+                            // });
+                        }
+            
+                        if ($check_monitoring) {
+                            $model = $model->where('status_monitoring', $check_monitoring);
+                            // });
+                        }
                         // if ($source) {
             
                         //     $source = $source;
@@ -243,7 +268,7 @@ class ApiDataLeakController extends ApiController
             
                         }
 
-                        $model->orderBy('created_at','desc')->get();
+                       // $model->orderBy('created_at','desc')->get();
                     } else {
 
                         if ($click_type2) {
@@ -303,13 +328,76 @@ class ApiDataLeakController extends ApiController
             
                         }
 
-                        $model->orderBy('created_at','desc')->get();
+                       // $model->orderBy('created_at','desc')->get();
                     }
-        
-                    $res = DataTables::of($model)->toJson(); 
+
+
+                    $order_column = $data['data']['order_column'];
+                    $order_dir = $data['data']['order_dir'];
+                 //   $res =  "";
+                    if($order_column){
+                        $column_order =$order_column;
+                        $column_dir =  $order_dir;
+                        if($column_order == "9"){
+                            $model->orderBy('status',$column_dir);
+                        }
+                        else if($column_order == "8"){
+                         //   $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
+                           //           $query->orderBy('feedtimepost',$column_dir);
+                         //   });
+                           $model->orderBy('created_at',$column_dir)->get();
+                        }
+                        else if($column_order == "7"){
+            
+                            $model->orderBy('status_monitoring',$column_dir);
+                        }
+                        else if($column_order == "6"){
+            
+                            $model->orderBy('serverity',$column_dir);
+
+                        }
+                        else if($column_order == "5"){
+            
+                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
+                                $query->orderBy('feedcontent',$column_dir);
+                            });
+                        }
+                        else if($column_order == "4"){
+            
+                            $model->orderBy('keyword',$column_dir);
+                        }
+                        else if($column_order == "3"){
+            
+                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
+                                $query->orderBy('source_name',$column_dir);
+                            });
+                        }
+                        else if($column_order == "2"){
+            
+                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
+                                $query->orderBy('feel_type',$column_dir);
+                            });
+                        }
+                        else if($column_order == "1"){
+            
+                            $model->whereHas('get_site', function ($query) use ($column_dir) {
+                                $query->orderBy('name',$column_dir);
+                            });
+                        }else{
+                            $model->orderBy('created_at', 'desc');
+                        }
+                    }else{
+                        $model->orderBy('created_at', 'desc');
+                    }
+                  //  $model->where('status_monitoring', 'in_progress');
+                 //   $res = DataTables::of($model)->toJson(); 
+                 //  $res =    $data['data']['order_column'];
+                   $data_count = $model->count();
 
                     $response = [
-                        "data" => $res,
+                        "recordsFiltered_count"=> $data_count,
+                        "recordsTotal_count" => $data_count,
+                        "data" => DataTables::of($model->skip($data['data']['start'])->take($data['data']['length'])->get())->rawColumns(['feedcontent','get_data_leak_feed_one.feedcontent'])->toJson(),
                     ];
 
                     $data_transcation = json_encode($response);

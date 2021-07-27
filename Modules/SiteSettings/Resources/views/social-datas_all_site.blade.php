@@ -281,7 +281,7 @@ use Carbon\Carbon;
                         <div class="container-fluid" style="padding: 2rem;">
                             <div class="row">
                                 <div class="col-lg-6 mb-1">
-                                    <h5 class="font-weight-bold">Keyword</h5>
+                                    <h5 class="font-weight-bold">Keyword/Content</h5>
                                         <input type="text" id="keyword" class="form-control">
                                 </div>
                                 {{-- <div class="col-lg-4 mb-1">
@@ -325,22 +325,22 @@ use Carbon\Carbon;
                                 <div class="col-lg-4 hide-social" style="display: none">
                                     <h5 class="font-weight-bold">Social</h5>
                                     <div id="groupby-social" class="btn-group special">
-                                        <button id="all" class="btn btn-grey active" value="mobile_app">
+                                        <button id="all" class="btn btn-grey active check_social" value="Mobile">
                                             <span> Mobile App</span>
                                         </button>
-                                        <button class="btn btn-grey" value="facebook">
+                                        <button class="btn btn-grey check_social" value="Facebook">
                                             <span> Fanpage </span>
                                         </button>
-                                        <button class="btn btn-grey" value="line">
+                                        <button class="btn btn-grey check_social" value="Line">
                                             <span> Line </span>
                                         </button>
-                                        <button class="btn btn-grey" value="twitter">
+                                        <button class="btn btn-grey check_social" value="Twitter">
                                             <span> Twitter </span>
                                         </button>
-                                        <button class="btn btn-grey" value="website">
+                                        <button class="btn btn-grey check_social" value="Website">
                                             <span> Website </span>
                                         </button>
-                                        <button class="btn btn-grey" value="other">
+                                        <button class="btn btn-grey check_social" value="other">
                                             <span> Other </span>
                                         </button>
                                     </div>
@@ -741,7 +741,7 @@ $('.btn').click(function(){
     var check_type = null;
     var check_serverity = null;
     var check_monitoring = null;
-    
+    var check_social = 'Mobile';
     
 
     $('#table_social_datas').on('click', '.select-chk', function () {
@@ -784,6 +784,10 @@ $('.btn').click(function(){
 
     $(".check_type").click(function() {
         check_type = $(this).val();
+   
+    });
+    $(".check_social").click(function() {
+        check_social = $(this).val();
    
     });
 
@@ -848,6 +852,7 @@ $('.btn').click(function(){
                         d.click_type2 = click_type2;
                         d.check_serverity = check_serverity;
                         d.check_monitoring = check_monitoring;
+                        d.check_social = check_social;
 
                         return d;
                     },
@@ -861,7 +866,7 @@ $('.btn').click(function(){
                 createdRow: function ( row, data, index ) {
                     $(row).attr('id', 'tr' + data.id);
                 },
-                "order": [ 6, 'desc' ],
+                "order": [ 8, 'desc' ],
                 columnDefs: [
                     {
                         targets: 0,
@@ -994,15 +999,14 @@ $('.btn').click(function(){
                         width: '5%',
                         className: 'nowrap',
                         render: function (data, type, full, meta) {
-                
                             if(full.serverity=='critical'){
                         return '<span class="badge" style="background-color: #b93624;">Critical</span>';
                             }else if(full.serverity=='high'){
                                 return '<span class="badge" style="background-color: #fcc838;">High</span>';
                             }else if(full.serverity=='medium'){
-                                return '<span class="badge" style="background-color: #f2ff15;color:#333;">Medium</span>';
+                                return '<span class="badge" style="background-color: #f2ff15;">Medium</span>';
                             }else if(full.serverity=='low'){
-                                return '<span class="badge" style="background-color: #88ce4f;">Low</span>';
+                                return '<span class="badge" style="background-color: #409967;">Low</span>';
                             }else if(full.serverity=='information'){
                                 return '<span class="badge" style="background-color: #00dcff;">Information</span>';
                             }else{

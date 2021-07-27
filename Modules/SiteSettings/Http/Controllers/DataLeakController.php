@@ -924,6 +924,19 @@ class DataLeakController extends Controller
                 });
 
             }
+            if ($request->check_social) {
+              
+                $check_social = $request->check_social;
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($check_social) {
+                    if($check_social =="other"){
+                        $query->whereNotIn('keyword', ['Mobile','Facebook','Line','Twitter','Website']);
+                    }else{
+                        $query->where('keyword', $check_social);
+                    }
+                  
+                });
+
+            }
 
 
 
@@ -1072,7 +1085,58 @@ class DataLeakController extends Controller
         
 
 
-        $model->orderBy('created_at', 'desc');
+        if(@$request->order){
+            $column_order = @$request->order[0]['column'];
+            $column_dir = @$request->order[0]['dir'];
+            if($column_order == "9"){
+                $model->orderBy('status',$column_dir);
+            }
+            else if($column_order == "8"){
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
+                          $query->orderBy('feedtimepost',$column_dir);
+                });
+            }
+            else if($column_order == "7"){
+
+                $model->orderBy('status_monitoring',$column_dir);
+            }
+            else if($column_order == "6"){
+
+                $model->orderBy('serverity',$column_dir);
+            }
+            else if($column_order == "5"){
+
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
+                    $query->orderBy('feedcontent',$column_dir);
+                });
+            }
+            else if($column_order == "4"){
+
+                $model->orderBy('keyword',$column_dir);
+            }
+            else if($column_order == "3"){
+
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
+                    $query->orderBy('source_name',$column_dir);
+                });
+            }
+            else if($column_order == "2"){
+
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
+                    $query->orderBy('feel_type',$column_dir);
+                });
+            }
+            else if($column_order == "1"){
+
+                $model->whereHas('get_site', function ($query) use ($column_dir) {
+                    $query->orderBy('name',$column_dir);
+                });
+            }else{
+                $model->orderBy('created_at', 'desc');
+            }
+        }else{
+            $model->orderBy('created_at', 'desc');
+        }
 
         return DataTables::of($model)->toJson();
 

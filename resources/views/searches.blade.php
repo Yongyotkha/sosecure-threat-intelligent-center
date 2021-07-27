@@ -711,7 +711,7 @@
                                     <a href="#{{$value["id"]}}">
                                         {{$value["name"]}}
                                     </a>
-                                    <div class='text-ellipsis'>{{$value["content"]}}</div>
+                                    <div class='text-ellipsis'>{$value["content"]}}</div>
                                 </div>
                             @endforeach
                         </div>
@@ -747,8 +747,13 @@
                                                         <a href="{{$value2["link"]}}" target="_blank" class="fz-search-20px">
                                                             {{$value2["name"]}}
                                                         </a>
-                                                        <div class="text-elips-ct">{!!$value2["content"]!!}</div>
-
+                                                        @if(humanize($key)!='data-leak')   
+                                                                <div class="text-elips-ct">{!!$value2["content"]!!}</div>
+                                                        @else
+ 
+                                                                 <div class="text-elips-ct">{!!$value2["content"]!!}</div>
+                                                        @endif
+                                                       
                                                         
                                                         
                                                     </div>
@@ -783,7 +788,7 @@
                                                                 <p>Groups : {!!explode_val($value2['groups'],'groups')!!}</p>
                                                                 <p>Industries : {!!explode_val($value2['industries'],'industries')!!}</p>
                                                         @else
-                                                        {{$value2["content"]}}
+                                                            {!!$value2["content"]!!}
                                                             
                                                         @endif
 

@@ -120,23 +120,49 @@ class SearchController extends Controller
             }
 
             if(@$role_custom['data_leak']) {
+
+                $keywords = $this->request->keyword;
+                $DataLeakFeed_data  = DataLeakFeed::where('deleted_at', null)->where('status','1')->whereIn('feel_type', ['social','darkweb_public'])->get();
+                foreach ($DataLeakFeed_data as $value_data) {
+                      $value_data->feedcontent_decode = html_entity_decode($value_data->feedcontent);
+                     
+                }
+                $DataLeakFeed_data_id = array();
+                array_push($DataLeakFeed_data_id, 0);
+                foreach($DataLeakFeed_data as $a) {
+                    if(strpos($a->feedcontent_decode, $keywords) !== false) {
+                        array_push($DataLeakFeed_data_id, $a->id);
+                    } 
+                }
+        
+              
+              
+
+
+
                 if(@get_role_custom()['superadmin'] == 1) {
-                    $DataLeakFeed_social = DataLeakFeed::select('data_leak_feed.id', 'data_leak_feed.feedcontent as content', 'data_leak_feed.sourceid', 'data_leak_feed.keyword as name', DB::raw('CONCAT("/socialdatas") AS link'))->whereNull('data_leak_feed.deleted_at')->whereNull('data_leak_socail_ref.deleted_at')->whereIn('data_leak_feed.feel_type',['social', 'darkweb_public'])->where(function ($query) use ($keyword) {
+                    $DataLeakFeed_social = DataLeakFeed::select('data_leak_feed.id', 'data_leak_feed.feedcontent as content', 'data_leak_feed.sourceid', 'data_leak_feed.keyword as name', DB::raw('CONCAT("/socialdatas") AS link'))->whereNull('data_leak_feed.deleted_at')->whereNull('data_leak_socail_ref.deleted_at')->whereIn('data_leak_feed.feel_type',['social', 'darkweb_public'])->where(function ($query) use ($keyword,$DataLeakFeed_data_id) {
                         $query->where('data_leak_feed.keyword', 'LIKE', $keyword)
-                        ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword) ->orWhere('data_leak_feed.feedcontent', 'LIKE', $keyword);
+                        ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword) ->orWhere('data_leak_feed.feedcontent', 'LIKE', $keyword)
+                        ->orWhereIn('data_leak_feed.id', $DataLeakFeed_data_id);
                     });
+                 
                     $DataLeakFeed_social = $DataLeakFeed_social->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
                     $dataWait["queryData"] = $DataLeakFeed_social;
 
                     $dataWait["count"] = $dataWait["queryData"]->count();
                     if ($dataWait['count'] > 0) {
+
+                    
+
                         $dataWait["queryData"] = $dataWait["queryData"]->orderBy('data_leak_feed.updated_at', 'desc')->get()->toArray();
                         $data['dataSearch']["Data Leak"] = $dataWait;
                     }
                 } else {
-                    $DataLeakFeed_social = DataLeakFeed::select('data_leak_feed.id', 'data_leak_feed.feedcontent as content', 'data_leak_feed.sourceid', 'data_leak_feed.keyword as name', DB::raw('CONCAT("/socialdatas") AS link'))->whereNull('data_leak_feed.deleted_at')->whereNull('data_leak_socail_ref.deleted_at')->whereIn('data_leak_feed.feel_type',['social', 'darkweb_public'])->where(function ($query) use ($keyword) {
+                    $DataLeakFeed_social = DataLeakFeed::select('data_leak_feed.id', 'data_leak_feed.feedcontent as content', 'data_leak_feed.sourceid', 'data_leak_feed.keyword as name', DB::raw('CONCAT("/socialdatas") AS link'))->whereNull('data_leak_feed.deleted_at')->whereNull('data_leak_socail_ref.deleted_at')->whereIn('data_leak_feed.feel_type',['social', 'darkweb_public'])->where(function ($query) use ($keyword,$DataLeakFeed_data_id) {
                         $query->where('data_leak_feed.keyword', 'LIKE', $keyword)
-                        ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword) ->orWhere('data_leak_feed.feedcontent', 'LIKE', $keyword);
+                        ->orWhere('data_leak_feed.source_name', 'LIKE', $keyword) ->orWhere('data_leak_feed.feedcontent', 'LIKE', $keyword)
+                        ->orWhereIn('data_leak_feed.id', $DataLeakFeed_data_id);
                     });
                     $DataLeakFeed_social = $DataLeakFeed_social->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
                     $dataWait["queryData"] = $DataLeakFeed_social->whereIn('site.id', $site_id_arr);
@@ -210,6 +236,9 @@ class SearchController extends Controller
                 $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
                 $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
+
+           
+
                 if($dataWait['count']>0){
                     $options = [
                         'allowDiskUse' => TRUE
@@ -217,7 +246,7 @@ class SearchController extends Controller
                     $pipeline = [
                         [
                             '$match' => [
-                                'name'  => ['$regex'=>$this->request->keyword, '$options' => 'i'],
+                                'name'  => ['$regex'=>$this->request->keyword, '$options' => 'i']
                             ]
                         ],
                         [
@@ -249,6 +278,57 @@ class SearchController extends Controller
                     $dataWait['queryData'] = $dataWait['queryData']->toArray();
                     $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
                     $data['dataSearch']["Events"] = $dataWait;
+                }else{
+
+             
+                    $pipeLine = array('tags' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
+                    $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
+    
+               
+    
+                    if($dataWait['count']>0){
+                        $options = [
+                            'allowDiskUse' => TRUE
+                        ];
+                        $pipeline = [
+                            [
+                                '$match' => [
+                                    'tags'  => ['$regex'=>$this->request->keyword, '$options' => 'i']
+                                ]
+                            ],
+                            [
+                                '$project' => [
+                                    '_id' => 0,
+                                    'id' => '$pulse_id',
+                                    'name' => '$name',
+                                    'is_modified' => '$is_modified',
+                                    'public' => '$public',
+                                    'created_at' => '$created_at',
+                                    'modified' => '$modified',
+                                    'tags' => '$tags',
+                                    'groups' => '$groups',
+                                    'industries' => '$industries',
+                                    'content' => [ '$concat' => ['source: ','$source']],
+                                    'link' => [ '$concat' => ['/indicators/events/events_detail/','$pulse_id']],
+                                ]
+                            ],
+                            [
+                                '$sort' => [
+                                    'modified'  => -1,
+                                ]
+                            ],
+                            [
+                                '$limit' => $limit
+                            ]
+                        ];
+                        $dataWait['queryData'] = $col_fx_otx_events->aggregate($pipeline,$options);
+                        $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                        $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
+                        $data['dataSearch']["Events"] = $dataWait;
+                    }
+                    
+    
+
                 }
             }
 

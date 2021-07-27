@@ -21,15 +21,15 @@ use App\DataLeakFeedTemp;
 use App\DataLeakSocial;
 use Carbon\Carbon;
 use MongoDB\BSON\UTCDateTime;
-class test_indicator extends Command
+class indicator_log extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:test_indicator';
-    protected $description = 'test_indicator';
+    protected $signature = 'app:indicator_log';
+    protected $description = 'indicator_log';
 
 
     
@@ -80,10 +80,10 @@ class test_indicator extends Command
         $where = array(
             //'feedtimepost' => ['$gt' => $time_stamp_search],
             //'feedcontent' => ['$regex'=>'PTT', '$options' => 'i'],
-            //'sourceid' => 1,
+            'indicator_id' => "2863709669",
            // "\$gte"=>$date1,
            // "\$lt"=>$date2
-            'updated_at' => ['$gte' => $dateStart,'$lt' => $dateEnd],
+            //'updated_at' => ['$gte' => $dateStart,'$lt' => $dateEnd],
            // 'feedcontent' => new \MongoDB\BSON\Regex($Site_keyword -> name),
            // 'feedcontent' => new \MongoDB\BSON\Regex('à¸—à¸³à¹„à¸¡à¹à¸Ÿà¸™à¸œà¸¡à¹€à¸›à¹‡à¸™à¹à¸šà¸šà¸™à¸µà¹‰'),
         );
