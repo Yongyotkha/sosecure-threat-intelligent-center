@@ -385,7 +385,7 @@ use Carbon\Carbon;
                                     <span> Reported </span>
                                 </button>
                                 <button class="btn check_monitoring btn-grey" value="in_progress">
-                                    <span> In Progress </span>
+                                    <span> Progress </span>
                                 </button>
                                 <button class="btn check_monitoring btn-grey" value="close">
                                     <span> Close </span>
@@ -884,10 +884,7 @@ $('.btn').click(function(){
                         className:'nowrap',
                         render: function (data, type, full, meta) {
 
-                                val = full.get_site;
-                                if(val) {
-                                    val = full.get_site.name;
-                                }
+                            val = full.site_name;
                         
                             return val;
 
@@ -899,8 +896,8 @@ $('.btn').click(function(){
                         className:'nowrap',
                         render: function (data, type, full, meta) {
                 
-                            if(full.get_data_leak_feed_one.feel_type){
-                                return get_word_leak_compromise(full.get_data_leak_feed_one.feel_type,'data_leak');
+                            if(full.feel_type){
+                                return get_word_leak_compromise(full.feel_type,'data_leak');
                             }
                             return '-';
 
@@ -912,8 +909,8 @@ $('.btn').click(function(){
                         width: '60px',
                         render: function (data, type, full, meta) {
                             
-                            if(full.get_data_leak_feed_one.source_name){
-                                return full.get_data_leak_feed_one.source_name;
+                            if(full.source_name){
+                                return full.source_name;
                             }
                             return '-';
 
@@ -945,7 +942,7 @@ $('.btn').click(function(){
 
                             var new_html = '';
                             var date_day = '2021-01-01';
-                            var date = full.get_data_leak_feed_one.feedtimepost;
+                            var date = full.feedtimepost;
                             var date_sp = date.split(" ");
                             if(date_sp.length > 0) {
                                 date_day = date_sp[0];
@@ -961,8 +958,8 @@ $('.btn').click(function(){
                                 new_html += `<span class="badge" style="background-color: #2196f3;">New</span>`;
                             }
                           
-                            if(full.get_data_leak_feed_one.feedcontent){
-                                var feedcontent =  stripHtml(full.get_data_leak_feed_one.feedcontent);
+                            if(full.feedcontent){
+                                var feedcontent =  stripHtml(full.feedcontent);
                                 var res = full.keyword.split(",");
                                 let content = '';
                                 for(let i in res){
@@ -1021,8 +1018,8 @@ $('.btn').click(function(){
                         className: 'nowrap',
                         render: function (data, type, full, meta) {
                 
-                            if(full.get_data_leak_feed_one.feedtimepost){
-                            return full.get_data_leak_feed_one.feedtimepost;
+                            if(full.feedtimepost){
+                            return full.feedtimepost;
                             }else{
                                 return '';
                             }

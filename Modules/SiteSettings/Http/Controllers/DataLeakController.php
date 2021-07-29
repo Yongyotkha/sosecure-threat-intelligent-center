@@ -817,6 +817,7 @@ class DataLeakController extends Controller
 
     public function socialdatas_all_site_tb(Request $request)
     {
+    
         $model = DataLeakSocialRef::where('deleted_at', null)
             ->whereHas('get_data_leak_feed_one', function ($query) {
                 $query->whereIn('feel_type', ['social','darkweb_public']);
@@ -824,53 +825,35 @@ class DataLeakController extends Controller
             ->with('get_site')
             ->with('get_data_leak_feed_one');
 
+           $DataLeakSocialRef_data = DataLeakSocialRef::join('data_leak_feed', 'data_leak_socail_ref.data_leak_feed_id', '=', 'data_leak_feed.id')
+             ->whereIn('data_leak_feed.feel_type', ['social','darkweb_public'])->join('site','site.id','data_leak_socail_ref.site_id')
+             ->select('data_leak_socail_ref.*','data_leak_feed.*','site.name as site_name');
+
         if ($request->search_val == 1) {
 
 
 
-            //<><><>
-            // if (Auth::check()) {
-
-            //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            //     if (Auth::user()->hasRole('admin')) { //if admin
-            //         // dd(777);
-
-            //     } else { //if notAdmin
-            //         // dd(888);
-            //         if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
-            //             if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
-            //                 // dd(99);
-
-            //                 $model = $model->whereIn('site_id', $site_id_arr);
-
-            //                 // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
-
-            //             } else { //not support and admin
-            //                 $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
-
-            //                 // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
-            //             }
-            //         }
-            //     }
-            // }
-
+           
+            $DataLeakFeed_Data =   DataLeakFeed::where('deleted_at', null)->where('status','1')->whereIn('feel_type', ['social','darkweb_public']);
             $get_role_custom_first = @get_role_custom();
             $site_id_arr = @$get_role_custom_first['site_id_arr'];
             if(@$get_role_custom_first['superadmin'] == 1) {
-                
 
             }else if(@$get_role_custom_first['client'] == 1) {
                 $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('data_leak_feed.status', 1);
 
             }else if(@$get_role_custom_first['site_support'] == 1) {
                 $model = $model->whereIn('site_id', $site_id_arr);
+                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.ite_id', $site_id_arr);
 
             }else if(@$get_role_custom_first['site_admin'] == 1) {
                 $model = $model->whereIn('site_id', $site_id_arr);
+                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.ite_id', $site_id_arr);
 
             }else if(@$get_role_custom_first['site_client'] == 1) {
-                $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
-
+                $model = $model->whereIn('site_id', $site_id_arr)->where('data_leak_feed.status', 1);
+                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('fx_data_leak_feed.status', 1);
             }
 
             
@@ -878,14 +861,14 @@ class DataLeakController extends Controller
            
             if ($request->keywords) {
                 $keywords = $request->keywords;
-                $DataLeakFeed_data  = DataLeakFeed::where('deleted_at', null)->where('status','1')->whereIn('feel_type', ['social','darkweb_public'])->get();
+                $DataLeakFeed_data  = $DataLeakFeed_Data->get();
                 foreach ($DataLeakFeed_data as $value_data) {
                       $value_data->feedcontent_decode = html_entity_decode($value_data->feedcontent);
                 }
                 $DataLeakFeed_data_id = array();
                 array_push($DataLeakFeed_data_id, 0);
                 foreach($DataLeakFeed_data as $a) {
-                    if(strpos($a->feedcontent_decode, $keywords) !== false) {
+                    if(strpos(strtoupper($a->feedcontent_decode), strtoupper($keywords)) !== false) {
                         array_push($DataLeakFeed_data_id, $a->id);
                     } 
                 }
@@ -895,16 +878,16 @@ class DataLeakController extends Controller
                    // $query->orwhere('feedcontent', 'LIKE', '%' . $keywords . '%');
                       $query->orWhereIn('id', $DataLeakFeed_data_id);
                 });
-                
+
+                $DataLeakSocialRef_data->whereRaw('(LOWER(fx_data_leak_feed.keyword) LIKE ? or LOWER(fx_data_leak_feed.feedcontent) LIKE ? )', array([trim(strtolower('%' .$request->keywords.'%'))],[trim(strtolower('%' .$request->keywords.'%'))]));
+                $DataLeakSocialRef_data->orWhereIn('data_leak_feed.id', $DataLeakFeed_data_id);
             }
-
-
 
             if ($request->site) {
                 $SiteSettings = SiteSettings::where('code', @$request->site)->first();
                 // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
                 $model = $model->where('site_id', $SiteSettings->id);
-                // });
+                $DataLeakSocialRef_data->where('data_leak_socail_ref.site_id',$SiteSettings->id);
             }
 
             if ($request->type) {
@@ -913,7 +896,7 @@ class DataLeakController extends Controller
                 $model->whereHas('get_data_leak_feed_one', function ($query) use ($type) {
                     $query->where('feel_type', 'LIKE', '%' . $type . '%');
                 });
-
+                $DataLeakSocialRef_data->where('data_leak_feed.feel_type', 'LIKE', '%' . $type . '%');
             }
 
             if ($request->check_type) {
@@ -922,9 +905,10 @@ class DataLeakController extends Controller
                 $model->whereHas('get_data_leak_feed_one', function ($query) use ($type) {
                     $query->where('feel_type', 'LIKE', '%' . $type . '%');
                 });
-
+                $DataLeakSocialRef_data->where('data_leak_feed.feel_type', 'LIKE', '%' . $type . '%');
             }
-            if ($request->check_social) {
+         //   dd($request->check_type);
+            if ($request->check_social && $request->check_type =="social") {
               
                 $check_social = $request->check_social;
                 $model->whereHas('get_data_leak_feed_one', function ($query) use ($check_social) {
@@ -935,7 +919,12 @@ class DataLeakController extends Controller
                     }
                   
                 });
+                if($check_social =="other"){
+                         $DataLeakSocialRef_data->whereNotIn('data_leak_feed.keyword', ['Mobile','Facebook','Line','Twitter','Website']);
+                }else{
+                       $DataLeakSocialRef_data->where('data_leak_feed.keyword', $check_social);
 
+                }
             }
 
 
@@ -947,18 +936,18 @@ class DataLeakController extends Controller
                     $query->where('sourceid', 'LIKE', '%' . $source . '%');
                 });
 
-
+                       $DataLeakSocialRef_data->where('data_leak_feed.sourceid', 'LIKE', '%' . $source . '%');
 
             }
 
             if ($request->check_serverity) {
                 $model = $model->where('serverity', $request->check_serverity);
-                // });
+                $DataLeakSocialRef_data->where('data_leak_socail_ref.serverity', 'LIKE', '%' . $request->check_serverity . '%');
             }
 
             if ($request->check_monitoring) {
                 $model = $model->where('status_monitoring', $request->check_monitoring);
-                // });
+                $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $request->check_monitoring . '%');
             }
 
             if ($request->isDateSearch == 1) {
@@ -986,7 +975,7 @@ class DataLeakController extends Controller
                 $model->whereHas('get_data_leak_feed_one', function ($query) use ($date_start_date_format, $date_end_date_format) {
                     $query->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
                 });
-
+                $DataLeakSocialRef_data->whereBetween('data_leak_feed.feedtimepost',array($date_start_date_format, $date_end_date_format));
             }
 
             // $model->get();
@@ -996,19 +985,19 @@ class DataLeakController extends Controller
                 $SiteSettings = SiteSettings::where('code', @$request->site)->first();
                 // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
                 $model = $model->where('site_id', $SiteSettings->id);
-                // });
+                $DataLeakSocialRef_data->where('data_leak_socail_ref.site_id', $SiteSettings->id);
             }
 
             if ($request->click_key) {
                 $model = $model->where('keyword', $request->click_key);
-                // });
+                $DataLeakSocialRef_data->where('LOWER(`data_leak_feed.keyword`)','LIKE',[trim(strtolower($request->click_key))]);
             }
 
 
             if($request ->click_type) {
 
                 $model = $model-> where('feel_type', '=' ,$request -> click_type);
-
+                $DataLeakSocialRef_data->where('data_leak_socail_ref.feel_type',$request -> click_type);
 
             }
     
@@ -1034,6 +1023,25 @@ class DataLeakController extends Controller
                         }
                     }
                 });
+
+                if($keywords == 'other') {
+                    $DataLeakSocialRef_data->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ',[trim(strtolower('mobile'))])
+                                            ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ',[trim(strtolower('facebook'))])
+                                            ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ',[trim(strtolower('line'))])
+                                            ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ',[trim(strtolower('twitter'))])
+                                            ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ',[trim(strtolower('website'))]);
+                } else {
+                    if($keywords == 'in_progress') {
+                        $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $keywords . '%');
+                    } else if($keywords == 'reported') {
+                        $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $keywords . '%');
+                    } else if($keywords == 'close') {
+                        $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $keywords . '%');
+                    } else {
+                        $DataLeakSocialRef_data->where('data_leak_feed.keyword', 'LIKE', '%' . $keywords . '%');
+                    }
+                }
+        
             }
 
             //<><><>
@@ -1068,16 +1076,19 @@ class DataLeakController extends Controller
 
             }else if(@$get_role_custom_first['client'] == 1) {
                 $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('data_leak_feed.status', 1);
 
             }else if(@$get_role_custom_first['site_support'] == 1) {
                 $model = $model->whereIn('site_id', $site_id_arr);
+                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.ite_id', $site_id_arr);
 
             }else if(@$get_role_custom_first['site_admin'] == 1) {
                 $model = $model->whereIn('site_id', $site_id_arr);
+                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.ite_id', $site_id_arr);
 
             }else if(@$get_role_custom_first['site_client'] == 1) {
-                $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
-
+                $model = $model->whereIn('site_id', $site_id_arr)->where('data_leak_feed.status', 1);
+                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('fx_data_leak_feed.status', 1);
             }
 
             
@@ -1090,55 +1101,88 @@ class DataLeakController extends Controller
             $column_dir = @$request->order[0]['dir'];
             if($column_order == "9"){
                 $model->orderBy('status',$column_dir);
+                $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.site_id', $column_dir);
             }
             else if($column_order == "8"){
                 $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
                           $query->orderBy('feedtimepost',$column_dir);
                 });
+                $DataLeakSocialRef_data->orderBy('data_leak_feed.feedtimepost', $column_dir);
             }
             else if($column_order == "7"){
 
                 $model->orderBy('status_monitoring',$column_dir);
+                $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.status_monitoring', $column_dir);
             }
             else if($column_order == "6"){
 
                 $model->orderBy('serverity',$column_dir);
+                $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.serverity', $column_dir);
             }
             else if($column_order == "5"){
 
                 $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
                     $query->orderBy('feedcontent',$column_dir);
                 });
+                $DataLeakSocialRef_data->orderBy('data_leak_feed.feedcontent', $column_dir);
             }
             else if($column_order == "4"){
 
                 $model->orderBy('keyword',$column_dir);
+                $DataLeakSocialRef_data->orderBy('data_leak_feed.keyword', $column_dir);
             }
             else if($column_order == "3"){
 
                 $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
                     $query->orderBy('source_name',$column_dir);
                 });
+                $DataLeakSocialRef_data->orderBy('data_leak_feed.source_name', $column_dir);
             }
             else if($column_order == "2"){
 
                 $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
                     $query->orderBy('feel_type',$column_dir);
                 });
+                $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.feel_type', $column_dir);
             }
             else if($column_order == "1"){
 
                 $model->whereHas('get_site', function ($query) use ($column_dir) {
                     $query->orderBy('name',$column_dir);
                 });
+                $DataLeakSocialRef_data->orderBy('site.name', $column_dir);
+           
             }else{
                 $model->orderBy('created_at', 'desc');
+                $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.created_at', $column_dir);
             }
         }else{
             $model->orderBy('created_at', 'desc');
+            $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.created_at', $column_dir);
         }
 
-        return DataTables::of($model)->toJson();
+      //  dd($DataLeakSocialRef_data->toSql());
+      // $datas = $DataLeakSocialRef_data->get();
+     //   foreach ($datas as $value) {
+      
+          //  $value['source_name'] = $value->get_data_leak_feed_one->source_name;
+        
+      //  }
+       // $this->aasort($datas,'source_name');
+     //  dd(DB::getQueryLog()); // Show results of log
+       // return DataTables::of($DataLeakSocialRef_data->get())->make(true);
+
+
+      $response = [
+        "recordsFiltered"=> $DataLeakSocialRef_data->count(),
+        "draw"=>$request->draw,
+        "recordsTotal" => $DataLeakSocialRef_data->count(),
+        "start"=>$request->start,
+        "length"=>$request->length,
+        "data" => $DataLeakSocialRef_data->skip($request->start)->take($request->length)->get(),
+    ];
+   // return DataTables::of($response)->make(true);
+      return response()->json( $response); 
 
         // $model = DataLeakSocialRef::where('deleted_at', null)->orderBy('id', 'desc');
         // $model->whereHas('get_data_leak_feed', function ($query){
@@ -1146,6 +1190,7 @@ class DataLeakController extends Controller
 
     }
 
+    
     // View Content DataLeak
     public function view_dataleak_modal($code)
     {
