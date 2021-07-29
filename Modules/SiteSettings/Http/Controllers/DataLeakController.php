@@ -1080,11 +1080,11 @@ class DataLeakController extends Controller
 
             }else if(@$get_role_custom_first['site_support'] == 1) {
                 $model = $model->whereIn('site_id', $site_id_arr);
-                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.ite_id', $site_id_arr);
+                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
 
             }else if(@$get_role_custom_first['site_admin'] == 1) {
                 $model = $model->whereIn('site_id', $site_id_arr);
-                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.ite_id', $site_id_arr);
+                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
 
             }else if(@$get_role_custom_first['site_client'] == 1) {
                 $model = $model->whereIn('site_id', $site_id_arr)->where('data_leak_feed.status', 1);

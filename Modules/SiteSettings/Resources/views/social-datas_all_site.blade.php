@@ -966,7 +966,9 @@ $('.btn').click(function(){
                                     const data2 = res[i];
                                     content += feedcontent.replaceAll(data2, '<span class="badge bg-warning">'+data2+'</span>');
                                 }
-                                 return'<div>'+new_html+content+'</div>';
+                         
+                                 return'<div>'+new_html+full.feedcontent+'</div>';
+                               
                             }else{
                                 return '-';
                             }
