@@ -1035,13 +1035,13 @@ $('.btn').click(function(){
                         render: function (data, type, full, meta) {
 
                             var checked_val = null;
-                                if (full.status == 1) {
+                                if (full.status_data == 1) {
                                     checked_val = 'checked';
                                 } else {
                                     checked_val = '';
                                 }
                         
-                            return  '<label class="switch"><input type="checkbox" id="social_active_' +full.id+  '" onchange="social_active( '+full.id+')" '+checked_val+' name="active" value="1"><span class="slider round"></span></label>';
+                            return  '<label class="switch"><input type="checkbox" id="social_active_' +full.id_data+  '" onchange="social_active( '+full.id_data+')" '+checked_val+' name="active" value="1"><span class="slider round"></span></label>';
 
                         }
 
