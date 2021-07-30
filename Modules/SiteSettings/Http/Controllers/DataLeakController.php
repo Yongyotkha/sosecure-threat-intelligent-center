@@ -827,7 +827,7 @@ class DataLeakController extends Controller
 
            $DataLeakSocialRef_data = DataLeakSocialRef::join('data_leak_feed', 'data_leak_socail_ref.data_leak_feed_id', '=', 'data_leak_feed.id')
              ->whereIn('data_leak_feed.feel_type', ['social','darkweb_public'])->join('site','site.id','data_leak_socail_ref.site_id')
-             ->select('data_leak_socail_ref.*','data_leak_feed.*','site.name as site_name');
+             ->select('data_leak_socail_ref.*','data_leak_feed.*','site.name as site_name','data_leak_socail_ref.code as code_data');
 
         if ($request->search_val == 1) {
 
