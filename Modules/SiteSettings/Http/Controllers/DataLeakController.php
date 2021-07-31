@@ -842,18 +842,24 @@ class DataLeakController extends Controller
             }else if(@$get_role_custom_first['client'] == 1) {
                 $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
                 $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('data_leak_feed.status', 1);
+                $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
 
             }else if(@$get_role_custom_first['site_support'] == 1) {
                 $model = $model->whereIn('site_id', $site_id_arr);
-                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.ite_id', $site_id_arr);
+                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
+                $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
 
             }else if(@$get_role_custom_first['site_admin'] == 1) {
                 $model = $model->whereIn('site_id', $site_id_arr);
-                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.ite_id', $site_id_arr);
+                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
+                $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
+
 
             }else if(@$get_role_custom_first['site_client'] == 1) {
                 $model = $model->whereIn('site_id', $site_id_arr)->where('data_leak_feed.status', 1);
                 $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('fx_data_leak_feed.status', 1);
+                $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
+
             }
 
             
@@ -861,8 +867,8 @@ class DataLeakController extends Controller
            
             if ($request->keywords) {
                 $keywords = $request->keywords;
-                $DataLeakFeed_data  = $DataLeakFeed_Data->get();
-                foreach ($DataLeakFeed_data as $value_data) {
+              //  $DataLeakFeed_data  = $DataLeakFeed_Data->get();
+            /*    foreach ($DataLeakFeed_data as $value_data) {
                       $value_data->feedcontent_decode = html_entity_decode($value_data->feedcontent);
                 }
                 $DataLeakFeed_data_id = array();
@@ -872,15 +878,16 @@ class DataLeakController extends Controller
                         array_push($DataLeakFeed_data_id, $a->id);
                     } 
                 }
+               */ 
               // dd(count($DataLeakFeed_data_id));
-                $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords,$DataLeakFeed_data_id) {
+                $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
                     $query->where('keyword', 'LIKE', '%' . $keywords . '%');
                    // $query->orwhere('feedcontent', 'LIKE', '%' . $keywords . '%');
-                      $query->orWhereIn('id', $DataLeakFeed_data_id);
+                   //   $query->orWhereIn('id', $DataLeakFeed_data_id);
                 });
 
-                $DataLeakSocialRef_data->whereRaw('(LOWER(fx_data_leak_feed.keyword) LIKE ? or LOWER(fx_data_leak_feed.feedcontent) LIKE ? )', array([trim(strtolower('%' .$request->keywords.'%'))],[trim(strtolower('%' .$request->keywords.'%'))]));
-                $DataLeakSocialRef_data->orWhereIn('data_leak_feed.id', $DataLeakFeed_data_id);
+                $DataLeakSocialRef_data->whereRaw('(LOWER(fx_data_leak_feed.keyword) LIKE ? or LOWER(fnStripTags(entity_decode(fx_data_leak_feed.feedcontent))) LIKE ? )', array([trim(strtolower('%' .$request->keywords.'%'))],[trim(strtolower('%' .$request->keywords.'%'))]));
+                //$DataLeakSocialRef_data->orWhereIn('data_leak_feed.id', $DataLeakFeed_data_id);
             }
 
             if ($request->site) {
@@ -961,7 +968,8 @@ class DataLeakController extends Controller
                 $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
 
                 $date_start_time_time = date("H:i", strtotime($date_start_time));
-                $date_start_datetime_format = $date_start_date_format . ' ' . $date_start_time_time . ':00';
+               // $date_start_datetime_format = $date_start_date_format . ' ' . $date_start_time_time . ':00';
+               $date_start_datetime_format = $date_start_date_format . ' '  . '00:00:01';
 
                 $date_end_explode = explode(" ", $date_end);
                 $date_end_date = @$date_end_explode[0];
@@ -969,15 +977,17 @@ class DataLeakController extends Controller
                 // dd($date_end_time);
                 $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
                 $date_end_time_time = date("H:i", strtotime($date_end_time));
-                $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
+               // $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
+               $date_end_datetime_format = $date_end_date_format . ' '  . '23:59:59';
 
                 $source = $request->source;
                 $model->whereHas('get_data_leak_feed_one', function ($query) use ($date_start_date_format, $date_end_date_format) {
                     $query->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
                 });
-                $DataLeakSocialRef_data->whereBetween('data_leak_feed.feedtimepost',array($date_start_date_format, $date_end_date_format));
+               
+                $DataLeakSocialRef_data->whereBetween('data_leak_feed.feedtimepost',array($date_start_datetime_format, $date_end_datetime_format));
             }
-
+         
             // $model->get();
         } else {
          
