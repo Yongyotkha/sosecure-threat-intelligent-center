@@ -17,7 +17,43 @@
                         <form action="">
                             <div class="form-group">
                                 <label for="">Input Tags :</label>
-                                <textarea class="form-control" name="tags" cols="30" rows="10" id="tags_events">{!! $events[0] -> tags !!}</textarea>
+                                <textarea class="form-control" name="tags" cols="30" rows="3" id="tags_events">{!! $events[0] -> tags !!}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="">Actor :</label>
+                                <select name="category_actor[]" id="category_actor" class="select2-option form-control" multiple>
+                                    @if($actors != null)
+                                        @foreach ($actors as $data_actor)
+                                            <option value="{{$data_actor->adversary_uuid}}" selected>{{$data_actor->adversary_name}}</option>
+                                        @endforeach
+                                    @endif
+                                </select>                            
+                            </div>
+                            <div class="form-group">
+                                <label for="">Campaign :</label>
+                                {{-- <input type="text" name="category_campaign" id="category_campaign" class="form-control"> --}}
+                                <select name="category_campaign[]" id="category_campaign" class="select2-option form-control" multiple>
+                                    @if($campainge != null)
+                                    @foreach($campainge as $data_camp)
+                                    <option value="{{$data_camp->campainge_uuid}}">{{$data_camp->name}}</option>
+                                    @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="">Techniques :</label>
+                                <select name="category_techniques[]" id="category_techniques" class="select2-option form-control" multiple>
+                                    @if($techniques != null)
+                                        @foreach ($techniques as $data_techniques)
+                                            <option value="{{$data_techniques->id}}">
+                                                {{$data_techniques->tactics_id}}
+                                                {{$data_techniques->tactics_name}}::
+                                                {{$data_techniques->code}}
+                                                {{$data_techniques->name}}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>                            
                             </div>
                         </form>
                     </div>
@@ -55,11 +91,17 @@
             var form_save = '.formSaving';
             let tags_events = $('#tags_events').val();
             let pulse_id = $('#pulse_id').val();
+            let category_actor = $('#category_actor').val();
+            let category_campaign = $('#category_campaign').val();
+            let category_techniques = $('#category_techniques').val();
             $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
             $('.formSaving').attr('disabled',true);
             var data = {
                 'tags_events': tags_events,
-                'pulse_id': pulse_id
+                'pulse_id': pulse_id,
+                'category_actor': category_actor,
+                'category_campaign': category_campaign,
+                'category_techniques': category_techniques
             };
             axios.post('{{ route('indicators.save_table_tags') }}', data).then(function (response) {
                 toastr.success(response.data.message, '@langapp('response_status') ');
@@ -81,4 +123,77 @@
                 }
             }); 
         }
+
+        $('#category_actor').select2({
+            tag: true,
+            tokenSeparators: [' '],
+            placeholder: 'select actor',
+            minimumInputLength: 1,
+            ajax: {
+                url: "{!! route('rssfeedsettings.rss_select_actor_news_create') !!}",
+                dataType: 'json',
+                method: 'post',
+                delay: 250,
+                processResults: function(data){
+                    return {
+                        results: $.map(data, function(item){
+                            return {
+                                text: item.name,
+                                id: item.name
+                            }
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
+
+        {{-- $('#category_campaign').select2({
+            tag: true,
+            tokenSeparators: [' '],
+            placeholder: 'select campaign',
+            minimumInputLength: 1,
+            ajax: {
+                url: "{!! route('rssfeedsettings.rss_select_actor_news_create') !!}",
+                dataType: 'json',
+                method: 'post',
+                delay: 250,
+                processResults: function(data){
+                    return {
+                        results: $.map(data, function(item){
+                            return {
+                                text: item.name,
+                                id: item.name
+                            }
+                        })
+                    };
+                },
+                cache: true
+            }
+        }); --}}
+
+        {{-- $('#category_techniques').select2({
+            tag: true,
+            tokenSeparators: [' '],
+            placeholder: 'select techniques',
+            minimumInputLength: 1,
+            ajax: {
+                url: "{!! route('indicators.select_techniques') !!}",
+                dataType: 'json',
+                method: 'post',
+                delay: 250,
+                processResults: function(data){
+                    return {
+                        results: $.map(data, function(item){
+                            return {
+                                text: item.name,
+                                id: item.name
+                            }
+                        })
+                    };
+                },
+                cache: true
+            }
+        }); --}}
+
     </script>
