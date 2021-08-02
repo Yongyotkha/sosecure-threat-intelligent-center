@@ -72,11 +72,11 @@
             </section>
 
 
-            {{-- <section class="panel panel-default">
+            <section class="panel panel-default">
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
                         <div class="col-xs-12">
-                            <i class="fas fa-table"></i> Table Actor
+                            <i class="fas fa-table"></i> Table Phishing Detection
                         </div>
                     </div>
                 </header>
@@ -85,49 +85,42 @@
                         <table class="table table-striped" id="table-rss-actor-template" style="width: 100%">
                             <thead>
                                 <tr>
+                                    <th></th>
                                     <th style="width: 80%">Content</th>
-                                    <th style="width: 10%" class="text-center">Status</th>
                                     <th style="width: 10%" class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td >
+                                    <td>
+                                        <div style="position: relative;width:150px;">
+                                            <img src="http://beepeers.com/assets/images/commerces/default-image.jpg" alt="" style="width: 100%">
+                                        </div>
+                                    </td>
+                                    <td>
                                         <div class="d-flex-actor">
-                                            <div class="warpper-img-actor">
-                                                <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
-                                            </div>
                                             <div class="details-actor">
-                                                <h4 class="text-primary" style="margin-left: 0">Actor Name</h4>
-                                                <p style="white-space: pre-wrap;">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione cupiditate repudiandae reprehenderit 
-                                                    ipsum odit error doloribus sunt fugit molestias. Amet explicabo, quas facilis quod est eligendi suscipit eum cum sequi!
-                                                </p>
-                                                <p>
-                                                   <strong>Tags</strong>  : <a href="#">honeypot</a>,<a href="#">Kfsensor</a>
+                                                <h4 class="text-primary" style="margin-left: 0">URL : http://testtest.com/scb/login.aspx</h4>
+                                                <p style="white-space: pre-wrap;">
+                                                    <strong>IP Address : 171.123.143.38</strong>
                                                 </p>
                                                 <div class="btw-text">
-                                                    <p>
-                                                        <strong>Location </strong>: Thailand
+                                                    <p style="margin-right: 20px;">
+                                                        <strong>Type </strong>: Thailand
                                                     </p>
                                                     <p>
-                                                        <strong>Created Date </strong>: 2021-08-08 22:33
-                                                    </p>
-                                                    <p>
-                                                        <strong>Attack Techniques </strong>: 
+                                                        <strong>Date </strong>: 2021-08-08 22:33
                                                     </p>
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="text-nowrap text-center">
-                                        <a href="{{route("actor.detail")}}" class="btn btn-info btn-xs">
+                                        <a href="#" class="btn btn-info btn-xs">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <a href="#" class="btn btn-info btn-xs">
                                             <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-danger btn-xs">
-                                            <i class="fas fa-trash-alt"></i>
                                         </a>
                                     </td>
                                 </tr>
@@ -135,7 +128,7 @@
                         </table>
                     </div>
                 </div>
-            </section> --}}
+            </section>
 
         </section>
     </section>
