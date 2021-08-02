@@ -40,7 +40,7 @@
                                     @endif
                                 </select>
                             </div>
-                            <div class="form-group">
+                            {{-- <div class="form-group">
                                 <label for="">Techniques :</label>
                                 <select name="category_techniques[]" id="category_techniques" class="select2-option form-control" multiple>
                                     @if($techniques != null)
@@ -54,7 +54,7 @@
                                         @endforeach
                                     @endif
                                 </select>                            
-                            </div>
+                            </div> --}}
                         </form>
                     </div>
                 </div>

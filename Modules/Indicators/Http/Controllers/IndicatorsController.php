@@ -2625,32 +2625,32 @@ public function tableEvents(Request $request)
             }
         }
 
-        if(!empty($request->category_techniques))
-        {
-            foreach($request->category_techniques as $data_techniques)
-            {
-                $add_techniques = $data_techniques;
+        // if(!empty($request->category_techniques))
+        // {
+        //     foreach($request->category_techniques as $data_techniques)
+        //     {
+        //         $add_techniques = $data_techniques;
                 
-                $query_techniques = FXTechniques::
-                    where('name', $add_techniques)
-                    ->first();
+        //         $query_techniques = FXTechniques::
+        //             where('name', $add_techniques)
+        //             ->first();
     
-                $data_techniques_related = array(
-                    'adversary_uuid' => $document['pulse_id'],
-                    'adversary_name' => $document['name'],
-                    'pulse_id' => $query_techniques->id,
-                    'pulse_name' => $add_techniques,
-                    'mode' => 'indicator',
-                    'join' => 'techniques',
-                    'created_at' => $date_now,
-                    'created_by' => 'system',
-                    'updated_at' => $date_now,
-                    'updated_by' => 'system'
-                );
+        //         $data_techniques_related = array(
+        //             'adversary_uuid' => $document['pulse_id'],
+        //             'adversary_name' => $document['name'],
+        //             'pulse_id' => $query_techniques->id,
+        //             'pulse_name' => $add_techniques,
+        //             'mode' => 'indicator',
+        //             'join' => 'techniques',
+        //             'created_at' => $date_now,
+        //             'created_by' => 'system',
+        //             'updated_at' => $date_now,
+        //             'updated_by' => 'system'
+        //         );
 
-                $insert_adversaries_related->insertOne($data_techniques_related);
-            }
-        }
+        //         $insert_adversaries_related->insertOne($data_techniques_related);
+        //     }
+        // }
 
         return ajaxResponse(
             [
