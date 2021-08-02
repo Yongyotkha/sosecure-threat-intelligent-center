@@ -325,7 +325,7 @@
                                      </div>
                                  </div> --}}
 
-                                    <div class="row">
+                                    <div class="row hide">
                                         <div class="col-lg- text-center">
                                             <div class="line"></div>
                                             <h4 class="py-3">Client System Status : <span class="text-success">Online
@@ -670,7 +670,7 @@
             type: "POST",
             url: "{{ route('sitesettings.artisan_call') }}",
             data: {
-                mode: 'update_code',
+                mode: 'update_code_v2',
                 site_id: '{{ $siteSettings -> id }}'
             },
             success: function (response) {

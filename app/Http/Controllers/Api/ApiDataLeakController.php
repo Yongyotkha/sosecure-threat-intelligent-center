@@ -250,7 +250,7 @@ class ApiDataLeakController extends ApiController
             
                         // }
             
-                        if ($isDateSearch == 1) {
+                      //  if ($isDateSearch == 1) {
                             $date_start = $startDate;
                             $date_end = $endDate;
             
@@ -278,7 +278,7 @@ class ApiDataLeakController extends ApiController
                                 $query->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
                             });
                             $DataLeakSocialRef_data->whereBetween('data_leak_feed.feedtimepost',array($date_start_datetime_format, $date_end_datetime_format));
-                        }
+                      //  }
 
                        // $model->orderBy('created_at','desc')->get();
                     } else {
