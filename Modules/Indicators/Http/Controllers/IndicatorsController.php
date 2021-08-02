@@ -4,6 +4,7 @@ namespace Modules\Indicators\Http\Controllers;
 
 use Modules\SiteSettings\Entities\SiteSettings;
 use App\IndicatorSummaryYear;
+use App\FXTechniques;
 use Yajra\DataTables\DataTables;
 use App\Entities\OtxIndicatiorData;
 use Illuminate\Http\Request;
@@ -2478,22 +2479,84 @@ public function tableEvents(Request $request)
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
 
-        $fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        if(app()->environment('local'))
+        {
+            $select_actors = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+            $select_campainge = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
+        }
+        else
+        {
+            $select_actors = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+            $select_campainge = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
+        }
+        // dd($request -> pulse_id);
 
+        $fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
         $query = [
             'pulse_id' => $request -> pulse_id,
         ];
-
         $options = [];
-        
         $cursor = $fx_otx_events->find($query,$options);       
         $events = $cursor->toArray();
         $data['events'] = $events;
+
+        $query_actor = [
+            'pulse_id' => $request -> pulse_id,
+            'mode' => 'indicator',
+            'join' => 'actor'
+        ];
+        $options_actor = [];
+        $connection_actor = $select_actors->find($query_actor,$options_actor);
+        if($connection_actor != null)
+        {
+            $actors = $connection_actor->toArray();
+            $data['actors'] = $actors;
+        } 
+        else
+        {
+            $data['actors'] = null;
+        }
+
+        // dd($data);
+
+        $query_campainge = [
+            'delete_at' => null
+        ];
+        $option_campainge = [];
+
+        $connection_campainge = $select_campainge->find($query_campainge,$option_campainge);
+        $campainge = $connection_campainge->toArray();
+
+        $data['campainge'] = $campainge;
+
+        $query_techniques = FXTechniques::orderBy('group', 'ASC')->get();
+        $data['techniques'] = $query_techniques;
+ 
+        // $query_techniques = [
+        //     'adversary_uuid' => $request -> pulse_id,
+        //     'mode' => 'indicator',
+        //     'join' => 'techniques'
+        // ];
+        // $options_techniques = [];
+        // $connection_techniques = $select_techniques->find($query_techniques,$options_techniques);     
+        // if($connection_actor != null)
+        // {
+        //     $techniques = $connection_techniques->toArray();
+        //     $data['techniques'] = $techniques;
+        // }
+        // else
+        // {
+        //     $data['techniques'] = null;
+        // }  
+
         $data['page'] = langapp('indicators');
         return view('indicators::modal.insert_tag')->with($data);
     }
 
     public function save_table_tags(Request $request){
+
+        $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
+
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
         $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
@@ -2513,6 +2576,81 @@ public function tableEvents(Request $request)
                 ]
             );
         }
+
+        //---------------------------------------------------------------------------------------------------
+        if(app()->environment('local'))
+        {
+            $insert_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+        }
+        else
+        {
+            $insert_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+        }
+
+        if(!empty($request->category_actor))
+        {
+            foreach($request->category_actor as $data_actor)
+            {
+                $add_actor = $data_actor;
+                if(app()->environment('local'))
+                {
+                    $indicator_actor_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
+                }
+                else
+                {
+                    $indicator_actor_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
+                }
+                $query_actor_related = [
+                    'name' => $add_actor
+                ];
+                $option_actor_related = [];
+                
+                $query_actor = $indicator_actor_related->findOne($query_actor_related,$option_actor_related);
+    
+                $data_actor_related = array(
+                    'adversary_uuid' => $query_actor['adversary_uuid'],
+                    'adversary_name' => $add_actor,
+                    'pulse_id' => $document['pulse_id'],
+                    'pulse_name' => $document['name'],
+                    'mode' => 'indicator',
+                    'join' => 'actor',
+                    'modified' => $date_now,
+                    'created_at' => $date_now,
+                    'created_by' => 'system',
+                    'updated_at' => $date_now,
+                    'updated_by' => 'system'
+                );
+
+                $insert_adversaries_related->insertOne($data_actor_related);
+            }
+        }
+
+        // if(!empty($request->category_techniques))
+        // {
+        //     foreach($request->category_techniques as $data_techniques)
+        //     {
+        //         $add_techniques = $data_techniques;
+                
+        //         $query_techniques = FXTechniques::
+        //             where('name', $add_techniques)
+        //             ->first();
+    
+        //         $data_techniques_related = array(
+        //             'adversary_uuid' => $document['pulse_id'],
+        //             'adversary_name' => $document['name'],
+        //             'pulse_id' => $query_techniques->id,
+        //             'pulse_name' => $add_techniques,
+        //             'mode' => 'indicator',
+        //             'join' => 'techniques',
+        //             'created_at' => $date_now,
+        //             'created_by' => 'system',
+        //             'updated_at' => $date_now,
+        //             'updated_by' => 'system'
+        //         );
+
+        //         $insert_adversaries_related->insertOne($data_techniques_related);
+        //     }
+        // }
 
         return ajaxResponse(
             [
@@ -2777,6 +2915,23 @@ public function tableEvents(Request $request)
                 return response()->json($response_complete);
             }
         }
+    }
+
+    public function select_techniques(Request $request)
+    {
+        $input = $request->all();
+
+        if($request->has('q'))
+        {
+            $search = $request->q;
+
+            $query = FXTechniques::
+                where('name', 'like', '%'.$search.'%')
+                ->select('id','name')
+                ->get();
+        }
+
+        return response()->json($query);
     }
 
 }
