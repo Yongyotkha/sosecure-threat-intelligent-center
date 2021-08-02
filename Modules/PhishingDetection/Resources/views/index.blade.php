@@ -1,0 +1,280 @@
+@extends('layouts.app')
+@section('content')
+
+<section id="content" class="bg">
+    <section class="vbox">
+        <header class="header bg-white b-b b-light" style="display: flex;justify-content:space-between;">
+            <div class="bc-head">Phishing Detection</div>
+            <div class="max-w-select" style="margin-top: 8px;">
+                <select name="site" id="site" class="select2-option form-control select-site"
+                    onchange="changeSite(value)">
+                    <option value="0" selected>All Site</option>
+                    {{-- @if ($site_settings)
+
+                    @foreach ($site_settings as $site_settings)
+                    <option value="{{$site_settings->code}}">{{$site_settings->name}}
+                    </option>
+                    @endforeach
+
+                    @endif --}}
+                </select>
+            </div>
+        </header>
+
+        {{-- Tab Content --}}
+        <section class="scrollable wrapper">
+            <section class="m-b-10">
+                <div class="row">
+                    <div class="col-xl-12 col-lg-12 col-md-12">
+                        <div class="row">
+                            <div class="col-md-6 col-lg-6 mb-small-5px">
+                                {{-- <div class="loadhost backdrop-loader">
+                                    <div class="loader4 centerloader"></div>
+                                    <div class="loadding-text">Loading ...</div>
+                                </div> --}}
+                                <div class="box-chart-color bg-white">
+                                    <div class="header-chart-p">
+                                        <div class="d-flex align-items-center ">
+                                            <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
+                                            <h1 class="text-blue bold-500">Timeline</h1>
+                                        </div>
+                                        <div id="filter-chart-btn" class="btn-group pull-right" style="margin-top: -25px;">
+                                            <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil active">
+                                                <i  class="far fa-calendar"></i> Day
+                                             </a>
+                                            <a href="javascript:void(0)"  class="btn btn-xs btn-chart-fil"><i class="far fa-calendar"></i>
+                                                Month
+                                             </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="divider-dark"></div>
+                                    <div id="chart-timeline" class="h-chart"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-6 mb-small-5px">
+                                {{-- <div class="category backdrop-loader">
+                                    <div class="loader4 centerloader"></div>
+                                    <div class="loadding-text">Loading ...</div>
+                                </div> --}}
+                                <div class="box-chart-color bg-white">
+                                    <div class="d-flex align-items-center header-chart-p">
+                                        <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
+                                        <h1 class="text-blue bold-500">Type</h1>
+                                    </div>
+                                    <div class="divider-dark"></div>
+                                    <div id="chart-type" class="h-chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            {{-- <section class="panel panel-default">
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <i class="fas fa-table"></i> Table Actor
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="table-rss-actor-template" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80%">Content</th>
+                                    <th style="width: 10%" class="text-center">Status</th>
+                                    <th style="width: 10%" class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td >
+                                        <div class="d-flex-actor">
+                                            <div class="warpper-img-actor">
+                                                <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
+                                            </div>
+                                            <div class="details-actor">
+                                                <h4 class="text-primary" style="margin-left: 0">Actor Name</h4>
+                                                <p style="white-space: pre-wrap;">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione cupiditate repudiandae reprehenderit 
+                                                    ipsum odit error doloribus sunt fugit molestias. Amet explicabo, quas facilis quod est eligendi suscipit eum cum sequi!
+                                                </p>
+                                                <p>
+                                                   <strong>Tags</strong>  : <a href="#">honeypot</a>,<a href="#">Kfsensor</a>
+                                                </p>
+                                                <div class="btw-text">
+                                                    <p>
+                                                        <strong>Location </strong>: Thailand
+                                                    </p>
+                                                    <p>
+                                                        <strong>Created Date </strong>: 2021-08-08 22:33
+                                                    </p>
+                                                    <p>
+                                                        <strong>Attack Techniques </strong>: 
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-nowrap text-center">
+                                        <a href="{{route("actor.detail")}}" class="btn btn-info btn-xs">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-info btn-xs">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-danger btn-xs">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section> --}}
+
+        </section>
+    </section>
+
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+
+</section>
+
+@push('pagestyle')
+@include('stacks.css.datatables')
+@include('stacks.css.form')
+@include('stacks.css.datepicker')
+@include('stacks.css.summernote')
+@include('stacks.css.highchart')
+<link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
+@endpush
+
+@push('pagescript')
+@include('stacks.js.datatables')
+@include('stacks.js.form')
+@include('stacks.js.datepicker')
+@include('scripts.summernote')
+@include('stacks.js.markdown')
+@include('stacks.js.hidesettings')
+@include('stacks.js.daterangpicker')
+@include('stacks.js.activebutton')
+@include('stacks.js.advanced_search')
+@include('stacks.js.highchart')
+
+<script>
+
+function mychart(myid){
+    const chart_top_source = Highcharts.chart(myid, {
+    chart: {
+        type: 'column'
+    },
+
+    title: {
+        text: ''
+    },
+
+    xAxis: {
+        categories: ['1', '2', '3', '4', '5']
+    },
+
+    yAxis: {
+        allowDecimals: false,
+        min: 0,
+        title: {
+            text: null
+        }
+    },
+
+    tooltip: {
+        formatter: function () {
+            return '<b>' + this.x + '</b><br/>' +
+                this.series.name + ': ' + this.y + '<br/>' +
+                'Total: ' + this.point.stackTotal;
+        }
+    },
+
+    plotOptions: {
+        column: {
+            stacking: 'normal'
+        },
+        dataLabels: {
+            enabled: true,
+            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+        },
+    },
+    series: [{
+        name: 'John',
+        data: [5, 3, 4, 7, 2],
+        stack: 'male'
+    }, {
+        name: 'Joe',
+        data: [3, 4, 4, 2, 5],
+        stack: 'male'
+    }, {
+        name: 'Jane',
+        data: [2, 5, 6, 2, 1],
+        stack: 'female'
+    }, {
+        name: 'Janet',
+        data: [3, 0, 4, 4, 3],
+        stack: 'female'
+    }]
+    });
+}
+
+function circle_chart(id){
+    const chart_pie = new Highcharts.chart(id, {
+        chart: {
+            height: 223, 
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: ''
+        },
+        tooltip: {
+            pointFormat: 'Amount {point.y}: <b>{point.percentage:.1f}%</b>'
+        },
+        accessibility: {
+            point: {
+                valueSuffix: '%'
+            }
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                color: ['#e64732', '#fcc838', '#00dcff', '#88ce4f', '#d3d3d3'],
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                },
+            }
+        },
+        series: [{
+            colorByPoint: false,
+            data: [
+            {  name: 'Critical', y: 5, color: '#e64732'}, 
+            {  name: 'High',  y: 4 , color: '#fcc838'}, 
+            {  name: 'Medium', y: 4, color: '#00dcff'  }, 
+            {  name: 'Low',   y: 4, color: '#88ce4f'  },
+            {  name: 'Information',   y: 4, color: '#d3d3d3'  },
+            ]
+        }],
+    });
+}
+
+circle_chart('chart-type');
+mychart('chart-timeline');
+
+
+
+</script>
+@endpush
+@endsection

@@ -5259,3 +5259,133 @@ input.form-policy[type=password] {
     text-overflow: ellipsis;;
 }
 
+.list-agt{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+}
+
+.list-agt li{
+    width: 20%;
+}
+
+.list-agt li .agt-card{
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    text-align: center;
+    padding: 1.5rem .5rem;
+    box-shadow: 0px 0px 3px 0px rgb(0 0 0 / 10%);
+}
+
+.list-agt li .agt-card .agt-score,
+.list-agt li .agt-card .agt-txt-sm{
+    display: inline-block;
+}
+.list-agt li .agt-card .agt-score{
+    font-size: 36px;
+    font-weight: bold;
+    color: #1785c5;
+}
+.list-agt li .agt-card .agt-txt-sm{
+    font-size: 16px;
+    font-weight: bold;
+    color: #606060;
+}
+
+.agt-main-box{
+    background: #fff;
+    box-shadow: 0px 0px 3px 0px rgb(0 0 0 / 10%);
+}
+.agt-header{
+    background: #f2f2f2;
+    font-weight: bold;
+    padding: .8rem .5rem;
+}
+
+.cs-pointer{
+    cursor: pointer;
+}
+
+.c3-chart-arcs-title{
+    font-size: 40px !important;
+    font-weight: bold;
+}
+
+.audit-log-list{
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+.audit-log-list li{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+}
+
+.audit-log-header{
+    font-weight: bold;
+}
+
+.wrapper-audit-log-img{
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    overflow: hidden;
+    position: relative;
+    margin-right: 1rem;
+}
+
+.wrapper-audit-log-img img{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top:0;
+    left: 0;
+    object-fit: cover;
+}
+
+.audit-log-time{
+    display: flex;
+    margin-top: 1rem;
+}
+.audit-log-time .audit-by,
+.audit-log-time .audit-time{
+    font-size: 13px;
+    color: #b3b0b0;
+    font-weight: bold;
+}
+.audit-log-time .audit-by{
+    width: 40%;
+}
+.audit-log-time .audit-time{
+   
+}
+
+.icon-devices{
+    background: #eee;
+    border: 1px solid #dfdfdf;
+    border-radius: 3px;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 5px;
+}
+
+.device-name-txt{
+    display: flex;
+    align-items: center;
+}
+
+.icon-devices i{
+    font-size: 20px;
+}

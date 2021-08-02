@@ -1,0 +1,1 @@
+<link rel="stylesheet" href="{{ getAsset('plugins/c3/docs/css/c3.min.css') }}" type="text/css"/>
