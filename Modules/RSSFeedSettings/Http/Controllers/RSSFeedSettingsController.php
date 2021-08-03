@@ -13,6 +13,8 @@ use App\FXCategories;
 use Modules\RSSFeedSettings\Http\Requests\CreateRssRequest;
 use Auth;
 use Carbon\Carbon;
+use MongoDB\BSON\UTCDateTime;
+use MongoDB\BSON\Regex;
 use MongoDB\Client;
 use MongoDB\Client as MongoClient;
 use Illuminate\Http\Request;
@@ -460,7 +462,9 @@ class RSSFeedSettingsController extends Controller
             }
 
             $query_actor = [
-                'pulse_id' => $check_id
+                'pulse_id' => $check_id,
+                'mode' => 'news',
+                'join' => 'actor'
             ];
 
             $option_actor = [];
@@ -1823,17 +1827,17 @@ class RSSFeedSettingsController extends Controller
                 }
             }
 
-            if(!empty($request -> actor)){
+            $new_id = $RSSNews->id;
+            $new_code = $RSSNews->code;
+            $new_title_th = $request->title_th;
+            $new_title_en = $request->title_en;
+            $new_detail_th = $request->detail_th;
+            $new_detail_en = $request->detail_en;
 
-                $new_id = $RSSNews->id;
-                $new_code = $RSSNews->code;
-                $new_title_th = $request->title_th;
-                $new_actor = $request->actor;
-
-                // dd($new_actor);
-
+            if(!empty($request -> actor))
+            {
                 $checkSuccess = true;
-                $date_now = date("Y-m-d H:i:s");
+                $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
 
                 $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
                 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
@@ -1848,37 +1852,40 @@ class RSSFeedSettingsController extends Controller
                     $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
                 }
 
-                $query = [
-                    'name' => $new_actor
-                ];
-                $option = [];
-
-                $result = $col_fx_otx_adversaries->find($query,$option);
-
-                $data_result = array();
-
-                foreach($result as $data){
-                    $data_result['id'] = $data->_id;
-                    $data_result['uuid'] = $data->adversary_uuid;
-                    // $data_result['uuid'] = $data->adversary_uuid;
+                foreach($request->actor as $data_actor)
+                {
+                    $query = [
+                        'name' => $data_actor
+                    ];
+                    $option = [];
+    
+                    $result = $col_fx_otx_adversaries->find($query,$option);
+    
+                    $data_result = array();
+    
+                    foreach($result as $data){
+                        $data_result['id'] = $data->_id;
+                        $data_result['uuid'] = $data->adversary_uuid;
+                    }
+    
+                    $data_adv_related = array(
+                        'adversary_uuid' => $data_result['uuid'],
+                        'adversary_name' => $data_actor,
+                        'pulse_id' => $new_id,
+                        'pulse_name' => '',
+                        'title_th' => $new_title_th,
+                        'title_en' => $new_title_en,
+                        'mode' => 'news',
+                        'join' => 'actor',
+                        'modified' => $date_now,
+                        'created_at' => $date_now,
+                        'created_by' => 'system',
+                        'updated_at' => $date_now,
+                        'updated_by' => 'system'
+                    );
+    
+                    $update_fx_otx_adversaries_related = $col_fx_otx_adversaries_related->insertOne($data_adv_related);
                 }
-
-                // dd($result);
-                // dd($data_result['uuid']);
-
-                $data_adv_related = array(
-                    'adversary_uuid' => $data_result['uuid'],
-                    'adversary_name' => $new_actor,
-                    'pulse_id' => $new_id,
-                    'pulse_name' => $new_title_th,
-                    'mode' => 'news',
-                    'created_at' => $date_now,
-                    'created_by' => 'system',
-                    'updated_at' => $date_now,
-                    'updated_by' => 'system'
-                );
-
-                $update_fx_otx_adversaries_related = $col_fx_otx_adversaries_related->insertOne($data_adv_related);
 
                 // $update_fx_otx_adversaries_related = $col_fx_otx_adversaries_related->updateOne(
                 //     ['adversary_uuid' => $uuid,'pulse_id' => $value["id"]],
@@ -1895,6 +1902,64 @@ class RSSFeedSettingsController extends Controller
                 //     ],
                 //     ['upsert' => true]
                 // );
+            }
+
+            if(!empty($request->new_campainge))
+            {
+
+                $checkSuccess = true;
+                $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
+
+                $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+                $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+                if(app()->environment('local'))
+                {
+                    $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
+                    $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+                    $collection_campaign = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
+                }
+                else
+                {
+                    $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
+                    $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+                    $collection_campaign = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
+                }
+
+                foreach($request->new_campainge as $data_campainge)
+                {
+                    $query = [
+                        'campainge_uuid' => $data_campainge
+                    ];
+                    $option = [];
+    
+                    $result = $collection_campaign->find($query,$option);
+    
+                    $data_result = array();
+    
+                    foreach($result as $data){
+                        $data_result['id'] = $data->_id;
+                        $data_result['uuid'] = $data->campainge_uuid;
+                        $data_result['name'] = $data->name;
+                    }
+    
+                    $data_adv_related = array(
+                        'adversary_uuid' => $data_campainge,
+                        'adversary_name' => $data_result['name'],
+                        'pulse_id' => $new_id,
+                        'pulse_name' => '',
+                        'title_th' => $new_title_th,
+                        'title_en' => $new_title_en,
+                        'mode' => 'news',
+                        'join' => 'campainge',
+                        'modified' => $date_now,
+                        'created_at' => $date_now,
+                        'created_by' => 'system',
+                        'updated_at' => $date_now,
+                        'updated_by' => 'system'
+                    );
+    
+                    $update_fx_otx_adversaries_related = $col_fx_otx_adversaries_related->insertOne($data_adv_related);
+                }
             }
 
 
@@ -2837,5 +2902,42 @@ class RSSFeedSettingsController extends Controller
             true,
             Response::HTTP_OK
         );
+    }
+
+    public function new_select_campainge(Request $request)
+    {
+        $input = $request->all();
+
+        if($request->has('q'))
+        {
+            $search = $request->q;
+
+            $DB_MONGO_KEY = env("DB_MONGO_DEV");
+            $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+            if(app()->environment('local'))
+            {
+                $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
+                $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+                $collection_campaign = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
+            }
+            else
+            {
+                $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
+                $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+                $collection_campaign = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
+            }
+
+            $query_search = [
+                'name' => new \MongoDB\BSON\Regex($search),
+                'delete_at' => null
+            ];
+
+            $option_search = [];
+
+            $final_search = $collection_campaign->find($query_search,$option_search);
+            $result_search = $final_search->toArray();
+        }
+
+        return response()->json($result_search);
     }
 }
