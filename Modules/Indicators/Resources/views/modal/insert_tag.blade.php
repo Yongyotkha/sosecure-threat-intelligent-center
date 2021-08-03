@@ -3,7 +3,7 @@
         <div class="modal-header bg-blue">
             <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
             <h4 class="modal-title text-white"><i class="fas fa-compress fullscreen-btn" onclick="fullscreen();"
-                    datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Insert Tag
+                    datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i> Insert Actor
             </h4>
         </div>
         <div class="modal-body">

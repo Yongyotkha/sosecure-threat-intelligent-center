@@ -230,6 +230,7 @@
                                 <th>Event Name</th>
                                 <th>Group</th>
                                 <th>Tags</th>
+                                <th style="width: 270px;">Actor / Campainge</th>
                                 <th>Published</th>
                                 <th>Last Status</th>
                                 <th class="nowrap">DateTime</th>
@@ -553,7 +554,9 @@
             {
                 data: 'tags',
             },
-
+            {
+                data: 'actor_and_campainge'
+            },
             {
                 data: 'public',
             },
@@ -587,6 +590,32 @@
             },
             {
                 targets: 5,
+                render: function (data, type, row) {
+                    var inner = ``;
+                    inner = `  <div>
+                                    <strong>Actor : </strong>
+                                    <span style="display: inline-flex;align-items: center;"> 
+                                        <div>
+                                            <img class="icon_sm_actor m-r-xs" src="{{asset('/asset_salepage/images/AgentBasedDetection.png')}}">
+                                        </div>
+                                        <a href="#">Name Actor</a>
+                                    </span>
+                                </div>
+                                
+                                <div>
+                                    <strong>Campainge : </strong>
+                                    <span> 
+                                        <a href="#">Name Campainge</a>
+                                    </span>
+                                </div>
+
+                                `;
+                    return inner;
+                }
+
+            },
+            {
+                targets: 6,
                 className: 'text-center',
                 render: function (data, type, row) {
                     var inner = '';
@@ -600,7 +629,7 @@
 
             },
             {
-                targets: 6,
+                targets: 7,
                 render: function (data, type, row) {
                     var inner = '';
                     if(row.is_modified == true) {
@@ -613,7 +642,7 @@
 
             },
             {
-                targets: 7,
+                targets: 8,
                 render: function (data, type, row) {
                     var inner = '';
                     if(row.modified) {
@@ -626,12 +655,14 @@
 
             },
             {
-                targets: 9,
+                targets: 10,
                 className : 'nowrap',
                 render: function (data, type, row) {
                     var inner = '';
-                    inner +=  '<a href="{{route('indicators.modal_tag')}}'+'?pulse_id='+row.pulse_id+'" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Insert Tag</a>';
-                    inner +=  '<a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                    inner += '<div style="display:flex;flex-direction:column;">';
+                    inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.modal_tag')}}'+'?pulse_id='+row.pulse_id+'" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add Actor</a>';
+                    inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="m-t-xs btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                    inner += '</div>';
                     return inner;
                 }
 
