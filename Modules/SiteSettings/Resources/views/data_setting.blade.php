@@ -202,7 +202,106 @@
                                       Last Search Use : {{$siteSettings->search_api_loookup_Use}}
                                     </div>
                                 </div>
+
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Agent Allow</label>
+                                    <div class="col-lg-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="allow_agent" value="TRUE">
+                                                <span class="label-text" data-rel="tooltip" title="">Allow</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <label class="col-lg-1 control-label">Limit : </label>
+                                    <div class="col-lg-3">
+                                        <input type="text" class="form-control touch_spin text-center" name="" value="0"> 
+                                    </div>
+                                </div>
                                 <hr>
+
+                                <div id="sec_agent" style="display: none">
+                                    <div class="row">
+    
+                                        <div class="col-sm-8">
+                                            <h4>Add Agent</h4>
+                                        </div>
+                                        <div class="col-sm-4 text-right">
+                                            <button id="add_agent" type="button" class="btn btn-info btn-rounded"><i class="fas fa-plus"></i> Add</button>
+                                        </div>
+                             
+                                    </div>
+    
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <div class="form-group row">
+                                                <label class="col-lg-3 control-label">OS :</label>
+                                                <div class="col-lg-9">
+                                                    <select name="os_agent[]" id="os_agent" class="form-control">
+                                                        <option value="Window">
+                                                            Window 
+                                                        </option>
+                                                        <option value="Linux">
+                                                            Linux
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group row">
+                                                <label class="col-lg-4 control-label">IP Private <span class="text-danger">*</span></label>
+                                                <div class="col-lg-8">
+                                                    <input type="text" id="ip_private" name="ip_private" class="form-control" value="">
+                                                    <span id="ip_required"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group row">
+                                                <label class="col-lg-3 control-label">Remark : </label>
+                                                <div class="col-lg-9">
+                                                    <input type="text" id="agent_remark" name="agent_remark" class="form-control" value="">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="table-responsive">
+                                        <div style="width: 100%">
+                                            <table id="tbl_agent" class="table table-borered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No.</th>
+                                                        <th>OS</th>
+                                                        <th>IP Private</th>
+                                                        <th>Remark</th>
+                                                        <th>Config</th>
+                                                        <th>Agent</th>
+                                                        <th>Date Created</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                                 
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <hr>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                       
+
+
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">E-mail Alert </label>
                                     <div class="col-lg-9">
@@ -275,6 +374,8 @@
 <script>
     $(document).ready(function () {
 
+        $('#os_agent').select2();
+
         $('#select-protocol').select2({
             minimumResultsForSearch: -1
         });
@@ -292,7 +393,80 @@
             max: 1000000000,
         });
 
+        if($('input[name="allow_agent"]').prop("checked")){
+            $('#sec_agent').show();
+        }else{
+            $('#sec_agent').hide();
+        }
+        
     });
+
+    var select_os = $('#os_agent');
+    var ip_private = $('#ip_private');
+    var agent_remark = $('#agent_remark');
+
+    $('input[name="allow_agent"]').on('change',function(){
+        if(this.checked) {
+            $('#sec_agent').show();
+        }else{
+            $('#sec_agent').hide();
+        }
+    });
+
+    $('#add_agent').click(function(){
+        let os = select_os.val();
+        let ip = ip_private.val();
+        let remark = agent_remark.val();
+
+        if(os != '' && ip != ''){
+            let html = ``;
+            html += `
+            <tr>
+                <td>1</td>
+                <td>${os}</td>
+                <td>
+                    <a href="">${ip}</a> 
+                </td>
+                <td>
+                    <button type="button" class="btn btn-info btn-xs btn-rounded">Download</button>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-info btn-xs btn-rounded">Download</button>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-info btn-xs btn-rounded">Download</button>
+                </td>
+                <td>03-08-2020</td>
+                <td>
+                    <label class="switch">
+                        <input type="checkbox" id="" onchange="" checked="" name="active" value="1">
+                        <span></span>
+                    </label>
+                </td>
+                <td>
+                    <a href="" class="btn btn-info btn-xs">
+                        <i class="fas fa-edit"></i>
+                    </a>
+
+                    <button type="button" class="btn btn-danger btn-xs delete_agent">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
+            `;
+            $('#tbl_agent tbody').append(html);
+
+            $('.delete_agent').click(function(){
+                $(this).closest('tr').remove();
+            });
+            $('#ip_required').empty();
+        }else{
+            let html = `<div class="text-danger">Please Enter IP Private</div>`;
+            $('#ip_required').append(html);
+        }
+    });
+
+    
 
     $('ul.role-group-sub').hide();
     function openrole(onck,id){
