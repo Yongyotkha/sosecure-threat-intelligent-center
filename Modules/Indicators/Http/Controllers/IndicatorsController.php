@@ -1954,12 +1954,60 @@ public function tableEvents(Request $request)
                     $nestedData['count_view'] = @$document["count_view"];
                     $nestedData['pulse_id'] = $document["pulse_id"];
 
+                    $DB_MONGO_KEY = env("DB_MONGO_DEV");
+                    $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+                    if(app()->environment('local'))
+                    {
+                        $collection_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+                    }
+                    else
+                    {
+                        $collection_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+                    }
+
+                    $query_actor = [
+                        'pulse_id' => $document["pulse_id"],
+                        'mode' => 'indicator',
+                        'join' => 'actor'
+                    ];
+                    $option_actor = [];
+            
+                    $result_actor = $collection_related->find($query_actor,$option_actor);
+                    $final_actor = $result_actor->toArray();
+                    $count_actor = count($final_actor);
+                    
+                    if($count_actor != '0')
+                    {
+                        // $nestedData['actor'] = $result_actor;
+                        $nestedData['actor'] = $final_actor;
+                        $nestedData['actor_count'] = $count_actor;
+                    }
+
+
+                    $query_camp = [
+                        'pulse_id' => $document["pulse_id"],
+                        'mode' => 'indicator',
+                        'join' => 'campainge'
+                    ];
+                    $option_camp = [];
+
+                    $result_camp = $collection_related->find($query_camp,$option_camp);
+                    $final_camp = $result_camp->toArray();
+                    $count_camp = count($final_camp);
+
+                    if($count_camp != '0')
+                    {
+                        // $nestedData['camp'] = $result_camp;
+                        $nestedData['camp'] = $final_camp;
+                        $nestedData['camp_count'] = $count_camp;
+                    }
+
                             // <a href="'.route('indicators.events_detail_select',['id' => $document['pulse_id']]).'" 
                             // class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
 
-
                     $data[] = $nestedData;
-
+                    
+                    
                 }
             }
             $dataOut["draw"] = $draw;
@@ -2553,8 +2601,10 @@ public function tableEvents(Request $request)
         return view('indicators::modal.insert_tag')->with($data);
     }
 
-    public function save_table_tags(Request $request){
-
+    public function save_table_tags(Request $request)
+    {
+        $input = $request->all();
+        // dd($input);
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
 
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
@@ -2581,13 +2631,15 @@ public function tableEvents(Request $request)
         if(app()->environment('local'))
         {
             $insert_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+            $collection_campaign = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
         }
         else
         {
             $insert_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+            $collection_campaign = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
         }
 
-        if(!empty($request->category_actor))
+        if(@$request->category_actor)
         {
             foreach($request->category_actor as $data_actor)
             {
@@ -2625,32 +2677,36 @@ public function tableEvents(Request $request)
             }
         }
 
-        // if(!empty($request->category_techniques))
-        // {
-        //     foreach($request->category_techniques as $data_techniques)
-        //     {
-        //         $add_techniques = $data_techniques;
-                
-        //         $query_techniques = FXTechniques::
-        //             where('name', $add_techniques)
-        //             ->first();
-    
-        //         $data_techniques_related = array(
-        //             'adversary_uuid' => $document['pulse_id'],
-        //             'adversary_name' => $document['name'],
-        //             'pulse_id' => $query_techniques->id,
-        //             'pulse_name' => $add_techniques,
-        //             'mode' => 'indicator',
-        //             'join' => 'techniques',
-        //             'created_at' => $date_now,
-        //             'created_by' => 'system',
-        //             'updated_at' => $date_now,
-        //             'updated_by' => 'system'
-        //         );
+        if(@$request->category_campaign)
+        {
+            foreach($request->category_campaign as $data_campaign)
+            {
+                $add_campaign = $data_campaign;
 
-        //         $insert_adversaries_related->insertOne($data_techniques_related);
-        //     }
-        // }
+                $query_campaign_related = [
+                    'campainge_uuid' => $add_campaign
+                ];
+                $option_campaign_related = [];
+                
+                $query_campaign = $collection_campaign->findOne($query_campaign_related,$option_campaign_related);
+    
+                $data_campaign_related = array(
+                    'adversary_uuid' => $query_campaign['campainge_uuid'],
+                    'adversary_name' => $query_campaign['name'],
+                    'pulse_id' => $document['pulse_id'],
+                    'pulse_name' => $document['name'],
+                    'mode' => 'indicator',
+                    'join' => 'campainge',
+                    'modified' => $date_now,
+                    'created_at' => $date_now,
+                    'created_by' => 'system',
+                    'updated_at' => $date_now,
+                    'updated_by' => 'system'
+                );
+
+                $insert_adversaries_related->insertOne($data_campaign_related);
+            }
+        }
 
         return ajaxResponse(
             [

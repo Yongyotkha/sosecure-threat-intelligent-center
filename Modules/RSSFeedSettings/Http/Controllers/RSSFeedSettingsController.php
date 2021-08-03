@@ -488,7 +488,61 @@ class RSSFeedSettingsController extends Controller
             $i++;
         }
         // dd($model);
+        $count_model = count($model);
+        // ---------------------------------- cve - actor ----------------------------------
+        if($count_model != 0)
+        {
+            $id = '';
+            $actor_id = array();
+
+            $DB_MONGO_KEY = config('app.DB_MONGO_DEV');
+            $client = new MongoClient($DB_MONGO_KEY);
+            if(app()->environment('local'))
+            {
+                $collection_actor = $client->sosecure_threatintelligent->fx_otx_adversaries;
+                $conn = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
+            }
+            else
+            {
+                $collection_actor = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
+                $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+            }
+
+            for($i=0;$i<$count_model;$i++)
+            {
+                $query= [
+                    'pulse_id' => $model[$i]['id'],
+                    'mode' => 'news',
+                    'join' => 'actor'
+                ];
+                $option = [];
         
+                $final_test = $conn->find($query,$option);
+                $result_test = $final_test->toArray();
+                $count_result_test = count($result_test);
+                
+                $model[$i]['actor'] = $result_test;
+                $model[$i]['count_result'] = $count_result_test;
+                // dd($id);
+
+                $query_camp= [
+                    'pulse_id' => $model[$i]['id'],
+                    'mode' => 'news',
+                    'join' => 'campainge'
+                ];
+                $option_camp = [];
+        
+                $final_camp = $conn->find($query_camp,$option_camp);
+                $result_camp = $final_camp->toArray();
+                $count_result_camp = count($result_camp);
+
+                $model[$i]['campainge'] = $result_camp;
+                $model[$i]['count_campainge'] = $count_result_camp;
+        
+            }
+        }
+        // dd($result_test);
+        // dd($model);
 
         // $model = RSSNews::all();
         return DataTables::of($model)
@@ -607,10 +661,59 @@ class RSSFeedSettingsController extends Controller
                 }else{
                     $html .= ' <b class="m-r-5 m-l-xs">Data Status : </b> <span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
                 }  
-                $html .= ' <span class="m-r-5 m-l-xs" style="display: inline-flex;align-items: center;"><b>Actor : </b> <div class="m-l-xs"><span><img class="icon_sm_actor" src="https://images.unsplash.com/photo-1627301044065-fc950957c311?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"></span> <a href="#">Name Actor</a></div></span>';
-                $html .= ' <b>Campainge : </b> <span> Name Campainge</span>';
 
+                if($model->count_result != 0)
+                {
+                    $html .= '<span class="m-r-5 m-l-xs" style="display: inline-flex;align-items: center;">
+                            <b>Actor : </b>
+                            <div class="m-l-xs">';
+                            $array_row = 1;
+                            $count_result = $model->count_result;
+                            for($i = 0 ; $i < $model->count_result ; $i++)
+                            {
+                                if($array_row == $count_result)
+                                {
+                                    $html .= '<span><img class="icon_sm_actor m-r-xs" src="https://images.unsplash.com/photo-1627301044065-fc950957c311?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"><span>
+                                            <a href="/actor/detail?_id='.$model->actor[$i]->adversary_uuid.'&mode=cve">'.$model->actor[$i]->adversary_name.'</a>';
+                                }
+                                else
+                                {
+                                    $html .= '<span><img class="icon_sm_actor m-r-xs" src="https://images.unsplash.com/photo-1627301044065-fc950957c311?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"><span>
+                                            <a href="/actor/detail?_id='.$model->actor[$i]->adversary_uuid.'&mode=cve">'.$model->actor[$i]->adversary_name.'</a> , ';
+                                }
+                                $array_row = $array_row+1;
+                            }
 
+                    $html .= '
+                            </div>
+                            </span>
+                    ';
+                }
+
+                if($model->count_campainge > 0)
+                {
+                    $html .= ' <span class="m-r-md">
+                            <b>Campainge : </b>';
+    
+                            $array_row = 1;
+                            $count_campainge = $model->count_campainge;
+                            for($i = 0 ; $i < @$model->count_campainge ; $i++)
+                            {
+                                // <a href="/actor/detail?_id='.$model->campainge[$i]->adversary_uuid.'&mode=cve">
+                                if($array_row == $count_campainge)
+                                {
+                                    $html .= ''.$model->campainge[$i]->adversary_name.'';
+                                }
+                                else
+                                {
+                                    $html .= ''.$model->campainge[$i]->adversary_name.' , ';
+                                }
+                                $array_row = $array_row+1;
+                            }
+                            // <span> Name Campainge </span>
+                            
+                    $html .='</span> ';
+                }
                 $html .= '</div>';
                 return $html;
             })
@@ -711,11 +814,11 @@ class RSSFeedSettingsController extends Controller
                 $html .= '<label>'.$model->category.'</label>';
                 return $html;
             })
-            ->addColumn('actor', function (RSSNews $model) {
-                $html = '';
-                $html .= '<label>'.$model->actor.'</label>';
-                return $html;
-            })
+            // ->addColumn('actor', function (RSSNews $model) {
+            //     $html = '';
+            //     $html .= '<label>'.$model->actor.'</label>';
+            //     return $html;
+            // })
             ->addColumn('status', function (RSSNews $model) {
                 if($model->status == '1') {
                     $checked_val = 'checked';

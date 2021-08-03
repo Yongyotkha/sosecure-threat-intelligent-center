@@ -592,24 +592,64 @@
                 targets: 5,
                 render: function (data, type, row) {
                     var inner = ``;
-                    inner = `  <div>
-                                    <strong>Actor : </strong>
-                                    <span style="display: inline-flex;align-items: center;"> 
-                                        <div>
-                                            <img class="icon_sm_actor m-r-xs" src="{{asset('/asset_salepage/images/AgentBasedDetection.png')}}">
-                                        </div>
-                                        <a href="#">Name Actor</a>
-                                    </span>
-                                </div>
-                                
-                                <div>
-                                    <strong>Campainge : </strong>
-                                    <span> 
-                                        <a href="#">Name Campainge</a>
-                                    </span>
-                                </div>
-
-                                `;
+                    inner = `  
+                            <div>
+                                <strong>Actor : </strong>
+                    `;
+                    for(let rows in row.actor)
+                    {
+                        let array_rows = 1;
+                        const data_actor = row.actor[rows];
+                    inner += `
+                                <span style="display: inline-flex;align-items: center;"> 
+                                    <div>
+                                        <img class="icon_sm_actor m-r-xs" src="{{asset('/asset_salepage/images/AgentBasedDetection.png')}}">
+                                    </div>`;
+                                    if(array_rows == row.actor_count)
+                            {
+                    inner += `
+                                    <a href="/actor/detail?_id=${data_actor.adversary_name}&mode=cve">
+                                        ${data_actor.adversary_name}
+                                    </a>
+                    `;
+                            }
+                            else
+                            {
+                    inner += `      
+                                    <a href="/actor/detail?_id=${data_actor.adversary_name}&mode=cve">
+                                        ${data_actor.adversary_name}
+                                    </a> , 
+                    `;
+                            }
+                            array_rows++;
+                                    
+                    inner += `  </span>
+                    `;
+                    }
+                    
+                    inner += `
+                            </div>
+                            <div>
+                                <strong>Campainge : </strong> 
+                                <span> `;
+                        let array_row = 1;
+                        for(let rows in row.camp)
+                        {
+                            const data_camp = row.camp[rows];
+                            if(array_row == row.camp_count)
+                            {
+                    inner += `${data_camp.adversary_name}`;
+                            }
+                            else
+                            {
+                    inner += `${data_camp.adversary_name} , `;
+                            }
+                            array_row++;
+                        }
+                    inner += ` 
+                                </span>
+                            </div>
+                    `;
                     return inner;
                 }
 
