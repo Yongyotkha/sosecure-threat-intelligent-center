@@ -220,88 +220,6 @@
                                 </div>
                                 <hr>
 
-                                <div id="sec_agent" style="display: none">
-                                    <div class="row">
-    
-                                        <div class="col-sm-8">
-                                            <h4>Add Agent</h4>
-                                        </div>
-                                        <div class="col-sm-4 text-right">
-                                            <button id="add_agent" type="button" class="btn btn-info btn-rounded"><i class="fas fa-plus"></i> Add</button>
-                                        </div>
-                             
-                                    </div>
-    
-                                    <div class="row">
-                                        <div class="col-lg-4">
-                                            <div class="form-group row">
-                                                <label class="col-lg-3 control-label">OS :</label>
-                                                <div class="col-lg-9">
-                                                    <select name="os_agent[]" id="os_agent" class="form-control">
-                                                        <option value="Window">
-                                                            Window 
-                                                        </option>
-                                                        <option value="Linux">
-                                                            Linux
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4">
-                                            <div class="form-group row">
-                                                <label class="col-lg-4 control-label">IP Private <span class="text-danger">*</span></label>
-                                                <div class="col-lg-8">
-                                                    <input type="text" id="ip_private" name="ip_private" class="form-control" value="">
-                                                    <span id="ip_required"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4">
-                                            <div class="form-group row">
-                                                <label class="col-lg-3 control-label">Remark : </label>
-                                                <div class="col-lg-9">
-                                                    <input type="text" id="agent_remark" name="agent_remark" class="form-control" value="">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="table-responsive">
-                                        <div style="width: 100%">
-                                            <table id="tbl_agent" class="table table-borered table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th>No.</th>
-                                                        <th>OS</th>
-                                                        <th>IP Private</th>
-                                                        <th>Remark</th>
-                                                        <th>Config</th>
-                                                        <th>Agent</th>
-                                                        <th>Date Created</th>
-                                                        <th>Status</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                                 
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <hr>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                       
-
-
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">E-mail Alert </label>
                                     <div class="col-lg-9">
@@ -347,6 +265,51 @@
                                 </div>
 
 
+                                <div id="sec_agent" style="display: none">
+                                    <div class="row m-b-md">
+    
+                                        <div class="col-sm-8">
+                                            <h4 style="margin:0;">Add Agent</h4>
+                                        </div>
+                                        <div class="col-sm-4 text-right">
+                                            <button type="button" class="btn btn-info btn-rounded" data-toggle="modal" data-target="#modal_agent"><i class="fas fa-plus"></i> Add</button>
+                                        </div>
+                             
+                                    </div>
+    
+                             
+                                    <div class="table-responsive">
+                                        <div style="width: 100%">
+                                            <table id="tbl_agent" class="table table-borered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No.</th>
+                                                        <th>OS</th>
+                                                        <th>IP Private</th>
+                                                        <th>Remark</th>
+                                                        <th>Config</th>
+                                                        <th>Agent</th>
+                                                        <th>Date Created</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                                 
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <hr>
+                                        </div>
+                                    </div>
+
+                                </div>
+
                             </div>
                             <div class="panel-footer text-right">
                                 {{-- {!! closeModalButton() !!} --}}
@@ -358,6 +321,65 @@
                 </section>
             </section>
     </section>
+
+    <div class="modal" id="modal_agent" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white txt-model">Add Agent</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">OS :</label>
+                                    <div class="col-lg-9">
+                                        <select name="os_agent[]" id="os_agent" class="form-control">
+                                            <option value="Window">
+                                                Window 
+                                            </option>
+                                            <option value="Linux">
+                                                Linux
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">IP Private <span class="text-danger">*</span></label>
+                                    <div class="col-lg-9">
+                                        <input type="text" id="ip_private" name="ip_private" class="form-control" value="">
+                                        <span id="ip_required"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Remark : </label>
+                                    <div class="col-lg-9">
+                                        <input type="text" id="agent_remark" name="agent_remark" class="form-control" value="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
+
+                    <button id="add_agent" type="button" class="btn btn-info submit btn-rounded" data-dismiss="modal"><i class="fas fa-paper-plane"></i> OK</button>
+                    
+                    {{-- <button type="button" class="btn btn-info submit btn-rounded" data-dismiss="modal"><i class="fas fa-paper-plane"></i> Update</button> --}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen, open" data-target="#nav,html"></a>
 </section>
 
@@ -444,9 +466,9 @@
                     </label>
                 </td>
                 <td>
-                    <a href="" class="btn btn-info btn-xs">
+                    <button type="button"  data-toggle="modal" data-target="#modal_agent" class="btn btn-info btn-xs">
                         <i class="fas fa-edit"></i>
-                    </a>
+                    </button>
 
                     <button type="button" class="btn btn-danger btn-xs delete_agent">
                         <i class="fas fa-trash-alt"></i>
