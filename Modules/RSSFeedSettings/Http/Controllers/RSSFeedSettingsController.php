@@ -505,22 +505,16 @@ class RSSFeedSettingsController extends Controller
             // })
             ->addColumn('content_detail', function (RSSNews $model) {
                 $html = '';
-                if($model -> source){
-                    // return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'"><a href="javascript:void(0);" onclick="find_source(\''.$model -> source.'\')">'.$model -> source.'</a></div>';
-                    $html .= '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'">'.$model -> source.'</div>';
-                }else{
-                    $html .= '<div class="text-elip" data-rel="tooltip" title="None">None</div>';
-                }
 
                 if($model -> title_th){
-                    $html .= '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_th.'">'.$model -> title_th.'</a>';
+                    $html .= '<a style="font-size:16px;" href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_th.'">'.$model -> title_th.'</a>';
                 }else if($model -> title_en){
-                    $html .= '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_en.'">'.$model -> title_en.'</a>';
+                    $html .= '<a style="font-size:16px;" href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_en.'">'.$model -> title_en.'</a>';
                 }else{
-                    $html .= '-';
+                    $html .= '<span style="font-size:16px;">No Title</span>';
                 }
 
-                $html .= '<div class="text-trucate-ovf">';
+                $html .= '<div class="text-trucate-ovf"> <span style="margin-right:5px;"><b>Category : </b>';
                 if($model->get_cate=="[]"){
                     $html .= 'None';
                 }else{
@@ -540,22 +534,29 @@ class RSSFeedSettingsController extends Controller
                         $html .= str_replace('None-delete0','', $htmls);
                     }
                     
-                    $html .= rtrim($html,", ");
+                    // $html .= rtrim($html,", ");
                 }
                 $html .= '</div>';
 
-                if($model->serverity=='critical'){
-                    $html .= ' <br><b>Serverity</b> <span class="badge" style="background-color: #b93624;">Critical</span>';
-                }else if($model->serverity=='high'){
-                    $html .= ' <br><b>Serverity</b> <span class="badge" style="background-color: #fcc838;">High</span>';
-                }else if($model->serverity=='medium'){
-                    $html .= ' <br><b>Serverity</b> <span class="badge" style="background-color: #f2ff15;color#333;">Medium</span>';
-                }else if($model->serverity=='low'){
-                    $html .= ' <br><b>Serverity</b> <span class="badge" style="background-color: #88ce4f;">Low</span>';
-                }else if($model->serverity=='information'){
-                    $html .= ' <br><b>Serverity</b> <span class="badge" style="background-color: #00dcff;">Information</span>';
+                if($model -> source){
+                    // return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'"><a href="javascript:void(0);" onclick="find_source(\''.$model -> source.'\')">'.$model -> source.'</a></div>';
+                    $html .= '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'"><span style="margin-right:5px;"><b>Source : </b>'.$model -> source.'</div>';
                 }else{
-                    $html .= ' - ';
+                    $html .= '<div class="text-elip" data-rel="tooltip" title="None"><span style="margin-right:5px;"><b>Source : </b> None</div>';
+                }
+
+                if($model->serverity=='critical'){
+                    $html .= ' <span style="margin-right:5px;"><b>Serverity : </b> <span class="badge" style="background-color: #b93624;">Critical</span></span>';
+                }else if($model->serverity=='high'){
+                    $html .= ' <span style="margin-right:5px;"><b>Serverity : </b> <span class="badge" style="background-color: #fcc838;">High</span></span>';
+                }else if($model->serverity=='medium'){
+                    $html .= ' <span style="margin-right:5px;"><b>Serverity : </b> <span class="badge" style="background-color: #f2ff15;color#333;">Medium</span></span>';
+                }else if($model->serverity=='low'){
+                    $html .= ' <span style="margin-right:5px;"><b>Serverity : </b> <span class="badge" style="background-color: #88ce4f;">Low</span></span>';
+                }else if($model->serverity=='information'){
+                    $html .= ' <span style="margin-right:5px;"><b>Serverity : </b> <span class="badge" style="background-color: #00dcff;">Information</span></span>';
+                }else{
+                    $html .= ' <span style="margin-right:5px;"><b>Serverity : </b> - </span>';
                 }
 
                 // $html_th = '';
@@ -587,11 +588,11 @@ class RSSFeedSettingsController extends Controller
                 // $html .= $html_th_n . $html_line_n . $html_en_n;
 
                 if($model -> save_draft == 1){
-                    $html .= ' <br><b>Data Status</b> <span class="badge badge-danger" style="background-color: #ea2e49;">Darft</span>';
+                    $html .= ' <b>Data Status : </b> <span class="badge badge-danger" style="background-color: #ea2e49;">Darft</span>';
                 }else if($model -> save_draft == 0){
-                    $html .= ' <br><b>Data Status</b> <span class="badge badge-success">Public</span>';
+                    $html .= ' <b>Data Status : </b> <span class="badge badge-success">Public</span>';
                 }else{
-                    $html .= ' <br><b>Data Status</b> <span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
+                    $html .= ' <b>Data Status : </b> <span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
                 }  
 
                 return $html;
@@ -670,26 +671,24 @@ class RSSFeedSettingsController extends Controller
             //     }  
             //     return $html;
             // })
-            // ->addColumn('link', function (RSSNews $model) {
-            //     $html = '';
-            //     $html_th = '';
-            //     $html_en = '';
-            //     $html_line = '';
-            //     if($model->title_th) {
-            //         $html_th = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank">TH</a>';
+            ->addColumn('link', function (RSSNews $model) {
+                $html = '';
+                $html_th = '';
+                $html_en = '';
+                $html_line = '';
+                if($model->title_th) {
+                    $html_th = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank">TH</a>';
                     
-            //     }
-            //     if($model->title_en) {
-            //         $html_en = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank">EN</a>';
-            //         $html_line = ' | ';
-            //     }
+                }
+                if($model->title_en) {
+                    $html_en = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank">EN</a>';
+                    $html_line = ' | ';
+                }
                 
-                
+                $html .= $html_th . $html_line . $html_en;
 
-            //     $html .= $html_th . $html_line . $html_en;
-
-            //     return $html;
-            // })
+                return $html;
+            })
             ->addColumn('category', function (RSSNews $model) {
                 $html = '';
                 $html .= '<label>'.$model->category.'</label>';
@@ -728,7 +727,7 @@ class RSSFeedSettingsController extends Controller
                 return $html;
                
             })
-            ->rawColumns(['chk','content_detail','category','serverity','actor','status','action'])
+            ->rawColumns(['chk','content_detail','category','serverity','actor','status','link','action'])
             ->toJson();
     }
 
