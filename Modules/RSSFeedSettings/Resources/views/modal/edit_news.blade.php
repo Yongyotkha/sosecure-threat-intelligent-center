@@ -54,13 +54,23 @@
                             <label for="" class="col-lg-12 control-label" id="labelactor">Actor</label>
 
                             <div class="col-sm-12">
-                                <select name="actor" id="actor" class="select2-option form-control">
+                                <select name="actor[]" id="actor" class="select2-option form-control" multiple>
 
                                 </select>
                             </div>
                             {{-- <div class="col-sm-2">
                                 <button class="btn btn-info"><i class="fas fa-plus"></i> Add Now</button>
                             </div> --}}
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="" class="col-lg-12 control-label" id="labelcampainge">Campainge</label>
+
+                            <div class="col-sm-12">
+                                <select name="new_campainge[]" id="new_campainge" class="select2-option form-control" multiple>
+
+                                </select>
+                            </div>
                         </div>
 
                         {{-- <div class="row">
@@ -323,30 +333,55 @@ $('#source_create').select2({
 });
 
 
+    $('#actor').select2({
+        tag: true,
+        tokenSeparators: [' '],
+        placeholder: 'select actor',
+        minimumInputLength: 1,
+        multiple: true,
+        ajax: {
+            url: "{!! route('rssfeedsettings.rss_select_actor_news_create') !!}",
+            dataType: 'json',
+            method: 'post',
+            deley: 250,
+            processResults: function(data){
+                return {
+                    results: $.map(data, function(item){
+                        return {
+                            text: item.name,
+                            id: item.name
+                        }
+                    })
+                };
+            },
+            cache: true
+        }
+    });
 
-$('#actor').select2({
-    tags: true,
-    tokenSeparators: [' '],
-    placeholder: 'select actor',
-    minimumInputLength: 1,
-    ajax: {
-        url: "{!! route('rssfeedsettings.rss_select_actor_news_create'); !!}",
-        dataType: 'json',
-        method: 'post',
-        delay: 250,
-        processResults: function (data) {
-            return {
-                results:  $.map(data, function (item) {
-                    return {
-                        text: item.name,
-                        id: item.name
-                    }
-                })
-            };
-        },
-        cache: true
-    }
-});
+    $('#new_campainge').select2({
+        tag: true,
+        tokenSeparators: [' '],
+        placeholder: 'select campainge',
+        minimumInputLength: 1,
+        multiple: true,
+        ajax: {
+            url: "{!! route('rssfeedsettings.new_select_campainge') !!}",
+            dataType: 'json',
+            method: 'post',
+            deley: 250,
+            processResults: function(data){
+                return {
+                    results: $.map(data, function(item){
+                        return {
+                            text: item.name,
+                            id: item.campainge_uuid
+                        }
+                    })
+                };
+            },
+            cache: true
+        }
+    });
 
 function readLogo(input) {
     if (input.files && input.files[0]) {
@@ -375,7 +410,7 @@ var form_save = '.formSaving';
     
     $('.ajaxifyFormCreate').submit(function (event) {
             $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
-            {{--$('.formSaving').attr('disabled',true);--}}
+            {{-- $('.formSaving').attr('disabled',true); --}}
             $('.formDraft').attr('disabled',true);
             
             event.preventDefault();
@@ -388,7 +423,7 @@ var form_save = '.formSaving';
             axios.post($(this).attr("action"), data).then(function (response) {
                 toastr.success(response.data.message, '@langapp('response_status') ');
                 $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
-                window.location.href = response.data.redirect;
+                {{-- window.location.href = response.data.redirect; --}}
             }).catch(function (error) {
                 $('.formSaving').attr('disabled',false);
                 $('.formDraft').attr('disabled',false);
