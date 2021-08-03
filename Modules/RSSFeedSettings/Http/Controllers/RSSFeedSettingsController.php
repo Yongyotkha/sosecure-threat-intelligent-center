@@ -521,13 +521,13 @@ class RSSFeedSettingsController extends Controller
 
                 if($model -> source){
                     // return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'"><a href="javascript:void(0);" onclick="find_source(\''.$model -> source.'\')">'.$model -> source.'</a></div>';
-                    $html .= '<span data-rel="tooltip" title="'.$model -> source.'"><span style="margin-right:5px;"><b>Source : </b>'.$model -> source.'</span>';
+                    $html .= '<span data-rel="tooltip" title="'.$model -> source.'"><span class="m-r-5 m-l-xs"><b>Source : </b>'.$model -> source.'</span>';
                 }else{
-                    $html .= '<span data-rel="tooltip" title="None"><span style="margin-right:5px;"><b>Source : </b> None</span>';
+                    $html .= '<span data-rel="tooltip" title="None"><span class="m-r-5 m-l-xs"><b>Source : </b> None</span>';
                 }
 
 
-                $html .= '<span class="text-trucate-ovf"> <span style="margin-right:5px;"><b>Category : </b>';
+                $html .= '<span class="text-trucate-ovf"> <span class="m-r-5 m-l-xs"><b>Category : </b>';
                 if($model->get_cate=="[]"){
                     $html .= 'None';
                 }else{
@@ -550,6 +550,8 @@ class RSSFeedSettingsController extends Controller
                     // $html .= rtrim($html,", ");
                 }
 
+                $html .= ' <b>Public Date : </b>'.$model->updated_at.'';
+
                 $html .= '</span>';
 
                
@@ -557,17 +559,17 @@ class RSSFeedSettingsController extends Controller
 
                 $html .= '<div>';
                 if($model->serverity=='critical'){
-                    $html .= ' <span style="margin-right:5px;"><b>Serverity : </b> <span class="badge" style="background-color: #b93624;">Critical</span></span>';
+                    $html .= ' <span class="m-r-5 m-l-xs"><b>Serverity : </b> <span class="badge" style="background-color: #b93624;">Critical</span></span>';
                 }else if($model->serverity=='high'){
-                    $html .= ' <span style="margin-right:5px;"><b>Serverity : </b> <span class="badge" style="background-color: #fcc838;">High</span></span>';
+                    $html .= ' <span class="m-r-5 m-l-xs"><b>Serverity : </b> <span class="badge" style="background-color: #fcc838;">High</span></span>';
                 }else if($model->serverity=='medium'){
-                    $html .= ' <span style="margin-right:5px;"><b>Serverity : </b> <span class="badge" style="background-color: #f2ff15;color#333;">Medium</span></span>';
+                    $html .= ' <span class="m-r-5 m-l-xs"><b>Serverity : </b> <span class="badge" style="background-color: #f2ff15;color#333;">Medium</span></span>';
                 }else if($model->serverity=='low'){
-                    $html .= ' <span style="margin-right:5px;"><b>Serverity : </b> <span class="badge" style="background-color: #88ce4f;">Low</span></span>';
+                    $html .= ' <span class="m-r-5 m-l-xs"><b>Serverity : </b> <span class="badge" style="background-color: #88ce4f;">Low</span></span>';
                 }else if($model->serverity=='information'){
-                    $html .= ' <span style="margin-right:5px;"><b>Serverity : </b> <span class="badge" style="background-color: #00dcff;">Information</span></span>';
+                    $html .= ' <span class="m-r-5 m-l-xs"><b>Serverity : </b> <span class="badge" style="background-color: #00dcff;">Information</span></span>';
                 }else{
-                    $html .= ' <span style="margin-right:5px;"><b>Serverity : </b> - </span>';
+                    $html .= ' <span class="m-r-5 m-l-xs"><b>Serverity : </b> - </span>';
                 }
 
                 // $html_th = '';
@@ -599,12 +601,15 @@ class RSSFeedSettingsController extends Controller
                 // $html .= $html_th_n . $html_line_n . $html_en_n;
 
                 if($model -> save_draft == 1){
-                    $html .= ' <b>Data Status : </b> <span class="badge badge-danger" style="background-color: #ea2e49;">Darft</span>';
+                    $html .= ' <b class="m-r-5 m-l-xs">Data Status : </b> <span class="badge badge-danger" style="background-color: #ea2e49;">Darft</span>';
                 }else if($model -> save_draft == 0){
-                    $html .= ' <b>Data Status : </b> <span class="badge badge-success">Public</span>';
+                    $html .= ' <b class="m-r-5 m-l-xs">Data Status : </b> <span class="badge badge-success">Public</span>';
                 }else{
-                    $html .= ' <b>Data Status : </b> <span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
+                    $html .= ' <b class="m-r-5 m-l-xs">Data Status : </b> <span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
                 }  
+                $html .= ' <span class="m-r-5 m-l-xs" style="display: inline-flex;align-items: center;"><b>Actor : </b> <div class="m-l-xs"><span><img class="icon_sm_actor" src="https://images.unsplash.com/photo-1627301044065-fc950957c311?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"></span> <a href="#">Name Actor</a></div></span>';
+                $html .= ' <b>Campainge : </b> <span> Name Campainge</span>';
+
 
                 $html .= '</div>';
                 return $html;

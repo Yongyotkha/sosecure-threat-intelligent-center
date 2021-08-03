@@ -5389,3 +5389,11 @@ input.form-policy[type=password] {
 .icon-devices i{
     font-size: 20px;
 }
+
+.icon_sm_actor{
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 50%;
+    overflow: hidden;
+}
