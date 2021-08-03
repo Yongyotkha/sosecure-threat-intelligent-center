@@ -450,7 +450,14 @@ class RSSFeedSettingsController extends Controller
 
             $DB_MONGO_KEY = config('app.DB_MONGO_DEV');
             $client = new MongoClient($DB_MONGO_KEY);
-            $collection = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+            if(app()->environment('local'))
+            {
+                $collection = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
+            }
+            else
+            {
+                $collection = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+            }
 
             $query_actor = [
                 'pulse_id' => $check_id
@@ -1363,9 +1370,18 @@ class RSSFeedSettingsController extends Controller
 
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $client = new MongoClient($DB_MONGO_KEY);
-            $db_name = 'sosecure_threatintelligent_test';
-            $db = $client->$db_name;
-            $collection = $db->fx_otx_adversaries;
+            if(app()->environment('local'))
+            {
+                $db_name = 'sosecure_threatintelligent';
+                $db = $client->$db_name;
+                $collection = $db->fx_otx_adversaries;
+            }
+            else
+            {
+                $db_name = 'sosecure_threatintelligent_test';
+                $db = $client->$db_name;
+                $collection = $db->fx_otx_adversaries;
+            }
             
             $query = [
 
@@ -1821,7 +1837,16 @@ class RSSFeedSettingsController extends Controller
 
                 $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
                 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-                $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
+                if(app()->environment('local'))
+                {
+                    $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
+                    $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+                }
+                else
+                {
+                    $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
+                    $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+                }
 
                 $query = [
                     'name' => $new_actor
@@ -1834,14 +1859,12 @@ class RSSFeedSettingsController extends Controller
 
                 foreach($result as $data){
                     $data_result['id'] = $data->_id;
-                    $data_result['uuid'] = $data->uuid;
+                    $data_result['uuid'] = $data->adversary_uuid;
                     // $data_result['uuid'] = $data->adversary_uuid;
                 }
 
                 // dd($result);
                 // dd($data_result['uuid']);
-
-                $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
 
                 $data_adv_related = array(
                     'adversary_uuid' => $data_result['uuid'],

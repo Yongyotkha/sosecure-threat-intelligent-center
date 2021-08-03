@@ -388,7 +388,7 @@ var form_save = '.formSaving';
             axios.post($(this).attr("action"), data).then(function (response) {
                 toastr.success(response.data.message, '@langapp('response_status') ');
                 $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
-                {{--window.location.href = response.data.redirect;--}}
+                window.location.href = response.data.redirect;
             }).catch(function (error) {
                 $('.formSaving').attr('disabled',false);
                 $('.formDraft').attr('disabled',false);
