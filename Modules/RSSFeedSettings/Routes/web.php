@@ -42,7 +42,7 @@ Route::group(
         Route::put('rssfeedsettings/{id}', 'RSSFeedSettingsController@update')->name('rssfeedsettings.update')->middleware('can:menu_items');
         Route::delete('rssfeedsettings/{id}', 'RSSFeedSettingsController@delete_process')->name('rssfeedsettings.delete_process')->middleware('can:menu_items');
 
-
+        Route::post('/new_select_campainge', 'RSSFeedSettingsController@new_select_campainge')->name('rssfeedsettings.new_select_campainge');
         
         Route::get('/setting', 'RSSFeedSettingsController@rss_setting')->name('rssfeedsettings.rss_setting')->middleware('can:menu_items');
         Route::get('/feed-all', 'RSSFeedSettingsController@rss_feed_all')->name('rssfeedsettings.feed_all')->middleware('can:menu_items');
