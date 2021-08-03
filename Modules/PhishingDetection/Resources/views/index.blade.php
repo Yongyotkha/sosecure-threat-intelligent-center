@@ -82,7 +82,7 @@
                 </header>
                 <div class="panel-body">
                     <div class="table-responsive">
-                        <table class="table table-striped" id="table-rss-actor-template" style="width: 100%">
+                        <table class="table table-striped" id="table-phishing-template" style="width: 100%">
                             <thead>
                                 <tr>
                                     <th></th>
@@ -91,6 +91,39 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr>
+                                    <td>
+                                        <div style="position: relative;width:150px;">
+                                            <img src="http://beepeers.com/assets/images/commerces/default-image.jpg" alt="" style="width: 100%">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex-actor">
+                                            <div class="details-actor">
+                                                <h4 class="text-primary" style="margin-left: 0">URL : http://testtest.com/scb/login.aspx</h4>
+                                                <p style="white-space: pre-wrap;">
+                                                    <strong>IP Address : 171.123.143.38</strong>
+                                                </p>
+                                                <div class="btw-text">
+                                                    <p style="margin-right: 20px;">
+                                                        <strong>Type </strong>: Thailand
+                                                    </p>
+                                                    <p>
+                                                        <strong>Date </strong>: 2021-08-08 22:33
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-nowrap text-center">
+                                        <a href="#" class="btn btn-info btn-xs">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-info btn-xs">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
                                 <tr>
                                     <td>
                                         <div style="position: relative;width:150px;">
@@ -160,6 +193,8 @@
 
 <script>
 
+$('#table-phishing-template').DataTable();
+
 function mychart(myid){
     const chart_top_source = Highcharts.chart(myid, {
     chart: {
@@ -195,24 +230,27 @@ function mychart(myid){
             stacking: 'normal'
         },
         dataLabels: {
-            enabled: true,
+            enabled: false,
             format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-        },
+        }
+    },
+    legend: {
+        enabled: false
     },
     series: [{
-        name: 'John',
+        name: '123',
         data: [5, 3, 4, 7, 2],
         stack: 'male'
     }, {
-        name: 'Joe',
+        name: '123',
         data: [3, 4, 4, 2, 5],
         stack: 'male'
     }, {
-        name: 'Jane',
+        name: '123',
         data: [2, 5, 6, 2, 1],
         stack: 'female'
     }, {
-        name: 'Janet',
+        name: '123',
         data: [3, 0, 4, 4, 3],
         stack: 'female'
     }]
@@ -253,11 +291,9 @@ function circle_chart(id){
         series: [{
             colorByPoint: false,
             data: [
-            {  name: 'Critical', y: 5, color: '#e64732'}, 
-            {  name: 'High',  y: 4 , color: '#fcc838'}, 
-            {  name: 'Medium', y: 4, color: '#00dcff'  }, 
-            {  name: 'Low',   y: 4, color: '#88ce4f'  },
-            {  name: 'Information',   y: 4, color: '#d3d3d3'  },
+            {  name: 'Type', y: 5, color: '#e64732'}, 
+            {  name: 'Type',  y: 4 , color: '#fcc838'}, 
+            {  name: 'Type', y: 4, color: '#00dcff'  }, 
             ]
         }],
     });
