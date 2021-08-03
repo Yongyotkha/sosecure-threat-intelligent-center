@@ -299,12 +299,12 @@ use Carbon\Carbon;
                                                 <th>Data Status</th>
                                                 <th>Public Date</th> --}}
                                                 {{-- <th width="30px">Modified Date</th> --}}
-                                                {{-- <th>View Count</th>  --}} 
+                                                {{-- <th>View Count</th> 
                                                 <th>Category</th>
                                                 <th>Serverity</th>
-                                                <th>Actor</th>
-                                                <th>Status</th>
-                                                <th>Link</th>
+                                                <th>Actor</th>--}} 
+                                                <th width="5%">Status</th> 
+                                                <th width="5%">Link</th>
                                                 <th width="5%">Action</th>
                                             </tr>
                                         </thead>

@@ -505,16 +505,25 @@ class RSSFeedSettingsController extends Controller
             // })
             ->addColumn('content_detail', function (RSSNews $model) {
                 $html = '';
-
+                $html .= '<div>';
                 if($model -> title_th){
-                    $html .= '<a style="font-size:16px;" href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_th.'">'.$model -> title_th.'</a>';
+                    $html .= '<a style="font-size:16px;" href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank" data-rel="tooltip" title="'.$model -> title_th.'">'.$model -> title_th.'</a>';
                 }else if($model -> title_en){
-                    $html .= '<a style="font-size:16px;" href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_en.'">'.$model -> title_en.'</a>';
+                    $html .= '<a style="font-size:16px;" href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank" data-rel="tooltip" title="'.$model -> title_en.'">'.$model -> title_en.'</a>';
                 }else{
                     $html .= '<span style="font-size:16px;">No Title</span>';
                 }
+                $html .= '</div>';
 
-                $html .= '<div class="text-trucate-ovf"> <span style="margin-right:5px;"><b>Category : </b>';
+                if($model -> source){
+                    // return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'"><a href="javascript:void(0);" onclick="find_source(\''.$model -> source.'\')">'.$model -> source.'</a></div>';
+                    $html .= '<span data-rel="tooltip" title="'.$model -> source.'"><span style="margin-right:5px;"><b>Source : </b>'.$model -> source.'</span>';
+                }else{
+                    $html .= '<span data-rel="tooltip" title="None"><span style="margin-right:5px;"><b>Source : </b> None</span>';
+                }
+
+
+                $html .= '<span class="text-trucate-ovf"> <span style="margin-right:5px;"><b>Category : </b>';
                 if($model->get_cate=="[]"){
                     $html .= 'None';
                 }else{
@@ -536,15 +545,13 @@ class RSSFeedSettingsController extends Controller
                     
                     // $html .= rtrim($html,", ");
                 }
-                $html .= '</div>';
 
-                if($model -> source){
-                    // return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'"><a href="javascript:void(0);" onclick="find_source(\''.$model -> source.'\')">'.$model -> source.'</a></div>';
-                    $html .= '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'"><span style="margin-right:5px;"><b>Source : </b>'.$model -> source.'</div>';
-                }else{
-                    $html .= '<div class="text-elip" data-rel="tooltip" title="None"><span style="margin-right:5px;"><b>Source : </b> None</div>';
-                }
+                $html .= '</span>';
 
+               
+          
+
+                $html .= '<div>';
                 if($model->serverity=='critical'){
                     $html .= ' <span style="margin-right:5px;"><b>Serverity : </b> <span class="badge" style="background-color: #b93624;">Critical</span></span>';
                 }else if($model->serverity=='high'){
@@ -595,6 +602,7 @@ class RSSFeedSettingsController extends Controller
                     $html .= ' <b>Data Status : </b> <span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
                 }  
 
+                $html .= '</div>';
                 return $html;
             })
             // ->addColumn('source', function (RSSNews $model) {
