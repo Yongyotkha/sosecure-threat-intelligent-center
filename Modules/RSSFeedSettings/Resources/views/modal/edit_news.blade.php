@@ -55,7 +55,11 @@
 
                             <div class="col-sm-12">
                                 <select name="actor[]" id="actor" class="select2-option form-control" multiple>
-
+                                    @if(@$actors != null)
+                                        @foreach ($actors as $data_actor)
+                                            <option value="{{$data_actor->adversary_uuid}}" selected>{{$data_actor->adversary_name}}</option>
+                                        @endforeach
+                                    @endif
                                 </select>
                             </div>
                             {{-- <div class="col-sm-2">
@@ -68,7 +72,11 @@
 
                             <div class="col-sm-12">
                                 <select name="new_campainge[]" id="new_campainge" class="select2-option form-control" multiple>
-
+                                    @if(@$campainge != null)
+                                        @foreach ($campainge as $data_actor)
+                                            <option value="{{$data_actor->adversary_uuid}}" selected>{{$data_actor->adversary_name}}</option>
+                                        @endforeach
+                                    @endif
                                 </select>
                             </div>
                         </div>
@@ -349,7 +357,7 @@ $('#source_create').select2({
                     results: $.map(data, function(item){
                         return {
                             text: item.name,
-                            id: item.name
+                            id: item.adversary_uuid
                         }
                     })
                 };

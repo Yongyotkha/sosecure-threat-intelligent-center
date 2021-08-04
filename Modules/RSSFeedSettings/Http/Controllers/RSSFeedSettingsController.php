@@ -513,7 +513,8 @@ class RSSFeedSettingsController extends Controller
                 $query= [
                     'pulse_id' => $model[$i]['id'],
                     'mode' => 'news',
-                    'join' => 'actor'
+                    'join' => 'actor',
+                    'delete_at'  => null
                 ];
                 $option = [];
         
@@ -549,7 +550,8 @@ class RSSFeedSettingsController extends Controller
                 $query_camp= [
                     'pulse_id' => $model[$i]['id'],
                     'mode' => 'news',
-                    'join' => 'campainge'
+                    'join' => 'campainge',
+                    'delete_at'  => null
                 ];
                 $option_camp = [];
         
@@ -1223,6 +1225,8 @@ class RSSFeedSettingsController extends Controller
         }else{
             $public_date = '';
         }
+
+        // dd($RSSNews);
  
         // dd($data['RSSNews']->source);
         // $data['RSSNews'] = '';
@@ -1238,6 +1242,57 @@ class RSSFeedSettingsController extends Controller
         $data['action'] = 'edit';
         $data['category'] = CategorySettings::where('active',1)->get();
         $data['public_date'] = $public_date;
+
+        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+        if(app()->environment('local'))
+        {
+            $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
+            $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+        }
+        else
+        {
+            $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
+            $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+        }
+
+        $query_actor = [
+            'pulse_id' => $RSSNews->id,
+            'mode' => 'news',
+            'join' => 'actor',
+            'delete_at' => null
+        ];
+        $options_actor = [];
+        $connection_actor = $col_fx_otx_adversaries_related->find($query_actor,$options_actor);
+        if($connection_actor != null)
+        {
+            $actors = $connection_actor->toArray();
+            $data['actors'] = $actors;
+        } 
+        else
+        {
+            $data['actors'] = null;
+        }
+
+        $query_campainge = [
+            'pulse_id' => $RSSNews->id,
+            'mode' => 'news',
+            'join' => 'campainge',
+            'delete_at' => null
+        ];
+        $option_campainge = [];
+
+        $connection_campainge = $col_fx_otx_adversaries_related->find($query_campainge,$option_campainge);
+        
+        if($connection_actor != null)
+        {
+            $campainge = $connection_campainge->toArray();
+            $data['campainge'] = $campainge;
+        } 
+        else
+        {
+            $data['campainge'] = null;
+        }
         
         return view('rssfeedsettings::modal.edit_news')->with($data);
     }
@@ -1543,7 +1598,7 @@ class RSSFeedSettingsController extends Controller
         return response()->json($result);
 
     }
-
+//----------------------------------------------------
     public function rss_data_store_news_create(Request $request){
         $role_custom = @check_role_custom();
         if(!$role_custom['news']) {
@@ -1602,6 +1657,9 @@ class RSSFeedSettingsController extends Controller
         $RSSNews_check = RSSNews::where("code",$request->rss_code)->first();
 
         if(@$RSSNews_check) {
+
+            // dd($RSSNews_check -> id);
+            // dd($input);
 
             $RSSNews_check -> code = generator_uuid();
             $RSSNews_check -> logo = config('app.URL_CENTER_PUBLISH').$logo;
@@ -1740,7 +1798,159 @@ class RSSFeedSettingsController extends Controller
                 }
             }
 
+            $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+            $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+            if(app()->environment('local'))
+            {
+                $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
+                $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+                $collection_campaign = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
+            }
+            else
+            {
+                $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
+                $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+                $collection_campaign = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
+            }
 
+            $query_delete = array(
+                'pulse_id' => $RSSNews_check -> id,
+                'mode' => 'news',
+                'join' => 'actor'
+            );
+            $option_delete = [];
+            $result_delete = $col_fx_otx_adversaries_related->find($query_delete,$option_delete);
+            $final_delete = $result_delete->toArray();
+            $count_actor = count($final_delete);
+
+            if($count_actor > 0)
+            {
+                $update_result_related = $col_fx_otx_adversaries_related->updateMany(
+                    $query_delete,
+                    ['$set' => 
+                        [
+                            'delete_at' => $date_now
+                        ]
+                    ]
+                );
+            }
+
+            if(!empty($request -> actor))
+            {
+                $checkSuccess = true;
+                $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
+
+
+                // $update_result_related = $col_fx_otx_adversaries_related->updateMany(
+                //     ['adversary_uuid' => $uuid],
+                //     ['$set' => 
+                //         [
+                //             'delete_at' => $date_now
+                //         ]
+                //     ]
+                // );
+
+                foreach($request->actor as $data_actor)
+                {
+                    $query = [
+                        'adversary_uuid' => $data_actor
+                    ];
+                    $option = [];
+    
+                    $result = $col_fx_otx_adversaries->find($query,$option);
+    
+                    $data_result = array();
+    
+                    foreach($result as $data){
+                        $data_result['id'] = $data->_id;
+                        $data_result['uuid'] = $data->adversary_uuid;
+                        $data_result['name'] = $data->name;
+                    }
+    
+                    $data_adv_related = array(
+                        'adversary_uuid' => $data_result['uuid'],
+                        'adversary_name' => $data_result['name'],
+                        'pulse_id' => $RSSNews_check -> id,
+                        'pulse_name' => '',
+                        'title_th' => $RSSNews_check -> detail_th,
+                        'title_en' => $RSSNews_check -> detail_en,
+                        'mode' => 'news',
+                        'join' => 'actor',
+                        'modified' => $date_now,
+                        'created_at' => $date_now,
+                        'created_by' => 'system',
+                        'updated_at' => $date_now,
+                        'updated_by' => 'system'
+                    );
+    
+                    $update_fx_otx_adversaries_related = $col_fx_otx_adversaries_related->insertOne($data_adv_related);
+                }
+            }
+
+            $query_delete_camp = array(
+                'pulse_id' => $RSSNews_check -> id,
+                'mode' => 'news',
+                'join' => 'campainge'
+            );
+            $option_delete_camp = [];
+            $result_delete_ = $col_fx_otx_adversaries_related->find($query_delete_camp,$option_delete_camp);
+            $final_delete_camp = $result_delete_->toArray();
+            $count_campainge = count($final_delete_camp);
+
+            if($count_campainge > 0)
+            {
+                $update_result_related = $col_fx_otx_adversaries_related->updateMany(
+                    $query_delete_camp,
+                    ['$set' => 
+                        [
+                            'delete_at' => $date_now
+                        ]
+                    ]
+                );
+            }
+            
+            if(!empty($request->new_campainge))
+            {
+                $checkSuccess = true;
+                $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
+
+
+                foreach($request->new_campainge as $data_campainge)
+                {
+                    $query = [
+                        'campainge_uuid' => $data_campainge
+                    ];
+                    $option = [];
+    
+                    $result = $collection_campaign->find($query,$option);
+    
+                    $data_result = array();
+    
+                    foreach($result as $data){
+                        $data_result['id'] = $data->_id;
+                        $data_result['uuid'] = $data->campainge_uuid;
+                        $data_result['name'] = $data->name;
+                    }
+    
+                    $data_adv_related = array(
+                        'adversary_uuid' => $data_result['uuid'],
+                        'adversary_name' => $data_result['name'],
+                        'pulse_id' => $RSSNews_check -> id,
+                        'pulse_name' => '',
+                        'title_th' => $RSSNews_check -> detail_th,
+                        'title_en' => $RSSNews_check -> detail_en,
+                        'mode' => 'news',
+                        'join' => 'campainge',
+                        'modified' => $date_now,
+                        'created_at' => $date_now,
+                        'created_by' => 'system',
+                        'updated_at' => $date_now,
+                        'updated_by' => 'system'
+                    );
+    
+                    $update_fx_otx_adversaries_related = $col_fx_otx_adversaries_related->insertOne($data_adv_related);
+                }
+            }
 
             // if(!empty($request -> tags)){
             //     foreach($request -> tags as $item){
@@ -1974,6 +2184,7 @@ class RSSFeedSettingsController extends Controller
             $new_detail_th = $request->detail_th;
             $new_detail_en = $request->detail_en;
 
+            //------------------------- actor ------------------------------
             if(!empty($request -> actor))
             {
                 $checkSuccess = true;
@@ -1992,10 +2203,41 @@ class RSSFeedSettingsController extends Controller
                     $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
                 }
 
+                // $query_delete = array(
+                //     'pulse_id' => $new_id,
+                //     'mode' => 'news',
+                //     'join' => 'actor'
+                // );
+                // $option_delete = [];
+                // $result_delete = $col_fx_otx_adversaries_related->find($query_delete,$option_delete);
+                // $final_delete = $result_delete->toArray();
+                // $count_actor = count($final_delete);
+
+                // if($count_actor > 0)
+                // {
+                //     $update_result_related = $col_fx_otx_adversaries_related->updateMany(
+                //         $query_delete,
+                //         ['$set' => 
+                //             [
+                //                 'delete_at' => $date_now
+                //             ]
+                //         ]
+                //     );
+                // }
+
+                // $update_result_related = $col_fx_otx_adversaries_related->updateMany(
+                //     ['adversary_uuid' => $uuid],
+                //     ['$set' => 
+                //         [
+                //             'delete_at' => $date_now
+                //         ]
+                //     ]
+                // );
+
                 foreach($request->actor as $data_actor)
                 {
                     $query = [
-                        'name' => $data_actor
+                        'adversary_uuid' => $data_actor
                     ];
                     $option = [];
     
@@ -2006,11 +2248,12 @@ class RSSFeedSettingsController extends Controller
                     foreach($result as $data){
                         $data_result['id'] = $data->_id;
                         $data_result['uuid'] = $data->adversary_uuid;
+                        $data_result['name'] = $data->name;
                     }
-    
+
                     $data_adv_related = array(
                         'adversary_uuid' => $data_result['uuid'],
-                        'adversary_name' => $data_actor,
+                        'adversary_name' => $data_result['name'],
                         'pulse_id' => $new_id,
                         'pulse_name' => '',
                         'title_th' => $new_title_th,
@@ -2046,7 +2289,6 @@ class RSSFeedSettingsController extends Controller
 
             if(!empty($request->new_campainge))
             {
-
                 $checkSuccess = true;
                 $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
 
@@ -2204,7 +2446,7 @@ class RSSFeedSettingsController extends Controller
             Response::HTTP_OK
         );
     }
-
+//-----------------------------------------------------
     public function rss_data_store_news(Request $request){
         $role_custom = @check_role_custom();
         if(!$role_custom['news']) {

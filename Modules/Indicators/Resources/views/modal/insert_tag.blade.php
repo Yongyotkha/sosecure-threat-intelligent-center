@@ -34,9 +34,9 @@
                                 {{-- <input type="text" name="category_campaign" id="category_campaign" class="form-control"> --}}
                                 <select name="category_campaign[]" id="category_campaign" class="select2-option form-control" multiple>
                                     @if($campainge != null)
-                                    @foreach($campainge as $data_camp)
-                                    <option value="{{$data_camp->campainge_uuid}}">{{$data_camp->name}}</option>
-                                    @endforeach
+                                        @foreach($campainge as $data_camp)
+                                            <option value="{{$data_camp->adversary_uuid}}" selected>{{$data_camp->adversary_name}}</option>
+                                        @endforeach
                                     @endif
                                 </select>
                             </div>
@@ -139,7 +139,7 @@
                         results: $.map(data, function(item){
                             return {
                                 text: item.name,
-                                id: item.name
+                                id: item.adversary_uuid
                             }
                         })
                     };
@@ -148,29 +148,30 @@
             }
         });
 
-        {{-- $('#category_campaign').select2({
+        $('#category_campaign').select2({
             tag: true,
             tokenSeparators: [' '],
-            placeholder: 'select campaign',
+            placeholder: 'select campainge',
             minimumInputLength: 1,
+            multiple: true,
             ajax: {
-                url: "{!! route('rssfeedsettings.rss_select_actor_news_create') !!}",
+                url: "{!! route('rssfeedsettings.new_select_campainge') !!}",
                 dataType: 'json',
                 method: 'post',
-                delay: 250,
+                deley: 250,
                 processResults: function(data){
                     return {
                         results: $.map(data, function(item){
                             return {
                                 text: item.name,
-                                id: item.name
+                                id: item.campainge_uuid
                             }
                         })
                     };
                 },
                 cache: true
             }
-        }); --}}
+        });
 
         {{-- $('#category_techniques').select2({
             tag: true,
