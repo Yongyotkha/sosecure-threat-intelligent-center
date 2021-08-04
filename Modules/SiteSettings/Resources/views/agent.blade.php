@@ -26,6 +26,20 @@
                 </header>
 
                 <section class="scrollable wrapper">
+                    <div class="row m-b-10">
+                        <div class="col-md-6">
+                            <div class="card-box-actor bg-2">
+                                <div class="card-actor-name">LIMIT AGENT</div>
+                                <div class="score-actor"> 3 </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card-box-actor bg-2">
+                                <div class="card-actor-name">AGENT ACTIVE</div>
+                                <div class="score-actor"> 2/3 </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-lg-12">
                             <section class="panel panel-default">

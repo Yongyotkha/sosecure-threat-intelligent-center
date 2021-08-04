@@ -3,26 +3,218 @@
 
 <section id="content" class="bg">
     <section class="vbox">
-        <header class="header bg-white b-b b-light" style="display: flex;justify-content:space-between;">
-            <div class="bc-head">Phishing Detection</div>
-            <div class="max-w-select" style="margin-top: 8px;">
-                <select name="site" id="site" class="select2-option form-control select-site"
-                    onchange="changeSite(value)">
-                    <option value="0" selected>All Site</option>
-                    {{-- @if ($site_settings)
+        <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+            <div class="header-flex-overflow m-t-10">
+                <div class="fwb-16">
+                    <span>
+                        Phishing Detection
+                    </span>
+                </div>
 
-                    @foreach ($site_settings as $site_settings)
-                    <option value="{{$site_settings->code}}">{{$site_settings->name}}
-                    </option>
-                    @endforeach
+                <div class="ml-2 text-right">
+                    {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
+                    <div class="text-left max-w-select m-r-xs" style="display:inline-block">
+                        <select name="site" id="site" class="text-left select2-option form-control select-site" onchange="changeSite(value)">
+                            <option value="">All Site</option>
+                            {{-- @if ($site_settings)
 
-                    @endif --}}
-                </select>
+                            @foreach ($site_settings as $site_settings)
+                            <option value="{{$site_settings->id}}">{{$site_settings->name}}
+                            </option>
+                            @endforeach
+
+                            @endif --}}
+                        </select>
+                    </div>
+                    
+                    <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                        <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                    </a>
+
+                </div>
             </div>
         </header>
 
         {{-- Tab Content --}}
         <section class="scrollable wrapper">
+
+            <section class="panel panel-default" id="hide-advance-search" style="display: none;">
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <i class="fas fa-filter"></i> Filter
+                        </div>
+                </header>
+                <div class="panel-body" style="padding: 0 !important">
+                    <div class="container-fluid" style="padding: 2rem;">
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div>
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">URL</label>
+                                        <input type="text" class="form-control" name="" id=""
+                                            placeholder="Search">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div>
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">IP</label>
+                                        <input type="text" class="form-control" name="" id=""
+                                            placeholder="Search">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 mb-1">
+                                <h5 class="font-weight-bold">Severity</h5>
+                                <div id="btngroup_sort_by" class="btn-group special mb-2">
+                                    <button class="btn btn-grey filter_agent_all active" value="" id="btn_search_all">
+                                        <span> All </span>
+                                    </button>
+                                    <button class="btn  btn-grey" value="">
+                                        <span> Information </span>
+                                    </button>
+                                    <button class="btn  btn-grey" value="">
+                                        <span> Low </span>
+                                    </button>
+                                    <button class="btn  btn-grey" value="">
+                                        <span> Medium </span>
+                                    </button>
+                                    <button class="btn  btn-grey" value="">
+                                        <span> High </span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 mb-1">
+                                <div>
+                                    <h5 class="font-weight-bold">Type</h5>
+                                    <div id="filter-type" class="btn-group special">
+                                        <button class="btn btn-grey check_alert active" id="all_type" value="">
+                                            <span> All </span>
+                                        </button>
+                                        <button class="btn btn-grey check_alert" value="1">
+                                            <span> Referrer </span>
+                                        </button>
+                                        <button class="btn btn-grey check_alert" value="1">
+                                            <span> Threat Feed </span>
+                                        </button>
+                                        <button class="btn btn-grey check_alert" value="2">
+                                            <span> Domain name </span>
+                                        </button>
+                                        <button class="btn btn-grey check_alert" value="2">
+                                            <span> other </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="filter_alert_main" class="row" style="display: none">
+                            <div class="col-lg-4">
+                                <div>
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">Site Name</label>
+                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                            placeholder="Search">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div>
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">Description</label>
+                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                            placeholder="Search">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <label for="" class="">Description</label>
+                                <div id="filter-alert" class="btn-group special">
+                                    <button class="btn btn-grey check_alert active" id="all" value="">
+                                        <span> All </span>
+                                    </button>
+                                    <button class="btn btn-grey check_alert" value="1">
+                                        <span> Scan </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="filter_agent_main" class="row"  style="display: none">
+                            <div class="col-lg-3">
+                                <div>
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">Site Name</label>
+                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                            placeholder="Search">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div>
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">Device Name</label>
+                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                            placeholder="Search">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div>
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">IP</label>
+                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                            placeholder="Search">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="" class="">OS Type</label>
+                                <div id="filter-alert" class="btn-group special">
+                                    <button class="btn btn-grey check_os_type active" id="all_os" value="">
+                                        <span> All </span>
+                                    </button>
+                                    <button class="btn btn-grey check_os_type" value="1">
+                                        <span> Scan </span>
+                                    </button>
+                                    <button class="btn btn-grey check_os_type" value="1">
+                                        <span> Window </span>
+                                    </button>
+                                </div>
+                            </div>
+
+                         
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-lg-12 text-right">
+                            <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
+                                <i class="fas fa-search"></i>
+                                @langapp('apply')
+                            </button>
+                            <button type="button" id="btn_rss_news_reset" class="btn btn-default btn-responsive btn-fz-13"
+                                style="white-space: nowrap">
+                                <i class="fas fa-broom"></i>
+                                <span> Clear </span>
+                            </button>
+                            <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                <i class="fas fa-times"></i>
+                                <span> Close </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <section class="m-b-10">
                 <div class="row">
                     <div class="col-xl-12 col-lg-12 col-md-12">
@@ -60,7 +252,7 @@
                                 <div class="box-chart-color bg-white">
                                     <div class="d-flex align-items-center header-chart-p">
                                         <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
-                                        <h1 class="text-blue bold-500">Type</h1>
+                                        <h1 class="text-blue bold-500">Phishing Type</h1>
                                     </div>
                                     <div class="divider-dark"></div>
                                     <div id="chart-type" class="h-chart"></div>
@@ -86,7 +278,12 @@
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th style="width: 80%">Content</th>
+                                    <th>URL</th>
+                                    <th>IP Address</th>
+                                    <th>Type</th>
+                                    <th>Score</th>
+                                    <th>Severity</th>
+                                    <th>Date</th>
                                     <th style="width: 10%" class="text-center">Action</th>
                                 </tr>
                             </thead>
@@ -94,69 +291,108 @@
                                 <tr>
                                     <td>
                                         <div style="position: relative;width:150px;">
-                                            <img src="http://beepeers.com/assets/images/commerces/default-image.jpg" alt="" style="width: 100%">
+                                            <img src="{{asset('images/webtest3.png')}}" alt="" style="width: 100%">
                                         </div>
                                     </td>
                                     <td>
                                         <div class="d-flex-actor">
-                                            <div class="details-actor">
-                                                <h4 class="text-primary" style="margin-left: 0">URL : http://testtest.com/scb/login.aspx</h4>
-                                                <p style="white-space: pre-wrap;">
-                                                    <strong>IP Address : 171.123.143.38</strong>
-                                                </p>
-                                                <div class="btw-text">
-                                                    <p style="margin-right: 20px;">
-                                                        <strong>Type </strong>: Thailand
-                                                    </p>
-                                                    <p>
-                                                        <strong>Date </strong>: 2021-08-08 22:33
-                                                    </p>
-                                                </div>
-                                            </div>
+                                            <strong class="text-elip-phi">
+                                                https://online.kasikornbankgroup.com/K-Online/login.jsp?lang=TH
+                                            </strong>
                                         </div>
                                     </td>
+                                    <td>
+                                        <strong>171.123.143.38</strong>
+                                    </td>
+                                    <td>
+                                        <strong> Referrer </strong>
+                                    </td>
+                                    <td>
+                                        <strong> 50 </strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background-color: #fcc838;">Medium</span>
+                                    </td>
+                                    <td>
+                                        <strong> 2021-08-08 22:33</strong>
+                                    </td>
                                     <td class="text-nowrap text-center">
-                                        <a href="#" class="btn btn-info btn-xs">
+                                        <a target="_blank" href="https://online.kasikornbankgroup.com/K-Online/login.jsp?lang=TH" class="btn btn-info btn-xs">
                                             <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-info btn-xs">
-                                            <i class="fas fa-edit"></i>
                                         </a>
                                     </td>
                                 </tr>
+
                                 <tr>
                                     <td>
                                         <div style="position: relative;width:150px;">
-                                            <img src="http://beepeers.com/assets/images/commerces/default-image.jpg" alt="" style="width: 100%">
+                                            <img src="{{asset('images/webtest1.png')}}" alt="" style="width: 100%">
                                         </div>
                                     </td>
                                     <td>
                                         <div class="d-flex-actor">
-                                            <div class="details-actor">
-                                                <h4 class="text-primary" style="margin-left: 0">URL : http://testtest.com/scb/login.aspx</h4>
-                                                <p style="white-space: pre-wrap;">
-                                                    <strong>IP Address : 171.123.143.38</strong>
-                                                </p>
-                                                <div class="btw-text">
-                                                    <p style="margin-right: 20px;">
-                                                        <strong>Type </strong>: Thailand
-                                                    </p>
-                                                    <p>
-                                                        <strong>Date </strong>: 2021-08-08 22:33
-                                                    </p>
-                                                </div>
-                                            </div>
+                                            <strong class="text-elip-phi">
+                                                http://e-tracking.customs.go.th/ETS/index.jsp?lang=th&left_menu=nmenu_esevice_002
+                                            </strong>
                                         </div>
                                     </td>
+                                    <td>
+                                        <strong>171.123.143.38</strong>
+                                    </td>
+                                    <td>
+                                        <strong> Threat Feed </strong>
+                                    </td>
+                                    <td>
+                                        <strong> 20 </strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background-color: #e64732;">High</span>
+                                    </td>
+                                    <td>
+                                        <strong> 2021-05-08 12:05</strong>
+                                    </td>
                                     <td class="text-nowrap text-center">
-                                        <a href="#" class="btn btn-info btn-xs">
+                                        <a target="_blank" href="http://e-tracking.customs.go.th/ETS/index.jsp?lang=th&left_menu=nmenu_esevice_002" class="btn btn-info btn-xs">
                                             <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-info btn-xs">
-                                            <i class="fas fa-edit"></i>
                                         </a>
                                     </td>
                                 </tr>
+
+                                <tr>
+                                    <td>
+                                        <div style="position: relative;width:150px;">
+                                            <img src="{{asset('images/webtest2.png')}}" alt="" style="width: 100%">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex-actor">
+                                            <strong class="text-elip-phi">
+                                                https://sosecure.cloudflareaccess.com/cdn-cgi/access/login/www.sosecure.co.th?kid=a1955092418b0afd7188f09818f844ad5c2a46dacdc474fb45fe0f4e0fa01d90&redirect_url=%2Fwp-login.php&meta=eyJraWQiOiJkZjk5ZTBmNzYwYmViYmE2M2UzZTQwMzgwZTlmYTBiNTBkMzI4YjUxMmIzYzBmZjQzMWFhMTQ0NjY5OWU4MGM0IiwiYWxnIjoiUlMyNTYiLCJ0eXAiOiJKV1QifQ.eyJzZXJ2aWNlX3Rva2VuX3N0YXR1cyI6ZmFsc2UsImlhdCI6MTYyODA3OTM5Miwic2VydmljZV90b2tlbl9pZCI6IiIsImF1ZCI6ImExOTU1MDkyNDE4YjBhZmQ3MTg4ZjA5ODE4Zjg0NGFkNWMyYTQ2ZGFjZGM0NzRmYjQ1ZmUwZjRlMGZhMDFkOTAiLCJpc19nYXRld2F5IjpmYWxzZSwibmJmIjoxNjI4MDc5MzkyLCJ0eXBlIjoibWV0YSIsImlzX3dhcnAiOmZhbHNlLCJhdXRoX3N0YXR1cyI6Ik5PTkUifQ.dRiTcWHpHQCBOUjkHnUU8xpRWeFacr7rQY1xn37o-Yww7PurqyDOMTBp_KcsJcGxOj1baqrz5gnftAShwtWAxr8lTrt35Kip8Bz70MDJp1uTXbLyJ5009iDrLF4S3Mb00I4dUZuchf1aB0M1ktgQ_eQW_eJHyi-05xrh5H2X2iWnhPywV4PP1Itwq7MpMaJAS01-CpJhoE9KQAWW6SJjCqbuxlayJn2J9nmUI4FytbZSQMnBdP6TU0Felv3ZEZ-F4kW_7Mr5E-7M9e-InRCIQn4bogi6TMvIAx_GdcO2JJLbeEjsTZDEwcEwx7fppz1U3vBozffp4cwDU940n4x0-A&v=60142ad2
+                                            </strong>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <strong>171.123.143.38</strong>
+                                    </td>
+                                    <td>
+                                        <strong> Threat Feed </strong>
+                                    </td>
+                                    <td>
+                                        <strong> 20 </strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background-color: #88ce4f;">Low</span>
+                                    </td>
+                                    <td>
+                                        <strong> 2021-04-02 08:44</strong>
+                                    </td>
+                                    <td class="text-nowrap text-center">
+                                        <a target="_blank" href="https://sosecure.cloudflareaccess.com/cdn-cgi/access/login/www.sosecure.co.th?kid=a1955092418b0afd7188f09818f844ad5c2a46dacdc474fb45fe0f4e0fa01d90&redirect_url=%2Fwp-login.php&meta=eyJraWQiOiJkZjk5ZTBmNzYwYmViYmE2M2UzZTQwMzgwZTlmYTBiNTBkMzI4YjUxMmIzYzBmZjQzMWFhMTQ0NjY5OWU4MGM0IiwiYWxnIjoiUlMyNTYiLCJ0eXAiOiJKV1QifQ.eyJzZXJ2aWNlX3Rva2VuX3N0YXR1cyI6ZmFsc2UsImlhdCI6MTYyODA3OTM5Miwic2VydmljZV90b2tlbl9pZCI6IiIsImF1ZCI6ImExOTU1MDkyNDE4YjBhZmQ3MTg4ZjA5ODE4Zjg0NGFkNWMyYTQ2ZGFjZGM0NzRmYjQ1ZmUwZjRlMGZhMDFkOTAiLCJpc19nYXRld2F5IjpmYWxzZSwibmJmIjoxNjI4MDc5MzkyLCJ0eXBlIjoibWV0YSIsImlzX3dhcnAiOmZhbHNlLCJhdXRoX3N0YXR1cyI6Ik5PTkUifQ.dRiTcWHpHQCBOUjkHnUU8xpRWeFacr7rQY1xn37o-Yww7PurqyDOMTBp_KcsJcGxOj1baqrz5gnftAShwtWAxr8lTrt35Kip8Bz70MDJp1uTXbLyJ5009iDrLF4S3Mb00I4dUZuchf1aB0M1ktgQ_eQW_eJHyi-05xrh5H2X2iWnhPywV4PP1Itwq7MpMaJAS01-CpJhoE9KQAWW6SJjCqbuxlayJn2J9nmUI4FytbZSQMnBdP6TU0Felv3ZEZ-F4kW_7Mr5E-7M9e-InRCIQn4bogi6TMvIAx_GdcO2JJLbeEjsTZDEwcEwx7fppz1U3vBozffp4cwDU940n4x0-A&v=60142ad2" class="btn btn-info btn-xs">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+
                             </tbody>
                         </table>
                     </div>
@@ -193,67 +429,99 @@
 
 <script>
 
+active_btn('#btngroup_sort_by .btn-grey');
+active_btn('#filter-type .btn-grey');
+
+
+if($('.filter_agent_agent').hasClass('active')){
+    $('#filter_alert_main').hide();
+    $('#filter_agent_main').show();
+} else if($('#category_btn').hasClass('active')){
+    $('#filter_alert_main').show();
+    $('#filter_agent_main').hide();
+}else if($('#btn_search_all').hasClass('active')){
+    $('#filter_alert_main').hide();
+    $('#filter_agent_main').hide();
+}
+
+$('#btngroup_sort_by .btn-grey').on('click',function(){
+    if($('.filter_agent_agent').hasClass('active')){
+    $('#filter_alert_main').hide();
+    $('#filter_agent_main').show();
+} else if($('.filter_agent_alert ').hasClass('active')){
+    $('#filter_alert_main').show();
+    $('#filter_agent_main').hide();
+}else if($('#btn_search_all').hasClass('active')){
+    $('#filter_alert_main').hide();
+    $('#filter_agent_main').hide();
+}
+});
+
 $('#table-phishing-template').DataTable();
 
 function mychart(myid){
     const chart_top_source = Highcharts.chart(myid, {
-    chart: {
-        type: 'column'
-    },
-
-    title: {
-        text: ''
-    },
-
-    xAxis: {
-        categories: ['1', '2', '3', '4', '5']
-    },
-
-    yAxis: {
-        allowDecimals: false,
-        min: 0,
         title: {
-            text: null
-        }
-    },
-
-    tooltip: {
-        formatter: function () {
-            return '<b>' + this.x + '</b><br/>' +
-                this.series.name + ': ' + this.y + '<br/>' +
-                'Total: ' + this.point.stackTotal;
-        }
-    },
-
-    plotOptions: {
-        column: {
-            stacking: 'normal'
+            text: ''
         },
-        dataLabels: {
-            enabled: false,
-            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+        yAxis: {
+            title: {
+                text: ''
+            }
+        },
+        xAxis: {
+            accessibility: {
+                rangeDescription: 'Range: 2010 to 2017'
+            }
+        },
+
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            enabled: false
+        },
+        plotOptions: {
+            series: {
+                label: {
+                    connectorAllowed: false
+                },
+                pointStart: 2010
+            }
+        },
+
+
+        series: [{
+            name: 'Installation',
+            data: [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175]
+        }, {
+            name: 'Manufacturing',
+            data: [24916, 24064, 29742, 29851, 32490, 30282, 38121, 40434]
+        }, {
+            name: 'Sales & Distribution',
+            data: [11744, 17722, 16005, 19771, 20185, 24377, 32147, 39387]
+        }, {
+            name: 'Project Development',
+            data: [null, null, 7988, 12169, 15112, 22452, 34400, 34227]
+        }, {
+            name: 'Other',
+            data: [12908, 5948, 8105, 11248, 8989, 11816, 18274, 18111]
+        }],
+
+        responsive: {
+            rules: [{
+                condition: {
+                    maxWidth: 500
+                },
+                chartOptions: {
+                    legend: {
+                        layout: 'horizontal',
+                        align: 'center',
+                        verticalAlign: 'bottom'
+                    }
+                }
+            }]
         }
-    },
-    legend: {
-        enabled: false
-    },
-    series: [{
-        name: '123',
-        data: [5, 3, 4, 7, 2],
-        stack: 'male'
-    }, {
-        name: '123',
-        data: [3, 4, 4, 2, 5],
-        stack: 'male'
-    }, {
-        name: '123',
-        data: [2, 5, 6, 2, 1],
-        stack: 'female'
-    }, {
-        name: '123',
-        data: [3, 0, 4, 4, 3],
-        stack: 'female'
-    }]
     });
 }
 
@@ -291,13 +559,15 @@ function circle_chart(id){
         series: [{
             colorByPoint: false,
             data: [
-            {  name: 'Type', y: 5, color: '#e64732'}, 
-            {  name: 'Type',  y: 4 , color: '#fcc838'}, 
-            {  name: 'Type', y: 4, color: '#00dcff'  }, 
+            {  name: 'Referrer', y: 5, color: '#e64732'}, 
+            {  name: 'Threat Feed',  y: 4 , color: '#fcc838'}, 
+            {  name: 'Domain name', y: 4, color: '#00dcff'  }, 
+            {  name: 'other', y: 4, color: '#c1c0c0'  }, 
             ]
         }],
     });
 }
+
 
 circle_chart('chart-type');
 mychart('chart-timeline');

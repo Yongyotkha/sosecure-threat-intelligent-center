@@ -1,28 +1,206 @@
 @extends('layouts.app')
+
+<style>
+    .dropdown-menu {
+        right: 0 !important;
+        left: unset !important;
+    }
+</style>
 @section('content')
 
 <section id="content" class="bg">
     <section class="vbox">
-        <header class="header bg-white b-b b-light" style="display: flex;justify-content:space-between;">
-            <div class="bc-head">Agent Management</div>
-            <div class="max-w-select" style="margin-top: 8px;">
-                <select name="site" id="site" class="select2-option form-control select-site"
-                    onchange="changeSite(value)">
-                    <option value="0" selected>All Site</option>
-                    {{-- @if ($site_settings)
+        <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+            <div class="header-flex-overflow m-t-10">
+                <div class="fwb-16">
+                    <span>
+                        Agent Management
+                    </span>
+                </div>
 
-                    @foreach ($site_settings as $site_settings)
-                    <option value="{{$site_settings->code}}">{{$site_settings->name}}
-                    </option>
-                    @endforeach
+                <div class="ml-2 text-right">
+                    {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
+                    <div class="text-left max-w-select m-r-xs" style="display:inline-block">
+                        <select name="site" id="site" class="text-left select2-option form-control select-site" onchange="changeSite(value)">
+                            <option value="">All Site</option>
+                            {{-- @if ($site_settings)
 
-                    @endif --}}
-                </select>
+                            @foreach ($site_settings as $site_settings)
+                            <option value="{{$site_settings->id}}">{{$site_settings->name}}
+                            </option>
+                            @endforeach
+
+                            @endif --}}
+                        </select>
+                    </div>
+                    
+                    <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                        <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                    </a>
+
+                </div>
             </div>
         </header>
 
         {{-- Tab Content --}}
         <section class="scrollable wrapper">
+
+            <section class="panel panel-default" id="hide-advance-search" style="display: none;">
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <i class="fas fa-filter"></i> Filter
+                        </div>
+                </header>
+                <div class="panel-body" style="padding: 0 !important">
+                    <div class="container-fluid" style="padding: 2rem;">
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div>
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">Keyword</label>
+                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                            placeholder="Search">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 mb-1">
+                                <h5 class="font-weight-bold">Filter By</h5>
+                                <div id="btngroup_sort_by" class="btn-group special mb-2">
+                                    <button class="btn btn-grey filter_agent_all active" value="" id="btn_search_all">
+                                        <span> All </span>
+                                    </button>
+                                    <button class="btn filter_agent_alert btn-grey" value="alert">
+                                        <span> Alert </span>
+                                    </button>
+                                    <button class="btn filter_agent_agent btn-grey" value="agent">
+                                        <span> Agent </span>
+                                    </button>
+                                </div>
+                            </div>
+                            {{-- <div class="col-lg-3 col-md-3 mb-1">
+                                <div>
+                                    <h5 class="font-weight-bold">Alert</h5>
+                                    <div id="filter-alert" class="btn-group special">
+                                        <button class="btn btn-grey check_alert active" id="all_alert" value="">
+                                            <span> All </span>
+                                        </button>
+                                        <button class="btn btn-grey check_alert" value="1">
+                                            <span> Active </span>
+                                        </button>
+                                        <button class="btn btn-grey check_alert" value="2">
+                                            <span> Inactive </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div> --}}
+                        </div>
+
+                        <div id="filter_alert_main" class="row" style="display: none">
+                            <div class="col-lg-4">
+                                <div>
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">Site Name</label>
+                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                            placeholder="Search">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div>
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">Description</label>
+                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                            placeholder="Search">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <label for="" class="">Description</label>
+                                <div id="filter-alert" class="btn-group special">
+                                    <button class="btn btn-grey check_alert active" id="all" value="">
+                                        <span> All </span>
+                                    </button>
+                                    <button class="btn btn-grey check_alert" value="1">
+                                        <span> Scan </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="filter_agent_main" class="row"  style="display: none">
+                            <div class="col-lg-3">
+                                <div>
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">Site Name</label>
+                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                            placeholder="Search">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div>
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">Device Name</label>
+                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                            placeholder="Search">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div>
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">IP</label>
+                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                            placeholder="Search">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="" class="">OS Type</label>
+                                <div id="filter-alert" class="btn-group special">
+                                    <button class="btn btn-grey check_os_type active" id="all_os" value="">
+                                        <span> All </span>
+                                    </button>
+                                    <button class="btn btn-grey check_os_type" value="1">
+                                        <span> Scan </span>
+                                    </button>
+                                    <button class="btn btn-grey check_os_type" value="1">
+                                        <span> Window </span>
+                                    </button>
+                                </div>
+                            </div>
+
+                         
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-lg-12 text-right">
+                            <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
+                                <i class="fas fa-search"></i>
+                                @langapp('apply')
+                            </button>
+                            <button type="button" id="btn_rss_news_reset" class="btn btn-default btn-responsive btn-fz-13"
+                                style="white-space: nowrap">
+                                <i class="fas fa-broom"></i>
+                                <span> Clear </span>
+                            </button>
+                            <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                <i class="fas fa-times"></i>
+                                <span> Close </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <div>
                 <ul class="list-agt">
                     <li>
@@ -66,10 +244,10 @@
                             <div class="col-lg-6 mb-3">
                                 <div class="agt-main-box">
                                     <div class="agt-header">
-                                        Device Type
+                                        Incident Type
                                     </div>
                                     <div class="agt-body">
-                                        <div id="chart-device-type" style="height: 250px;"></div>
+                                        <div id="chart-incident-type" style="height: 250px;"></div>
                                     </div>
                                 </div>
                                 
@@ -86,16 +264,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-lg-6 mb-3">
-                                <div class="agt-main-box">
-                                    <div class="agt-header">
-                                        Incident Type
-                                    </div>
-                                    <div class="agt-body">
-                                        <div id="chart-incident-type" style="height: 250px;"></div>
-                                    </div>
-                                </div>
-                            </div>
+
                             <div class="col-lg-6 mb-3">
                                 <div class="agt-main-box">
                                     <div class="agt-header">
@@ -106,6 +275,18 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="col-lg-6 mb-3">
+                                <div class="agt-main-box">
+                                    <div class="agt-header">
+                                        Top Rule
+                                    </div>
+                                    <div class="agt-body">
+                                        <div id="chart-top-rule" style="height: 250px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                       
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -243,8 +424,24 @@
                         </div>
                     </div>
                 </div>
+
+
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="agt-main-box">
+                            <div class="agt-header">
+                                Timeline
+                            </div>
+                            <div class="agt-body">
+                                <div id="chart-time-line" style="height: 250px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
+         
 
 
             <div class="container-fluid nopadding">
@@ -252,7 +449,7 @@
                     <div class="col-md-12">
                         <div class="tabbable">
                             <ul class="nav nav-tabs nav-tabs-highlight">
-                                <li class="active"><a href="#tab_acvt" data-toggle="tab">Activities</a></li>
+                                <li class="active"><a href="#tab_acvt" data-toggle="tab">Alert</a></li>
                                 <li><a href="#tab_agent" data-toggle="tab">Agent</a></li>   
                                 <li><a href="#tab_schedule" data-toggle="tab">Schedule Task</a></li>   
                             </ul>
@@ -263,7 +460,7 @@
                                         <header class="panel-heading font-bold panel-header-blue">
                                             <div class="row">
                                                 <div class="col-xs-12">
-                                                    <i class="fas fa-table"></i> Table Activities
+                                                    <i class="fas fa-table"></i> Table Alert
                                                 </div>
                                             </div>
                                         </header>
@@ -333,16 +530,13 @@
                                                             </th>
                                                             <th>Site Name</th>
                                                             <th>Device Name</th>
-                                                            <th>Owned By</th>
                                                             <th>OS Type</th>
                                                             <th>OS Description</th>
                                                             <th>System Info</th>
-                                                            {{-- <th>User Name</th>
-                                                            <th>Email</th> --}}
                                                             <th>Domain</th>
                                                             <th>IP</th>
                                                             <th>Last Online</th>
-                                                            {{-- <th class="text-center">Action</th> --}}
+                                                            <th class="text-center">Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -357,9 +551,6 @@
                                                             </td>
                                                             <td>
                                                                 <b>DESKTOP-KJAK36N</b>
-                                                            </td>
-                                                            <td>
-                                                                <b>Corporate</b>
                                                             </td>
                                                             <td>
                                                                 <div class="device-name-txt">
@@ -397,48 +588,22 @@
                                                             <td>
                                                                 <b>04-08-2021 09:31:00 AM</b>
                                                             </td>
-                                                            {{-- <td class="text-center">
-                                                                <a href="#" class="btn btn-info btn-xs">
-                                                                    <i class="fas fa-eye"></i>
-                                                                </a>
-                                                            </td> --}}
-                                                        </tr>
-
-                                                        {{-- <tr>
-                                                            <td>
-                                                                <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
-                                                                    <span class="label-text"></span>
-                                                                </label>
-                                                            </td>
-                                                            <td>
-                                                                <div class="device-name-txt">
-                                                                    <div class="icon-devices">
-                                                                        <i class="fab fa-windows"></i>
-                                                                    </div>
-                                                                    <b class="text-info">Laptop</b>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <b>Corporate</b>
-                                                            </td>
-                                                            <td>
-                                                                <b>invite</b>
-                                                            </td>
-                                                            <td>
-                                                                <b>admin</b>
-                                                            </td>
-                                                            <td>
-                                                                <b>admin@zylker.com</b>
-                                                            </td>
-                                                            <td>
-                                                                <b>MDM</b>
-                                                            </td>
                                                             <td class="text-center">
-                                                                <a href="#" class="btn btn-info btn-xs">
-                                                                    <i class="fas fa-eye"></i>
-                                                                </a>
+                                                                <div class="btn-group">
+                                                                    <button class="btn btn-info btn-xs dropdown-toggle" data-toggle="dropdown">
+                                                                        <i class="fas fa-ellipsis-h"></i>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu">
+                                                                      <li><a href=""><i class="fas fa-power-off"></i> Restrat Service</a></li>
+                                                                      <li><a href=""><i class="fas fa-search"></i> Quick Scan</a></li>
+                                                                      <li><a href=""><i class="fas fa-stop-circle"></i> Stop Service</a></li>
+                                                                      <li><a href=""><i class="fas fa-search"></i> Scan Yara</a></li>
+                                                                      <li><a href=""><i class="fas fa-eye"></i> View Log Data</a></li>
+                                                                      <li><a href=""><i class="fas fa-eye"></i> View Log Error</a></li>
+                                                                    </ul>
+                                                                  </div>
                                                             </td>
-                                                        </tr> --}}
+                                                        </tr>
 
                                                     </tbody>
                                                 </table>
@@ -446,6 +611,8 @@
                                         </div>
                                     </section>
                                 </div>
+
+                            
 
                                 <div class="tab-pane" id="tab_schedule">
                                     <section class="panel panel-default">
@@ -558,10 +725,12 @@
 @include('stacks.css.form')
 @include('stacks.css.datepicker')
 @include('stacks.css.summernote')
-{{-- @include('stacks.css.highchart') --}}
-@include('stacks.css.multitext')
+@include('stacks.css.highchart')
+
 @include('stacks.css.c3')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
+
+@include('stacks.css.multitext')
 @endpush
 
 @push('pagescript')
@@ -574,20 +743,49 @@
 @include('stacks.js.daterangpicker')
 @include('stacks.js.activebutton')
 @include('stacks.js.advanced_search')
-
-@include('stacks.js.multitext')
+@include('stacks.js.highchart')
 @include('stacks.js.c3')
+@include('stacks.js.multitext')
 
 <script>
 
-$( ".text-trucate-ovf").each(function() {
-$(this).multiTextToggleCollapse({
-    line: 2
-    });
+active_btn('#groupby-btn .btn-grey');
+active_btn('#groupby-status .btn-grey');
+active_btn('#btngroup_sort_by .btn-grey');
+
+if($('.filter_agent_agent').hasClass('active')){
+    $('#filter_alert_main').hide();
+    $('#filter_agent_main').show();
+} else if($('#category_btn').hasClass('active')){
+    $('#filter_alert_main').show();
+    $('#filter_agent_main').hide();
+}else if($('#btn_search_all').hasClass('active')){
+    $('#filter_alert_main').hide();
+    $('#filter_agent_main').hide();
+}
+
+$('#btngroup_sort_by .btn-grey').on('click',function(){
+    if($('.filter_agent_agent').hasClass('active')){
+    $('#filter_alert_main').hide();
+    $('#filter_agent_main').show();
+} else if($('.filter_agent_alert ').hasClass('active')){
+    $('#filter_alert_main').show();
+    $('#filter_agent_main').hide();
+}else if($('#btn_search_all').hasClass('active')){
+    $('#filter_alert_main').hide();
+    $('#filter_agent_main').hide();
+}
 });
 
+
+
 $('#table-activities-template').DataTable();
-$('#table-agent-template').DataTable();
+
+$('#table-agent-template').DataTable({
+    "fnDrawCallback": function( oSettings ) {
+        multi_readmore()
+    },
+});
 $('#table-schedule-template').DataTable();
 
 function chart_c3(id,value,score_mid) {
@@ -609,13 +807,138 @@ function chart_c3(id,value,score_mid) {
     });
 }
 
-chart_c3('#chart-device-type', [['Desktop', 30]],7);
+function chart_bar(id){
+    Highcharts.chart(id, {
+        chart: {
+            type: 'column',
+                scrollablePlotArea: {
+                minWidth: 400,
+            },
+        },
+        title: {
+            text: null
+        },
+        xAxis: {
+            type: 'category',
+            crosshair: true,
+            labels: {
+                overflow: 'justify',
+                autoRotation: false,
+                textAlign: 'center',
+            }
+    
+        },
+        yAxis: {
+            min: 0,
+            title: {
+            text: 'Values'
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            },
+            series:{
+                pointWidth: 30,
+                color : '#ffc107',
+                align: 'center',
+            },
+            style:{
+                background: '#fff'
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        series: [{
+            name: 'Population',
+            data: [
+                [ 'Top Rule1',  100],
+                [ 'Top Rule2',  30],
+                [ 'Top Rule3',  40],
+            ],
+            dataLabels: {
+                enabled: true,
+                color: '#333',
+                align: 'center',
+                format: '{point.y{{--:.1f--}}}',
+                y: 0, 
+                style: {
+                    fontSize: '13px',
+                    fontFamily: 'Verdana, sans-serif',
+                }
+            }
+        }]
+    });
+}
+
+function timeline_chart(id){
+    Highcharts.chart(id, {
+        title: {
+            text: ''
+        },
+        yAxis: {
+            title: {
+            text: ''
+            },
+            plotLines: [{
+                color: '#FF0000',
+            }]
+        },
+
+        xAxis: {
+            accessibility: {
+            rangeDescription: 'Range: 2010 to 2017'
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            enabled: false,
+        },
+
+        plotOptions: {
+            series: {
+            label: {
+                connectorAllowed: false
+            },
+            pointStart: 0
+            }
+        },
+
+        series: [{
+            name: 'Installation',
+            data: [143934, 52503, 57177, 69658, 97031, 119931, 137133, 154175],
+            type: 'area',
+            fillColor: '#c8dcf17d',
+            },
+            {
+            name: 'Installation2',
+            fillColor: '#014f9a9e',
+            color: '#014f9a',
+            data: [14393, 2503, 7177, 9658, 7031, 19931, 13133, 14175]
+            }
+        ]
+    });
+}
+
 chart_c3('#chart-platform-summary', [['Linux', 30],['Window',10]],7);
 chart_c3('#chart-incident-type', [['Corporate', 42.9],['Personal', 57.1]],7);
 chart_c3('#chart-serverity', [['White Listed', 273],['Blacklisted', 50]],275);
 
+chart_bar('chart-top-rule');
 
-
+timeline_chart('chart-time-line');
 
 </script>
 
