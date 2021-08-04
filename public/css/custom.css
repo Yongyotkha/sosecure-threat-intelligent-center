@@ -5397,3 +5397,10 @@ input.form-policy[type=password] {
     border-radius: 50%;
     overflow: hidden;
 }
+
+.text-elip-phi{
+    max-width: 470px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

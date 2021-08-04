@@ -424,8 +424,24 @@
                         </div>
                     </div>
                 </div>
+
+
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="agt-main-box">
+                            <div class="agt-header">
+                                Timeline
+                            </div>
+                            <div class="agt-body">
+                                <div id="chart-time-line" style="height: 250px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
+         
 
 
             <div class="container-fluid nopadding">
@@ -595,6 +611,8 @@
                                         </div>
                                     </section>
                                 </div>
+
+                            
 
                                 <div class="tab-pane" id="tab_schedule">
                                     <section class="panel panel-default">
@@ -863,12 +881,64 @@ function chart_bar(id){
     });
 }
 
+function timeline_chart(id){
+    Highcharts.chart(id, {
+        title: {
+            text: ''
+        },
+        yAxis: {
+            title: {
+            text: ''
+            },
+            plotLines: [{
+                color: '#FF0000',
+            }]
+        },
+
+        xAxis: {
+            accessibility: {
+            rangeDescription: 'Range: 2010 to 2017'
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            enabled: false,
+        },
+
+        plotOptions: {
+            series: {
+            label: {
+                connectorAllowed: false
+            },
+            pointStart: 0
+            }
+        },
+
+        series: [{
+            name: 'Installation',
+            data: [143934, 52503, 57177, 69658, 97031, 119931, 137133, 154175],
+            type: 'area',
+            fillColor: '#c8dcf17d',
+            },
+            {
+            name: 'Installation2',
+            fillColor: '#014f9a9e',
+            color: '#014f9a',
+            data: [14393, 2503, 7177, 9658, 7031, 19931, 13133, 14175]
+            }
+        ]
+    });
+}
+
 chart_c3('#chart-platform-summary', [['Linux', 30],['Window',10]],7);
 chart_c3('#chart-incident-type', [['Corporate', 42.9],['Personal', 57.1]],7);
 chart_c3('#chart-serverity', [['White Listed', 273],['Blacklisted', 50]],275);
 
 chart_bar('chart-top-rule');
 
+timeline_chart('chart-time-line');
 
 </script>
 
