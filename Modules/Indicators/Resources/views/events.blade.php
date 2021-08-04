@@ -598,27 +598,32 @@
                         inner = `  
                                 <div>
                                     <strong>Actor : </strong>
+                                    <span style="display: inline-flex;align-items: center;">
                         `;
                         for(let rows in row.actor)
                         {
                             let array_rows = 1;
                             const data_actor = row.actor[rows];
                         inner += `
-                                    <span style="display: inline-flex;align-items: center;"> 
-                                        <div>
-                                            <img class="icon_sm_actor m-r-xs"  src="${row.logo[rows]}">
-                                        </div>`;
+                                     
+                                        `;
                                         if(array_rows == row.count_actor)
                                         {
                         inner += `
+                                        <div>
+                                            <img class="icon_sm_actor m-r-xs"  src="${row.logo[rows]}">
+                                        </div>
                                         <a href="/actor/detail?_id=${data_actor.adversary_name}&mode=cve">
                                             ${data_actor.adversary_name}
-                                        </a>
+                                        </a> 
                         `;
                                         }
                                         else
                                         {
                         inner += `      
+                                        <div>
+                                            <img class="icon_sm_actor m-r-xs"  src="${row.logo[rows]}">
+                                        </div>
                                         <a href="/actor/detail?_id=${data_actor.adversary_name}&mode=cve">
                                             ${data_actor.adversary_name}
                                         </a> , 
@@ -626,10 +631,10 @@
                                         }
                                 array_rows++;
                                         
+                        }
                         inner += `  </span>
                                 </div>
                         `;
-                        }
                     }
                     if(row.count_camp > 0)
                     {
@@ -707,7 +712,7 @@
                 render: function (data, type, row) {
                     var inner = '';
                     inner += '<div style="display:flex;flex-direction:column;">';
-                    inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.modal_tag')}}'+'?pulse_id='+row.pulse_id+'" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Add Actor</a>';
+                    inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.modal_tag')}}'+'?pulse_id='+row.pulse_id+'" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
                     inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="m-t-xs btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
                     inner += '</div>';
                     return inner;

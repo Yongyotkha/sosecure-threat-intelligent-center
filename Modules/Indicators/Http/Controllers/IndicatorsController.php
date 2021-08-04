@@ -2567,7 +2567,8 @@ public function tableEvents(Request $request)
         $query_actor = [
             'pulse_id' => $request -> pulse_id,
             'mode' => 'indicator',
-            'join' => 'actor'
+            'join' => 'actor',
+            'delete_at' => null
         ];
         $options_actor = [];
         $connection_actor = $select_actors->find($query_actor,$options_actor);
@@ -2582,16 +2583,25 @@ public function tableEvents(Request $request)
         }
 
         // dd($data);
-
         $query_campainge = [
+            'pulse_id' => $request -> pulse_id,
+            'mode' => 'indicator',
+            'join' => 'campainge',
             'delete_at' => null
         ];
         $option_campainge = [];
 
-        $connection_campainge = $select_campainge->find($query_campainge,$option_campainge);
-        $campainge = $connection_campainge->toArray();
-
-        $data['campainge'] = $campainge;
+        $connection_campainge = $select_actors->find($query_campainge,$option_campainge);
+        
+        if($connection_actor != null)
+        {
+            $campainge = $connection_campainge->toArray();
+            $data['campainge'] = $campainge;
+        } 
+        else
+        {
+            $data['campainge'] = null;
+        }
 
         $query_techniques = FXTechniques::orderBy('group', 'ASC')->get();
         $data['techniques'] = $query_techniques;
@@ -2655,11 +2665,36 @@ public function tableEvents(Request $request)
             $collection_campaign = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
         }
 
+        $query_delete = array(
+            'pulse_id' => $document['pulse_id'],
+            'pulse_name' => $document['name'],
+            'mode' => 'indicator',
+            'join' => 'actor'
+        );
+        $option_delete = [];
+        $result_delete = $insert_adversaries_related->find($query_delete,$option_delete);
+        $final_delete = $result_delete->toArray();
+        $count_actor = count($final_delete);
+
+        if($count_actor > 0)
+        {
+            $update_result_related = $insert_adversaries_related->updateMany(
+                $query_delete,
+                ['$set' => 
+                    [
+                        'delete_at' => $date_now
+                    ]
+                ]
+            );
+        }
+
         if(@$request->category_actor)
         {
+
             foreach($request->category_actor as $data_actor)
             {
                 $add_actor = $data_actor;
+                // dd($add_actor);
                 if(app()->environment('local'))
                 {
                     $indicator_actor_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
@@ -2669,15 +2704,15 @@ public function tableEvents(Request $request)
                     $indicator_actor_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
                 }
                 $query_actor_related = [
-                    'name' => $add_actor
+                    'adversary_uuid' => $add_actor
                 ];
                 $option_actor_related = [];
                 
                 $query_actor = $indicator_actor_related->findOne($query_actor_related,$option_actor_related);
-    
+                // dd($query_actor['name']);
                 $data_actor_related = array(
-                    'adversary_uuid' => $query_actor['adversary_uuid'],
-                    'adversary_name' => $add_actor,
+                    'adversary_uuid' => $add_actor,
+                    'adversary_name' => $query_actor['name'],
                     'pulse_id' => $document['pulse_id'],
                     'pulse_name' => $document['name'],
                     'mode' => 'indicator',
@@ -2693,8 +2728,32 @@ public function tableEvents(Request $request)
             }
         }
 
+        $query_delete_camp = array(
+            'pulse_id' => $document['pulse_id'],
+            'pulse_name' => $document['name'],
+            'mode' => 'indicator',
+            'join' => 'campainge'
+        );
+        $option_delete_camp = [];
+        $result_delete_camp = $insert_adversaries_related->find($query_delete_camp,$option_delete_camp);
+        $final_delete_camp = $result_delete_camp->toArray();
+        $count_camp = count($final_delete_camp);
+
+        if($count_camp > 0)
+        {
+            $update_result_related = $insert_adversaries_related->updateMany(
+                $query_delete_camp,
+                ['$set' => 
+                    [
+                        'delete_at' => $date_now
+                    ]
+                ]
+            );
+        }
+        
         if(@$request->category_campaign)
         {
+
             foreach($request->category_campaign as $data_campaign)
             {
                 $add_campaign = $data_campaign;
