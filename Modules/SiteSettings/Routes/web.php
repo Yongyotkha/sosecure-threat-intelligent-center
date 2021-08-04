@@ -114,6 +114,7 @@ Route::group(
         Route::post('/socialdatas/socialdatas_change_delete', 'DataLeakController@socialdatas_change_delete')->name('socialdatas.socialdatas_change_delete')->middleware('can:menu_items');
         Route::post('/socialdatas/count_keyword', 'DataLeakController@count_keyword')->name('socialdatas.count_keyword')->middleware('can:menu_items');
 
+        Route::get('/agent/{id}', 'AgentController@index')->name('agent.index')->middleware('can:menu_items');
     }
 );
 

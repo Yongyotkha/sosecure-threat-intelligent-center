@@ -31,6 +31,12 @@
         </a>
     </li>
 
+    <li class="{{ $page === 'Agent' ? 'active' : '' }}">
+        <a href="{{route('agent.index', ['id' => $siteSettings->code])}}">
+            Agent
+        </a>
+    </li>
+
 
     
     <li class="{{ $page === 'Credentials' ? 'active' : '' }}">

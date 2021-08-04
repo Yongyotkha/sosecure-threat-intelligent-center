@@ -265,7 +265,7 @@
                                 </div>
 
 
-                                <div id="sec_agent" style="display: none">
+                                {{-- <div id="sec_agent" style="display: none">
                                     <div class="row m-b-md">
     
                                         <div class="col-sm-8">
@@ -308,7 +308,7 @@
                                         </div>
                                     </div>
 
-                                </div>
+                                </div> --}}
 
                             </div>
                             <div class="panel-footer text-right">
@@ -322,6 +322,7 @@
             </section>
     </section>
 
+    <!--
     <div class="modal" id="modal_agent" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
@@ -378,7 +379,7 @@
             </div>
         </div>
     </div>
-
+    -->
 
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen, open" data-target="#nav,html"></a>
 </section>
@@ -396,7 +397,7 @@
 <script>
     $(document).ready(function () {
 
-        $('#os_agent').select2();
+      
 
         $('#select-protocol').select2({
             minimumResultsForSearch: -1
@@ -421,8 +422,10 @@
             $('#sec_agent').hide();
         }
         
+       
     });
 
+    {{-- 
     var select_os = $('#os_agent');
     var ip_private = $('#ip_private');
     var agent_remark = $('#agent_remark');
@@ -488,7 +491,8 @@
         }
     });
 
-    
+    $('#os_agent').select2();
+    --}}
 
     $('ul.role-group-sub').hide();
     function openrole(onck,id){
