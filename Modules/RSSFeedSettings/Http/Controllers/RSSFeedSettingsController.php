@@ -1797,6 +1797,8 @@ class RSSFeedSettingsController extends Controller
                     $RSSNewsCategory -> save();
                 }
             }
+            
+            $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
 
             $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
@@ -1838,7 +1840,6 @@ class RSSFeedSettingsController extends Controller
             if(!empty($request -> actor))
             {
                 $checkSuccess = true;
-                $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
 
 
                 // $update_result_related = $col_fx_otx_adversaries_related->updateMany(
