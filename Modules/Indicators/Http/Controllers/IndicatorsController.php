@@ -1934,60 +1934,80 @@ public function tableEvents(Request $request)
             $cursor = $col_fx_otx_events->find($query,$options);
             $cursor = $cursor->toArray();
 
+            // dd($cursor);
             $data = array();
             $order_number = $start;
             if(!empty($cursor))
             {
-                foreach ($cursor as $document)
+                $name = [];
+                
+                foreach ($cursor as $document_2)
                 {
                     $order_number++;
                     $nestedData['No'] = $order_number;
-                    $nestedData['name'] = $document["name"];
-                    $nestedData['groups'] = explode_val($document["groups"],'groups');
-                    $nestedData['tags'] = explode_val($document["tags"],'tags');
-                    $nestedData['industries'] = explode_val($document["industries"]);
+                    $nestedData['name'] = $document_2["name"];
+                    $nestedData['groups'] = explode_val($document_2["groups"],'groups');
+                    $nestedData['tags'] = explode_val($document_2["tags"],'tags');
+                    $nestedData['industries'] = explode_val($document_2["industries"]);
                     $nestedData['attr'] = '';
-                    $nestedData['attrCount'] = $document["indicator_count"];
-                    $nestedData['public'] = ($document["public"]);
-                    $nestedData['is_modified'] = ($document["is_modified"]);
-                    $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
-                    $nestedData['count_view'] = @$document["count_view"];
-                    $nestedData['pulse_id'] = $document["pulse_id"];
+                    $nestedData['attrCount'] = $document_2["indicator_count"];
+                    $nestedData['public'] = ($document_2["public"]);
+                    $nestedData['is_modified'] = ($document_2["is_modified"]);
+                    $nestedData['modified'] = change_date_utc_to_thai($document_2['modified']);
+                    $nestedData['count_view'] = @$document_2["count_view"];
+                    $nestedData['pulse_id'] = $document_2["pulse_id"];
 
+                    //------------------------------------------------------
                     $DB_MONGO_KEY = env("DB_MONGO_DEV");
                     $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
                     if(app()->environment('local'))
                     {
+                        $collection = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
                         $collection_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
                     }
                     else
                     {
+                        $collection = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
                         $collection_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
                     }
 
                     $query_actor = [
-                        'pulse_id' => $document["pulse_id"],
+                        'pulse_id' => $document_2['pulse_id'],
                         'mode' => 'indicator',
-                        'join' => 'actor'
+                        'join' => 'actor',
+                        'delete_at' => null
                     ];
                     $option_actor = [];
-            
+
                     $result_actor = $collection_related->find($query_actor,$option_actor);
                     $final_actor = $result_actor->toArray();
                     $count_actor = count($final_actor);
-                    
-                    if($count_actor != '0')
+
+                    $nestedData['actor'] = $final_actor;
+                    $nestedData['count_actor'] = $count_actor;
+
+                    foreach(@$final_actor as $sel_data_act)
                     {
-                        // $nestedData['actor'] = $result_actor;
-                        $nestedData['actor'] = $final_actor;
-                        $nestedData['actor_count'] = $count_actor;
+                        $query_sel_act = [
+                            'adversary_uuid' => $sel_data_act['adversary_uuid']
+                        ];
+                        $option_sel_act = [];
+                        $result_sel_act = $collection->findOne($query_sel_act,$option_sel_act);
+                        if(@$result_sel_act['logo'])
+                        {
+                            $nestedData['logo'][] = $result_sel_act['logo'];
+                        }
+                        else
+                        {
+                            $nestedData['logo'][] = '/asset_salepage/images/AgentBasedDetection.png';
+                        }
                     }
 
-
                     $query_camp = [
-                        'pulse_id' => $document["pulse_id"],
+                        'pulse_id' => $document_2['pulse_id'],
                         'mode' => 'indicator',
-                        'join' => 'campainge'
+                        'join' => 'campainge',
+                        'delete_at' => null
                     ];
                     $option_camp = [];
 
@@ -1995,20 +2015,16 @@ public function tableEvents(Request $request)
                     $final_camp = $result_camp->toArray();
                     $count_camp = count($final_camp);
 
-                    if($count_camp != '0')
-                    {
-                        // $nestedData['camp'] = $result_camp;
-                        $nestedData['camp'] = $final_camp;
-                        $nestedData['camp_count'] = $count_camp;
-                    }
-
-                            // <a href="'.route('indicators.events_detail_select',['id' => $document['pulse_id']]).'" 
-                            // class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
+                    $nestedData['camp'] = $final_camp;
+                    $nestedData['count_camp'] = $count_camp;
+                        // <a href="'.route('indicators.events_detail_select',['id' => $document['pulse_id']]).'" 
+                        // class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
 
                     $data[] = $nestedData;
                     
-                    
+
                 }
+                // dd($data);
             }
             $dataOut["draw"] = $draw;
             $dataOut["recordsTotal"] = $cursor_count;

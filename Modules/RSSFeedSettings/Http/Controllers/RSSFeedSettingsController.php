@@ -523,6 +523,27 @@ class RSSFeedSettingsController extends Controller
                 
                 $model[$i]['actor'] = $result_test;
                 $model[$i]['count_result'] = $count_result_test;
+                
+                $logo = [];
+                foreach(@$result_test as $sel_data_act)
+                {
+                    $query_sel_act = [
+                        'adversary_uuid' => $sel_data_act['adversary_uuid']
+                    ];
+                    $option_sel_act = [];
+                    $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
+                    
+                    if(@$result_sel_act['logo'])
+                    {
+                        $logo[] = $result_sel_act['logo'];
+                    }
+                    else
+                    {
+                        $logo[] = '/asset_salepage/images/AgentBasedDetection.png';
+                    }
+                    
+                }
+                $model[$i]['logo'] = $logo;
                 // dd($id);
 
                 $query_camp= [
@@ -673,12 +694,12 @@ class RSSFeedSettingsController extends Controller
                             {
                                 if($array_row == $count_result)
                                 {
-                                    $html .= '<span><img class="icon_sm_actor m-r-xs" src="https://images.unsplash.com/photo-1627301044065-fc950957c311?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"><span>
+                                    $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$model->logo[$i].'"><span>
                                             <a href="/actor/detail?_id='.$model->actor[$i]->adversary_uuid.'&mode=cve">'.$model->actor[$i]->adversary_name.'</a>';
                                 }
                                 else
                                 {
-                                    $html .= '<span><img class="icon_sm_actor m-r-xs" src="https://images.unsplash.com/photo-1627301044065-fc950957c311?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"><span>
+                                    $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$model->logo[$i].'"><span>
                                             <a href="/actor/detail?_id='.$model->actor[$i]->adversary_uuid.'&mode=cve">'.$model->actor[$i]->adversary_name.'</a> , ';
                                 }
                                 $array_row = $array_row+1;
