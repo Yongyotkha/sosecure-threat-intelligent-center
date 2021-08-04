@@ -42,6 +42,7 @@ class DataSettingsController extends Controller
     public function datasetting($id)
     {
         $get_data = $this->siteSettings->get_data($id);
+        // dd($get_data);
         $Menu = Menu::where('deleted_at', null)->whereNotIn('id', [8,9,10])->where('active', 1)->orderBy('order', 'asc')->get();
         $data['site_user_limit_default'] = DB::table("config")->where("config_key", "site_user_limit_default")->first();
         $data['site_domain_limit_default'] = DB::table("config")->where("config_key", "site_domain_limit_default")->first();
@@ -145,6 +146,11 @@ class DataSettingsController extends Controller
                 $SiteSettings->search_api_loookup_limit = $request->search_api_loookup_limit;
             }
 
+            $SiteSettings->allow_agent = $request->allow_agent ? 'Y' : 'N';
+            if ($request->allow_agent_limit) {
+                $SiteSettings->agent_count = (int)$request->allow_agent_limit;
+            }
+
             $SiteSettings->server_log_port = trim($request->port);
             $SiteSettings->server_log_protocol = trim($request->protocol);
             $SiteSettings->server_log_ip = trim($request->ip);
@@ -176,6 +182,7 @@ class DataSettingsController extends Controller
             //     $SiteCategory->category_id = $category;
             //     $SiteCategory->save();
             // }
+
             site_menu_permission::where('site_id', $SiteSettings->id)->delete();
             if ($request->menu) {
                 if (count($request->menu) > 0) {

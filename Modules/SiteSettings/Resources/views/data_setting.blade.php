@@ -208,14 +208,14 @@
                                     <div class="col-lg-2">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" name="allow_agent" value="TRUE">
+                                                <input type="checkbox" name="allow_agent" {{$siteSettings->allow_agent == 'Y' || $siteSettings->allow_agent == null ? 'checked' : '' }} value="TRUE">
                                                 <span class="label-text" data-rel="tooltip" title="">Allow</span>
                                             </label>
                                         </div>
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control touch_spin text-center" name="" value="0"> 
+                                        <input type="text" class="form-control touch_spin text-center" name="allow_agent_limit" value="{{$siteSettings->agent_count}}"> 
                                     </div>
                                 </div>
                                 <hr>
