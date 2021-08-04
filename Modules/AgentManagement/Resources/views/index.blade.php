@@ -28,22 +28,22 @@
                     <li>
                         <div class="agt-card">
                             <span class="agt-score">7</span>
-                            <span class="agt-txt-sm">Enrolled Devices</span>
+                            <span class="agt-txt-sm">Agent</span>
                         </div>
                     </li>
                     <li>
                         <div class="agt-card">
                             <span class="agt-score">7</span>
-                            <span class="agt-txt-sm">Inactive Devices</span>
+                            <span class="agt-txt-sm">Alert</span>
                         </div>
                     </li>
                     <li>
                         <div class="agt-card">
                             <span class="agt-score">5</span>
-                            <span class="agt-txt-sm">Enrollment Pending</span>
+                            <span class="agt-txt-sm">Rule</span>
                         </div>
                     </li>
-                    <li>
+                    {{-- <li>
                         <div class="agt-card">
                             <span class="agt-score">4</span>
                             <span class="agt-txt-sm">Enrolled Users</span>
@@ -54,7 +54,7 @@
                             <span class="agt-score">2</span>
                             <span class="agt-txt-sm">Detected Blacklisted Apps</span>
                         </div>
-                    </li>
+                    </li> --}}
                 </ul>
             </div>
 

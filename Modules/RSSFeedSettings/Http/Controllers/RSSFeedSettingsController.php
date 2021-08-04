@@ -603,7 +603,7 @@ class RSSFeedSettingsController extends Controller
 
 
                 $html .= '<span class="text-trucate-ovf"> <span class="m-r-5 m-l-xs"><b>Category : </b>';
-                $html .= '<span>';
+                $html .= '<span style="word-break: break-all;">';
                 if($model->get_cate=="[]"){
                     $html .= 'None';
                 }else{
