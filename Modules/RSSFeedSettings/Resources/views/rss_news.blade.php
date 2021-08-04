@@ -291,7 +291,7 @@ use Carbon\Carbon;
                                                     </label>
                                                 </th>
                                                 {{-- <th>Site Name</th> --}}
-                                                <th>Content</th>
+                                                <th style="width: 70%">Content</th>
                                                 {{-- <th>Source</th>
                                                 <th>Title</th>
                                                 <th>Category</th>
