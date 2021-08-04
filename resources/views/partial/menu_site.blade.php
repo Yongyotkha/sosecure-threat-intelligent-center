@@ -24,19 +24,11 @@
     </li>
     
 
-
     <li class="{{ $page === 'Users_in_site' ? 'active' : '' }}">
         <a href="{{route('userssettings.index', ['id' => $siteSettings->code])}}">
             Users
         </a>
     </li>
-
-    <li class="{{ $page === 'Agent' ? 'active' : '' }}">
-        <a href="{{route('agent.index', ['id' => $siteSettings->code])}}">
-            Agent
-        </a>
-    </li>
-
 
     
     <li class="{{ $page === 'Credentials' ? 'active' : '' }}">
@@ -51,6 +43,14 @@
             Assets
         </a>
     </li>
+
+    @if($siteSettings->allow_agent == 'Y')
+    <li class="{{ $page === 'Agent' ? 'active' : '' }}">
+        <a href="{{route('agent.index', ['id' => $siteSettings->code])}}">
+            Agent
+        </a>
+    </li>
+    @endif
 
 
     <li class="{{ $page === 'Keyword Setting' ? 'active' : '' }}">
