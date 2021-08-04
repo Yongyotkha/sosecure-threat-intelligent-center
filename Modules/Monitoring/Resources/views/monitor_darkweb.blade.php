@@ -37,6 +37,8 @@
                                     <option value="domain">Domain</option>
                                     <option value="email">Email</option>
                                     <option value="ip">IP</option>
+                                    <option value="ccn">Credit Cards</option>
+                                    <option value="leak">Data Leaks</option>
                                 </select>
                             </div>
                             <div class="col-lg-4 col-md-12 col-sm-12">
