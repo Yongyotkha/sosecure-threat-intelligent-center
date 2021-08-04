@@ -331,13 +331,18 @@
                                                                     <span class="label-text"></span>
                                                                 </label>
                                                             </th>
+                                                            <th>Site Name</th>
                                                             <th>Device Name</th>
                                                             <th>Owned By</th>
-                                                            <th>Entollment Type</th>
-                                                            <th>User Name</th>
-                                                            <th>Email</th>
+                                                            <th>OS Type</th>
+                                                            <th>OS Description</th>
+                                                            <th>System Info</th>
+                                                            {{-- <th>User Name</th>
+                                                            <th>Email</th> --}}
                                                             <th>Domain</th>
-                                                            <th class="text-center">Action</th>
+                                                            <th>IP</th>
+                                                            <th>Last Online</th>
+                                                            {{-- <th class="text-center">Action</th> --}}
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -348,36 +353,58 @@
                                                                 </label>
                                                             </td>
                                                             <td>
-                                                                <div class="device-name-txt">
-                                                                    <div class="icon-devices">
-                                                                        <i class="fab fa-apple"></i>
-                                                                    </div>
-                                                                    <b class="text-info">Ipad</b>
-                                                                </div>
+                                                                <b>Sosecure</b>
+                                                            </td>
+                                                            <td>
+                                                                <b>DESKTOP-KJAK36N</b>
                                                             </td>
                                                             <td>
                                                                 <b>Corporate</b>
                                                             </td>
                                                             <td>
-                                                                <b>invite</b>
+                                                                <div class="device-name-txt">
+                                                                    <div class="icon-devices">
+                                                                        <i class="fab fa-apple"></i>
+                                                                    </div>
+                                                                    <b class="text-info">Linux</b>
+                                                                </div>
                                                             </td>
                                                             <td>
-                                                                <b>admin</b>
+                                                                <div class="text-trucate-ovf">
+                                                                    OS Name: Microsoft Windows 10 Pro 
+                                                                    OS Version:  10.0.19042 N/A Build 19042 
+                                                                    OS Manufacturer:  Microsoft Corporation 
+                                                                    OS Configuration: Standalone Workstation 
+                                                                    OS Build Type:  Multiprocessor Free 
+                                                                </div>
                                                             </td>
                                                             <td>
-                                                                <b>admin@zylker.com</b>
+                                                                <div class="text-trucate-ovf">
+                                                                    System Boot Time: 8/2/2021, 2:43:47 AM 
+                                                                    System Manufacturer: LENOVO
+                                                                    System Model:  20N8S0KB00
+                                                                    System Type:   x64-based PC
+                                                                    Processor(s):  1 Processor(s) Installed.
+                                                                    [01]: Intel64 Family 6 Model 142 Stepping 12 GenuineIntel
+                                                                </div>
                                                             </td>
                                                             <td>
-                                                                <b>MDM</b>
+                                                                <b>WORKGROUP</b>
                                                             </td>
-                                                            <td class="text-center">
+                                                            <td>
+                                                                <b>192.168.1.2  </b>
+                                                            </td>
+                                                            <td>
+                                                                <b>04-08-2021 09:31:00 AM</b>
+                                                            </td>
+                                                            {{-- <td class="text-center">
                                                                 <a href="#" class="btn btn-info btn-xs">
                                                                     <i class="fas fa-eye"></i>
                                                                 </a>
-                                                            </td>
+                                                            </td> --}}
                                                         </tr>
 
-                                                        <tr>
+                                                        {{-- <tr>
                                                             <td>
                                                                 <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
                                                                     <span class="label-text"></span>
@@ -411,7 +438,7 @@
                                                                     <i class="fas fa-eye"></i>
                                                                 </a>
                                                             </td>
-                                                        </tr>
+                                                        </tr> --}}
 
                                                     </tbody>
                                                 </table>
@@ -532,6 +559,7 @@
 @include('stacks.css.datepicker')
 @include('stacks.css.summernote')
 {{-- @include('stacks.css.highchart') --}}
+@include('stacks.css.multitext')
 @include('stacks.css.c3')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @endpush
@@ -546,10 +574,18 @@
 @include('stacks.js.daterangpicker')
 @include('stacks.js.activebutton')
 @include('stacks.js.advanced_search')
+
+@include('stacks.js.multitext')
 @include('stacks.js.c3')
 
 <script>
-    
+
+$( ".text-trucate-ovf").each(function() {
+$(this).multiTextToggleCollapse({
+    line: 2
+    });
+});
+
 $('#table-activities-template').DataTable();
 $('#table-agent-template').DataTable();
 $('#table-schedule-template').DataTable();
@@ -574,7 +610,7 @@ function chart_c3(id,value,score_mid) {
 }
 
 chart_c3('#chart-device-type', [['Desktop', 30]],7);
-chart_c3('#chart-platform-summary', [['iOS', 30],['Linux', 30],['Window',10]],7);
+chart_c3('#chart-platform-summary', [['Linux', 30],['Window',10]],7);
 chart_c3('#chart-incident-type', [['Corporate', 42.9],['Personal', 57.1]],7);
 chart_c3('#chart-serverity', [['White Listed', 273],['Blacklisted', 50]],275);
 
