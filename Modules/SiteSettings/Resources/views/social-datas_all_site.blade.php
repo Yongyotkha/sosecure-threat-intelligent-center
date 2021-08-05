@@ -1001,7 +1001,7 @@ $('.btn').click(function(){
                             }else if(full.serverity=='high'){
                                 return '<span class="badge" style="background-color: #fcc838;">High</span>';
                             }else if(full.serverity=='medium'){
-                                return '<span class="badge" style="background-color: #f2ff15;">Medium</span>';
+                                return '<span class="badge" style="background-color: #f2ff15;color:#333;">Medium</span>';
                             }else if(full.serverity=='low'){
                                 return '<span class="badge" style="background-color: #409967;">Low</span>';
                             }else if(full.serverity=='information'){

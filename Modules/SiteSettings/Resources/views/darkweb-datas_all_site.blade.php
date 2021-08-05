@@ -658,11 +658,11 @@ use Carbon\Carbon;
                     var html_content='<div style="display:flex;align-items:center;">'+new_html+html_img+'<div class="nowrap" style="color: #3869d4;font-weight: 800;display:inline-block;"><strong>'+stripHtml(aData.get_data_leak_feed_one.feedcontent)+'</strong></div></div>';
                 
                   
-                    html_content+= '<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 5px;">'+ val+'</div>';
+                    html_content+= '<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 5px;padding-left: 35px;">'+ val+'</div>';
 
 
     
-                    html_content+='<div class="nowrap" style="padding-top: 22px;">'+ '<strong>Site </strong>'+aData.get_site.name+'&nbsp;&nbsp;&nbsp;<strong>Modified Date </strong>'+aData.get_data_leak_feed_one.feedtimepost;
+                    html_content+='<div class="nowrap" style="padding-top: 22px;padding-left: 35px;">'+ '<strong>Site </strong>'+aData.get_site.name+'&nbsp;&nbsp;&nbsp;<strong>Modified Date </strong>'+aData.get_data_leak_feed_one.feedtimepost;
                     if(aData.get_data_leak_feed_one.feedlink){
                          html_content+= '&nbsp;&nbsp;&nbsp;<b><strong><i class="fas fa-eye"></i>&nbsp;&nbsp;&nbsp; </strong><a href="'+aData.get_data_leak_feed_one.feedlink+'" target="_blank">'+'View Code'+'</a></b>';
                     }
@@ -827,7 +827,7 @@ use Carbon\Carbon;
                             }else if(full.serverity=='high'){
                                 return '<span class="badge" style="background-color: #fcc838;">High</span>';
                             }else if(full.serverity=='medium'){
-                                return '<span class="badge" style="background-color: #f2ff15;">Medium</span>';
+                                return '<span class="badge" style="background-color: #f2ff15;color:#333;">Medium</span>';
                             }else if(full.serverity=='low'){
                                 return '<span class="badge" style="background-color: #409967;">Low</span>';
                             }else if(full.serverity=='information'){
