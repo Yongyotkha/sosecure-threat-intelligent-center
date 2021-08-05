@@ -101,7 +101,7 @@ use Carbon\Carbon;
 
                 <div class="container-fluid" style="margin-bottom:10px;">
                     <div class="row">
-                        <div class="col-md-4 nopadding">
+                        <div class="col-md-6 nopadding">
                             <a href="#" onclick="dataType('compromise')">
                                 <div class="card-dash-compro none-bg none-shadow">
                                     <div class="left-card">
@@ -114,7 +114,7 @@ use Carbon\Carbon;
                                 </div>
                             </a>
                         </div>
-                        <div class="col-md-4 nopadding">
+                        <div class="col-md-6 nopadding">
                             <a href="#" onclick="dataType('darkweb')">
                                 <div class="card-dash-compro none-bg none-shadow">
                                     <div class="left-card">
@@ -127,6 +127,9 @@ use Carbon\Carbon;
                                 </div>
                             </a>
                         </div>
+                    </div>
+
+                    <div class="row m-t-10">
                         <div class="col-md-4 nopadding">
                             <a href="#" onclick="dataType('webserver')">
                                 <div class="card-dash-compro none-bg none-shadow">
@@ -136,6 +139,32 @@ use Carbon\Carbon;
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper ">Endpoint Detection</h3>
                                         <span class="number-card green" id='webserver-count'>{{$webserver}}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4 nopadding">
+                            <a href="#" onclick="">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <div class="left-card">
+                                        <div class="img-icon-card ice">
+                                            <img src="{{asset('images/webserver.png')}}" alt="">
+                                        </div>
+                                        <h3 class="name-dash-text-compro text-dark text-upper">Agent</h3>
+                                        <span class="number-card green" id='agent-count'>4</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4 nopadding">
+                            <a href="#" onclick="">
+                                <div class="card-dash-compro none-bg none-shadow">
+                                    <div class="left-card">
+                                        <div class="img-icon-card ice">
+                                            <img src="{{asset('images/webserver.png')}}" alt="">
+                                        </div>
+                                        <h3 class="name-dash-text-compro text-dark text-upper ">Network</h3>
+                                        <span class="number-card green" id='network-count'>3</span>
                                     </div>
                                 </div>
                             </a>
