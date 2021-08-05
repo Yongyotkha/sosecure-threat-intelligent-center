@@ -60,8 +60,7 @@
                                 <div>
                                     <div class="form-group m-b-md">
                                         <label for="" class="">Keyword</label>
-                                        <input type="text" class="form-control" name="keyword" id="keyword"
-                                            placeholder="Search">
+                                        <input type="text" class="form-control" name="keyword_search" id="keyword_search" placeholder="Search">
                                     </div>
                                 </div>
                             </div>
@@ -71,13 +70,13 @@
                             <div class="col-lg-3 col-md-3 mb-1">
                                 <h5 class="font-weight-bold">Filter By</h5>
                                 <div id="btngroup_sort_by" class="btn-group special mb-2">
-                                    <button class="btn btn-grey filter_agent_all active" value="" id="btn_search_all">
+                                    <button class="btn btn-grey filter_agent_all check_type active" value="" id="btn_search_all">
                                         <span> All </span>
                                     </button>
-                                    <button class="btn filter_agent_alert btn-grey" value="alert">
+                                    <button class="btn filter_agent_alert check_type btn-grey" value="alert">
                                         <span> Alert </span>
                                     </button>
-                                    <button class="btn filter_agent_agent btn-grey" value="agent">
+                                    <button class="btn filter_agent_agent check_type btn-grey" value="agent">
                                         <span> Agent </span>
                                     </button>
                                 </div>
@@ -105,7 +104,7 @@
                                 <div>
                                     <div class="form-group m-b-md">
                                         <label for="" class="">Site Name</label>
-                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                        <input type="text" class="form-control" name="filter_alert_site_name" id="filter_alert_site_name"
                                             placeholder="Search">
                                     </div>
                                 </div>
@@ -114,7 +113,7 @@
                                 <div>
                                     <div class="form-group m-b-md">
                                         <label for="" class="">Description</label>
-                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                        <input type="text" class="form-control" name="filter_alert_des" id="filter_alert_des"
                                             placeholder="Search">
                                     </div>
                                 </div>
@@ -137,7 +136,7 @@
                                 <div>
                                     <div class="form-group m-b-md">
                                         <label for="" class="">Site Name</label>
-                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                        <input type="text" class="form-control" name="filter_agent_site_name" id="filter_agent_site_name"
                                             placeholder="Search">
                                     </div>
                                 </div>
@@ -146,7 +145,7 @@
                                 <div>
                                     <div class="form-group m-b-md">
                                         <label for="" class="">Device Name</label>
-                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                        <input type="text" class="form-control" name="filter_agent_device" id="filter_agent_device"
                                             placeholder="Search">
                                     </div>
                                 </div>
@@ -155,7 +154,7 @@
                                 <div>
                                     <div class="form-group m-b-md">
                                         <label for="" class="">IP</label>
-                                        <input type="text" class="form-control" name="keyword" id="keyword"
+                                        <input type="text" class="form-control" name="filter_agent_ip" id="filter_agent_ip"
                                             placeholder="Search">
                                     </div>
                                 </div>
@@ -779,7 +778,9 @@
 
 <script>
 
-    var site = null;
+    var keyword_search = null;
+    var check_type = null;
+
     $(document).ready(function(){
         count_head();
         dudit_log_feed();
@@ -816,6 +817,35 @@
         }
     });
 
+    $('.check_type').click(function(){
+        check_type = $(this).val();
+    });
+
+    function search()
+    {
+        var site_val = $('#site').val();
+        keyword_search = $('#keyword_search').val();
+        console.log(check_type);
+        if(check_type == null)
+        {
+            datatable_alert(site_val);
+            datatable_agent(site_val);
+            datatable_schedule(site_val);
+        }
+        else if(check_type == 'alert')
+        {
+        }
+        else if(check_type == 'agent')
+        {
+
+        }
+        else
+        {
+
+        }
+
+    }
+
     function count_head(site_val)
     {
         console.log('count - '+site_val);
@@ -846,30 +876,49 @@
             },
             success:function(response){
                 $('#audit_log_list').empty();
-                let html = ``;
-                for(let rows in response.query)
+                if(response.query.length > 0)
                 {
-                    const data_log = response.query[rows];
-                    html += `
-                            <li>
-                                <div class="w-100per">
-                                    <div class="audit-log-time">
-                                        <span class="audit-by">
-                                            Site : ${data_log.site_name}
-                                        </span>
-                                        <span class="audit-time">
-                                            IP : ${data_log.agent_logs_ip_address}
+                    let html = ``;
+                    for(let rows in response.query)
+                    {
+                        const data_log = response.query[rows];
+                        html += `
+                                <li>
+                                    <div class="w-100per">
+                                        <div class="audit-log-time">
+                                            <span class="audit-by">
+                                                Site : ${data_log.site_name}
+                                            </span>
+                                            <span class="audit-time">
+                                                IP : ${data_log.agent_logs_ip_address}
+                                            </span>
+                                        </div>
+                                        <span class="audit-log-header">
+                                            ${data_log.agent_logs_created} | ${data_log.agent_logs_description}
                                         </span>
                                     </div>
-                                    <span class="audit-log-header">
-                                        ${data_log.agent_logs_created} | ${data_log.agent_logs_description}
-                                    </span>
-                                </div>
-                            </li>
-                        `;
-                }
+                                </li>
+                            `;
+                    }
 
-                $('#audit_log_list').append(html);
+                    $('#audit_log_list').append(html);
+                }
+                else
+                {
+                    let html = ``;
+                        html += `
+                                    <li>
+                                        <div class="w-100per">
+                                            <div class="audit-log-time">
+                                                <span style="text-align:center;">
+                                                    ไม่พบข้อมูล
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                `;
+                    $('#audit_log_list').append(html);
+                }
             }
         });
     }
@@ -891,6 +940,7 @@
                 type: "POST",
                 data:function(d){
                     d.site_id = site_id;
+                    d.keyword_search = keyword_search;
                     return d ;
                 }
             },
@@ -981,7 +1031,50 @@
     function datatable_schedule(site_val)
     {
         console.log(site_val);
-        $('#table-schedule-template').DataTable();
+        let site_id = site_val;
+        $('#table-schedule-template').DataTable({
+            cache: false,
+            processData: false,
+            contentType: false,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            ajax: 
+            {
+                url: "{{route('agentmanagement.tb_schedule')}}",
+                type: "POST",
+                data:function(d){
+                    d.site_id = site_id;
+                    return d ;
+                }
+            },
+            columns: [
+                {
+                    data: 'chk',
+                },
+                {
+                    data: 'agent_schedule_name',
+                },
+                {
+                    data: 'agent_schedule_start_date',
+                },
+                {
+                    data: 'agent_schedule_end_date',
+                },
+                {
+                    data: 'agent_schedule_username',
+                },
+                {
+                    data: 'agent_schedule_status',
+                },
+                {
+                    data: 'agent_schedule_source',
+                },
+                {
+                    data: 'agent_schedule_duration',
+                },
+            ],
+        });
     }
     
 

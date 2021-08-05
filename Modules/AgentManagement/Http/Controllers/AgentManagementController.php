@@ -11,6 +11,7 @@ use App\FXSiteAgents;
 use App\FXAgentAlerts;
 use App\FXAgentLogs;
 use App\FXAgentRules;
+use App\FXAgentSchedule;
 use Modules\SiteSettings\Entities\Menu;
 use Modules\SiteSettings\Entities\Menu_sub;
 use Modules\SiteSettings\Entities\site_config_email_alert;
@@ -253,7 +254,7 @@ class AgentManagementController extends Controller
     {
         $input = $request->all();
 
-        // dd($request->site_id);
+        // dd($input);
 
         $query = FXAgentAlerts::
                     join('site', 'agent_alerts.site_id', 'site.id')
@@ -272,6 +273,14 @@ class AgentManagementController extends Controller
         {
             $query->where('site_id', $request->site_id);
         }
+
+        if($request->keyword_search != null)
+        {
+            $query->where('agent_alerts.rule', 'like', '%'.$request->keyword_search.'%')
+                  ->orwhere('agent_alerts.description', 'like', '%'.$request->keyword_search.'%')
+                  ->orwhere('agent_alerts.incident', 'like', '%'.$request->keyword_search.'%');
+        }
+
 
         return DataTables::of($query)
         ->addColumn('chk', function($query) {
@@ -319,6 +328,7 @@ class AgentManagementController extends Controller
         $input = $request->all();
 
         // dd($request->site_id);
+        dd($input);
 
         $query = FXSiteAgents::
                     join('site', 'site_agents.site_id', 'site.id')
@@ -377,30 +387,45 @@ class AgentManagementController extends Controller
         ->make(true);
     }
 
-    
-
     public function tb_schedule(Request $request)
     {
-        $query_agent = FXSiteAgents::where('site_id', $request->hd_site_id)->get();
+        $query_schedule = FXAgentSchedule::
+                        join('site', 'agent_schedule.site_id', 'site.id')
+                        ->select(
+                            'site.name as site_name',
+                            'site.logo as site_logo',
+                            'agent_schedule.name as agent_schedule_name',
+                            'agent_schedule.start_date as agent_schedule_start_date',
+                            'agent_schedule.end_date as agent_schedule_end_date',
+                            'agent_schedule.username as agent_schedule_username',
+                            'agent_schedule.status as agent_schedule_status',
+                            'agent_schedule.source as agent_schedule_source',
+                            'agent_schedule.duration as agent_schedule_duration'
+                        );
 
-        return DataTables::of($query_agent)
-        // ->addColumn('chk', function($query_agent) {
-        //     $html = '';
-        //     $html .= '
-        //         <label>
-        //             <input name="select_all" value="'.$query_agent->id.'" id="select-all" type="checkbox" class="select-chk">
-        //             <span class="label-text"></span>
-        //         </label>
-        //     ';
-        //     return $html;
-        // })
-        // ->addColumn('chk_status', function($query_agent) {
+        if($request->site_id != null)
+        {
+            $query_schedule->where('site_id', $request->site_id);
+        }
+
+        return DataTables::of($query_schedule)
+        ->addColumn('chk', function($query_schedule) {
+            $html = '';
+            $html .= '
+                <label>
+                    <input name="select_all" value="'.$query_schedule->id.'" id="select-all" type="checkbox" class="select-chk">
+                    <span class="label-text"></span>
+                </label>
+            ';
+            return $html;
+        })
+        // ->addColumn('chk_status', function($query_schedule) {
         //     $html = '';
         //     $html .= '
         //         <label class="switch">
         //             <input type="checkbox" id="" onchange="" name="active" value="1"
         //     ';
-        //             if($query_agent->status == 1)
+        //             if($query_schedule->status == 1)
         //             {
         //     $html .= 'checked';
         //             }
@@ -411,16 +436,16 @@ class AgentManagementController extends Controller
         //     ';
         //     return $html;
         // })
-        // ->addColumn('action', function($query_agent) {
+        // ->addColumn('action', function($query_schedule) {
         //     $html = '';
         //     $html .= '
-        //         <a href="#?id='.$query_agent->id.'" class="btn btn-danger btn-xs">
+        //         <a href="#?id='.$query_schedule->id.'" class="btn btn-danger btn-xs">
         //             <i class="fas fa-trash"></i>
         //         </a>
         //     ';
         //     return $html;
         // })
-        // ->rawColumns(['chk','chk_status','action'])
+        ->rawColumns(['chk'])
         ->make(true);
     }
 }
