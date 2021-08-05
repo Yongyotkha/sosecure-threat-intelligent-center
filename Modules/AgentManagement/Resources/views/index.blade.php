@@ -38,10 +38,6 @@
                         <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                     </a>
 
-                    <a href="{{route('agentmanagement.view_txt')}}" data-toggle='ajaxModal'  class="btn btn-info btn-xs">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    
                 </div>
             </div>
         </header>
