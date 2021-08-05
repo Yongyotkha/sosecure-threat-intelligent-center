@@ -21,7 +21,10 @@
                 <header class="header panel-heading bg-white b-b b-light">
                     <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none;">@icon('solid/bars')</a>
                     <div class="bc-head">Site Setting &gt; Agent </div>
-             
+                    
+                    <input type="hidden" name="hd_site_id" id="hd_site_id" value="{{$siteSettings->id}}">
+
+
                     <a href="#" class="btn btn-sm btn-{{ get_option('theme_color') }} pull-right">Download</a>
                 </header>
 
@@ -30,13 +33,13 @@
                         <div class="col-md-6">
                             <div class="card-box-actor bg-2">
                                 <div class="card-actor-name">LIMIT AGENT</div>
-                                <div class="score-actor"> 3 </div>
+                                <div class="score-actor"> {{$siteSettings->agent_count}} </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="card-box-actor bg-2">
                                 <div class="card-actor-name">AGENT ACTIVE</div>
-                                <div class="score-actor"> 2/3 </div>
+                                <div class="score-actor"> {{$count_agent}}/{{$siteSettings->agent_count}} </div>
                             </div>
                         </div>
                     </div>
@@ -66,14 +69,15 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
+                                            {{-- <tr>
                                                 <td>
-                                                    <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
+                                                    <label>
+                                                        <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
                                                         <span class="label-text"></span>
                                                     </label>
                                                 </td>
                                                 <td>
-                                                    <b>DESKTOP-KJAK36N</b>
+                                                    <b>DESKTOP-</b>
                                                 </td>
                                                 <td>
                                                     <div class="device-name-txt">
@@ -119,7 +123,7 @@
                                                         <i class="fas fa-trash"></i>
                                                     </a>
                                                 </td>
-                                            </tr>
+                                            </tr> --}}
                                         </tbody>
                                     </table>
                                 </div>
@@ -134,172 +138,6 @@
 
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen, open" data-target="#nav,html"></a>
-
-    <!-- Modal New User -->
-    <div class="modal in fixed-left" id="create-new-user" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-aside" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-blue">
-                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title text-white">
-                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
-                        New User
-                    </h4>
-                </div>
-                <form action="">
-                <div class="modal-body">
-                    <div class="form-group row">
-                        <label class="col-lg-4 control-label">Username (e-mail) <span class="text-danger">*</span> </label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-4 control-label">Name <span class="text-danger">*</span> </label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-4 control-label">Set Password <span class="text-danger">*</span> </label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-4 control-label">Re-enter Password <span class="text-danger">*</span> </label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-lg-4 control-label">Role <span class="text-danger">*</span> </label>
-                        <div class="col-lg-8">
-                            <select name="" id="role" class="select2-option form-control">
-                                <option value="1">Admin</option>
-                                <option value="1">User</option>
-                                <option value="1">Customer</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-lg-4 control-label"> Login Expire Date <span class="text-danger">*</span> </label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control">
-                            <span class="input-group-addon">Day</span>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-lg-4 control-label">Status </label>
-                        <div class="col-lg-8">
-                            <label class="switch">
-                                <input type="hidden" value="FALSE" name="">
-                                <input type="checkbox" name="" value="TRUE">
-                                <span></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
-                        <i class="fas fa-times"></i>
-                        Close
-                    </button>
-                    <button type="submit" class="btn btn-info btn-rounded">
-                        <i class="fas fa-paper-plane"></i>
-                        Save
-                    </button>
-                </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="modal in fixed-left" id="support-password" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-aside" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-blue">
-                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title text-white">
-                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip" title="Fullscreen" data-placement="right"></i>
-                        Support Password
-                    </h4>
-                </div>
-                <form action="">
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <button type="submit" class="btn btn-info"> Support Password </button>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th class="text-center">Password</th>
-                                    <th class="text-center">Date Expried</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <span>Upvel Admin</span>
-                                    </td>
-                                    <td class="text-center">
-                                        <button type="submit" class="btn btn-success btn-rounded"> Copy Password </button>
-                                    </td>
-                                    <td class="text-center">
-                                        <span>16-11-2020 11:18:39</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-rounded" data-dismiss="modal">
-                        <i class="fas fa-times"></i>
-                        Close
-                    </button>
-                    <button type="submit" class="btn btn-info btn-rounded">
-                        <i class="fas fa-paper-plane"></i>
-                        Save
-                    </button>
-                </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="delete_user" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true"
-    style="left: unset">
-    <div class="modal-dialog modal-dialog-aside" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-danger">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">@langapp('delete')</h4>
-            </div>
-            <div class="modal-body">
-                <div class="container-fluid">
-                    <p class="text-danger">@langapp('delete_warning') </p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i
-                        class="fas fa-times text-muted"></i> Close</a>
-                <button type="button" class="btn btn-info submit btn-rounded delete_webdefacement_submit"
-                    onclick="delete_user_save()"><i class="fas fa-paper-plane"></i> OK</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 </section>
 
@@ -321,7 +159,63 @@
 
 <script>
     multi_readmore_text();
-    $('#table-agent-template').DataTable();
+
+    $(document).ready(function(){
+        table_agent();
+    });
+
+    function table_agent()
+    {
+        var hd_site_id = $('#hd_site_id').val();
+        console.log(hd_site_id);
+        $('#table-agent-template').DataTable({
+            cache: false,
+            processData: false,
+            contentType: false,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            ajax: 
+            {
+                url: "{{route('agent.tb_agent')}}",
+                type: "POST",
+                data:function(d){
+                    d.hd_site_id = hd_site_id;
+                    return d ;
+                }
+            },
+            columns: [
+                {
+                    data: 'chk',
+                },
+                {
+                    data: 'device_name',
+                },
+                {
+                    data: 'os_type',
+                },
+                {
+                    data: 'os_description',
+                },
+                {
+                    data: 'system_info',
+                },
+                {
+                    data: 'ip_private',
+                },
+                {
+                    data: 'last_online',
+                },
+                {
+                    data: 'chk_status',
+                },
+                {
+                    data: 'action',
+                },
+            ]
+        });
+    }
+    
 </script>
 
 

@@ -609,9 +609,9 @@
                                         `;
                                         if(array_rows == row.count_actor)
                                         {
+                                            // <img class="icon_sm_actor m-r-xs"  src="${row.logo[rows]}">
                         inner += `
                                         <div>
-                                            <img class="icon_sm_actor m-r-xs"  src="${row.logo[rows]}">
                                         </div>
                                         <a href="/actor/detail?_id=${data_actor.adversary_name}&mode=cve">
                                             ${data_actor.adversary_name}
@@ -620,9 +620,9 @@
                                         }
                                         else
                                         {
+                                            // <img class="icon_sm_actor m-r-xs"  src="${row.logo[rows]}">
                         inner += `      
                                         <div>
-                                            <img class="icon_sm_actor m-r-xs"  src="${row.logo[rows]}">
                                         </div>
                                         <a href="/actor/detail?_id=${data_actor.adversary_name}&mode=cve">
                                             ${data_actor.adversary_name}

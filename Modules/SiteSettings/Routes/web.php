@@ -115,6 +115,8 @@ Route::group(
         Route::post('/socialdatas/count_keyword', 'DataLeakController@count_keyword')->name('socialdatas.count_keyword')->middleware('can:menu_items');
 
         Route::get('/agent/{id}', 'AgentController@index')->name('agent.index')->middleware('can:menu_items');
+        Route::post('/tb_agent', 'AgentController@tb_agent')->name('agent.tb_agent');
+
     }
 );
 
