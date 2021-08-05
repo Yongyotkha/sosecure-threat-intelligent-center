@@ -858,11 +858,11 @@
                                             Site : ${data_log.site_name}
                                         </span>
                                         <span class="audit-time">
-                                            IP : ${data_log.site_ip_key}
+                                            IP : ${data_log.agent_logs_ip_address}
                                         </span>
                                     </div>
                                     <span class="audit-log-header">
-                                        ${data_log.agent_alerts_created} | ${data_log.description}
+                                        ${data_log.agent_logs_created} | ${data_log.agent_logs_description}
                                     </span>
                                 </div>
                             </li>
@@ -963,7 +963,7 @@
                     data: 'site_agents_system_info',
                 },
                 {
-                    data: 'site_agents_ip_private',
+                    data: 'site_agents_domain',
                 },
                 {
                     data: 'site_agents_ip_private',
