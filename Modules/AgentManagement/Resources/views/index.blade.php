@@ -781,11 +781,11 @@
 
     var site = null;
     $(document).ready(function(){
+        count_head();
+        dudit_log_feed();
         datatable_alert();
         datatable_agent();
         datatable_schedule();
-        dudit_log_feed();
-        count_head();
     });
 
     active_btn('#groupby-btn .btn-grey');
@@ -827,7 +827,9 @@
                 site_log_id:site_log_id
             },
             success:function(response){
-                let html = ``;
+                $('#text_agent').text(response.count_agent);
+                $('#text_alert').text(response.count_alert);
+                $('#text_rule').text(response.count_rule);
             }
         });
     }
@@ -921,10 +923,58 @@
     function datatable_agent(site_val)
     {
         console.log(site_val);
+        var site_id = site_val;
         $('#table-agent-template').DataTable({
+            cache: false,
+            processData: false,
+            contentType: false,
+            processing: true,
+            serverSide: true,
+            destroy: true,
             "fnDrawCallback": function( oSettings ) {
                 multi_readmore()
             },
+            ajax: 
+            {
+                url: "{{route('agentmanagement.tb_agent')}}",
+                type: "POST",
+                data:function(d){
+                    d.site_id = site_id;
+                    return d ;
+                }
+            },
+            columns: [
+                {
+                    data: 'chk',
+                },
+                {
+                    data: 'site_name',
+                },
+                {
+                    data: 'site_agents_device_name',
+                },
+                {
+                    data: 'os_type_name',
+                },
+                {
+                    data: 'site_agents_os_description',
+                },
+                {
+                    data: 'site_agents_system_info',
+                },
+                {
+                    data: 'site_agents_ip_private',
+                },
+                {
+                    data: 'site_agents_ip_private',
+                },
+                {
+                    data: 'site_agents_last_online',
+                },
+                {
+                    data: 'action',
+                },
+            ],
         });
     }
     
