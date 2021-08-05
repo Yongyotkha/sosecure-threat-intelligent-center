@@ -8,6 +8,9 @@ use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use DB;
 use App\FXSiteAgents;
+use App\FXAgentAlerts;
+use App\FXAgentLogs;
+use App\FXAgentRules;
 use Modules\SiteSettings\Entities\Menu;
 use Modules\SiteSettings\Entities\Menu_sub;
 use Modules\SiteSettings\Entities\site_config_email_alert;
@@ -123,6 +126,117 @@ class AgentManagementController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+
+    public function count_head(Request $request)
+    {
+        $input = $request->all();
+        dd($input);
+
+        $site_log_id = $request->site_log_id;
+    }
+
+    public function dudit_log_feed(Request $request)
+    {
+        $input = $request->all();
+        // dd($input);
+
+        $site_log_id = $request->site_log_id;
+        $query = FXAgentAlerts::
+                    join('site', 'agent_alerts.site_id', 'site.id')
+                    // ->where('site_id', $request->site_id)
+                    ->where(function ($query_site) use ($site_log_id) {
+                        if($site_log_id != null)
+                        {
+                            $query_site->where('agent_alerts.site_id', $site_log_id);
+                        }
+                        else
+                        {
+                            $query_site->where('agent_alerts.site_id', '!=', null);
+                        }
+                    })
+                    ->select(
+                        'site.name as site_name',
+                        'site.logo as site_logo',
+                        'site.ip_key as site_ip_key',
+                        'agent_alerts.id as agent_alerts_id',
+                        'agent_alerts.description as agent_alerts_description',
+                        'agent_alerts.status as agent_alerts_status',
+                        'agent_alerts.created as agent_alerts_created'
+                    )
+                    ->get();
+                    
+        // dd($query);
+
+        $response = [
+            'query' => $query
+        ];
+
+        return response()->json($response);
+    }
+
+    public function tb_alert(Request $request)
+    {
+        $input = $request->all();
+
+        // dd($request->site_id);
+
+        $query = FXAgentAlerts::
+                    join('site', 'agent_alerts.site_id', 'site.id')
+                    ->select(
+                        'site.name as site_name',
+                        'site.logo as site_logo',
+                        'agent_alerts.id as agent_alerts_id',
+                        'agent_alerts.description as agent_alerts_description',
+                        'agent_alerts.status as agent_alerts_status',
+                        'agent_alerts.created as agent_alerts_created'
+                    );
+
+        if($request->site_id != null)
+        {
+            $query->where('site_id', $request->site_id);
+        }
+
+        return DataTables::of($query)
+        ->addColumn('chk', function($query) {
+            $html = '';
+            $html .= '
+                <label>
+                    <input name="select_all" value="'.$query->agent_alerts_id.'" id="select-all" type="checkbox" class="select-chk">
+                    <span class="label-text"></span>
+                </label>
+            ';
+            return $html;
+        })
+        ->addColumn('chk_status', function($query) {
+            $html = '';
+            $html .= '
+                <label class="switch">
+                    <input type="checkbox" id="" onchange="" name="active" value="1"
+            ';
+                    if($query->agent_alerts_status == 'Y')
+                    {
+            $html .= 'checked';
+                    }
+            $html .= '        
+                    >
+                    <span></span>
+                </label>
+            ';
+            return $html;
+        })
+        ->addColumn('action', function($query) {
+            $html = '';
+            $html .= '
+                <a href="#?id='.$query->agent_alerts_id.'" class="btn btn-danger btn-xs">
+                    <i class="fas fa-trash"></i>
+                </a>
+            ';
+            return $html;
+        })
+        ->rawColumns(['chk','chk_status','action'])
+        ->make(true);
     }
 
     public function tb_schedule(Request $request)

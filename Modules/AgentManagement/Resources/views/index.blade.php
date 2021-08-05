@@ -297,8 +297,8 @@
                             </div>
                             <div class="agt-body">
                                 <div id="audit-log" style="height: 559px;;overflow-y:auto;">
-                                    <ul class="audit-log-list">
-                                        <li>
+                                    <ul class="audit-log-list" id="audit_log_list">
+                                        {{-- <li>
                                             <div>
                                                 <div class="wrapper-audit-log-img">
                                                     <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
@@ -317,107 +317,7 @@
                                                     </span>
                                                 </div>
                                             </div>
-                                        </li>
-                                        <li>
-                                            <div>
-                                                <div class="wrapper-audit-log-img">
-                                                    <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <span class="audit-log-header">
-                                                    The host 192.168.3.2 is connected as admin with Adminstrator role
-                                                </span>
-                                                <div class="audit-log-time">
-                                                    <span class="audit-by">
-                                                        admin
-                                                    </span>
-                                                    <span class="audit-time">
-                                                        1 hour ago
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div>
-                                                <div class="wrapper-audit-log-img">
-                                                    <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <span class="audit-log-header">
-                                                    The host 192.168.3.2 is connected as admin with Adminstrator role
-                                                </span>
-                                                <div class="audit-log-time">
-                                                    <span class="audit-by">
-                                                        admin
-                                                    </span>
-                                                    <span class="audit-time">
-                                                        1 hour ago
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div>
-                                                <div class="wrapper-audit-log-img">
-                                                    <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <span class="audit-log-header">
-                                                    The host 192.168.3.2 is connected as admin with Adminstrator role
-                                                </span>
-                                                <div class="audit-log-time">
-                                                    <span class="audit-by">
-                                                        admin
-                                                    </span>
-                                                    <span class="audit-time">
-                                                        1 hour ago
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div>
-                                                <div class="wrapper-audit-log-img">
-                                                    <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <span class="audit-log-header">
-                                                    The host 192.168.3.2 is connected as admin with Adminstrator role
-                                                </span>
-                                                <div class="audit-log-time">
-                                                    <span class="audit-by">
-                                                        admin
-                                                    </span>
-                                                    <span class="audit-time">
-                                                        1 hour ago
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div>
-                                                <div class="wrapper-audit-log-img">
-                                                    <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <span class="audit-log-header">
-                                                    The host 192.168.3.2 is connected as admin with Adminstrator role
-                                                </span>
-                                                <div class="audit-log-time">
-                                                    <span class="audit-by">
-                                                        admin
-                                                    </span>
-                                                    <span class="audit-time">
-                                                        1 hour ago
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </li>
+                                        </li> --}}
                                     </ul>
                                 </div>
                             </div>
@@ -486,7 +386,7 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
+                                                        {{-- <tr>
                                                             <td>
                                                                 <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
                                                                     <span class="label-text"></span>
@@ -501,7 +401,7 @@
                                                                     <i class="fas fa-eye"></i>
                                                                 </a>
                                                             </td>
-                                                        </tr>
+                                                        </tr> --}}
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -540,7 +440,7 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
+                                                        {{-- <tr>
                                                             <td>
                                                                 <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
                                                                     <span class="label-text"></span>
@@ -603,16 +503,13 @@
                                                                     </ul>
                                                                   </div>
                                                             </td>
-                                                        </tr>
-
+                                                        </tr> --}}
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </section>
                                 </div>
-
-                            
 
                                 <div class="tab-pane" id="tab_schedule">
                                     <section class="panel panel-default">
@@ -643,7 +540,7 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
+                                                        {{-- <tr>
                                                             <td>
                                                                 <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
                                                                     <span class="label-text"></span>
@@ -698,8 +595,7 @@
                                                             <td class="text-center">
                                                                 1 hour 45 minute
                                                             </td>
-                                                        </tr>
-
+                                                        </tr> --}}
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -754,6 +650,8 @@
         datatable_alert();
         datatable_agent();
         datatable_schedule();
+        dudit_log_feed();
+        count_head();
     });
 
     active_btn('#groupby-btn .btn-grey');
@@ -784,10 +682,111 @@
         }
     });
 
+    function count_head(site_val)
+    {
+        console.log('count - '+site_val);
+        let site_log_id = site_val;
+        $.ajax({
+            url: "{{route('agentmanagement.count_head')}}",
+            type: "POST",
+            data:{
+                site_log_id:site_log_id
+            },
+            success:function(response){
+                let html = ``;
+            }
+        });
+    }
+
+    function dudit_log_feed(site_val)
+    {
+        console.log('log - '+site_val);
+        let site_log_id = site_val;
+        $.ajax({
+            url: "{{route('agentmanagement.dudit_log_feed')}}",
+            type: "POST",
+            data:{
+                site_log_id:site_log_id
+            },
+            success:function(response){
+                $('#audit_log_list').empty();
+                let html = ``;
+                for(let rows in response.query)
+                {
+                    const data_log = response.query[rows];
+                    {{-- <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt=""> --}}
+                    {{-- alert(data_log.agent_alerts_id); ${data_log.site_logo} --}}
+                    html += `
+                            <li>
+                                <div>
+                                    <div class="wrapper-audit-log-img">
+                                        <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="audit-log-header">
+                                        ${data_log.site_name} : ${data_log.site_ip_key}<br>
+                                        ${data_log.description}
+                                    </span>
+                                    <div class="audit-log-time">
+                                        <span class="audit-by">
+                                            ${data_log.site_name}
+                                        </span>
+                                        <span class="audit-time">
+                                            ${data_log.agent_alerts_created}
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                        `;
+                }
+
+                $('#audit_log_list').append(html);
+            }
+        });
+    }
+
     function datatable_alert(site_val)
     {
         console.log(site_val);
-        $('#table-activities-template').DataTable();
+        var site_id = site_val;
+        $('#table-activities-template').DataTable({
+            cache: false,
+            processData: false,
+            contentType: false,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            ajax: 
+            {
+                url: "{{route('agentmanagement.tb_alert')}}",
+                type: "POST",
+                data:function(d){
+                    d.site_id = site_id;
+                    return d ;
+                }
+            },
+            columns: [
+                {
+                    data: 'chk',
+                },
+                {
+                    data: 'site_name',
+                },
+                {
+                    data: 'agent_alerts_description',
+                },
+                {
+                    data: 'chk_status',
+                },
+                {
+                    data: 'agent_alerts_created',
+                },
+                {
+                    data: 'action',
+                },
+            ],
+        });
     }
 
     function datatable_agent(site_val)
@@ -962,6 +961,8 @@
     $('#site').change(function(){
         var site_val = $('#site').val();
         console.log(site_val);
+        count_head(site_val);
+        dudit_log_feed(site_val);
         datatable_alert(site_val);
         datatable_agent(site_val);
         datatable_schedule(site_val);
