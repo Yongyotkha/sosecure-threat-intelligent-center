@@ -427,7 +427,7 @@
                                                             </td>
                                                             <td>Sosecure</td>
                                                             <td>webshell_mysqlwebsh</td>
-                                                            <td>D://yara//webshell////web-malware-collection-13-06-2012//PHP//mysqlwebsh.php</td>
+                                                            <td>D:/yara/webshell/web-malware-collection-13-06-2012/PHP/mysqlwebsh.php</td>
                                                             <td>Agent</td>
                                                             <td>2021-05-08 09:34:12 </td>
                                                             <td class="text-center">
@@ -444,7 +444,7 @@
                                                             </td>
                                                             <td>Sosecure</td>
                                                             <td>webshell_jsp_up</td>
-                                                            <td>D://yara//webshell////web-malware-collection-13-06-2012//JSP//up_win32.jsp</td>
+                                                            <td>D:/yara/webshell/web-malware-collection-13-06-2012/JSP/up_win32.jsp</td>
                                                             <td>Agent</td>
                                                             <td>2021-05-08 09:45:47 </td>
                                                             <td class="text-center">
@@ -461,7 +461,7 @@
                                                             </td>
                                                             <td>Sosecure</td>
                                                             <td>NT_Addy_asp</td>
-                                                            <td>D://yara//webshell////web-malware-collection-13-06-2012//ASP//ELMALISEKER Backd00r.asp</td>
+                                                            <td>D:/yara/webshell/web-malware-collection-13-06-2012/ASP/ELMALISEKER Backd00r.asp</td>
                                                             <td>Agent</td>
                                                             <td>2021-05-08 09:58:01 </td>
                                                             <td class="text-center">
@@ -478,7 +478,7 @@
                                                             </td>
                                                             <td>Sosecure</td>
                                                             <td>MySQL_Web_Interface_Version_0_8_php</td>
-                                                            <td>D://yara//webshell////web-malware-collection-13-06-2012//PHP//MySQL Web Interface Version 0.8.txt</td>
+                                                            <td>D:/yara/webshell/web-malware-collection-13-06-2012/PHP/MySQL Web Interface Version 0.8.txt</td>
                                                             <td>Agent</td>
                                                             <td>2021-05-08 09:50:16 </td>
                                                             <td class="text-center">
@@ -495,7 +495,7 @@
                                                             </td>
                                                             <td>Sosecure</td>
                                                             <td>BASE64_table</td>
-                                                            <td>D://yara//webshell////pl//pps-pl//pps-v4.0.pl</td>
+                                                            <td>D:/yara/webshell/pl/pps-pl/pps-v4.0.pl</td>
                                                             <td>Agent</td>
                                                             <td>2021-05-08 10:20:12 </td>
                                                             <td class="text-center">

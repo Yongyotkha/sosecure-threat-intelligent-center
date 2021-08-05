@@ -7,12 +7,22 @@
     
         <div class="modal-body">
 
-            <textarea name="" id="" cols="30" rows="30" class="form-control">
-                <?php 
-                    $text = file_get_contents('https://insight.sosecure.co.th/css/log_yara_scan_data_2021-08-05.txt');
-                    echo $text;
-                ?>
-            </textarea>
+            <?php 
+
+                // $fh = fopen("https://insight.sosecure.co.th/css/log_yara_scan_data_2021-08-05.txt", 'r');
+
+                // $pageText = fread($fh, 25000);
+
+                // echo nl2br($pageText);
+
+            ?>
+
+            <?php
+                $myfile = fopen("https://insight.sosecure.co.th/css/log_yara_scan_data_2021-08-05.txt.txt", "r") or die("Unable to open file!");
+                echo fread($myfile,filesize("https://insight.sosecure.co.th/css/log_yara_scan_data_2021-08-05.txt.txt"));
+                fclose($myfile);
+            ?>
+
         </div>
         
         <div class="modal-footer">
@@ -31,6 +41,8 @@
 @include('partial.ajaxify')
 
     <script>
+
+
     var form_save = '.formSaving';
     $('.ajaxifyForm_custom').submit(function (event) {
         event.preventDefault();
