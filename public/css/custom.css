@@ -2322,7 +2322,7 @@ ul.topics-news-list li a:hover{
 }
 
 .img-icon-card{
-    width: 35px;
+    width: 20px;
     height: 35px;
     overflow: hidden;
     position: relative;
@@ -5408,4 +5408,9 @@ input.form-policy[type=password] {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.dt-txt *{
+    font-size: 13px !important;
+    font-family: 'Poppins';
 }

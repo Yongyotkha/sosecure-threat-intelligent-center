@@ -98,12 +98,6 @@ use Carbon\Carbon;
 
                                 @endif
                             @endif
-
-
-                  
-    
-                          
-
                         </div>
                     </div>
                 </header>
@@ -112,161 +106,165 @@ use Carbon\Carbon;
 
                 <section class="scrollable wrapper">
 
-                    <div class="col-xl-2 col-lg-2 col-md-12 nopadding m-b-12">
+                    <div class="container-fluid m-b-xs">
                         <div class="row">
-                            <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149.5px;">
-                                <a href="javascript:void(0)" onclick="dataType2('reported')">
-                                   <div class="card-dash" style="height: 149.5px; border: 1px solid #e4e4e4;">
-                                      <div class="left-card">
-                                         <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/Reported.png')}}" alt="" onerror="setDefaultPic(this)"></div>
-                                         <h3 class="name-dash-text text-dark text-upper ">Reported</h3>
-                                         <span class="number-card green number_reported">0</span>
-                                      </div>
-                                   </div>
-                                </a>
-                             </div>
-                           <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149.5px;">
-                              <a href="javascript:void(0)" onclick="dataType2('in_progress')">
-                                 <div class="card-dash" style="height: 149.5px; border: 1px solid #e4e4e4;">
-                                    <div class="left-card">
-                                       <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/In progress.png')}}" alt="" onerror="setDefaultPic(this)"></div>
-                                       <h3 class="name-dash-text text-dark text-upper ">In Progress</h3>
-                                       <span class="number-card info number_in_progress">0</span>
-                                    </div>
-                                 </div>
-                              </a>
-                           </div>
-                           <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149px;">
-                              <a href="javascript:void(0)" onclick="dataType2('close')">
-                                 <div class="card-dash" style="height: 150px; border: 1px solid #e4e4e4;">
-                                    <div class="left-card">
-                                       <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/Close .png')}}" alt="" onerror="setDefaultPic(this)"></div>
-                                       <h3 class="name-dash-text text-dark text-upper ">Close</h3>
-                                       <span class="number-card warning number_close">0</span>
-                                    </div>
-                                 </div>
-                              </a>
-                           </div>
-                        </div>
-                     </div>
-
-                     
-                    <div class="col-xl-10 col-lg-10 col-md-12">
-                        <div class="row">
-                            <div class="container-fluid" style="">
+                            <div class="col-xl-2 col-lg-2 col-md-12 nopadding m-b-12">
                                 <div class="row">
-                                    <div class="col-md-6 col-sm-12 col-xs-12 nopadding" style="border-right: 0px !important;border: 1px solid #e4e4e4;">
-                                       <div class="col-md-12 nopadding" style="
-                                          /* grid-template-columns: 1fr 1fr; */
-                                          /* display: grid; */
-                                          ">
-                                          <div class="col-md-12 nopadding" style="
-                                             border-right: solid 0;
-                                             ">
-                                             <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6" style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
-                                                <a href="javascript:void(0)" onclick="dataType2('mobile')">
-                                                   <div class="left-card">
-                                                      <div id="left1" class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
-                                                         <img src="{{asset('images/icon/MOBILE.png')}}" alt="" onerror="setDefaultPic(this)" class="border_cicle" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%; background: #d8d8d8;"><span class="number-card_s warning" style="font-size: 35px !important;padding: 20px; margin-left: 108px; color: #ffcc00;" id="icon_mobile">0</span>
-                                                         <p class="text_icon_social">Mobile</p>
-                                                      </div>
-                                                   </div>
-                                                </a>
-                                             </div>
-                                             <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6" style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
-                                                <a href="javascript:void(0)" onclick="dataType2('line')">
-                                                   <div class="left-card">
-                                                      <div id="right1" class="img-icon-card ice right" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
-                                                         <img src="{{asset('images/icon/line_icon.png')}}" alt="" onerror="setDefaultPic(this)" class="border_cicle" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%; "><span class="number-card_s info" style="font-size: 35px !important;padding: 20px; margin-left: 108px; color: #00dcff;" id="icon_line">0</span>
-                                                         <p class="text_icon_social">Line</p>
-                                                      </div>
-                                                   </div>
-                                                </a>
-                                             </div>
-                                             <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6" style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
-                                                <a href="javascript:void(0)" onclick="dataType2('website')">
-                                                   <div class="left-card">
-                                                      <div id="left2" class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
-                                                         <img src="{{asset('images/icon/WEBSITE.png')}}" alt="" onerror="setDefaultPic(this)" class="border_cicle" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;"><span class="number-card_s " style="color: #8793db; font-size: 35px !important;padding: 20px; margin-left: 108px; color: #8793db;" id="icon_website">0</span>
-                                                         <p class="text_icon_social">Website</p>
-                                                      </div>
-                                                   </div>
-                                                </a>
-                                             </div>
-                                             <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6" style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
-                                                <a href="javascript:void(0)" onclick="dataType2('facebook')">
-                                                   <div class="left-card">
-                                                      <div id="right2" class="img-icon-card ice right" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
-                                                         <img src="{{asset('images/icon/FACEBOOK.png')}}" alt="" onerror="setDefaultPic(this)" class="border_cicle" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;"><span class="number-card_s info" style="font-size: 35px !important;padding: 20px; margin-left: 108px; color: #00dcff;" id="icon_facebook">0</span>
-                                                         <p class="text_icon_social">Fanpage</p>
-                                                      </div>
-                                                   </div>
-                                                </a>
-                                             </div>
-                                             <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6" style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
-                                                <a href="javascript:void(0)" onclick="dataType2('twitter')">
-                                                   <div class="left-card">
-                                                      <div id="left3" class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
-                                                         <img src="{{asset('images/icon/TWIITER.png')}}" alt="" onerror="setDefaultPic(this)" class="border_cicle" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;"><span class="number-card_s " style="color: #5bb984; font-size: 35px !important;padding: 20px; margin-left: 108px; color: #5bb984;" id="icon_twitter">0</span>
-                                                         <p class="text_icon_social">Twitter</p>
-                                                      </div>
-                                                   </div>
-                                                </a>
-                                             </div>
-                                             <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6" style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
-                                                <a href="javascript:void(0)" onclick="dataType2('other')">
-                                                   <div class="left-card">
-                                                      <div id="right3" class="img-icon-card ice right" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
-                                                         <img src="{{asset('images/icon/OTHER2.png')}}" alt="" onerror="setDefaultPic(this)" class="border_cicle" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;"><span class="number-card_s " style="color: #565656; font-size: 35px !important;padding: 20px; margin-left: 108px; color: #565656;" id="icon_other">0</span>
-                                                         <p class="text_icon_social">Other</p>
-                                                      </div>
-                                                   </div>
-                                                </a>
-                                             </div>
-                                          </div>
-                                       </div>
+                                    <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149.5px;">
+                                        <a href="javascript:void(0)" onclick="dataType2('reported')">
+                                           <div class="card-dash" style="height: 149.5px; border: 1px solid #e4e4e4;">
+                                              <div class="left-card">
+                                                 <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/Reported.png')}}" alt="" onerror="setDefaultPic(this)"></div>
+                                                 <h3 class="name-dash-text text-dark text-upper ">Reported</h3>
+                                                 <span class="number-card green number_reported">0</span>
+                                              </div>
+                                           </div>
+                                        </a>
+                                     </div>
+                                   <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149.5px;">
+                                      <a href="javascript:void(0)" onclick="dataType2('in_progress')">
+                                         <div class="card-dash" style="height: 149.5px; border: 1px solid #e4e4e4;">
+                                            <div class="left-card">
+                                               <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/In progress.png')}}" alt="" onerror="setDefaultPic(this)"></div>
+                                               <h3 class="name-dash-text text-dark text-upper ">In Progress</h3>
+                                               <span class="number-card info number_in_progress">0</span>
+                                            </div>
+                                         </div>
+                                      </a>
+                                   </div>
+                                   <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149px;">
+                                      <a href="javascript:void(0)" onclick="dataType2('close')">
+                                         <div class="card-dash" style="height: 150px; border: 1px solid #e4e4e4;">
+                                            <div class="left-card">
+                                               <div class="img-icon-card" style="width: 55px; height: 55px;"><img src="{{asset('images/icon/Close .png')}}" alt="" onerror="setDefaultPic(this)"></div>
+                                               <h3 class="name-dash-text text-dark text-upper ">Close</h3>
+                                               <span class="number-card warning number_close">0</span>
+                                            </div>
+                                         </div>
+                                      </a>
+                                   </div>
+                                </div>
+                             </div>
+        
+                             
+                            <div class="col-xl-10 col-lg-10 col-md-12">
+                                <div class="row">
+                                    <div class="container-fluid" style="">
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-12 col-xs-12 nopadding" style="border-right: 0px !important;border: 1px solid #e4e4e4;">
+                                               <div class="col-md-12 nopadding" style="
+                                                  /* grid-template-columns: 1fr 1fr; */
+                                                  /* display: grid; */
+                                                  ">
+                                                  <div class="col-md-12 nopadding" style="
+                                                     border-right: solid 0;
+                                                     ">
+                                                     <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6" style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
+                                                        <a href="javascript:void(0)" onclick="dataType2('mobile')">
+                                                           <div class="left-card">
+                                                              <div id="left1" class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
+                                                                 <img src="{{asset('images/icon/MOBILE.png')}}" alt="" onerror="setDefaultPic(this)" class="border_cicle" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%; background: #d8d8d8;"><span class="number-card_s warning" style="font-size: 35px !important;padding: 20px; margin-left: 108px; color: #ffcc00;" id="icon_mobile">0</span>
+                                                                 <p class="text_icon_social">Mobile</p>
+                                                              </div>
+                                                           </div>
+                                                        </a>
+                                                     </div>
+                                                     <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6" style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
+                                                        <a href="javascript:void(0)" onclick="dataType2('line')">
+                                                           <div class="left-card">
+                                                              <div id="right1" class="img-icon-card ice right" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
+                                                                 <img src="{{asset('images/icon/line_icon.png')}}" alt="" onerror="setDefaultPic(this)" class="border_cicle" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%; "><span class="number-card_s info" style="font-size: 35px !important;padding: 20px; margin-left: 108px; color: #00dcff;" id="icon_line">0</span>
+                                                                 <p class="text_icon_social">Line</p>
+                                                              </div>
+                                                           </div>
+                                                        </a>
+                                                     </div>
+                                                     <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6" style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
+                                                        <a href="javascript:void(0)" onclick="dataType2('website')">
+                                                           <div class="left-card">
+                                                              <div id="left2" class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
+                                                                 <img src="{{asset('images/icon/WEBSITE.png')}}" alt="" onerror="setDefaultPic(this)" class="border_cicle" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;"><span class="number-card_s " style="color: #8793db; font-size: 35px !important;padding: 20px; margin-left: 108px; color: #8793db;" id="icon_website">0</span>
+                                                                 <p class="text_icon_social">Website</p>
+                                                              </div>
+                                                           </div>
+                                                        </a>
+                                                     </div>
+                                                     <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6" style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
+                                                        <a href="javascript:void(0)" onclick="dataType2('facebook')">
+                                                           <div class="left-card">
+                                                              <div id="right2" class="img-icon-card ice right" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
+                                                                 <img src="{{asset('images/icon/FACEBOOK.png')}}" alt="" onerror="setDefaultPic(this)" class="border_cicle" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;"><span class="number-card_s info" style="font-size: 35px !important;padding: 20px; margin-left: 108px; color: #00dcff;" id="icon_facebook">0</span>
+                                                                 <p class="text_icon_social">Fanpage</p>
+                                                              </div>
+                                                           </div>
+                                                        </a>
+                                                     </div>
+                                                     <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6" style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
+                                                        <a href="javascript:void(0)" onclick="dataType2('twitter')">
+                                                           <div class="left-card">
+                                                              <div id="left3" class="img-icon-card ice" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
+                                                                 <img src="{{asset('images/icon/TWIITER.png')}}" alt="" onerror="setDefaultPic(this)" class="border_cicle" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;"><span class="number-card_s " style="color: #5bb984; font-size: 35px !important;padding: 20px; margin-left: 108px; color: #5bb984;" id="icon_twitter">0</span>
+                                                                 <p class="text_icon_social">Twitter</p>
+                                                              </div>
+                                                           </div>
+                                                        </a>
+                                                     </div>
+                                                     <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6" style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
+                                                        <a href="javascript:void(0)" onclick="dataType2('other')">
+                                                           <div class="left-card">
+                                                              <div id="right3" class="img-icon-card ice right" style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
+                                                                 <img src="{{asset('images/icon/OTHER2.png')}}" alt="" onerror="setDefaultPic(this)" class="border_cicle" style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;"><span class="number-card_s " style="color: #565656; font-size: 35px !important;padding: 20px; margin-left: 108px; color: #565656;" id="icon_other">0</span>
+                                                                 <p class="text_icon_social">Other</p>
+                                                              </div>
+                                                           </div>
+                                                        </a>
+                                                     </div>
+                                                  </div>
+                                               </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-12 col-xs-12 nopadding">
+                                               <div class="col-md-12 nopadding">
+                                                  <div class="card-dash-compro none-bg none-shadow " style="border-top: solid 1px #e4e4e4;min-height: 51px;box-shadow: 0 0px 0px #f5f5f5;"></div>
+                                               </div>
+                                               <div class="col-md-12 nopadding">
+                                                  <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
+                                                     <a href="#" onclick="dataType('social')">
+                                                        <div id="icon_publish" class="left-card" style="margin-left: 0px;">
+                                                           <div class="img-icon-card ice" style="width: 150px;height: 150px;"><img src="{{asset('images/icebergline2.png')}}" alt="" onerror="setDefaultPic(this)"></div>
+                                                           <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
+                                                           <span class="number-card warning" id="compromise-count">0</span>
+                                                        </div>
+                                                     </a>
+                                                  </div>
+                                               </div>
+                                               <div class="col-md-12 nopadding">
+                                                  <div id="area_pp" class="card-dash-compro none-bg none-shadow" style="min-height: 151px;box-shadow: 0 0px 0px #f5f5f5;"></div>
+                                               </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-12 col-xs-12 nopadding" style=" border: 1px solid #e4e4e4;">
+                                               <div class="col-md-12 nopadding">
+                                                  <div class="card-dash-compro none-bg none-shadow " style="min-height: 51px; box-shadow: 0 1px 1px rgb(0 0 0 / 20%); "></div>
+                                               </div>
+                                               <div class="col-md-12 nopadding">
+                                                  <div class="card-dash-compro none-bg none-shadow" style=" box-shadow: 0 1px 1px rgb(0 0 0 / 20%);">
+                                                     <a href="#" onclick="dataType('darkweb_public')">
+                                                        <div class="left-card">
+                                                           <div class="img-icon-card ice" style="width: 150px;height: 150px; "><img src="{{asset('images/icebergline1.png')}}" alt="" onerror="setDefaultPic(this)"></div>
+                                                           <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
+                                                           <span class="number-card info" id="darkweb-count">0</span>
+                                                        </div>
+                                                     </a>
+                                                  </div>
+                                               </div>
+                                               <div class="col-md-12 nopadding">
+                                                  <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px; box-shadow: 0 1px 1px rgb(0 0 0 / 20%); "></div>
+                                               </div>
+                                            </div>
+                                         </div>
                                     </div>
-                                    <div class="col-md-3 col-sm-12 col-xs-12 nopadding">
-                                       <div class="col-md-12 nopadding">
-                                          <div class="card-dash-compro none-bg none-shadow " style="border-top: solid 1px #e4e4e4;min-height: 51px;box-shadow: 0 0px 0px #f5f5f5;"></div>
-                                       </div>
-                                       <div class="col-md-12 nopadding">
-                                          <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
-                                             <a href="#" onclick="dataType('social')">
-                                                <div id="icon_publish" class="left-card" style="margin-left: 0px;">
-                                                   <div class="img-icon-card ice" style="width: 150px;height: 150px;"><img src="{{asset('images/icebergline2.png')}}" alt="" onerror="setDefaultPic(this)"></div>
-                                                   <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
-                                                   <span class="number-card warning" id="compromise-count">0</span>
-                                                </div>
-                                             </a>
-                                          </div>
-                                       </div>
-                                       <div class="col-md-12 nopadding">
-                                          <div id="area_pp" class="card-dash-compro none-bg none-shadow" style="min-height: 151px;box-shadow: 0 0px 0px #f5f5f5;"></div>
-                                       </div>
-                                    </div>
-                                    <div class="col-md-3 col-sm-12 col-xs-12 nopadding" style=" border: 1px solid #e4e4e4;">
-                                       <div class="col-md-12 nopadding">
-                                          <div class="card-dash-compro none-bg none-shadow " style="min-height: 51px; box-shadow: 0 1px 1px rgb(0 0 0 / 20%); "></div>
-                                       </div>
-                                       <div class="col-md-12 nopadding">
-                                          <div class="card-dash-compro none-bg none-shadow" style=" box-shadow: 0 1px 1px rgb(0 0 0 / 20%);">
-                                             <a href="#" onclick="dataType('darkweb_public')">
-                                                <div class="left-card">
-                                                   <div class="img-icon-card ice" style="width: 150px;height: 150px; "><img src="{{asset('images/icebergline1.png')}}" alt="" onerror="setDefaultPic(this)"></div>
-                                                   <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
-                                                   <span class="number-card info" id="darkweb-count">0</span>
-                                                </div>
-                                             </a>
-                                          </div>
-                                       </div>
-                                       <div class="col-md-12 nopadding">
-                                          <div class="card-dash-compro none-bg none-shadow " style="min-height: 149px; box-shadow: 0 1px 1px rgb(0 0 0 / 20%); "></div>
-                                       </div>
-                                    </div>
-                                 </div>
+        
+                                </div>
                             </div>
-
                         </div>
                     </div>
 
@@ -967,7 +965,7 @@ $('.btn').click(function(){
                                     content += feedcontent.replaceAll(data2, '<span class="badge bg-warning">'+data2+'</span>');
                                 }
                          
-                                 return'<div>'+new_html+full.feedcontent+'</div>';
+                                 return'<div class="dt-txt">'+new_html+full.feedcontent+'</div>';
                                
                             }else{
                                 return '-';

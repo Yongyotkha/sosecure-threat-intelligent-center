@@ -154,7 +154,6 @@ use Carbon\Carbon;
                             </a>
                         </div>
                     </div>
-
                 </div>
 
                 <section class="panel panel-default" id="hide-advance-search" style="display: none">
