@@ -260,7 +260,9 @@ class AgentManagementController extends Controller
                         'site.name as site_name',
                         'site.logo as site_logo',
                         'agent_alerts.id as agent_alerts_id',
+                        'agent_alerts.rule as agent_alerts_rule',
                         'agent_alerts.description as agent_alerts_description',
+                        'agent_alerts.incident as agent_alerts_incident',
                         'agent_alerts.status as agent_alerts_status',
                         'agent_alerts.created as agent_alerts_created'
                     );
@@ -301,9 +303,9 @@ class AgentManagementController extends Controller
         ->addColumn('action', function($query) {
             $html = '';
             $html .= '
-                <a href="#?id='.$query->agent_alerts_id.'" class="btn btn-danger btn-xs">
-                    <i class="fas fa-trash"></i>
-                </a>
+                    <a href="'.route('agentmanagement.view_txt').'" data-toggle="ajaxModal"  class="btn btn-info btn-xs">
+                        <i class="fas fa-eye"></i>
+                    </a>
             ';
             return $html;
         })

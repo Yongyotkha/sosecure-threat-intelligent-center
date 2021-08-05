@@ -914,9 +914,6 @@
                     data: 'agent_alerts_created',
                 },
                 {
-                    data: 'agent_alerts_created',
-                },
-                {
                     data: 'action',
                 },
             ],
