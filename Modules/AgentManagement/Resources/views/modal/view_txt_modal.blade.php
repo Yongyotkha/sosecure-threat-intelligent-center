@@ -7,18 +7,13 @@
     
         <div class="modal-body">
 
-            <?php 
+                <?php 
+                    $file = 'https://insight.sosecure.co.th/css/log_yara_scan_data_2021-08-05.txt';
+                    $orig = file_get_contents($file);
+                    $a = nl2br($orig);
+                    echo $a;
 
-                $fh = fopen("https://insight.sosecure.co.th/css/log_yara_scan_data_2021-08-05.txt", 'r');
-
-                $pageText = fread($fh, 25000);
-
-                echo nl2br($pageText);
-
-            ?>
-
-      
-
+                ?>
         </div>
         
         <div class="modal-footer">
