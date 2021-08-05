@@ -276,11 +276,27 @@ class AgentManagementController extends Controller
 
         if($request->keyword_search != null)
         {
-            $query->where('agent_alerts.rule', 'like', '%'.$request->keyword_search.'%')
+            $query->where('site.name', 'like', '%'.$request->keyword_search.'%')
+                  ->orwhere('agent_alerts.rule', 'like', '%'.$request->keyword_search.'%')
                   ->orwhere('agent_alerts.description', 'like', '%'.$request->keyword_search.'%')
-                  ->orwhere('agent_alerts.incident', 'like', '%'.$request->keyword_search.'%');
+                  ->orwhere('agent_alerts.incident', 'like', '%'.$request->keyword_search.'%')
+                  ->orwhere('agent_alerts.log_file', 'like', '%'.$request->keyword_search.'%');
         }
 
+        if($request->filter_alert_site_name != null)
+        {
+            $query->where('site.name', 'like', '%'.$request->filter_alert_site_name.'%');
+        }
+
+        if($request->filter_alert_des != null)
+        {
+            $query->where('agent_alerts.description', 'like', '%'.$request->filter_alert_des.'%');
+        }
+
+        if($request->check_alert != null)
+        {
+            $query->where('agent_alerts.incident', $request->check_alert);
+        }
 
         return DataTables::of($query)
         ->addColumn('chk', function($query) {
@@ -328,7 +344,7 @@ class AgentManagementController extends Controller
         $input = $request->all();
 
         // dd($request->site_id);
-        dd($input);
+        // dd($input);
 
         $query = FXSiteAgents::
                     join('site', 'site_agents.site_id', 'site.id')
@@ -351,6 +367,37 @@ class AgentManagementController extends Controller
         if($request->site_id != null)
         {
             $query->where('site_id', $request->site_id);
+        }
+
+        if($request->keyword_search != null)
+        {
+            $query->where('site.name', 'like', '%'.$request->keyword_search.'%')
+                  ->orwhere('site_agents.device_name', 'like', '%'.$request->keyword_search.'%')
+                  ->orwhere('os_type.name', 'like', '%'.$request->keyword_search.'%')
+                  ->orwhere('site_agents.os_description', 'like', '%'.$request->keyword_search.'%')
+                  ->orwhere('site_agents.system_info', 'like', '%'.$request->keyword_search.'%')
+                  ->orwhere('site_agents.domain', 'like', '%'.$request->keyword_search.'%')
+                  ->orwhere('site_agents.ip_private', 'like', '%'.$request->keyword_search.'%');
+        }
+
+        if($request->filter_agent_site_name != null)
+        {
+            $query->where('site.name', 'like', '%'.$request->filter_agent_site_name.'%');
+        }
+
+        if($request->filter_agent_device != null)
+        {
+            $query->where('site_agents.device_name', 'like', '%'.$request->filter_agent_device.'%');
+        }
+
+        if($request->filter_agent_ip != null)
+        {
+            $query->where('site_agents.ip_private', 'like', '%'.$request->filter_agent_ip.'%');
+        }
+
+        if($request->check_os_type != null)
+        {
+            $query->where('site_agents.os_type', $request->check_os_type);
         }
 
         return DataTables::of($query)

@@ -119,13 +119,13 @@
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <label for="" class="">Description</label>
-                                <div id="filter-alert" class="btn-group special">
-                                    <button class="btn btn-grey check_alert active" id="all" value="">
+                                <label for="" class="">Incident</label>
+                                <div id="filter-alert-incident" class="btn-group special">
+                                    <button class="btn btn-grey check_alert active" id="incident-status-all" value="">
                                         <span> All </span>
                                     </button>
-                                    <button class="btn btn-grey check_alert" value="1">
-                                        <span> Scan </span>
+                                    <button class="btn btn-grey check_alert" value="Agent">
+                                        <span> Agent </span>
                                     </button>
                                 </div>
                             </div>
@@ -161,15 +161,21 @@
                             </div>
                             <div class="col-lg-3">
                                 <label for="" class="">OS Type</label>
-                                <div id="filter-alert" class="btn-group special">
+                                <div id="filter-agent-os-type" class="btn-group special">
                                     <button class="btn btn-grey check_os_type active" id="all_os" value="">
                                         <span> All </span>
                                     </button>
                                     <button class="btn btn-grey check_os_type" value="1">
-                                        <span> Scan </span>
-                                    </button>
-                                    <button class="btn btn-grey check_os_type" value="1">
                                         <span> Window </span>
+                                    </button>
+                                    <button class="btn btn-grey check_os_type" value="2">
+                                        <span> Linux </span>
+                                    </button>
+                                    <button class="btn btn-grey check_os_type" value="3">
+                                        <span> Redhat </span>
+                                    </button>
+                                    <button class="btn btn-grey check_os_type" value="4">
+                                        <span> Other </span>
                                     </button>
                                 </div>
                             </div>
@@ -187,7 +193,7 @@
                                 @langapp('apply')
                             </button>
                             <button type="button" id="btn_rss_news_reset" class="btn btn-default btn-responsive btn-fz-13"
-                                style="white-space: nowrap">
+                                style="white-space: nowrap" onclick="clear_search()">
                                 <i class="fas fa-broom"></i>
                                 <span> Clear </span>
                             </button>
@@ -410,9 +416,9 @@
                     <div class="col-md-12">
                         <div class="tabbable">
                             <ul class="nav nav-tabs nav-tabs-highlight">
-                                <li class="active"><a href="#tab_acvt" data-toggle="tab">Alert</a></li>
-                                <li><a href="#tab_agent" data-toggle="tab">Agent</a></li>   
-                                <li><a href="#tab_schedule" data-toggle="tab">Schedule Task</a></li>   
+                                <li class="active"><a href="#tab_acvt" data-toggle="tab" id="tab_acvt_click">Alert</a></li>
+                                <li><a href="#tab_agent" data-toggle="tab" id="tab_agent_click">Agent</a></li>   
+                                <li><a href="#tab_schedule" data-toggle="tab" id="tab_schedule_click">Schedule Task</a></li>   
                             </ul>
                             <div class="tab-content">
 
@@ -778,8 +784,19 @@
 
 <script>
 
+    var site_val = null;
+
     var keyword_search = null;
     var check_type = null;
+
+    var check_alert = null;
+    var filter_alert_site_name = null;
+    var filter_alert_des = null;
+
+    var filter_agent_site_name = null;
+    var filter_agent_device = null;
+    var filter_agent_ip = null;
+    var check_os_type = null;
 
     $(document).ready(function(){
         count_head();
@@ -792,6 +809,8 @@
     active_btn('#groupby-btn .btn-grey');
     active_btn('#groupby-status .btn-grey');
     active_btn('#btngroup_sort_by .btn-grey');
+    active_btn('#filter-alert-incident .btn-grey');
+    active_btn('#filter-agent-os-type .btn-grey');
 
     if($('.filter_agent_agent').hasClass('active')){
         $('#filter_alert_main').hide();
@@ -821,29 +840,88 @@
         check_type = $(this).val();
     });
 
+    $('.check_alert').click(function(){
+        check_alert = $(this).val();
+    });
+
+    $('.check_os_type').click(function(){
+        check_os_type = $(this).val();
+    });
+
     function search()
     {
-        var site_val = $('#site').val();
+        site_val = $('#site').val();
         keyword_search = $('#keyword_search').val();
-        console.log(check_type);
-        if(check_type == null)
+
+        if(check_type == 'alert')
         {
+            filter_alert_site_name = $('#filter_alert_site_name').val();
+            filter_alert_des = $('#filter_alert_des').val();
+
+            datatable_alert(site_val);
+            $('#tab_acvt_click').trigger("click");
+        }
+        else if(check_type == 'agent')
+        {
+            filter_agent_site_name = $('#filter_agent_site_name').val();
+            filter_agent_device = $('#filter_agent_device').val();
+            filter_agent_ip = $('#filter_agent_ip').val();
+
+            datatable_agent(site_val);
+            $('#tab_agent_click').trigger("click");
+        }
+        else
+        {
+            check_type = null;
+            check_alert = null;
+            check_os_type = null;
+            filter_alert_site_name = null;
+            filter_alert_des = null;
+            filter_agent_site_name = null;
+            filter_agent_device = null;
+            filter_agent_ip = null;
+            
             datatable_alert(site_val);
             datatable_agent(site_val);
             datatable_schedule(site_val);
         }
-        else if(check_type == 'alert')
-        {
-        }
-        else if(check_type == 'agent')
-        {
 
-        }
-        else
-        {
+    }
 
-        }
+    function clear_search()
+    {
+        keyword_search = null;
+        check_type = null;
+        check_alert = null;
+        check_os_type = null;
+        filter_alert_site_name = null;
+        filter_alert_des = null;
+        filter_agent_site_name = null;
+        filter_agent_device = null;
+        filter_agent_ip = null;
 
+        $('.check_type').removeClass('active');
+        $('.check_alert').removeClass('active');
+        $('.check_os_type').removeClass('active');
+        $('#btn_search_all').addClass('active');
+        $('#incident-status-all').addClass('active');
+        $('#all_os').addClass('active');
+
+        $('#keyword_search').val('');
+        $('#filter_alert_site_name').val('');
+        $('#filter_alert_des').val('');
+        $('#filter_agent_site_name').val('');
+        $('#filter_agent_device').val('');
+        $('#filter_agent_ip').val('');
+
+        $('#filter_alert_main').hide();
+        $('#filter_agent_main').hide();
+
+        $('#tab_acvt_click').trigger("click");
+
+        datatable_alert(site_val);
+        datatable_agent(site_val);
+        datatable_schedule(site_val);
     }
 
     function count_head(site_val)
@@ -868,6 +946,7 @@
     {
         console.log('log - '+site_val);
         let site_log_id = site_val;
+
         $.ajax({
             url: "{{route('agentmanagement.dudit_log_feed')}}",
             type: "POST",
@@ -925,8 +1004,8 @@
 
     function datatable_alert(site_val)
     {
-        console.log(site_val);
         var site_id = site_val;
+
         $('#table-activities-template').DataTable({
             cache: false,
             processData: false,
@@ -941,6 +1020,9 @@
                 data:function(d){
                     d.site_id = site_id;
                     d.keyword_search = keyword_search;
+                    d.filter_alert_site_name = filter_alert_site_name;
+                    d.filter_alert_des = filter_alert_des;
+                    d.check_alert = check_alert;
                     return d ;
                 }
             },
@@ -972,8 +1054,8 @@
 
     function datatable_agent(site_val)
     {
-        console.log(site_val);
         var site_id = site_val;
+
         $('#table-agent-template').DataTable({
             cache: false,
             processData: false,
@@ -990,6 +1072,11 @@
                 type: "POST",
                 data:function(d){
                     d.site_id = site_id;
+                    d.keyword_search = keyword_search;
+                    d.filter_agent_site_name = filter_agent_site_name;
+                    d.filter_agent_device = filter_agent_device;
+                    d.filter_agent_ip = filter_agent_ip;
+                    d.check_os_type = check_os_type;
                     return d ;
                 }
             },
@@ -1030,7 +1117,6 @@
     
     function datatable_schedule(site_val)
     {
-        console.log(site_val);
         let site_id = site_val;
         $('#table-schedule-template').DataTable({
             cache: false,
@@ -1245,7 +1331,7 @@
     timeline_chart('chart-time-line');
 
     $('#site').change(function(){
-        var site_val = $('#site').val();
+        site_val = $('#site').val();
         console.log(site_val);
         count_head(site_val);
         dudit_log_feed(site_val);
