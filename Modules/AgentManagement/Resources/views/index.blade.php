@@ -20,17 +20,17 @@
 
                 <div class="ml-2 text-right">
                     {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
-                    <div class="text-left max-w-select m-r-xs" style="display:inline-block">
-                        <select name="site" id="site" class="text-left select2-option form-control select-site" onchange="changeSite(value)">
+                    <div class="text-left max-w-select" style="display:inline-block">
+                        <select name="site" id="site" class="text-left select2-option form-control select-site">
                             <option value="">All Site</option>
-                            {{-- @if ($site_settings)
+                            @if ($site_settings)
 
                             @foreach ($site_settings as $site_settings)
                             <option value="{{$site_settings->id}}">{{$site_settings->name}}
                             </option>
                             @endforeach
 
-                            @endif --}}
+                            @endif
                         </select>
                     </div>
                     
@@ -749,196 +749,223 @@
 
 <script>
 
-active_btn('#groupby-btn .btn-grey');
-active_btn('#groupby-status .btn-grey');
-active_btn('#btngroup_sort_by .btn-grey');
+    var site = null;
+    $(document).ready(function(){
+        datatable_alert();
+        datatable_agent();
+        datatable_schedule();
+    });
 
-if($('.filter_agent_agent').hasClass('active')){
-    $('#filter_alert_main').hide();
-    $('#filter_agent_main').show();
-} else if($('#category_btn').hasClass('active')){
-    $('#filter_alert_main').show();
-    $('#filter_agent_main').hide();
-}else if($('#btn_search_all').hasClass('active')){
-    $('#filter_alert_main').hide();
-    $('#filter_agent_main').hide();
-}
+    active_btn('#groupby-btn .btn-grey');
+    active_btn('#groupby-status .btn-grey');
+    active_btn('#btngroup_sort_by .btn-grey');
 
-$('#btngroup_sort_by .btn-grey').on('click',function(){
     if($('.filter_agent_agent').hasClass('active')){
-    $('#filter_alert_main').hide();
-    $('#filter_agent_main').show();
-} else if($('.filter_agent_alert ').hasClass('active')){
-    $('#filter_alert_main').show();
-    $('#filter_agent_main').hide();
-}else if($('#btn_search_all').hasClass('active')){
-    $('#filter_alert_main').hide();
-    $('#filter_agent_main').hide();
-}
-});
+        $('#filter_alert_main').hide();
+        $('#filter_agent_main').show();
+    } else if($('#category_btn').hasClass('active')){
+        $('#filter_alert_main').show();
+        $('#filter_agent_main').hide();
+    }else if($('#btn_search_all').hasClass('active')){
+        $('#filter_alert_main').hide();
+        $('#filter_agent_main').hide();
+    }
 
-
-
-$('#table-activities-template').DataTable();
-
-$('#table-agent-template').DataTable({
-    "fnDrawCallback": function( oSettings ) {
-        multi_readmore()
-    },
-});
-$('#table-schedule-template').DataTable();
-
-function chart_c3(id,value,score_mid) {
-   const myc3 = c3.generate({
-        bindto: id,
-        data: {
-            columns: value,
-            type : 'donut',
-        },
-        donut: {
-            title: score_mid
-        },
-        legend: {
-            position: 'bottom'
-        },
-        color: {
-            pattern: ['#4398d4', '#40cd8f','#ffaa5b',]
+    $('#btngroup_sort_by .btn-grey').on('click',function(){
+        if($('.filter_agent_agent').hasClass('active')){
+            $('#filter_alert_main').hide();
+            $('#filter_agent_main').show();
+        } else if($('.filter_agent_alert ').hasClass('active')){
+            $('#filter_alert_main').show();
+            $('#filter_agent_main').hide();
+        }else if($('#btn_search_all').hasClass('active')){
+            $('#filter_alert_main').hide();
+            $('#filter_agent_main').hide();
         }
     });
-}
 
-function chart_bar(id){
-    Highcharts.chart(id, {
-        chart: {
-            type: 'column',
-                scrollablePlotArea: {
-                minWidth: 400,
+    function datatable_alert(site_val)
+    {
+        console.log(site_val);
+        $('#table-activities-template').DataTable();
+    }
+
+    function datatable_agent(site_val)
+    {
+        console.log(site_val);
+        $('#table-agent-template').DataTable({
+            "fnDrawCallback": function( oSettings ) {
+                multi_readmore()
             },
-        },
-        title: {
-            text: null
-        },
-        xAxis: {
-            type: 'category',
-            crosshair: true,
-            labels: {
-                overflow: 'justify',
-                autoRotation: false,
-                textAlign: 'center',
-            }
+        });
+    }
     
-        },
-        yAxis: {
-            min: 0,
+    function datatable_schedule(site_val)
+    {
+        console.log(site_val);
+        $('#table-schedule-template').DataTable();
+    }
+    
+
+    function chart_c3(id,value,score_mid) {
+        const myc3 = c3.generate({
+            bindto: id,
+            data: {
+                columns: value,
+                type : 'donut',
+            },
+            donut: {
+                title: score_mid
+            },
+            legend: {
+                position: 'bottom'
+            },
+            color: {
+                pattern: ['#4398d4', '#40cd8f','#ffaa5b',]
+            }
+        });
+    }
+
+    function chart_bar(id){
+        Highcharts.chart(id, {
+            chart: {
+                type: 'bar',
+                    scrollablePlotArea: {
+                    minWidth: 400,
+                },
+            },
             title: {
-            text: 'Values'
-            }
-        },
-        tooltip: {
-            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-            '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
-            footerFormat: '</table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
+                text: null
             },
-            series:{
-                pointWidth: 30,
-                color : '#ffc107',
-                align: 'center',
-            },
-            style:{
-                background: '#fff'
-            }
-        },
-        legend: {
-            enabled: false
-        },
-        series: [{
-            name: 'Population',
-            data: [
-                [ 'Top Rule1',  100],
-                [ 'Top Rule2',  30],
-                [ 'Top Rule3',  40],
-            ],
-            dataLabels: {
-                enabled: true,
-                color: '#333',
-                align: 'center',
-                format: '{point.y{{--:.1f--}}}',
-                y: 0, 
-                style: {
-                    fontSize: '13px',
-                    fontFamily: 'Verdana, sans-serif',
+            xAxis: {
+                type: 'category',
+                crosshair: true,
+                labels: {
+                    overflow: 'justify',
+                    autoRotation: false,
+                    textAlign: 'center',
                 }
-            }
-        }]
-    });
-}
-
-function timeline_chart(id){
-    Highcharts.chart(id, {
-        title: {
-            text: ''
-        },
-        yAxis: {
-            title: {
-            text: ''
+        
             },
-            plotLines: [{
-                color: '#FF0000',
+            yAxis: {
+                min: 0,
+                title: {
+                text: 'Values'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                },
+                series:{
+                    pointWidth: 30,
+                    color : '#ffc107',
+                    align: 'center',
+                },
+                style:{
+                    background: '#fff'
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            series: [{
+                name: 'Population',
+                data: [
+                    [ 'Top Rule1',  100],
+                    [ 'Top Rule2',  30],
+                    [ 'Top Rule3',  40],
+                ],
+                dataLabels: {
+                    enabled: true,
+                    color: '#333',
+                    align: 'center',
+                    format: '{point.y{{--:.1f--}}}',
+                    y: 0, 
+                    style: {
+                        fontSize: '13px',
+                        fontFamily: 'Verdana, sans-serif',
+                    }
+                }
             }]
-        },
+        });
+    }
 
-        xAxis: {
-            accessibility: {
-            rangeDescription: 'Range: 2010 to 2017'
-            }
-        },
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle',
-            enabled: false,
-        },
-
-        plotOptions: {
-            series: {
-            label: {
-                connectorAllowed: false
+    function timeline_chart(id){
+        Highcharts.chart(id, {
+            title: {
+                text: ''
             },
-            pointStart: 0
-            }
-        },
-
-        series: [{
-            name: 'Installation',
-            data: [143934, 52503, 57177, 69658, 97031, 119931, 137133, 154175],
-            type: 'area',
-            fillColor: '#c8dcf17d',
+            yAxis: {
+                title: {
+                text: ''
+                },
+                plotLines: [{
+                    color: '#FF0000',
+                }]
             },
-            {
-            name: 'Installation2',
-            fillColor: '#014f9a9e',
-            color: '#014f9a',
-            data: [14393, 2503, 7177, 9658, 7031, 19931, 13133, 14175]
-            }
-        ]
+
+            xAxis: {
+                accessibility: {
+                rangeDescription: 'Range: 2010 to 2017'
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                enabled: false,
+            },
+
+            plotOptions: {
+                series: {
+                label: {
+                    connectorAllowed: false
+                },
+                pointStart: 0
+                }
+            },
+
+            series: [{
+                name: 'Installation',
+                data: [143934, 52503, 57177, 69658, 97031, 119931, 137133, 154175],
+                type: 'area',
+                fillColor: '#c8dcf17d',
+                },
+                {
+                name: 'Installation2',
+                fillColor: '#014f9a9e',
+                color: '#014f9a',
+                data: [14393, 2503, 7177, 9658, 7031, 19931, 13133, 14175]
+                }
+            ]
+        });
+    }
+
+    chart_c3('#chart-platform-summary', [['Linux', 30],['Window',10]],7);
+    chart_c3('#chart-incident-type', [['Corporate', 42.9],['Personal', 57.1]],7);
+    chart_c3('#chart-serverity', [['White Listed', 273],['Blacklisted', 50]],275);
+
+    chart_bar('chart-top-rule');
+
+    timeline_chart('chart-time-line');
+
+    $('#site').change(function(){
+        var site_val = $('#site').val();
+        console.log(site_val);
+        datatable_alert(site_val);
+        datatable_agent(site_val);
+        datatable_schedule(site_val);
     });
-}
-
-chart_c3('#chart-platform-summary', [['Linux', 30],['Window',10]],7);
-chart_c3('#chart-incident-type', [['Corporate', 42.9],['Personal', 57.1]],7);
-chart_c3('#chart-serverity', [['White Listed', 273],['Blacklisted', 50]],275);
-
-chart_bar('chart-top-rule');
-
-timeline_chart('chart-time-line');
 
 </script>
 
