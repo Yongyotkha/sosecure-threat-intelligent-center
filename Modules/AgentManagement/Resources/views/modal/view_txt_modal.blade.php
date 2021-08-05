@@ -9,19 +9,15 @@
 
             <?php 
 
-                // $fh = fopen("https://insight.sosecure.co.th/css/log_yara_scan_data_2021-08-05.txt", 'r');
+                $fh = fopen("https://insight.sosecure.co.th/css/log_yara_scan_data_2021-08-05.txt", 'r');
 
-                // $pageText = fread($fh, 25000);
+                $pageText = fread($fh, 25000);
 
-                // echo nl2br($pageText);
+                echo nl2br($pageText);
 
             ?>
 
-            <?php
-                $myfile = fopen("https://insight.sosecure.co.th/css/log_yara_scan_data_2021-08-05.txt.txt", "r") or die("Unable to open file!");
-                echo fread($myfile,filesize("https://insight.sosecure.co.th/css/log_yara_scan_data_2021-08-05.txt.txt"));
-                fclose($myfile);
-            ?>
+      
 
         </div>
         
