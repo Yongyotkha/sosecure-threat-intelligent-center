@@ -43,7 +43,7 @@
 
             <section class="panel panel-default bg-white-cust m-t-lg b-r-cust">
                 <div class="panel-body text-center">
-                    <h2 style="margin-bottom: 2rem;color:#333;">Two-factor authentication</h2>
+                    <h3 style="margin-bottom: 2rem;color:#333;">Two-factor authentication</h3>
                     <form class="form-horizontal" method="POST" action="{{ route('2fa.auth') }}">
                         {{ csrf_field() }}
                         @if ($errors->has('message'))
@@ -54,11 +54,11 @@
                         @endif
                         <div class="form-group">
                             <div class="col-md-12">
-                                <input id="one_time_password" type="text" class="form-control" name="one_time_password" required autofocus style="font-size:2.3rem;height: 55px !important;">
+                                <input id="one_time_password" type="text" class="form-control" name="one_time_password" required autofocus style="font-size:1.8rem;height: 40px !important;">
                             </div>
                         </div>
-                        <div style="margin:4rem 0 2rem 0">
-                            <button type="submit" class="btn btn-info btn-block"><h3 style="margin: 1rem 0 !important">Verify</h3></button>
+                        <div style="margin:2rem 0 2rem 0">
+                            <button type="submit" class="btn btn-info btn-block"><h4 style="margin: .8rem 0 !important">Verify</h4></button>
                         </div>
                         {{-- <div class="m-sm">
                             <a href="{{ url('/logout') }}">@langapp('cancel')</a> | <a href="{{ route('2fa.reset') }}">@langapp('verify')</a>

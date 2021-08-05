@@ -5414,3 +5414,25 @@ input.form-policy[type=password] {
     font-size: 13px !important;
     font-family: 'Poppins';
 }
+
+.compromised-new-box{
+    display: flex;
+    justify-content: space-between;
+    padding: 0 1rem;
+}
+.img-icon-smm-compro{
+    width: 75px;
+    height: 110px;
+    overflow: hidden;
+    position: relative;
+    margin: auto;
+}
+
+.img-icon-smm-compro img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}

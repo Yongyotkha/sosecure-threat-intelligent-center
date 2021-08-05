@@ -132,7 +132,7 @@ use Carbon\Carbon;
                                 <div class="card-dash-compro none-bg none-shadow">
                                     <div class="left-card">
                                         <div class="img-icon-card ice">
-                                            <img src="{{asset('images/webserver.png')}}" alt="">
+                                            <img src="{{asset('images/endpoint.png')}}" alt="">
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper ">Endpoint Detection</h3>
                                         <span class="number-card green" id='webserver-count'>{{$webserver}}</span>
@@ -143,12 +143,25 @@ use Carbon\Carbon;
                         <div class="col-md-3 nopadding">
                             <a href="#" onclick="">
                                 <div class="card-dash-compro none-bg none-shadow">
-                                    <div class="left-card">
-                                        <div class="img-icon-card ice">
-                                            <img src="{{asset('images/webserver.png')}}" alt="">
+
+                                    <div class="compromised-new-box">
+                                        <div class="img-icon-smm-compro">
+                                            <img src="{{asset('images/Agent.png')}}" alt="">
                                         </div>
-                                        <h3 class="name-dash-text-compro text-dark text-upper">Agent</h3>
-                                        <span class="number-card green" id='agent-count'>4</span>
+                                        <div style="width: 50%" class="text-center">
+                                            <span class="number-card green" id='agent-count'>4</span>
+                                            <h3 class="name-dash-text-compro text-dark text-upper">Agent</h3>
+                                        </div>
+                                    </div>
+
+                                    <div class="compromised-new-box">
+                                        <div class="img-icon-smm-compro">
+                                            <img src="{{asset('images/nw.png')}}" alt="">
+                                        </div>
+                                        <div style="width: 50%" class="text-center">
+                                            <span class="number-card green" id='network-count'>10</span>
+                                            <h3 class="name-dash-text-compro text-dark text-upper">Network</h3>
+                                        </div>
                                     </div>
                                 </div>
                             </a>
