@@ -213,29 +213,30 @@ class AgentManagementController extends Controller
         // dd($input);
 
         $site_log_id = $request->site_log_id;
-        $query = FXAgentAlerts::
-                    join('site', 'agent_alerts.site_id', 'site.id')
+        $query = FXAgentLogs::
+                    join('site', 'agent_logs.site_id', 'site.id')
                     // ->where('site_id', $request->site_id)
                     ->where(function ($query_site) use ($site_log_id) {
                         if($site_log_id != null)
                         {
-                            $query_site->where('agent_alerts.site_id', $site_log_id);
+                            $query_site->where('agent_logs.site_id', $site_log_id);
                         }
                         else
                         {
-                            $query_site->where('agent_alerts.site_id', '!=', null);
+                            $query_site->where('agent_logs.site_id', '!=', null);
                         }
                     })
                     ->select(
                         'site.name as site_name',
                         'site.logo as site_logo',
                         'site.ip_key as site_ip_key',
-                        'agent_alerts.id as agent_alerts_id',
-                        'agent_alerts.rule as agent_alerts_rule',
-                        'agent_alerts.description as agent_alerts_description',
-                        'agent_alerts.incident as agent_alerts_incident',
-                        'agent_alerts.status as agent_alerts_status',
-                        'agent_alerts.created as agent_alerts_created'
+                        'agent_logs.id as agent_logs_id',
+                        'agent_logs.agent_id as agent_logs_agent_id',
+                        'agent_logs.title as agent_logs_title',
+                        'agent_logs.ip_address as agent_logs_ip_address',
+                        'agent_logs.description as agent_logs_description',
+                        'agent_logs.rules as agent_logs_rules',
+                        'agent_logs.created as agent_logs_created'
                     )
                     ->get();
                     
@@ -330,6 +331,7 @@ class AgentManagementController extends Controller
                         'site_agents.device_name as site_agents_device_name',
                         'site_agents.os_description as site_agents_os_description',
                         'site_agents.system_info as site_agents_system_info',
+                        'site_agents.domain as site_agents_domain',
                         'site_agents.ip_private as site_agents_ip_private',
                         'site_agents.last_online as site_agents_last_online',
                         'site_agents.status as site_agents_status',
