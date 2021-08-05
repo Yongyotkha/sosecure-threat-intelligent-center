@@ -205,7 +205,7 @@
                 <ul class="list-agt">
                     <li>
                         <div class="agt-card">
-                            <span class="agt-score">7</span>
+                            <span class="agt-score">1</span>
                             <span class="agt-txt-sm">Agent</span>
                         </div>
                     </li>
@@ -239,9 +239,9 @@
 
             <div class="container-fluid nopadding">
                 <div class="row">
-                    <div class="col-md-8">
+                    <div class="col-lg-12">
                         <div class="row">
-                            <div class="col-lg-6 mb-3">
+                            <div class="col-lg-4 mb-3">
                                 <div class="agt-main-box">
                                     <div class="agt-header">
                                         Incident Type
@@ -252,7 +252,7 @@
                                 </div>
                                 
                             </div>
-                            <div class="col-lg-6 mb-3">
+                            <div class="col-lg-4 mb-3">
                                 <div class="agt-main-box">
                                     <div class="agt-header">
                                         Platform Summary
@@ -262,10 +262,8 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
 
-                            <div class="col-lg-6 mb-3">
+                            <div class="col-lg-4 mb-3">
                                 <div class="agt-main-box">
                                     <div class="agt-header">
                                         Severity
@@ -276,153 +274,85 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-6 mb-3">
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-8 mb-3">
                                 <div class="agt-main-box">
                                     <div class="agt-header">
                                         Top Rule
                                     </div>
                                     <div class="agt-body">
-                                        <div id="chart-top-rule" style="height: 250px;"></div>
+                                        <div id="chart-top-rule" style="height: 300px;"></div>
                                     </div>
                                 </div>
                             </div>
-                       
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="agt-main-box">
-                            <div class="agt-header">
-                                Audit Log Feed
-                                <span class="refresh-audit-log pull-right cs-pointer"><i class="fas fa-sync-alt"></i></span>
-                            </div>
-                            <div class="agt-body">
-                                <div id="audit-log" style="height: 559px;;overflow-y:auto;">
-                                    <ul class="audit-log-list">
-                                        <li>
-                                            <div>
-                                                <div class="wrapper-audit-log-img">
-                                                    <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <span class="audit-log-header">
-                                                    The host 192.168.3.2 is connected as admin with Adminstrator role
-                                                </span>
-                                                <div class="audit-log-time">
-                                                    <span class="audit-by">
-                                                        admin
-                                                    </span>
-                                                    <span class="audit-time">
-                                                        1 hour ago
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div>
-                                                <div class="wrapper-audit-log-img">
-                                                    <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <span class="audit-log-header">
-                                                    The host 192.168.3.2 is connected as admin with Adminstrator role
-                                                </span>
-                                                <div class="audit-log-time">
-                                                    <span class="audit-by">
-                                                        admin
-                                                    </span>
-                                                    <span class="audit-time">
-                                                        1 hour ago
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div>
-                                                <div class="wrapper-audit-log-img">
-                                                    <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <span class="audit-log-header">
-                                                    The host 192.168.3.2 is connected as admin with Adminstrator role
-                                                </span>
-                                                <div class="audit-log-time">
-                                                    <span class="audit-by">
-                                                        admin
-                                                    </span>
-                                                    <span class="audit-time">
-                                                        1 hour ago
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div>
-                                                <div class="wrapper-audit-log-img">
-                                                    <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <span class="audit-log-header">
-                                                    The host 192.168.3.2 is connected as admin with Adminstrator role
-                                                </span>
-                                                <div class="audit-log-time">
-                                                    <span class="audit-by">
-                                                        admin
-                                                    </span>
-                                                    <span class="audit-time">
-                                                        1 hour ago
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div>
-                                                <div class="wrapper-audit-log-img">
-                                                    <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <span class="audit-log-header">
-                                                    The host 192.168.3.2 is connected as admin with Adminstrator role
-                                                </span>
-                                                <div class="audit-log-time">
-                                                    <span class="audit-by">
-                                                        admin
-                                                    </span>
-                                                    <span class="audit-time">
-                                                        1 hour ago
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div>
-                                                <div class="wrapper-audit-log-img">
-                                                    <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <span class="audit-log-header">
-                                                    The host 192.168.3.2 is connected as admin with Adminstrator role
-                                                </span>
-                                                <div class="audit-log-time">
-                                                    <span class="audit-by">
-                                                        admin
-                                                    </span>
-                                                    <span class="audit-time">
-                                                        1 hour ago
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
+                            <div class="col-lg-4">
+                                <div class="agt-main-box">
+                                    <div class="agt-header">
+                                        Log Feed
+                                        <span class="refresh-audit-log pull-right cs-pointer"><i class="fas fa-sync-alt"></i></span>
+                                    </div>
+                                    <div class="agt-body">
+                                        <div id="audit-log" style="height: 300px;;overflow-y:auto;">
+                                            <ul class="audit-log-list">
+                                                <li>
+                                                    {{-- <div>
+                                                        <div class="wrapper-audit-log-img">
+                                                            <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
+                                                        </div>
+                                                    </div> --}}
+                                                    <div class="w-100per">
+                                                        <div class="audit-log-time">
+                                                            <span class="audit-by">
+                                                                Site : Sosecure
+                                                            </span>
+                                                            <span class="audit-time">
+                                                                IP : 127.0.0.3
+                                                            </span>
+                                                        </div>
+                                                        <span class="audit-log-header">
+                                                            2021-08-05 08:58:50 | Start Scan Yara
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="w-100per">
+                                                        <div class="audit-log-time">
+                                                            <span class="audit-by">
+                                                                Site : Sosecure
+                                                            </span>
+                                                            <span class="audit-time">
+                                                                IP : 127.0.0.3
+                                                            </span>
+                                                        </div>
+                                                        <span class="audit-log-header">
+                                                            2021-08-05 08:59:10|/crypto/crypto_signatures.yar(71): warning: $c0 in rule Big_Numbers5 is slowing down scanning
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="w-100per">
+                                                        <div class="audit-log-time">
+                                                            <span class="audit-by">
+                                                                Site : Sosecure
+                                                            </span>
+                                                            <span class="audit-time">
+                                                                IP : 127.0.0.3
+                                                            </span>
+                                                        </div>
+                                                        <span class="audit-log-header">
+                                                            2021-08-05 09:28:20|Stop Scan Yara
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                 
                 </div>
 
 
@@ -478,9 +408,12 @@
                                                                 Site Name            
                                                             </th>
                                                             <th>
+                                                                Rule
+                                                            </th>
+                                                            <th>
                                                                 Description
                                                             </th>
-                                                            <th>Status</th>
+                                                            <th>Incident</th>
                                                             <th>Datetime</th>
                                                             <th class="text-center">Action</th>
                                                         </tr>
@@ -492,12 +425,81 @@
                                                                     <span class="label-text"></span>
                                                                 </label>
                                                             </td>
-                                                            <td>Site Demo</td>
-                                                            <td>Found 1 matches in "/var/www/webshell/pl/remot shell.pl"   </td>
-                                                            <td>Scan</td>
-                                                            <td>2021-04-22 08:34:12 </td>
+                                                            <td>Sosecure</td>
+                                                            <td>webshell_mysqlwebsh</td>
+                                                            <td>D://yara//webshell////web-malware-collection-13-06-2012//PHP//mysqlwebsh.php</td>
+                                                            <td>Agent</td>
+                                                            <td>2021-05-08 09:34:12 </td>
                                                             <td class="text-center">
-                                                                <a href="#" class="btn btn-info btn-xs">
+                                                                <a href="{{route('agentmanagement.view_txt')}}" data-toggle='ajaxModal'  class="btn btn-info btn-xs">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
+                                                                    <span class="label-text"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td>Sosecure</td>
+                                                            <td>webshell_jsp_up</td>
+                                                            <td>D://yara//webshell////web-malware-collection-13-06-2012//JSP//up_win32.jsp</td>
+                                                            <td>Agent</td>
+                                                            <td>2021-05-08 09:45:47 </td>
+                                                            <td class="text-center">
+                                                                <a href="{{route('agentmanagement.view_txt')}}" data-toggle='ajaxModal'  class="btn btn-info btn-xs">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
+                                                                    <span class="label-text"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td>Sosecure</td>
+                                                            <td>NT_Addy_asp</td>
+                                                            <td>D://yara//webshell////web-malware-collection-13-06-2012//ASP//ELMALISEKER Backd00r.asp</td>
+                                                            <td>Agent</td>
+                                                            <td>2021-05-08 09:58:01 </td>
+                                                            <td class="text-center">
+                                                                <a href="{{route('agentmanagement.view_txt')}}" data-toggle='ajaxModal'  class="btn btn-info btn-xs">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
+                                                                    <span class="label-text"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td>Sosecure</td>
+                                                            <td>MySQL_Web_Interface_Version_0_8_php</td>
+                                                            <td>D://yara//webshell////web-malware-collection-13-06-2012//PHP//MySQL Web Interface Version 0.8.txt</td>
+                                                            <td>Agent</td>
+                                                            <td>2021-05-08 09:50:16 </td>
+                                                            <td class="text-center">
+                                                                <a href="{{route('agentmanagement.view_txt')}}" data-toggle='ajaxModal'  class="btn btn-info btn-xs">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
+                                                                    <span class="label-text"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td>Sosecure</td>
+                                                            <td>BASE64_table</td>
+                                                            <td>D://yara//webshell////pl//pps-pl//pps-v4.0.pl</td>
+                                                            <td>Agent</td>
+                                                            <td>2021-05-08 10:20:12 </td>
+                                                            <td class="text-center">
+                                                                <a href="{{route('agentmanagement.view_txt')}}" data-toggle='ajaxModal'  class="btn btn-info btn-xs">
                                                                     <i class="fas fa-eye"></i>
                                                                 </a>
                                                             </td>
@@ -821,7 +823,7 @@
                 position: 'bottom'
             },
             color: {
-                pattern: ['#4398d4', '#40cd8f','#ffaa5b',]
+                pattern: ['#4398d4', '#40cd8f','#f4d757','#fcc838','#b93624']
             }
         });
     }
@@ -850,8 +852,14 @@
             yAxis: {
                 min: 0,
                 title: {
-                text: 'Values'
+                    text: 'Values'
+                },
+                labels: {
+                    overflow: 'justify',
+                    autoRotation: false,
+                    textAlign: 'center',
                 }
+                
             },
             tooltip: {
                 headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
@@ -881,12 +889,15 @@
             series: [{
                 name: 'Population',
                 data: [
-                    [ 'Top Rule1',  100],
-                    [ 'Top Rule2',  30],
-                    [ 'Top Rule3',  40],
+                    [ 'webshell_MySQL_Web_Interface_Version_0_8',  90],
+                    [ 'MySQL_Web_Interface_Version_0_8_php',  80],
+                    [ 'webshell_mysqlwebsh',  50],
+                    [ 'NT_Addy_asp',  40],
+                    [ 'BASE64_table',  40],
+                    [ 'webshell_jsp_up',  30],
                 ],
                 dataLabels: {
-                    enabled: true,
+                    enabled: false,
                     color: '#333',
                     align: 'center',
                     format: '{point.y{{--:.1f--}}}',
@@ -906,6 +917,7 @@
                 text: ''
             },
             yAxis: {
+                
                 title: {
                 text: ''
                 },
@@ -915,8 +927,9 @@
             },
 
             xAxis: {
+                categories: ['7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18','19','20','21','22','23','24','25','26','27','28','29','30','31','1','2','3','4','5'],
                 accessibility: {
-                rangeDescription: 'Range: 2010 to 2017'
+                rangeDescription: ''
                 }
             },
             legend: {
@@ -936,24 +949,27 @@
             },
 
             series: [{
-                name: 'Installation',
-                data: [143934, 52503, 57177, 69658, 97031, 119931, 137133, 154175],
+                name: 'Alert',
+                data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7],
                 type: 'area',
                 fillColor: '#c8dcf17d',
-                },
-                {
-                name: 'Installation2',
-                fillColor: '#014f9a9e',
-                color: '#014f9a',
-                data: [14393, 2503, 7177, 9658, 7031, 19931, 13133, 14175]
                 }
             ]
         });
     }
 
-    chart_c3('#chart-platform-summary', [['Linux', 30],['Window',10]],7);
-    chart_c3('#chart-incident-type', [['Corporate', 42.9],['Personal', 57.1]],7);
-    chart_c3('#chart-serverity', [['White Listed', 273],['Blacklisted', 50]],275);
+    chart_c3('#chart-platform-summary', [['Linux', 0],['Window',100]],1);
+    chart_c3('#chart-incident-type', [['Yara', 100],['Indicator', 0]],1);
+    chart_c3(
+        '#chart-serverity',
+         [
+             ['Information', 0],
+             ['Low', 0],
+             ['Mediumn', 7],
+             ['High', 0],
+             ['Critical', 0]
+             ],7
+    );
 
     chart_bar('chart-top-rule');
 

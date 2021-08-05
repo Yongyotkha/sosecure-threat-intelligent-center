@@ -74,6 +74,11 @@ class AgentManagementController extends Controller
         return view('agentmanagement::create');
     }
 
+    public function view_txt()
+    {
+        return view('agentmanagement::modal.view_txt_modal');
+    }
+    
     /**
      * Store a newly created resource in storage.
      * @param Request $request

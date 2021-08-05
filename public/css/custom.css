@@ -2449,7 +2449,7 @@ ul.topics-news-list li a:hover{
 
 .name-dash-text-compro{
     margin: 10px !important;
-    font-size: 32px !important;
+    font-size: 26px !important;
 }
 
 .name-dash-text-vuln{
@@ -5327,6 +5327,7 @@ input.form-policy[type=password] {
     display: flex;
     align-items: center;
     padding: 1rem;
+    border-bottom: 1px solid #f2f2f2;
 }
 
 .audit-log-header{
@@ -5353,19 +5354,23 @@ input.form-policy[type=password] {
 
 .audit-log-time{
     display: flex;
-    margin-top: 1rem;
+    justify-content: space-between;
+    margin-bottom: .5px;
 }
 .audit-log-time .audit-by,
 .audit-log-time .audit-time{
     font-size: 13px;
-    color: #b3b0b0;
+    color: #333;
     font-weight: bold;
 }
 .audit-log-time .audit-by{
-    width: 40%;
 }
 .audit-log-time .audit-time{
    
+}
+
+.w-100per{
+    width: 100%;
 }
 
 .icon-devices{

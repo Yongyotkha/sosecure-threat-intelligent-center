@@ -15,5 +15,6 @@ Route::group(
 	['middleware' => 'web', 'prefix' => 'agent_management'],
 	function () {
 		Route::get('/', 'AgentManagementController@index')->name('agentmanagement.index')->middleware('can:menu_items');
+		Route::get('/view_txt', 'AgentManagementController@view_txt')->name('agentmanagement.view_txt')->middleware('can:menu_items');
 	}
 );

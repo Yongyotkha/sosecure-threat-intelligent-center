@@ -18,7 +18,7 @@ use Carbon\Carbon;
                 <header class="dk header b-b">
                     <a class="btn btn-icon btn-default btn-sm pull-right visible-xs m-r-xs" data-toggle="class:show" data-target="#setting-nav">@icon('solid/bars')</a>
                     <a class="hide-setting btn btn-icon btn-default btn-sm pull-right btn-h-vis-menu">@icon('solid/bars')</a>
-                    <p class="h3 text-elipse-setting">Compromise</p>
+                    <p class="h3 text-elipse-setting">Compromised</p>
                 </header>
                 <section class="scrollable">
                     <section id="setting-nav" class="hidden-xs">
@@ -134,7 +134,7 @@ use Carbon\Carbon;
                                         <div class="img-icon-card ice">
                                             <img src="{{asset('images/webserver.png')}}" alt="">
                                         </div>
-                                        <h3 class="name-dash-text-compro text-dark text-upper ">Web Server</h3>
+                                        <h3 class="name-dash-text-compro text-dark text-upper ">Endpoint Detection</h3>
                                         <span class="number-card green" id='webserver-count'>{{$webserver}}</span>
                                     </div>
                                 </div>
