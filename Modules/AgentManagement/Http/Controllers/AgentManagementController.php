@@ -137,8 +137,23 @@ class AgentManagementController extends Controller
     public function count_head(Request $request)
     {
         $input = $request->all();
-        dd($input);
+        // dd($input);
         $site_log_id = $request->site_log_id;
+
+        $query_agent = FXSiteAgents::
+                where(function ($query_site) use ($site_log_id) {
+                    if($site_log_id != null)
+                    {
+                        $query_site->where('site_id', $site_log_id);
+                    }
+                    else
+                    {
+                        $query_site->where('site_id', '!=', null);
+                    }
+                })
+                ->get();
+        $count_agent = count($query_agent);
+
         $query_alert = FXAgentAlerts::
                 where(function ($query_site) use ($site_log_id) {
                     if($site_log_id != null)
@@ -153,7 +168,7 @@ class AgentManagementController extends Controller
                 ->get();
         $count_alert = count($query_alert);
 
-        $query_alert = FXAgentLogs::
+        $query_log = FXAgentLogs::
                 where(function ($query_site) use ($site_log_id) {
                     if($site_log_id != null)
                     {
@@ -165,9 +180,9 @@ class AgentManagementController extends Controller
                     }
                 })
                 ->get();
-        $count_alert = count($query_alert);
+        $count_log = count($query_log);
 
-        $query_alert = FXAgentRules::
+        $query_rule = FXAgentRules::
                 where(function ($query_site) use ($site_log_id) {
                     if($site_log_id != null)
                     {
@@ -179,8 +194,17 @@ class AgentManagementController extends Controller
                     }
                 })
                 ->get();
+        $count_rule = count($query_rule);
 
-        $site_log_id = $request->site_log_id;
+        $response = [
+            'count_agent' => $count_agent,
+            'count_alert' => $count_alert,
+            'count_log' => $count_log,
+            'count_rule' => $count_rule
+        ];
+
+        return response()->json($response);
+
     }
 
     public function dudit_log_feed(Request $request)
@@ -286,6 +310,70 @@ class AgentManagementController extends Controller
         ->rawColumns(['chk','chk_status','action'])
         ->make(true);
     }
+
+    public function tb_agent(Request $request)
+    {
+        $input = $request->all();
+
+        // dd($request->site_id);
+
+        $query = FXSiteAgents::
+                    join('site', 'site_agents.site_id', 'site.id')
+                    ->join('os_type', 'site_agents.os_type', 'os_type.id')
+                    ->select(
+                        'site.name as site_name',
+                        'site.logo as site_logo',
+                        'os_type.name as os_type_name',
+                        'site_agents.id as site_agents_id',
+                        'site_agents.device_name as site_agents_device_name',
+                        'site_agents.os_description as site_agents_os_description',
+                        'site_agents.system_info as site_agents_system_info',
+                        'site_agents.ip_private as site_agents_ip_private',
+                        'site_agents.last_online as site_agents_last_online',
+                        'site_agents.status as site_agents_status',
+                        'site_agents.created as site_agents_created'
+                    );
+
+        if($request->site_id != null)
+        {
+            $query->where('site_id', $request->site_id);
+        }
+
+        return DataTables::of($query)
+        ->addColumn('chk', function($query) {
+            $html = '';
+            $html .= '
+                <label>
+                    <input name="select_all" value="'.$query->site_agents_id.'" id="select-all" type="checkbox" class="select-chk">
+                    <span class="label-text"></span>
+                </label>
+            ';
+            return $html;
+        })
+        ->addColumn('action', function($query) {
+            $html = '';
+            $html .= '
+                <div class="btn-group">
+                    <button type="button" class="btn btn-info btn-xs dropdown-toggle" data-toggle="dropdown">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="#"><i class="fas fa-power-off"></i> Restrat Service</a></li>
+                        <li><a href="#"><i class="fas fa-search"></i> Quick Scan</a></li>
+                        <li><a href="#"><i class="fas fa-stop-circle"></i> Stop Service</a></li>
+                        <li><a href="#"><i class="fas fa-search"></i> Scan Yara</a></li>
+                        <li><a href="#"><i class="fas fa-eye"></i> View Log Data</a></li>
+                        <li><a href="#"><i class="fas fa-eye"></i> View Log Error</a></li>
+                    </ul>
+                </div>
+            ';
+            return $html;
+        })
+        ->rawColumns(['chk','action'])
+        ->make(true);
+    }
+
+    
 
     public function tb_schedule(Request $request)
     {
