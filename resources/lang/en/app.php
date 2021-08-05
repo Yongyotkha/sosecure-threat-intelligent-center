@@ -1013,7 +1013,7 @@ return [
     'apply'                                     => 'Apply',
     'tools'                                     => 'Tools',
     'darkweb_darkowl'                           => 'Darkweb(darkowl)',
-    'actor'                                     => 'Actor',
+    'actor'                                     => 'Threat Actor',
     'agent_management'                          => 'Agent Management',
     'phishing_detection'                        => 'Phishing Detection',
 ];
