@@ -138,6 +138,47 @@ class AgentManagementController extends Controller
     {
         $input = $request->all();
         dd($input);
+        $site_log_id = $request->site_log_id;
+        $query_alert = FXAgentAlerts::
+                where(function ($query_site) use ($site_log_id) {
+                    if($site_log_id != null)
+                    {
+                        $query_site->where('site_id', $site_log_id);
+                    }
+                    else
+                    {
+                        $query_site->where('site_id', '!=', null);
+                    }
+                })
+                ->get();
+        $count_alert = count($query_alert);
+
+        $query_alert = FXAgentLogs::
+                where(function ($query_site) use ($site_log_id) {
+                    if($site_log_id != null)
+                    {
+                        $query_site->where('site_id', $site_log_id);
+                    }
+                    else
+                    {
+                        $query_site->where('site_id', '!=', null);
+                    }
+                })
+                ->get();
+        $count_alert = count($query_alert);
+
+        $query_alert = FXAgentRules::
+                where(function ($query_site) use ($site_log_id) {
+                    if($site_log_id != null)
+                    {
+                        $query_site->where('site_id', $site_log_id);
+                    }
+                    else
+                    {
+                        $query_site->where('site_id', '!=', null);
+                    }
+                })
+                ->get();
 
         $site_log_id = $request->site_log_id;
     }
@@ -166,7 +207,9 @@ class AgentManagementController extends Controller
                         'site.logo as site_logo',
                         'site.ip_key as site_ip_key',
                         'agent_alerts.id as agent_alerts_id',
+                        'agent_alerts.rule as agent_alerts_rule',
                         'agent_alerts.description as agent_alerts_description',
+                        'agent_alerts.incident as agent_alerts_incident',
                         'agent_alerts.status as agent_alerts_status',
                         'agent_alerts.created as agent_alerts_created'
                     )

@@ -205,19 +205,19 @@
                 <ul class="list-agt">
                     <li>
                         <div class="agt-card">
-                            <span class="agt-score">1</span>
+                            <span class="agt-score" id="text_agent">0</span>
                             <span class="agt-txt-sm">Agent</span>
                         </div>
                     </li>
                     <li>
                         <div class="agt-card">
-                            <span class="agt-score">7</span>
+                            <span class="agt-score" id="text_alert">0</span>
                             <span class="agt-txt-sm">Alert</span>
                         </div>
                     </li>
                     <li>
                         <div class="agt-card">
-                            <span class="agt-score">5</span>
+                            <span class="agt-score" id="text_rule">0</span>
                             <span class="agt-txt-sm">Rule</span>
                         </div>
                     </li>
@@ -294,13 +294,13 @@
                                     </div>
                                     <div class="agt-body">
                                         <div id="audit-log" style="height: 300px;;overflow-y:auto;">
-                                            <ul class="audit-log-list">
-                                                <li>
-                                                    {{-- <div>
+                                            <ul class="audit-log-list" id="audit_log_list">
+                                                {{-- <li>
+                                                    <div>
                                                         <div class="wrapper-audit-log-img">
                                                             <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
                                                         </div>
-                                                    </div> --}}
+                                                    </div>
                                                     <div class="w-100per">
                                                         <div class="audit-log-time">
                                                             <span class="audit-by">
@@ -344,14 +344,14 @@
                                                             2021-08-05 09:28:20|Stop Scan Yara
                                                         </span>
                                                     </div>
-                                                </li>
+                                                </li> --}}
                                             </ul>
                                         </div>
                                     </div>
                        
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    {{-- <div class="col-md-4">
                         <div class="agt-main-box">
                             <div class="agt-header">
                                 Audit Log Feed
@@ -360,7 +360,7 @@
                             <div class="agt-body">
                                 <div id="audit-log" style="height: 559px;;overflow-y:auto;">
                                     <ul class="audit-log-list" id="audit_log_list">
-                                        {{-- <li>
+                                        <li>
                                             <div>
                                                 <div class="wrapper-audit-log-img">
                                                     <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
@@ -379,13 +379,12 @@
                                                     </span>
                                                 </div>
                                             </div>
-                                        </li> --}}
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                 
+                    </div> --}}
                 </div>
 
 
@@ -849,28 +848,20 @@
                 for(let rows in response.query)
                 {
                     const data_log = response.query[rows];
-                    {{-- <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt=""> --}}
-                    {{-- alert(data_log.agent_alerts_id); ${data_log.site_logo} --}}
                     html += `
                             <li>
-                                <div>
-                                    <div class="wrapper-audit-log-img">
-                                        <img src="{{asset('asset_salepage/images/AgentBasedDetection.png')}}" alt="">
-                                    </div>
-                                </div>
-                                <div>
-                                    <span class="audit-log-header">
-                                        ${data_log.site_name} : ${data_log.site_ip_key}<br>
-                                        ${data_log.description}
-                                    </span>
+                                <div class="w-100per">
                                     <div class="audit-log-time">
                                         <span class="audit-by">
-                                            ${data_log.site_name}
+                                            Site : ${data_log.site_name}
                                         </span>
                                         <span class="audit-time">
-                                            ${data_log.agent_alerts_created}
+                                            IP : ${data_log.site_ip_key}
                                         </span>
                                     </div>
+                                    <span class="audit-log-header">
+                                        ${data_log.agent_alerts_created} | ${data_log.description}
+                                    </span>
                                 </div>
                             </li>
                         `;
@@ -909,10 +900,13 @@
                     data: 'site_name',
                 },
                 {
+                    data: 'agent_alerts_rule',
+                },
+                {
                     data: 'agent_alerts_description',
                 },
                 {
-                    data: 'chk_status',
+                    data: 'agent_alerts_incident',
                 },
                 {
                     data: 'agent_alerts_created',
