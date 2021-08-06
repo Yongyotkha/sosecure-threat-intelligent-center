@@ -300,7 +300,6 @@
                                             <div class="loader4 centerloader"></div>
                                             <div class="loadding-text">Loading ...</div>
                                         </div>
-
                                         <div id="chart-severity" style="height: 250px;"></div>
                                     </div>
                                 </div>
@@ -314,6 +313,12 @@
                                         Top Rule
                                     </div>
                                     <div class="agt-body">
+
+                                        <div class="loadder-rule  backdrop-loader" style="background: #fff">
+                                            <div class="loader4 centerloader"></div>
+                                            <div class="loadding-text">Loading ...</div>
+                                        </div>
+
                                         <div id="chart-top-rule" style="height: 300px;"></div>
                                     </div>
                                 </div>
@@ -1319,7 +1324,12 @@
                 d.keyword_search = keyword_search;
                 return d ;
             },
+            beforesend:function(){
+                $('.loadder-rule').show();
+            },
             success:function(data){
+                $('.loadder-rule').hide();
+                chart_bar('chart-top-rule',data);
             }
         });
     }
@@ -1349,7 +1359,7 @@
         });
     }
 
-    function chart_bar(id){
+    function chart_bar(id,value){
         Highcharts.chart(id, {
             chart: {
                 type: 'bar',
@@ -1409,14 +1419,7 @@
             },
             series: [{
                 name: 'Population',
-                data: [
-                    [ 'webshell_MySQL_Web_Interface_Version_0_8',  90],
-                    [ 'MySQL_Web_Interface_Version_0_8_php',  80],
-                    [ 'webshell_mysqlwebsh',  50],
-                    [ 'NT_Addy_asp',  40],
-                    [ 'BASE64_table',  40],
-                    [ 'webshell_jsp_up',  30],
-                ],
+                data: value,
                 dataLabels: {
                     enabled: false,
                     color: '#333',
@@ -1479,7 +1482,8 @@
         });
     }
 
-    {{-- chart_c3('#chart-platform-summary', [['Linux', 0],['Window',100]],1); --}}
+    {{-- 
+    chart_c3('#chart-platform-summary', [['Linux', 0],['Window',100]],1); 
     chart_c3('#chart-incident-type', [['Yara', 100],['Indicator', 0]],1);
     chart_c3(
         '#chart-severity',
@@ -1492,8 +1496,9 @@
         ]
         ,7
     );
+    --}}
 
-    chart_bar('chart-top-rule');
+
 
     timeline_chart('chart-time-line');
 
