@@ -21,5 +21,9 @@ Route::group(
 		Route::post('/tb_schedule', 'AgentManagementController@tb_schedule')->name('agentmanagement.tb_schedule');
 		Route::post('/dudit_log_feed', 'AgentManagementController@dudit_log_feed')->name('agentmanagement.dudit_log_feed');
 		Route::post('/count_head', 'AgentManagementController@count_head')->name('agentmanagement.count_head');
+		Route::post('/data_chart_platform', 'AgentManagementController@data_chart_platform')->name('agentmanagement.data_chart_platform');
+		Route::post('/data_chart_incident', 'AgentManagementController@data_chart_incident')->name('agentmanagement.data_chart_incident');
+		Route::post('/data_chart_severity', 'AgentManagementController@data_chart_severity')->name('agentmanagement.data_chart_severity');
+		Route::post('/data_chart_rule', 'AgentManagementController@data_chart_rule')->name('agentmanagement.data_chart_rule');
 	}
 );

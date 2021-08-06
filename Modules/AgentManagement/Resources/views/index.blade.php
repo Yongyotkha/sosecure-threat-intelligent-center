@@ -787,6 +787,8 @@
     var site_val = null;
 
     var keyword_search = null;
+    var start_date = null;
+    var end_date = null;
     var check_type = null;
 
     var check_alert = null;
@@ -801,6 +803,10 @@
     $(document).ready(function(){
         count_head();
         dudit_log_feed();
+        datachart_Incident();
+        datachart_platform();
+        datachart_severity();
+        datachart_rule();
         datatable_alert();
         datatable_agent();
         datatable_schedule();
@@ -852,6 +858,8 @@
     {
         site_val = $('#site').val();
         keyword_search = $('#keyword_search').val();
+        start_date = null;
+        end_date = null;
 
         if(check_type == 'alert')
         {
@@ -1162,7 +1170,84 @@
             ],
         });
     }
-    
+
+
+
+    function datachart_Incident()
+    {
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{route('agentmanagement.data_chart_incident')}}",
+            type: "POST",
+            data:function(d){
+                d.keyword_search = keyword_search;
+                return d ;
+            },
+        });
+    }
+
+    function datachart_platform()
+    {
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{route('agentmanagement.data_chart_platform')}}",
+            type: "POST",
+            data:function(d){
+                d.keyword_search = keyword_search;
+                return d ;
+            },
+            success:function(data){
+                {{-- let test = $('#chart-platform-summary').attr('id');
+                let tests = '#chart-platform-summary';
+                var testss = $('#chart-platform-summary');
+                var testsss = document.getElementById('chart-platform-summary');
+                chart_c3('#chart-platform-summary', data,1); --}}
+            }
+        });
+        {{-- .done(function(data){
+            console.log(data);
+            console.log(test);
+            chart_c3(test, data,1);
+        }); --}}
+    }
+
+    function datachart_severity()
+    {
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{route('agentmanagement.data_chart_severity')}}",
+            type: "POST",
+            data:function(d){
+                d.keyword_search = keyword_search;
+                return d ;
+            },
+            success:function(data){
+            }
+        });
+    }
+
+    function datachart_rule()
+    {
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{route('agentmanagement.data_chart_rule')}}",
+            type: "POST",
+            data:function(d){
+                d.keyword_search = keyword_search;
+                return d ;
+            },
+            success:function(data){
+            }
+        });
+    }
 
     function chart_c3(id,value,score_mid) {
         const myc3 = c3.generate({
@@ -1323,7 +1408,8 @@
              ['Mediumn', 7],
              ['High', 0],
              ['Critical', 0]
-             ],7
+        ]
+        ,7
     );
 
     chart_bar('chart-top-rule');

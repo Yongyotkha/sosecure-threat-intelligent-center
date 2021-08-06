@@ -7,6 +7,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use DB;
+use App\FXOSType;
 use App\FXSiteAgents;
 use App\FXAgentAlerts;
 use App\FXAgentLogs;
@@ -134,6 +135,73 @@ class AgentManagementController extends Controller
         //
     }
 
+    public function data_chart_incident(Request $request)
+    {
+        $query_incident = FXAgentAlerts::select('incident')->get();
+
+        $data = [];
+        foreach($query_incident as $data_incident)
+        {
+            $query_count = FXAgentAlerts::where('incident',$data_incident->incident)->get();
+            $count = count($query_count);
+
+            $data[] = ['incident' => $data_incident->incident, 'count' => $count];
+        }
+
+        return response()->json($data);
+    }
+
+    public function data_chart_platform(Request $request)
+    {
+        $query_type = FXOSType::select('id','name')->get();
+
+        // dd($query_type);
+
+        $data = [];
+        foreach($query_type as $data_type)
+        {
+            $query = FXSiteAgents::
+                        where('os_type', $data_type->id)
+                        ->get();
+            $count = count($query);
+            $data[] = ['type' => $data_type->name,'count' => $count];
+        }
+        // dd($data);
+
+        return response()->json($data);
+    }
+
+    public function data_chart_severity(Request $request)
+    {
+        $query_severity = FXAgentAlerts::select('severity')->get();
+
+        $data = [];
+        foreach($query_severity as $data_severity)
+        {
+            $query_count = FXAgentAlerts::where('severity',$data_severity->severity)->get();
+            $count = count($query_count);
+
+            $data[] = ['severity' => $data_severity->severity, 'count' => $count];
+        }
+
+        return response()->json($data);
+    }
+    
+    public function data_chart_rule(Request $request)
+    {
+        $query_rule = FXAgentAlerts::select('rule')->get();
+
+        $data = [];
+        foreach($query_rule as $data_rule)
+        {
+            $query_count = FXAgentAlerts::where('rule',$data_rule->rule)->get();
+            $count = count($query_count);
+
+            $data[] = ['rule' => $data_rule->rule, 'count' => $count];
+        }
+
+        return response()->json($data);
+    }
 
     public function count_head(Request $request)
     {
