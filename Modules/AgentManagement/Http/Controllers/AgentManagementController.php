@@ -145,7 +145,7 @@ class AgentManagementController extends Controller
             $query_count = FXAgentAlerts::where('incident',$data_incident->incident)->get();
             $count = count($query_count);
 
-            $data[] = ['incident' => $data_incident->incident, 'count' => $count];
+            $data[] = [$data_incident->incident, $count];
         }
 
         return response()->json($data);
@@ -164,7 +164,7 @@ class AgentManagementController extends Controller
                         where('os_type', $data_type->id)
                         ->get();
             $count = count($query);
-            $data[] = ['type' => $data_type->name,'count' => $count];
+            $data[] = [$data_type->name, $count];
         }
         // dd($data);
 
@@ -181,7 +181,7 @@ class AgentManagementController extends Controller
             $query_count = FXAgentAlerts::where('severity',$data_severity->severity)->get();
             $count = count($query_count);
 
-            $data[] = ['severity' => $data_severity->severity, 'count' => $count];
+            $data[] = [$data_severity->severity, $count];
         }
 
         return response()->json($data);
@@ -197,7 +197,7 @@ class AgentManagementController extends Controller
             $query_count = FXAgentAlerts::where('rule',$data_rule->rule)->get();
             $count = count($query_count);
 
-            $data[] = ['rule' => $data_rule->rule, 'count' => $count];
+            $data[] = [$data_rule->rule, $count];
         }
 
         return response()->json($data);

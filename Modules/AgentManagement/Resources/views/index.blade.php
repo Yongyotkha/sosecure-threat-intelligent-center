@@ -1201,11 +1201,12 @@
                 return d ;
             },
             success:function(data){
-                {{-- let test = $('#chart-platform-summary').attr('id');
+                let test = $('#chart-platform-summary').attr('id');
                 let tests = '#chart-platform-summary';
                 var testss = $('#chart-platform-summary');
                 var testsss = document.getElementById('chart-platform-summary');
-                chart_c3('#chart-platform-summary', data,1); --}}
+                console.log(data);
+                chart_c3('#chart-platform-summary', data,1);
             }
         });
         {{-- .done(function(data){
@@ -1398,7 +1399,7 @@
         });
     }
 
-    chart_c3('#chart-platform-summary', [['Linux', 0],['Window',100]],1);
+    {{-- chart_c3('#chart-platform-summary', [['Linux', 0],['Window',100]],1); --}}
     chart_c3('#chart-incident-type', [['Yara', 100],['Indicator', 0]],1);
     chart_c3(
         '#chart-serverity',
