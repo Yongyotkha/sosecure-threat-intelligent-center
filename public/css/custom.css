@@ -5282,6 +5282,10 @@ input.form-policy[type=password] {
     box-shadow: 0px 0px 3px 0px rgb(0 0 0 / 10%);
 }
 
+.agt-body{
+    position: relative;
+}
+
 .list-agt li .agt-card .agt-score,
 .list-agt li .agt-card .agt-txt-sm{
     display: inline-block;

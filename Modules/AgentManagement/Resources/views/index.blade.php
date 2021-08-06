@@ -56,11 +56,21 @@
                     <div class="container-fluid" style="padding: 2rem;">
 
                         <div class="row">
-                            <div class="col-lg-12">
+                            <div class="col-lg-6">
                                 <div>
                                     <div class="form-group m-b-md">
                                         <label for="" class="">Keyword</label>
                                         <input type="text" class="form-control" name="keyword_search" id="keyword_search" placeholder="Search">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group m-b-md">
+                                    <label for="" class="">Date</label>
+                                    <div id="filter_date" class="text-center form-control"style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                        <i class="fa fa-calendar"></i>
+                                        &nbsp;<span></span> 
+                                        <i class="fa fa-caret-down"></i>
                                     </div>
                                 </div>
                             </div>
@@ -252,6 +262,12 @@
                                         Incident Type
                                     </div>
                                     <div class="agt-body">
+
+                                        <div class="loadder-incident  backdrop-loader" style="background: #fff">
+                                            <div class="loader4 centerloader"></div>
+                                            <div class="loadding-text">Loading ...</div>
+                                        </div>
+
                                         <div id="chart-incident-type" style="height: 250px;"></div>
                                     </div>
                                 </div>
@@ -263,6 +279,12 @@
                                         Platform Summary
                                     </div>
                                     <div class="agt-body">
+
+                                        <div class="loadder-platform  backdrop-loader" style="background: #fff">
+                                            <div class="loader4 centerloader"></div>
+                                            <div class="loadding-text">Loading ...</div>
+                                        </div>
+
                                         <div id="chart-platform-summary" style="height: 250px;"></div>
                                     </div>
                                 </div>
@@ -274,7 +296,12 @@
                                         Severity
                                     </div>
                                     <div class="agt-body">
-                                        <div id="chart-serverity" style="height: 250px;"></div>
+                                        <div class="loadder-severity  backdrop-loader" style="background: #fff">
+                                            <div class="loader4 centerloader"></div>
+                                            <div class="loadding-text">Loading ...</div>
+                                        </div>
+
+                                        <div id="chart-severity" style="height: 250px;"></div>
                                     </div>
                                 </div>
                             </div>
@@ -950,6 +977,41 @@
         });
     }
 
+
+    var start = moment().startOf('hour');
+    var end = moment().startOf('hour').add(32, 'hour');
+
+    function cb(start, end) {
+        $('#filter_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        startDate = start;
+        endDate = end;
+    }
+
+    $('#filter_date').daterangepicker({
+        timePicker: true,
+        startDate: start,
+        endDate: end,
+        locale: {
+            format: 'M/DD hh:mm A'
+        },
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
+    $('#filter_date').on('apply.daterangepicker', function(ev, picker) {
+        isDateSearch = 1;
+        if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
+
+        }
+    });
+
+    cb(start, end);
+
     function dudit_log_feed(site_val)
     {
         console.log('log - '+site_val);
@@ -1185,6 +1247,13 @@
                 d.keyword_search = keyword_search;
                 return d ;
             },
+            beforesend:function(){
+                $('.loadder-incident').show();
+            },
+            success:function(data){
+                $('.loadder-incident').hide();
+                chart_c3('#chart-incident-type', data,1);
+            }
         });
     }
 
@@ -1200,11 +1269,11 @@
                 d.keyword_search = keyword_search;
                 return d ;
             },
+            beforesend:function(){
+                $('.loadder-platform').show();
+            },
             success:function(data){
-                let test = $('#chart-platform-summary').attr('id');
-                let tests = '#chart-platform-summary';
-                var testss = $('#chart-platform-summary');
-                var testsss = document.getElementById('chart-platform-summary');
+                $('.loadder-platform').hide();
                 console.log(data);
                 chart_c3('#chart-platform-summary', data,1);
             }
@@ -1227,8 +1296,13 @@
             data:function(d){
                 d.keyword_search = keyword_search;
                 return d ;
+            },  
+            beforesend:function(){
+                $('.loadder-severity').show();
             },
             success:function(data){
+                $('.loadder-severity').hide();
+                chart_c3('#chart-severity', data,1);
             }
         });
     }
@@ -1258,11 +1332,17 @@
                 type : 'donut',
             },
             donut: {
-                title: score_mid
+                title: score_mid,
+                label: {
+                format: function(value, ratio, id) {
+                    return value;
+                    }
+                }
             },
             legend: {
                 position: 'bottom'
             },
+
             color: {
                 pattern: ['#4398d4', '#40cd8f','#f4d757','#fcc838','#b93624']
             }
@@ -1402,7 +1482,7 @@
     {{-- chart_c3('#chart-platform-summary', [['Linux', 0],['Window',100]],1); --}}
     chart_c3('#chart-incident-type', [['Yara', 100],['Indicator', 0]],1);
     chart_c3(
-        '#chart-serverity',
+        '#chart-severity',
          [
              ['Information', 0],
              ['Low', 0],
