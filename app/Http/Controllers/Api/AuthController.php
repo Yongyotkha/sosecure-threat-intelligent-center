@@ -170,10 +170,10 @@ class AuthController extends ApiController
                 $error_current = true;
             }else{
                 if(empty($user->password_days_expire)){
-                    $user->password_days_expire = '90';
-                    $user -> password_start_reset = Carbon::now()->addDays(90);
+                    $user->password_days_expire = '60';
+                    $user -> password_start_reset = Carbon::now()->addDays(60);
                 }else{
-                    $user -> password_start_reset = Carbon::now()->addDays($user->password_days_expire);
+                    $user -> password_start_reset = Carbon::now();
                 }
                 $user->password = $data_key['password'];
                 $user -> save();

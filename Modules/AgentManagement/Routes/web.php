@@ -25,5 +25,6 @@ Route::group(
 		Route::post('/data_chart_incident', 'AgentManagementController@data_chart_incident')->name('agentmanagement.data_chart_incident');
 		Route::post('/data_chart_severity', 'AgentManagementController@data_chart_severity')->name('agentmanagement.data_chart_severity');
 		Route::post('/data_chart_rule', 'AgentManagementController@data_chart_rule')->name('agentmanagement.data_chart_rule');
+		Route::post('/data_chart_timeline', 'AgentManagementController@data_chart_timeline')->name('agentmanagement.data_chart_timeline');
 	}
 );
