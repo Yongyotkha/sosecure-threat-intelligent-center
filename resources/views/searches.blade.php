@@ -376,6 +376,9 @@
    
                     <section class="table-ibmcloud" style="display: none">
                         <h3 class="text-primary-head">IBM X-Force</h1>
+
+                        <div id="chart-time-line"></div>
+
                         <table id="table-ibmcloud" class="table">
                             <thead>
                                 <tr>
@@ -2689,6 +2692,77 @@ $('#text_status_risk').html(html_status);
 $('.table-hybrid').show();
 $('.table-virustotal').show();
 $('.table-ibmcloud').show();
+
+$('');
+
+function chart_time_line(id){
+    Highcharts.chart(id, {
+        title: {
+            text: ''
+        },
+        yAxis: {
+            title: {
+                text: ''
+            }
+        },
+
+        xAxis: {
+            categories: ['Jan 1,2013','Jan 5,2013','Jan 6,2013','Jan 8,2013','Oct 9,2015','Dec 9,2016','May 9,2017'],
+            accessibility: {
+                rangeDescription: ''
+            }
+            
+        },
+
+        legend: {
+            align: 'right',
+            verticalAlign: 'top',
+            borderWidth: 0
+        },
+
+        plotOptions: {
+            series: {
+                label: {
+                    connectorAllowed: false,
+                    enabled : false
+                },
+                step: 'left',
+                marker: {
+                    enabled: false
+                },
+            }
+        },
+        tooltip:{
+            formatter: function () {
+                return '<b>Oct 13,2013 </b> <br>'+ this.series.name  +' :' + this.y + '';
+            },	
+        },
+        series: [{
+            name: 'Dynamic IPs',
+            data: [10, 10, 10, 50, 50, 80, 80]
+        }, {
+            name: 'Botnet Command and Control Server',
+            data: [null, null, 20, 20, 20, 30, 10]
+        }],
+
+        responsive: {
+            rules: [{
+                condition: {
+                    maxWidth: 500
+                },
+                chartOptions: {
+                    legend: {
+                        layout: 'horizontal',
+                        align: 'center',
+                        verticalAlign: 'bottom'
+                    }
+                }
+            }]
+        }
+    });
+}
+
+chart_time_line('chart-time-line');
 
 multi_readmore_text();
 </script>
