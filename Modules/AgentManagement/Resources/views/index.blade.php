@@ -21,7 +21,7 @@
                 <div class="ml-2 text-right">
                     {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
                     <div class="text-left max-w-select" style="display:inline-block">
-                        <select name="site" id="site" class="text-left select2-option form-control select-site">
+                        <select name="site" id="site" class="text-left select2-option form-control select-site" >
                             <option value="">All Site</option>
                             @if ($site_settings)
 
@@ -44,177 +44,6 @@
 
         {{-- Tab Content --}}
         <section class="scrollable wrapper">
-
-            <section class="panel panel-default" id="hide-advance-search" style="display: none;">
-                <header class="panel-heading font-bold panel-header-blue">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <i class="fas fa-filter"></i> Filter
-                        </div>
-                </header>
-                <div class="panel-body" style="padding: 0 !important">
-                    <div class="container-fluid" style="padding: 2rem;">
-
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div>
-                                    <div class="form-group m-b-md">
-                                        <label for="" class="">Keyword</label>
-                                        <input type="text" class="form-control" name="keyword_search" id="keyword_search" placeholder="Search">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="form-group m-b-md">
-                                    <label for="" class="">Date</label>
-                                    <div id="filter_date" class="text-center form-control"style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                        <i class="fa fa-calendar"></i>
-                                        &nbsp;<span></span> 
-                                        <i class="fa fa-caret-down"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-3 col-md-3 mb-1">
-                                <h5 class="font-weight-bold">Filter By</h5>
-                                <div id="btngroup_sort_by" class="btn-group special mb-2">
-                                    <button class="btn btn-grey filter_agent_all check_type active" value="" id="btn_search_all">
-                                        <span> All </span>
-                                    </button>
-                                    <button class="btn filter_agent_alert check_type btn-grey" value="alert">
-                                        <span> Alert </span>
-                                    </button>
-                                    <button class="btn filter_agent_agent check_type btn-grey" value="agent">
-                                        <span> Agent </span>
-                                    </button>
-                                </div>
-                            </div>
-                            {{-- <div class="col-lg-3 col-md-3 mb-1">
-                                <div>
-                                    <h5 class="font-weight-bold">Alert</h5>
-                                    <div id="filter-alert" class="btn-group special">
-                                        <button class="btn btn-grey check_alert active" id="all_alert" value="">
-                                            <span> All </span>
-                                        </button>
-                                        <button class="btn btn-grey check_alert" value="1">
-                                            <span> Active </span>
-                                        </button>
-                                        <button class="btn btn-grey check_alert" value="2">
-                                            <span> Inactive </span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div> --}}
-                        </div>
-
-                        <div id="filter_alert_main" class="row" style="display: none">
-                            <div class="col-lg-4">
-                                <div>
-                                    <div class="form-group m-b-md">
-                                        <label for="" class="">Site Name</label>
-                                        <input type="text" class="form-control" name="filter_alert_site_name" id="filter_alert_site_name"
-                                            placeholder="Search">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div>
-                                    <div class="form-group m-b-md">
-                                        <label for="" class="">Description</label>
-                                        <input type="text" class="form-control" name="filter_alert_des" id="filter_alert_des"
-                                            placeholder="Search">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <label for="" class="">Incident</label>
-                                <div id="filter-alert-incident" class="btn-group special">
-                                    <button class="btn btn-grey check_alert active" id="incident-status-all" value="">
-                                        <span> All </span>
-                                    </button>
-                                    <button class="btn btn-grey check_alert" value="Agent">
-                                        <span> Agent </span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="filter_agent_main" class="row"  style="display: none">
-                            <div class="col-lg-3">
-                                <div>
-                                    <div class="form-group m-b-md">
-                                        <label for="" class="">Site Name</label>
-                                        <input type="text" class="form-control" name="filter_agent_site_name" id="filter_agent_site_name"
-                                            placeholder="Search">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div>
-                                    <div class="form-group m-b-md">
-                                        <label for="" class="">Device Name</label>
-                                        <input type="text" class="form-control" name="filter_agent_device" id="filter_agent_device"
-                                            placeholder="Search">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div>
-                                    <div class="form-group m-b-md">
-                                        <label for="" class="">IP</label>
-                                        <input type="text" class="form-control" name="filter_agent_ip" id="filter_agent_ip"
-                                            placeholder="Search">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <label for="" class="">OS Type</label>
-                                <div id="filter-agent-os-type" class="btn-group special">
-                                    <button class="btn btn-grey check_os_type active" id="all_os" value="">
-                                        <span> All </span>
-                                    </button>
-                                    <button class="btn btn-grey check_os_type" value="1">
-                                        <span> Window </span>
-                                    </button>
-                                    <button class="btn btn-grey check_os_type" value="2">
-                                        <span> Linux </span>
-                                    </button>
-                                    <button class="btn btn-grey check_os_type" value="3">
-                                        <span> Redhat </span>
-                                    </button>
-                                    <button class="btn btn-grey check_os_type" value="4">
-                                        <span> Other </span>
-                                    </button>
-                                </div>
-                            </div>
-
-                         
-                        </div>
-                        
-                    </div>
-                </div>
-                <div class="panel-footer">
-                    <div class="row">
-                        <div class="col-lg-12 text-right">
-                            <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
-                                <i class="fas fa-search"></i>
-                                @langapp('apply')
-                            </button>
-                            <button type="button" id="btn_rss_news_reset" class="btn btn-default btn-responsive btn-fz-13"
-                                style="white-space: nowrap" onclick="clear_search()">
-                                <i class="fas fa-broom"></i>
-                                <span> Clear </span>
-                            </button>
-                            <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
-                                <i class="fas fa-times"></i>
-                                <span> Close </span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             <div>
                 <ul class="list-agt">
@@ -327,9 +156,13 @@
                                 <div class="agt-main-box">
                                     <div class="agt-header">
                                         Log Feed
-                                        <span class="refresh-audit-log pull-right cs-pointer"><i class="fas fa-sync-alt"></i></span>
+                                        <span class="refresh-audit-log pull-right cs-pointer" id="refresh_log"><i class="fas fa-sync-alt"></i></span>
                                     </div>
                                     <div class="agt-body">
+                                        <div class="loadder-log  backdrop-loader" style="background: #fff">
+                                            <div class="loader4 centerloader"></div>
+                                            <div class="loadding-text">Loading ...</div>
+                                        </div>
                                         <div id="audit-log" style="height: 300px;;overflow-y:auto;">
                                             <ul class="audit-log-list" id="audit_log_list">
                                                 {{-- <li>
@@ -385,9 +218,8 @@
                                             </ul>
                                         </div>
                                     </div>
-                       
-                        </div>
-                    </div>
+                                </div>
+                            </div>
                     {{-- <div class="col-md-4">
                         <div class="agt-main-box">
                             <div class="agt-header">
@@ -429,9 +261,28 @@
                     <div class="col-md-12">
                         <div class="agt-main-box">
                             <div class="agt-header">
-                                Timeline
+                                <div class="row">
+                                    <div class="col-md-6 text-left">
+                                        Timeline
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <div class="form-group m-b-md">
+                                            {{-- <label for="" class="">Date</label> --}}
+                                            <div id="filter_date_timeline" class="text-center form-control"style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;width:500px;">
+                                                <i class="fa fa-calendar"></i>
+                                                &nbsp;<span></span> 
+                                                <i class="fa fa-caret-down"></i>
+                                            </div>
+                                            <button type="button" class="btn btn-info" onclick="search_timeline()"><i class="fas fa-search"></i> Apply </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="agt-body">
+                                <div class="loadder-timeline  backdrop-loader" style="background: #fff">
+                                    <div class="loader4 centerloader"></div>
+                                    <div class="loadding-text">Loading ...</div>
+                                </div>
                                 <div id="chart-time-line" style="height: 250px;"></div>
                             </div>
                         </div>
@@ -440,10 +291,216 @@
 
             </div>
 
-         
+            <section class="scrollable wrapper">
+                <section class="panel panel-default" id="hide-advance-search" style="display: none;">
+                    <header class="panel-heading font-bold panel-header-blue">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <i class="fas fa-filter"></i> Filter
+                            </div>
+                        </div>
+                    </header>
+                    <div class="panel-body" style="padding: 0 !important">
+                        <div class="container-fluid" style="padding: 2rem;">
+    
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div>
+                                        <div class="form-group m-b-md">
+                                            <label for="" class="">Keyword</label>
+                                            <input type="text" class="form-control" name="keyword_search" id="keyword_search" placeholder="Search">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group m-b-md">
+                                        <label for="" class="">Date</label>
+                                        <div id="filter_date" class="text-center form-control"style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                            <i class="fa fa-calendar"></i>
+                                            &nbsp;<span></span> 
+                                            <i class="fa fa-caret-down"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 mb-1">
+                                    <h5 class="font-weight-bold">Filter By</h5>
+                                    <div id="btngroup_sort_by" class="btn-group special mb-2">
+                                        <button class="btn btn-grey filter_agent_all check_type active" value="" id="btn_search_all">
+                                            <span> All </span>
+                                        </button>
+                                        <button class="btn filter_agent_alert check_type btn-grey" value="alert">
+                                            <span> Alert </span>
+                                        </button>
+                                        <button class="btn filter_agent_agent check_type btn-grey" value="agent">
+                                            <span> Agent </span>
+                                        </button>
+                                    </div>
+                                </div>
+                                {{-- <div class="col-lg-3 col-md-3 mb-1">
+                                    <div>
+                                        <h5 class="font-weight-bold">Alert</h5>
+                                        <div id="filter-alert" class="btn-group special">
+                                            <button class="btn btn-grey check_alert active" id="all_alert" value="">
+                                                <span> All </span>
+                                            </button>
+                                            <button class="btn btn-grey check_alert" value="1">
+                                                <span> Active </span>
+                                            </button>
+                                            <button class="btn btn-grey check_alert" value="2">
+                                                <span> Inactive </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div> --}}
+                            </div>
+    
+                            <div id="filter_alert_main" class="row" style="display: none">
+                                <div class="col-lg-3">
+                                    <div>
+                                        <div class="form-group m-b-md">
+                                            <label for="" class="">Rule</label>
+                                            <input type="text" class="form-control" name="filter_alert_rule" id="filter_alert_rule"
+                                                placeholder="Search">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div>
+                                        <div class="form-group m-b-md">
+                                            <label for="" class="">Description</label>
+                                            <input type="text" class="form-control" name="filter_alert_des" id="filter_alert_des"
+                                                placeholder="Search">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <label for="" class="">Incident</label>
+                                    <div id="filter-alert-incident" class="btn-group special">
+                                        <button class="btn btn-grey check_alert active" id="incident-status-all" value="">
+                                            <span> All </span>
+                                        </button>
+                                        <button class="btn btn-grey check_alert" value="Agent">
+                                            <span> Agent </span>
+                                        </button>
+                                        <button class="btn btn-grey check_alert" value="Agent">
+                                            <span> Indicator </span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <label for="" class="">Severity</label>
+                                    <div id="filter-alert-severity" class="btn-group special">
+                                        <button class="btn btn-grey check_alert_severity active" id="severity-status-all" value="">
+                                            <span> All </span>
+                                        </button>
+                                        <button class="btn btn-grey check_alert_severity" value="Critical">
+                                            <span> Critical </span>
+                                        </button>
+                                        <button class="btn btn-grey check_alert_severity" value="High">
+                                            <span> High </span>
+                                        </button>
+                                        <button class="btn btn-grey check_alert_severity" value="Medium">
+                                            <span> Medium </span>
+                                        </button>
+                                        <button class="btn btn-grey check_alert_severity" value="Low">
+                                            <span> Low </span>
+                                        </button>
+                                        <button class="btn btn-grey check_alert_severity" value="Information">
+                                            <span> Information </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <div id="filter_agent_main" class="row"  style="display: none">
+                                {{-- <div class="col-lg-3">
+                                    <div>
+                                        <div class="form-group m-b-md">
+                                            <label for="" class="">Site Name</label>
+                                            <input type="text" class="form-control" name="filter_agent_site_name" id="filter_agent_site_name"
+                                                placeholder="Search">
+                                        </div>
+                                    </div>
+                                </div> --}}
+                                <div class="col-lg-3">
+                                    <div>
+                                        <div class="form-group m-b-md">
+                                            <label for="" class="">Device Name</label>
+                                            <input type="text" class="form-control" name="filter_agent_device" id="filter_agent_device"
+                                                placeholder="Search">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div>
+                                        <div class="form-group m-b-md">
+                                            <label for="" class="">IP</label>
+                                            <input type="text" class="form-control" name="filter_agent_ip" id="filter_agent_ip"
+                                                placeholder="Search">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div>
+                                        <div class="form-group m-b-md">
+                                            <label for="" class="">OS Description</label>
+                                            <input type="text" class="form-control" name="filter_agent_os_des" id="filter_agent_os_des"
+                                                placeholder="Search">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <label for="" class="">OS Type</label>
+                                    <div id="filter-agent-os-type" class="btn-group special">
+                                        <button class="btn btn-grey check_os_type active" id="all_os" value="">
+                                            <span> All </span>
+                                        </button>
+                                        <button class="btn btn-grey check_os_type" value="1">
+                                            <span> Window </span>
+                                        </button>
+                                        <button class="btn btn-grey check_os_type" value="2">
+                                            <span> Linux </span>
+                                        </button>
+                                        <button class="btn btn-grey check_os_type" value="3">
+                                            <span> Redhat </span>
+                                        </button>
+                                        <button class="btn btn-grey check_os_type" value="4">
+                                            <span> Other </span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+    
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-lg-12 text-right">
+                                <button type="button" class="btn btn-info btn-responsive btn-fz-13" onclick="search()">
+                                    <i class="fas fa-search"></i>
+                                    @langapp('apply')
+                                </button>
+                                <button type="button" id="btn_rss_news_reset" class="btn btn-default btn-responsive btn-fz-13"
+                                    style="white-space: nowrap" onclick="clear_search()">
+                                    <i class="fas fa-broom"></i>
+                                    <span> Clear </span>
+                                </button>
+                                <button type="button" id="close_filter" class="btn btn-default btn-responsive btn-fz-13" style="white-space: nowrap">
+                                    <i class="fas fa-times"></i>
+                                    <span> Close </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
 
-
-            <div class="container-fluid nopadding">
+            <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
                         <div class="tabbable">
@@ -464,6 +521,18 @@
                                             </div>
                                         </header>
                                         <div class="panel-body">
+                                            <div class="row m-b-10">
+                                                <div class="col-md-12">
+                                                    <h5 class="font-weight-bold">Severity</h5>
+                                                    <div class="st-dt-leak">
+                                                        <span class="st-dt vrh" data-toggle="tooltip" data-placement="right" data-html="true" title="" data-original-title="<div class='st-flex'><div class='box-st-tooltip vrh'>Critical</div><div class='text-st-tooltip'>Criticalข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Critical</span>
+                                                        <span class="st-dt high" data-toggle="tooltip" data-placement="right" data-html="true" title="" data-original-title="<div class='st-flex'><div class='box-st-tooltip high'>High</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">High</span>
+                                                        <span class="st-dt md" data-toggle="tooltip" data-placement="right" data-html="true" title="" data-original-title="<div class='st-flex'><div class='box-st-tooltip md'>Medium</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Medium</span>
+                                                        <span class="st-dt low" data-toggle="tooltip" data-placement="right" data-html="true" title="" data-original-title="<div class='st-flex'><div class='box-st-tooltip low'>Low</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของลูกค้าเช่น ข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">Low</span>
+                                                        <span class="st-dt vrl" data-toggle="tooltip" data-placement="right" data-html="true" title="" data-original-title="<div class='st-flex'><div class='box-st-tooltip vrl'>Informational</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลที่เป็นข้อมูลทั่วไปหรือเป็นข่าวที่ยังไม่ได้รับการยืนยันว่าเป็นข้อมูลรั่วไหลจริง</div></div>">Informational</span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div class="table-responsive">
                                                 <table class="table table-bordered table-striped" id="table-activities-template" style="width: 100%">
                                                     <thead>
@@ -483,6 +552,7 @@
                                                                 Description
                                                             </th>
                                                             <th>Incident</th>
+                                                            <th>Severity</th>
                                                             <th>Datetime</th>
                                                             <th class="text-center">Action</th>
                                                         </tr>
@@ -815,6 +885,8 @@
 @include('stacks.js.multitext')
 
 <script>
+    var start_date_tl = null;
+    var end_date_tl = null;
 
     var site_val = null;
 
@@ -824,21 +896,24 @@
     var check_type = null;
 
     var check_alert = null;
-    var filter_alert_site_name = null;
+    var check_alert_severity = null;
+    var filter_alert_rule = null;
     var filter_alert_des = null;
 
     var filter_agent_site_name = null;
     var filter_agent_device = null;
     var filter_agent_ip = null;
     var check_os_type = null;
+    var filter_agent_os_des = null;
 
     $(document).ready(function(){
         count_head();
-        dudit_log_feed();
         datachart_Incident();
         datachart_platform();
         datachart_severity();
         datachart_rule();
+        dudit_log_feed();
+        datachart_timeline();
         datatable_alert();
         datatable_agent();
         datatable_schedule();
@@ -848,6 +923,7 @@
     active_btn('#groupby-status .btn-grey');
     active_btn('#btngroup_sort_by .btn-grey');
     active_btn('#filter-alert-incident .btn-grey');
+    active_btn('#filter-alert-severity .btn-grey');
     active_btn('#filter-agent-os-type .btn-grey');
 
     if($('.filter_agent_agent').hasClass('active')){
@@ -860,6 +936,72 @@
         $('#filter_alert_main').hide();
         $('#filter_agent_main').hide();
     }
+
+    var start = moment().startOf('hour');
+    var end = moment().startOf('hour').add(32, 'hour');
+
+    function cb(start, end) {
+        $('#filter_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        startDate = start;
+        endDate = end;
+    }
+
+    function cb_tl(start, end) {
+        $('#filter_date_timeline span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        startDate = start;
+        endDate = end;
+    }
+
+    $('#filter_date').daterangepicker({
+        timePicker: true,
+        startDate: start,
+        endDate: end,
+        locale: {
+            format: 'M/DD hh:mm A'
+        },
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
+
+    $('#filter_date').on('apply.daterangepicker', function(ev, picker) {
+        isDateSearch = 1;
+        if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
+
+        }
+    });
+
+    $('#filter_date_timeline').daterangepicker({
+        timePicker: true,
+        startDate: start,
+        endDate: end,
+        locale: {
+            format: 'M/DD hh:mm A'
+        },
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb_tl);
+
+    $('#filter_date_timeline').on('apply.daterangepicker', function(ev, picker) {
+        isDateSearch = 1;
+        if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
+
+        }
+    });
+
+    cb(start, end);
+    cb_tl(start, end);
 
     $('#btngroup_sort_by .btn-grey').on('click',function(){
         if($('.filter_agent_agent').hasClass('active')){
@@ -882,6 +1024,10 @@
         check_alert = $(this).val();
     });
 
+    $('.check_alert_severity').click(function(){
+        check_alert_severity = $(this).val();
+    });
+
     $('.check_os_type').click(function(){
         check_os_type = $(this).val();
     });
@@ -890,12 +1036,12 @@
     {
         site_val = $('#site').val();
         keyword_search = $('#keyword_search').val();
-        start_date = null;
-        end_date = null;
+        start_date = $("#filter_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm:ss');
+        end_date = $("#filter_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm:ss');
 
         if(check_type == 'alert')
         {
-            filter_alert_site_name = $('#filter_alert_site_name').val();
+            filter_alert_rule = $('#filter_alert_rule').val();
             filter_alert_des = $('#filter_alert_des').val();
 
             datatable_alert(site_val);
@@ -906,6 +1052,7 @@
             filter_agent_site_name = $('#filter_agent_site_name').val();
             filter_agent_device = $('#filter_agent_device').val();
             filter_agent_ip = $('#filter_agent_ip').val();
+            filter_agent_os_des = $('#filter_agent_os_des').val();
 
             datatable_agent(site_val);
             $('#tab_agent_click').trigger("click");
@@ -914,18 +1061,29 @@
         {
             check_type = null;
             check_alert = null;
+            check_alert_severity = null;
             check_os_type = null;
-            filter_alert_site_name = null;
+            filter_alert_rule = null;
             filter_alert_des = null;
             filter_agent_site_name = null;
             filter_agent_device = null;
             filter_agent_ip = null;
+            filter_agent_os_des = null;
             
             datatable_alert(site_val);
             datatable_agent(site_val);
             datatable_schedule(site_val);
         }
+    }
 
+    function search_timeline()
+    {
+        $('.loadder-timeline').show();
+        site_val = $('#site').val();
+        start_date_tl = $("#filter_date_timeline").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm:ss');
+        end_date_tl = $("#filter_date_timeline").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm:ss');
+
+        datachart_timeline(site_val);
     }
 
     function clear_search()
@@ -933,26 +1091,31 @@
         keyword_search = null;
         check_type = null;
         check_alert = null;
+        check_alert_severity = null;
         check_os_type = null;
-        filter_alert_site_name = null;
+        filter_alert_rule = null;
         filter_alert_des = null;
         filter_agent_site_name = null;
         filter_agent_device = null;
         filter_agent_ip = null;
+        filter_agent_os_des = null;
 
         $('.check_type').removeClass('active');
         $('.check_alert').removeClass('active');
+        $('.check_alert_severity').removeClass('active');
         $('.check_os_type').removeClass('active');
         $('#btn_search_all').addClass('active');
         $('#incident-status-all').addClass('active');
+        $('#severity-status-all').addClass('active');
         $('#all_os').addClass('active');
 
         $('#keyword_search').val('');
-        $('#filter_alert_site_name').val('');
+        $('#filter_alert_rule').val('');
         $('#filter_alert_des').val('');
         $('#filter_agent_site_name').val('');
         $('#filter_agent_device').val('');
         $('#filter_agent_ip').val('');
+        $('#filter_agent_os_des').val('');
 
         $('#filter_alert_main').hide();
         $('#filter_agent_main').hide();
@@ -966,7 +1129,7 @@
 
     function count_head(site_val)
     {
-        console.log('count - '+site_val);
+        {{-- console.log('count - '+site_val); --}}
         let site_log_id = site_val;
         $.ajax({
             url: "{{route('agentmanagement.count_head')}}",
@@ -982,44 +1145,9 @@
         });
     }
 
-
-    var start = moment().startOf('hour');
-    var end = moment().startOf('hour').add(32, 'hour');
-
-    function cb(start, end) {
-        $('#filter_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-        startDate = start;
-        endDate = end;
-    }
-
-    $('#filter_date').daterangepicker({
-        timePicker: true,
-        startDate: start,
-        endDate: end,
-        locale: {
-            format: 'M/DD hh:mm A'
-        },
-        ranges: {
-            'Today': [moment(), moment()],
-            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        }
-    }, cb);
-    $('#filter_date').on('apply.daterangepicker', function(ev, picker) {
-        isDateSearch = 1;
-        if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
-
-        }
-    });
-
-    cb(start, end);
-
     function dudit_log_feed(site_val)
     {
-        console.log('log - '+site_val);
+        {{-- console.log('log - '+site_val); --}}
         let site_log_id = site_val;
 
         $.ajax({
@@ -1028,7 +1156,11 @@
             data:{
                 site_log_id:site_log_id
             },
+            beforesend:function(){
+                $('.loadder-log').show();
+            },
             success:function(response){
+                $('.loadder-log').hide();
                 $('#audit_log_list').empty();
                 if(response.query.length > 0)
                 {
@@ -1077,6 +1209,142 @@
         });
     }
 
+    $('#refresh_log').click(function(){
+        $('.loadder-log').show();
+        site_val = $('#site').val();
+        dudit_log_feed(site_val);
+    });
+
+    function datachart_Incident(site_val)
+    {
+        let site_id = site_val;
+        {{-- console.log('inci - '+site_id); --}}
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{route('agentmanagement.data_chart_incident')}}",
+            type: "POST",
+            data: {
+                {{-- keyword_search:keyword_search, --}}
+                site_id:site_id
+            },
+            beforesend:function(){
+                $('.loadder-incident').show();
+            },
+            success:function(data){
+                $('.loadder-incident').hide();
+                chart_c3('#chart-incident-type', data.chart, data.count_all);
+            }
+        });
+    }
+
+    function datachart_platform(site_val)
+    {
+        let site_id = site_val;
+        {{-- console.log('plat - '+site_id); --}}
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{route('agentmanagement.data_chart_platform')}}",
+            type: "POST",
+            data: {
+                {{-- keyword_search:keyword_search, --}}
+                site_id:site_id
+            },
+            beforesend:function(){
+                $('.loadder-platform').show();
+            },
+            success:function(data){
+                $('.loadder-platform').hide();
+
+                chart_c3('#chart-platform-summary', data.chart, data.count_all);
+            }
+        });
+    }
+
+    function datachart_severity(site_val)
+    {
+        let site_id = site_val;
+        {{-- console.log('seve - '+site_id); --}}
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{route('agentmanagement.data_chart_severity')}}",
+            type: "POST",
+            {{-- data:function(d){
+                d.keyword_search = keyword_search;
+                d.site_id = site_id;
+                return d ;
+            },  --}}
+            data: {
+                {{-- keyword_search:keyword_search, --}}
+                site_id:site_id
+            },
+            beforesend:function(){
+                $('.loadder-severity').show();
+            },
+            success:function(data){
+                $('.loadder-severity').hide();
+                chart_c3('#chart-severity', data.chart, data.count_all);
+            }
+        });
+    }
+
+    function datachart_rule(site_val)
+    {
+        let site_id = site_val;
+        {{-- console.log('rule - '+site_id); --}}
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{route('agentmanagement.data_chart_rule')}}",
+            type: "POST",
+            data: {
+                keyword_search:keyword_search,
+                site_id:site_id
+            },
+            beforesend:function(){
+                $('.loadder-rule').show();
+            },
+            success:function(data){
+                $('.loadder-rule').hide();
+                chart_bar('chart-top-rule',data);
+            }
+        });
+    }
+
+    function datachart_timeline(site_val)
+    {
+        let site_id = site_val;
+        console.log('rule - '+site_id);
+        console.log('s - '+start_date_tl);
+        console.log('e - '+end_date_tl);
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "{{route('agentmanagement.data_chart_timeline')}}",
+            type: "POST",
+            data: {
+                {{-- keyword_search:keyword_search, --}}
+                site_id:site_id,
+                start_date:start_date_tl,
+                end_date:end_date_tl
+            },
+            beforesend:function(){
+                $('.loadder-timeline').show();
+            },
+            success:function(data){
+                $('.loadder-timeline').hide();
+                timeline_chart('chart-time-line', data.day, data.count);
+            }
+        });
+    }
+
     function datatable_alert(site_val)
     {
         var site_id = site_val;
@@ -1095,9 +1363,12 @@
                 data:function(d){
                     d.site_id = site_id;
                     d.keyword_search = keyword_search;
-                    d.filter_alert_site_name = filter_alert_site_name;
+                    d.filter_alert_rule = filter_alert_rule;
                     d.filter_alert_des = filter_alert_des;
                     d.check_alert = check_alert;
+                    d.check_alert_severity = check_alert_severity;
+                    d.start_date = start_date;
+                    d.end_date = end_date;
                     return d ;
                 }
             },
@@ -1118,12 +1389,15 @@
                     data: 'agent_alerts_incident',
                 },
                 {
+                    data: 'sev_status',
+                },
+                {
                     data: 'agent_alerts_created',
                 },
                 {
                     data: 'action',
-                },
-            ],
+                }
+            ]
         });
     }
 
@@ -1152,6 +1426,9 @@
                     d.filter_agent_device = filter_agent_device;
                     d.filter_agent_ip = filter_agent_ip;
                     d.check_os_type = check_os_type;
+                    d.filter_agent_os_des = filter_agent_os_des;
+                    d.start_date = start_date;
+                    d.end_date = end_date;
                     return d ;
                 }
             },
@@ -1185,14 +1462,15 @@
                 },
                 {
                     data: 'action',
-                },
-            ],
+                }
+            ]
         });
     }
     
     function datatable_schedule(site_val)
     {
         let site_id = site_val;
+
         $('#table-schedule-template').DataTable({
             cache: false,
             processData: false,
@@ -1206,6 +1484,8 @@
                 type: "POST",
                 data:function(d){
                     d.site_id = site_id;
+                    d.start_date = start_date;
+                    d.end_date = end_date;
                     return d ;
                 }
             },
@@ -1233,104 +1513,8 @@
                 },
                 {
                     data: 'agent_schedule_duration',
-                },
-            ],
-        });
-    }
-
-
-
-    function datachart_Incident()
-    {
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: "{{route('agentmanagement.data_chart_incident')}}",
-            type: "POST",
-            data:function(d){
-                d.keyword_search = keyword_search;
-                return d ;
-            },
-            beforesend:function(){
-                $('.loadder-incident').show();
-            },
-            success:function(data){
-                $('.loadder-incident').hide();
-                chart_c3('#chart-incident-type', data,1);
-            }
-        });
-    }
-
-    function datachart_platform()
-    {
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: "{{route('agentmanagement.data_chart_platform')}}",
-            type: "POST",
-            data:function(d){
-                d.keyword_search = keyword_search;
-                return d ;
-            },
-            beforesend:function(){
-                $('.loadder-platform').show();
-            },
-            success:function(data){
-                $('.loadder-platform').hide();
-                console.log(data);
-                chart_c3('#chart-platform-summary', data,1);
-            }
-        });
-        {{-- .done(function(data){
-            console.log(data);
-            console.log(test);
-            chart_c3(test, data,1);
-        }); --}}
-    }
-
-    function datachart_severity()
-    {
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: "{{route('agentmanagement.data_chart_severity')}}",
-            type: "POST",
-            data:function(d){
-                d.keyword_search = keyword_search;
-                return d ;
-            },  
-            beforesend:function(){
-                $('.loadder-severity').show();
-            },
-            success:function(data){
-                $('.loadder-severity').hide();
-                chart_c3('#chart-severity', data,1);
-            }
-        });
-    }
-
-    function datachart_rule()
-    {
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: "{{route('agentmanagement.data_chart_rule')}}",
-            type: "POST",
-            data:function(d){
-                d.keyword_search = keyword_search;
-                return d ;
-            },
-            beforesend:function(){
-                $('.loadder-rule').show();
-            },
-            success:function(data){
-                $('.loadder-rule').hide();
-                chart_bar('chart-top-rule',data);
-            }
+                }
+            ]
         });
     }
 
@@ -1435,11 +1619,13 @@
         });
     }
 
-    function timeline_chart(id){
+    function timeline_chart(id,day,data)
+    {
         Highcharts.chart(id, {
             title: {
                 text: ''
             },
+
             yAxis: {
                 
                 title: {
@@ -1451,11 +1637,12 @@
             },
 
             xAxis: {
-                categories: ['7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18','19','20','21','22','23','24','25','26','27','28','29','30','31','1','2','3','4','5'],
+                categories: day,
                 accessibility: {
                 rangeDescription: ''
                 }
             },
+
             legend: {
                 layout: 'vertical',
                 align: 'right',
@@ -1474,7 +1661,7 @@
 
             series: [{
                 name: 'Alert',
-                data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7],
+                data: data,
                 type: 'area',
                 fillColor: '#c8dcf17d',
                 }
@@ -1490,23 +1677,31 @@
          [
              ['Information', 0],
              ['Low', 0],
-             ['Mediumn', 7],
+             ['Medium', 7],
              ['High', 0],
              ['Critical', 0]
         ]
         ,7
     );
+    timeline_chart('chart-time-line');
     --}}
 
-
-
-    timeline_chart('chart-time-line');
-
     $('#site').change(function(){
+        $('.loadder-incident').show();
+        $('.loadder-platform').show();
+        $('.loadder-severity').show();
+        $('.loadder-rule').show();
+        $('.loadder-log').show();
+        $('.loadder-timeline').show();
         site_val = $('#site').val();
         console.log(site_val);
         count_head(site_val);
+        datachart_Incident(site_val);
+        datachart_platform(site_val);
+        datachart_severity(site_val);
+        datachart_rule(site_val);
         dudit_log_feed(site_val);
+        datachart_timeline(site_val);
         datatable_alert(site_val);
         datatable_agent(site_val);
         datatable_schedule(site_val);

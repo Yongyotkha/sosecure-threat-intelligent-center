@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use DB;
 use App\FXOSType;
+use App\FXSeverityType;
 use App\FXSiteAgents;
 use App\FXAgentAlerts;
 use App\FXAgentLogs;
@@ -137,35 +138,74 @@ class AgentManagementController extends Controller
 
     public function data_chart_incident(Request $request)
     {
-        $query_incident = FXAgentAlerts::select('incident')->get();
+        $site_id = $request->site_id;
+        $query_incident = FXAgentAlerts::
+                            select('incident')
+                            ->groupBy('incident')
+                            ->get();
 
         $data = [];
+        $count_all = 0;
         foreach($query_incident as $data_incident)
         {
-            $query_count = FXAgentAlerts::where('incident',$data_incident->incident)->get();
+            $query_count = FXAgentAlerts::
+                            where(function ($query_site) use ($site_id) {
+                                if($site_id != null)
+                                {
+                                    $query_site->where('site_id', $site_id);
+                                }
+                                else
+                                {
+                                    $query_site->where('site_id', '!=', null);
+                                }
+                            })
+                            ->where('incident',$data_incident->incident)
+                            ->get();
+
             $count = count($query_count);
 
-            $data[] = [$data_incident->incident, $count];
-        }
+            $count_all = $count_all + $count;
 
+            $data['chart'][] = [$data_incident->incident, $count];
+        }
+        
+        $data['count_all'] = $count_all;
+        
         return response()->json($data);
     }
 
     public function data_chart_platform(Request $request)
     {
-        $query_type = FXOSType::select('id','name')->get();
-
-        // dd($query_type);
+        $site_id = $request->site_id;
+        $query_type = FXOSType::
+                        select('id','name')
+                        ->get();
 
         $data = [];
+        $count_all = 0;
         foreach($query_type as $data_type)
         {
             $query = FXSiteAgents::
-                        where('os_type', $data_type->id)
+                        where(function ($query_site) use ($site_id) {
+                            if($site_id != null)
+                            {
+                                $query_site->where('site_id', $site_id);
+                            }
+                            else
+                            {
+                                $query_site->where('site_id', '!=', null);
+                            }
+                        })
+                        ->where('os_type', $data_type->id)
                         ->get();
+                    
             $count = count($query);
-            $data[] = [$data_type->name, $count];
+
+            $count_all = $count_all + $count;
+
+            $data['chart'][] = [$data_type->name, $count];
         }
+        $data['count_all'] = $count_all;
         // dd($data);
 
         return response()->json($data);
@@ -173,31 +213,122 @@ class AgentManagementController extends Controller
 
     public function data_chart_severity(Request $request)
     {
-        $query_severity = FXAgentAlerts::select('severity')->get();
+        $site_id = $request->site_id;
+        $query_severity = FXSeverityType::select('id', 'name')->get();
 
         $data = [];
+        $count_all = 0;
         foreach($query_severity as $data_severity)
         {
-            $query_count = FXAgentAlerts::where('severity',$data_severity->severity)->get();
+            $query_count = FXAgentAlerts::
+                                where(function ($query_site) use ($site_id) {
+                                    if($site_id != null)
+                                    {
+                                        $query_site->where('site_id', $site_id);
+                                    }
+                                    else
+                                    {
+                                        $query_site->where('site_id', '!=', null);
+                                    }
+                                })
+                                ->where('severity',$data_severity->name)
+                                ->get();
+
             $count = count($query_count);
 
-            $data[] = [$data_severity->severity, $count];
+            $count_all = $count_all + $count;
+
+            $data['chart'][] = [$data_severity->name, $count];
         }
+        $data['count_all'] = $count_all;
 
         return response()->json($data);
     }
     
     public function data_chart_rule(Request $request)
     {
-        $query_rule = FXAgentAlerts::select('rule')->get();
+        $site_id = $request->site_id;
+        $query_rule = FXAgentAlerts::
+                        select('rule',DB::raw('count(*) as total'))
+                        ->orderBy('total', 'desc')
+                        ->groupBy('rule')
+                        ->limit(10)
+                        ->get();
 
         $data = [];
         foreach($query_rule as $data_rule)
         {
-            $query_count = FXAgentAlerts::where('rule',$data_rule->rule)->get();
-            $count = count($query_count);
+            $query_rule = FXAgentAlerts::
+                            where(function ($query_site) use ($site_id) {
+                                if($site_id != null)
+                                {
+                                    $query_site->where('site_id', $site_id);
+                                }
+                                else
+                                {
+                                    $query_site->where('site_id', '!=', null);
+                                }
+                            })
+                            ->where('rule', $data_rule->rule)
+                            ->get();
+
+            $count = count($query_rule);
 
             $data[] = [$data_rule->rule, $count];
+        }
+
+        return response()->json($data);
+    }
+
+    public function data_chart_timeline(Request $request)
+    {
+        $input = $request->all();
+        $site_id = $request->site_id;
+        $start_date_input = $request->start_date;
+        $end_date_input = $request->end_date;
+        $data = [];
+
+        // dd($input);
+
+        // // $start_date_input = date("Y-m-d", strtotime("+1 day", strtotime($start_date_input)));
+        if($start_date_input == null && $end_date_input == null)
+        {
+            $end_date_input = date('Y-m-d');
+            $start_date_input = date("Y-m-d", strtotime("-30 day", strtotime($end_date_input)));
+        }
+
+        $start_date = date('Y-m-d', strtotime($start_date_input));
+        $end_date = date('Y-m-d', strtotime($end_date_input));
+        
+        $Variable1 = strtotime($start_date);
+        $Variable2 = strtotime($end_date);
+        
+        for ($currentDate = $Variable1; $currentDate <= $Variable2; $currentDate += (86400)) {
+                                            
+            $Store = date('Y-m-d', $currentDate);
+            $Store2 = date("Y-m-d", strtotime("+1 day", strtotime($Store)));
+            
+            $day = explode('-', $Store);
+
+            $query_timeline = FXAgentAlerts::
+                                where(function ($query_site) use ($site_id) {
+                                    if(@$site_id != null)
+                                    {
+                                        $query_site->where('site_id', $site_id);
+                                    }
+                                    else
+                                    {
+                                        $query_site->where('site_id', '!=', null);
+                                    }
+                                })
+                                ->whereBetween('created', [$Store, $Store2])
+                                ->get();
+
+            $count = count($query_timeline);
+
+            $data['day'][] = $day[2];
+            $data['date'][] = $Store;
+            $data['count'][] = $count;
         }
 
         return response()->json($data);
@@ -321,6 +452,8 @@ class AgentManagementController extends Controller
     public function tb_alert(Request $request)
     {
         $input = $request->all();
+        $start_date_input = $request->start_date;
+        $end_date_input = $request->end_date;
 
         // dd($input);
 
@@ -333,6 +466,7 @@ class AgentManagementController extends Controller
                         'agent_alerts.rule as agent_alerts_rule',
                         'agent_alerts.description as agent_alerts_description',
                         'agent_alerts.incident as agent_alerts_incident',
+                        'agent_alerts.severity as agent_alerts_severity',
                         'agent_alerts.status as agent_alerts_status',
                         'agent_alerts.created as agent_alerts_created'
                     );
@@ -345,15 +479,20 @@ class AgentManagementController extends Controller
         if($request->keyword_search != null)
         {
             $query->where('site.name', 'like', '%'.$request->keyword_search.'%')
-                  ->orwhere('agent_alerts.rule', 'like', '%'.$request->keyword_search.'%')
+                //   ->orwhere('agent_alerts.rule', 'like', '%'.$request->keyword_search.'%')
                   ->orwhere('agent_alerts.description', 'like', '%'.$request->keyword_search.'%')
                   ->orwhere('agent_alerts.incident', 'like', '%'.$request->keyword_search.'%')
                   ->orwhere('agent_alerts.log_file', 'like', '%'.$request->keyword_search.'%');
         }
 
-        if($request->filter_alert_site_name != null)
+        if($start_date_input != null && $end_date_input != null)
         {
-            $query->where('site.name', 'like', '%'.$request->filter_alert_site_name.'%');
+            $query->whereBetween('agent_alerts.created', [$start_date_input, $end_date_input]);
+        }
+
+        if($request->filter_alert_rule != null)
+        {
+            $query->where('agent_alerts.rule', 'like', '%'.$request->filter_alert_rule.'%');
         }
 
         if($request->filter_alert_des != null)
@@ -366,6 +505,11 @@ class AgentManagementController extends Controller
             $query->where('agent_alerts.incident', $request->check_alert);
         }
 
+        if($request->check_alert_severity != null)
+        {
+            $query->where('agent_alerts.severity', $request->check_alert_severity);
+        }
+
         return DataTables::of($query)
         ->addColumn('chk', function($query) {
             $html = '';
@@ -375,6 +519,35 @@ class AgentManagementController extends Controller
                     <span class="label-text"></span>
                 </label>
             ';
+            return $html;
+        })
+        ->addColumn('sev_status', function($query) {
+            $html = '';
+                    if($query->agent_alerts_severity == 'Critical')
+                    {
+            $html .= '<span class="badge" style="background-color: #b93624;">Critical</span>';
+                    }
+                    else if($query->agent_alerts_severity == 'High')
+                    {
+            $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
+                    }
+                    else if($query->agent_alerts_severity == 'Medium')
+                    {
+            $html .= '<span class="badge" style="background-color: #f2ff15;">Medium</span>';
+                    }
+                    else if($query->agent_alerts_severity == 'Low')
+                    {
+            $html .= '<span class="badge" style="background-color: #409967;">Low</span>';
+                    }
+                    else if($query->agent_alerts_severity == 'Information')
+                    {
+            $html .= '<span class="badge" style="background-color: #00dcff;">Information</span>';
+                    }
+                    else
+                    {
+            $html .= '<span class="badge"> No Severity </span>';
+                    }
+            $html .= '';
             return $html;
         })
         ->addColumn('chk_status', function($query) {
@@ -403,13 +576,15 @@ class AgentManagementController extends Controller
             ';
             return $html;
         })
-        ->rawColumns(['chk','chk_status','action'])
+        ->rawColumns(['chk', 'sev_status', 'chk_status', 'action'])
         ->make(true);
     }
 
     public function tb_agent(Request $request)
     {
         $input = $request->all();
+        $start_date_input = $request->start_date;
+        $end_date_input = $request->end_date;
 
         // dd($request->site_id);
         // dd($input);
@@ -442,10 +617,15 @@ class AgentManagementController extends Controller
             $query->where('site.name', 'like', '%'.$request->keyword_search.'%')
                   ->orwhere('site_agents.device_name', 'like', '%'.$request->keyword_search.'%')
                   ->orwhere('os_type.name', 'like', '%'.$request->keyword_search.'%')
-                  ->orwhere('site_agents.os_description', 'like', '%'.$request->keyword_search.'%')
+                //   ->orwhere('site_agents.os_description', 'like', '%'.$request->keyword_search.'%')
                   ->orwhere('site_agents.system_info', 'like', '%'.$request->keyword_search.'%')
                   ->orwhere('site_agents.domain', 'like', '%'.$request->keyword_search.'%')
                   ->orwhere('site_agents.ip_private', 'like', '%'.$request->keyword_search.'%');
+        }
+
+        if($start_date_input != null && $end_date_input != null)
+        {
+            $query->whereBetween('site_agents.last_online', [$start_date_input, $end_date_input]);
         }
 
         if($request->filter_agent_site_name != null)
@@ -466,6 +646,11 @@ class AgentManagementController extends Controller
         if($request->check_os_type != null)
         {
             $query->where('site_agents.os_type', $request->check_os_type);
+        }
+
+        if($request->filter_agent_os_des != null)
+        {
+            $query->where('site_agents.os_description', 'like', '%'.$request->filter_agent_os_des.'%');
         }
 
         return DataTables::of($query)
@@ -504,6 +689,9 @@ class AgentManagementController extends Controller
 
     public function tb_schedule(Request $request)
     {
+        // $start_date_input = $request->start_date;
+        // $end_date_input = $request->end_date;
+        
         $query_schedule = FXAgentSchedule::
                         join('site', 'agent_schedule.site_id', 'site.id')
                         ->select(
@@ -522,6 +710,11 @@ class AgentManagementController extends Controller
         {
             $query_schedule->where('site_id', $request->site_id);
         }
+
+        // if($start_date_input != null && $end_date_input != null)
+        // {
+        //     $query->whereBetween('agent_schedule.created_at', [$start_date_input, $end_date_input]);
+        // }
 
         return DataTables::of($query_schedule)
         ->addColumn('chk', function($query_schedule) {
