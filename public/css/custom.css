@@ -5440,3 +5440,21 @@ input.form-policy[type=password] {
     height: 100%;
     object-fit: contain;
 }
+
+.risk-status{
+    display: inline-block;
+    width: 5px;
+    height: 100%;
+    min-height: 45px;
+    padding: 10px 0;
+}
+
+.risk-status.low-risk{
+    background-color: #53ad66;
+}
+.risk-status.medium-risk{
+    background-color: #f90;
+}
+.risk-status.high-risk{
+    background-color: #c00;
+}

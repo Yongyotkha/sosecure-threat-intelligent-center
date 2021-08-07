@@ -377,11 +377,12 @@
                     <section class="table-ibmcloud" style="display: none">
                         <h3 class="text-primary-head">IBM X-Force</h1>
 
-                        <div id="chart-time-line"></div>
+                        {{-- <div id="chart-time-line"></div> --}}
 
                         <table id="table-ibmcloud" class="table">
                             <thead>
                                 <tr>
+                                    <th style="width: 5px;padding:0;"></th>
                                     <th>Category</th>
                                     <th>Reason</th>
                                     <th>Location</th>
@@ -1396,12 +1397,40 @@ $.ajax({
                     const history = data.history[i];
                     html += `
                     <tr>`;
+                        console.log(history);
+                        console.log(history.cats);
+                        
+                        if(history.cats && history.cats.length != 0){
+                            html += `<td style="padding:0;line-height: 0;">`;
+                            for(let [key, value] of Object.entries(history.cats)){
+                               var percent = value;
+                               if(percent <= 39){
+                                    html += `<div class="risk-status low-risk"></div>`; 
+                               }else if(percent <= 69){
+                                    html += `<div class="risk-status medium-risk"></div>`; 
+                               }else if(percent <= 100){
+                                    html += `<div class="risk-status high-risk"></div>`; 
+                               }else{
+                                   html += `<div class="risk-status low-risk"></div>`; 
+                               }
+                            }
+                           html += ` </td>`;
+                        }else{
+                            html += `<td style="padding:0;line-height: 0;">
+                                        <div class="risk-status low-risk"></div>
+                                    </td>`;
+                        }
+
+                       
+                        
                         if(history.cats){
                             html += `<td>`;
                             for(const [key, value] of Object.entries(history.cats)){
                                 html += ` ${key} (${value}%)`;
                             }
                             html += `</td>`;
+                        }else{
+                            html += `<td></td>`;
                         }
                         
                         html += `<td>${history.reason}</td>`;
@@ -1412,11 +1441,14 @@ $.ajax({
                             html += `<td></td>`;
                         }
                         
+                        if(history.created){
                         html += `<td>
-                            ${moment(new Date(history.created)).format('DD-MM-YYYY HH:MM:SS')}
-                        </td>
-                    </tr>
-                    `;
+                                ${moment(new Date(history.created)).format('DD-MM-YYYY HH:MM:SS')}
+                            </td>`;
+                        }else{
+                            html += `<td></td>`;
+                        }
+                        html += `</tr> `;
                 }
                 document.getElementById("tbody-ibmcloud").innerHTML = html;
                 $('#table-ibmcloud').DataTable({
@@ -2761,8 +2793,6 @@ function chart_time_line(id){
         }
     });
 }
-
-chart_time_line('chart-time-line');
 
 multi_readmore_text();
 </script>
