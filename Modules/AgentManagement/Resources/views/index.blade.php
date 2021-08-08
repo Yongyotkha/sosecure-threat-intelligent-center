@@ -155,7 +155,7 @@
                             <div class="col-lg-4">
                                 <div class="agt-main-box">
                                     <div class="agt-header">
-                                        Log Feed
+                                        Log
                                         <span class="refresh-audit-log pull-right cs-pointer" id="refresh_log"><i class="fas fa-sync-alt"></i></span>
                                     </div>
                                     <div class="agt-body">
@@ -262,19 +262,24 @@
                         <div class="agt-main-box">
                             <div class="agt-header">
                                 <div class="row">
-                                    <div class="col-md-6 text-left">
-                                        Timeline
+                                    <div class="col-md-7">
+                                        <div class="agt-main-box">
+                                            <div class="agt-header"> 
+                                                Timeline
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6 text-right">
-                                        <div class="form-group m-b-md">
-                                            {{-- <label for="" class="">Date</label> --}}
-                                            <div id="filter_date_timeline" class="text-center form-control"style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;width:500px;">
+                                    <div class="col-md-4 text-right">
+                                        <div class="form-group m-b-md" style="margin-bottom: 0px;">
+                                            <div id="filter_date_timeline" class="text-center form-control" style="background: #fff; cursor: pointer; padding: 5px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                                 <i class="fa fa-calendar"></i>
                                                 &nbsp;<span></span> 
                                                 <i class="fa fa-caret-down"></i>
                                             </div>
-                                            <button type="button" class="btn btn-info" onclick="search_timeline()"><i class="fas fa-search"></i> Apply </button>
                                         </div>
+                                    </div>
+                                    <div class="col-md-1 text-left">
+                                        <button type="button" class="btn btn-sm btn-info" onclick="search_timeline()"><i class="fas fa-search"></i> Apply </button>
                                     </div>
                                 </div>
                             </div>
@@ -385,7 +390,7 @@
                                         <button class="btn btn-grey check_alert" value="Agent">
                                             <span> Agent </span>
                                         </button>
-                                        <button class="btn btn-grey check_alert" value="Agent">
+                                        <button class="btn btn-grey check_alert" value="Indicator">
                                             <span> Indicator </span>
                                         </button>
                                     </div>
@@ -1375,6 +1380,7 @@
             columns: [
                 {
                     data: 'chk',
+                    "orderable": false,
                 },
                 {
                     data: 'site_name',
@@ -1397,7 +1403,7 @@
                 {
                     data: 'action',
                 }
-            ]
+            ],
         });
     }
 

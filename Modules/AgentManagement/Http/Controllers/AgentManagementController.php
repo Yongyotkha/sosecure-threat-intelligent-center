@@ -438,6 +438,7 @@ class AgentManagementController extends Controller
                         'agent_logs.rules as agent_logs_rules',
                         'agent_logs.created as agent_logs_created'
                     )
+                    ->orderBy('created', 'desc')
                     ->get();
                     
         // dd($query);
@@ -469,7 +470,8 @@ class AgentManagementController extends Controller
                         'agent_alerts.severity as agent_alerts_severity',
                         'agent_alerts.status as agent_alerts_status',
                         'agent_alerts.created as agent_alerts_created'
-                    );
+                    )
+                    ->orderBy('created', 'desc');
 
         if($request->site_id != null)
         {
