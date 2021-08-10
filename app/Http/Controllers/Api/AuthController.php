@@ -20,6 +20,7 @@ use Firebase\JWT\JWT;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Response;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\Validator;
 use Modules\Users\Entities\model_has_roles;
 use Modules\Users\Entities\user_menu_permission;
 use Modules\Users\Entities\user_menu_sub_permission;
@@ -166,24 +167,53 @@ class AuthController extends ApiController
             $error_current = false;
             $data_key = json_decode($data, true);
             $user = User::find($data_key['user_id']);
-            if(!Hash::check($data_key['current_password'], $user->password)){
-                $error_current = true;
-            }else{
-                if(empty($user->password_days_expire)){
-                    $user->password_days_expire = '90';
-                    $user -> password_start_reset = Carbon::now()->addDays(90);
-                }else{
-                    $user -> password_start_reset = Carbon::now()->addDays($user->password_days_expire);
+            $validator = Validator::make($data_key, [
+                'current_password' => 'required',
+                'password' => array(
+                    'required', 
+                    'string', 
+                    'min:8',  
+                    'regex:/[a-z]/', 
+                    'regex:/[A-Z]/', 
+                    'regex:/[0-9]/',
+                    'regex:/[~!@#$%^&*-_+=?><]/', 
+                    'confirmed'
+                ),
+            ]);
+            if ($validator->fails()){
+                $validation = $validator->getMessageBag()->toArray();
+                $error_current = null;
+                if(auth()->check()){
+                    $user = User::find(auth()->user()->id);
+                    if(!Hash::check($request->current_password, $user->password)){
+                        $error_current = 'The current password is invalid.';
+                    }
                 }
-                $user->password = $data_key['password'];
-                $user -> save();
-    
-                event(new PasswordReset($user));
-                
-                $response = array(
-                    'data' => $user
-                );
-    
+                $data_transcation = json_encode($validation);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+                $data_transcation_error_current = json_encode($validation);
+                $datas_error_current = encrypt_decrypt('encrypt', $data_transcation_error_current, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+                return response()->json(['errors' => $datas, 'error_current' => $datas_error_current, 'status_code' => '400']);
+            }else{
+                if(!Hash::check($data_key['current_password'], $user->password)){
+                    $error_current = true;
+                }else{
+                    if(empty($user->password_days_expire)){
+                        $user->password_days_expire = '90';
+                        $user -> password_start_reset = Carbon::now()->addDays(90);
+                    }else{
+                        $user -> password_start_reset = Carbon::now()->addDays($user->password_days_expire);
+                    }
+                    $user->password = $data_key['password'];
+                    $user -> save();
+        
+                    event(new PasswordReset($user));
+                    
+                    $response = array(
+                        'data' => $user
+                    );
+        
+                }
             }
             if($error_current){
                 return response()->json(['message' => '', 'error' => 'error current password', 'status_code' => '400']);
