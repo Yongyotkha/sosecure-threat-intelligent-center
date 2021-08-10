@@ -200,6 +200,7 @@
                                                                         <th>Site</th>
                                                                         <th>Host</th>
                                                                         <th>Asset</th>
+                                                                        <th>Port</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody id="cve_assets"></tbody>
@@ -904,6 +905,9 @@ Highcharts.setOptions({
                                 </td>
                                 <td>
                                     <span>${data.value}</span>
+                                </td>
+                                <td>
+                                    <span>${data.port}</span>
                                 </td>
                             </tr>
                             `;

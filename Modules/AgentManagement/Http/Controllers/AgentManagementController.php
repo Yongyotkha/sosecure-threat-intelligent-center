@@ -159,6 +159,7 @@ class AgentManagementController extends Controller
                                     $query_site->where('site_id', '!=', null);
                                 }
                             })
+                            ->where('status', 'Y')
                             ->where('incident',$data_incident->incident)
                             ->get();
 
@@ -196,6 +197,7 @@ class AgentManagementController extends Controller
                                 $query_site->where('site_id', '!=', null);
                             }
                         })
+                        ->where('status', '1')
                         ->where('os_type', $data_type->id)
                         ->get();
                     
@@ -231,6 +233,7 @@ class AgentManagementController extends Controller
                                         $query_site->where('site_id', '!=', null);
                                     }
                                 })
+                                ->where('status', 'Y')
                                 ->where('severity',$data_severity->name)
                                 ->get();
 
@@ -269,6 +272,7 @@ class AgentManagementController extends Controller
                                     $query_site->where('site_id', '!=', null);
                                 }
                             })
+                            ->where('status', 'Y')
                             ->where('rule', $data_rule->rule)
                             ->get();
 
@@ -321,6 +325,7 @@ class AgentManagementController extends Controller
                                         $query_site->where('site_id', '!=', null);
                                     }
                                 })
+                                ->where('status', 'Y')
                                 ->whereBetween('created', [$Store, $Store2])
                                 ->get();
 
@@ -351,6 +356,7 @@ class AgentManagementController extends Controller
                         $query_site->where('site_id', '!=', null);
                     }
                 })
+                ->where('status', '1')
                 ->get();
         $count_agent = count($query_agent);
 
@@ -365,6 +371,7 @@ class AgentManagementController extends Controller
                         $query_site->where('site_id', '!=', null);
                     }
                 })
+                ->where('status', 'Y')
                 ->get();
         $count_alert = count($query_alert);
 
@@ -379,6 +386,7 @@ class AgentManagementController extends Controller
                         $query_site->where('site_id', '!=', null);
                     }
                 })
+                ->where('status', 'Y')
                 ->get();
         $count_log = count($query_log);
 
@@ -393,6 +401,7 @@ class AgentManagementController extends Controller
                         $query_site->where('site_id', '!=', null);
                     }
                 })
+                ->where('status', 'Y')
                 ->get();
         $count_rule = count($query_rule);
 
@@ -426,6 +435,7 @@ class AgentManagementController extends Controller
                             $query_site->where('agent_logs.site_id', '!=', null);
                         }
                     })
+                    ->where('status', 'Y')
                     ->select(
                         'site.name as site_name',
                         'site.logo as site_logo',
@@ -471,6 +481,7 @@ class AgentManagementController extends Controller
                         'agent_alerts.status as agent_alerts_status',
                         'agent_alerts.created as agent_alerts_created'
                     )
+                    ->where('status', 'Y')
                     ->orderBy('created', 'desc');
 
         if($request->site_id != null)
@@ -607,7 +618,8 @@ class AgentManagementController extends Controller
                         'site_agents.last_online as site_agents_last_online',
                         'site_agents.status as site_agents_status',
                         'site_agents.created as site_agents_created'
-                    );
+                    )
+                    ->where('status', '1');
 
         if($request->site_id != null)
         {
@@ -706,7 +718,8 @@ class AgentManagementController extends Controller
                             'agent_schedule.status as agent_schedule_status',
                             'agent_schedule.source as agent_schedule_source',
                             'agent_schedule.duration as agent_schedule_duration'
-                        );
+                        )
+                        ->where('status', 'Y');
 
         if($request->site_id != null)
         {
