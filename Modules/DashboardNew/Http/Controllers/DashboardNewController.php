@@ -24,6 +24,7 @@ use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Modules\MonitoringVulnerabilitys\Entities\CVEAssets;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
 use MongoDB\Client as MongoClient;
+use App\FXAssetsPort;
 use App\DataLeakFeed;
 use App\DataLeakSocialRef;
 use App\R_s_s_news;
@@ -150,8 +151,11 @@ class DashboardNewController extends Controller
 
     public function cve_assets(Request $request){
 
-        $site_id_active = SiteSettings::select('id')->where('active', 1)->whereNull('deleted_at')->get()->pluck('id')->toArray(); 
+        $input = $request->all();
+        // dd($input);
 
+        $site_id_active = SiteSettings::select('id')->where('active', 1)->whereNull('deleted_at')->get()->pluck('id')->toArray(); 
+        // dd(get_role_custom());
         if(Auth::check()) {
             $role_custom = @check_role_custom();
             if($role_custom['assets']) {
@@ -189,14 +193,45 @@ class DashboardNewController extends Controller
                                     $Assets_data_list['site'] = $site->name;
                                     $Assets_data_list['host'] = "None";
                                     $Assets_data_list['value'] = $IP_Listvalue->value;
+                                    $Assets_data_list['port'] = "None";
                                     array_push($assets, $Assets_data_list);
                                 }else{
                                     foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                                         $Assets_data_list = array();
+                                        $port = '';
+                                        $num_main = 1;
+                                        $port_all = FXAssetsPort::
+                                                        select('port')
+                                                        ->where('site_id', $IP_Listvalue->site_id)
+                                                        ->where('asset_name', $IP_Listvalue->value)
+                                                        ->get(); 
+                                        $count_port = count($port_all);
+                                        
+                                        if($count_port > 0)
+                                        {
+                                            foreach($port_all as $data_port)
+                                            {
+                                                if($count_port == $num_main)
+                                                {
+                                                    $port = $port.$data_port->port;
+                                                }
+                                                else
+                                                {
+                                                    $port = $port.$data_port->port.',';
+                                                }
+                                                $num_main++;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            $port = null;
+                                        }
+
                                         $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 
                                         $Assets_data_list['site'] = $site->name;
                                         $Assets_data_list['host'] = $Domain_listvalue->value;
                                         $Assets_data_list['value'] = $IP_Listvalue->value;
+                                        $Assets_data_list['port'] = $port;
                                         array_push($assets, $Assets_data_list);
                                     }
                                 }
@@ -204,13 +239,18 @@ class DashboardNewController extends Controller
                         }
                     }else{
                         $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->whereNull('deleted_at')->where('active',1)->first();
+                        // dd($site_id_m);
+
                         $assets = [];
                         $Assets_data = Assets::where('status',1)->get();
                         foreach ($Assets_data as $key => $value) {
                             $AssetsData_data = AssetsData::where('site_id',$site_id_m->id)->whereIn('site_id',$site_id_active)->where('asset_id',$value->id)->where('status',1)->get();
+                            // dd($AssetsData_data);
+                            
                             $Domain_list = [];
                             $IP_List =[];
                             foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
+                                // dd($AssetsData_datavalue);
                                 if ($AssetsData_datavalue->data_type_id == 1 || $AssetsData_datavalue->data_type_id == 4) {
                                     //Domain
                                     array_push($Domain_list, $AssetsData_datavalue);
@@ -221,9 +261,12 @@ class DashboardNewController extends Controller
 
                                 }
                             }
+                            // dd($Domain_list);
+                            // dd($IP_List);
 
                             foreach ($IP_List as $IP_Listkey => $IP_Listvalue) {
                                 $CPE_Data = CPE::where('asset_id',$IP_Listvalue->id)->get();
+                                // dd($IP_Listvalue);
                                 $CPE_List = array();
                                 foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
                                     array_push($CPE_List, $CPE_Datavalue->result .' : '.$CPE_Datavalue->os_type);
@@ -235,14 +278,46 @@ class DashboardNewController extends Controller
                                     $Assets_data_list['site'] = $site->name;
                                     $Assets_data_list['host'] = "None";
                                     $Assets_data_list['value'] = $IP_Listvalue->value;
+                                    $Assets_data_list['port'] = "None";
                                     array_push($assets, $Assets_data_list);
+
                                 }else{
                                     foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                                         $Assets_data_list = array();
+                                        $port = '';
+                                        $num_main = 1;
+                                        $port_all = FXAssetsPort::
+                                                        select('port')
+                                                        ->where('site_id', $IP_Listvalue->site_id)
+                                                        ->where('asset_name', $IP_Listvalue->value)
+                                                        ->get(); 
+                                        $count_port = count($port_all);
+                                        
+                                        if($count_port > 0)
+                                        {
+                                            foreach($port_all as $data_port)
+                                            {
+                                                if($count_port == $num_main)
+                                                {
+                                                    $port = $port.$data_port->port;
+                                                }
+                                                else
+                                                {
+                                                    $port = $port.$data_port->port.',';
+                                                }
+                                                $num_main++;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            $port = null;
+                                        }
+
                                         $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 
                                         $Assets_data_list['site'] = $site->name;
                                         $Assets_data_list['host'] = $Domain_listvalue->value;
                                         $Assets_data_list['value'] = $IP_Listvalue->value;
+                                        $Assets_data_list['port'] = $port;
                                         array_push($assets, $Assets_data_list);
                                     }
                                 }
@@ -283,14 +358,45 @@ class DashboardNewController extends Controller
                                     $Assets_data_list['site'] = $site->name;
                                     $Assets_data_list['host'] = "None";
                                     $Assets_data_list['value'] = $IP_Listvalue->value;
+                                    $Assets_data_list['port'] = "None";
                                     array_push($assets, $Assets_data_list);
                                 }else{
                                     foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                                         $Assets_data_list = array();
+                                        $port = '';
+                                        $num_main = 1;
+                                        $port_all = FXAssetsPort::
+                                                        select('port')
+                                                        ->where('site_id', $IP_Listvalue->site_id)
+                                                        ->where('asset_name', $IP_Listvalue->value)
+                                                        ->get(); 
+                                        $count_port = count($port_all);
+                                        
+                                        if($count_port > 0)
+                                        {
+                                            foreach($port_all as $data_port)
+                                            {
+                                                if($count_port == $num_main)
+                                                {
+                                                    $port = $port.$data_port->port;
+                                                }
+                                                else
+                                                {
+                                                    $port = $port.$data_port->port.',';
+                                                }
+                                                $num_main++;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            $port = null;
+                                        }
+
                                         $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 
                                         $Assets_data_list['site'] = $site->name;
                                         $Assets_data_list['host'] = $Domain_listvalue->value;
                                         $Assets_data_list['value'] = $IP_Listvalue->value;
+                                        $Assets_data_list['port'] = $port;
                                         array_push($assets, $Assets_data_list);
                                     }
                                 }
@@ -329,14 +435,45 @@ class DashboardNewController extends Controller
                                     $Assets_data_list['site'] = $site->name;
                                     $Assets_data_list['host'] = "None";
                                     $Assets_data_list['value'] = $IP_Listvalue->value;
+                                    $Assets_data_list['port'] = "None";
                                     array_push($assets, $Assets_data_list);
                                 }else{
                                     foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                                         $Assets_data_list = array();
+                                        $port = '';
+                                        $num_main = 1;
+                                        $port_all = FXAssetsPort::
+                                                        select('port')
+                                                        ->where('site_id', $IP_Listvalue->site_id)
+                                                        ->where('asset_name', $IP_Listvalue->value)
+                                                        ->get(); 
+                                        $count_port = count($port_all);
+                                        
+                                        if($count_port > 0)
+                                        {
+                                            foreach($port_all as $data_port)
+                                            {
+                                                if($count_port == $num_main)
+                                                {
+                                                    $port = $port.$data_port->port;
+                                                }
+                                                else
+                                                {
+                                                    $port = $port.$data_port->port.',';
+                                                }
+                                                $num_main++;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            $port = null;
+                                        }
+
                                         $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 
                                         $Assets_data_list['site'] = $site->name;
                                         $Assets_data_list['host'] = $Domain_listvalue->value;
                                         $Assets_data_list['value'] = $IP_Listvalue->value;
+                                        $Assets_data_list['port'] = $port;
                                         array_push($assets, $Assets_data_list);
                                     }
                                 }
@@ -347,6 +484,7 @@ class DashboardNewController extends Controller
             }
         }
         
+        // dd($assets);
     //$assets = Assets::select('raw_data','referent',DB::raw('CONCAT("/asset?Search_Link_All=",id) AS link'))->where('status', 1)->get();
         $response = array(
             'error' => '', 

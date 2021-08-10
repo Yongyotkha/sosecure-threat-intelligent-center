@@ -155,7 +155,7 @@
                             <div class="col-lg-4">
                                 <div class="agt-main-box">
                                     <div class="agt-header">
-                                        Log Feed
+                                        Log
                                         <span class="refresh-audit-log pull-right cs-pointer" id="refresh_log"><i class="fas fa-sync-alt"></i></span>
                                     </div>
                                     <div class="agt-body">
@@ -262,19 +262,24 @@
                         <div class="agt-main-box">
                             <div class="agt-header">
                                 <div class="row">
-                                    <div class="col-md-6 text-left">
-                                        Timeline
+                                    <div class="col-md-7">
+                                        <div class="agt-main-box">
+                                            <div class="agt-header"> 
+                                                Timeline
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6 text-right">
-                                        <div class="form-group m-b-md">
-                                            {{-- <label for="" class="">Date</label> --}}
-                                            <div id="filter_date_timeline" class="text-center form-control"style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;width:500px;">
+                                    <div class="col-md-4 text-right">
+                                        <div class="form-group m-b-md" style="margin-bottom: 0px;">
+                                            <div id="filter_date_timeline" class="text-center form-control" style="background: #fff; cursor: pointer; padding: 5px; border: 1px solid #ccc; display:block;margin-bottom:0;">
                                                 <i class="fa fa-calendar"></i>
                                                 &nbsp;<span></span> 
                                                 <i class="fa fa-caret-down"></i>
                                             </div>
-                                            <button type="button" class="btn btn-info" onclick="search_timeline()"><i class="fas fa-search"></i> Apply </button>
                                         </div>
+                                    </div>
+                                    <div class="col-md-1 text-left">
+                                        <button type="button" class="btn btn-sm btn-info" onclick="search_timeline()"><i class="fas fa-search"></i> Apply </button>
                                     </div>
                                 </div>
                             </div>
@@ -304,7 +309,22 @@
                         <div class="container-fluid" style="padding: 2rem;">
     
                             <div class="row">
-                                <div class="col-lg-6">
+                                <div class="col-lg-2 col-md-2">
+                                    {{-- <h5>Filter By</h5> --}}
+                                    <label for="" class="">Filter By</label>
+                                    <div id="btngroup_sort_by" class="btn-group special">
+                                        <button class="btn btn-grey filter_agent_all check_type active" value="" id="btn_search_all">
+                                            <span> All </span>
+                                        </button>
+                                        <button class="btn filter_agent_alert check_type btn-grey" value="alert">
+                                            <span> Alert </span>
+                                        </button>
+                                        <button class="btn filter_agent_agent check_type btn-grey" value="agent">
+                                            <span> Agent </span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5">
                                     <div>
                                         <div class="form-group m-b-md">
                                             <label for="" class="">Keyword</label>
@@ -312,7 +332,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
+                                <div class="col-lg-4">
                                     <div class="form-group m-b-md">
                                         <label for="" class="">Date</label>
                                         <div id="filter_date" class="text-center form-control"style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
@@ -324,7 +344,7 @@
                                 </div>
                             </div>
     
-                            <div class="row">
+                            {{-- <div class="row">
                                 <div class="col-lg-3 col-md-3 mb-1">
                                     <h5 class="font-weight-bold">Filter By</h5>
                                     <div id="btngroup_sort_by" class="btn-group special mb-2">
@@ -339,23 +359,7 @@
                                         </button>
                                     </div>
                                 </div>
-                                {{-- <div class="col-lg-3 col-md-3 mb-1">
-                                    <div>
-                                        <h5 class="font-weight-bold">Alert</h5>
-                                        <div id="filter-alert" class="btn-group special">
-                                            <button class="btn btn-grey check_alert active" id="all_alert" value="">
-                                                <span> All </span>
-                                            </button>
-                                            <button class="btn btn-grey check_alert" value="1">
-                                                <span> Active </span>
-                                            </button>
-                                            <button class="btn btn-grey check_alert" value="2">
-                                                <span> Inactive </span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div> --}}
-                            </div>
+                            </div> --}}
     
                             <div id="filter_alert_main" class="row" style="display: none">
                                 <div class="col-lg-3">
@@ -385,7 +389,7 @@
                                         <button class="btn btn-grey check_alert" value="Agent">
                                             <span> Agent </span>
                                         </button>
-                                        <button class="btn btn-grey check_alert" value="Agent">
+                                        <button class="btn btn-grey check_alert" value="Indicator">
                                             <span> Indicator </span>
                                         </button>
                                     </div>
@@ -1375,6 +1379,7 @@
             columns: [
                 {
                     data: 'chk',
+                    "orderable": false,
                 },
                 {
                     data: 'site_name',
@@ -1396,8 +1401,9 @@
                 },
                 {
                     data: 'action',
+                    "orderable": false,
                 }
-            ]
+            ],
         });
     }
 
@@ -1435,6 +1441,7 @@
             columns: [
                 {
                     data: 'chk',
+                    "orderable": false,
                 },
                 {
                     data: 'site_name',
@@ -1462,6 +1469,7 @@
                 },
                 {
                     data: 'action',
+                    "orderable": false,
                 }
             ]
         });
@@ -1492,6 +1500,7 @@
             columns: [
                 {
                     data: 'chk',
+                    "orderable": false,
                 },
                 {
                     data: 'agent_schedule_name',

@@ -1443,7 +1443,7 @@ $.ajax({
                         
                         if(history.created){
                         html += `<td>
-                                ${moment(new Date(history.created)).format('DD-MM-YYYY HH:MM:SS')}
+                                ${moment(new Date(history.created)).format('YYYY-MM-DD HH:MM:SS')}
                             </td>`;
                         }else{
                             html += `<td></td>`;
@@ -1459,6 +1459,11 @@ $.ajax({
                     "bFilter": false,
                     "bInfo": false,
                     "bAutoWidth": false ,
+                    "order" : [[4,"desc"]],
+                    "columnDefs": [{
+                        "targets" : 0,
+                        "orderable" : false
+                    }]
                 });
             }else if(data.malware){
                 $('#table-ibmcloud').hide();
