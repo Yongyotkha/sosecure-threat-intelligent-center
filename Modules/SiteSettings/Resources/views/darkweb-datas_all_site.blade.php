@@ -101,9 +101,9 @@ use Carbon\Carbon;
 
                 <div class="container-fluid" style="margin-bottom:10px;">
                     <div class="row">
-                        <div class="col-md-3 nopadding">
+                        <div class="col-lg-3 col-md-6 nopadding">
                             <a href="#" onclick="dataType('compromise')">
-                                <div class="card-dash-compro none-bg none-shadow">
+                                <div class="card-dash-compro border-ee">
                                     <div class="left-card">
                                         <div class="img-icon-card ice">
                                             <img src="{{asset('images/icebergline2.png')}}" alt="">
@@ -114,9 +114,9 @@ use Carbon\Carbon;
                                 </div>
                             </a>
                         </div>
-                        <div class="col-md-3 nopadding">
+                        <div class="col-lg-3 col-md-6 nopadding">
                             <a href="#" onclick="dataType('darkweb')">
-                                <div class="card-dash-compro none-bg none-shadow">
+                                <div class="card-dash-compro border-ee">
                                     <div class="left-card">
                                         <div class="img-icon-card ice">
                                             <img src="{{asset('images/icebergline1.png')}}" alt="">
@@ -127,9 +127,9 @@ use Carbon\Carbon;
                                 </div>
                             </a>
                         </div>
-                        <div class="col-md-3 nopadding">
+                        <div class="col-lg-3 col-md-6 nopadding">
                             <a href="#" onclick="dataType('webserver')">
-                                <div class="card-dash-compro none-bg none-shadow">
+                                <div class="card-dash-compro border-ee" style="border-right: none !important">
                                     <div class="left-card">
                                         <div class="img-icon-card ice">
                                             <img src="{{asset('images/endpoint.png')}}" alt="">
@@ -140,29 +140,30 @@ use Carbon\Carbon;
                                 </div>
                             </a>
                         </div>
-                        <div class="col-md-3 nopadding">
-                            <a href="#" onclick="">
-                                <div class="card-dash-compro none-bg none-shadow">
-
-                                    <div class="compromised-new-box">
-                                        <div class="img-icon-smm-compro">
-                                            <img src="{{asset('images/Agent.png')}}" alt="">
+                        <div class="col-lg-3 col-md-6 nopadding">
+                                <div class="card-dash-compro border-ee" style="border-left: none !important;">
+                                    <a href="#" onclick="">
+                                        <div class="compromised-new-box">
+                                            <div class="img-icon-smm-compro">
+                                                <img src="{{asset('images/Agent.png')}}" alt="">
+                                            </div>
+                                            <div style="width: 50%" class="text-center">
+                                                <span class="number-card green" id='agent-count'>4</span>
+                                                <h3 class="name-dash-text-compro text-dark text-upper">Agent</h3>
+                                            </div>
                                         </div>
-                                        <div style="width: 50%" class="text-center">
-                                            <span class="number-card green" id='agent-count'>4</span>
-                                            <h3 class="name-dash-text-compro text-dark text-upper">Agent</h3>
+                                    </a>
+                                    <a href="">
+                                        <div class="compromised-new-box">
+                                            <div class="img-icon-smm-compro">
+                                                <img src="{{asset('images/nw.png')}}" alt="">
+                                            </div>
+                                            <div style="width: 50%" class="text-center">
+                                                <span class="number-card green" id='network-count'>10</span>
+                                                <h3 class="name-dash-text-compro text-dark text-upper">Network</h3>
+                                            </div>
                                         </div>
-                                    </div>
-
-                                    <div class="compromised-new-box">
-                                        <div class="img-icon-smm-compro">
-                                            <img src="{{asset('images/nw.png')}}" alt="">
-                                        </div>
-                                        <div style="width: 50%" class="text-center">
-                                            <span class="number-card green" id='network-count'>10</span>
-                                            <h3 class="name-dash-text-compro text-dark text-upper">Network</h3>
-                                        </div>
-                                    </div>
+                                      </a>
                                 </div>
                             </a>
                         </div>
