@@ -546,7 +546,7 @@ class AgentManagementController extends Controller
                     }
                     else if($query->agent_alerts_severity == 'Medium')
                     {
-            $html .= '<span class="badge" style="background-color: #f2ff15;">Medium</span>';
+            $html .= '<span class="badge" style="background-color: #f2ff15;color: #333;">Medium</span>';
                     }
                     else if($query->agent_alerts_severity == 'Low')
                     {
