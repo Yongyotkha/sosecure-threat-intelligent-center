@@ -1784,6 +1784,10 @@ public function tableEvents(Request $request)
 
 
     public function datatableEvent(Request $request) {
+
+        $input = $request->all();
+        // dd($input);
+
         $role_custom = @check_role_custom();
         if(!$role_custom['indicators']) {
             check_permission403();
