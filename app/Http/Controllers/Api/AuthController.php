@@ -164,36 +164,10 @@ class AuthController extends ApiController
         if($data === false){
             return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
         }else{
-            $error_current = false;
             $data_key = json_decode($data, true);
             $user = User::find($data_key['user_id']);
-            $validator = Validator::make($data_key, [
-                'current_password' => 'required',
-                'password' => array(
-                    'required', 
-                    'string', 
-                    'min:8',  
-                    'regex:/[a-z]/', 
-                    'regex:/[A-Z]/', 
-                    'regex:/[0-9]/',
-                    'regex:/[~!@#$%^&*-_+=?><]/', 
-                    'confirmed'
-                ),
-            ]);
-            if ($validator->fails()){
-                $validation = $validator->getMessageBag()->toArray();
-                $error_current = null;
-                if(auth()->check()){
-                    $user = User::find(auth()->user()->id);
-                    if(!Hash::check($request->current_password, $user->password)){
-                        $error_current = 'The current password is invalid.';
-                    }
-                }
-                $data_transcation = json_encode($validation);
-                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
-                $data_transcation_error_current = json_encode($validation);
-                $datas_error_current = encrypt_decrypt('encrypt', $data_transcation_error_current, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
-                return response()->json(['errors' => $datas, 'error_current' => $datas_error_current, 'status_code' => '400']);
+            if(!Hash::check($data_key['current_password'], $user->password)){
+                return response()->json(['message' => '', 'error' => 'error current password', 'status_code' => '400']);
             }else{
                 if(empty($user->password_days_expire)){
                     $user->password_days_expire = '60';
@@ -209,16 +183,11 @@ class AuthController extends ApiController
                 $response = array(
                     'data' => $user
                 );
-            }
-            if($error_current){
-                return response()->json(['message' => '', 'error' => 'error current password', 'status_code' => '400']);
-            }else{
+
                 $data_transcation = json_encode($response);
                 $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
                 return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
-               
             }
-            
         }
     }
 
