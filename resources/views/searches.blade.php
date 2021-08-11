@@ -1397,9 +1397,6 @@ $.ajax({
                     const history = data.history[i];
                     html += `
                     <tr>`;
-                        console.log(history);
-                        console.log(history.cats);
-                        
                         if(history.cats && history.cats.length != 0){
                             html += `<td style="padding:0;line-height: 0;">`;
                             for(let [key, value] of Object.entries(history.cats)){

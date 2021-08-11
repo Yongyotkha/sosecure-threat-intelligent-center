@@ -2400,6 +2400,15 @@ ul.topics-news-list li a:hover{
     width: 100%;
 } 
 
+/* .card-dash-compro.none-shadow{
+    box-shadow: unset !important;
+} */
+
+.card-dash-compro.border-ee{
+    border: 1px solid #e3e3e3;
+    box-shadow: unset !important;
+}
+
 .main-card-dash-flex .card-dash-compro.none-bg{
     background-color: unset !important;
 }

@@ -500,13 +500,6 @@
 
     });
 
-    function load_graph() {
-
-        var graph = {!!json_encode(@$attr_type)!!};
-        return graph;
-
-    }
-
     function load_table(page=1){
         $('#table_events').DataTable({
             ordering: true,
@@ -579,146 +572,145 @@
 
             ],
             columnDefs: [
-            {
-                targets: 2,
-                render: function (data, type, row) {
-                    var inner = '';
-                    inner =  '<div><a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a></div>';
-                    return inner;
-                }
+                {
+                    targets: 2,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        inner =  '<div><a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a></div>';
+                        return inner;
+                    }
 
-            },
-            {
-                targets: 5,
-                render: function (data, type, row) {
-                    var inner = ``;
-                    const test = row.actor;
-                    if(row.count_actor > 0)
-                    {
-                        inner = `  
-                                <div>
-                                    <strong>Actor : </strong>
-                                    <span style="display: inline-flex;align-items: center;">
-                        `;
-                        for(let rows in row.actor)
+                },
+                {
+                    targets: 5,
+                    render: function (data, type, row) {
+                        var inner = ``;
+                        const test = row.actor;
+                        if(row.count_actor > 0)
                         {
-                            let array_rows = 1;
-                            const data_actor = row.actor[rows];
-                        inner += `
-                                     
-                                        `;
-                                        if(array_rows == row.count_actor)
-                                        {
-                        inner += `
-                                        <a href="/actor/detail?_id=${data_actor.adversary_name}&mode=cve">
-                                            ${data_actor.adversary_name}
-                                        </a> 
-                        `;
-                                        }
-                                        else
-                                        {
-                        inner += `      
-                                        <a href="/actor/detail?_id=${data_actor.adversary_name}&mode=cve">
-                                            ${data_actor.adversary_name}
-                                        </a> , 
-                        `;
-                                        }
-                                array_rows++;
+                            inner = `  
+                                    <div>
+                                        <strong>Actor : </strong>
+                                        <span style="display: inline-flex;align-items: center;">
+                            `;
+                            for(let rows in row.actor)
+                            {
+                                let array_rows = 1;
+                                const data_actor = row.actor[rows];
+                            inner += `
                                         
+                                            `;
+                                            if(array_rows == row.count_actor)
+                                            {
+                            inner += `
+                                            <a href="/actor/detail?_id=${data_actor.adversary_name}&mode=cve">
+                                                ${data_actor.adversary_name}
+                                            </a> 
+                            `;
+                                            }
+                                            else
+                                            {
+                            inner += `      
+                                            <a href="/actor/detail?_id=${data_actor.adversary_name}&mode=cve">
+                                                ${data_actor.adversary_name}
+                                            </a> , 
+                            `;
+                                            }
+                                    array_rows++;
+                                            
+                            }
+                            inner += `  </span>
+                                    </div>
+                            `;
                         }
-                        inner += `  </span>
+                        if(row.count_camp > 0)
+                        {
+                        inner += `
+                                <div>
+                                    <strong>Campainge : </strong> 
+                                    <span> 
+                                    `;
+                            let array_row = 1;
+                            for(let rows in row.camp)
+                            {
+                                const data_camp = row.camp[rows];
+                                if(array_row == row.count_camp)
+                                {
+                            inner += `${data_camp.adversary_name}`;
+                                }
+                                else
+                                {
+                            inner += `${data_camp.adversary_name} , `;
+                                }
+                                array_row++;
+                            }
+                            inner += ` 
+                                    </span>
                                 </div>
                         `;
-                    }
-                    if(row.count_camp > 0)
-                    {
-                    inner += `
-                            <div>
-                                <strong>Campainge : </strong> 
-                                <span> 
-                                `;
-                        let array_row = 1;
-                        for(let rows in row.camp)
-                        {
-                            const data_camp = row.camp[rows];
-                            if(array_row == row.count_camp)
-                            {
-                        inner += `${data_camp.adversary_name}`;
-                            }
-                            else
-                            {
-                        inner += `${data_camp.adversary_name} , `;
-                            }
-                            array_row++;
                         }
-                        inner += ` 
-                                </span>
-                            </div>
-                    `;
+                        return inner;
                     }
-                    return inner;
-                }
 
-            },
-            {
-                targets: 6,
-                className: 'text-center',
-                render: function (data, type, row) {
-                    var inner = '';
-                    if(row.public==1) {
-                        inner = '<i class="fas fa-check text-success"></i>';
-                    } else {
-                        inner = '<i class="fas fa-times text-danger"></i>';
+                },
+                {
+                    targets: 6,
+                    className: 'text-center',
+                    render: function (data, type, row) {
+                        var inner = '';
+                        if(row.public==1) {
+                            inner = '<i class="fas fa-check text-success"></i>';
+                        } else {
+                            inner = '<i class="fas fa-times text-danger"></i>';
+                        }
+                        return inner;
                     }
-                    return inner;
-                }
 
-            },
-            {
-                targets: 7,
-                render: function (data, type, row) {
-                    var inner = '';
-                    if(row.is_modified == true) {
-                        inner = 'Modified';
-                    } else {
-                        inner = 'Created';
+                },
+                {
+                    targets: 7,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        if(row.is_modified == true) {
+                            inner = 'Modified';
+                        } else {
+                            inner = 'Created';
+                        }
+                        return inner;
                     }
-                    return inner;
-                }
 
-            },
-            {
-                targets: 8,
-                render: function (data, type, row) {
-                    var inner = '';
-                    if(row.modified) {
-                        inner = row.modified;
-                    } else {
-                        inner = row.modified;
+                },
+                {
+                    targets: 8,
+                    render: function (data, type, row) {
+                        var inner = '';
+                        if(row.modified) {
+                            inner = row.modified;
+                        } else {
+                            inner = row.modified;
+                        }
+                        return inner;
                     }
-                    return inner;
-                }
 
-            },
-            {
-                targets: 10,
-                className : 'nowrap',
-                render: function (data, type, row) {
-                    var inner = '';
-                    inner += '<div style="display:flex;flex-direction:column;">';
-                    inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.modal_tag')}}'+'?pulse_id='+row.pulse_id+'" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
-                    inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="m-t-xs btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
-                    inner += '</div>';
-                    return inner;
-                }
+                },
+                {
+                    targets: 10,
+                    className : 'nowrap',
+                    render: function (data, type, row) {
+                        var inner = '';
+                        inner += '<div style="display:flex;flex-direction:column;">';
+                        inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.modal_tag')}}'+'?pulse_id='+row.pulse_id+'" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
+                        inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="m-t-xs btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                        inner += '</div>';
+                        return inner;
+                    }
 
-            }
+                }
             ]
         });
 
     }
 
-    
     function search_table(page=1){
         let startDate=  $("#event_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         let endDate=  $("#event_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
@@ -849,6 +841,18 @@
         });
 
     }
+
+    function load_graph() {
+
+        var graph = {!!json_encode(@$attr_type)!!};
+        return graph;
+
+    }
+
+
+
+    
+
 
 
 

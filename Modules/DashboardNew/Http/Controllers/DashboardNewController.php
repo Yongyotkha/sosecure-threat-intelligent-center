@@ -165,7 +165,7 @@ class DashboardNewController extends Controller
                         $assets = [];
                         $Assets_data = Assets::where('status',1)->get();
                         foreach ($Assets_data as $key => $value) {
-                            $AssetsData_data = AssetsData::where('site_id',$value->site_id)->whereIn('site_id',$site_id_active)->where('asset_id',$value->id)->where('status',1)->get();
+                            $AssetsData_data = AssetsData::where('site_id',$value->site_id)->whereIn('site_id',$site_id_active)->where('asset_id',$value->id)->where('status',1)->groupBy('site_id')->get();
                             $Domain_list = [];
                             $IP_List =[];
                             foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
@@ -224,7 +224,7 @@ class DashboardNewController extends Controller
                                         }
                                         else
                                         {
-                                            $port = null;
+                                            $port = " 1 ";
                                         }
 
                                         $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 
@@ -310,7 +310,7 @@ class DashboardNewController extends Controller
                                         }
                                         else
                                         {
-                                            $port = null;
+                                            $port = " - ";
                                         }
 
                                         $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 
@@ -389,7 +389,7 @@ class DashboardNewController extends Controller
                                         }
                                         else
                                         {
-                                            $port = null;
+                                            $port = " - ";
                                         }
 
                                         $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 
@@ -466,7 +466,7 @@ class DashboardNewController extends Controller
                                         }
                                         else
                                         {
-                                            $port = null;
+                                            $port = " - ";
                                         }
 
                                         $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first(); 

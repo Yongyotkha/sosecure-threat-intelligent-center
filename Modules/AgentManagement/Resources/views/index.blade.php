@@ -263,11 +263,11 @@
                             <div class="agt-header">
                                 <div class="row">
                                     <div class="col-md-7">
-                                        <div class="agt-main-box">
+                                        {{-- <div class="agt-main-box"> --}}
                                             <div class="agt-header"> 
                                                 Timeline
                                             </div>
-                                        </div>
+                                        {{-- </div> --}}
                                     </div>
                                     <div class="col-md-4 text-right">
                                         <div class="form-group m-b-md" style="margin-bottom: 0px;">

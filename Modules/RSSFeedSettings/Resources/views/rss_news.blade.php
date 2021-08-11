@@ -283,7 +283,7 @@ use Carbon\Carbon;
                                     <table class="table table-striped" id="table-rss-news-template">
                                         <thead>
                                             <tr>
-                                                <th class="no-sort">
+                                                <th width="5%" class="no-sort">
                                                     <label>
                                                         <input name="select_all" value="1" id="select-all"
                                                             type="checkbox" class="select-chk" />
@@ -291,7 +291,7 @@ use Carbon\Carbon;
                                                     </label>
                                                 </th>
                                                 {{-- <th>Site Name</th> --}}
-                                                <th style="width: 70%">Content</th>
+                                                <th style="width: 80%">Content</th>
                                                 {{-- <th>Source</th>
                                                 <th>Title</th>
                                                 <th>Category</th>

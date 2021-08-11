@@ -425,7 +425,7 @@ use Carbon\Carbon;
                     <section class="panel panel-default">
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
-                                <div class="col-xs-12" style="    padding-top: 10px;">
+                                <div class="col-xs-12">
                                     <i class="fas fa-table"></i> Table Data Leak Data
                                 </div>
                             </div>
@@ -433,7 +433,7 @@ use Carbon\Carbon;
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <h5 class="font-weight-bold">Status</h5>
+                                    <h5 class="font-weight-bold">Severity</h5>
                                     <div class="st-dt-leak">
                                         <span class="st-dt vrh" data-toggle="tooltip" data-placement="right" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrh'>Critical</div><div class='text-st-tooltip'>Critical	ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Critical</span>
                                         <span class="st-dt high" data-toggle="tooltip" data-placement="right" data-html="true"title="<div class='st-flex'><div class='box-st-tooltip high'>High</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">High</span>

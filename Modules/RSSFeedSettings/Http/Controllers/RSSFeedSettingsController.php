@@ -644,7 +644,7 @@ class RSSFeedSettingsController extends Controller
                 }else if($model->serverity=='high'){
                     $html .= ' <span class="m-r-5"><b>Serverity : </b> <span class="badge" style="background-color: #fcc838;">High</span></span>';
                 }else if($model->serverity=='medium'){
-                    $html .= ' <span class="m-r-5"><b>Serverity : </b> <span class="badge" style="background-color: #f2ff15;color#333;">Medium</span></span>';
+                    $html .= ' <span class="m-r-5"><b>Serverity : </b> <span class="badge" style="background-color: #f2ff15;color:#333;">Medium</span></span>';
                 }else if($model->serverity=='low'){
                     $html .= ' <span class="m-r-5"><b>Serverity : </b> <span class="badge" style="background-color: #88ce4f;">Low</span></span>';
                 }else if($model->serverity=='information'){
