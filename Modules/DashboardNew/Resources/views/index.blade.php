@@ -182,14 +182,17 @@
                                                                 <h1 class="text-blue bold-500">Assets</h1>
                                                             </div>
 
-                                                            <div id="filter-chart-btn" class="btn-group pull-right" style="margin-top: -25px;">
-                                                                <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil active" onclick="load_port('host')">
-                                                                    <i class="fas fa-laptop"></i> New Host
+                                                            {{-- <div id="filter-chart-btn" class="btn-group pull-right" style="margin-top: -25px;">
+                                                                
+                                                                <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil active">
+                                                                    <i class="fas fa-laptop"></i> Host Info
+                                                                    New Host
                                                                 </a>
-                                                                <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil" onclick="load_port('port')">
-                                                                    <i class="fas fa-laptop"></i> New Port
+                                                                <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil" >
+                                                                    <i class="fas fa-laptop"></i> Service / Port
+                                                                    New Port
                                                                 </a>
-                                                            </div>
+                                                            </div> --}}
                                                         </div>
                                                         <div class="divider-dark"></div>
                                                         <div class="table-responsive cve_assets h-table">
@@ -424,7 +427,6 @@ Highcharts.setOptions({
     var endDate = '';
     var pagename = '';
     var site = 0;
-    var type_port = 'host';
 
     var today_date = new Date();
     var dd = String(today_date.getDate()).padStart(2, '0');
@@ -876,11 +878,6 @@ Highcharts.setOptions({
         });
     }
 
-    function load_port(type) {
-        type_port = type;
-        cve_assets();
-    }
-
     function cve_assets(){
         $.ajax({
             type: 'POST',
@@ -888,10 +885,9 @@ Highcharts.setOptions({
             url: '{{ route("dashboardnew.cve_assets") }}',
             data: {
                 site : site, 
-                type_port : type_port
             },
             beforeSend: function() {
-                $(".loaddertb").hide();
+                $(".loaddertb").show();
             },
             success: function(result){
                 $(".loaddertb").hide();
