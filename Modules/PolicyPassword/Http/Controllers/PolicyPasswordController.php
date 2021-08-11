@@ -109,10 +109,10 @@ class PolicyPasswordController extends Controller
                 'required', 
                 'string', 
                 'min:8',  
-                'regex:/[a-z]/', 
-                'regex:/[A-Z]/', 
-                'regex:/[0-9]/',
-                'regex:/[~!@#$%^&*-_+=?><]/', 
+                // 'regex:/[a-z]/', 
+                // 'regex:/[A-Z]/', 
+                // 'regex:/[0-9]/',
+                'regex:/^.*(?=.{3,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[~!@#$%^&*+=?>\_]).*$/', 
                 'confirmed'
             ),
         ]);
