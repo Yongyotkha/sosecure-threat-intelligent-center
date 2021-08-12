@@ -353,6 +353,99 @@ class ApiCVEController extends ApiController
                     $model_data['edition'] = '';
                 }
 
+                $count_model = count($model);
+                // ---------------------------------- cve - actor ----------------------------------
+                if($count_model != 0)
+                {
+                    $id = '';
+                    $actor_id = array();
+
+                    $DB_MONGO_KEY = config('app.DB_MONGO_DEV');
+                    $client = new MongoClient($DB_MONGO_KEY);
+                    if(app()->environment('local'))
+                    {
+                        $collection_actor = $client->sosecure_threatintelligent->fx_otx_adversaries;
+                        $conn = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
+                    }
+                    else
+                    {
+                        $collection_actor = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
+                        $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+                    }
+
+                    for($i=0;$i<$count_model;$i++)
+                    {
+                        $query= [
+                            'pulse_id' => (string)$model[$i]['id'],
+                            'mode' => 'vulnerabilities',
+                            'join' => 'actor',
+                            'delete_at' => null
+                        ];
+                        $option = [];
+                
+                        $final_test = $conn->find($query,$option);
+                        $result_test = $final_test->toArray();
+                        $count_result_test = count($result_test);
+
+                        // foreach($result_test as $data_test)
+                        // {
+                        //     $id = $data_test->adversary_uuid;
+
+                        //     $conn_actor = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
+
+                        //     $query_actor= [
+                        //         'uuid' => $id
+                        //     ];
+
+                        //     $option_actor = [];
+                    
+                        //     $final_actor = $conn_actor->find($query_actor,$option_actor);
+                        //     $result_actor = $final_actor->toArray();
+                        // }
+                        
+                        $model[$i]['actor'] = $result_test;
+                        $model[$i]['count_result'] = $count_result_test;
+                        // dd($id);
+
+                        $logo = [];
+                        foreach(@$result_test as $sel_data_act)
+                        {
+                            $query_sel_act = [
+                                'adversary_uuid' => $sel_data_act['adversary_uuid']
+                            ];
+                            $option_sel_act = [];
+                            $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
+                            
+                            if(@$result_sel_act['logo'])
+                            {
+                                $logo[] = $result_sel_act['logo'];
+                            }
+                            else
+                            {
+                                $logo[] = '/asset_salepage/images/AgentBasedDetection.png';
+                            }
+                            
+                        }
+                        $model[$i]['logo'] = $logo;
+
+                        $query_camp= [
+                            'pulse_id' => (string)$model[$i]['id'],
+                            'mode' => 'vulnerabilities',
+                            'join' => 'campainge',
+                            'delete_at' => null
+                        ];
+                        $option_camp = [];
+                
+                        $final_camp = $conn->find($query_camp,$option_camp);
+                        $result_camp = $final_camp->toArray();
+                        $count_result_camp = count($result_camp);
+
+                        $model[$i]['campainge'] = $result_camp;
+                        $model[$i]['count_campainge'] = $count_result_camp;
+                
+                    }
+                }
+
                 $res = DataTables::of($model)
                     ->editColumn('chk', function (CVEMapping $model) {
                         //return '<label><input type="checkbox"  name="cve_id" class="cve_id" value="' . $model->id . '"><span class="label-text"></span></label>';
@@ -395,6 +488,55 @@ class ApiCVEController extends ApiController
                         // $html .= '<div class="scroll-ovf-content-fixh-60">'.$model->description.'</div> <button class="btn btn-xs btn-link btn-readmore text-info">More</button>';
                         $html.='<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 20px;color: #3869d4;font-weight: 800;"><strong>'. $html_status.'</strong></div>';
                         $html .= '<div class="nowrap" style="margin-top:25px;"><strong>Published:</strong> ' . @$model->published . '&nbsp; &nbsp; <strong>Modified:</strong> ' . @$model->modified . '</div>';
+                        
+                        if($model->count_result > 0)
+                        {
+                            $html .= '<strong>Actor: </strong> 
+                                    <span style="display: inline-flex;align-items: center;"> 
+                                    <div class="m-r-md">';
+                                    $array_row = 1;
+                                    $count_result = $model->count_result;
+                                    for($i = 0 ; $i < @$model->count_result ; $i++)
+                                    {
+                                        if($array_row == $count_result)
+                                        {
+                                            $html .= '<img class="icon_sm_actor m-r-xs" src="'.$model->logo[$i].'">
+                                                    <a href="/actor/detail?_id='.$model->actor[$i]->adversary_uuid.'&mode=cve">'.$model->actor[$i]->adversary_name.'</a>';
+                                        }
+                                        else
+                                        {
+                                            $html .= '<img class="icon_sm_actor m-r-xs" src="'.$model->logo[$i].'">
+                                                    <a href="/actor/detail?_id='.$model->actor[$i]->adversary_uuid.'&mode=cve">'.$model->actor[$i]->adversary_name.'</a> , ';
+                                        }
+                                        $array_row = $array_row+1;
+                                    }
+
+                            $html .= '</div></span>';
+                        }
+
+                        if($model->count_campainge > 0)
+                        {
+                            $html .= ' <span class="m-r-md">
+                                    <strong>Campainge: </strong> ';
+            
+                                    $array_row = 1;
+                                    $count_campainge = $model->count_campainge;
+                                    for($i = 0 ; $i < @$model->count_campainge ; $i++)
+                                    {
+                                        if($array_row == $count_campainge)
+                                        {
+                                            $html .= ''.$model->campainge[$i]->adversary_name.'';
+                                        }
+                                        else
+                                        {
+                                            $html .= ''.$model->campainge[$i]->adversary_name.' , ';
+                                        }
+                                        $array_row = $array_row+1;
+                                    }
+                                    
+                            $html .='</span> ';
+                        }
+                        
                         return $html;
                     })
                     ->addColumn('site', function (CVEMapping $model) {

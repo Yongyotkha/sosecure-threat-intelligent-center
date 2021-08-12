@@ -41,6 +41,12 @@ use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Symfony\Polyfill\Intl\Idn\Resources\unidata\Regex;
 
+use App\FXTechniques;
+use App\Entities\OtxIndicatiorData;
+use Illuminate\Http\Response;
+use Modules\indicators\Entities\OTXtypeData;
+use MongoDB\Client;
+
 class ApiIndicatorController extends ApiController
 {
     public function events_table(Request $request){      
@@ -173,6 +179,66 @@ class ApiIndicatorController extends ApiController
                             // <a href="'.rou   te('indicators.events_detail_select',['id' => $document['pulse_id']]).'" 
                             // class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
                             
+                            //------------------------------------------------------
+                            $DB_MONGO_KEY = env("DB_MONGO_DEV");
+                            $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+                            if(app()->environment('local'))
+                            {
+                                $collection = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
+                                $collection_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+                            }
+                            else
+                            {
+                                $collection = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
+                                $collection_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+                            }
+
+                            $query_actor = [
+                                'pulse_id' => $document['pulse_id'],
+                                'mode' => 'indicator',
+                                'join' => 'actor',
+                                'delete_at' => null
+                            ];
+                            $option_actor = [];
+
+                            $result_actor = $collection_related->find($query_actor,$option_actor);
+                            $final_actor = $result_actor->toArray();
+                            $count_actor = count($final_actor);
+
+                            $nestedData['actor'] = $final_actor;
+                            $nestedData['count_actor'] = $count_actor;
+
+                            foreach(@$final_actor as $sel_data_act)
+                            {
+                                $query_sel_act = [
+                                    'adversary_uuid' => $sel_data_act['adversary_uuid']
+                                ];
+                                $option_sel_act = [];
+                                $result_sel_act = $collection->findOne($query_sel_act,$option_sel_act);
+                                if(@$result_sel_act['logo'])
+                                {
+                                    $nestedData['logo'][] = $result_sel_act['logo'];
+                                }
+                                else
+                                {
+                                    $nestedData['logo'][] = '/asset_salepage/images/AgentBasedDetection.png';
+                                }
+                            }
+
+                            $query_camp = [
+                                'pulse_id' => $document['pulse_id'],
+                                'mode' => 'indicator',
+                                'join' => 'campainge',
+                                'delete_at' => null
+                            ];
+                            $option_camp = [];
+
+                            $result_camp = $collection_related->find($query_camp,$option_camp);
+                            $final_camp = $result_camp->toArray();
+                            $count_camp = count($final_camp);
+
+                            $nestedData['camp'] = $final_camp;
+                            $nestedData['count_camp'] = $count_camp;
                         
                         $data_nestedData[] = $nestedData;
                             
