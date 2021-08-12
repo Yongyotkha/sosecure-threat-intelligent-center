@@ -620,17 +620,24 @@
             }
         }
 
+        console.log(columnSearch+' / '+selectedValue);
+
 
         let selectedSiteName = '';
         if($('#select-site').children("option:selected").val()!=0){
             selectedSiteName = $('#select-site').children("option:selected").text();
         }
+
+        console.log('sel / '+selectedSiteName);
+
         let active_tb;
         if(active==""){
             active_tb = active;
         }else{
             active_tb = '^'+active+'$';
         }
+
+        console.log('active_tb / '+active_tb);
         
         if(columnSearch=='domain'){
             columnSearch = 1;
@@ -641,9 +648,21 @@
             columnSearch = 12;
         }else if(columnSearch=='os_type'){
             columnSearch = 8;
-            if(selectedValue=='OthER'){
-                columnSearch = 14;
-                selectedValue = 1;
+            if(selectedValue='OthER'){
+                columnSearch = 9;
+                selectedValue = 'Other';
+            }
+            else if(selectedValue=='Windows'){
+                columnSearch = 9;
+                selectedValue = 'Windows';
+            }
+            else if(selectedValue=='Linux'){
+                columnSearch = 9;
+                selectedValue = 'Linux';
+            }
+            else if(selectedValue=='Redhat'){
+                columnSearch = 9;
+                selectedValue = 'Redhat';
             }
         }else if(columnSearch=='ip_asset_id'){
  
@@ -660,7 +679,7 @@
             t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
         }
         
-       
+        console.log(t);
        
         {{--ads.column(5).search(active_tb).draw();
         t.search( '' ).columns().search( '' ).draw();--}}
@@ -830,6 +849,14 @@
                     }
                    
                 },--}}
+                {{-- {
+                    targets: 9,
+                    render: function (data, type, row, meta) {
+                        return row.cpe+row.action;
+                        
+                    }
+                   
+                }, --}}
                 {
                     targets: 12,
                     render: function (data, type, row, meta) {

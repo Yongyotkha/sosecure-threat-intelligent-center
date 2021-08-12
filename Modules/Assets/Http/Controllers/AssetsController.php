@@ -459,6 +459,7 @@ class AssetsController extends Controller
     {
         $selectedGroup = $request->selectedGroup;
         $site = null;
+        
         if($request->sitecode){
             $site = SiteSettings::select('id')->where("code",$request->sitecode)->first();
         }
