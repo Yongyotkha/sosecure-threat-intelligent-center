@@ -439,14 +439,14 @@ class ApiNewsController extends ApiController
                                 $news[$i]['actor'] = $result_test;
                                 $news[$i]['count_result'] = $count_result_test;
                                 
-                                $logo = [];
-                                foreach(@$result_test as $sel_data_act)
-                                {
-                                    $query_sel_act = [
-                                        'adversary_uuid' => $sel_data_act['adversary_uuid']
-                                    ];
-                                    $option_sel_act = [];
-                                    $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
+                                // $logo = [];
+                                // foreach(@$result_test as $sel_data_act)
+                                // {
+                                //     $query_sel_act = [
+                                //         'adversary_uuid' => $sel_data_act['adversary_uuid']
+                                //     ];
+                                //     $option_sel_act = [];
+                                //     $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
                                     
                                     // if(@$result_sel_act['logo'])
                                     // {
@@ -457,7 +457,7 @@ class ApiNewsController extends ApiController
                                     //     $logo[] = '/asset_salepage/images/AgentBasedDetection.png';
                                     // }
                                     
-                                }
+                                // }
                                 // $news[$i]['logo'] = $logo;
                                 // dd($id);
 
@@ -637,8 +637,8 @@ class ApiNewsController extends ApiController
                                 .@$html_source_all_full.
                                 '<span><p class="details-news-elip">&nbsp;'.strip_tags($n_detail).'</p></span>';
 
-                                $html .= '<span><p class="details-news-elip">&nbsp;'.$item->campainge.'</p></span>';
-                                $html .= '<span><p class="details-news-elip">&nbsp;'.$item->count_campainge.'</p></span>';
+                                // $html .= '<span><p class="details-news-elip">&nbsp;'.$item->campainge.'</p></span>';
+                                // $html .= '<span><p class="details-news-elip">&nbsp;'.$item->count_campainge.'</p></span>';
 
                                 // if($item->count_campainge > 0)
                                 // {
