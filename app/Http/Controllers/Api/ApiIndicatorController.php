@@ -91,8 +91,11 @@ class ApiIndicatorController extends ApiController
                         
                     ],
                     'sort' => [
-                        $order => $dir
+                        'modified' => -1
                     ],
+                    // 'sort' => [
+                    //     $order => $dir
+                    // ],
                     'skip' => $start,
                     'limit' => $rowperpage,
                 ];
