@@ -239,7 +239,7 @@ class ApiCVEController extends ApiController
                             WHEN severity = 'NONE' THEN 4
                             WHEN severity = '' THEN 4
                             ELSE 5
-                            END")->orderBy( 'created_at','desc' )->get();
+                            END")->orderBy( 'created_at','desc' )->skip($data['data']['start'])->take($data['data']['length'])->get();
                         }else{
                             $model = $model->orderByRaw("CASE
                             WHEN severity = 'CRITICAL' THEN 4
@@ -249,7 +249,7 @@ class ApiCVEController extends ApiController
                             WHEN severity = 'NONE' THEN 0
                             WHEN severity = '' THEN 0
                             ELSE 5
-                            END")->orderBy( 'created_at','desc' )->get();
+                            END")->orderBy( 'created_at','desc' )->skip($data['data']['start'])->take($data['data']['length'])->get();
                         }
                     }else{
                         
@@ -263,7 +263,7 @@ class ApiCVEController extends ApiController
                     WHEN severity = 'NONE' THEN 4
                     WHEN severity = '' THEN 4
                     ELSE 5
-                END")->orderBy( 'created_at','desc' )->get();
+                END")->orderBy( 'created_at','desc' )->skip($data['data']['start'])->take($data['data']['length'])->get();
                 }
                 
                 foreach($model as $model_data){
@@ -609,9 +609,11 @@ class ApiCVEController extends ApiController
 
                     ->rawColumns(['chk', 'name_cve', 'description', 'cvss_severity', 'transaction', 'fixed', 'site', 'hostname', 'ip', 'vendor', 'title', 'version', 'edition'])
                     ->toJson();
-
+                    $data_count = count($model);
                     $response = [
                         "data" => $res,
+                        "recordsFiltered_count"=> $data_count,
+                        "recordsTotal_count" => $data_count,
                     ];
 
                     $data_transcation = json_encode($response);
