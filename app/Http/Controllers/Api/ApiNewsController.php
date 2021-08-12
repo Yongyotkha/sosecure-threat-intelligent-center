@@ -297,7 +297,7 @@ class ApiNewsController extends ApiController
                         $news = $news->orderBy('created_at','desc')->take(PAGINATE_NUM)->offset($page >= 2 ? $page * 10 : 0)->get();
                     
 
-                        // $count_model = count($news);
+                         $count_model = count($news);
                         // // ---------------------------------- cve - actor ----------------------------------
                         // if($count_model > 0)
                         // {
@@ -416,7 +416,7 @@ class ApiNewsController extends ApiController
                                 $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
                             }
 
-                            $testsss = '555555';
+                           // $testsss = '555555';
 
                             for($i=0;$i<$count_model;$i++)
                             {
@@ -713,7 +713,7 @@ class ApiNewsController extends ApiController
                         "html" => $html,
                         "count" => $news_all,
                         "news" => $news,
-                        "testsss" => $testsss,
+                        //"testsss" => $testsss,
                         "count_model" => $count_model
                     ];
                     $data_transcation = json_encode($dataOut);
