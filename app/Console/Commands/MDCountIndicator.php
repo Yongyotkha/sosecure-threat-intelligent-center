@@ -129,10 +129,11 @@ class MDCountIndicator extends Command
 
            $countAttr = $col_fx_otx_indicator_detail->aggregate($pipeline, $options);
            $countAttr = $countAttr->toArray();
-
-           $countEvents = $col_fx_otx_events->aggregate($pipeline2, $options);
-           $countEvents = $countEvents->toArray();
-
+         
+        //   $countEvents = $col_fx_otx_events->aggregate($pipeline2, $options);
+         //  $countEvents = $countEvents->toArray();
+         $countEvents = array();
+        
            $countIndustries = $col_fx_otx_events->aggregate($pipelineIndustries);
            $countIndustries = $countIndustries->toArray();
            $countpipelineGroup = $col_fx_otx_events->aggregate($pipelineGroup);
@@ -159,7 +160,7 @@ class MDCountIndicator extends Command
             }
         }
 
-
+     
 
 
         foreach ( $countEvents as $value) {
@@ -182,7 +183,7 @@ class MDCountIndicator extends Command
 
             }
         }
-
+       
         foreach ( $countIndustries as $value) {
             $pizza  = $value["_id"];
             $pieces = explode(",", $pizza);
