@@ -435,58 +435,58 @@ class RSSFeedSettingsController extends Controller
         $model = $model -> get();
 
         // dd(count($model));
-        $count_row = count($model);
+        // $count_row = count($model);
 
-        $i = 0;
-        foreach($model as $id)
-        {
-            $check_id = $id->id;
+        // $i = 0;
+        // foreach($model as $id)
+        // {
+        //     $check_id = $id->id;
 
-            $query_id_cate = RSSNewsCategory::where('rss_news_id', $check_id)->select('news_category_id')->get();
-            $id_cate = $query_id_cate[0]['news_category_id'];
+        //     $query_id_cate = RSSNewsCategory::where('rss_news_id', $check_id)->select('news_category_id')->get();
+        //     $id_cate = $query_id_cate[0]['news_category_id'];
             
-            $query_name_cate = FXCategories::where('id', $id_cate)->select('name')->first();
-            $name_cate = $query_name_cate['name'];
+        //     $query_name_cate = FXCategories::where('id', $id_cate)->select('name')->first();
+        //     $name_cate = $query_name_cate['name'];
 
-            $model[$i]['category'] = $name_cate;
+        //     $model[$i]['category'] = $name_cate;
 
-            $DB_MONGO_KEY = config('app.DB_MONGO_DEV');
-            $client = new MongoClient($DB_MONGO_KEY);
-            if(app()->environment('local'))
-            {
-                $collection = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
-            }
-            else
-            {
-                $collection = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
-            }
+        //     $DB_MONGO_KEY = config('app.DB_MONGO_DEV');
+        //     $client = new MongoClient($DB_MONGO_KEY);
+        //     if(app()->environment('local'))
+        //     {
+        //         $collection = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
+        //     }
+        //     else
+        //     {
+        //         $collection = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+        //     }
 
-            $query_actor = [
-                'pulse_id' => $check_id,
-                'mode' => 'news',
-                'join' => 'actor'
-            ];
+        //     $query_actor = [
+        //         'pulse_id' => $check_id,
+        //         'mode' => 'news',
+        //         'join' => 'actor'
+        //     ];
 
-            $option_actor = [];
+        //     $option_actor = [];
 
-            $final_actor = $collection->find($query_actor, $option_actor);
-            $result_actor = $final_actor->toArray();
+        //     $final_actor = $collection->find($query_actor, $option_actor);
+        //     $result_actor = $final_actor->toArray();
 
-            if(count($result_actor) != 0)
-            {
-                foreach($result_actor as $data)
-                {
-                    $name_actor = $data['adversary_name'];
-                    $model[$i]['actor'] = $name_actor;
-                }
-            }
-            else
-            {
-                $model[$i]['actor'] = '';
-            }
+        //     if(count($result_actor) != 0)
+        //     {
+        //         foreach($result_actor as $data)
+        //         {
+        //             $name_actor = $data['adversary_name'];
+        //             $model[$i]['actor'] = $name_actor;
+        //         }
+        //     }
+        //     else
+        //     {
+        //         $model[$i]['actor'] = '';
+        //     }
 
-            $i++;
-        }
+        //     $i++;
+        // }
         // dd($model);
         $count_model = count($model);
         // ---------------------------------- cve - actor ----------------------------------

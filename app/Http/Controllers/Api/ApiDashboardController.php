@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\FXAssetsPort;
 use App\DataLeakFeed;
 use App\DataLeakFeedTemp;
 use App\DataLeakSocialRef;
@@ -1108,14 +1109,45 @@ class ApiDashboardController extends ApiController
                                         $Assets_data_list['site'] = $site->name;
                                         $Assets_data_list['host'] = "None";
                                         $Assets_data_list['value'] = $IP_Listvalue->value;
+                                        $Assets_data_list['port'] = "None";
                                         array_push($assets, $Assets_data_list);
                                     } else {
                                         foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                                             $Assets_data_list = array();
+                                            $port = '';
+                                            $num_main = 1;
+                                            $port_all = FXAssetsPort::
+                                                            select('port')
+                                                            ->where('site_id', $IP_Listvalue->site_id)
+                                                            ->where('asset_name', $IP_Listvalue->value)
+                                                            ->get(); 
+                                            $count_port = count($port_all);
+                                            
+                                            if($count_port > 0)
+                                            {
+                                                foreach($port_all as $data_port)
+                                                {
+                                                    if($count_port == $num_main)
+                                                    {
+                                                        $port = $port.$data_port->port;
+                                                    }
+                                                    else
+                                                    {
+                                                        $port = $port.$data_port->port.',';
+                                                    }
+                                                    $num_main++;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                $port = " - ";
+                                            }
+
                                             $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first();
                                             $Assets_data_list['site'] = $site->name;
                                             $Assets_data_list['host'] = $Domain_listvalue->value;
                                             $Assets_data_list['value'] = $IP_Listvalue->value;
+                                            $Assets_data_list['port'] = $port;
                                             array_push($assets, $Assets_data_list);
                                         }
                                     }
@@ -1154,14 +1186,45 @@ class ApiDashboardController extends ApiController
                                         $Assets_data_list['site'] = $site->name;
                                         $Assets_data_list['host'] = "None";
                                         $Assets_data_list['value'] = $IP_Listvalue->value;
+                                        $Assets_data_list['port'] = "None";
                                         array_push($assets, $Assets_data_list);
                                     } else {
                                         foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                                             $Assets_data_list = array();
+                                            $port = '';
+                                            $num_main = 1;
+                                            $port_all = FXAssetsPort::
+                                                            select('port')
+                                                            ->where('site_id', $IP_Listvalue->site_id)
+                                                            ->where('asset_name', $IP_Listvalue->value)
+                                                            ->get(); 
+                                            $count_port = count($port_all);
+                                            
+                                            if($count_port > 0)
+                                            {
+                                                foreach($port_all as $data_port)
+                                                {
+                                                    if($count_port == $num_main)
+                                                    {
+                                                        $port = $port.$data_port->port;
+                                                    }
+                                                    else
+                                                    {
+                                                        $port = $port.$data_port->port.',';
+                                                    }
+                                                    $num_main++;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                $port = " - ";
+                                            }
+
                                             $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first();
                                             $Assets_data_list['site'] = $site->name;
                                             $Assets_data_list['host'] = $Domain_listvalue->value;
                                             $Assets_data_list['value'] = $IP_Listvalue->value;
+                                            $Assets_data_list['port'] = $port;
                                             array_push($assets, $Assets_data_list);
                                         }
                                     }
@@ -1203,14 +1266,45 @@ class ApiDashboardController extends ApiController
                                         $Assets_data_list['site'] = $site->name;
                                         $Assets_data_list['host'] = "None";
                                         $Assets_data_list['value'] = $IP_Listvalue->value;
+                                        $Assets_data_list['port'] = "None";
                                         array_push($assets, $Assets_data_list);
                                     } else {
                                         foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                                             $Assets_data_list = array();
+                                            $port = '';
+                                            $num_main = 1;
+                                            $port_all = FXAssetsPort::
+                                                            select('port')
+                                                            ->where('site_id', $IP_Listvalue->site_id)
+                                                            ->where('asset_name', $IP_Listvalue->value)
+                                                            ->get(); 
+                                            $count_port = count($port_all);
+                                            
+                                            if($count_port > 0)
+                                            {
+                                                foreach($port_all as $data_port)
+                                                {
+                                                    if($count_port == $num_main)
+                                                    {
+                                                        $port = $port.$data_port->port;
+                                                    }
+                                                    else
+                                                    {
+                                                        $port = $port.$data_port->port.',';
+                                                    }
+                                                    $num_main++;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                $port = " - ";
+                                            }
+
                                             $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first();
                                             $Assets_data_list['site'] = $site->name;
                                             $Assets_data_list['host'] = $Domain_listvalue->value;
                                             $Assets_data_list['value'] = $IP_Listvalue->value;
+                                            $Assets_data_list['port'] = $port;
                                             array_push($assets, $Assets_data_list);
                                         }
                                     }
@@ -1249,14 +1343,45 @@ class ApiDashboardController extends ApiController
                                         $Assets_data_list['site'] = $site->name;
                                         $Assets_data_list['host'] = "None";
                                         $Assets_data_list['value'] = $IP_Listvalue->value;
+                                        $Assets_data_list['port'] = "None";
                                         array_push($assets, $Assets_data_list);
                                     } else {
                                         foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
                                             $Assets_data_list = array();
+                                            $port = '';
+                                            $num_main = 1;
+                                            $port_all = FXAssetsPort::
+                                                            select('port')
+                                                            ->where('site_id', $IP_Listvalue->site_id)
+                                                            ->where('asset_name', $IP_Listvalue->value)
+                                                            ->get(); 
+                                            $count_port = count($port_all);
+                                            
+                                            if($count_port > 0)
+                                            {
+                                                foreach($port_all as $data_port)
+                                                {
+                                                    if($count_port == $num_main)
+                                                    {
+                                                        $port = $port.$data_port->port;
+                                                    }
+                                                    else
+                                                    {
+                                                        $port = $port.$data_port->port.',';
+                                                    }
+                                                    $num_main++;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                $port = " - ";
+                                            }
+
                                             $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first();
                                             $Assets_data_list['site'] = $site->name;
                                             $Assets_data_list['host'] = $Domain_listvalue->value;
                                             $Assets_data_list['value'] = $IP_Listvalue->value;
+                                            $Assets_data_list['port'] = $port;
                                             array_push($assets, $Assets_data_list);
                                         }
                                     }
