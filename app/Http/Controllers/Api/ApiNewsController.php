@@ -958,11 +958,14 @@ class ApiNewsController extends ApiController
                             if(@$item -> news -> transaction_rss_id) {
                                 if(@$item -> news -> logo) {
                                     $url_logo = config('app.URL_CENTER_PUBLISH').@$item -> news -> logo;
+                                    $url_logo = '/images/icon/news_default.png';
                                 } else {
                                     $url_logo = @$item -> news -> logo_rss;
+                                    
                                 }
                             } else {
                                 $url_logo = config('app.URL_CENTER_PUBLISH').@$item -> news -> logo;
+                                $url_logo = '/images/icon/news_default.png';
                             }
 
 
