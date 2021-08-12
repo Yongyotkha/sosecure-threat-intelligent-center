@@ -181,6 +181,10 @@ Route::group([
 });
 
 
+Route::group(['prefix' => 'v1/agent'], function () {
+    Route::get('connection', 'Api\ApiAgentController@index_client');
+
+});
 
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
 //     return $request->user();

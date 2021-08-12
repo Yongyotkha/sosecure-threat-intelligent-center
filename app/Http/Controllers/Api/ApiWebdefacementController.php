@@ -832,18 +832,29 @@ return $result_json_e;
                     $delay_screenshot_val = $webdefacement->delay_screen_shot_val;
                
                     // $command = 'app:WebDefacementsCreenshotCheck';
-                    $result = exec('/usr/bin/php /var/www/html/threat-intelligent-center/threat-intelligent-center/artisan app:WebDefacementsCreenshotCheck '.$url_web.' '.$port_web.' '.$site_id.' '.$url_id.' '.$delay_screenshot_val);
+                 //   $result = exec('/usr/bin/php /var/www/html/threat-intelligent-center/threat-intelligent-center/artisan app:WebDefacementsCreenshotCheck '.$url_web.' '.$port_web.' '.$site_id.' '.$url_id.' '.$delay_screenshot_val);
                     // Artisan::call('app:WebDefacementsCreenshotCheck ' .$url_web, 
-                    //     [
-                    //         'url' => $url_web,
-                    //         'port' => $port_web,
-                    //         'site_id' => $site_id,
-                    //         'url_id' => $url_id,
-                    //         'delay' => $delay_screenshot_val
-                    //     ]
-                    // );
-                    // $result = Artisan::output();
-                    $response = json_decode($result);
+                      //   [
+                        //     'url' => $url_web,
+                      //      'port' => $port_web,
+                       //    'site_id' => $site_id,
+                     //     'url_id' => $url_id,
+                     //        'delay' => $delay_screenshot_val
+                     //    ]
+                //    );
+
+
+
+        $response = [
+            "Result"=> 1,
+            "image_path_original"=> url('/').$webdefacement->image_original,
+            "image_path_original_full"=>url('/').$webdefacement->image_original,
+            "image_url"=>url('/').$webdefacement->image_original,
+            "message"=> "",
+            "url_id"=> $webdefacment_id
+        ];
+                            // $result = Artisan::output();
+                 //   $response = json_decode($result);
 
                     $data_transcation = json_encode($response);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
