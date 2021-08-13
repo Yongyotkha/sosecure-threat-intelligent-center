@@ -199,7 +199,7 @@
                     <div class="panel-body" style="padding: 0 !important">
                         <div class="container-fluid" style="padding: 2rem;">
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <h5 class="font-weight-bold">Filter By</h5>
                                     <div id="groupby-btn" class="btn-group special mb-2">
                                         <button class="btn btn-grey active" onclick="selectGroupBy('domain')">
@@ -215,14 +215,22 @@
                                             <span> OS Type </span>
                                         </button>
                                     </div>
+                                    {{-- <div class="form-group">
+                                        <select id="groupby-select" class="form-control">
+                                            <option value="">- SELECT -</option>
+                                        </select>
+                                    </div> --}}
+                                </div>
+
+                                <div class="col-md-5">
+                                    <h5 class="font-weight-bold"> </h5>
                                     <div class="form-group">
                                         <select id="groupby-select" class="form-control">
                                             <option value="">- SELECT -</option>
                                         </select>
                                     </div>
                                 </div>
-
-                                <div class="col-md-4">
+                                <div class="col-md-4" style="display: none;">
                                     <h5 class="font-weight-bold">Status</h5>
                                     <div id="groupby-status" class="btn-group special mb-2">
                                         <button class="btn btn-grey active" onclick="changeActive('')">
@@ -606,9 +614,10 @@
 
     function searchTB(searchLinkAll='',colsearchLinkAll=''){
         
-        
+        console.log(searchLinkAll+' / '+colsearchLinkAll);
         let selectedValue = $('#groupby-select').children("option:selected").val();
         let columnSearch = selectedGroup;
+        let otherval = null;
 
         if(colsearchLinkAll!==''){
             if(colsearchLinkAll=='clearFilter'){
@@ -620,15 +629,10 @@
             }
         }
 
-        console.log(columnSearch+' / '+selectedValue);
-
-
         let selectedSiteName = '';
         if($('#select-site').children("option:selected").val()!=0){
             selectedSiteName = $('#select-site').children("option:selected").text();
         }
-
-        console.log('sel / '+selectedSiteName);
 
         let active_tb;
         if(active==""){
@@ -636,8 +640,6 @@
         }else{
             active_tb = '^'+active+'$';
         }
-
-        console.log('active_tb / '+active_tb);
         
         if(columnSearch=='domain'){
             columnSearch = 1;
@@ -646,24 +648,22 @@
         }else if(columnSearch=='cpe'){
             {{--columnSearch = [3, 4,5,6,7,12];--}}
             columnSearch = 12;
-        }else if(columnSearch=='os_type'){
-            columnSearch = 8;
-            if(selectedValue='OthER'){
-                columnSearch = 9;
-                selectedValue = 'Other';
+        }else if(columnSearch == 'os_type'){
+            columnSearch = 9;
+            if(selectedValue == 'OthER'){
+                selectedValue = 'other';
+                otherval = 1;
             }
-            else if(selectedValue=='Windows'){
-                columnSearch = 9;
+            else if(selectedValue == 'Windows'){
                 selectedValue = 'Windows';
             }
-            else if(selectedValue=='Linux'){
-                columnSearch = 9;
+            else if(selectedValue == 'Linux'){
                 selectedValue = 'Linux';
             }
-            else if(selectedValue=='Redhat'){
-                columnSearch = 9;
+            else if(selectedValue == 'Redhat'){
                 selectedValue = 'Redhat';
             }
+            console.log(columnSearch+' / '+selectedValue);
         }else if(columnSearch=='ip_asset_id'){
  
         }else{
@@ -676,10 +676,15 @@
             columnSearch = 13;
             t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue, true, false).column(10).search(active_tb).draw();
         }else{
-            t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
+            if(otherval == 1)
+            {
+                t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
+            }
+            else
+            {
+                t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
+            }
         }
-        
-        console.log(t);
        
         {{--ads.column(5).search(active_tb).draw();
         t.search( '' ).columns().search( '' ).draw();--}}
@@ -889,7 +894,7 @@
             searchTB(check,'ip_asset_id');
         }
 
-        $("div.btnaction").html('<button id="btn_view_1" class="btn btn-info" onclick="btn_view(1)" >Host Info</button> <button  id="btn_view_2" onclick="btn_view(2)" class="btn">Service / Port</button>');
+        {{-- $("div.btnaction").html('<button id="btn_view_1" class="btn btn-info" onclick="btn_view(1)" >Host Info</button> <button  id="btn_view_2" onclick="btn_view(2)" class="btn">Service / Port</button>'); --}}
     }
 
 
@@ -1084,7 +1089,7 @@
             searchTB(check,'ip_asset_id');
         }
 
-        $("div.btnaction").html('<button id="btn_view_1" class="btn btn-info" onclick="btn_view(1)" >Host Info</button> <button  id="btn_view_2" onclick="btn_view(2)" class="btn">Service / Port</button>');
+        {{-- $("div.btnaction").html('<button id="btn_view_1" class="btn btn-info" onclick="btn_view(1)" >Host Info</button> <button  id="btn_view_2" onclick="btn_view(2)" class="btn">Service / Port</button>'); --}}
     }
     function btn_view(mode){
             if(mode == 2){
