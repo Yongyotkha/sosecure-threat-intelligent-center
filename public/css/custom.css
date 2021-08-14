@@ -2458,7 +2458,7 @@ ul.topics-news-list li a:hover{
 
 .name-dash-text-compro{
     margin: 10px !important;
-    font-size: 26px !important;
+    font-size: 22px !important;
 }
 
 .name-dash-text-vuln{
@@ -5434,8 +5434,8 @@ input.form-policy[type=password] {
     padding: 0 1rem;
 }
 .img-icon-smm-compro{
-    width: 75px;
-    height: 110px;
+    width: 70px;
+    height: 90px;
     overflow: hidden;
     position: relative;
     margin: auto;
