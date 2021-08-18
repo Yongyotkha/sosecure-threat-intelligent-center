@@ -8,7 +8,9 @@ class TwoFactorAuthController extends Controller
 {
     public function authenticate()
     {
-        return redirect(url()->previous());
+
+        return redirect('dashboardnew');
+        // return redirect(url()->previous());
     }
 
     public function reset()

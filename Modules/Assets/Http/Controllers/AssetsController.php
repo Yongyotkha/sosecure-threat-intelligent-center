@@ -459,10 +459,13 @@ class AssetsController extends Controller
     {
         $selectedGroup = $request->selectedGroup;
         $site = null;
+
+        // dd($selectedGroup);
         
         if($request->sitecode){
             $site = SiteSettings::select('id')->where("code",$request->sitecode)->first();
         }
+
         $returnData = null;
         if($selectedGroup=='domain'){
             if($site){
@@ -912,7 +915,7 @@ class AssetsController extends Controller
                                     $Assets_data_list['CPE_OtherCheck'] = $CPE_OtherCheck;
                                     array_push($Assets_list, $Assets_data_list);
                                 }
-                            }else{
+                        }else{
 
                                 $Assets_data_list['chk'] = "";
                                 $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal"><i class="fas fa-plus"></i> Add CPE </a>';
@@ -956,7 +959,7 @@ class AssetsController extends Controller
                                 $Assets_data_list['CPE_Del'] = $CPE_Del;
                                 $Assets_data_list['CPE_OtherCheck'] = $CPE_OtherCheck;
                                 array_push($Assets_list, $Assets_data_list);
-                            }
+                        }
     
                     } else {
                         foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {

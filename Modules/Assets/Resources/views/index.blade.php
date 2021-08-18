@@ -615,6 +615,7 @@
     function searchTB(searchLinkAll='',colsearchLinkAll=''){
         
         console.log(searchLinkAll+' / '+colsearchLinkAll);
+
         let selectedValue = $('#groupby-select').children("option:selected").val();
         let columnSearch = selectedGroup;
         let otherval = null;
@@ -652,7 +653,6 @@
             columnSearch = 9;
             if(selectedValue == 'OthER'){
                 selectedValue = 'other';
-                otherval = 1;
             }
             else if(selectedValue == 'Windows'){
                 selectedValue = 'Windows';
@@ -663,7 +663,9 @@
             else if(selectedValue == 'Redhat'){
                 selectedValue = 'Redhat';
             }
+
             console.log(columnSearch+' / '+selectedValue);
+
         }else if(columnSearch=='ip_asset_id'){
  
         }else{
@@ -676,14 +678,7 @@
             columnSearch = 13;
             t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue, true, false).column(10).search(active_tb).draw();
         }else{
-            if(otherval == 1)
-            {
                 t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
-            }
-            else
-            {
-                t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
-            }
         }
        
         {{--ads.column(5).search(active_tb).draw();

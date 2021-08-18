@@ -166,6 +166,7 @@ class ApiNewsController extends ApiController
                     $date_start = $data['data']['date_start'];
                     $date_end = $data['data']['date_end'];
                     $f_search = $data['data']['f_search'];
+                    $status_serverity = $data['data']['status_serverity'];
                     $site_code = $data['data']['site_code'];
                     $user_id = $data['data']['user_id'];
                     $page = $data['data']['page'];
@@ -279,6 +280,11 @@ class ApiNewsController extends ApiController
                         if($date_end) {
         
                         }
+
+                        if($status_serverity){
+
+                            $news = $news -> where('serverity', $status_serverity);
+                        }
         
                         // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
         
@@ -297,86 +303,86 @@ class ApiNewsController extends ApiController
                         $news = $news->orderBy('created_at','desc')->take(PAGINATE_NUM)->offset($page >= 2 ? $page * 10 : 0)->get();
                     
 
-                         $count_model = count($news);
-                        // // ---------------------------------- cve - actor ----------------------------------
-                        // if($count_model > 0)
-                        // {
-                        //     $id = '';
+                        $count_model = count($news);
 
-                        //     $DB_MONGO_KEY = config('app.DB_MONGO_DEV');
-                        //     $client = new MongoClient($DB_MONGO_KEY);
-                        //     if(app()->environment('local'))
-                        //     {
-                        //         // $collection_actor = $client->sosecure_threatintelligent->fx_otx_adversaries;
-                        //         // $conn = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
-                        //         $collection_actor = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
-                        //         $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
-                        //     }
-                        //     else
-                        //     {
-                        //         $collection_actor = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
-                        //         $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
-                        //     }
+                        if($count_model > 0)
+                        {
+                            $id = '';
 
-                        //     for($i=0;$i<$count_model;$i++)
-                        //     {
-                        //         $query= [
-                        //             'pulse_id' => $news[$i]['id'],
-                        //             'mode' => 'news',
-                        //             'join' => 'actor',
-                        //             'delete_at'  => null
-                        //         ];
-                        //         $option = [];
+                            $DB_MONGO_KEY = config('app.DB_MONGO_DEV');
+                            $client = new MongoClient($DB_MONGO_KEY);
+                            if(app()->environment('local'))
+                            {
+                                $collection_actor = $client->sosecure_threatintelligent->fx_otx_adversaries;
+                                $conn = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
+                                // $collection_actor = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
+                                // $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+                            }
+                            else
+                            {
+                                $collection_actor = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
+                                $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+                            }
+
+
+                            for($i=0;$i<$count_model;$i++)
+                            {
+                                $query_camp= [
+                                    'pulse_id' => $news[$i]['id'],
+                                    'mode' => 'news',
+                                    'join' => 'campainge',
+                                    'delete_at'  => null
+                                ];
+                                $option_camp = [];
                         
-                        //         $final_test = $conn->find($query,$option);
-                        //         $result_test = $final_test->toArray();
-                        //         $count_result_test = count($result_test);
+                                $final_camp = $conn->find($query_camp,$option_camp);
+                                $result_camp = $final_camp->toArray();
+                                $count_result_camp = count($result_camp);
+
+                                $news[$i]['campainge'] = $result_camp;
+                                $news[$i]['count_campainge'] = $count_result_camp;
+
+                                $query= [
+                                    'pulse_id' => $news[$i]['id'],
+                                    'mode' => 'news',
+                                    'join' => 'actor',
+                                    'delete_at'  => null
+                                ];
+                                $option = [];
+                        
+                                $final_test = $conn->find($query,$option);
+                                $result_test = $final_test->toArray();
+                                $count_result_test = count($result_test);
                                 
-                        //         $news[$i]['actor'] = $result_test;
-                        //         $news[$i]['count_result'] = $count_result_test;
+                                $news[$i]['actor'] = $result_test;
+                                $news[$i]['count_result'] = $count_result_test;
                                 
-                        //         $logo = [];
-                        //         foreach(@$result_test as $sel_data_act)
-                        //         {
-                        //             $query_sel_act = [
-                        //                 'adversary_uuid' => $sel_data_act['adversary_uuid']
-                        //             ];
-                        //             $option_sel_act = [];
-                        //             $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
-                                    
-                        //             if(@$result_sel_act['logo'])
-                        //             {
-                        //                 $logo[] = $result_sel_act['logo'];
-                        //             }
-                        //             else
-                        //             {
-                        //                 $logo[] = '/asset_salepage/images/AgentBasedDetection.png';
-                        //             }
-                                    
-                        //         }
-                        //         $news[$i]['logo'] = $logo;
-                        //         // dd($id);
-
-                        //         $query_camp= [
-                        //             'pulse_id' => $news[$i]['id'],
-                        //             'mode' => 'news',
-                        //             'join' => 'campainge',
-                        //             'delete_at'  => null
-                        //         ];
-                        //         $option_camp = [];
+                                $logo_actor = array();
+                                if(is_array($result_test) || is_object($result_test)){
+                                    foreach(@$result_test as $sel_data_act)
+                                    {
+                                        $query_sel_act = [
+                                            'adversary_uuid' => $sel_data_act['adversary_uuid']
+                                        ];
+                                        $option_sel_act = [];
+                                        $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
+                                        
+                                        if(@$result_sel_act['logo'])
+                                        {
+                                            $logo_actor[] = $result_sel_act['logo'];
+                                        }
+                                        else
+                                        {
+                                            $logo_actor[] = '/asset_salepage/images/AgentBasedDetection.png';
+                                        }
+                                        
+                                        // $news[$i]['logo'] = $logo;
+                                        $news[$i]['logo_actor'] = $logo_actor;
+                                    }
+                                }
                         
-                        //         $final_camp = $conn->find($query_camp,$option_camp);
-                        //         $result_camp = $final_camp->toArray();
-                        //         $count_result_camp = count($result_camp);
-
-                        //         $news[$i]['campainge'] = $result_camp;
-                        //         $news[$i]['count_campainge'] = $count_result_camp;
-                        
-                        //     }
-                        // }
-
-
-                        
+                            }
+                        }
                     
                     }else{
                         $news = RSSNews::where(function ($query) {
@@ -405,10 +411,10 @@ class ApiNewsController extends ApiController
                             $client = new MongoClient($DB_MONGO_KEY);
                             if(app()->environment('local'))
                             {
-                                // $collection_actor = $client->sosecure_threatintelligent->fx_otx_adversaries;
-                                // $conn = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
-                                $collection_actor = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
-                                $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+                                $collection_actor = $client->sosecure_threatintelligent->fx_otx_adversaries;
+                                $conn = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
+                                // $collection_actor = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
+                                // $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
                             }
                             else
                             {
@@ -416,51 +422,9 @@ class ApiNewsController extends ApiController
                                 $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
                             }
 
-                           // $testsss = '555555';
 
                             for($i=0;$i<$count_model;$i++)
                             {
-                                $query= [
-                                    'pulse_id' => $news[$i]['id'],
-                                    'mode' => 'news',
-                                    'join' => 'actor',
-                                    'delete_at'  => null
-                                ];
-                                $option = [];
-                        
-                                $final_test = $conn->find($query,$option);
-                                $result_test = $final_test->toArray();
-                                $count_result_test = count($result_test);
-                                
-                                // $news[$i] = ['actor' => $result_test];
-                                // $news[$i] = ['count_result' => $count_result_test];
-                                // $news[$i]['actor'] = 'actor';
-                                // $news[$i]['count_result'] = 'count result';
-                                $news[$i]['actor'] = $result_test;
-                                $news[$i]['count_result'] = $count_result_test;
-                                
-                                // $logo = [];
-                                // foreach(@$result_test as $sel_data_act)
-                                // {
-                                //     $query_sel_act = [
-                                //         'adversary_uuid' => $sel_data_act['adversary_uuid']
-                                //     ];
-                                //     $option_sel_act = [];
-                                //     $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
-                                    
-                                    // if(@$result_sel_act['logo'])
-                                    // {
-                                    //     $logo[] = $result_sel_act['logo'];
-                                    // }
-                                    // else
-                                    // {
-                                    //     $logo[] = '/asset_salepage/images/AgentBasedDetection.png';
-                                    // }
-                                    
-                                // }
-                                // $news[$i]['logo'] = $logo;
-                                // dd($id);
-
                                 $query_camp= [
                                     'pulse_id' => $news[$i]['id'],
                                     'mode' => 'news',
@@ -473,8 +437,47 @@ class ApiNewsController extends ApiController
                                 $result_camp = $final_camp->toArray();
                                 $count_result_camp = count($result_camp);
 
-                                // $news[$i]['campainge'] = $result_camp;
-                                // $news[$i]['count_campainge'] = $count_result_camp;
+                                $news[$i]['campainge'] = $result_camp;
+                                $news[$i]['count_campainge'] = $count_result_camp;
+
+                                $query= [
+                                    'pulse_id' => $news[$i]['id'],
+                                    'mode' => 'news',
+                                    'join' => 'actor',
+                                    'delete_at'  => null
+                                ];
+                                $option = [];
+                        
+                                $final_test = $conn->find($query,$option);
+                                $result_test = $final_test->toArray();
+                                $count_result_test = count($result_test);
+                                
+                                $news[$i]['actor'] = $result_test;
+                                $news[$i]['count_result'] = $count_result_test;
+                                
+                                $logo_actor = array();
+                                if(is_array($result_test) || is_object($result_test)){
+                                    foreach(@$result_test as $sel_data_act)
+                                    {
+                                        $query_sel_act = [
+                                            'adversary_uuid' => $sel_data_act['adversary_uuid']
+                                        ];
+                                        $option_sel_act = [];
+                                        $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
+                                        
+                                        if(@$result_sel_act['logo'])
+                                        {
+                                            $logo_actor[] = $result_sel_act['logo'];
+                                        }
+                                        else
+                                        {
+                                            $logo_actor[] = '/asset_salepage/images/AgentBasedDetection.png';
+                                        }
+                                        
+                                        // $news[$i]['logo'] = $logo;
+                                        $news[$i]['logo_actor'] = $logo_actor;
+                                    }
+                                }
                         
                             }
                         }
@@ -637,61 +640,57 @@ class ApiNewsController extends ApiController
                                 .@$html_source_all_full.
                                 '<span><p class="details-news-elip">&nbsp;'.strip_tags($n_detail).'</p></span>';
 
-                                // $html .= '<span><p class="details-news-elip">&nbsp;'.$item->campainge.'</p></span>';
-                                // $html .= '<span><p class="details-news-elip">&nbsp;'.$item->count_campainge.'</p></span>';
+                                if($item->count_campainge > 0)
+                                {
+                                $html .= '<span class="m-r-5 m-l-xs" style="display: inline-flex;align-items: center;">
+                                            <b>Actor : </b>
+                                            <div class="m-l-xs">';
+                                            $array_row = 1;
+                                            $count_result = $item->count_result;
+                                            for($i = 0 ; $i < $item->count_result ; $i++)
+                                            {
+                                                if($array_row == $count_result)
+                                                {
+                                                    $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$item->logo_actor[$i].'"><span>
+                                                            '.$item->actor[$i]->adversary_name.'';
+                                                }
+                                                else
+                                                {
+                                                    $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$item->logo_actor[$i].'"><span>
+                                                            '.$item->actor[$i]->adversary_name.', ';
+                                                }
+                                                $array_row = $array_row+1;
+                                            }
 
-                                // if($item->count_campainge > 0)
-                                // {
-                                // $html .= '<span class="m-r-5 m-l-xs" style="display: inline-flex;align-items: center;">
-                                //             <b>Actor : </b>
-                                //             <div class="m-l-xs">';
-                                //             $array_row = 1;
-                                //             $count_result = $item->count_result;
-                                //             for($i = 0 ; $i < $item->count_result ; $i++)
-                                //             {
-                                //                 if($array_row == $count_result)
-                                //                 {
-                                //                     $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$item->logo[$i].'"><span>
-                                //                             <a href="/actor/detail?_id='.$item->actor[$i]->adversary_uuid.'&mode=cve">'.$item->actor[$i]->adversary_name.'</a>';
-                                //                 }
-                                //                 else
-                                //                 {
-                                //                     $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$item->logo[$i].'"><span>
-                                //                             <a href="/actor/detail?_id='.$item->actor[$i]->adversary_uuid.'&mode=cve">'.$item->actor[$i]->adversary_name.'</a> , ';
-                                //                 }
-                                //                 $array_row = $array_row+1;
-                                //             }
+                                    $html .= '
+                                            </div>
+                                        </span>
+                                    ';
+                                }
 
-                                //     $html .= '
-                                //             </div>
-                                //             </span>
-                                //     ';
-                                // }
-
-                                // if($item->count_campainge > 0)
-                                // {
-                                //     $html .= ' <span class="m-r-md">
-                                //             <b>Campainge : </b>';
+                                if($item->count_campainge > 0)
+                                {
+                                    $html .= ' <span class="m-r-md">
+                                            <b>Campainge : </b>';
                     
-                                //             $array_row = 1;
-                                //             $count_campainge = $item->count_campainge;
-                                //             for($i = 0 ; $i < @$item->count_campainge ; $i++)
-                                //             {
-                                //                 // <a href="/actor/detail?_id='.$item->campainge[$i]->adversary_uuid.'&mode=cve">
-                                //                 if($array_row == $count_campainge)
-                                //                 {
-                                //                     $html .= ''.$item->campainge[$i]->adversary_name.'';
-                                //                 }
-                                //                 else
-                                //                 {
-                                //                     $html .= ''.$item->campainge[$i]->adversary_name.' , ';
-                                //                 }
-                                //                 $array_row = $array_row+1;
-                                //             }
-                                //             // <span> Name Campainge </span>
+                                            $array_row = 1;
+                                            $count_campainge = $item->count_campainge;
+                                            for($i = 0 ; $i < @$item->count_campainge ; $i++)
+                                            {
+                                                if($array_row == $count_campainge)
+                                                {
+                                                    $html .= ''.$item->campainge[$i]->adversary_name.'';
+                                                }
+                                                else
+                                                {
+                                                    $html .= ''.$item->campainge[$i]->adversary_name.' , ';
+                                                }
+                                                $array_row = $array_row+1;
+                                            }
                                             
-                                //     $html .='</span> ';
-                                // }
+                                    $html .='</span> ';
+                                }
+
                             $html .='</div>
                             </div>
                             <div class="content-news-image">
@@ -712,9 +711,7 @@ class ApiNewsController extends ApiController
                     $dataOut = [
                         "html" => $html,
                         "count" => $news_all,
-                        "news" => $news,
-                        //"testsss" => $testsss,
-                        "count_model" => $count_model
+                        "news" => $news
                     ];
                     $data_transcation = json_encode($dataOut);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
@@ -1061,7 +1058,6 @@ class ApiNewsController extends ApiController
         }
     }
 
-
     public function news_load_top_source(Request $request){
         try{
             $header = $request->bearerToken();
@@ -1088,6 +1084,7 @@ class ApiNewsController extends ApiController
                     $startDate = $data['data']['startDate'];
                     $endDate = $data['data']['endDate'];
                     $isDateSearch = $data['data']['isDateSearch'];
+                    $status_serverity = $data['data']['status_serverity'];
                     $site_id_arr = $data['data']['site_id_arr'];
                     $user_id = $data['data']['user_id'];
      
@@ -1112,11 +1109,11 @@ class ApiNewsController extends ApiController
                             }
                             
                         }
-            
+
                         if($isDateSearch == 1){
                             $date_start = $startDate;
                             $date_end = $endDate;
-            
+
                             $date_start_explode = explode(" ",$date_start);
                             $date_start_date = @$date_start_explode[0];
                             $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
@@ -1126,7 +1123,7 @@ class ApiNewsController extends ApiController
                             $date_start_time_time = date("H:i", strtotime($date_start_time));
                             $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
                             // dd($date_start);
-            
+
                             $date_end_explode = explode(" ",$date_end);
                             $date_end_date = @$date_end_explode[0];
                             $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
@@ -1135,29 +1132,29 @@ class ApiNewsController extends ApiController
                             $date_end_time_time = date("H:i", strtotime($date_end_time));
                             $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
                             // dd($date_end_time_time);
-            
-                            // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+
+                            // $model -> whereDate('transcation_date', Carbon::parse($public_date)->format('Y-m-d'));
                             $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
                         }
-            
-                        // if($status_news){
-                        //     if($status_news == 1 || $status_news == 2){
-                        //         if($status_news == 1) {
-                        //             $model =  $model -> where('save_draft','=',0);
+
+                        if($status_news){
+                            if($status_news == 1 || $status_news == 2){
+                                if($status_news == 1) {
+                                    $model =  $model -> where('save_draft','=',0);
                                     
-                        //         } else if ($status_news == 2) {
-                        //             $model =  $model -> where('save_draft',1);
-                        //             // dd($model);
-                        //         }
+                                } else if ($status_news == 2) {
+                                    $model =  $model -> where('save_draft',1);
+                                    // dd($model);
+                                }
                                 
-                        //     }  
-                        // }
+                            }  
+                        }
                         if($news_source){
-            
+
                             // $model -> where('source', 'LIKE' ,'%'.$news_source.'%');
                             $model = $model -> whereIn('source', $news_source);
                         }
-            
+
                         if($news_category){
                             $news_cate_id = $news_category;
                             $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
@@ -1171,14 +1168,14 @@ class ApiNewsController extends ApiController
                         }
                         
                     }
-            
+
                     $model = $model         
                     ->select(DB::raw('count(*) as source_count , source as source'))
                     ->groupBy('source')
                     ->orderBy('source_count', 'desc')
                     ->limit(11)
                     ->get();
-            
+
                     $host2 = array();
                     foreach($model as $value){
                         if(empty($value->source)||$value->source=='None'){

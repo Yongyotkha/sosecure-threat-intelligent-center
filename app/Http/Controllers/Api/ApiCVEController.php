@@ -502,12 +502,12 @@ class ApiCVEController extends ApiController
                                         if($array_row == $count_result)
                                         {
                                             $html .= '<img class="icon_sm_actor m-r-xs" src="'.$model->logo[$i].'">
-                                                    <a href="/actor/detail?_id='.$model->actor[$i]->adversary_uuid.'&mode=cve">'.$model->actor[$i]->adversary_name.'</a>';
+                                                    '.$model->actor[$i]->adversary_name.'';
                                         }
                                         else
                                         {
                                             $html .= '<img class="icon_sm_actor m-r-xs" src="'.$model->logo[$i].'">
-                                                    <a href="/actor/detail?_id='.$model->actor[$i]->adversary_uuid.'&mode=cve">'.$model->actor[$i]->adversary_name.'</a> , ';
+                                                    '.$model->actor[$i]->adversary_name.' , ';
                                         }
                                         $array_row = $array_row+1;
                                     }
