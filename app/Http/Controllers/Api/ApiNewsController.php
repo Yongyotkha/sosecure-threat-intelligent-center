@@ -282,7 +282,6 @@ class ApiNewsController extends ApiController
                         }
 
                         if($status_serverity){
-
                             $news = $news -> where('serverity', $status_serverity);
                         }
         
@@ -1155,11 +1154,22 @@ class ApiNewsController extends ApiController
                             $model = $model -> whereIn('source', $news_source);
                         }
 
-                        if($news_category){
-                            $news_cate_id = $news_category;
-                            $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
-                                $query->whereIn('news_category_id', $news_cate_id);
+                        // if($news_category){
+                        //     $news_cate_id = $news_category;
+                        //     $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
+                        //         $query->whereIn('news_category_id', $news_cate_id);
+                        //     });
+                        // }
+
+                        if($news_category) {
+                            // dd($news_category);
+                            $news_category_id_m = CategorySettings::where('code',$news_category)->first();
+                            $news_category_id = @$news_category_id_m->id;
+                            // dd($news_category_id);
+                            $model = $model->whereHas('get_cate', function ($query) use ($news_category_id) {
+                                $query->where('news_category_id', '=', $news_category_id);
                             });
+        
                         }
 
                         if($status_serverity){
@@ -1249,6 +1259,7 @@ class ApiNewsController extends ApiController
                     $startDate = $data['data']['startDate'];
                     $endDate = $data['data']['endDate'];
                     $isDateSearch = $data['data']['isDateSearch'];
+                    $status_serverity = $data['data']['status_serverity'];
                     $site_id_arr = $data['data']['site_id_arr'];
                     $user_id = $data['data']['user_id'];
 
@@ -1320,14 +1331,25 @@ class ApiNewsController extends ApiController
                             $model = $model -> whereIn('source', $news_source);
                         }
             
-                        if($news_category){
-                            $news_cate_id = $news_category;
-                            $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
-                                $query->whereIn('news_category_id', $news_cate_id);
-                            });
-                        }
-                        if($status_serverity){
+                        // if($news_category){
+                        //     $news_cate_id = $news_category;
+                        //     $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
+                        //         $query->whereIn('news_category_id', $news_cate_id);
+                        //     });
+                        // }
 
+                        if($news_category) {
+                            // dd($news_category);
+                            $news_category_id_m = CategorySettings::where('code',$news_category)->first();
+                            $news_category_id = @$news_category_id_m->id;
+                            // dd($news_category_id);
+                            $model = $model->whereHas('get_cate', function ($query) use ($news_category_id) {
+                                $query->where('news_category_id', '=', $news_category_id);
+                            });
+        
+                        }
+
+                        if($status_serverity){
                             $model = $model -> where('serverity', $status_serverity);
                         }
                         
