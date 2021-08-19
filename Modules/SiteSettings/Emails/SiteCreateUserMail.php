@@ -35,7 +35,8 @@ class SiteCreateUserMail extends Mailable
         //     ->markdown('emails.create_site_user');
 
 
-            $mail = $this->subject('Notification Register | Threat Intelligent')
+            $mail = $this->subject('Notification Register | Threat inSight')
+            // $mail = $this->subject('Notification Register | Threat Intelligent')
             // ->from('sales@dsure.net', 'Dsure')//glorysociety@gmail.com
             // ->view('backEnd.template_email.send_massage_data_mailto_org_ins');
             ->markdown('emails.template_email_create_site_user');

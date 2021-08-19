@@ -568,6 +568,8 @@ class RSSFeedSettingsController extends Controller
         // dd($model);
 
         // $model = RSSNews::all();
+
+        dd($model[0]);
         return DataTables::of($model)
             ->editColumn('chk', function (RSSNews $model) {
                     return '<label><input type="checkbox" name="checked" class="rss_new_id" value="' . $model->code . '"><span class="label-text"></span></label>';

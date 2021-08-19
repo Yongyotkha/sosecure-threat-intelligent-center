@@ -613,11 +613,11 @@ class ApiNewsController extends ApiController
                                 </label>
                             </div>-->
                             <div class="content-news-text">
-                                '.$new_html.'
-                                <a href="'.$url.'/news/detail/'.$item -> code.'">
-                                    <span class="head-news-text text-elip-ovf" style="'.@$font_weight.'">'.$icon_related.' '.$n_title.'</span>
-                                </a>
-                                <div class="entry-meta">
+                                '.$new_html.'';
+                                // <a href="'.$url.'/news/detail/'.$item -> code.'">
+                        $html .= '<span class="head-news-text text-elip-ovf" style="'.@$font_weight.'">'.$icon_related.' '.$n_title.'</span>';
+                                // </a>
+                        $html .= '<div class="entry-meta">
                                 <span class="entry-view"> <i class="fas fa-eye"></i> '.$item -> view.'</span>
                                 <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$item -> public_date.'</span>
                                 <span> <b>Serverity: </b> ';
@@ -692,11 +692,27 @@ class ApiNewsController extends ApiController
 
                             $html .='</div>
                             </div>
-                            <div class="content-news-image">
-                                <a href="'.$url.'/news/detail/'.$item -> code.'">
-                                    <img src="'.$logo_url.'" alt="" onerror="setDefaultPic(this)">
-                                </a>
-                            </div>
+                            <div class="content-news-text" style="text-align: right; padding: 0rem 3rem;">';
+                            // <div class="content-news-image">';
+                                // <a href="'.$url.'/news/detail/'.$item -> code.'">
+                                //     <img src="'.$logo_url.'" alt="" onerror="setDefaultPic(this)">
+                                // </a>
+                            $link = '';
+                            $link_th = '';
+                            $link_en = '';
+                            $link_line = '';
+
+                            if($item->title_th) {
+                                $link_th = '<a href="public/news/detail/'.$item -> code.'/th" target="_blank">TH</a>';
+                                
+                            }
+                            if($item->title_en) {
+                                $link_en = '<a href="public/news/detail/'.$item -> code.'/en" target="_blank">EN</a>';
+                                $link_line = ' | ';
+                            }
+                            
+                            $html .= $link_th . $link_line . $link_en;
+                            $html .= '</div>
                             <div class="action-bookmark">';
                             if(!empty($checkBookmark)){
                                 $html .= '<i class="fas fa-bookmark bookmark-active" id="mark'.$item -> id.'" onclick="Bookmarks(this, '.$item -> id.')"></i>';
@@ -712,6 +728,7 @@ class ApiNewsController extends ApiController
                         "count" => $news_all,
                         "news" => $news
                     ];
+
                     $data_transcation = json_encode($dataOut);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);

@@ -31,9 +31,11 @@ class CompromisedMail extends Mailable
     public function build()
     {
         if($this->title == 'data_leak'){
-            return $this->subject('Notification New Data Leak | Threat Intelligent')->markdown('emails.template_email_compro');
+            return $this->subject('Notification New Data Leak | Threat inSight')->markdown('emails.template_email_compro');
+            // return $this->subject('Notification New Data Leak | Threat Intelligent')->markdown('emails.template_email_compro');
         }else{
-            return $this->subject('Notification New Compromised | Threat Intelligent')->markdown('emails.template_email_compro');
+            return $this->subject('Notification New Compromised | Threat inSight')->markdown('emails.template_email_compro');
+            // return $this->subject('Notification New Compromised | Threat Intelligent')->markdown('emails.template_email_compro');
         }
         
     }

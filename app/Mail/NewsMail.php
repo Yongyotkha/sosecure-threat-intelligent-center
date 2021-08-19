@@ -29,6 +29,7 @@ class NewsMail extends Mailable
      */
     public function build()
     {
-        $this->subject('Cyber News Update | Threat Intelligent')->markdown('emails.template_email_new_news');
+        $this->subject('Cyber News Update | Threat inSight')->markdown('emails.template_email_new_news');
+        // $this->subject('Cyber News Update | Threat Intelligent')->markdown('emails.template_email_new_news');
     }
 }
