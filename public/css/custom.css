@@ -1951,6 +1951,12 @@ ul.topics-news-list li a:hover{
     position: relative;
     display: inline-block;
 }
+.content-news-image div{
+    width: 60px;
+    height: 60px;
+    position: relative;
+    display: inline-block;
+}
 
 .text-elipse-overflow{
     white-space: nowrap; 

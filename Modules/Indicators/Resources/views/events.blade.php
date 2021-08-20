@@ -714,6 +714,7 @@
     function search_table(page=1){
         let startDate=  $("#event_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
         let endDate=  $("#event_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+        console.log(industries);
         $('#table_events').DataTable({
             searching: false,
             ordering: true,

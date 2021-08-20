@@ -1957,7 +1957,8 @@ public function tableEvents(Request $request)
                     $nestedData['attrCount'] = $document_2["indicator_count"];
                     $nestedData['public'] = ($document_2["public"]);
                     $nestedData['is_modified'] = ($document_2["is_modified"]);
-                    $nestedData['modified'] = change_date_utc_to_thai($document_2['modified']);
+                    // $nestedData['modified'] = change_date_utc_to_thai($document_2['modified']);
+                    $nestedData['modified'] = change_date_thai_tummai($document_2['modified']);
                     $nestedData['count_view'] = @$document_2["count_view"];
                     $nestedData['pulse_id'] = $document_2["pulse_id"];
 

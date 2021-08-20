@@ -690,6 +690,29 @@ function change_date_utc_to_thai($val) {
     return $return_date;
 }
 
+function change_date_thai_tummai($val) {
+
+    if(is_string($val))
+    {
+        $time = strtotime($val);
+        $newformat = date('Y-m-d H:i',$time);
+        
+        $return_date = $newformat;
+    }
+    else
+    {
+        $tz = new \DateTimeZone('Asia/Bangkok');
+
+        $date_start = $val->toDateTime();
+        $date_start->setTimezone($tz);
+
+        $re_date = $date_start->format(DATE_ATOM);
+        $return_date = date("Y-m-d H:i",strtotime($re_date));
+    }
+
+    return $return_date;
+}
+
 
 
 function get_menu_html() {

@@ -635,6 +635,8 @@
             selectedSiteName = $('#select-site').children("option:selected").text();
         }
 
+        console.log(columnSearch+' / '+selectedValue);
+
         let active_tb;
         if(active==""){
             active_tb = active;
@@ -644,6 +646,11 @@
         
         if(columnSearch=='domain'){
             columnSearch = 1;
+            if(selectedValue != null && selectedValue != " " && selectedValue != [])
+            {   
+                selectedValue = '^'+selectedValue+'$';
+                console.log('rerr');
+            }
         }else if(columnSearch=='ip'){
             columnSearch = 2;
         }else if(columnSearch=='cpe'){
@@ -678,7 +685,14 @@
             columnSearch = 13;
             t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue, true, false).column(10).search(active_tb).draw();
         }else{
+            if(columnSearch == 1)
+            {
+                t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue, true, false).column(10).search(active_tb, true, false).draw();
+            }
+            else
+            {
                 t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
+            }
         }
        
         {{--ads.column(5).search(active_tb).draw();
@@ -741,7 +755,6 @@
                 $('#count_windows').html(json.countWindows+"");
                 $('#count_linux').html(json.countLinux+"");
                 $('#count_other').html(json.countOther+"");
-                
             },
             columns: [
                 {{--{
@@ -860,7 +873,7 @@
                 {
                     targets: 12,
                     render: function (data, type, row, meta) {
-                        return row.cpe+row.action;
+                        return row.cpe+row.action+`<span style="visibility: hidden;width: 0px;overflow: hidden;display: inline-block;">${row.CPE}</span>`;
                         
                     }
                    

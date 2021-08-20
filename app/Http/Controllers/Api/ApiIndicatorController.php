@@ -175,7 +175,8 @@ class ApiIndicatorController extends ApiController
                             $nestedData['attrCount'] = $document["indicator_count"];
                             $nestedData['public'] = ($document["public"]);
                             $nestedData['is_modified'] = ($document["is_modified"]);
-                            $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
+                            // $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
+                            $nestedData['modified'] = change_date_thai_tummai($document['modified']);
                             $nestedData['count_view'] = @$document["count_view"];
                             $nestedData['pulse_id'] = $document["pulse_id"];
                         
