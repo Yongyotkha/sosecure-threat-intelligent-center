@@ -16,7 +16,7 @@ class MDMISPFeedDaily extends Command
      *
      * @var string
      */
-    protected $signature = 'app:MDMISPFeedDaily';
+    protected $signature = 'app:MDMISPFeedDaily_v1';
 
     /**
      * The console command description.
