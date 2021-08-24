@@ -899,7 +899,7 @@ Highcharts.setOptions({
                             const data = result.data[i];                    
                             html += `
                             <tr>
-                                <td>
+                                <td style="white-space: nowrap;">
                                     <span>${data.site}</span>
                                 </td>
                                 <td>
