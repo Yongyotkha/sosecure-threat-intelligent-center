@@ -299,7 +299,7 @@ class RSSFeedSettingsController extends Controller
     }  
 
 
-
+    ///----------------
     public function tableNews(Request $request){
         $role_custom = @check_role_custom();
         if(!$role_custom['news']) {
@@ -569,7 +569,6 @@ class RSSFeedSettingsController extends Controller
 
         // $model = RSSNews::all();
 
-        dd($model[0]);
         return DataTables::of($model)
             ->editColumn('chk', function (RSSNews $model) {
                     return '<label><input type="checkbox" name="checked" class="rss_new_id" value="' . $model->code . '"><span class="label-text"></span></label>';
@@ -1466,14 +1465,46 @@ class RSSFeedSettingsController extends Controller
             check_permission403();
         }
         $RSS_news = RSSNews::where("code",$id)->first();
+        // dd($RSS_news->logo);
         if($RSS_news->logo != config('app.URL_CENTER_PUBLISH').'/images/icon/news_default.png'){
             unlink($RSS_news->logo);
         }
+
+        $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
         
+        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+        if(app()->environment('local'))
+        {
+            $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+        }
+        else
+        {
+            $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+        }
+
+        $query_delete = array(
+            'pulse_id' => $RSS_news -> id,
+            'mode' => 'news'
+        );
+        $option_delete = [];
+        $result_delete = $col_fx_otx_adversaries_related->find($query_delete,$option_delete);
+        $final_delete = $result_delete->toArray();
+        $count_actor = count($final_delete);
+
+        if($count_actor > 0)
+        {
+            $update_result_related = $col_fx_otx_adversaries_related->updateMany(
+                $query_delete,
+                ['$set' => 
+                    [
+                        'delete_at' => $date_now
+                    ]
+                ]
+            );
+        }
+
         RSSNews::where("code",$id)->delete();
-
-
-       
         // $RSSNews = RSSNews::where('transaction_rss_id',$check_TransactionRssData->id)->first();
         if($RSS_news) {
             // $RSSNews_del = RSSNews::where('transaction_rss_id',$check_TransactionRssData);
@@ -1600,7 +1631,7 @@ class RSSFeedSettingsController extends Controller
         return response()->json($result);
 
     }
-//----------------------------------------------------
+//-------------------------------------------------------------------------------
     public function rss_data_store_news_create(Request $request){
         $role_custom = @check_role_custom();
         if(!$role_custom['news']) {
@@ -1635,7 +1666,7 @@ class RSSFeedSettingsController extends Controller
                 if($SiteCategory_val) {
                     if(!empty($SiteCategory_val->site_email_alert)) {
                         foreach ($SiteCategory_val->site_email_alert as $valueEmail) {
-                            // $email_site_a[] = @$valueEmail->email;
+                            $email_site_a[] = @$valueEmail->email;
                             $site_news[] = @$valueEmail->site_id;
                         }
                         
@@ -1645,7 +1676,7 @@ class RSSFeedSettingsController extends Controller
                     // }
                 }
             }
-            $email_site_a = ['oatnunkung@gmail.com','oatnunkung88@gmail.com'];
+            // $email_site_a = ['oatnunkung@gmail.com','oatnunkung88@gmail.com'];
             $site_news = array_unique($site_news);
             $email_site_alert = array_unique($email_site_a);
 
@@ -1805,6 +1836,7 @@ class RSSFeedSettingsController extends Controller
 
             $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+            
             if(app()->environment('local'))
             {
                 $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
@@ -2489,7 +2521,7 @@ class RSSFeedSettingsController extends Controller
                 if($SiteCategory_val) {
                     if(!empty($SiteCategory_val->site_email_alert)) {
                         foreach ($SiteCategory_val->site_email_alert as $emailValue) {
-                            // $email_site_a[] = @$emailValue->email;
+                            $email_site_a[] = @$emailValue->email;
                             $site_news[] = @$emailValue->site_id;
                         }
                         
@@ -2498,7 +2530,7 @@ class RSSFeedSettingsController extends Controller
             }
             // $email_site_alert_implode = implode(",",$email_site_alert);
             // dd($email_site_alert);
-            $email_site_a = ['oatnunkung@gmail.com','oatnunkung88@gmail.com'];
+            // $email_site_a = ['oatnunkung@gmail.com','oatnunkung88@gmail.com'];
             $email_site_alert = array_unique($email_site_a);
         }
         
@@ -2949,7 +2981,6 @@ class RSSFeedSettingsController extends Controller
                         }
                         // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
                         $mail = ['oatnunkung@gmail.com','oatnunkung88@gmail.com'];
-                        // $mail = $email_site_alert;
                         // dd($mail);
                         foreach($mail as $data){
                             // dd($data);

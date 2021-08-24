@@ -220,6 +220,7 @@ class ApiNewsController extends ApiController
                             $query->where('save_draft',  0)
                                 ->orWhere('save_draft',  null);
                         })->where('status', 1)->where('public_date', '<=', Carbon::now());//->get() ->orderBy('created_at','desc')->paginate(10)  // selectRaw('*, count(id) as rss_new_count')
+                        
                         if($title){
                             $news = $news -> where('title_th', 'LIKE' ,'%'.$title.'%');
                         }
@@ -241,20 +242,20 @@ class ApiNewsController extends ApiController
                             
                         }
                     
-                        if($site_id) {
-                            $news = $news->wherehas('get_site_news_related', function($q) use ($site_id) {
-                                $q->where('site_id', $site_id)->where('deleted_at', null);
-                            });
-                        }
+                        // if($site_id) {
+                        //     $news = $news->wherehas('get_site_news_related', function($q) use ($site_id) {
+                        //         $q->where('site_id', $site_id)->where('deleted_at', null);
+                        //     });
+                        // }
         
         
         
-                        if($related_news == 'true') {
-                            $news = $news->wherehas('get_site_news_related', function($q) use ($site_id) {
-                                $q->where('site_id', $site_id)->where('deleted_at', null);
-                            });
+                        // if($related_news == 'true') {
+                        //     $news = $news->wherehas('get_site_news_related', function($q) use ($site_id) {
+                        //         $q->where('site_id', $site_id)->where('deleted_at', null);
+                        //     });
         
-                        }
+                        // }
         
                         if($cate) {
                             // dd($cate);
@@ -277,9 +278,9 @@ class ApiNewsController extends ApiController
         
                         }
         
-                        if($date_end) {
+                        // if($date_end) {
         
-                        }
+                        // }
 
                         if($status_serverity){
                             $news = $news -> where('serverity', $status_serverity);
@@ -296,11 +297,10 @@ class ApiNewsController extends ApiController
                         // dd($news->get());
                         // dd($news);
                         // dd($news->total);
+
                         $news_all = $news->count();
-                        // $news = $news->orderBy('created_at','desc')->paginate(PAGINATE_NUM);
                         
-                        $news = $news->orderBy('created_at','desc')->take(PAGINATE_NUM)->offset($page >= 2 ? $page * 10 : 0)->get();
-                    
+                        $news = $news->orderBy('created_at','desc')->take(PAGINATE_NUM)->offset($page >= 1 ? $page * 10 : 0)->get();
 
                         $count_model = count($news);
 
@@ -382,7 +382,7 @@ class ApiNewsController extends ApiController
                         
                             }
                         }
-                    
+
                     }else{
                         $news = RSSNews::where(function ($query) {
                             $query->where('save_draft',  0)
@@ -394,11 +394,11 @@ class ApiNewsController extends ApiController
                                 $q->where('site_id', $site_id)->where('deleted_at', null);
                             });
                         }
+
+                        
                         $news_all = $news->count();
-                        // $news = $news->orderBy('created_at','desc')->paginate(PAGINATE_NUM);
-                        $news = $news->orderBy('created_at','desc')->take(PAGINATE_NUM)->offset($page >= 2 ? $page * 10 : 0)->get();
                         
-                        
+                        $news = $news->orderBy('created_at','desc')->take(PAGINATE_NUM)->offset($page >= 1 ? $page * 10 : 0)->get();
                         
                         $count_model = count($news);
 
@@ -412,8 +412,6 @@ class ApiNewsController extends ApiController
                             {
                                 $collection_actor = $client->sosecure_threatintelligent->fx_otx_adversaries;
                                 $conn = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
-                                // $collection_actor = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
-                                // $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
                             }
                             else
                             {
@@ -480,9 +478,8 @@ class ApiNewsController extends ApiController
                         
                             }
                         }
-
-
-
+                        
+                        
                     }
         
                     // dd($news);
@@ -588,7 +585,7 @@ class ApiNewsController extends ApiController
                         if(!empty($item->get_cate)) {
                             foreach($item->get_cate as $cate_id_val) {
                                 if(!empty($cate_id_val)) {
-                                    $html_cate_all .= '<span class="badge badge-primary" style="background-color:#007bff;">'.@$cate_id_val->get_cate_name->name.'</span> &nbsp;';
+                                    $html_cate_all .= '<span class="badge badge-primary" style="background-color:#007bff; margin-bottom: 5px;">'.@$cate_id_val->get_cate_name->name.'</span> &nbsp;';
                                 }
                             }
                         }
@@ -617,7 +614,8 @@ class ApiNewsController extends ApiController
                                 // <a href="'.$url.'/news/detail/'.$item -> code.'">
                         $html .= '<span class="head-news-text text-elip-ovf" style="'.@$font_weight.'">'.$icon_related.' '.$n_title.'</span>';
                                 // </a>
-                        $html .= '<div class="entry-meta">
+                                // <div class="entry-meta">
+                        $html .= '<div class="">
                                 <span class="entry-view"> <i class="fas fa-eye"></i> '.$item -> view.'</span>
                                 <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$item -> public_date.'</span>
                                 <span> <b>Serverity: </b> ';
@@ -692,7 +690,8 @@ class ApiNewsController extends ApiController
 
                             $html .='</div>
                             </div>
-                            <div class="content-news-text" style="text-align: right; padding: 0rem 3rem;">';
+                            <div class="" style="text-align: right; padding: 0rem 3rem; width: 20%;">';
+                            // <div class="content-news-text" style="text-align: right; padding: 0rem 3rem; width: 20%;">';
                             // <div class="content-news-image">';
                                 // <a href="'.$url.'/news/detail/'.$item -> code.'">
                                 //     <img src="'.$logo_url.'" alt="" onerror="setDefaultPic(this)">
@@ -703,16 +702,37 @@ class ApiNewsController extends ApiController
                             $link_line = '';
 
                             if($item->title_th) {
-                                $link_th = '<a href="public/news/detail/'.$item -> code.'/th" target="_blank">TH</a>';
+                                $link_th = '<a class="btn btn-sm btn-info" href="public/news/detail/'.$item -> code.'/th" target="_blank">TH</a>';
                                 
                             }
                             if($item->title_en) {
-                                $link_en = '<a href="public/news/detail/'.$item -> code.'/en" target="_blank">EN</a>';
-                                $link_line = ' | ';
+                                $link_en = '<a class="btn btn-sm btn-info" href="public/news/detail/'.$item -> code.'/en" target="_blank">EN</a>';
+                                // $link_line = ' | ';
                             }
-                            
-                            $html .= $link_th . $link_line . $link_en;
+                            $html .= '
+                                <div style="display: flex; align-items: center; justify-content: flex-end;">
+                                    <div style="text-align: right;">
+                            ';
+                            $html .= $link_th.$link_en;
                             $html .= '</div>
+                                    <div class="content-news-image" style="padding: 0rem 1rem;">';
+                            if($item->title_th) 
+                            {
+                                $html .=  '<a href="public/news/detail/'.$item -> code.'/th" target="_blank">';
+                            }
+                            else if($item->title_en)
+                            {
+                                $html .=  '<a href="public/news/detail/'.$item -> code.'/en" target="_blank">';
+                            }
+                            else
+                            {
+                                $html .=  '<a href="#">';
+                            }
+                            $html .= '      <img src="'.$logo_url.'" alt="" onerror="setDefaultPic(this)" style="left: 0;">
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="action-bookmark">';
                             if(!empty($checkBookmark)){
                                 $html .= '<i class="fas fa-bookmark bookmark-active" id="mark'.$item -> id.'" onclick="Bookmarks(this, '.$item -> id.')"></i>';
@@ -1112,8 +1132,13 @@ class ApiNewsController extends ApiController
                         $site_id = @$site;
                     }
         
-                    $model = New RSSNews();
+                    $model = new RSSNews();
                     if($search_val == 1){
+
+                        $model = $model->where(function ($query) {
+                                                $query->where('save_draft',  0)
+                                                      ->orWhere('save_draft',  null);
+                                        })->where('status', 1)->where('public_date', '<=', Carbon::now());
                         
                         if($keywords){
                             $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$keywords.'%')->first();
@@ -1153,18 +1178,19 @@ class ApiNewsController extends ApiController
                             $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
                         }
 
-                        if($status_news){
-                            if($status_news == 1 || $status_news == 2){
-                                if($status_news == 1) {
-                                    $model =  $model -> where('save_draft','=',0);
+                        // if($status_news){
+                        //     if($status_news == 1 || $status_news == 2){
+                        //         if($status_news == 1) {
+                        //             $model =  $model -> where('save_draft','=',0);
                                     
-                                } else if ($status_news == 2) {
-                                    $model =  $model -> where('save_draft',1);
-                                    // dd($model);
-                                }
+                        //         } else if ($status_news == 2) {
+                        //             $model =  $model -> where('save_draft',1);
+                        //             // dd($model);
+                        //         }
                                 
-                            }  
-                        }
+                        //     }  
+                        // }
+
                         if($news_source){
 
                             // $model -> where('source', 'LIKE' ,'%'.$news_source.'%');
@@ -1175,6 +1201,12 @@ class ApiNewsController extends ApiController
                         //     $news_cate_id = $news_category;
                         //     $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
                         //         $query->whereIn('news_category_id', $news_cate_id);
+                        //     });
+                        // }
+
+                        // if($site_id) {
+                        //     $model = $model->wherehas('get_site_news_related', function($q) use ($site_id) {
+                        //         $q->where('site_id', $site_id)->where('deleted_at', null);
                         //     });
                         // }
 
@@ -1289,9 +1321,14 @@ class ApiNewsController extends ApiController
                     }
         
                     
-                    $model = New RSSNews();
+                    $model = new RSSNews();
                     if($search_val == 1){
-                        
+
+                        $model = $model->where(function ($query) {
+                                                $query->where('save_draft',  0)
+                                                    ->orWhere('save_draft',  null);
+                                        })->where('status', 1)->where('public_date', '<=', Carbon::now());
+
                         if($keywords){
                             $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$keywords.'%')->first();
                             
@@ -1330,18 +1367,19 @@ class ApiNewsController extends ApiController
                             $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
                         }
             
-                        if($status_news){
-                            if($status_news == 1 || $status_news == 2){
-                                if($status_news == 1) {
-                                    $model =  $model -> where('save_draft','=',0);
+                        // if($status_news){
+                        //     if($status_news == 1 || $status_news == 2){
+                        //         if($status_news == 1) {
+                        //             $model =  $model -> where('save_draft','=',0);
                                     
-                                } else if ($status_news == 2) {
-                                    $model =  $model -> where('save_draft',1);
-                                    // dd($model);
-                                }
+                        //         } else if ($status_news == 2) {
+                        //             $model =  $model -> where('save_draft',1);
+                        //             // dd($model);
+                        //         }
                                 
-                            }  
-                        }
+                        //     }  
+                        // }
+
                         if($news_source){
             
                             // $model -> where('source', 'LIKE' ,'%'.$news_source.'%');
@@ -1352,6 +1390,12 @@ class ApiNewsController extends ApiController
                         //     $news_cate_id = $news_category;
                         //     $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
                         //         $query->whereIn('news_category_id', $news_cate_id);
+                        //     });
+                        // }
+
+                        // if($site_id) {
+                        //     $model = $model->wherehas('get_site_news_related', function($q) use ($site_id) {
+                        //         $q->where('site_id', $site_id)->where('deleted_at', null);
                         //     });
                         // }
 
