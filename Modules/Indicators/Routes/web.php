@@ -39,7 +39,8 @@ Route::group(
         Route::get('/load/pulses_tb', 'IndicatorsController@load_relatedPulse_tb')->name('indicators.load_pulses_tb');
         Route::post('events_table', 'IndicatorsController@datatableEvent')->name('indicators.events_table')->middleware('can:menu_items');
         Route::post('events_attributes_table', 'IndicatorsController@load_attributes_tb')->name('indicators.events_attributes_table')->middleware('can:menu_items');
-        Route::post('events_pulse_table', 'IndicatorsController@events_pulse_table')->name('indicators.events_pulse_table')->middleware('can:menu_items');
+        // Route::post('events_pulse_table', 'IndicatorsController@events_pulse_table')->name('indicators.events_pulse_table')->middleware('can:menu_items');
+        Route::post('events_pulse_table', 'IndicatorsController@load_pulse_tb')->name('indicators.events_pulse_table')->middleware('can:menu_items');
         Route::post('load_adversary_tb', 'IndicatorsController@load_adversary_tb')->name('indicators.load_adversary_tb')->middleware('can:menu_items');
         Route::post('load_malware_tb', 'IndicatorsController@load_malware_tb')->name('indicators.load_malware_tb')->middleware('can:menu_items');
         Route::post('events_table_search', 'IndicatorsController@datatableEvent_search')->name('indicators.events_table_search')->middleware('can:menu_items');
