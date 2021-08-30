@@ -618,8 +618,8 @@ class OTXMDFeedIndicator extends Command
                                 'pulse_modified' => isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null,
                                 'updated_at' => $date_now ,
                                 'updated_by' => "system",
-                                'indicator' => $indicatorName,
-                                'type' => $type,
+                               // 'indicator' => $indicatorName,
+                              //  'type' => $type,
                             ],
                             '$setOnInsert' => [
                                 'role' => null,

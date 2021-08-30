@@ -41,7 +41,7 @@ class OTXMDFeedPulse_v1 extends Command
     public function handle()
     {
 
-
+/*
         $tz = new \DateTimeZone('Asia/Bangkok');
         $start = date("Y-m-d").' 00:00:00';
         $end = date("Y-m-d").' 23:59:59';
@@ -105,7 +105,11 @@ foreach($countAttr as $v){
 echo '================================================================';
 $d =0/0;
 //---------------------------------------------------------------
-
+*/
+$DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
+$clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+$this->countAttr('60ece5998a5b54a5ffe75cb4',$clientMD);
+$d = 0/0;
 
         $urlLimit = 1;
         $retryLimit = 1;
@@ -124,7 +128,7 @@ $d =0/0;
                 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
                 $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
                 if (!isset($insertOneResult)) {
-                    $collectionStamp = $clientMD->sosecure_threatintelligent_test->fx_transaction_otx_event_stamp;
+                    $collectionStamp = $clientMD->sosecure_threatintelligent->fx_transaction_otx_event_stamp;
                     $insertOneResult = $collectionStamp->insertOne([
                         'code' => generator_uuid(),
                         'transaction_date' => date("Y-m-d"),
@@ -147,8 +151,7 @@ $d =0/0;
                     $otxSuccessCheck = false;
                     // $this->info("FAIL1");
                 }
-                print_r($otxFeedData);
-                break;
+               
                 while ($otxFeedDataCheck) {
                     $loop++;
                     if (!empty($otxFeedData["results"])) {
@@ -233,15 +236,19 @@ $d =0/0;
     {
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+      
+      
+
+
         $checkSuccess = true;
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_test->fx_otx_events;
-        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_test->fx_otx_events_indicator_ref;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
         $loop = 0;
         if (!empty($pulses)) {
             foreach ($pulses as $value) {
                 try {
-
+                 
                    $modified = $value["modified"]; 
                    $created = $value["created"]; 
                //  $this->info("created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
@@ -337,11 +344,13 @@ return $dataOut;
 }
 
 public function countAttr($pulseID_,$clientMD){
+
     $pulseID = $pulseID_."";
-    $col_fx_otx_events = $clientMD->sosecure_threatintelligent_test->fx_otx_events;
-    $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_test->fx_otx_events_indicator_ref;
-    $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_test->fx_otx_indicator_detail;
+    $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+    $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+    $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
     $findOne_col_fx_otx_events = $col_fx_otx_events->findOne(array('pulse_id' => $pulseID));
+  
     $query2 = [
         '$and' =>   
         [
@@ -350,6 +359,8 @@ public function countAttr($pulseID_,$clientMD){
         ]
     ];
     $find_col_fx_otx_events_indicator_ref_2 = $col_fx_otx_events_indicator_ref->count($query2);
+   
+  
     if($find_col_fx_otx_events_indicator_ref_2==$findOne_col_fx_otx_events["indicator_count"]){
 
             //count corrrect
@@ -361,16 +372,22 @@ public function countAttr($pulseID_,$clientMD){
             ]
         ];
         $find_col_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->find($query)->toArray();
+
+       // print_r($find_col_fx_otx_events_indicator_ref);
+        
         $countAttrArray = $findOne_col_fx_otx_events["indicator_type_counts"];
         $countAttrAll = $findOne_col_fx_otx_events["indicator_count"];
+       // $countAttrAll = 0;
+        
         foreach ($find_col_fx_otx_events_indicator_ref as $key => $value) {
-            $findOne_col_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $value["indicator_id"]));
+           // $findOne_col_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $value["indicator_id"]));
             $countAttrAll++;
-            if(!empty($findOne_col_fx_otx_indicator_detail)){
-                if (isset($countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]])) {
-                    $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] + 1;
+            if(!empty($value)){
+                echo $value["type"];
+                if (isset($countAttrArray[$value["type"]])) {
+                    $countAttrArray[$value["type"]] = $countAttrArray[$value["type"]] + 1;
                 } else {
-                    $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = 1;
+                    $countAttrArray[$value["type"]] = 1;
                 }
             }
         }
@@ -439,8 +456,8 @@ public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
         $otxFeedDataCheck = true;
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $collectionBasic = $clientMD->sosecure_threatintelligent_test->fx_otx_indicator_detail;
-        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_test->fx_otx_events_indicator_ref;
+        $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
         $loop = 0;
         $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/indicators/?sort=-created&limit=1000&page=1', $urlLimit);
         if ($reconCall["success"]) {
@@ -533,13 +550,13 @@ public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
                             // $this->info("FAIL5");
                             // echo json_encode($error["Exception"]);
                             // echo json_encode($value);
-                            break;
+                          //  break;
                         }
 
 
                     }else{
                        $otxFeedDataCheck = false;
-                       break;
+                     //  break;
                    }
 
 
@@ -578,8 +595,8 @@ public function savePulse_related($pulseID,$urlLimit)
         $otxFeedDataCheck = true;
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_test->fx_otx_events;
-        $col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent_test->fx_otx_events_event_ref;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
         $loop = 0;
         $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/related?limit=100&sort=-modified', $urlLimit);
         if ($reconCall["success"]) {

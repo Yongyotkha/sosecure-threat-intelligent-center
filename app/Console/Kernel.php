@@ -97,6 +97,7 @@ class Kernel extends ConsoleKernel
       $schedule->command('app:TransactionCenterReset')->cron('5 0 * * *')->withoutOverlapping(5);
       $schedule->command('app:MDAdversaries')->cron('0 */8 * * *')->withoutOverlapping(5);
       $schedule->command('app:MDMalware')->cron('0 */8 * * *')->withoutOverlapping(5);
+      $schedule->command('app:SendLog_Indicator')->dailyAt('18:00')->withoutOverlapping(5);
 
     }
 

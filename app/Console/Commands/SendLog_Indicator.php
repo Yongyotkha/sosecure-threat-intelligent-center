@@ -21,15 +21,15 @@ use App\DataLeakFeedTemp;
 use App\DataLeakSocial;
 use Carbon\Carbon;
 use MongoDB\BSON\UTCDateTime;
-class test_indicator extends Command
+class SendLog_Indicator extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:test_indicator';
-    protected $description = 'test_indicator';
+    protected $signature = 'app:SendLog_Indicator';
+    protected $description = 'SendLog_Indicator';
 
 
     
@@ -48,8 +48,15 @@ class test_indicator extends Command
     {
 
 
-        $site_id =73;
-        $Logs_setting_data = Logs_setting::where('site_id',$site_id)->where('type','indicator')->first();
+        //Get Setting Site ก่อนว่าควรจะมี Site ใหนทีจะ send log
+      //  $site_id =73;
+      //  $Logs_setting_data = Logs_setting::->where('type','indicator')->first();
+
+        $logs_setting_content =  Sites::select('logs_setting.content','logs_setting.site_id')
+        ->join('logs_setting', 'site.id', '=', 'logs_setting.site_id')
+        ->where('site.active', 1)->where('logs_setting.type','indicator')
+        ->get();
+        print_r($logs_setting_content);
 
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
@@ -85,7 +92,7 @@ class test_indicator extends Command
            // "\$lt"=>$date2
             'updated_at' => ['$gte' => $dateStart,'$lt' => $dateEnd],
            // 'feedcontent' => new \MongoDB\BSON\Regex($Site_keyword -> name),
-           // 'feedcontent' => new \MongoDB\BSON\Regex('à¸—à¸³à¹„à¸¡à¹à¸Ÿà¸™à¸œà¸¡à¹€à¸›à¹‡à¸™à¹à¸šà¸šà¸™à¸µà¹‰'),
+           // 'feedcontent' => new \MongoDB\BSON\Regex('ทำไมแฟนผมเป็นแบบนี้'),
         );
     $cursor = $col_fx_otx_indicator_detail->find($where);   //This is the main line
     $docs = $cursor->toArray();
@@ -99,7 +106,7 @@ class test_indicator extends Command
            // "\$lt"=>$date2
            // 'updated_at' => ['$gte' => $dateStart,'$lt' => $dateEnd],
            // 'feedcontent' => new \MongoDB\BSON\Regex($Site_keyword -> name),
-           // 'feedcontent' => new \MongoDB\BSON\Regex('à¸—à¸³à¹„à¸¡à¹à¸Ÿà¸™à¸œà¸¡à¹€à¸›à¹‡à¸™à¹à¸šà¸šà¸™à¸µà¹‰'),
+           // 'feedcontent' => new \MongoDB\BSON\Regex('ทำไมแฟนผมเป็นแบบนี้'),
         );
     $cursor_ref = $col_fx_otx_events_indicator_ref->find($where_ref);   //This is the main line
     $docs_ref = $cursor_ref->toArray();
@@ -114,7 +121,7 @@ class test_indicator extends Command
            // "\$lt"=>$date2
            // 'updated_at' => ['$gte' => $dateStart,'$lt' => $dateEnd],
            // 'feedcontent' => new \MongoDB\BSON\Regex($Site_keyword -> name),
-           // 'feedcontent' => new \MongoDB\BSON\Regex('à¸—à¸³à¹„à¸¡à¹à¸Ÿà¸™à¸œà¸¡à¹€à¸›à¹‡à¸™à¹à¸šà¸šà¸™à¸µà¹‰'),
+           // 'feedcontent' => new \MongoDB\BSON\Regex('ทำไมแฟนผมเป็นแบบนี้'),
         );
     $cursor_event = $col_fx_otx_events->find($where_event);   //This is the main line
     $docs_event = $cursor_event->toArray();
@@ -122,35 +129,38 @@ class test_indicator extends Command
 
     foreach ($docs_event as $docs_eventkey => $docs_eventvalue) {
         # code...
+        foreach($logs_setting_content as  $logs_setting_content_key => $logs_setting_content_data ){
+                if ($logs_setting_content_data->content) {
+                $format_str = $logs_setting_content_data->content;
+                if ($format_str) {
 
-        if ($Logs_setting_data) {
-         $format_str = $Logs_setting_data->content;
-         if ($format_str) {
+                    $format_str = str_replace("[[M]]",date("M"),$format_str);
+                    $format_str = str_replace("[[m]]",date("m"),$format_str);
+                    $format_str = str_replace("[[Y]]",date("Y"),$format_str);
+                    $format_str = str_replace("[[y]]",date("y"),$format_str);
+                    $format_str = str_replace("[[d]]",date("d"),$format_str);
+                    $format_str = str_replace("[[D]]",date("D"),$format_str);
+                    $format_str = str_replace("[[h:i:s]]",date("h:i:s"),$format_str);
+                    $format_str = str_replace("[[H:i:s]]",date("H:i:s"),$format_str);
 
-            $format_str = str_replace("[[M]]",date("M"),$format_str);
-            $format_str = str_replace("[[m]]",date("m"),$format_str);
-            $format_str = str_replace("[[Y]]",date("Y"),$format_str);
-            $format_str = str_replace("[[y]]",date("y"),$format_str);
-            $format_str = str_replace("[[d]]",date("d"),$format_str);
-            $format_str = str_replace("[[D]]",date("D"),$format_str);
-            $format_str = str_replace("[[h:i:s]]",date("h:i:s"),$format_str);
-            $format_str = str_replace("[[H:i:s]]",date("H:i:s"),$format_str);
+                    $format_str = str_replace("[[Event name]]", $docs_eventvalue->name,$format_str);
+                    $format_str = str_replace("[[Attribute Type]]", $data -> type,$format_str);
+                    $format_str = str_replace("[[Attribute Name]]", $data -> indicator_name,$format_str);
+                    $format_str = str_replace("[[Tags]]", $docs_eventvalue->tags,$format_str);
+                    $format_str = str_replace("[[Attribute DateTime]]", change_date_utc_to_thai($docs_eventvalue->modified),$format_str);
+                    $Logs_sent_transaction_save = new Logs_sent_transaction;
+                    $Logs_sent_transaction_save->site_id = $logs_setting_content_data->site_id;
+                    $Logs_sent_transaction_save->content = $format_str ;
+                    $Logs_sent_transaction_save->type = 'indicator' ;
+                    $Logs_sent_transaction_save->transaction_status = 1;
+                    //$Logs_sent_transaction_save->created_at = date("yyyy-MM-dd H:i:s"); 
+                    $Logs_sent_transaction_save->save(); 
+                    echo $format_str;
+                }
+            }
 
-            $format_str = str_replace("[[Event name]]", $docs_eventvalue->name,$format_str);
-            $format_str = str_replace("[[Attribute Type]]", $data -> type,$format_str);
-            $format_str = str_replace("[[Attribute Name]]", $data -> indicator_name,$format_str);
-            $format_str = str_replace("[[Tags]]", $docs_eventvalue->tags,$format_str);
-            $format_str = str_replace("[[Attribute DateTime]]", change_date_utc_to_thai($docs_eventvalue->modified),$format_str);
-            $Logs_sent_transaction_save = new Logs_sent_transaction;
-            $Logs_sent_transaction_save->site_id = $site_id;
-            $Logs_sent_transaction_save->content = $format_str ;
-            $Logs_sent_transaction_save->type = 'indicator' ;
-            $Logs_sent_transaction_save->transaction_status = 1;
-               //$Logs_sent_transaction_save->created_at = date("yyyy-MM-dd H:i:s"); 
-            $Logs_sent_transaction_save->save(); 
-            echo $format_str;
+
         }
-    }
 
 }
 

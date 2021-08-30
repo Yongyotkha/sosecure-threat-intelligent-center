@@ -296,13 +296,13 @@ public function countAttr($pulseID_,$clientMD){
         $countAttrArray = $findOne_col_fx_otx_events["indicator_type_counts"];
         $countAttrAll = $findOne_col_fx_otx_events["indicator_count"];
         foreach ($find_col_fx_otx_events_indicator_ref as $key => $value) {
-            $findOne_col_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $value["indicator_id"]));
+           // $findOne_col_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $value["indicator_id"]));
             $countAttrAll++;
-            if(!empty($findOne_col_fx_otx_indicator_detail)){
-                if (isset($countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]])) {
-                    $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] + 1;
+            if(!empty($value)){
+                if (isset($countAttrArray[$value["type"]])) {
+                    $countAttrArray[$value["type"]] = $countAttrArray[$value["type"]] + 1;
                 } else {
-                    $countAttrArray[$findOne_col_fx_otx_indicator_detail["type"]] = 1;
+                    $countAttrArray[$value["type"]] = 1;
                 }
             }
         }
@@ -438,8 +438,8 @@ public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
                                     'created' => (isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null),
                                     'expiration' => (isset($value["expiration"]) ? new UTCDateTime(strtotime($value["expiration"])*1000) : null),
                                     'is_active' => (isset($value["is_active"]) ? $value["is_active"] : ""),
-                                    'indicator' => $value["indicator"],
-                                    'type' => $value["type"],
+                                  //  'indicator' => $value["indicator"],
+                                   // 'type' => $value["type"],
 
                                 ],
                                 '$setOnInsert' => [
