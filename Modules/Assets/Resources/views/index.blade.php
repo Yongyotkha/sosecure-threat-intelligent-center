@@ -902,7 +902,7 @@
             searchTB(check,'ip_asset_id');
         }
 
-        {{-- $("div.btnaction").html('<button id="btn_view_1" class="btn btn-info" onclick="btn_view(1)" >Host Info</button> <button  id="btn_view_2" onclick="btn_view(2)" class="btn">Service / Port</button>'); --}}
+        $("div.btnaction").html('<button id="btn_view_1" class="btn btn-info" onclick="btn_view(1)" >Host Info</button> <button  id="btn_view_2" onclick="btn_view(2)" class="btn">Service / Port</button>');
     }
 
 
@@ -1097,7 +1097,7 @@
             searchTB(check,'ip_asset_id');
         }
 
-        {{-- $("div.btnaction").html('<button id="btn_view_1" class="btn btn-info" onclick="btn_view(1)" >Host Info</button> <button  id="btn_view_2" onclick="btn_view(2)" class="btn">Service / Port</button>'); --}}
+        $("div.btnaction").html('<button id="btn_view_1" class="btn btn-info" onclick="btn_view(1)" >Host Info</button> <button  id="btn_view_2" onclick="btn_view(2)" class="btn">Service / Port</button>');
     }
     function btn_view(mode){
             if(mode == 2){
