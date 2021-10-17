@@ -188,7 +188,7 @@
                                                                     <i class="fas fa-laptop"></i> Host Info
                                                                     New Host
                                                                 </a>
-                                                                <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil" >
+                                                                <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil" onclick="data_table_host()">
                                                                     <i class="fas fa-laptop"></i> Service / Port
                                                                     New Port
                                                                 </a>
@@ -929,6 +929,24 @@ Highcharts.setOptions({
                     }
                     
                     $('#cve_assets').html(html);
+                }
+            }
+        });
+    }
+
+    function data_table_host(){
+        $.ajax({
+            type: "POST",
+            url: '{!! route('assets.table_asset_host')!!}',
+            data: {
+                site : site, 
+            },
+            beforeSend: function() {
+                $(".loaddertb").show();
+            },
+            success: function(result){
+                $(".loaddertb").hide();
+                if(result.status_code == 200){
                 }
             }
         });
