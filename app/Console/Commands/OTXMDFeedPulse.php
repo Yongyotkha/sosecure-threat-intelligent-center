@@ -176,87 +176,91 @@ class OTXMDFeedPulse extends Command
 
                    $modified = $value["modified"]; 
                    $created = $value["created"]; 
-               //  $this->info("created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
-                   if (explode("T", $modified)[0] == date('Y-m-d') || explode("T", $created)[0] == date('Y-m-d')) {
-                    $this->info("Insert created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
+                if(strpos($value["name"], 'Public DNS') !== false){
+
+                }else{
+                        //  $this->info("created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
+                            if (explode("T", $modified)[0] == date('Y-m-d') || explode("T", $created)[0] == date('Y-m-d') || 1==1) {
+                                $this->info("Insert created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
 
 
-                    $url_1 = "https://otx.alienvault.com/otxapi/pulses/" . $value["id"] . "/";
-                    $reconCall = $this->reconnnect($url_1, $urlLimit);
-                    if ($reconCall["success"]) {
-                        $otxPulseDetail = json_decode($reconCall["result"], true);
-                        $groups = implode(', ', array_column(isset($otxPulseDetail["groups"])?$otxPulseDetail["groups"]:[] , 'name'));
-                    } else {
-                     $checkSuccess = false;
-                 }
-                 $references = implode(', ', isset($value["references"]) ? $value["references"] : []);
-                 $tags = implode(', ', isset($value["tags"]) ? $value["tags"] : []);
-                 $industries = implode(', ', isset($value["industries"]) ? $value["industries"] : []);
-                 $malware_families = implode(', ', array_column(isset($value["malware_families"]) ? $value["malware_families"] : [], 'display_name'));
+                                $url_1 = "https://otx.alienvault.com/otxapi/pulses/" . $value["id"] . "/";
+                                $reconCall = $this->reconnnect($url_1, $urlLimit);
+                                if ($reconCall["success"]) {
+                                    $otxPulseDetail = json_decode($reconCall["result"], true);
+                                    $groups = implode(', ', array_column(isset($otxPulseDetail["groups"])?$otxPulseDetail["groups"]:[] , 'name'));
+                                } else {
+                                $checkSuccess = false;
+                            }
+                            $references = implode(', ', isset($value["references"]) ? $value["references"] : []);
+                            $tags = implode(', ', isset($value["tags"]) ? $value["tags"] : []);
+                            $industries = implode(', ', isset($value["industries"]) ? $value["industries"] : []);
+                            $malware_families = implode(', ', array_column(isset($value["malware_families"]) ? $value["malware_families"] : [], 'display_name'));
 
-                 $update_fx_otx_events = $col_fx_otx_events->updateOne(
-                    ['pulse_id' => isset($value["id"]) ? $value["id"] : ""],
-                    ['$set' => [
-                        'name' => isset($value["name"]) ? $value["name"] : "",
-                        'description' => isset($value["description"]) ? $value["description"] : "",
-                        'modified' => isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null,
-                        'created' => isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null,
-                        'public' => isset($value["public"]) ? $value["public"] : "",
-                        'TLP' => isset($value["TLP"]) ? $value["TLP"] : "",
+                            $update_fx_otx_events = $col_fx_otx_events->updateOne(
+                                ['pulse_id' => isset($value["id"]) ? $value["id"] : ""],
+                                ['$set' => [
+                                    'name' => isset($value["name"]) ? $value["name"] : "",
+                                    'description' => isset($value["description"]) ? $value["description"] : "",
+                                    'modified' => isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null,
+                                    'created' => isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null,
+                                    'public' => isset($value["public"]) ? $value["public"] : "",
+                                    'TLP' => isset($value["TLP"]) ? $value["TLP"] : "",
 
-                        'is_modified' => isset($value["is_modified"]) ? $value["is_modified"] : "",
+                                    'is_modified' => isset($value["is_modified"]) ? $value["is_modified"] : "",
 
-                        'references' => isset($references) ? $references : "",
-                        'tags' => isset($tags) ? $tags : "",
-                        'industries' => isset($industries) ? $industries : "",
-                        'malware_families' => isset($malware_families) ? $malware_families : "",
-                        'groups' => isset($groups) ? $groups : "",
-                        'author_username' => isset($value["author"]["username"]) ? $value["author"]["username"] : "",
-                        'updated_at' => $date_now ,
-                        'updated_by' => "system",
-                    ],
-                    '$setOnInsert' => [
-                        'indicator_type_counts' => array(),
-                        'indicator_count' => 0,
-                        'transcation_id' => $InsertedId,
-                        'status' => 1,
-                        'created_at' => $date_now ,
-                        'created_by' => "system",
-                        'deleted_at' => null,
-                        'transaction_date' => date("Y-m-d"),
-                        'count_view' => 0,
-                        'source' => "otx.alienvault",
-                    ],
-                ],
-                ['upsert' => true]
-            );
-                 if(isset($value["id"])){
+                                    'references' => isset($references) ? $references : "",
+                                    'tags' => isset($tags) ? $tags : "",
+                                    'industries' => isset($industries) ? $industries : "",
+                                    'malware_families' => isset($malware_families) ? $malware_families : "",
+                                    'groups' => isset($groups) ? $groups : "",
+                                    'author_username' => isset($value["author"]["username"]) ? $value["author"]["username"] : "",
+                                    'updated_at' => $date_now ,
+                                    'updated_by' => "system",
+                                ],
+                                '$setOnInsert' => [
+                                    'indicator_type_counts' => array(),
+                                    'indicator_count' => 0,
+                                    'transcation_id' => $InsertedId,
+                                    'status' => 1,
+                                    'created_at' => $date_now ,
+                                    'created_by' => "system",
+                                    'deleted_at' => null,
+                                    'transaction_date' => date("Y-m-d"),
+                                    'count_view' => 0,
+                                    'source' => "otx.alienvault",
+                                ],
+                            ],
+                            ['upsert' => true]
+                        );
+                            if(isset($value["id"])){
 
 
-                    echo "Indi : ".$value["id"];
-                    $dateModified = isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null;
-                    $checkSuccessDummy = $this->saveIndicator_ref($value["id"],$urlLimit,$dateModified)["success"];
-                    $this->countAttr($value["id"],$clientMD);
-                    if(!$checkSuccessDummy){
+                                echo "Indi : ".$value["id"];
+                                $dateModified = isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null;
+                                $checkSuccessDummy = $this->saveIndicator_ref($value["id"],$urlLimit,$dateModified)["success"];
+                                $this->countAttr($value["id"],$clientMD);
+                                if(!$checkSuccessDummy){
+                                    $checkSuccess = false;
+                                }
+                                echo "  Pulse : ".$value["id"];
+                                $checkSuccessDummy = $this->savePulse_related($value["id"],$urlLimit)["success"];
+                                if(!$checkSuccessDummy){
+                                    $checkSuccess = false;
+                                }
+
+
+                                $this->info("--END--");
+
+                            }
+                        }else{
+                        $this->info("created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
                         $checkSuccess = false;
+                        // break;
+
+
                     }
-                    echo "  Pulse : ".$value["id"];
-                    $checkSuccessDummy = $this->savePulse_related($value["id"],$urlLimit)["success"];
-                    if(!$checkSuccessDummy){
-                        $checkSuccess = false;
-                    }
-
-
-                    $this->info("--END--");
-
-                }
-            }else{
-              $this->info("created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
-              $checkSuccess = false;
-              break;
-
-
-          }
+        }
 
       } catch (Exception $e) {
         $checkSuccess = false;
@@ -364,7 +368,7 @@ public function countAttr($pulseID_,$clientMD){
 public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
 {
     $allRow = (object) array();
-    $dayMoreThan = 2;
+    $dayMoreThan = 6;
     $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
     try {
         $otxSuccessCheck = true;
@@ -503,7 +507,7 @@ return $dataOut;
 public function savePulse_related($pulseID,$urlLimit)
 {
     $allRow = (object) array();
-    $dayMoreThan = 2;
+    $dayMoreThan = 6;
     $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
     try {
         $otxSuccessCheck = true;
