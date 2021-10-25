@@ -108,7 +108,40 @@ $d =0/0;
 */
 $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-$this->countAttr('60ece5998a5b54a5ffe75cb4',$clientMD);
+$pipeline = [
+    [
+        '$group' => [
+            '_id' => [
+                'type' => '$type'
+           
+            ],
+            'COUNT(*)' => [
+                '$sum' => 1
+            ]
+        ]
+    ],
+    [
+        '$project' => [
+            'COUNT_Attr' => '$COUNT(*)',
+            'type' => '$_id.type',
+        ]
+    ],
+     [
+                '$match' => ["pulse_id" =>"5f936d56b8b834c41fdfcb45"]
+     ]
+  
+];
+
+$options = [
+    'allowDiskUse' => TRUE
+];
+$DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
+$clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+$col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+$countAttr = $col_fx_otx_indicator_detail->aggregate($pipeline, $options);
+$countAttr = $countAttr->toArray();
+print_r($countAttr);
+//$this->countAttr('602bc528f447d628d41494f2',$clientMD);
 $d = 0/0;
 
         $urlLimit = 1;
@@ -368,7 +401,7 @@ public function countAttr($pulseID_,$clientMD){
             '$and' =>   
             [
                 ['pulse_id' => $pulseID],
-                ['is_count_attr' => ['$exists' => false]],
+              //  ['is_count_attr' => ['$exists' => false]],
             ]
         ];
         $find_col_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->find($query)->toArray();
@@ -377,7 +410,8 @@ public function countAttr($pulseID_,$clientMD){
         
         $countAttrArray = $findOne_col_fx_otx_events["indicator_type_counts"];
         $countAttrAll = $findOne_col_fx_otx_events["indicator_count"];
-       // $countAttrAll = 0;
+        $countAttrArray =array();
+        $countAttrAll = 0;
         
         foreach ($find_col_fx_otx_events_indicator_ref as $key => $value) {
            // $findOne_col_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $value["indicator_id"]));

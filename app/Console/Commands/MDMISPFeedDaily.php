@@ -48,7 +48,7 @@ class MDMISPFeedDaily extends Command
 
 //---------------------------------------------------------------
 
-
+/*
 $pipeline = [
     [
         '$group' => [
@@ -91,7 +91,7 @@ $countAttr = $countAttr->toArray();
 //print_r($countAttr);
 //echo '================================================================';
 //---------------------------------------------------------------
-
+*/
 
 
 
@@ -183,9 +183,10 @@ $countAttr = $countAttr->toArray();
     public function saveJson($stamp_event_id, $stamp_indicator_id, $json_o = null)
     {
         $urlLimit = 3;
-        //$time_stamp_start = Carbon::now()->subDays(2)->format('Y-m-d');
-        $time_stamp_start = Carbon::now()->format('Y-m-d');
+        $time_stamp_start = Carbon::now()->subDays(2)->format('Y-m-d');
+       // $time_stamp_start = Carbon::now()->format('Y-m-d');
         $time_stamp_end = Carbon::now()->format('Y-m-d');
+        echo $time_stamp_start.'|'.$time_stamp_end ;
        // $time_stamp_start="2021-08-21";
       //  $time_stamp_end ="2021-08-21";
         $url_1 = "https://10.104.0.9/events/xml/download/null/false/null/" . $time_stamp_start . "/" . $time_stamp_end . "/";

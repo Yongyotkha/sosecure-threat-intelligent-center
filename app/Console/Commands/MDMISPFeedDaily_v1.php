@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 use MongoDB\BSON\UTCDateTime;
 use Artisan;
 
-class MDMISPFeedDaily_v1 extends Command
+class MDMISPFeedDaily extends Command
 {
     /**
      * The name and signature of the console command.
@@ -49,12 +49,21 @@ class MDMISPFeedDaily_v1 extends Command
 //---------------------------------------------------------------
 
 
+        $tz = new \DateTimeZone('Asia/Bangkok');
+        $start = date("Y-m-d").' 00:00:00';
+        $end = date("Y-m-d").' 23:59:59';
+        $start = '2021-01-01'.' 00:00:00';
+        $end = '2021-07-31'.' 23:59:59';
+        $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($start)*1000);
+        $dateEnd = new \MongoDB\BSON\UTCDateTime(strtotime($end)*1000);
+        
 $pipeline = [
     [
         '$group' => [
             '_id' => [
                 'month'=>['$month'=>'$created_at'],
                 'year'=>['$year'=>'$created_at'],
+                'type' => '$type',
             ],
             'COUNT(*)' => [
                 '$sum' => 1
@@ -66,7 +75,7 @@ $pipeline = [
             'COUNT_Attr' => '$COUNT(*)',
             'year' => '$_id.year',
             'month' => '$_id.month',
-            'type' => 'Attr',
+            'type' => '$_id.type',
             '_id' => 0
         ]
     ],
@@ -75,7 +84,15 @@ $pipeline = [
             'year' =>-1,
             'month' => -1,
         ]
-    ]
+        ],
+        [
+
+            '$match' => [
+                'month' => 9
+            ]
+        ]
+ 
+  
 ];
 
 $options = [
@@ -84,11 +101,14 @@ $options = [
 $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
 $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
-$col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
 $countAttr = $col_fx_otx_indicator_detail->aggregate($pipeline, $options);
 $countAttr = $countAttr->toArray();
+foreach($countAttr as $v){
+    $this->info("Year:".$v->year." Month:".$v->month.' Type:'.$v->type.' Count:'.$v->COUNT_Attr);
 
-//print_r($countAttr);
+}
+
+print_r($countAttr);
 //echo '================================================================';
 //---------------------------------------------------------------
 
@@ -183,11 +203,11 @@ $countAttr = $countAttr->toArray();
     public function saveJson($stamp_event_id, $stamp_indicator_id, $json_o = null)
     {
         $urlLimit = 3;
-        //$time_stamp_start = Carbon::now()->subDays(2)->format('Y-m-d');
-        $time_stamp_start = Carbon::now()->format('Y-m-d');
+        $time_stamp_start = Carbon::now()->subDays(2)->format('Y-m-d');
+      //  $time_stamp_start = Carbon::now()->format('Y-m-d');
         $time_stamp_end = Carbon::now()->format('Y-m-d');
-        $time_stamp_start="2021-08-20";
-        $time_stamp_end ="2021-08-22";
+     //   $time_stamp_start="2021-08-28";
+    //   $time_stamp_end ="2021-08-28";
         $url_1 = "https://10.104.0.9/events/xml/download/null/false/null/" . $time_stamp_start . "/" . $time_stamp_end . "/";
         // $url_1 = "https://10.104.0.9/events/xml/download/null/false/null/2020-12-29/2020-12-30/";
         $reconCall = $this->reconnnect($url_1, $urlLimit);
