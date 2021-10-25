@@ -264,6 +264,9 @@ class ApiSearchController extends ApiController
                                     $dataWait['queryData'] = $dataWait['queryData']->toArray();
                                     $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$data['data']['keyword'];
                                     $data21['dataSearch']["Events"] = $dataWait;
+                                }else{
+
+                                    $data21['dataSearch']["Events"] =  array();
                                 }
                             }
                         }
@@ -389,9 +392,19 @@ class ApiSearchController extends ApiController
                                                 ];
                                                  $dataWait['queryData'] = $col_fx_otx_events->aggregate($pipeline,$options);
                                              
-                                                 $dataWait['queryData'] = $dataWait['queryData']->toArray();
-                                                 $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$data['data']['keyword'];
-                                                 $data21['dataSearch']["Events"] = $dataWait;
+                                               //  $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                                               //  $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$data['data']['keyword'];
+                                               //  $data21['dataSearch']["Events"] = $dataWait;
+                                                 if(count($data21['dataSearch']["Events"]) > 0){
+                                                    foreach ($dataWait['queryData']->toArray() as $queryData_data) {
+                                                          array_push($data21['dataSearch']["Events"],$queryData_data);
+                                                      }
+    
+                                                }else{
+                                                    $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                                                    $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$data['data']['keyword'];
+                                                    $data21['dataSearch']["Events"] = $dataWait;
+                                                }
                                             }
                                             //===============================================================
     

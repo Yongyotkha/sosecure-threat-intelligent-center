@@ -37,7 +37,7 @@ class SearchController extends Controller
 
     public function search(Request $mode)
     {
-        // dd(json_encode($this->request->keyword));
+      
         // $this->request->validate(['keyword' => 'required']);
         $data['dataSearch'] = array();
         $limit = 100;//->take($limit)
@@ -237,7 +237,7 @@ class SearchController extends Controller
                 $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
 
-           
+            
 
                 if($dataWait['count']>0){
                     $options = [
@@ -274,10 +274,12 @@ class SearchController extends Controller
                             '$limit' => $limit
                         ]
                     ];
+                    
                     $dataWait['queryData'] = $col_fx_otx_events->aggregate($pipeline,$options);
                     $dataWait['queryData'] = $dataWait['queryData']->toArray();
                     $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
                     $data['dataSearch']["Events"] = $dataWait;
+                
                 }else{
 
              
@@ -325,6 +327,8 @@ class SearchController extends Controller
                         $dataWait['queryData'] = $dataWait['queryData']->toArray();
                         $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
                         $data['dataSearch']["Events"] = $dataWait;
+                    }else{
+                        $data['dataSearch']["Events"]  = array();
                     }
                     
     
@@ -453,9 +457,21 @@ class SearchController extends Controller
                                             ];
                                              $dataWait['queryData'] = $col_fx_otx_events->aggregate($pipeline,$options);
                                          
-                                             $dataWait['queryData'] = $dataWait['queryData']->toArray();
-                                             $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
-                                             $data['dataSearch']["Events"] = $dataWait;
+                                           //  $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                                           //  $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
+                                          // dd($data['dataSearch']["Events"]);
+                                           if(count($data['dataSearch']["Events"]) > 0){
+                                                foreach ($dataWait['queryData']->toArray() as $queryData_data) {
+                                                      array_push($data['dataSearch']["Events"],$queryData_data);
+                                                  }
+
+                                            }else{
+                                                $dataWait['queryData'] = $dataWait['queryData']->toArray();
+                                                $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
+                                                $data['dataSearch']["Events"] = $dataWait;
+                                            }
+                                            
+                                           
                                         }
                                         //===============================================================
 
@@ -465,6 +481,7 @@ class SearchController extends Controller
                     // $data['dataSearch']["indicators"] = $dataWait;
                 }
             }
+         
             if(@$role_custom['indicators']) {
                 //Malware
                 $this->request->keyword = trim($this->request->keyword);
