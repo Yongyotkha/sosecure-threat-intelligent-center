@@ -478,10 +478,10 @@ use Carbon\Carbon;
                                             @if(!empty(get_role_custom()))
                                                 @if(@get_role_custom()['client'] != 1)
                                                     <th>Status</th>
-                                                    <th>@langapp('action')</th>
+                                                  
                                                 @endif
                                             @endif
-                                            
+                                            <th>@langapp('action')</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1064,12 +1064,16 @@ $('.btn').click(function(){
                             }
 
                         },
+                        @endif
+                    @endif               
+               
                         {
-                            targets: 10,
+                            targets: -1,
                             width: '7%',
                             className : 'nowrap',
                             render: function (data, type, full, meta) {
-        
+                                @if(!empty(get_role_custom()))
+                        @if(@get_role_custom()['client'] != 1)
                                 return `
                                 <a href="${base_url}/socialdatas/activity_modal/${full.code_data}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="far fa-comment-dots"></i></a>
                                 <!--<a href="${base_url}/socialdatas/view_content/${full.code_data}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>-->
@@ -1079,16 +1083,17 @@ $('.btn').click(function(){
                                 <a href="${base_url}/socialdatas/delete_dataleakdata_modal/${full.code_data}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>
                                 `;
                         
-                                
+                                @else 
             
-                                
-                                
+                                return `
+                                <a href="${base_url}/socialdatas/activity_modal/${full.code_data}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="far fa-comment-dots"></i></a>
+                               `;
+                                @endif
+                    @endif  
                                 {{--href="${base_url}/rssfeedsettings/delete-rss_data/${full.code}"--}}
                             },
                         },
-                        @endif
-                    @endif               
-
+                        
                 ]
         
             });

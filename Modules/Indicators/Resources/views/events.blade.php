@@ -240,11 +240,7 @@
                                 <th>Last Status</th>
                                 <th class="nowrap">DateTime</th>
                                 <th>Attribute</th>
-                                @if(!empty(get_role_custom()))
-                                    @if(@get_role_custom()['client'] != 1)
-                                        <th>Action</th>
-                                    @endif
-                                @endif
+                                <th>Action</th>
                                
                             </tr>
                         </thead>
@@ -703,24 +699,25 @@
                     }
 
                 },
-                
-                @if(!empty(get_role_custom()))
-                    @if(@get_role_custom()['client'] != 1)
+            
                         {
                             targets: 10,
                             className : 'nowrap',
                             render: function (data, type, row) {
                                 var inner = '';
                                 inner += '<div style="display:flex;flex-direction:column;">';
-                                inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.modal_tag')}}'+'?pulse_id='+row.pulse_id+'" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
+                                    @if(!empty(get_role_custom()))
+                                    @if(@get_role_custom()['client'] != 1)
+                                    inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.modal_tag')}}'+'?pulse_id='+row.pulse_id+'" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
+                                    @endif
+                                @endif
+                               
                                 inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="m-t-xs btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
                                 inner += '</div>';
                                 return inner;
                             }
 
                         }
-                    @endif
-                @endif
                 
             ]
         });

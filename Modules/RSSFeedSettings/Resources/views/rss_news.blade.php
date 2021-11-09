@@ -292,13 +292,18 @@ use Carbon\Carbon;
                                     <table class="table table-striped" id="table-rss-news-template">
                                         <thead>
                                             <tr>
-                                                <th width="5%" class="no-sort">
-                                                    <label>
-                                                        <input name="select_all" value="1" id="select-all"
-                                                            type="checkbox" class="select-chk" />
-                                                        <span class="label-text"></span>
-                                                    </label>
-                                                </th>
+                                                @if(!empty(get_role_custom()))
+                    @if(@get_role_custom()['client'] != 1)
+                    <th width="5%" class="no-sort">
+                        <label>
+                            <input name="select_all" value="1" id="select-all"
+                                type="checkbox" class="select-chk" />
+                            <span class="label-text"></span>
+                        </label>
+                    </th>
+                    @endif
+                @endif
+                                                
                                                 {{-- <th>Site Name</th> --}}
                                                 <th style="width: 80%">Content</th>
                                                 {{-- <th>Source</th>
@@ -699,13 +704,18 @@ $(function() {
           
             },
             columns: [
-                {
-                    data: 'chk',
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
-                    className: 'w-10'
-                },
+                @if(!empty(get_role_custom()))
+                    @if(@get_role_custom()['client'] != 1)
+                    {
+                        data: 'chk',
+                        orderable: false,
+                        searchable: false,
+                        sortable: false,
+                        className: 'w-10'
+                    },
+                    @endif
+                @endif
+               
                 {{--{
                     data: 'site_name',
                     name: 'site_name'
