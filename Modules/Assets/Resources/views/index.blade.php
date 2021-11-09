@@ -41,18 +41,19 @@
                         </div>
                         
                         @if(TYPE_WEB=='center')
-                            <a href="{{route("assets.assets_redirect_add_modal")}}" data-toggle="ajaxModal" class="m-l-xs btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle">@icon('solid/plus') Add</a>
+                            @if(!empty(get_role_custom()))
+                                @if(@get_role_custom()['client'] != 1)
+                                    <a href="{{route("assets.assets_redirect_add_modal")}}" data-toggle="ajaxModal" class="m-l-xs btn btn-{{ get_option('theme_color') }} btn-sm dropdown-toggle">@icon('solid/plus') Add</a>
                             
-                            <a href="{{route("scans.home")}}" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                <span data-rel="tooltip" title="Assets Scan" data-placement="bottom"><i class="fas fa-search"></i><span class="hide-text">Assets Scan</span> </span>
-                            </a>
+                                    <a href="{{route("scans.home")}}" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                        <span data-rel="tooltip" title="Assets Scan" data-placement="bottom"><i class="fas fa-search"></i><span class="hide-text">Assets Scan</span> </span>
+                                    </a>
 
-                            <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span> </span>
-                            </a>
-                          
-                        
-
+                                    <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                        <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span> </span>
+                                    </a>
+                                @endif
+                            @endif
                             <input type="hidden" value="" id="site_code">
                         @else
                             <a id="advance-search" href="#hide-advance-search" class="m-l-xs btn btn-sm btn-{{ get_option('theme_color')  }}">
@@ -315,13 +316,33 @@
                                         <th rowspan="2" class="align-middle">Site</th>
                                         <th rowspan="2" class="align-middle">Host</th>
                                         <th rowspan="2" class="align-middle">Assets</th>
-                                        <th rowspan="2" class="align-middle">Open Ports</th>
+                                        @if(!empty(get_role_custom()))
+                                            @if(@get_role_custom()['client'] != 1)
+                                                <th rowspan="2" class="align-middle">Open Ports</th>
+                                               
+                                            @endif
+                                        @endif
+                                            
+                              
+                               
+                                       
                                         <th colspan="7" class="text-center">CPE</th>
                                         <th rowspan="2" class="align-middle">Status</th>
+                                        @if(!empty(get_role_custom()))
+                                        @if(@get_role_custom()['client'] != 1)
                                         <th rowspan="2" class="align-middle">Action</th>
-                                        <th rowspan="2" class="align-middle">CPESTRING</th>
+                                        @endif
+                                    @endif
+                                                
+                                                <th rowspan="2" class="align-middle">CPESTRING</th>
+                                 
+
                                         <th rowspan="2" class="align-middle">Asset ID</th>
+                                        @if(!empty(get_role_custom()))
+                                        @if(@get_role_custom()['client'] != 1)
                                         <th rowspan="2" class="align-middle">CPE_OtherCheck</th>
+                                        @endif
+                                    @endif
                                     </tr>
                                     <tr>
                                         <th>Vendor</th>
@@ -330,7 +351,19 @@
                                         <th>Edition</th>
                                         <th>Remark</th>
                                         <th>OS Type</th>
+                                        @if(!empty(get_role_custom()))
+                                        @if(@get_role_custom()['client'] != 1)
                                         <th>Delete CPE</th>
+                                        @else 
+                                        <th></th>
+                                        @endif
+                                    @endif
+                                               
+                                  
+                                                
+                                   
+                              
+                                       
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -538,11 +571,13 @@
                     name: 'status',
                     className: 'w-10 text-center'
                 },  
-                {
-                    data: 'action',
-                    name: 'action',
-                    className: 'no-wrap'
-                },    
+
+                        {
+                            data: 'action',
+                            name: 'action',
+                            className: 'no-wrap'
+                        },   
+   
             ],
         });--}}
 
@@ -794,11 +829,18 @@
                     data: 'ip',
                     name: 'ip',
                 },
-                {
-                    data: 'port',
-                    name: 'port',
-                    className: 'no-wrap'
-                },
+                @if(!empty(get_role_custom()))
+                    @if(@get_role_custom()['client'] != 1)
+                        {
+                            data: 'port',
+                            name: 'port',
+                            className: 'no-wrap'
+                        }, 
+                    @endif
+                @endif
+                                            
+                    
+                
                 {
                     data: 'CPE_Vendor',
                     name: 'CPE_Vendor',
@@ -819,6 +861,7 @@
                     name: 'CPE_Edition',
                     className: 'padingtablezero text-center no-wrap'
                 },
+              
                 {
                     data: 'CPE_Remark',
                     name: 'CPE_Remark',
@@ -829,12 +872,20 @@
                     name: 'CPE_Ostype',
                     className: 'padingtablezero text-center no-wrap'
                 },
-                {
-                    data: 'CPE_Del',
-                    name: 'CPE_Del',
-                    className: 'padingtablezero text-center no-wrap',
-                    visible:{{(TYPE_WEB=='center'?json_encode(true):json_encode(false))}},
-                },
+                @if(!empty(get_role_custom()))
+                    @if(@get_role_custom()['client'] != 1)
+                    {
+                            data: 'CPE_Del',
+                            name: 'CPE_Del',
+                            className: 'padingtablezero text-center no-wrap',
+                            visible:{{(TYPE_WEB=='center'?json_encode(true):json_encode(false))}},
+                        },
+    
+                    @endif
+                @endif
+                    
+                        
+               
                 {
                     orderable: false,
                     width: '3%',
@@ -842,19 +893,24 @@
                     name: 'status',
                     className: 'text-center'
                 },  
-                {
-                    orderable: false,
-                    width: '3%',
-                    data: 'action',
-                    name: 'action',
-                    className: 'text-center no-wrap',
-                    visible:{{(TYPE_WEB=='center'?json_encode(true):json_encode(false))}},
-                },
-                {
-                    data: 'CPE',
-                    name: 'CPE',
-                    visible:false
-                },
+                @if(!empty(get_role_custom()))
+                    @if(@get_role_custom()['client'] != 1)
+                    {
+                        orderable: false,
+                        width: '3%',
+                        data: 'action',
+                        name: 'action',
+                        className: 'text-center no-wrap',
+                        visible:{{(TYPE_WEB=='center'?json_encode(true):json_encode(false))}},
+                    }, 
+                    @endif
+                @endif
+                    
+                        {
+                            data: 'CPE',
+                            name: 'CPE',
+                            visible:false
+                        },
                 {
                     data: 'ip_asset_id',
                     name: 'ip_asset_id',
@@ -895,7 +951,13 @@
                    
                 },
                 {
+                    @if(!empty(get_role_custom()))
+                    @if(@get_role_custom()['client'] != 1)
                     targets: 11,
+                    @else 
+                    targets: 9,
+                    @endif
+                @endif
                     render: function (data, type, row, meta) {
                         if(row.status==1){
                             return '<span class="badge badge-success">Active</span>';
@@ -1014,13 +1076,16 @@
                     className: 'padingtablezero text-center no-wrap',
                     visible:false
                 },
-                {
-                    data: 'CPE_Del',
-                    name: 'CPE_Del',
-                    className: 'padingtablezero text-center no-wrap',
-                    visible:{{(TYPE_WEB=='center'?json_encode(true):json_encode(false))}},
-                    visible:false
-                },
+ 
+                        {
+                            data: 'CPE_Del',
+                            name: 'CPE_Del',
+                            className: 'padingtablezero text-center no-wrap',
+                            visible:{{(TYPE_WEB=='center'?json_encode(true):json_encode(false))}},
+                            visible:false
+                        },
+    
+
                 {
                     orderable: false,
                     width: '3%',

@@ -54,45 +54,54 @@ use Carbon\Carbon;
                         </div>
         
                         <div class="ml-2 text-right news-btn">
-                            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-                                {{-- <button type="button" class="btn btn-secondary">1</button>
-                                <button type="button" class="btn btn-secondary">2</button> --}}
-        
-                                <div class="btn-group" role="group">
-                                    <button class="btn btn-sm btn-{{ get_option('theme_color')  }} dropdown-toggle"
-                                        data-toggle="dropdown"> @icon('solid/plus') @langapp('add')
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-left">
-                                        <li>
-                                            <a href="{{route('rssfeedsettings.rss_news_create_news')}}" data-toggle='ajaxModal'>
-                                                Create News
-                                            </a>
-                                            <a href="{{route('rssfeedsettings.rss_data')}}" id="">
-                                                RSS Data
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+                            @if(!empty(get_role_custom()))
+                                @if(@get_role_custom()['client'] != 1)
+                                    <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                                        {{-- <button type="button" class="btn btn-secondary">1</button>
+                                        <button type="button" class="btn btn-secondary">2</button> --}}
+                
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-{{ get_option('theme_color')  }} dropdown-toggle"
+                                                data-toggle="dropdown"> @icon('solid/plus') @langapp('add')
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-left">
+                                                <li>
+                                                    <a href="{{route('rssfeedsettings.rss_news_create_news')}}" data-toggle='ajaxModal'>
+                                                        Create News
+                                                    </a>
+                                                    <a href="{{route('rssfeedsettings.rss_data')}}" id="">
+                                                        RSS Data
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <a id="btn_client_view" href="{{site_url('/news_client')}}"
+                                        class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                        <span data-rel="tooltip" title="Site View" data-placement="bottom"><i class="fas fa-eye"></i><span class="hide-text"> Site View</span></span>
+                                    </a>
 
-                            <a id="btn_client_view" href="{{site_url('/news_client')}}"
-                                class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                <span data-rel="tooltip" title="Site View" data-placement="bottom"><i class="fas fa-eye"></i><span class="hide-text"> Site View</span></span>
-                            </a>
-
-                            <a id="btn_rss_setting" href="{{site_url('/rssfeedsettings')}}"
-                                class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                                <span data-rel="tooltip" title="Setting" data-placement="bottom"><i class="fas fa-cog icon"></i></span>
-                            </a>
-        
+                                    <a id="btn_rss_setting" href="{{site_url('/rssfeedsettings')}}"
+                                        class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                                        <span data-rel="tooltip" title="Setting" data-placement="bottom"><i class="fas fa-cog icon"></i></span>
+                                    </a>
+                                @endif
+                            @endif
+                            
                             <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                                 <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                             </a>
 
-                            <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger"  value="bulk-delete" disabled>
-                                <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span> </span>
-                            </button>
+                            @if(!empty(get_role_custom()))
+                                @if(@get_role_custom()['client'] != 1)
+                                    <button type="button" id="btn_news_del_select" class="btn btn-sm btn-danger"  value="bulk-delete" disabled>
+                                        <span data-rel="tooltip" title="Delete" data-placement="bottom">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span> </span>
+                                    </button>
+                                @endif
+                            @endif
+                           
                         </div>
                     </div>
                 </header>
@@ -303,9 +312,20 @@ use Carbon\Carbon;
                                                 <th>Category</th>
                                                 <th>Serverity</th>
                                                 <th>Actor</th>--}} 
-                                                <th width="5%">Status</th> 
+                                                @if(!empty(get_role_custom()))
+                                                    @if(@get_role_custom()['client'] != 1)
+                                                        <th width="5%">Status</th> 
+                                                    @endif
+                                                @endif
+                                                
                                                 <th width="5%">Link</th>
-                                                <th width="5%">Action</th>
+
+                                                @if(!empty(get_role_custom()))
+                                                    @if(@get_role_custom()['client'] != 1)
+                                                        <th width="5%">Action</th>
+                                                    @endif
+                                                @endif
+                                                
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -740,21 +760,31 @@ $(function() {
                     className: 'no-wrap text-center'
                 },
                 --}}
-                {
-                    data: 'status',
-                    name: 'status',
-                    className: 'w-10 text-center'
-                },
+                @if(!empty(get_role_custom()))
+                    @if(@get_role_custom()['client'] != 1)
+                        {
+                            data: 'status',
+                            name: 'status',
+                            className: 'w-10 text-center'
+                        },
+                    @endif
+                @endif
+                
                 {
                     data: 'link',
                     name: 'link',
                     className: 'no-wrap'
                 },
-                {
-                    data: 'action',
-                    name: 'action',
-                    className: 'no-wrap'
-                },
+                @if(!empty(get_role_custom()))
+                    @if(@get_role_custom()['client'] != 1)
+                        {
+                            data: 'action',
+                            name: 'action',
+                            className: 'no-wrap'
+                        },
+                    @endif
+                @endif
+               
             ]
         });
     }

@@ -27,9 +27,14 @@
                 <a id="" href="" class="btn btn-sm btn-info d-none">
                     <span data-rel="tooltip" title="Setting Format Log" data-placement="bottom"><i class="fas fa-eye icon"></i><span class="hide-text">Setting Format Log</span></span>
                 </a>
-                <a id="" href="{{url('/monitoring/send_logs')}}?type=indicator" class="btn btn-sm btn-info">
-                    <span data-rel="tooltip" title="View Send Log" data-placement="bottom"><i class="fas fa-eye"></i><span class="hide-text">View Send Log</span></span>
-                </a>
+                @if(!empty(get_role_custom()))
+                    @if(@get_role_custom()['client'] != 1)
+                        <a id="" href="{{url('/monitoring/send_logs')}}?type=indicator" class="btn btn-sm btn-info">
+                            <span data-rel="tooltip" title="View Send Log" data-placement="bottom"><i class="fas fa-eye"></i><span class="hide-text">View Send Log</span></span>
+                        </a>
+                    @endif
+                @endif
+                
 
                 <a id="advance-search" href="#area_search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                 <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
@@ -235,7 +240,12 @@
                                 <th>Last Status</th>
                                 <th class="nowrap">DateTime</th>
                                 <th>Attribute</th>
-                                <th>Action</th>
+                                @if(!empty(get_role_custom()))
+                                    @if(@get_role_custom()['client'] != 1)
+                                        <th>Action</th>
+                                    @endif
+                                @endif
+                               
                             </tr>
                         </thead>
                         <tbody>
@@ -693,19 +703,25 @@
                     }
 
                 },
-                {
-                    targets: 10,
-                    className : 'nowrap',
-                    render: function (data, type, row) {
-                        var inner = '';
-                        inner += '<div style="display:flex;flex-direction:column;">';
-                        inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.modal_tag')}}'+'?pulse_id='+row.pulse_id+'" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
-                        inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="m-t-xs btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
-                        inner += '</div>';
-                        return inner;
-                    }
+                
+                @if(!empty(get_role_custom()))
+                    @if(@get_role_custom()['client'] != 1)
+                        {
+                            targets: 10,
+                            className : 'nowrap',
+                            render: function (data, type, row) {
+                                var inner = '';
+                                inner += '<div style="display:flex;flex-direction:column;">';
+                                inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.modal_tag')}}'+'?pulse_id='+row.pulse_id+'" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
+                                inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="m-t-xs btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                                inner += '</div>';
+                                return inner;
+                            }
 
-                }
+                        }
+                    @endif
+                @endif
+                
             ]
         });
 

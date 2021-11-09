@@ -55,11 +55,25 @@ use Carbon\Carbon;
                      
                             <div class="text-left max-w-select" style="display:inline-block;">
                                 <select name="site" id="site" class="text-left select2-option form-control select-site">
-                                    <option value="">All Site</option>
+                                    {{-- <option value="">All Site</option>
                                     @if($SiteSettings)
                                     @foreach($SiteSettings as $SiteSettings_val)
                                     <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
                                     @endforeach
+                                    @endif --}}
+                                    @if(count($SiteSettings) == 1)
+                                        @if ($SiteSettings)
+                                            @foreach ($SiteSettings as $SiteSettings_val)
+                                                <option value="{{$SiteSettings_val->code}}" selected>{{$SiteSettings_val->name}}</option>
+                                            @endforeach
+                                        @endif
+                                    @else
+                                        <option value="" selected>All Site</option>
+                                        @if ($SiteSettings)
+                                            @foreach ($SiteSettings as $SiteSettings_val)
+                                                <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                                            @endforeach
+                                        @endif
                                     @endif
                                 </select>
                             </div>
@@ -69,15 +83,15 @@ use Carbon\Carbon;
                             {{-- // var_dump(get_role_custom()['superadmin']);
                                 // var_dump(get_role_custom()['site_admin']); --}}
                                 @if(TYPE_WEB == 'center')
-                                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
+                                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] != 1)
                                         <a id="btn_dataleak_feed" href="{{site_url('/datafeedsocial')}}" class="btn btn-sm btn-info m-l-xs"><span> Dataleak Feed</span></a>
                                     @endif
-
-                                    <a href="{{route('dataleak.create') }}" class="btn btn-sm btn-{{ get_option('theme_color') }}" data-toggle="ajaxModal">
-                                        <span data-rel="tooltip" title="Add" data-placement="top">@icon('solid/plus')</span>
-                                        <span class="hide-text">@langapp('add')</span>
-                                    </a>
-                                    
+                                    @if(@get_role_custom()['client'] != 1)
+                                        <a href="{{route('dataleak.create') }}" class="btn btn-sm btn-{{ get_option('theme_color') }}" data-toggle="ajaxModal">
+                                            <span data-rel="tooltip" title="Add" data-placement="top">@icon('solid/plus')</span>
+                                            <span class="hide-text">@langapp('add')</span>
+                                        </a>
+                                    @endif
                                 @endif
                             @endif
 
@@ -86,16 +100,15 @@ use Carbon\Carbon;
                             </a>
 
                             @if(!empty(get_role_custom()))
-
                                 @if(TYPE_WEB == 'center')
-
-                                    <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger"
-                                        value="bulk-delete" disabled>
-                                        <span data-rel="tooltip" title="Delete" data-placement="bottom">
-                                            @icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span> 
-                                        </span>
-                                    </button>
-
+                                    @if(@get_role_custom()['client'] != 1)
+                                        <button type="submit" id="btn-change-status" class="btn btn-sm btn-danger"
+                                            value="bulk-delete" disabled>
+                                            <span data-rel="tooltip" title="Delete" data-placement="bottom">
+                                                @icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span> 
+                                            </span>
+                                        </button>
+                                    @endif
                                 @endif
                             @endif
                         </div>
@@ -462,8 +475,13 @@ use Carbon\Carbon;
                                             <th>Status Monitoring</th>                                        
                                             <th>Data Feed</th>
                                             {{-- <th>View</th> --}}
-                                            <th>Status</th>
-                                            <th>@langapp('action')</th>
+                                            @if(!empty(get_role_custom()))
+                                                @if(@get_role_custom()['client'] != 1)
+                                                    <th>Status</th>
+                                                    <th>@langapp('action')</th>
+                                                @endif
+                                            @endif
+                                            
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1025,47 +1043,51 @@ $('.btn').click(function(){
                             }
 
                         },
-                    },                   
-                    {
-                        visible: visible_c,
-                        targets: 9,
-                        width: '3%',
-                        render: function (data, type, full, meta) {
+                    },    
+                    @if(!empty(get_role_custom()))
+                        @if(@get_role_custom()['client'] != 1)
+                        {
+                            visible: visible_c,
+                            targets: 9,
+                            width: '3%',
+                            render: function (data, type, full, meta) {
 
-                            var checked_val = null;
-                                if (full.status_data == 1) {
-                                    checked_val = 'checked';
-                                } else {
-                                    checked_val = '';
-                                }
-                        
-                            return  '<label class="switch"><input type="checkbox" id="social_active_' +full.id_data+  '" onchange="social_active( '+full.id_data+')" '+checked_val+' name="active" value="1"><span class="slider round"></span></label>';
+                                var checked_val = null;
+                                    if (full.status_data == 1) {
+                                        checked_val = 'checked';
+                                    } else {
+                                        checked_val = '';
+                                    }
+                            
+                                return  '<label class="switch"><input type="checkbox" id="social_active_' +full.id_data+  '" onchange="social_active( '+full.id_data+')" '+checked_val+' name="active" value="1"><span class="slider round"></span></label>';
 
-                        }
+                            }
 
-                    },
-                    {
-                        targets: 10,
-                        width: '7%',
-                        className : 'nowrap',
-                        render: function (data, type, full, meta) {
-      
-                            return `
-                            <a href="${base_url}/socialdatas/activity_modal/${full.code_data}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="far fa-comment-dots"></i></a>
-                            <!--<a href="${base_url}/socialdatas/view_content/${full.code_data}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>-->
-                            <a href="${base_url}/dataleak/edit_dataleak_modal/${full.code_data}" class="btn btn-info btn-xs" data-toggle="ajaxModal">
-                                <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
-                            </a>
-                            <a href="${base_url}/socialdatas/delete_dataleakdata_modal/${full.code_data}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>
-                            `;
-                      
-                            
-        
-                            
-                            
-                            {{--href="${base_url}/rssfeedsettings/delete-rss_data/${full.code}"--}}
                         },
-                    },
+                        {
+                            targets: 10,
+                            width: '7%',
+                            className : 'nowrap',
+                            render: function (data, type, full, meta) {
+        
+                                return `
+                                <a href="${base_url}/socialdatas/activity_modal/${full.code_data}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="far fa-comment-dots"></i></a>
+                                <!--<a href="${base_url}/socialdatas/view_content/${full.code_data}" class="btn btn-info btn-xs" data-toggle="ajaxModal"><i class="fas fa-eye"></i></a>-->
+                                <a href="${base_url}/dataleak/edit_dataleak_modal/${full.code_data}" class="btn btn-info btn-xs" data-toggle="ajaxModal">
+                                    <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
+                                </a>
+                                <a href="${base_url}/socialdatas/delete_dataleakdata_modal/${full.code_data}" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>
+                                `;
+                        
+                                
+            
+                                
+                                
+                                {{--href="${base_url}/rssfeedsettings/delete-rss_data/${full.code}"--}}
+                            },
+                        },
+                        @endif
+                    @endif               
 
                 ]
         
