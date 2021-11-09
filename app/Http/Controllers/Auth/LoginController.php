@@ -77,7 +77,7 @@ class LoginController extends Controller
         $User = User::where('email',$request->email)->where('email_verified_at','!=',null)->where('banned',0)->where('deleted_at',null)->where('active',1)->first();
         $model_has_roles = model_has_roles::where('role_id',@$User->get_model_has_roles->role_id)->first();
         if($model_has_roles) {
-            if($model_has_roles->role_id == 1 || $model_has_roles->role_id == 2) {
+            if($model_has_roles->role_id == 1 || $model_has_roles->role_id == 2 || $model_has_roles->role_id == 4) {
                 $role_status = 1;
             } else {
                 $role_status = 0;

@@ -9,6 +9,16 @@
             <div class="max-w-select" style="margin-top: 8px;">
                 <select name="site" id="site" class="select2-option form-control select-site"
                     onchange="changeSite(value)">
+                    @if(count($site_settings) == 1)
+                    @if ($site_settings)
+
+                    @foreach ($site_settings as $site_settings)
+                    <option value="{{$site_settings->code}}" selected>{{$site_settings->name}}
+                    </option>
+                    @endforeach
+
+                    @endif
+                    @else
                     <option value="0" selected>All Site</option>
                     @if ($site_settings)
 
@@ -18,6 +28,8 @@
                     @endforeach
 
                     @endif
+                    @endif
+                    
                 </select>
             </div>
         </header>

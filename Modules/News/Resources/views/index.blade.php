@@ -20,11 +20,25 @@
                     <div class="ml-2 text-right">
                         <div class="text-left max-w-select" style="display:inline-block;">
                             <select name="" id="select-site" class="select2-option form-control select-site" onchange="changeSite(value)">
-                                <option value="">All Site</option>
+                                {{-- <option value="">All Site</option>
                                 @if($SiteSettings)
                                 @foreach($SiteSettings as $SiteSettings_val)
                                 <option value="{{$SiteSettings_val->id}}">{{$SiteSettings_val->name}}</option>
                                 @endforeach
+                                @endif --}}
+                                @if(count($SiteSettings) == 1)
+                                    @if ($SiteSettings)
+                                        @foreach ($SiteSettings as $SiteSettings_val)
+                                            <option value="{{$SiteSettings_val->code}}" selected>{{$SiteSettings_val->name}}</option>
+                                        @endforeach
+                                    @endif
+                                @else
+                                    <option value="" selected>All Site</option>
+                                    @if ($SiteSettings)
+                                        @foreach ($SiteSettings as $SiteSettings_val)
+                                            <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
+                                        @endforeach
+                                    @endif
                                 @endif
                             </select>
                         </div>
