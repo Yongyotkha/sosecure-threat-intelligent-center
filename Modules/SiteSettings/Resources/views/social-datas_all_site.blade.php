@@ -64,7 +64,7 @@ use Carbon\Carbon;
                                     @if(count($SiteSettings) == 1)
                                         @if ($SiteSettings)
                                             @foreach ($SiteSettings as $SiteSettings_val)
-                                                <option value="{{$SiteSettings_val->code}}" selected>{{$SiteSettings_val->name}}</option>
+                                                <option value="{{$SiteSettings_val->code}}" selected data-site_id="{{ $SiteSettings_val->id }}" data-site_code="{{ $SiteSettings_val->code }}">{{$SiteSettings_val->name}}</option>
                                             @endforeach
                                         @endif
                                     @else
@@ -758,8 +758,14 @@ $('.btn').click(function(){
     var check_serverity = null;
     var check_monitoring = null;
     var check_social = 'Mobile';
+    var site_code = null;
     
-
+    @if(!empty(get_role_custom()))
+        @if(@get_role_custom()['client'] == 1)
+            site = $('#site').find(':selected').attr("data-site_id");
+            site_code = $('#site').find(':selected').attr("data-site_code");
+        @endif
+    @endif
     $('#table_social_datas').on('click', '.select-chk', function () {
     if ($(this).is(':checked')) {
 
@@ -855,7 +861,7 @@ $('.btn').click(function(){
                     url: '{!! route('socialdatas.socialdatas_all_site_tb') !!}',
                     data: function ( d ) {
                         d.keywords = keywords;
-                        d.site = site;
+                        d.site = site_code;
                         d.type = type;
                         d.source = source;
                         d.search_val = search_val;
@@ -1247,7 +1253,7 @@ $('.btn').click(function(){
             url:'{!! site_url('social/count_val') !!}',
             data: ({
                 keywords : keywords,
-                site_id : site,
+                site_id : site_code,
                 type : type,
                 social : source,
                 search_val : search_val,
@@ -1355,7 +1361,7 @@ var click_type2 = null;
             type:"POST",
             url:'{!! site_url('social/count_icon') !!}',
             data: ({
-                site_id : site,
+                site_id : site_code,
             }),
             beforeSend: function(){
                 {{--loading('load');--}}

@@ -19,7 +19,7 @@
                                 @if(count($SiteSettings) == 1)
                                     @if ($SiteSettings)
                                         @foreach ($SiteSettings as $SiteSettings_val)
-                                            <option value="{{$SiteSettings_val->code}}" selected>{{$SiteSettings_val->name}}</option>
+                                            <option value="{{$SiteSettings_val->code}}" selected data-site_code="{{ $SiteSettings_val->code }}">{{$SiteSettings_val->name}}</option>
                                         @endforeach
                                     @endif
                                 @else
@@ -511,6 +511,14 @@
     active_btn('#groupby-btn .btn-grey');
     active_btn('#groupby-status .btn-grey');
     var id_select_site = 'select-site';
+    var site_code = null;
+    var menu = null;
+    @if(!empty(get_role_custom()))
+        @if(@get_role_custom()['client'] == 1)
+        site_code = $('#select-site').find(':selected').attr("data-site_code");
+        menu = 'site';
+        @endif
+    @endif
     {{--$('#table-assets-template-test').DataTable();--}}
     
     $(document).ready(function () {
@@ -797,8 +805,8 @@
                 type: "POST",
                 url: '{!! route('assets.table_asset')!!}',
                 data:function(d){
-                    d.menu = "{{$menu}}";
-                    d.site = $('#site_code').val();
+                    d.menu = menu ? menu : "{{$menu}}";
+                    d.site = site_code != null ? site_code : $('#site_code').val();
                 }
             },
             initComplete : function( settings, json){
@@ -999,8 +1007,8 @@
                 type: "POST",
                 url: '{!! route('assets.table_asset_host')!!}',
                 data:function(d){
-                    d.menu = "{{$menu}}";
-                    d.site = $('#site_code').val();
+                    d.menu = menu ? menu : "{{$menu}}";
+                    d.site = site_code != null ? site_code : $('#site_code').val();
                 }
             },
             initComplete : function( settings, json){

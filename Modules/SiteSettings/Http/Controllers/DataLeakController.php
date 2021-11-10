@@ -826,8 +826,8 @@ class DataLeakController extends Controller
             ->with('get_data_leak_feed_one');
 
            $DataLeakSocialRef_data = DataLeakSocialRef::join('data_leak_feed', 'data_leak_socail_ref.data_leak_feed_id', '=', 'data_leak_feed.id')
-             ->whereIn('data_leak_feed.feel_type', ['social','darkweb_public'])->join('site','site.id','data_leak_socail_ref.site_id')
-             ->select('data_leak_socail_ref.*','data_leak_feed.*','site.name as site_name','data_leak_socail_ref.code as code_data','data_leak_socail_ref.id as id_data','data_leak_socail_ref.status as status_data');
+           ->whereIn('data_leak_feed.feel_type', ['social','darkweb_public'])->join('site','site.id','data_leak_socail_ref.site_id')
+            ->select('data_leak_socail_ref.*','data_leak_feed.*','site.name as site_name','data_leak_socail_ref.code as code_data','data_leak_socail_ref.id as id_data','data_leak_socail_ref.status as status_data');
 
         if ($request->search_val == 1) {
 
@@ -840,8 +840,8 @@ class DataLeakController extends Controller
             if(@$get_role_custom_first['superadmin'] == 1) {
 
             }else if(@$get_role_custom_first['client'] == 1) {
-                $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
-                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('data_leak_feed.status', 1);
+                $model = $model->whereIn('site_id', $site_id_arr);
+                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('data_leak_socail_ref.status', 1);
                 $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
 
             }else if(@$get_role_custom_first['site_support'] == 1) {
@@ -994,8 +994,8 @@ class DataLeakController extends Controller
             if ($request->site) {
                 $SiteSettings = SiteSettings::where('code', @$request->site)->first();
                 // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
-                $model = $model->where('site_id', $SiteSettings->id);
-                $DataLeakSocialRef_data->where('data_leak_socail_ref.site_id', $SiteSettings->id);
+                $model = $model->where('status', 1)->where('site_id', $SiteSettings->id);
+                $DataLeakSocialRef_data->where('status', 1)->where('data_leak_socail_ref.site_id', $SiteSettings->id)->where('data_leak_socail_ref.status', 1);
             }
 
             if ($request->click_key) {
