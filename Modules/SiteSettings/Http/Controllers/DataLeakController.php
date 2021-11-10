@@ -4361,27 +4361,31 @@ class DataLeakController extends Controller
 
         $DataLeakSocialRef = DataLeakSocialRef::where('id',$request->id_DataLeakSocialRefs)->first();
         // if($DataLeakSocialRef->status_monitoring != 'close') {
-            if($Activity->status_activity == 'close') {
-                $DataLeakSocialRef->status_monitoring = 'close';
-                $DataLeakSocialRef->save();
-            } else if ($Activity->status_activity == 'in_progress') {//reported
-                if($Activity_check) {
-                    $DataLeakSocialRef->status_monitoring = 'close';
-                    $DataLeakSocialRef->save();
-                } else {
-                    $DataLeakSocialRef->status_monitoring = 'in_progress';//reported
-                    $DataLeakSocialRef->save();
-                }
-            } else if ($Activity->status_activity == 'in_progress') {
-                if($Activity_check) {
-                    $DataLeakSocialRef->status_monitoring = 'close';
-                    $DataLeakSocialRef->save();
-                } else {
-                    $DataLeakSocialRef->status_monitoring = 'in_progress';
-                    $DataLeakSocialRef->save();
-                }
-            }   
+            // if($Activity->status_activity == 'close') {
+            //     $DataLeakSocialRef->status_monitoring = 'close';
+            //     $DataLeakSocialRef->save();
+            // } else if ($Activity->status_activity == 'in_progress') {//reported
+            //     if($Activity_check) {
+            //         $DataLeakSocialRef->status_monitoring = 'close';
+            //         $DataLeakSocialRef->save();
+            //     } else {
+            //         $DataLeakSocialRef->status_monitoring = 'in_progress';//reported
+            //         $DataLeakSocialRef->save();
+            //     }
+            // } else if ($Activity->status_activity == 'in_progress') {
+            //     if($Activity_check) {
+            //         $DataLeakSocialRef->status_monitoring = 'close';
+            //         $DataLeakSocialRef->save();
+            //     } else {
+            //         $DataLeakSocialRef->status_monitoring = 'in_progress';
+            //         $DataLeakSocialRef->save();
+            //     }
+            // }   
         // }
+        if($status_activity) {
+            $DataLeakSocialRef->status_monitoring = $status_activity;
+            $DataLeakSocialRef->save();
+        }
         
 
         if($request->site_code){
