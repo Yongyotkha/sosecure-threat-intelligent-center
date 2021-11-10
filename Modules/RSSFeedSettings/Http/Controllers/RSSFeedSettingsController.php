@@ -638,7 +638,7 @@ class RSSFeedSettingsController extends Controller
 
                 $html .= '<div>';
 
-                $html .= ' <span class="m-r-5"><b>Public Date : </b>'.$model->updated_at.'</span>';
+                $html .= ' <span class="m-r-5"><b>Public Date : </b>'.$model->public_date.'</span>';
 
                 if($model->serverity=='critical'){
                     $html .= ' <span class="m-r-5"><b>Serverity : </b> <span class="badge" style="background-color: #b93624;">Critical</span></span>';
