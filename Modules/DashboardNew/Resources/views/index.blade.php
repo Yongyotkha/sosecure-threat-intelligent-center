@@ -13,7 +13,7 @@
                     @if ($site_settings)
 
                     @foreach ($site_settings as $site_settings)
-                    <option value="{{$site_settings->code}}" selected>{{$site_settings->name}}
+                    <option value="{{$site_settings->code}}" selected data-site_id="{{ $site_settings->code }}">{{$site_settings->name}}
                     </option>
                     @endforeach
 
@@ -439,6 +439,11 @@ Highcharts.setOptions({
     var endDate = '';
     var pagename = '';
     var site = 0;
+    @if(!empty(get_role_custom()))
+        @if(@get_role_custom()['client'] == 1)
+            site = $('#site').find(':selected').attr("data-site_id");
+        @endif
+    @endif
 
     var today_date = new Date();
     var dd = String(today_date.getDate()).padStart(2, '0');

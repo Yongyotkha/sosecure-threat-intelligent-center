@@ -1094,7 +1094,7 @@ public function chart_indicators(Request $request){
                 }
             }else{
                 if(!$request -> sitecode){
-                    $DataLeakFeed_social = DataLeakFeed::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->whereIn('feed_type', ['social','darkweb_public'])->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
+                    $DataLeakFeed_social = DataLeakFeed::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->whereIn('feel_type', ['social','darkweb_public'])->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
                     foreach ($DataLeakFeed_social as $key => $value) {
                         $leak_socail_ref_temps = DataLeakSocialRef::select('site_id')->where('status',1)->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->whereIn('site_id',$site_id_arr)->first();
                         if($leak_socail_ref_temps){
@@ -1110,7 +1110,7 @@ public function chart_indicators(Request $request){
                         }
                     }
                 } else {
-                    $DataLeakFeed_social = DataLeakFeed::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('status',1)->whereIn('feed_type', ['social','darkweb_public'])->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
+                    $DataLeakFeed_social = DataLeakFeed::select('id','feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('status',1)->whereIn('feel_type', ['social','darkweb_public'])->whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
                     foreach ($DataLeakFeed_social as $key => $value) {
                         $leak_socail_ref_temps = DataLeakSocialRef::select('site_id')->where('status',1)->whereNull('deleted_at')->where('data_leak_feed_id', $value["id"])->where('site_id',$SiteSettings->id)->first();
                         if($leak_socail_ref_temps){
@@ -1288,7 +1288,7 @@ public function chart_indicators(Request $request){
                     $TransactionScans = TransactionScans::select('transaction_time_stamp_scans.code as t_code','transaction_scans.updated_at as datetime', 'site.name as sitename','site.id as site_id',DB::raw('CONCAT("/scans/scans-domain/datatype/",fx_transaction_time_stamp_scans.code) AS link , "Assets" AS pagename , CONCAT(IFNULL(fx_transaction_scans.data_type,""),"||",IFNULL(fx_transaction_scans.raw_data,""),"||",IFNULL(fx_transaction_scans.referent,""),"||",IFNULL(fx_transaction_scans.status,"")) AS content'))->where('transaction_scans.site_id', $SiteSettings->id)->where('transaction_scans.status',1)->where('transaction_scans.module','!=','sfp_citadel')->orderBy('transaction_scans.status', 'desc');
                     $TransactionScans = $TransactionScans->leftjoin('site', 'transaction_scans.site_id', '=', 'site.id');
                     $TransactionScans = $TransactionScans->leftjoin('transaction_time_stamp_scans', 'site.id', '=', 'transaction_time_stamp_scans.site_id');
-                    $TransactionScans = $TransactionScans->where('site.id', $SiteSettings->id)->whereIn('site_id', $site_id_arr);
+                    $TransactionScans = $TransactionScans->where('site.id', $SiteSettings->id)->whereIn('transaction_scans.site_id', $site_id_arr);
                     $TransactionScans = $TransactionScans->whereBetween('transaction_scans.updated_at',array($date_start_datetime_format,$date_end_datetime_format))->get()->toArray();
                 }
             }
