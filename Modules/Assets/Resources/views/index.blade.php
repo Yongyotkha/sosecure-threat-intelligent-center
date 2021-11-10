@@ -13,7 +13,7 @@
                     </div>
     
                     <div class="ml-2 text-right">
-                        <div class="text-left pull-left max-w-select">
+                        <div class="text-left pull-left max-w-select {{ count($SiteSettings) == 1 ? 'd-none' : '' }}">
                             <select name="" id="select-site" class="select2-option select-site" onchange="changeSite(value)">
 
                                 @if(count($SiteSettings) == 1)

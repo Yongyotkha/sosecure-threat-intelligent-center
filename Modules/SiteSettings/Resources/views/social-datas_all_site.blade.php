@@ -53,7 +53,7 @@ use Carbon\Carbon;
 
                         <div class="ml-2 text-right">
                      
-                            <div class="text-left max-w-select" style="display:inline-block;">
+                            <div class="text-left max-w-select {{ count($SiteSettings) == 1 ? 'd-none' : '' }}" style="display:inline-block;">
                                 <select name="site" id="site" class="text-left select2-option form-control select-site">
                                     {{-- <option value="">All Site</option>
                                     @if($SiteSettings)
