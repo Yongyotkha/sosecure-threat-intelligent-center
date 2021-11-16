@@ -823,7 +823,8 @@ $('.btn').click(function(){
 
     $("#site").change(function() {
         set_cookie_site($(`#${id_select_site}`).val());
-        site = this.value;   
+        site = this.value; 
+        site_code = this.value;  
         table_social_data();
         get_count();
         {{--count_keyword();--}}
