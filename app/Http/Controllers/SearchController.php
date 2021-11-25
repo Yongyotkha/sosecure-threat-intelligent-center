@@ -203,7 +203,7 @@ class SearchController extends Controller
             }
 
             if(@$role_custom['indicators']) {
-                if($type == 'indicators_1'){
+                if($type == 'events'){
                     $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
                     $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                     $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
@@ -307,7 +307,7 @@ class SearchController extends Controller
             }
 
             if(@$role_custom['indicators']) {
-                if($type == 'indicators_2'){
+                if($type == 'events'){
                     $dataWait = null;
                     $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
                     $pipeLine = array('indicator' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
@@ -447,7 +447,7 @@ class SearchController extends Controller
             }
 
             if(@$role_custom['indicators']) {
-                if($type == 'indicators_3'){
+                if($type == 'events'){
                 //Malware
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
@@ -556,7 +556,7 @@ class SearchController extends Controller
             }
 
             if(@$role_custom['indicators']) {
-                if($type == 'indicators_4'){
+                if($type == 'events'){
                 //Adversaries
               
                 $this->request->keyword = trim($this->request->keyword);
@@ -669,7 +669,7 @@ class SearchController extends Controller
             }
 
             if(@$role_custom['indicators']) {
-                if($type == 'indicators_5'){
+                if($type == 'malware'){
                 //Malware
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
@@ -717,7 +717,7 @@ class SearchController extends Controller
             }
 
             if(@$role_custom['indicators']) {
-                if($type == 'indicators_6'){
+                if($type == 'adversaries'){
                 //Adversaries
               
                 $this->request->keyword = trim($this->request->keyword);

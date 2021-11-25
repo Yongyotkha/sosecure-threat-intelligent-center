@@ -55,9 +55,9 @@
                                     <a href="javascript:void(0)" data-btn="vulnerabilities" id="" class="btn btn-selector btn_filter">Vulnerabilities <span id="vulnerabilities">0</span></a>
                                 @endif
                                 
-                                @if($role_custom['indicators'])
+                                {{-- @if($role_custom['indicators'])
                                     <a href="javascript:void(0)" data-btn="indicators" id="" class="btn btn-selector btn_filter">Indicators <span id="indicators">0</span></a>
-                                @endif
+                                @endif --}}
 
                                      
                                 @if($role_custom['indicators'])
@@ -626,6 +626,9 @@
     var mode_search = '{{ request()->mode }}';
     var btn_val;
     var btn_filter_indicators_type;
+    var count_all = 0;
+    var count_rows = 0;
+    var count_rows_finish = 0;
     $(".btn_filter").click(function() {
         btn_val = $(this).data("btn");
         if(btn_val == 'all') {
@@ -747,7 +750,7 @@
         $('#iframe_source').attr('src', '');
         loading('stop_load');
     }
-
+var interval;
 $(function(){
     if(mode_search == 'lookup'){
   
@@ -806,25 +809,45 @@ $(function(){
     }else{
         @if($role_custom['news'])
             loadNews();
+            count_rows++;
         @endif
         @if($role_custom['vulnerabilities'])
             loadVulnerabilities();
+            count_rows++;
         @endif
         @if($role_custom['compromised'])
             loadCompromised();
+            count_rows++;
         @endif
         @if($role_custom['data_leak'])
             loadDataLeak();
+            count_rows++;
         @endif
         @if($role_custom['web_defacement'])
             loadWebDefacement();
+            count_rows++;
         @endif
-        loadIndicator1();
-        loadIndicator2();
-        loadIndicator3();
-        loadIndicator4();
-        loadIndicator5();
-        loadIndicator6();
+        @if($role_custom['indicators'])
+            loadEvents();
+            count_rows++;
+        @endif
+        @if($role_custom['indicators'])
+            loadAdversaries();
+            count_rows++;
+        @endif
+        @if($role_custom['indicators'])
+            loadMalware();
+            count_rows++;
+        @endif
+
+        interval = setInterval(
+            function(){ 
+                if(count_rows == count_rows_finish){
+                    $('#all').text(count_all);
+                    clearInterval(interval);
+                }
+            }
+        , 1000);
     }
     
 });
@@ -847,6 +870,8 @@ function loadNews(){
             data = data_leak;
         }
         $('#news').text(data.count);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
         console.log("No response from server");
     });
@@ -870,6 +895,8 @@ function loadVulnerabilities(){
             data = data_leak;
         }
         $('#vulnerabilities').text(data.count);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
         console.log("No response from server");
     });
@@ -893,6 +920,8 @@ function loadCompromised(){
             data = data_leak;
         }
         $('#compromised').text(data.count);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
         console.log("No response from server");
     });
@@ -916,6 +945,8 @@ function loadDataLeak(){
             data = data_leak;
         }
         $('#data_leak').text(data.count);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
         console.log("No response from server");
     });
@@ -939,12 +970,14 @@ function loadWebDefacement(){
             data = data_leak;
         }
         $('#web_defacement').text(data.count);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
         console.log("No response from server");
     });
 }
 
-function loadIndicator1(){
+function loadEvents(){
     $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -953,16 +986,23 @@ function loadIndicator1(){
         method: 'post',
         data: ({
             keyword:text_search_new,
-            type:'indicators_1',
+            type:'events',
         }),
     }).done(function(res){
-        
+        let data = [];
+        for(let i in res.dataSearch){
+            const data_leak = res.dataSearch[i];
+            data = data_leak;
+        }
+        $('#events').text(data.count);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
         console.log("No response from server");
     });
 }
 
-function loadIndicator2(){
+function loadAdversaries(){
     $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -971,16 +1011,23 @@ function loadIndicator2(){
         method: 'post',
         data: ({
             keyword:text_search_new,
-            type:'indicators_2',
+            type:'adversaries',
         }),
     }).done(function(res){
-        
+        let data = [];
+        for(let i in res.dataSearch){
+            const data_leak = res.dataSearch[i];
+            data = data_leak;
+        }
+        $('#adversaries').text(data.count);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
         console.log("No response from server");
     });
 }
 
-function loadIndicator3(){
+function loadMalware(){
     $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -989,64 +1036,17 @@ function loadIndicator3(){
         method: 'post',
         data: ({
             keyword:text_search_new,
-            type:'indicators_3',
+            type:'malware',
         }),
     }).done(function(res){
-        
-    }).fail(function(jqXHR, ajaxOptions, thrownError){
-        console.log("No response from server");
-    });
-}
-
-function loadIndicator4(){
-    $.ajax({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        url: "/newSearchAPI",
-        method: 'post',
-        data: ({
-            keyword:text_search_new,
-            type:'indicators_4',
-        }),
-    }).done(function(res){
-        
-    }).fail(function(jqXHR, ajaxOptions, thrownError){
-        console.log("No response from server");
-    });
-}
-
-function loadIndicator5(){
-    $.ajax({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        url: "/newSearchAPI",
-        method: 'post',
-        data: ({
-            keyword:text_search_new,
-            type:'indicators_5',
-        }),
-    }).done(function(res){
-        
-    }).fail(function(jqXHR, ajaxOptions, thrownError){
-        console.log("No response from server");
-    });
-}
-
-function loadIndicator6(){
-    $.ajax({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        url: "/newSearchAPI",
-        method: 'post',
-        data: ({
-            keyword:text_search_new,
-            type:'indicators_6',
-        }),
-    }).done(function(res){
-        
+        let data = [];
+        for(let i in res.dataSearch){
+            const data_leak = res.dataSearch[i];
+            data = data_leak;
+        }
+        $('#malware').text(data.count);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
         console.log("No response from server");
     });
