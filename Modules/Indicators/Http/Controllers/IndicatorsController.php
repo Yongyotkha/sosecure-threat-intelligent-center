@@ -2146,9 +2146,9 @@ class IndicatorsController extends Controller
     }
 
 
-    public function link_tags($id) {
+    public function new_link_tags(Request $request) {
 
-        $data['id'] = $id;
+        $data['id'] = $request -> id;
         $data['page'] = langapp('indicators');
         return view('indicators::link_tag')->with($data);
     }
@@ -2310,6 +2310,13 @@ class IndicatorsController extends Controller
     public function link_group($id) {
 
         $data['id'] = $id;
+        $data['page'] = langapp('indicators');
+        return view('indicators::link_group')->with($data);
+    }
+
+    public function new_link_group(Request $request) {
+
+        $data['id'] = $request -> id;
         $data['page'] = langapp('indicators');
         return view('indicators::link_group')->with($data);
     }

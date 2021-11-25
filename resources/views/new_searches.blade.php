@@ -808,6 +808,7 @@ $(function(){
                 if(count_rows == count_rows_finish){
                     $('#all').text(count_all);
                     if(count_all == 0){
+                        let html = '';
                         html += `<div class="notfound">
                             <img src="{{asset('images/notfound.png')}}" alt="" style="max-width: 500px;width:100%:">
                             <h1>Sorry. no result found</h1>
@@ -841,8 +842,8 @@ function loadNews(){
             data = news;
         }
         $('#news').text(data.count);
+        let html = '';
         if(parseInt(data.count) > 0){
-            let html = '';
             html += `
             <li id="news_head" class="panel panel-default">
                 <div class="panel-heading fontw-weight-bold">
@@ -898,8 +899,8 @@ function loadVulnerabilities(){
             data = data_leak;
         }
         $('#vulnerabilities').text(data.count);
+        let html = '';
         if(parseInt(data.count) > 0){
-            let html = '';
             html += `
             <li id="vulnerabilities_head" class="panel panel-default">
                 <div class="panel-heading fontw-weight-bold">
@@ -955,8 +956,8 @@ function loadCompromised(){
             data = data_leak;
         }
         $('#compromised').text(data.count);
+        let html = '';
         if(parseInt(data.count) > 0){
-            let html = '';
             html += `
             <li id="compromised_head" class="panel panel-default">
                 <div class="panel-heading fontw-weight-bold">
@@ -1012,8 +1013,8 @@ function loadDataLeak(){
             data = data_leak;
         }
         $('#data_leak').text(data.count);
+        let html = '';
         if(parseInt(data.count) > 0){
-            let html = '';
             html += `
             <li id="data_leak_head" class="panel panel-default">
                 <div class="panel-heading fontw-weight-bold">
@@ -1069,8 +1070,8 @@ function loadWebDefacement(){
             data = data_leak;
         }
         $('#web_defacement').text(data.count);
+        let html = '';
         if(parseInt(data.count) > 0){
-            let html = '';
             html += `
             <li id="web_defacement_head" class="panel panel-default">
                 <div class="panel-heading fontw-weight-bold">
@@ -1126,8 +1127,8 @@ function loadEvents(){
             data = data_leak;
         }
         $('#events').text(data.count);
+        let html = '';
         if(parseInt(data.count) > 0){
-            let html = '';
             html += `
             <li id="events_head" class="panel panel-default">
                 <div class="panel-heading fontw-weight-bold">
@@ -1146,11 +1147,11 @@ function loadEvents(){
                                         ${events.name}
                                     </a>
 
-                                    <p class="">Last Status : ${check_last_status(events.is_modified)} | Public : ${check_publish(events.public)}</p>
+                                    <p class="">Last Status : ${js_check_last_status(events.is_modified)} | Public : ${js_check_publish(events.public)}</p>
                                                            
-                                    <p>Tags : {!!explode_val($value2['tags'],'tags')!!}</p>
-                                    <p>Groups : {!!explode_val($value2['groups'],'groups')!!}</p>
-                                    <p>Industries : {!!explode_val($value2['industries'],'industries')!!}</p>
+                                    <p>Tags : ${js_explode_val(events.tags,'tags')}</p>
+                                    <p>Groups : ${js_explode_val(events.groups,'groups')}</p>
+                                    <p>Industries : ${js_explode_val(events.industries,'industries')}</p>
                                 </div>
                                 <div style="width: 10%" class="text-center">
                                     <a href="javascript:void(0);" onclick="modal_iframe_source('${events.link}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
@@ -1187,6 +1188,38 @@ function loadAdversaries(){
             data = data_leak;
         }
         $('#adversaries').text(data.count);
+        let html = '';
+        if(parseInt(data.count) > 0){
+            html += `
+            <li id="adversaries_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#adversaries_coll">
+                        @icon('solid/caret-right') 
+                        Threat Actor ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="adversaries_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const adversaries = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${adversaries.link}')" class="fz-search-20px">
+                                        ${adversaries.name}
+                                    </a>
+
+                                    ${adversaries.content}
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${adversaries.link}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
         count_all += data.count ? parseInt(data.count) : 0;
         count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
@@ -1212,6 +1245,38 @@ function loadMalware(){
             data = data_leak;
         }
         $('#malware').text(data.count);
+        let html = '';
+        if(parseInt(data.count) > 0){
+            html += `
+            <li id="malware_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#malware_coll">
+                        @icon('solid/caret-right') 
+                        Malware ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="malware_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const malware = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('/indicators/detail_malware?malware_uuid=${encodeURIComponent(malware.name)}')" class="fz-search-20px">
+                                        ${malware.name}
+                                    </a>
+
+                                    ${malware.content}
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('/indicators/detail_malware?malware_uuid=${encodeURIComponent(malware.name)}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
         count_all += data.count ? parseInt(data.count) : 0;
         count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
@@ -1274,7 +1339,7 @@ function loadMalware(){
         });
     }
 
-    function check_last_status(val) {
+    function js_check_last_status(val) {
         if(val== true) {
             result = 'Modified';
         } else {
@@ -1283,7 +1348,7 @@ function loadMalware(){
         return result;
     }
 
-    function check_publish(val) {
+    function js_check_publish(val) {
         if(val==1) {
             let result = '<i class="fas fa-check"></i>';
         } else {
@@ -1292,7 +1357,7 @@ function loadMalware(){
         return result;
     }
 
-    function explode_val(val, type=null) {
+    function js_explode_val(val, type) {
         let result = '';
         if(val) {
             let val_arr = val.split(',');
@@ -1300,12 +1365,12 @@ function loadMalware(){
                 result += '<div>';
                 for(let i in val_arr){
                     const tag = val_arr[i];
-                    if($type == 'tags') {
-                        $result .=  '<a href="{{route('indicators.link_tags', ['id' => tag])}}">'.tag.'</a> ,';
-                    } else if ($type == 'groups') {
-                        $result .=  '<a href="{{route('indicators.link_group', ['id' => tag])}}">'.tag.'</a> ,';
+                    if(type == 'tags') {
+                        result +=  `<a href="/newTags?id=${tag}">${tag}</a> ,`;
+                    } else if (type == 'groups') {
+                        result +=  `<a href="/newGroups?id=${tag}">${tag}</a> ,`;
                     } else {
-                        $result .=  '<a href="#">'.$tag.'</a> ,';
+                        result +=  `<a href="#">${tag}</a> ,`;
                     }
                 }
                     
