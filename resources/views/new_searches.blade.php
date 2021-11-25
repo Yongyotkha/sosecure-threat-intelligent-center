@@ -28,7 +28,7 @@
         <header class="header panel-heading bg-white b-b b-light">
             <div class="bc-head">@langapp('search_results_for_tag',['keyword' => $keyword])</div>
             <span class="pull-right" style="margin-top: 1.2rem;font-size: 16px;font-weight: bold;">
-                Total Result : 
+                Total Result : <span id="total_all">0</span>
                 <button class="btn btn-info lookup" style="display:none;"><i class="fas fa-search"></i> Threat Lookup</button>
             </span>
         </header>
@@ -807,6 +807,7 @@ $(function(){
             function(){ 
                 if(count_rows == count_rows_finish){
                     $('#all').text(count_all);
+                    $('#total_all').text(count_all);
                     if(count_all == 0){
                         let html = '';
                         html += `<div class="notfound">
