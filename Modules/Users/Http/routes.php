@@ -1,5 +1,4 @@
 <?php
-
 Route::group(
     ['middleware' => ['web', 'permission:manage_users'], 'prefix' => 'users', 'namespace' => 'Modules\Users\Http\Controllers'],
     function () {
@@ -66,10 +65,6 @@ Route::group(
 
         Route::get('holiday/{status}', 'UserCustomController@holiday')->name('users.holiday')->middleware(['can:users_update']);
 
-        Route::get('2fa/complete/{secret}', 'TwoFactorCustomController@complete')->name('users.2fa.complete')->middleware(['can:menu_items']);
-        Route::get('2fa/disable', 'TwoFactorCustomController@disable')->name('users.2fa.disable')->middleware(['can:menu_items']);
-        Route::get('2fa', 'TwoFactorCustomController@twoFactor')->name('users.2fa');
-
         Route::get('oauth/create-client', 'OauthController@oauthClient')->name('oauth.create.client');
         Route::get('oauth/new-token', 'OauthController@oauthToken')->name('oauth.refresh.token');
         Route::post('oauth/new-token', 'OauthController@tokenRecreate')->name('oauth.recreate.token');
@@ -88,5 +83,8 @@ Route::group(
     function () {
         Route::get('profile', 'ProfileCustomController@profile')->name('users.profile')->middleware('can:menu_items');
         Route::post('change', 'ProfileCustomController@change')->name('users.change')->middleware('can:menu_items');
+        Route::get('users/2fa/complete/{secret}', 'TwoFactorCustomController@complete')->name('users.2fa.complete')->middleware(['can:menu_items']);
+        Route::get('users/2fa/disable', 'TwoFactorCustomController@disable')->name('users.2fa.disable')->middleware(['can:menu_items']);
+        Route::get('users/2fa', 'TwoFactorCustomController@twoFactor')->name('users.2fa');  
     }
 );
