@@ -38,34 +38,34 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div id="fillter_click" class="button-group">
-                                <a href="javascript:void(0)" data-btn="all" class="btn btn-selector btn_filter active">All </a>
+                                <a href="javascript:void(0)" data-btn="all" class="btn btn-selector btn_filter active">All <span id="all">0</span></a>
                                 @if($role_custom['news'])
-                                    <a href="javascript:void(0)" data-btn="news" class="btn btn-selector btn_filter">News </a>
+                                    <a href="javascript:void(0)" data-btn="news" class="btn btn-selector btn_filter">News <span id="news">0</label></a>
                                 @endif
                                 @if($role_custom['indicators'])
-                                    <a href="javascript:void(0)" data-btn="events" class="btn btn-selector btn_filter">Event </a>
+                                    <a href="javascript:void(0)" data-btn="events" id="" class="btn btn-selector btn_filter">Event <span id="events">0</label></a>
                                 @endif
                                 @if($role_custom['data_leak'])
-                                    <a href="javascript:void(0)" data-btn="data-leak" class="btn btn-selector btn_filter">Data Leak </a>
+                                    <a href="javascript:void(0)" data-btn="data-leak" id="" class="btn btn-selector btn_filter">Data Leak <span id="data_leak">0</label></a>
                                 @endif
                                 @if($role_custom['compromised'])
-                                    <a href="javascript:void(0)" data-btn="compromised" class="btn btn-selector btn_filter">Compromised </a>
+                                    <a href="javascript:void(0)" data-btn="compromised" id="" class="btn btn-selector btn_filter">Compromised <span id="compromised">0</span></a>
                                 @endif
                                 @if($role_custom['vulnerabilities'])
-                                    <a href="javascript:void(0)" data-btn="vulnerabilities" class="btn btn-selector btn_filter">Vulnerabilities </a>
+                                    <a href="javascript:void(0)" data-btn="vulnerabilities" id="" class="btn btn-selector btn_filter">Vulnerabilities <span id="vulnerabilities">0</span></a>
                                 @endif
                                 
                                 @if($role_custom['indicators'])
-                                    <a href="javascript:void(0)" data-btn="indicators" class="btn btn-selector btn_filter">Indicators </a>
+                                    <a href="javascript:void(0)" data-btn="indicators" id="" class="btn btn-selector btn_filter">Indicators <span id="indicators">0</span></a>
                                 @endif
 
                                      
                                 @if($role_custom['indicators'])
-                                    <a href="javascript:void(0)" data-btn="adversaries" class="btn btn-selector btn_filter">Threat Actor </a>
+                                    <a href="javascript:void(0)" data-btn="adversaries" id="" class="btn btn-selector btn_filter">Threat Actor <span id="adversaries">0</span></a>
                                 @endif
                                      
                                 @if($role_custom['indicators'])
-                                    <a href="javascript:void(0)" data-btn="malware" class="btn btn-selector btn_filter">Malware </a>
+                                    <a href="javascript:void(0)" data-btn="malware" id="" class="btn btn-selector btn_filter">Malware <span id="malware">0</span></a>
                                 @endif
                             </div>
                         </div>
@@ -548,7 +548,44 @@
 
             <div class="panel-group m-b" id="accordion2">
                 <ul class="list no-style" id="clauses-list">
+                    <li id="_head" class="panel panel-default">
+                        <div class="panel-heading fontw-weight-bold">
+                            <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#">
+                                @icon('solid/caret-right') 
+                                Threat Actor 0
+                            </a>
+                        </div>
+                        <div id="" class="panel-collapse collapse in">
+                                <div class="panel-body clause" data-div_i_type="">
+                                    <div class="item-search">
+                                        <div style="width: 90%;">
+                                            <a href="javascript:void(0);" onclick="" class="fz-search-20px">
+                                               
+                                            </a>
 
+                                            <div class="text-elips-ct"></div>
+                                            <p class="">Last Status :  | Public : </p>
+                                            <p>Tags : </p>
+                                            <p>Groups : </p>
+                                            <p>Industries : </p>
+                                        </div>
+                                        <div style="width: 10%" class="text-center">
+                                            <a href="javascript:void(0);" onclick=""class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel-body clause">
+                                    <a href="" target="_blank">
+                                        More
+                                    </a>
+                                    <div style="
+                                    max-height:100px;
+                                    overflow:hidden;
+                                    text-overflow: ellipsis;
+                                    -webkit-box-orient: vertical;"></div>
+                                </div>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </section>
@@ -585,6 +622,7 @@
 @include('stacks.js.multitext')
 <script>
     active_btn('#fillter_click .btn-selector');
+    var text_search_new = '{{request()->keyword}}';
     var mode_search = '{{ request()->mode }}';
     var btn_val;
     var btn_filter_indicators_type;
@@ -765,8 +803,254 @@ $(function(){
                     }).fail(function(jqXHR, ajaxOptions, thrownError){
                 console.log("No response from server");
         });
+    }else{
+        @if($role_custom['news'])
+            loadNews();
+        @endif
+        @if($role_custom['vulnerabilities'])
+            loadVulnerabilities();
+        @endif
+        @if($role_custom['compromised'])
+            loadCompromised();
+        @endif
+        @if($role_custom['data_leak'])
+            loadDataLeak();
+        @endif
+        @if($role_custom['web_defacement'])
+            loadWebDefacement();
+        @endif
+        loadIndicator1();
+        loadIndicator2();
+        loadIndicator3();
+        loadIndicator4();
+        loadIndicator5();
+        loadIndicator6();
     }
+    
 });
+
+function loadNews(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'news',
+        }),
+    }).done(function(res){
+        let data = [];
+        for(let i in res.dataSearch){
+            const data_leak = res.dataSearch[i];
+            data = data_leak;
+        }
+        $('#news').text(data.count);
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadVulnerabilities(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'vulnerabilities',
+        }),
+    }).done(function(res){
+        let data = [];
+        for(let i in res.dataSearch){
+            const data_leak = res.dataSearch[i];
+            data = data_leak;
+        }
+        $('#vulnerabilities').text(data.count);
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadCompromised(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'compromised',
+        }),
+    }).done(function(res){
+        let data = [];
+        for(let i in res.dataSearch){
+            const data_leak = res.dataSearch[i];
+            data = data_leak;
+        }
+        $('#compromised').text(data.count);
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadDataLeak(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'data_leak',
+        }),
+    }).done(function(res){
+        let data = [];
+        for(let i in res.dataSearch){
+            const data_leak = res.dataSearch[i];
+            data = data_leak;
+        }
+        $('#data_leak').text(data.count);
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadWebDefacement(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'web_defacement',
+        }),
+    }).done(function(res){
+        let data = [];
+        for(let i in res.dataSearch){
+            const data_leak = res.dataSearch[i];
+            data = data_leak;
+        }
+        $('#web_defacement').text(data.count);
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadIndicator1(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'indicators_1',
+        }),
+    }).done(function(res){
+        
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadIndicator2(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'indicators_2',
+        }),
+    }).done(function(res){
+        
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadIndicator3(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'indicators_3',
+        }),
+    }).done(function(res){
+        
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadIndicator4(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'indicators_4',
+        }),
+    }).done(function(res){
+        
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadIndicator5(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'indicators_5',
+        }),
+    }).done(function(res){
+        
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadIndicator6(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'indicators_6',
+        }),
+    }).done(function(res){
+        
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
 
     $(".btn_filter_indicators_type").click(function() {
         $("#indicators").collapse("show");
@@ -914,8 +1198,6 @@ $(function(){
         });      
     }
 
-
-    var text_search_new = '{{request()->keyword}}';
     let status_value_ibmcloud = 0;
     let status_value_virustotal = 0;
     let status_value_hybrid = 0;

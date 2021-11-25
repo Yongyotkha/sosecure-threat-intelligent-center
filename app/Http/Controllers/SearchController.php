@@ -75,7 +75,7 @@ class SearchController extends Controller
             }
 
             if(@$role_custom['vulnerabilities']) {
-                if($type == 'news'){
+                if($type == 'vulnerabilities'){
                     if(@get_role_custom()['superadmin'] == 1) {
                         $CVEMappingAssets_name = CVEMappingAssets::select('namecve')->get();
 
