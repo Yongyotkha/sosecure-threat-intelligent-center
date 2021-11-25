@@ -1366,9 +1366,9 @@ function loadMalware(){
                 for(let i in val_arr){
                     const tag = val_arr[i];
                     if(type == 'tags') {
-                        result +=  `<a href="/newTags?id=${tag}">${tag}</a> ,`;
+                        result +=  `<a href="/indicators/newTags?id=${tag}">${tag}</a> ,`;
                     } else if (type == 'groups') {
-                        result +=  `<a href="/newGroups?id=${tag}">${tag}</a> ,`;
+                        result +=  `<a href="/indicators/newGroups?id=${tag}">${tag}</a> ,`;
                     } else {
                         result +=  `<a href="#">${tag}</a> ,`;
                     }
