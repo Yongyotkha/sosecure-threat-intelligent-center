@@ -1511,45 +1511,48 @@ $.ajax({
         if(res.status_code == 400){
             $('.load-ibmcloud').remove();
         }else{
-            if(data.error){
-                $('#not-ibmcloud').show();
-                $('#table-ibmcloud').DataTable({
-                    "dom": 'tp',
-                    "searching": false,
-                    "bPaginate": true,
-                    "bLengthChange": false,
-                    "bFilter": false,
-                    "bInfo": false,
-                    "bAutoWidth": false ,
-                });
-            }else{
-                number_new_row++;
-                let num_total = 0;
-                if(data.score && data.score > 0){
-                    num_total = data.score;
-                }else if(data.malware){
-                    const malware = data.malware;
-                    num_total = malware.origins.external.detectionCoverage == 0 ? 0 : malware.origins.external.detectionCoverage / 10;
-                }else if(data.result.score > 0){
-                    num_total = data.result.score;
+            if(data){
+                if(data.error){
+                    $('#not-ibmcloud').show();
+                    $('#table-ibmcloud').DataTable({
+                        "dom": 'tp',
+                        "searching": false,
+                        "bPaginate": true,
+                        "bLengthChange": false,
+                        "bFilter": false,
+                        "bInfo": false,
+                        "bAutoWidth": false ,
+                    });
+                }else{
+                    number_new_row++;
+                    let num_total = 0;
+                    if(data.score && data.score > 0){
+                        num_total = data.score;
+                    }else if(data.malware){
+                        const malware = data.malware;
+                        num_total = malware.origins.external.detectionCoverage == 0 ? 0 : malware.origins.external.detectionCoverage / 10;
+                    }else if(data.result.score > 0){
+                        num_total = data.result.score;
+                    }
+                    
+                    $('#text_' + source).text(num_total);
+                    const elem = $("#circle-ibmcloud");
+                    if(num_total <= 3.9){
+                        status_value_ibmcloud = 1;
+                    }else if(num_total <= 6.9){
+                        status_value_ibmcloud = 2;
+                        elem[0].style.removeProperty('background-color');
+                        elem[0].style.setProperty('background-color', '#f2ff15', 'important');
+                        $('#text_' + source).css('color', '#f2ff15');
+                    }else if(num_total >= 7.0){
+                        status_value_ibmcloud = 3;
+                        elem[0].style.removeProperty('background-color');
+                        elem[0].style.setProperty('background-color', '#fcc838', 'important');
+                        $('#text_' + source).css('color', '#fcc838');
+                    }
                 }
+
                 
-                $('#text_' + source).text(num_total);
-                const elem = $("#circle-ibmcloud");
-                if(num_total <= 3.9){
-                    status_value_ibmcloud = 1;
-                }else if(num_total <= 6.9){
-                    status_value_ibmcloud = 2;
-                    elem[0].style.removeProperty('background-color');
-                    elem[0].style.setProperty('background-color', '#f2ff15', 'important');
-                    $('#text_' + source).css('color', '#f2ff15');
-                }else if(num_total >= 7.0){
-                    status_value_ibmcloud = 3;
-                    elem[0].style.removeProperty('background-color');
-                    elem[0].style.setProperty('background-color', '#fcc838', 'important');
-                    $('#text_' + source).css('color', '#fcc838');
-                }
-            }
             
             
             let html = ``;
@@ -1683,101 +1686,17 @@ $.ajax({
             
             $('.load-ibmcloud').remove();
             click_ibmcloud();
+            }else{
+                $('.load-ibmcloud').remove();
+            }
         }
     }else if(source == 'virustotal'){
         if(res.status_code == 400){
             $('.load-virustotal').remove();
         }else{
-            if(data.error){
-                $('#not-virustotal').show();
-                $('#table-virustotal').DataTable({
-                    "dom": 'tp',
-                    "searching": false,
-                    "bPaginate": true,
-                    "bLengthChange": false,
-                    "bFilter": false,
-                    "bInfo": false,
-                    "bAutoWidth": false ,
-                });
-            }else{
-                number_new_row++;
-                if(data.data){
-                    var last_analysis_stats = data.data.attributes.last_analysis_stats;
-                    if(data.data.attributes.last_analysis_stats.malicious && data.data.attributes.last_analysis_stats.malicious > 0){
-                        $('#text_' + source).text(data.data.attributes.last_analysis_stats.malicious);
-                        const elem = $("#circle-virustotal");
-                        if(last_analysis_stats.malicious > 0 && last_analysis_stats.malicious <= 3){
-                            status_value_virustotal = 1;
-                            elem[0].style.removeProperty('background-color');
-                            elem[0].style.setProperty('background-color', '#b93624', 'important');
-                            $('#text_' + source).css('color', '#b93624');
-                        }else if(last_analysis_stats.malicious <= 5){
-                            status_value_virustotal = 2;
-                            elem[0].style.removeProperty('background-color');
-                            elem[0].style.setProperty('background-color', '#b93624', 'important');
-                            $('#text_' + source).css('color', '#b93624');
-                        }else if(last_analysis_stats.malicious <= 7){
-                            status_value_virustotal = 3;
-                            elem[0].style.removeProperty('background-color');
-                            elem[0].style.setProperty('background-color', '#b93624', 'important');
-                            $('#text_' + source).css('color', '#b93624');
-                        }else if(last_analysis_stats.malicious >= 10){
-                            status_value_virustotal = 4;
-                            elem[0].style.removeProperty('background-color');
-                            elem[0].style.setProperty('background-color', '#b93624', 'important');
-                            $('#text_' + source).css('color', '#b93624');
-                        }
-                    }
-                    let total = (parseInt(last_analysis_stats.harmless) + parseInt(last_analysis_stats.malicious) + parseInt(last_analysis_stats.suspicious) + parseInt(last_analysis_stats.timeout) + parseInt(last_analysis_stats.undetected));
-                    $('#text_virustotal_sum').text('/ '+total);
-                    
-                    
-                    let html = ``;
-                    let count_data_virus = 0;
-                    for(let i in data.data.attributes.last_analysis_results){
-                        count_data_virus++;
-                        const last_analysis_results = data.data.attributes.last_analysis_results[i];
-                        html += `
-                        <tr>
-                            <td>${last_analysis_results.engine_name}</td>
-                            <td>${last_analysis_results.category}</td>
-                            <td>
-                                ${last_analysis_results.method} 
-                            </td>
-                            <td>`;
-                                if(last_analysis_results.result == 'malicious' || last_analysis_results.result == 'phishing' || last_analysis_results.result == 'malware'){
-                                    html += `<span class="label label-danger">
-                                        ${last_analysis_results.result}
-                                    </span>`; 
-                                }else if(last_analysis_results.result == 'suspicious'){
-                                    html += `<span class="label label-warning">
-                                        ${last_analysis_results.result}
-                                    </span>`;
-                                }else if(last_analysis_results.result == 'clean'){
-                                    html += `<span class="label label-success">
-                                        ${last_analysis_results.result}
-                                    </span>`;
-                                }else if(last_analysis_results.result == 'unrated'){
-                                    html += `<span class="label label-secondary">
-                                        ${last_analysis_results.result}
-                                    </span>`;
-                                }else if(last_analysis_results.result == null){
-                                    html += `<span class="label label-success">
-                                        undetected
-                                    </span>`;
-                                }else{
-                                    html += `<span class="label label-danger">
-                                        ${last_analysis_results.result}
-                                    </span>`; 
-                                }
-                            html += `</td>
-                        </tr>
-                        `;
-                    }
-                    if(count_data_virus == 0){
-                        $('#not-virustotal').show();
-                    }
-                    document.getElementById("tbody-virustotal").innerHTML = html;
+            if(data){
+                if(data.error){
+                    $('#not-virustotal').show();
                     $('#table-virustotal').DataTable({
                         "dom": 'tp',
                         "searching": false,
@@ -1787,155 +1706,250 @@ $.ajax({
                         "bInfo": false,
                         "bAutoWidth": false ,
                     });
+                }else{
+                    number_new_row++;
+                    if(data.data){
+                        var last_analysis_stats = data.data.attributes.last_analysis_stats;
+                        if(data.data.attributes.last_analysis_stats.malicious && data.data.attributes.last_analysis_stats.malicious > 0){
+                            $('#text_' + source).text(data.data.attributes.last_analysis_stats.malicious);
+                            const elem = $("#circle-virustotal");
+                            if(last_analysis_stats.malicious > 0 && last_analysis_stats.malicious <= 3){
+                                status_value_virustotal = 1;
+                                elem[0].style.removeProperty('background-color');
+                                elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                $('#text_' + source).css('color', '#b93624');
+                            }else if(last_analysis_stats.malicious <= 5){
+                                status_value_virustotal = 2;
+                                elem[0].style.removeProperty('background-color');
+                                elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                $('#text_' + source).css('color', '#b93624');
+                            }else if(last_analysis_stats.malicious <= 7){
+                                status_value_virustotal = 3;
+                                elem[0].style.removeProperty('background-color');
+                                elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                $('#text_' + source).css('color', '#b93624');
+                            }else if(last_analysis_stats.malicious >= 10){
+                                status_value_virustotal = 4;
+                                elem[0].style.removeProperty('background-color');
+                                elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                $('#text_' + source).css('color', '#b93624');
+                            }
+                        }
+                        let total = (parseInt(last_analysis_stats.harmless) + parseInt(last_analysis_stats.malicious) + parseInt(last_analysis_stats.suspicious) + parseInt(last_analysis_stats.timeout) + parseInt(last_analysis_stats.undetected));
+                        $('#text_virustotal_sum').text('/ '+total);
+                        
+                        
+                        let html = ``;
+                        let count_data_virus = 0;
+                        for(let i in data.data.attributes.last_analysis_results){
+                            count_data_virus++;
+                            const last_analysis_results = data.data.attributes.last_analysis_results[i];
+                            html += `
+                            <tr>
+                                <td>${last_analysis_results.engine_name}</td>
+                                <td>${last_analysis_results.category}</td>
+                                <td>
+                                    ${last_analysis_results.method} 
+                                </td>
+                                <td>`;
+                                    if(last_analysis_results.result == 'malicious' || last_analysis_results.result == 'phishing' || last_analysis_results.result == 'malware'){
+                                        html += `<span class="label label-danger">
+                                            ${last_analysis_results.result}
+                                        </span>`; 
+                                    }else if(last_analysis_results.result == 'suspicious'){
+                                        html += `<span class="label label-warning">
+                                            ${last_analysis_results.result}
+                                        </span>`;
+                                    }else if(last_analysis_results.result == 'clean'){
+                                        html += `<span class="label label-success">
+                                            ${last_analysis_results.result}
+                                        </span>`;
+                                    }else if(last_analysis_results.result == 'unrated'){
+                                        html += `<span class="label label-secondary">
+                                            ${last_analysis_results.result}
+                                        </span>`;
+                                    }else if(last_analysis_results.result == null){
+                                        html += `<span class="label label-success">
+                                            undetected
+                                        </span>`;
+                                    }else{
+                                        html += `<span class="label label-danger">
+                                            ${last_analysis_results.result}
+                                        </span>`; 
+                                    }
+                                html += `</td>
+                            </tr>
+                            `;
+                        }
+                        if(count_data_virus == 0){
+                            $('#not-virustotal').show();
+                        }
+                        document.getElementById("tbody-virustotal").innerHTML = html;
+                        $('#table-virustotal').DataTable({
+                            "dom": 'tp',
+                            "searching": false,
+                            "bPaginate": true,
+                            "bLengthChange": false,
+                            "bFilter": false,
+                            "bInfo": false,
+                            "bAutoWidth": false ,
+                        });
+                    }
                 }
+                $('.load-virustotal').remove();
+                click_virustotal();
+            }else{
+                $('.load-virustotal').remove();
             }
-            $('.load-virustotal').remove();
-            click_virustotal();
         }
     }else if(source == 'hybrid'){
         if(res.status_code == 400){
             $('.load-hybrid').remove();
         }else{
-            let html = ``;
-            let total = 0;
-            if(res.type == 'Domain'){
-                $('#table-hybrid').hide();
-                $('#table-hybrid-url').show();
-                for(let i in data.search_terms){
-                    const search_terms = data.search_terms[i];
-                    total += data.count;
-                    html += `
-                    <tr>
-                        <td>${search_terms.id}</td>
-                        <td>${search_terms.value}</td>
-                    </tr>
-                    `;
-                }
-                document.getElementById("tbody-hybrid-url").innerHTML = html;
-                $('#table-hybrid-url').DataTable({
-                    "dom": 'tp',
-                    "searching": false,
-                    "bPaginate": true,
-                    "bLengthChange": false,
-                    "bFilter": false,
-                    "bInfo": false,
-                    "bAutoWidth": false ,
-                });
-            }else if(data.result){
-                for(let i in data.result){
-                    const results = data.result[i];
-                    if(results.threat_score){
-                        total += results.threat_score;
-                    }else{
-                        total += results.av_detect;
+            if(res && data){
+                let html = ``;
+                let total = 0;
+                if(res.type == 'Domain'){
+                    $('#table-hybrid').hide();
+                    $('#table-hybrid-url').show();
+                    for(let i in data.search_terms){
+                        const search_terms = data.search_terms[i];
+                        total += data.count;
+                        html += `
+                        <tr>
+                            <td>${search_terms.id}</td>
+                            <td>${search_terms.value}</td>
+                        </tr>
+                        `;
                     }
-                    html += `
-                    <tr>
-                        <td>${results.environment_description}</td>
-                        <td>${results.sha256}</td>
-                        <td>${results.submit_name}</td>
-                        <td>${results.type_short}</td>
-                        <td>${results.threat_score ? results.threat_score : 0}/100</td>
-                        <td>${results.av_detect ? results.av_detect : 0}%</td>
-                        <td>${results.verdict}</td>
-                        <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
-                    </tr>
-                    `;
-                }
-                if(data.count == 0 || (total / data.count) == 0 || data.validation_errors){
-                    
-                }
-                let total_number = (total / (100 * data.count)).toFixed(2);
-                if(data.count && data.count > 0){
-                    $('#text_' + source).text(total_number);
-                }
-                const elem = $("#circle-hybrid");
-                if(total_number <= 0.39){
-                    status_value_hybrid = 1;
-                }else if(total_number <= 0.69){
-                    status_value_hybrid = 2;
-                    elem[0].style.removeProperty('background-color');
-                    elem[0].style.setProperty('background-color', '#f2ff15', 'important');
-                    $('#text_' + source).css('color', '#f2ff15');
-                }else if(total_number >= 0.70){
-                    status_value_hybrid = 3;
-                    elem[0].style.removeProperty('background-color');
-                    elem[0].style.setProperty('background-color', '#fcc838', 'important');
-                    $('#text_' + source).css('color', '#fcc838');
-                }
-                document.getElementById("tbody-hybrid").innerHTML = html;
-                $('#table-hybrid').DataTable({
-                    "dom": 'tp',
-                    "searching": false,
-                    "bPaginate": true,
-                    "bLengthChange": false,
-                    "bFilter": false,
-                    "bInfo": false,
-                    "bAutoWidth": false ,
-                });
-            }else if(data){
-                let count = 0;
-                for(let i in data){
-                    count++;
-                    const results = data[i];
-                    if(results.threat_score){
-                        total += results.threat_score;
-                    }else{
-                        total += results.av_detect;
+                    document.getElementById("tbody-hybrid-url").innerHTML = html;
+                    $('#table-hybrid-url').DataTable({
+                        "dom": 'tp',
+                        "searching": false,
+                        "bPaginate": true,
+                        "bLengthChange": false,
+                        "bFilter": false,
+                        "bInfo": false,
+                        "bAutoWidth": false ,
+                    });
+                }else if(data.result){
+                    for(let i in data.result){
+                        const results = data.result[i];
+                        if(results.threat_score){
+                            total += results.threat_score;
+                        }else{
+                            total += results.av_detect;
+                        }
+                        html += `
+                        <tr>
+                            <td>${results.environment_description}</td>
+                            <td>${results.sha256}</td>
+                            <td>${results.submit_name}</td>
+                            <td>${results.type_short}</td>
+                            <td>${results.threat_score ? results.threat_score : 0}/100</td>
+                            <td>${results.av_detect ? results.av_detect : 0}%</td>
+                            <td>${results.verdict}</td>
+                            <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
+                        </tr>
+                        `;
                     }
-                    
-                    html += `
-                    <tr>
-                        <td>${results.environment_description}</td>
-                        <td>${results.sha256}</td>
-                        <td>${results.submit_name}</td>
-                        <td>${results.type_short}</td>
-                        <td>${results.threat_score ? results.threat_score : 0}/100</td>
-                        <td>${results.av_detect ? results.av_detect : 0}%</td>
-                        <td>${results.verdict}</td>
-                        <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
-                    </tr>
-                    `;
-                }
-                if(count == 0 || (total / count) == 0 || data.validation_errors){
+                    if(data.count == 0 || (total / data.count) == 0 || data.validation_errors){
+                        
+                    }
+                    let total_number = (total / (100 * data.count)).toFixed(2);
+                    if(data.count && data.count > 0){
+                        $('#text_' + source).text(total_number);
+                    }
+                    const elem = $("#circle-hybrid");
+                    if(total_number <= 0.39){
+                        status_value_hybrid = 1;
+                    }else if(total_number <= 0.69){
+                        status_value_hybrid = 2;
+                        elem[0].style.removeProperty('background-color');
+                        elem[0].style.setProperty('background-color', '#f2ff15', 'important');
+                        $('#text_' + source).css('color', '#f2ff15');
+                    }else if(total_number >= 0.70){
+                        status_value_hybrid = 3;
+                        elem[0].style.removeProperty('background-color');
+                        elem[0].style.setProperty('background-color', '#fcc838', 'important');
+                        $('#text_' + source).css('color', '#fcc838');
+                    }
+                    document.getElementById("tbody-hybrid").innerHTML = html;
+                    $('#table-hybrid').DataTable({
+                        "dom": 'tp',
+                        "searching": false,
+                        "bPaginate": true,
+                        "bLengthChange": false,
+                        "bFilter": false,
+                        "bInfo": false,
+                        "bAutoWidth": false ,
+                    });
+                }else if(data){
+                    let count = 0;
+                    for(let i in data){
+                        count++;
+                        const results = data[i];
+                        if(results.threat_score){
+                            total += results.threat_score;
+                        }else{
+                            total += results.av_detect;
+                        }
+                        
+                        html += `
+                        <tr>
+                            <td>${results.environment_description}</td>
+                            <td>${results.sha256}</td>
+                            <td>${results.submit_name}</td>
+                            <td>${results.type_short}</td>
+                            <td>${results.threat_score ? results.threat_score : 0}/100</td>
+                            <td>${results.av_detect ? results.av_detect : 0}%</td>
+                            <td>${results.verdict}</td>
+                            <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
+                        </tr>
+                        `;
+                    }
+                    if(count == 0 || (total / count) == 0 || data.validation_errors){
 
-                }
-                let total_number = (total / (100 * count)).toFixed(2);
-                if(count && count > 0){
-                    $('#text_' + source).text(total_number);
-                }
+                    }
+                    let total_number = (total / (100 * count)).toFixed(2);
+                    if(count && count > 0){
+                        $('#text_' + source).text(total_number);
+                    }
 
-                const elem = $("#circle-hybrid");
-                if(total_number <= 0.39){
-                    status_value_hybrid = 1;
-                }else if(total_number <= 0.69){
-                    status_value_hybrid = 2;
-                    elem[0].style.removeProperty('background-color');
-                    elem[0].style.setProperty('background-color', '#f2ff15', 'important');
-                    $('#text_' + source).css('color', '#f2ff15');
-                }else if(total_number >= 0.70){
-                    status_value_hybrid = 3;
-                    elem[0].style.removeProperty('background-color');
-                    elem[0].style.setProperty('background-color', '#fcc838', 'important');
-                    $('#text_' + source).css('color', '#fcc838');
+                    const elem = $("#circle-hybrid");
+                    if(total_number <= 0.39){
+                        status_value_hybrid = 1;
+                    }else if(total_number <= 0.69){
+                        status_value_hybrid = 2;
+                        elem[0].style.removeProperty('background-color');
+                        elem[0].style.setProperty('background-color', '#f2ff15', 'important');
+                        $('#text_' + source).css('color', '#f2ff15');
+                    }else if(total_number >= 0.70){
+                        status_value_hybrid = 3;
+                        elem[0].style.removeProperty('background-color');
+                        elem[0].style.setProperty('background-color', '#fcc838', 'important');
+                        $('#text_' + source).css('color', '#fcc838');
+                    }
+                    document.getElementById("tbody-hybrid").innerHTML = html;
+                    $('#table-hybrid').DataTable({
+                        "dom": 'tp',
+                        "searching": false,
+                        "bPaginate": true,
+                        "bLengthChange": false,
+                        "bFilter": false,
+                        "bInfo": false,
+                        "bAutoWidth": false ,
+                    });
+                }else{
+                    number_new_row++;
+                    $('#not-hybrid').show();
                 }
-                document.getElementById("tbody-hybrid").innerHTML = html;
-                $('#table-hybrid').DataTable({
-                    "dom": 'tp',
-                    "searching": false,
-                    "bPaginate": true,
-                    "bLengthChange": false,
-                    "bFilter": false,
-                    "bInfo": false,
-                    "bAutoWidth": false ,
-                });
+                
+                $('.load-hybrid').remove();
+                click_hybrid();
             }else{
-                number_new_row++;
-                $('#not-hybrid').show();
+                $('.load-hybrid').remove();
             }
-            
-            $('.load-hybrid').remove();
-            click_hybrid();
         }
     }else if(source == 'otx_indicators'){
         if(res.status_code == 400){
