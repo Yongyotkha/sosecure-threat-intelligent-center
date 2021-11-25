@@ -64,7 +64,7 @@ class AuthController extends ApiController
             if($model_has_roles) {
                 if($model_has_roles->role_id == 1 || $model_has_roles->role_id == 2) {
                     $role_status = 0;
-                } else if($model_has_roles->role_id == 4 || $model_has_roles->role_id == 5 || $model_has_roles->role_id == 6) {
+                } else if($model_has_roles->role_id == 4 || $model_has_roles->role_id == 5 || $model_has_roles->role_id == 6 || $model_has_roles->role_id == 9 || $model_has_roles->role_id == 10) {
                     $role_status = 1;
                 } else {
                     $role_status = 0;
@@ -120,7 +120,7 @@ class AuthController extends ApiController
                     return response()->json(['error' => 'Username or password is incorrect', 'status_code' => '400']);
                 }
             } else {
-                return response()->json(['error' => 'Username or password is incorrect', 'status_code' => '400']);
+                return response()->json(['error' => 'Username or password is incorrect ', 'status_code' => '400', 'user' => $user_check]);
             }
 
 
