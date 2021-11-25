@@ -71,7 +71,7 @@
                         </div>
                     </div>
 
-                    <div class="row type_indicator" style="display: none;">
+                    {{-- <div class="row type_indicator" style="display: none;">
                         <div class="col-md-12">
                             <label style="margin-top: 5px;"><b>Type</b></label>
                         </div>
@@ -79,15 +79,15 @@
                     <div class="row type_indicator" style="display: none;">
                         <div class="col-md-12">
                             <div id="fillter_click" class="button-group">
-                                {{-- @if($indicators_type_unique)
+                                @if($indicators_type_unique)
                                 <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter_indicators_type active" data-btn_i_type="type_all">All</a>
                                     @foreach($indicators_type_unique as $indicators_type_unique_val)
                                         <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter_indicators_type" data-btn_i_type="type_{{$indicators_type_unique_val}}">{{$indicators_type_unique_val}}</a>
                                     @endforeach
-                                @endif --}}
+                                @endif
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </section>
 
@@ -548,44 +548,7 @@
 
             <div class="panel-group m-b" id="accordion2">
                 <ul class="list no-style" id="clauses-list">
-                    <li id="_head" class="panel panel-default">
-                        <div class="panel-heading fontw-weight-bold">
-                            <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#">
-                                @icon('solid/caret-right') 
-                                Threat Actor 0
-                            </a>
-                        </div>
-                        <div id="" class="panel-collapse collapse in">
-                                <div class="panel-body clause" data-div_i_type="">
-                                    <div class="item-search">
-                                        <div style="width: 90%;">
-                                            <a href="javascript:void(0);" onclick="" class="fz-search-20px">
-                                               
-                                            </a>
-
-                                            <div class="text-elips-ct"></div>
-                                            <p class="">Last Status :  | Public : </p>
-                                            <p>Tags : </p>
-                                            <p>Groups : </p>
-                                            <p>Industries : </p>
-                                        </div>
-                                        <div style="width: 10%" class="text-center">
-                                            <a href="javascript:void(0);" onclick=""class="btn btn-info"><i class="fas fa-eye"></i> View</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="panel-body clause">
-                                    <a href="" target="_blank">
-                                        More
-                                    </a>
-                                    <div style="
-                                    max-height:100px;
-                                    overflow:hidden;
-                                    text-overflow: ellipsis;
-                                    -webkit-box-orient: vertical;"></div>
-                                </div>
-                        </div>
-                    </li>
+                    
                 </ul>
             </div>
         </section>
@@ -844,6 +807,14 @@ $(function(){
             function(){ 
                 if(count_rows == count_rows_finish){
                     $('#all').text(count_all);
+                    if(count_all == 0){
+                        html += `<div class="notfound">
+                            <img src="{{asset('images/notfound.png')}}" alt="" style="max-width: 500px;width:100%:">
+                            <h1>Sorry. no result found</h1>
+                            <p>What you searched was unfortunately <br>not found or doesn't exist.</p>
+                        </div>`;
+                        $('#clauses-list').append(html);
+                    }
                     clearInterval(interval);
                 }
             }
@@ -866,10 +837,42 @@ function loadNews(){
     }).done(function(res){
         let data = [];
         for(let i in res.dataSearch){
-            const data_leak = res.dataSearch[i];
-            data = data_leak;
+            const news = res.dataSearch[i];
+            data = news;
         }
         $('#news').text(data.count);
+        if(parseInt(data.count) > 0){
+            let html = '';
+            html += `
+            <li id="news_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#news_coll">
+                        @icon('solid/caret-right') 
+                        News ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="news_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const news = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${news.link}')" class="fz-search-20px">
+                                        ${news.name}
+                                    </a>
+
+                                    ${news.content}
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${news.link}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
         count_all += data.count ? parseInt(data.count) : 0;
         count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
@@ -895,6 +898,38 @@ function loadVulnerabilities(){
             data = data_leak;
         }
         $('#vulnerabilities').text(data.count);
+        if(parseInt(data.count) > 0){
+            let html = '';
+            html += `
+            <li id="vulnerabilities_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#vulnerabilities_coll">
+                        @icon('solid/caret-right') 
+                        Vulnerabilities ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="vulnerabilities_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const vulnerabilities = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${vulnerabilities.link}')" class="fz-search-20px">
+                                        ${vulnerabilities.name}
+                                    </a>
+
+                                    ${vulnerabilities.content}
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${vulnerabilities.link}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
         count_all += data.count ? parseInt(data.count) : 0;
         count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
@@ -920,6 +955,38 @@ function loadCompromised(){
             data = data_leak;
         }
         $('#compromised').text(data.count);
+        if(parseInt(data.count) > 0){
+            let html = '';
+            html += `
+            <li id="compromised_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#compromised_coll">
+                        @icon('solid/caret-right') 
+                        Compromised ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="compromised_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const compromised = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${compromised.link}')" class="fz-search-20px">
+                                        ${compromised.name}
+                                    </a>
+
+                                    ${compromised.content}
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${compromised.link}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
         count_all += data.count ? parseInt(data.count) : 0;
         count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
@@ -945,6 +1012,38 @@ function loadDataLeak(){
             data = data_leak;
         }
         $('#data_leak').text(data.count);
+        if(parseInt(data.count) > 0){
+            let html = '';
+            html += `
+            <li id="data_leak_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#data_leak_coll">
+                        @icon('solid/caret-right') 
+                        Data Leak ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="data_leak_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const data_leak = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${data_leak.link}')" class="fz-search-20px">
+                                        ${data_leak.name}
+                                    </a>
+
+                                    ${data_leak.content}
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${data_leak.link}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
         count_all += data.count ? parseInt(data.count) : 0;
         count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
@@ -970,6 +1069,38 @@ function loadWebDefacement(){
             data = data_leak;
         }
         $('#web_defacement').text(data.count);
+        if(parseInt(data.count) > 0){
+            let html = '';
+            html += `
+            <li id="web_defacement_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#web_defacement_coll">
+                        @icon('solid/caret-right') 
+                        Web Defacement ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="web_defacement_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const web_defacement = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${web_defacement.link}')" class="fz-search-20px">
+                                        ${web_defacement.name}
+                                    </a>
+
+                                    ${web_defacement.content}
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${web_defacement.link}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
         count_all += data.count ? parseInt(data.count) : 0;
         count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
@@ -995,6 +1126,42 @@ function loadEvents(){
             data = data_leak;
         }
         $('#events').text(data.count);
+        if(parseInt(data.count) > 0){
+            let html = '';
+            html += `
+            <li id="events_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#events_coll">
+                        @icon('solid/caret-right') 
+                        Events ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="events_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const events = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${events.link}')" class="fz-search-20px">
+                                        ${events.name}
+                                    </a>
+
+                                    <p class="">Last Status : ${check_last_status(events.is_modified)} | Public : ${check_publish(events.public)}</p>
+                                                           
+                                    <p>Tags : {!!explode_val($value2['tags'],'tags')!!}</p>
+                                    <p>Groups : {!!explode_val($value2['groups'],'groups')!!}</p>
+                                    <p>Industries : {!!explode_val($value2['industries'],'industries')!!}</p>
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${events.link}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
         count_all += data.count ? parseInt(data.count) : 0;
         count_rows_finish++;
     }).fail(function(jqXHR, ajaxOptions, thrownError){
@@ -1106,6 +1273,57 @@ function loadMalware(){
             console.log("No response from server");
         });
     }
+
+    function check_last_status(val) {
+        if(val== true) {
+            result = 'Modified';
+        } else {
+            result = 'Created';
+        }
+        return result;
+    }
+
+    function check_publish(val) {
+        if(val==1) {
+            let result = '<i class="fas fa-check"></i>';
+        } else {
+            let result = '';
+        }
+        return result;
+    }
+
+    function explode_val(val, type=null) {
+        let result = '';
+        if(val) {
+            let val_arr = val.split(',');
+            if(val_arr) {
+                result += '<div>';
+                for(let i in val_arr){
+                    const tag = val_arr[i];
+                    if($type == 'tags') {
+                        $result .=  '<a href="{{route('indicators.link_tags', ['id' => tag])}}">'.tag.'</a> ,';
+                    } else if ($type == 'groups') {
+                        $result .=  '<a href="{{route('indicators.link_group', ['id' => tag])}}">'.tag.'</a> ,';
+                    } else {
+                        $result .=  '<a href="#">'.$tag.'</a> ,';
+                    }
+                }
+                    
+                result += '</div>';
+                result += result.rtrim(',');
+            }
+        } else {
+            result = '';
+        }
+        return result;
+    }
+
+    String.prototype.rtrim = function (s) {
+        if (s == undefined)
+            s = '\\s';
+        return this.replace(new RegExp("[" + s + "]*$"), '');
+    };
+
 
 
     $('.int-lookup-main').hide();
