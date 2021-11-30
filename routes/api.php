@@ -139,6 +139,9 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('search/loadSearchAPI', 'Api\ApiSearchController@loadSearchAPI');
 
     Route::post('transaction_send_log_error', 'Api\ReciveLogErrorController@recive_log_error');
+
+    //Agent
+    Route::post('agentCenter/dataInfo', 'Api\ApiAgentController@dataInfo');
 });
 
 Route::group(['prefix' => 'v1/client-transfer'], function () {
