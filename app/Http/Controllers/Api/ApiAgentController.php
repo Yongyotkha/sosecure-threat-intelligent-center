@@ -37,7 +37,7 @@ class ApiAgentController extends ApiController
                 $ip_private = $data_key['ip_private'];
 
                 $error = [];
-                if(empty($device_name) || empty($os_type) || empty($os_description) || empty($system_info) || empty($domain) || mpty($ip_private)){
+                if(empty($device_name) || empty($os_type) || empty($os_description) || empty($system_info) || empty($domain) || empty($ip_private)){
                     if(empty($device_name)){
                         $error['device_name'] = 'Device name is empty';
                     }
