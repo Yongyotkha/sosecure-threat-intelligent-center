@@ -67,7 +67,8 @@ class ApiAgentController extends ApiController
             return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
         } catch (\Exception $e) {
             $response = array(
-                'message' => $e -> getMessage(),
+                'status_code' => 500,
+                'error' => $e -> getMessage(),
             );
             $data_transcation = json_encode($response);
             $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
@@ -140,7 +141,8 @@ class ApiAgentController extends ApiController
             return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
         } catch (\Exception $e) {
             $response = array(
-                'message' => $e -> getMessage(),
+                'status_code' => 500,
+                'error' => $e -> getMessage(),
             );
             $data_transcation = json_encode($response);
             $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
@@ -203,7 +205,8 @@ class ApiAgentController extends ApiController
             return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
         } catch (\Exception $e) {
             $response = array(
-                'message' => $e -> getMessage(),
+                'status_code' => 500,
+                'error' => $e -> getMessage(),
             );
             $data_transcation = json_encode($response);
             $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
@@ -237,7 +240,8 @@ class ApiAgentController extends ApiController
             return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
         } catch (\Exception $e) {
             $response = array(
-                'message' => $e -> getMessage(),
+                'status_code' => 500,
+                'error' => $e -> getMessage(),
             );
             $data_transcation = json_encode($response);
             $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
@@ -275,7 +279,8 @@ class ApiAgentController extends ApiController
             return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
         } catch (\Exception $e) {
             $response = array(
-                'message' => $e -> getMessage(),
+                'status_code' => 500,
+                'error' => $e -> getMessage(),
             );
             $data_transcation = json_encode($response);
             $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
@@ -324,7 +329,8 @@ class ApiAgentController extends ApiController
             return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
         } catch (\Exception $e) {
             $response = array(
-                'message' => $e -> getMessage(),
+                'status_code' => 500,
+                'error' => $e -> getMessage(),
             );
             $data_transcation = json_encode($response);
             $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
@@ -377,7 +383,8 @@ class ApiAgentController extends ApiController
             return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
         } catch (\Exception $e) {
             $response = array(
-                'message' => $e -> getMessage(),
+                'status_code' => 500,
+                'error' => $e -> getMessage(),
             );
             $data_transcation = json_encode($response);
             $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
@@ -419,8 +426,8 @@ class ApiAgentController extends ApiController
 
         } catch (\Exception $e) {
             $response = array(
-                'status' => 0,
-                'message' => $e -> getMessage(),
+                'status_code' => 500,
+                'error' => $e -> getMessage(),
             );
             return response()->json($response);
         }
