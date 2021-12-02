@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\FXSiteAgents;
+use Firebase\JWT\JWT;
+use Hautelook\Phpass\PasswordHash;
 use Illuminate\Http\Request;
 use Modules\Users\Entities\model_has_roles;
 use Modules\Users\Entities\User;
@@ -22,11 +25,38 @@ class ApiAgentController extends ApiController
                     'data' => []
                 ];
             } else {
-                $response = [
-                    'error' => '', 
-                    'status_code' => 200,
-                    'data' => []
-                ];
+                $data_key = $data['data'];
+                $device_name = $data_key['device_name'];
+                $os_type = $data_key['os_type'];
+                $os_description = $data_key['os_description'];
+                $system_info = $data_key['system_info'];
+                $domain = $data_key['domain'];
+                $ip_private = $data_key['ip_private'];
+                $siteAgentsHasData = FXSiteAgents::where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
+                if(empty($siteAgentsHasData)){
+                    $siteAgents = new FXSiteAgents();
+                    $siteAgents -> site_id = $data['site']['data']['id'];
+                    $siteAgents -> device_name = $device_name;
+                    $siteAgents -> os_type = $os_type;
+                    $siteAgents -> os_description = $os_description;
+                    $siteAgents -> system_info = $system_info;
+                    $siteAgents -> domain = $domain;
+                    $siteAgents -> ip_private = $ip_private;
+                    $siteAgents -> status = 0;
+                    $siteAgents -> save();
+
+                    $response = [
+                        'error' => '', 
+                        'status_code' => 200,
+                        'data' => $siteAgents
+                    ];
+                }else{
+                    $response = [
+                        'error' => 'Has data site agent', 
+                        'status_code' => 200,
+                        'data' => []
+                    ];
+                }
             }
 
             $data_transcation = json_encode($response);
@@ -34,12 +64,11 @@ class ApiAgentController extends ApiController
             return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
         } catch (\Exception $e) {
             $response = array(
-                'status' => 0,
                 'message' => $e -> getMessage(),
             );
             $data_transcation = json_encode($response);
             $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
-            return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
+            return response()->json(['error' => '', 'status_code' => 500, 'data' => $datas]);
         }
     }
 
@@ -49,9 +78,9 @@ class ApiAgentController extends ApiController
             $mode = $request->mode;
             $data_request = $request->data;
             
-            $site = $this->AuthorizationLogin($header, $request->mode, $request->code);
+            $site = $this->AuthorizationAgent($header, $request->code);
             if($site['status_code'] !== '200'){
-                return $this->AuthorizationLogin($header, $request->mode, $request->code);
+                return $this->AuthorizationAgent($header, $request->code);
             }
 
             $data = $this->dataFalse($header, $mode, $data_request);
@@ -62,39 +91,45 @@ class ApiAgentController extends ApiController
                     'data' => []
                 ];
             } else {
-                $data_key = json_decode($data, true);
-                $user_check = User::where('email', $data_key['email'])->where('email_verified_at','!=',null)->where('banned',0)->where('deleted_at',null)->where('active',1)->where('verify',1)->first();
-                $UserSite = UserSite::where('user_id',@$user_check->id)->where('active',1)->get()->pluck('site_id')->toArray();
-
-                $role_status = 0;
-                $user = User::where('email', $data_key['email'])->where('site_id', $site['data']['id'])->where('email_verified_at','!=',null)->where('banned',0)->where('deleted_at',null)->where('active',1)->where('verify',1);
-                $user = $user->where(function($q) {
+                $data_key = $data['data'];
+                $user = User::where('email', $data_key['email'])->where('email_verified_at','!=',null)->where('banned',0)
+                ->where('deleted_at',null)->where('active',1)
+                ->where('verify',1)->where('site_id', $data['site']['data']['id'])
+                ->where('site_role_id', 6)
+                ->where(function($q) {
                     $q->whereNull('password_time_expire');
                     $q->orWhereDate('password_time_expire', '<=', date('Y-m-d H:i:s'));
-                });
-                $user = $user->whereHas('get_user_site_many', function($q) use ($UserSite) {
-                    $q->whereIn('site_id', $UserSite);
-                });
+                })->first();
 
-                $user = $user->first();
-                $model_has_roles = model_has_roles::where('role_id',@$user->get_model_has_roles->role_id)->first();
-                if($model_has_roles) {
-                    if($model_has_roles->role_id == 1 || $model_has_roles->role_id == 2) {
-                        $role_status = 0;
-                    } else if($model_has_roles->role_id == 4 || $model_has_roles->role_id == 5 || $model_has_roles->role_id == 6 || $model_has_roles->role_id == 9 || $model_has_roles->role_id == 10) {
-                        $role_status = 1;
-                    } else {
-                        $role_status = 0;
+                if ($user != null) {
+                    $passwordHasher = new PasswordHash(8, true);
+                    $passwordMatch  = $passwordHasher->CheckPassword($data_key['password'], $user->password);
+                    if ($passwordMatch) {
+                        $token = $this->jwt($user);
+                        $user -> access_token = $token;
+                        $user -> save();
+
+                        $response = [
+                            'error' => '', 
+                            'status_code' => 200,
+                            'data' => [
+                                'user' => $user
+                            ]
+                        ];
+                    }else{
+                        $response = [
+                            'error' => 'Username or password is incorrect', 
+                            'status_code' => 400,
+                            'data' => []
+                        ];
                     }
+                }else{
+                    $response = [
+                        'error' => 'Username or password is incorrect', 
+                        'status_code' => 400,
+                        'data' => []
+                    ];
                 }
-
-                $response = [
-                    'error' => '', 
-                    'status_code' => 200,
-                    'data' => [
-                        'user' => $user
-                    ]
-                ];
             }
 
             $data_transcation = json_encode($response);
@@ -102,13 +137,24 @@ class ApiAgentController extends ApiController
             return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
         } catch (\Exception $e) {
             $response = array(
-                'status' => 0,
                 'message' => $e -> getMessage(),
             );
             $data_transcation = json_encode($response);
             $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
-            return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
+            return response()->json(['error' => '', 'status_code' => 500, 'data' => $datas]);
         }
+    }
+
+    protected function jwt($user)
+    {
+        $payload = [
+            'iss' => "lumen-jwt", // Issuer of the token
+            'sub' => $user->id, // Subject of the token
+            'iat' => time(), // Time when JWT was issued.
+            'exp' => time() + env('JWT_EXPIRE_HOUR') * 60 * 60, // Expiration time
+        ];
+
+        return JWT::encode($payload, env('JWT_SECRET'));
     }
 
     private function dataFalse($bearerToken, $mode, $data){

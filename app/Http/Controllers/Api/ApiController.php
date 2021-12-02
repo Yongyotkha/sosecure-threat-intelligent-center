@@ -102,6 +102,19 @@ class ApiController extends Controller
         }
     }
 
+    protected function AuthorizationAgent($header, $code){
+        $site = SiteSettings::where('code', $code)->where('public_key', $header)->first();
+        if(empty($site)){
+            return ['error' => 'The request parameters are invalid', 'status_code' => '400'];
+        }else{
+            if(($site->start_active <= date("Y-m-d H:i:s") && $site->end_active >= date("Y-m-d H:i:s")) && $site->deleted_at == null){
+                return ['error' => '', 'status_code' => '200', 'data' => $site];
+            }else{
+                return ['error' => 'Site expried or Site deleted', 'status_code' => '403'];
+            }
+        }
+    }
+
     protected function Authorization($header, $mode, $code){
         if($mode == 'site_offline'){
             $user = User::where('access_token', $header)->first();
