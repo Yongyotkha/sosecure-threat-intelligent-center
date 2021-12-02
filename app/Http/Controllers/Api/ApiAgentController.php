@@ -172,7 +172,7 @@ class ApiAgentController extends ApiController
                         ->get();
                         $ruleFiles = [];
                         foreach($ruleSites as $ruleSite){
-                            $ruleFiles[] = RuleFile::where('id', $ruleSite -> rule_id)->first();
+                            $ruleFiles[] = RuleFile::where('id', $ruleSite -> rule_id)->where('transaction_download_client', 1)->first();
                         }
                         $response = [
                             'error' => '', 
@@ -196,6 +196,78 @@ class ApiAgentController extends ApiController
                         'data' => []
                     ];
                 }
+            }
+
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
+        } catch (\Exception $e) {
+            $response = array(
+                'message' => $e -> getMessage(),
+            );
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 500, 'data' => $datas]);
+        }
+    }
+
+    public function downloadRule(Request $request){
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            if ($data === false) {
+                $response =[
+                    'error' => 'The request parameters are invalid',
+                    'status_code' => 400,
+                    'data' => []
+                ];
+            } else {
+                $ruleFiles = RuleFile::where('transaction_download_client', 0)->get();
+                $response = [
+                    'error' => '', 
+                    'status_code' => 200,
+                    'data' => $ruleFiles
+                ];
+            }
+
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
+        } catch (\Exception $e) {
+            $response = array(
+                'message' => $e -> getMessage(),
+            );
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 500, 'data' => $datas]);
+        }
+    }
+
+    public function downloadRuleComplete(Request $request){
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            if ($data === false) {
+                $response =[
+                    'error' => 'The request parameters are invalid',
+                    'status_code' => 400,
+                    'data' => []
+                ];
+            } else {
+                $id = $data['data']['id'];
+                $ruleFiles = RuleFile::where('id', $id)->where('transaction_download_client', 0)->first();
+                if($ruleFiles){
+                    $ruleFiles -> transaction_download_client = 1;
+                    $ruleFiles -> save();
+                }
+                $response = [
+                    'error' => '', 
+                    'status_code' => 200,
+                ];
             }
 
             $data_transcation = json_encode($response);
@@ -237,6 +309,59 @@ class ApiAgentController extends ApiController
                         'data' => [
                             'last_online' => $now->toDateTimeString()
                         ]
+                    ];
+                }else{
+                    $response = [
+                        'error' => 'Data not found', 
+                        'status_code' => 200,
+                        'data' => []
+                    ];
+                }
+            }
+
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
+        } catch (\Exception $e) {
+            $response = array(
+                'message' => $e -> getMessage(),
+            );
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 500, 'data' => $datas]);
+        }
+    }
+
+    public function updateRuleDownload(Request $request){
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            if ($data === false) {
+                $response =[
+                    'error' => 'The request parameters are invalid',
+                    'status_code' => 400,
+                    'data' => []
+                ];
+            } else {
+                $data_key = $data['data'];
+                $agent_id = $data_key['agent_id'];
+                $rule_id = $data_key['rule_id'];
+
+                $ruleSites = RuleSite::where('site_id', $data['site']['data']['id'])
+                ->where('agent_id', $agent_id)
+                ->where('rule_id', $rule_id)
+                ->where('transaction_download', 0)
+                ->first();
+
+                if($ruleSites){
+                    $ruleSites -> transaction_download = 1;
+                    $ruleSites -> save();
+                    $response = [
+                        'error' => '', 
+                        'status_code' => 200,
+                        'data' => $ruleSites
                     ];
                 }else{
                     $response = [

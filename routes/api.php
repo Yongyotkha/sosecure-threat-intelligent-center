@@ -145,6 +145,9 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('agentCenter/loginAgent', 'Api\ApiAgentController@loginAgent');
     Route::post('agentCenter/checkedAgentApproved', 'Api\ApiAgentController@checkedAgentApproved');
     Route::post('agentCenter/agentOnlineTimestamp', 'Api\ApiAgentController@agentOnlineTimestamp');
+    Route::post('agentCenter/updateRuleDownload', 'Api\ApiAgentController@updateRuleDownload');
+    Route::post('agentCenter/downloadRule', 'Api\ApiAgentController@downloadRule');
+    Route::post('agentCenter/downloadRuleComplete', 'Api\ApiAgentController@downloadRuleComplete');
 });
 
 Route::group(['prefix' => 'v1/client-transfer'], function () {
