@@ -143,6 +143,8 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     //Agent
     Route::post('agentCenter/dataInfo', 'Api\ApiAgentController@dataInfo');
     Route::post('agentCenter/loginAgent', 'Api\ApiAgentController@loginAgent');
+    Route::post('agentCenter/checkedAgentApproved', 'Api\ApiAgentController@checkedAgentApproved');
+    Route::post('agentCenter/agentOnlineTimestamp', 'Api\ApiAgentController@agentOnlineTimestamp');
 });
 
 Route::group(['prefix' => 'v1/client-transfer'], function () {

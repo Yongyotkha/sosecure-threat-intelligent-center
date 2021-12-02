@@ -617,7 +617,7 @@ class AgentManagementController extends Controller
                         'site_agents.ip_private as site_agents_ip_private',
                         'site_agents.last_online as site_agents_last_online',
                         'site_agents.status as site_agents_status',
-                        'site_agents.created as site_agents_created'
+                        'site_agents.created_at as site_agents_created'
                     )
                     ->where('status', '1');
 
