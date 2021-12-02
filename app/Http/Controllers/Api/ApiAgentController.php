@@ -35,30 +35,64 @@ class ApiAgentController extends ApiController
                 $system_info = $data_key['system_info'];
                 $domain = $data_key['domain'];
                 $ip_private = $data_key['ip_private'];
-                $siteAgentsHasData = FXSiteAgents::where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
-                if(empty($siteAgentsHasData)){
-                    $siteAgents = new FXSiteAgents();
-                    $siteAgents -> site_id = $data['site']['data']['id'];
-                    $siteAgents -> device_name = $device_name;
-                    $siteAgents -> os_type = $os_type;
-                    $siteAgents -> os_description = $os_description;
-                    $siteAgents -> system_info = $system_info;
-                    $siteAgents -> domain = $domain;
-                    $siteAgents -> ip_private = $ip_private;
-                    $siteAgents -> status = 0;
-                    $siteAgents -> save();
+
+                $error = [];
+                if(empty($device_name) || empty($os_type) || empty($os_description) || empty($system_info) || empty($domain) || mpty($ip_private)){
+                    if(empty($device_name)){
+                        $error['device_name'] = 'Device name is empty';
+                    }
+    
+                    if(empty($os_type)){
+                        $error['os_type'] = 'OS Type is empty';
+                    }
+    
+                    if(empty($os_description)){
+                        $error['os_description'] = 'OS Description is empty';
+                    }
+    
+                    if(empty($system_info)){
+                        $error['system_info'] = 'System Info is empty';
+                    }
+    
+                    if(empty($domain)){
+                        $error['domain'] = 'Domain is empty';
+                    }
+    
+                    if(empty($ip_private)){
+                        $error['ip_private'] = 'IP Private is empty';
+                    }
 
                     $response = [
-                        'error' => '', 
-                        'status_code' => 200,
-                        'data' => $siteAgents
-                    ];
-                }else{
-                    $response = [
-                        'error' => 'Has data site agent', 
-                        'status_code' => 200,
+                        'error' => $error, 
+                        'status_code' => 400,
                         'data' => []
                     ];
+                }else{
+                    $siteAgentsHasData = FXSiteAgents::where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
+                    if(empty($siteAgentsHasData)){
+                        $siteAgents = new FXSiteAgents();
+                        $siteAgents -> site_id = $data['site']['data']['id'];
+                        $siteAgents -> device_name = $device_name;
+                        $siteAgents -> os_type = $os_type;
+                        $siteAgents -> os_description = $os_description;
+                        $siteAgents -> system_info = $system_info;
+                        $siteAgents -> domain = $domain;
+                        $siteAgents -> ip_private = $ip_private;
+                        $siteAgents -> status = 0;
+                        $siteAgents -> save();
+    
+                        $response = [
+                            'error' => '', 
+                            'status_code' => 200,
+                            'data' => $siteAgents
+                        ];
+                    }else{
+                        $response = [
+                            'error' => 'Has data site agent', 
+                            'status_code' => 200,
+                            'data' => []
+                        ];
+                    }
                 }
             }
 
