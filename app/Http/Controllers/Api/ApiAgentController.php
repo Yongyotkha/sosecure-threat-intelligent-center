@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\FXSiteAgents;
 use App\RuleFile;
 use App\RuleSite;
+use App\YaraLog;
 use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use Hautelook\Phpass\PasswordHash;
@@ -410,6 +411,65 @@ class ApiAgentController extends ApiController
                         'data' => []
                     ];
                 }
+            }
+
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'error' => $e -> getMessage(),
+            );
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 500, 'data' => $datas]);
+        }
+    }
+
+    public function sendLogYara(Request $request){
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            if ($data === false) {
+                $response =[
+                    'error' => 'The request parameters are invalid',
+                    'status_code' => 400,
+                    'data' => []
+                ];
+            } else {
+                $data_key = $data['data'];
+                $yara = $data_key['yara'];
+
+                $yaraLogs = [];
+                foreach($yara as $yaraData){
+                    $agent_id = $yaraData['agent_id'];
+                    $path = $yaraData['path'];
+                    $rule = $yaraData['rule'];
+                    $description = $yaraData['description'];
+                    $device_name = $yaraData['device_name'];
+                    $file_text = $yaraData['file_text'];
+
+                    $yaraLog = new YaraLog();
+                    $yaraLog -> agent_id = $agent_id;
+                    $yaraLog -> site_id = $data['site']['data']['id'];
+                    $yaraLog -> path = $path;
+                    $yaraLog -> rule = $rule;
+                    $yaraLog -> description = $description;
+                    $yaraLog -> device_name = $device_name;
+                    $yaraLog -> file_text = $file_text;
+                    $yaraLog -> save();
+
+                    $yaraLogs[] = $yaraLog;
+                }
+
+                $response = [
+                    'error' => '', 
+                    'status_code' => 200,
+                    'data' => $yaraLogs
+                ];
             }
 
             $data_transcation = json_encode($response);
