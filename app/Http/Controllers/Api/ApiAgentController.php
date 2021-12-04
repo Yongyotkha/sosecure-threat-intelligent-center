@@ -453,16 +453,26 @@ class ApiAgentController extends ApiController
                     $device_name = $yaraData['device_name'];
                     $file_text = $yaraData['file_text'];
 
-                    $yaraLog = new YaraLog();
-                    $yaraLog -> agent_id = $agent_id;
-                    $yaraLog -> site_id = $data['site']['data']['id'];
-                    $yaraLog -> path = $path;
-                    $yaraLog -> rule = $rule;
-                    $yaraLog -> description = $description;
-                    $yaraLog -> device_name = $device_name;
-                    $yaraLog -> file_text = $file_text;
-                    $yaraLog -> save();
+                    $yaraLog = YaraLog::where('agent_id', $agent_id)->where('site_id', $data['site']['data']['id'])
+                    ->where('path', $path)
+                    ->where('rule', $rule)
+                    ->first();
 
+                    if($yaraLog){
+                        $yaraLog -> updated_at = Carbon::now();
+                        $yaraLog -> save();
+                    }else{
+                        $yaraLog = new YaraLog();
+                        $yaraLog -> agent_id = $agent_id;
+                        $yaraLog -> site_id = $data['site']['data']['id'];
+                        $yaraLog -> path = $path;
+                        $yaraLog -> rule = $rule;
+                        $yaraLog -> description = $description;
+                        $yaraLog -> device_name = $device_name;
+                        $yaraLog -> file_text = $file_text;
+                        $yaraLog -> save();
+                    }
+                    
                     $yaraLogs[] = $yaraLog;
                 }
 
