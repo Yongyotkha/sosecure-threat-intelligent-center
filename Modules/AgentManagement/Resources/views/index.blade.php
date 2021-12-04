@@ -555,7 +555,7 @@
                                                             <th>
                                                                 Description
                                                             </th>
-                                                            <th>Incident</th>
+                                                            {{-- <th>Incident</th> --}}
                                                             <th>Severity</th>
                                                             <th>Datetime</th>
                                                             <th class="text-center">Action</th>
@@ -1390,9 +1390,9 @@
                 {
                     data: 'agent_alerts_description',
                 },
-                {
+                {{-- {
                     data: 'agent_alerts_incident',
-                },
+                }, --}}
                 {
                     data: 'sev_status',
                 },

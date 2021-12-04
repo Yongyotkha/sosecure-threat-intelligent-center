@@ -14,6 +14,7 @@ use App\FXAgentAlerts;
 use App\FXAgentLogs;
 use App\FXAgentRules;
 use App\FXAgentSchedule;
+use App\YaraLog;
 use Modules\SiteSettings\Entities\Menu;
 use Modules\SiteSettings\Entities\Menu_sub;
 use Modules\SiteSettings\Entities\site_config_email_alert;
@@ -468,21 +469,20 @@ class AgentManagementController extends Controller
 
         // dd($input);
 
-        $query = FXAgentAlerts::
-                    join('site', 'agent_alerts.site_id', 'site.id')
+        $query = YaraLog::
+                    join('site', 'yara_log.site_id', 'site.id')
                     ->select(
                         'site.name as site_name',
                         'site.logo as site_logo',
-                        'agent_alerts.id as agent_alerts_id',
-                        'agent_alerts.rule as agent_alerts_rule',
-                        'agent_alerts.description as agent_alerts_description',
-                        'agent_alerts.incident as agent_alerts_incident',
-                        'agent_alerts.severity as agent_alerts_severity',
-                        'agent_alerts.status as agent_alerts_status',
-                        'agent_alerts.created as agent_alerts_created'
+                        'yara_log.id as agent_alerts_id',
+                        'yara_log.rule as agent_alerts_rule',
+                        'yara_log.description as agent_alerts_description',
+                        'yara_log.severity as agent_alerts_severity',
+                        'yara_log.status as agent_alerts_status',
+                        'yara_log.created_at as agent_alerts_created'
                     )
-                    ->where('status', 'Y')
-                    ->orderBy('created', 'desc');
+                    ->where('status', 1)
+                    ->orderBy('agent_alerts_created', 'desc');
 
         if($request->site_id != null)
         {
@@ -493,35 +493,35 @@ class AgentManagementController extends Controller
         {
             $query->where('site.name', 'like', '%'.$request->keyword_search.'%')
                 //   ->orwhere('agent_alerts.rule', 'like', '%'.$request->keyword_search.'%')
-                  ->orwhere('agent_alerts.description', 'like', '%'.$request->keyword_search.'%')
-                  ->orwhere('agent_alerts.incident', 'like', '%'.$request->keyword_search.'%')
-                  ->orwhere('agent_alerts.log_file', 'like', '%'.$request->keyword_search.'%');
+                  ->orwhere('yara_log.description', 'like', '%'.$request->keyword_search.'%');
+                //   ->orwhere('yara_log.incident', 'like', '%'.$request->keyword_search.'%')
+                //   ->orwhere('yara_log.log_file', 'like', '%'.$request->keyword_search.'%');
         }
 
-        if($start_date_input != null && $end_date_input != null)
-        {
-            $query->whereBetween('agent_alerts.created', [$start_date_input, $end_date_input]);
-        }
+        // if($start_date_input != null && $end_date_input != null)
+        // {
+        //     $query->whereBetween('agent_alerts.created', [$start_date_input, $end_date_input]);
+        // }
 
-        if($request->filter_alert_rule != null)
-        {
-            $query->where('agent_alerts.rule', 'like', '%'.$request->filter_alert_rule.'%');
-        }
+        // if($request->filter_alert_rule != null)
+        // {
+        //     $query->where('agent_alerts.rule', 'like', '%'.$request->filter_alert_rule.'%');
+        // }
 
-        if($request->filter_alert_des != null)
-        {
-            $query->where('agent_alerts.description', 'like', '%'.$request->filter_alert_des.'%');
-        }
+        // if($request->filter_alert_des != null)
+        // {
+        //     $query->where('agent_alerts.description', 'like', '%'.$request->filter_alert_des.'%');
+        // }
 
-        if($request->check_alert != null)
-        {
-            $query->where('agent_alerts.incident', $request->check_alert);
-        }
+        // if($request->check_alert != null)
+        // {
+        //     $query->where('agent_alerts.incident', $request->check_alert);
+        // }
 
-        if($request->check_alert_severity != null)
-        {
-            $query->where('agent_alerts.severity', $request->check_alert_severity);
-        }
+        // if($request->check_alert_severity != null)
+        // {
+        //     $query->where('agent_alerts.severity', $request->check_alert_severity);
+        // }
 
         return DataTables::of($query)
         ->addColumn('chk', function($query) {
@@ -569,7 +569,7 @@ class AgentManagementController extends Controller
                 <label class="switch">
                     <input type="checkbox" id="" onchange="" name="active" value="1"
             ';
-                    if($query->agent_alerts_status == 'Y')
+                    if($query->agent_alerts_status == 1)
                     {
             $html .= 'checked';
                     }
