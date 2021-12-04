@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\AgentScanLog;
 use App\FXSiteAgents;
 use App\RuleFile;
 use App\RuleSite;
@@ -469,6 +470,82 @@ class ApiAgentController extends ApiController
                     'error' => '', 
                     'status_code' => 200,
                     'data' => $yaraLogs
+                ];
+            }
+
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'error' => $e -> getMessage(),
+            );
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 500, 'data' => $datas]);
+        }
+    }
+
+    public function sendAgentScanLog(Request $request){
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            if ($data === false) {
+                $response =[
+                    'error' => 'The request parameters are invalid',
+                    'status_code' => 400,
+                    'data' => []
+                ];
+            } else {
+                $data_key = $data['data'];
+                $agentScan = $data_key['agent_scan'];
+
+                $agentScanLogs = [];
+                foreach($agentScan as $agentScanData){
+                    $agent_id = $agentScanData['agent_id'];
+                    $file_scan_count = $agentScanData['file_scan_count'];
+                    $file_name = $agentScanData['file_name'];
+                    $device_name = $agentScanData['device_name'];
+                    $time_stamp = $agentScanData['time_stamp'];
+                    $mode = $agentScanData['mode'];
+
+                    if($mode == 'create'){
+                        $agentScanLog = new AgentScanLog();
+                        $agentScanLog -> agent_id = $agent_id;
+                        $agentScanLog -> site_id = $data['site']['data']['id'];
+                        $agentScanLog -> file_scan_count = $file_scan_count;
+                        $agentScanLog -> file_name = $file_name;
+                        $agentScanLog -> device_name = $device_name;
+                        $agentScanLog -> first_scan = Carbon::parse($time_stamp);
+                        $agentScanLog -> save();
+
+                        $agentScanLog -> mode = $mode;
+                    }else{
+                        $agentScanLog = AgentScanLog::where('agent_id', $agent_id)->where('site_id', $data['site']['data']['id'])
+                        ->where('file_name', $file_name)
+                        ->where('device_name', $device_name)
+                        ->where('last_scan', null)
+                        ->first();
+
+                        if($agentScanLog){
+                            $agentScanLog -> file_scan_count = $file_scan_count;
+                            $agentScanLog -> last_scan = Carbon::parse($time_stamp);
+                            $agentScanLog -> save();
+
+                            $agentScanLog -> mode = $mode;
+                        }
+                    }
+
+                    $agentScanLogs[] = $agentScanLog;
+                }
+
+                $response = [
+                    'error' => '', 
+                    'status_code' => 200,
+                    'data' => $agentScanLogs
                 ];
             }
 
