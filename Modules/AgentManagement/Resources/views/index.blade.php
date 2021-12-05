@@ -792,13 +792,11 @@
                                                                     <span class="label-text"></span>
                                                                 </label>
                                                             </th>
-                                                            <th>Name</th>
+                                                            <th>Site</th>
+                                                            <th>Mode</th>
                                                             <th>Start Date</th>
                                                             <th>End Date</th>
-                                                            <th>User Name</th>
-                                                            <th>Status</th>
-                                                            <th>Source</th>
-                                                            <th class="text-center">Duration</th>
+                                                            <th>Description</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -1529,25 +1527,19 @@
                     "orderable": false,
                 },
                 {
-                    data: 'agent_schedule_name',
+                    data: 'site_name',
                 },
                 {
-                    data: 'agent_schedule_start_date',
+                    data: 'mode',
                 },
                 {
-                    data: 'agent_schedule_end_date',
+                    data: 'first_scan',
                 },
                 {
-                    data: 'agent_schedule_username',
+                    data: 'last_scan',
                 },
                 {
-                    data: 'agent_schedule_status',
-                },
-                {
-                    data: 'agent_schedule_source',
-                },
-                {
-                    data: 'agent_schedule_duration',
+                    data: 'description',
                 }
             ]
         });

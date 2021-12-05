@@ -2,6 +2,7 @@
 
 namespace Modules\AgentManagement\Http\Controllers;
 
+use App\AgentScanLog;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -724,20 +725,16 @@ class AgentManagementController extends Controller
         // $start_date_input = $request->start_date;
         // $end_date_input = $request->end_date;
         
-        $query_schedule = FXAgentSchedule::
-                        join('site', 'agent_schedule.site_id', 'site.id')
+        $query_schedule = AgentScanLog::
+                        join('site', 'agent_scan_log.site_id', 'site.id')
                         ->select(
                             'site.name as site_name',
                             'site.logo as site_logo',
-                            'agent_schedule.name as agent_schedule_name',
-                            'agent_schedule.start_date as agent_schedule_start_date',
-                            'agent_schedule.end_date as agent_schedule_end_date',
-                            'agent_schedule.username as agent_schedule_username',
-                            'agent_schedule.status as agent_schedule_status',
-                            'agent_schedule.source as agent_schedule_source',
-                            'agent_schedule.duration as agent_schedule_duration'
-                        )
-                        ->where('status', 'Y');
+                            'agent_scan_log.mode',
+                            'agent_scan_log.first_scan',
+                            'agent_scan_log.last_scan',
+                            'agent_scan_log.description'
+                        );
 
         if($request->site_id != null)
         {

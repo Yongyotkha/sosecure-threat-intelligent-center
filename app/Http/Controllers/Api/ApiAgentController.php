@@ -522,9 +522,7 @@ class ApiAgentController extends ApiController
                 $agentScanLogs = [];
                 foreach($agentScan as $agentScanData){
                     $agent_id = $agentScanData['agent_id'];
-                    $file_scan_count = $agentScanData['file_scan_count'];
-                    $file_name = $agentScanData['file_name'];
-                    $device_name = $agentScanData['device_name'];
+                    $description = $agentScanData['description'];
                     $time_stamp = $agentScanData['time_stamp'];
                     $mode_new = $agentScanData['mode'];
                     $type = $agentScanData['type'];
@@ -535,12 +533,12 @@ class ApiAgentController extends ApiController
 
                     if($agentScanLog){
                         if($type == 'start'){
-                            $agentScanLog -> file_scan_count = 0;
+                            $agentScanLog -> description = null;
                             $agentScanLog -> first_scan = Carbon::parse($time_stamp);
                             $agentScanLog -> last_scan = null;
                             $agentScanLog -> save();
                         }else{
-                            $agentScanLog -> file_scan_count = $file_scan_count;
+                            $agentScanLog -> description = $description;
                             $agentScanLog -> last_scan = Carbon::parse($time_stamp);
                             $agentScanLog -> save();
                         }
@@ -548,9 +546,7 @@ class ApiAgentController extends ApiController
                         $agentScanLog = new AgentScanLog();
                         $agentScanLog -> agent_id = $agent_id;
                         $agentScanLog -> site_id = $data['site']['data']['id'];
-                        $agentScanLog -> file_scan_count = $file_scan_count;
-                        $agentScanLog -> file_name = $file_name;
-                        $agentScanLog -> device_name = $device_name;
+                        $agentScanLog -> description = $description;
                         $agentScanLog -> first_scan = Carbon::parse($time_stamp);
                         $agentScanLog -> mode = $mode_new;
                         $agentScanLog -> save();
