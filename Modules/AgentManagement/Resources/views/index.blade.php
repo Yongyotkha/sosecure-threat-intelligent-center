@@ -776,6 +776,7 @@
                                                                 </label>
                                                             </th>
                                                             <th>Name</th>
+                                                            {{-- <th>IP</th> --}}
                                                             <th>Start Date</th>
                                                             <th>End Date</th>
                                                             <th>User Name</th>

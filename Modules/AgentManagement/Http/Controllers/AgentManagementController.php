@@ -711,6 +711,7 @@ class AgentManagementController extends Controller
                         ->select(
                             'site.name as site_name',
                             'site.logo as site_logo',
+                            'site.ip_key as site_ip_key',
                             'agent_schedule.name as agent_schedule_name',
                             'agent_schedule.start_date as agent_schedule_start_date',
                             'agent_schedule.end_date as agent_schedule_end_date',
