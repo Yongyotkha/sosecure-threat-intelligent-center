@@ -452,6 +452,8 @@ class ApiAgentController extends ApiController
                     $description = $yaraData['description'];
                     $device_name = $yaraData['device_name'];
                     $file_text = $yaraData['file_text'];
+                    $first_scan = $yaraData['first_scan'];
+                    $last_scan = $yaraData['last_scan'];
 
                     $yaraLog = YaraLog::where('agent_id', $agent_id)->where('site_id', $data['site']['data']['id'])
                     ->where('path', $path)
@@ -459,8 +461,10 @@ class ApiAgentController extends ApiController
                     ->first();
 
                     if($yaraLog){
-                        $yaraLog -> updated_at = Carbon::now();
+                        $yaraLog -> last_scan = Carbon::parse($last_scan);
                         $yaraLog -> save();
+
+                        $yaraLog -> mode = $mode;
                     }else{
                         $yaraLog = new YaraLog();
                         $yaraLog -> agent_id = $agent_id;
@@ -470,9 +474,11 @@ class ApiAgentController extends ApiController
                         $yaraLog -> description = $description;
                         $yaraLog -> device_name = $device_name;
                         $yaraLog -> file_text = $file_text;
+                        $yaraLog -> first_scan = Carbon::parse($first_scan);
+                        $yaraLog -> last_scan = Carbon::parse($last_scan);
                         $yaraLog -> save();
                     }
-                    
+
                     $yaraLogs[] = $yaraLog;
                 }
 
