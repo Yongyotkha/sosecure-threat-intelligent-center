@@ -526,9 +526,25 @@ class ApiAgentController extends ApiController
                     $file_name = $agentScanData['file_name'];
                     $device_name = $agentScanData['device_name'];
                     $time_stamp = $agentScanData['time_stamp'];
-                    $mode = $agentScanData['mode'];
+                    $mode_new = $agentScanData['mode'];
+                    $type = $agentScanData['type'];
 
-                    if($mode == 'create'){
+                    $agentScanLog = AgentScanLog::where('agent_id', $agent_id)->where('site_id', $data['site']['data']['id'])
+                    ->where('mode', $mode_new)
+                    ->first();
+
+                    if($agentScanLog){
+                        if($type == 'start'){
+                            $agentScanLog -> file_scan_count = 0;
+                            $agentScanLog -> first_scan = Carbon::parse($time_stamp);
+                            $agentScanLog -> last_scan = null;
+                            $agentScanLog -> save();
+                        }else{
+                            $agentScanLog -> file_scan_count = $file_scan_count;
+                            $agentScanLog -> last_scan = Carbon::parse($time_stamp);
+                            $agentScanLog -> save();
+                        }
+                    }else{
                         $agentScanLog = new AgentScanLog();
                         $agentScanLog -> agent_id = $agent_id;
                         $agentScanLog -> site_id = $data['site']['data']['id'];
@@ -536,25 +552,9 @@ class ApiAgentController extends ApiController
                         $agentScanLog -> file_name = $file_name;
                         $agentScanLog -> device_name = $device_name;
                         $agentScanLog -> first_scan = Carbon::parse($time_stamp);
+                        $agentScanLog -> mode = $mode_new;
                         $agentScanLog -> save();
-
-                        $agentScanLog -> mode = $mode;
-                    }else{
-                        $agentScanLog = AgentScanLog::where('agent_id', $agent_id)->where('site_id', $data['site']['data']['id'])
-                        ->where('file_name', $file_name)
-                        ->where('device_name', $device_name)
-                        ->where('last_scan', null)
-                        ->first();
-
-                        if($agentScanLog){
-                            $agentScanLog -> file_scan_count = $file_scan_count;
-                            $agentScanLog -> last_scan = Carbon::parse($time_stamp);
-                            $agentScanLog -> save();
-
-                            $agentScanLog -> mode = $mode;
-                        }
                     }
-
                     $agentScanLogs[] = $agentScanLog;
                 }
 
