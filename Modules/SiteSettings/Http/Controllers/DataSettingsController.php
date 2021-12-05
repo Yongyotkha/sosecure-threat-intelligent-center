@@ -71,6 +71,9 @@ class DataSettingsController extends Controller
         $data['menus'] = $Menu;
         $data['page'] = 'DataSetting';
         $data['page'] = langapp('data_setting');
+
+        $data['file_agent_name'] = $data['siteSettings']['name'].'_(Agent-'.$data['siteSettings']['id'].').zip';
+
         return view('sitesettings::data_setting')->with($data);
     }
 

@@ -217,6 +217,13 @@
                                     <div class="col-lg-3">
                                         <input type="text" class="form-control touch_spin text-center" name="allow_agent_limit" value="{{$siteSettings->agent_count}}"> 
                                     </div>
+                                    <div class="col-lg-3">
+                                        @if(@$file_agent_name)
+                                            <a href="../../agent/file_download/{{$file_agent_name}}" target="_black" class="btn btn-primary">Download Agent</a>
+                                        @else
+                                            <button class="btn btn-primary" disabled>Download Agent</button>
+                                        @endif
+                                    </div>
                                 </div>
                                 <hr>
 
