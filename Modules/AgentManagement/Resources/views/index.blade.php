@@ -5,6 +5,21 @@
         right: 0 !important;
         left: unset !important;
     }
+    .tooltip-new{
+        position: absolute;
+        opacity: 0;
+        padding: 10px;
+        background: #313131;
+        border-radius: 5px;
+        color: #fff;
+    -webkit-transition:all 0.2s ease-in;
+      -moz-transition:all 0.2s ease-in;
+            transition:all 0.2s ease-in;
+     }
+
+    .wrapper-new:hover > .tooltip-new{
+        opacity: 0.9;
+    }
 </style>
 @section('content')
 
@@ -555,7 +570,9 @@
                                                             <th>
                                                                 Description
                                                             </th>
-                                                            {{-- <th>Incident</th> --}}
+                                                            <th>Path</th>
+                                                            <th>Date Scan</th>
+                                                            <th>Date Last Scan</th>
                                                             <th>Severity</th>
                                                             <th>Datetime</th>
                                                             <th class="text-center">Action</th>
@@ -921,6 +938,9 @@
         datatable_alert();
         datatable_agent();
         datatable_schedule();
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
     });
 
     active_btn('#groupby-btn .btn-grey');
@@ -1390,9 +1410,15 @@
                 {
                     data: 'agent_alerts_description',
                 },
-                {{-- {
-                    data: 'agent_alerts_incident',
-                }, --}}
+                {
+                    data: 'device_name',
+                },
+                {
+                    data: 'first_scan',
+                },
+                {
+                    data: 'last_scan',
+                },
                 {
                     data: 'sev_status',
                 },

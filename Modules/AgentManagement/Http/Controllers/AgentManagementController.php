@@ -479,7 +479,10 @@ class AgentManagementController extends Controller
                         'yara_log.description as agent_alerts_description',
                         'yara_log.severity as agent_alerts_severity',
                         'yara_log.status as agent_alerts_status',
-                        'yara_log.created_at as agent_alerts_created'
+                        'yara_log.created_at as agent_alerts_created',
+                        'yara_log.device_name',
+                        'yara_log.first_scan',
+                        'yara_log.last_scan'
                     )
                     ->where('status', 1)
                     ->orderBy('agent_alerts_created', 'desc');
@@ -580,16 +583,31 @@ class AgentManagementController extends Controller
             ';
             return $html;
         })
+        ->addColumn('device_name', function($query) {
+            $html = '';
+            $html .= '     
+            <div class="wrapper-new">
+                <span class="tooltip-new">'.$query -> device_name.'</span>
+                <button class="btn btn-secondary"><i class="fas fa-file"></i></button>
+            </div>  
+            ';
+            return $html;
+        })
+        
         ->addColumn('action', function($query) {
             $html = '';
+            // <a href="'.route('agentmanagement.view_txt').'" data-toggle="ajaxModal"  class="btn btn-info btn-xs">
+            //             <i class="fas fa-eye"></i>
+            //         </a>
             $html .= '
-                    <a href="'.route('agentmanagement.view_txt').'" data-toggle="ajaxModal"  class="btn btn-info btn-xs">
-                        <i class="fas fa-eye"></i>
+                    
+                    <a href="#" class="btn btn-danger btn-xs">
+                        <i class="fas fa-ban"></i>
                     </a>
             ';
             return $html;
         })
-        ->rawColumns(['chk', 'sev_status', 'chk_status', 'action'])
+        ->rawColumns(['chk', 'sev_status', 'chk_status', 'device_name', 'action'])
         ->make(true);
     }
 
