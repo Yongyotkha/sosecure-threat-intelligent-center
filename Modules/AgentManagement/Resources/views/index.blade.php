@@ -565,6 +565,9 @@
                                                                 Site Name            
                                                             </th>
                                                             <th>
+                                                                IP            
+                                                            </th>
+                                                            <th>
                                                                 Rule
                                                             </th>
                                                             <th>
@@ -698,6 +701,7 @@
                                                             <th>Domain</th>
                                                             <th>IP</th>
                                                             <th>Last Online</th>
+                                                            <th>Status</th>
                                                             <th class="text-center">Action</th>
                                                         </tr>
                                                     </thead>
@@ -793,6 +797,7 @@
                                                                 </label>
                                                             </th>
                                                             <th>Site</th>
+                                                            <th>IP</th>
                                                             <th>Mode</th>
                                                             <th>Start Date</th>
                                                             <th>End Date</th>
@@ -959,8 +964,8 @@
         $('#filter_agent_main').hide();
     }
 
-    var start = moment().startOf('hour');
-    var end = moment().startOf('hour').add(32, 'hour');
+    var start = moment().startOf('hour').add(-30, 'days');
+    var end = moment().startOf('hour');
 
     function cb(start, end) {
         $('#filter_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
@@ -1190,7 +1195,7 @@
                     for(let rows in response.query)
                     {
                         const data_log = response.query[rows];
-                        html += `
+                        {{-- html += `
                                 <li>
                                     <div class="w-100per">
                                         <div class="audit-log-time">
@@ -1203,6 +1208,24 @@
                                         </div>
                                         <span class="audit-log-header">
                                             ${data_log.agent_logs_created} | ${data_log.agent_logs_description}
+                                        </span>
+                                    </div>
+                                </li>
+                            `; --}}
+
+                        html += `
+                                <li>
+                                    <div class="w-100per">
+                                        <div class="audit-log-time">
+                                            <span class="audit-by">
+                                                ${data_log.site_name}
+                                            </span>
+                                            <span class="audit-time">
+                                                IP : ${data_log.site_agents_ip_private}
+                                            </span>
+                                        </div>
+                                        <span class="audit-log-header">
+                                            ${data_log.mode} : ${data_log.created_at}
                                         </span>
                                     </div>
                                 </li>
@@ -1403,6 +1426,9 @@
                     data: 'site_name',
                 },
                 {
+                    data: 'site_agents_ip_private',
+                },
+                {
                     data: 'agent_alerts_rule',
                 },
                 {
@@ -1492,6 +1518,9 @@
                     data: 'site_agents_last_online',
                 },
                 {
+                    data: 'chk_status',
+                },
+                {
                     data: 'action',
                     "orderable": false,
                 }
@@ -1528,6 +1557,9 @@
                 },
                 {
                     data: 'site_name',
+                },
+                {
+                    data: 'site_ip_key',
                 },
                 {
                     data: 'mode',
@@ -1733,6 +1765,19 @@
         datatable_agent(site_val);
         datatable_schedule(site_val);
     });
+
+    function change_status_agent(id) 
+    {
+        let checkState = $("#agent-status-" + id).is(":checked") ? 1 : 0;
+        axios.post('{{route('agentmanagement.update_status_agent')}}', {
+            status: checkState,
+            id: id,
+        }).then(function (response) {
+            toastr.success('Update Status Success!!');
+        }).catch(function (error) {
+            toastr.error('error!!');
+        });
+    }
 
 </script>
 

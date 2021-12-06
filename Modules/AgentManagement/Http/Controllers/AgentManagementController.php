@@ -140,39 +140,42 @@ class AgentManagementController extends Controller
 
     public function data_chart_incident(Request $request)
     {
-        $site_id = $request->site_id;
-        $query_incident = FXAgentAlerts::
-                            select('incident')
-                            ->groupBy('incident')
-                            ->get();
+        // $site_id = $request->site_id;
+        // $query_incident = FXAgentAlerts::
+        //                     select('incident')
+        //                     ->groupBy('incident')
+        //                     ->get();
 
-        $data = [];
-        $count_all = 0;
-        foreach($query_incident as $data_incident)
-        {
-            $query_count = FXAgentAlerts::
-                            where(function ($query_site) use ($site_id) {
-                                if($site_id != null)
-                                {
-                                    $query_site->where('site_id', $site_id);
-                                }
-                                else
-                                {
-                                    $query_site->where('site_id', '!=', null);
-                                }
-                            })
-                            ->where('status', 'Y')
-                            ->where('incident',$data_incident->incident)
-                            ->get();
+        // $data = [];
+        // $count_all = 0;
+        // foreach($query_incident as $data_incident)
+        // {
+        //     $query_count = FXAgentAlerts::
+        //                     where(function ($query_site) use ($site_id) {
+        //                         if($site_id != null)
+        //                         {
+        //                             $query_site->where('site_id', $site_id);
+        //                         }
+        //                         else
+        //                         {
+        //                             $query_site->where('site_id', '!=', null);
+        //                         }
+        //                     })
+        //                     ->where('status', 'Y')
+        //                     ->where('incident',$data_incident->incident)
+        //                     ->get();
 
-            $count = count($query_count);
+        //     $count = count($query_count);
 
-            $count_all = $count_all + $count;
+        //     $count_all = $count_all + $count;
 
-            $data['chart'][] = [$data_incident->incident, $count];
-        }
+        //     $data['chart'][] = [$data_incident->incident, $count];
+        // }
         
-        $data['count_all'] = $count_all;
+        // $data['count_all'] = $count_all;
+
+        $data['chart'][] = [0, 0];
+        $data['count_all'] = 0;
         
         return response()->json($data);
     }
@@ -199,7 +202,7 @@ class AgentManagementController extends Controller
                                 $query_site->where('site_id', '!=', null);
                             }
                         })
-                        ->where('status', '1')
+                        ->where(['deleted_at' => null])
                         ->where('os_type', $data_type->id)
                         ->get();
                     
@@ -224,7 +227,8 @@ class AgentManagementController extends Controller
         $count_all = 0;
         foreach($query_severity as $data_severity)
         {
-            $query_count = FXAgentAlerts::
+            // FXAgentAlerts
+            $query_count = YaraLog::
                                 where(function ($query_site) use ($site_id) {
                                     if($site_id != null)
                                     {
@@ -236,7 +240,7 @@ class AgentManagementController extends Controller
                                     }
                                 })
                                 ->where('status', 'Y')
-                                ->where('severity',$data_severity->name)
+                                ->where('severity', $data_severity->name)
                                 ->get();
 
             $count = count($query_count);
@@ -253,7 +257,9 @@ class AgentManagementController extends Controller
     public function data_chart_rule(Request $request)
     {
         $site_id = $request->site_id;
-        $query_rule = FXAgentAlerts::
+
+        // FXAgentAlerts
+        $query_rule = YaraLog::
                         select('rule',DB::raw('count(*) as total'))
                         ->orderBy('total', 'desc')
                         ->groupBy('rule')
@@ -263,7 +269,7 @@ class AgentManagementController extends Controller
         $data = [];
         foreach($query_rule as $data_rule)
         {
-            $query_rule = FXAgentAlerts::
+            $query_rule = YaraLog::
                             where(function ($query_site) use ($site_id) {
                                 if($site_id != null)
                                 {
@@ -274,7 +280,7 @@ class AgentManagementController extends Controller
                                     $query_site->where('site_id', '!=', null);
                                 }
                             })
-                            ->where('status', 'Y')
+                            ->where(['status' => '1', 'deleted_at' => null])
                             ->where('rule', $data_rule->rule)
                             ->get();
 
@@ -316,7 +322,8 @@ class AgentManagementController extends Controller
             
             $day = explode('-', $Store);
 
-            $query_timeline = FXAgentAlerts::
+            //FXAgentAlerts
+            $query_timeline = YaraLog::
                                 where(function ($query_site) use ($site_id) {
                                     if(@$site_id != null)
                                     {
@@ -327,8 +334,8 @@ class AgentManagementController extends Controller
                                         $query_site->where('site_id', '!=', null);
                                     }
                                 })
-                                ->where('status', 'Y')
-                                ->whereBetween('created', [$Store, $Store2])
+                                ->where('status', '1')
+                                ->whereBetween('created_at', [$Store, $Store2.' 23:59:59'])
                                 ->get();
 
             $count = count($query_timeline);
@@ -358,11 +365,26 @@ class AgentManagementController extends Controller
                         $query_site->where('site_id', '!=', null);
                     }
                 })
-                ->where('status', '1')
+                ->where(['deleted_at' => null])
                 ->get();
         $count_agent = count($query_agent);
 
-        $query_alert = FXAgentAlerts::
+        // $query_alert = FXAgentAlerts::
+        //         where(function ($query_site) use ($site_log_id) {
+        //             if($site_log_id != null)
+        //             {
+        //                 $query_site->where('site_id', $site_log_id);
+        //             }
+        //             else
+        //             {
+        //                 $query_site->where('site_id', '!=', null);
+        //             }
+        //         })
+        //         ->where('status', 'Y')
+        //         ->get();
+        // $count_alert = count($query_alert);
+
+        $query_alert = YaraLog::
                 where(function ($query_site) use ($site_log_id) {
                     if($site_log_id != null)
                     {
@@ -373,7 +395,7 @@ class AgentManagementController extends Controller
                         $query_site->where('site_id', '!=', null);
                     }
                 })
-                ->where('status', 'Y')
+                ->where(['deleted_at' => null])
                 ->get();
         $count_alert = count($query_alert);
 
@@ -392,7 +414,8 @@ class AgentManagementController extends Controller
                 ->get();
         $count_log = count($query_log);
 
-        $query_rule = FXAgentRules::
+        // FXAgentRules
+        $count_rule = YaraLog::
                 where(function ($query_site) use ($site_log_id) {
                     if($site_log_id != null)
                     {
@@ -403,9 +426,11 @@ class AgentManagementController extends Controller
                         $query_site->where('site_id', '!=', null);
                     }
                 })
-                ->where('status', 'Y')
-                ->get();
-        $count_rule = count($query_rule);
+                ->where('status', '1')
+                ->distinct('rule')
+                ->count('rule');
+
+        // $count_rule = count($query_rule);
 
         $response = [
             'count_agent' => $count_agent,
@@ -424,33 +449,50 @@ class AgentManagementController extends Controller
         // dd($input);
 
         $site_log_id = $request->site_log_id;
-        $query = FXAgentLogs::
-                    join('site', 'agent_logs.site_id', 'site.id')
-                    // ->where('site_id', $request->site_id)
-                    ->where(function ($query_site) use ($site_log_id) {
-                        if($site_log_id != null)
-                        {
-                            $query_site->where('agent_logs.site_id', $site_log_id);
-                        }
-                        else
-                        {
-                            $query_site->where('agent_logs.site_id', '!=', null);
-                        }
-                    })
-                    ->where('status', 'Y')
+        // $query = FXAgentLogs::
+        //             join('site', 'agent_logs.site_id', 'site.id')
+        //             // ->where('site_id', $request->site_id)
+        //             ->where(function ($query_site) use ($site_log_id) {
+        //                 if($site_log_id != null)
+        //                 {
+        //                     $query_site->where('agent_logs.site_id', $site_log_id);
+        //                 }
+        //                 else
+        //                 {
+        //                     $query_site->where('agent_logs.site_id', '!=', null);
+        //                 }
+        //             })
+        //             ->where('status', 'Y')
+        //             ->select(
+        //                 'site.name as site_name',
+        //                 'site.logo as site_logo',
+        //                 'site.ip_key as site_ip_key',
+        //                 'agent_logs.id as agent_logs_id',
+        //                 'agent_logs.agent_id as agent_logs_agent_id',
+        //                 'agent_logs.title as agent_logs_title',
+        //                 'agent_logs.ip_address as agent_logs_ip_address',
+        //                 'agent_logs.description as agent_logs_description',
+        //                 'agent_logs.rules as agent_logs_rules',
+        //                 'agent_logs.created as agent_logs_created'
+        //             )
+        //             ->orderBy('created', 'desc')
+        //             ->get();
+
+        $query = AgentScanLog::
+                    join('site', 'agent_scan_log.site_id', 'site.id')
+                    ->join('site_agents', 'agent_scan_log.agent_id', 'site_agents.id')
+                    ->orderBy('agent_scan_log.created_at', 'desc')
                     ->select(
                         'site.name as site_name',
                         'site.logo as site_logo',
                         'site.ip_key as site_ip_key',
-                        'agent_logs.id as agent_logs_id',
-                        'agent_logs.agent_id as agent_logs_agent_id',
-                        'agent_logs.title as agent_logs_title',
-                        'agent_logs.ip_address as agent_logs_ip_address',
-                        'agent_logs.description as agent_logs_description',
-                        'agent_logs.rules as agent_logs_rules',
-                        'agent_logs.created as agent_logs_created'
+                        'site_agents.ip_private as site_agents_ip_private',
+                        'agent_scan_log.mode',
+                        'agent_scan_log.first_scan',
+                        'agent_scan_log.last_scan',
+                        'agent_scan_log.description',
+                        'agent_scan_log.created_at'
                     )
-                    ->orderBy('created', 'desc')
                     ->get();
                     
         // dd($query);
@@ -472,9 +514,11 @@ class AgentManagementController extends Controller
 
         $query = YaraLog::
                     join('site', 'yara_log.site_id', 'site.id')
+                    ->join('site_agents', 'yara_log.agent_id', 'site_agents.id')
                     ->select(
                         'site.name as site_name',
                         'site.logo as site_logo',
+                        'site_agents.ip_private as site_agents_ip_private',
                         'yara_log.id as agent_alerts_id',
                         'yara_log.rule as agent_alerts_rule',
                         'yara_log.description as agent_alerts_description',
@@ -485,7 +529,7 @@ class AgentManagementController extends Controller
                         'yara_log.first_scan',
                         'yara_log.last_scan'
                     )
-                    ->where('status', 1)
+                    ->where('yara_log.status', 1)
                     ->orderBy('agent_alerts_created', 'desc');
 
         if($request->site_id != null)
@@ -638,7 +682,7 @@ class AgentManagementController extends Controller
                         'site_agents.status as site_agents_status',
                         'site_agents.created_at as site_agents_created'
                     )
-                    ->where('status', '1');
+                    ->where('site_agents.deleted_at', null);
 
         if($request->site_id != null)
         {
@@ -713,10 +757,30 @@ class AgentManagementController extends Controller
                         <li><a href="#"><i class="fas fa-eye"></i> View Log Error</a></li>
                     </ul>
                 </div>
+                <a href="'.route('agentmanagement.agent_delete_modal', ['_id' => $query->site_agents_id]).'" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>
             ';
             return $html;
         })
-        ->rawColumns(['chk','action'])
+        ->addColumn('chk_status', function($query) {
+            $html = '';
+            $html .= '
+                <div class="text-center">
+                    <label class="switch">
+                        <input type="checkbox" id="agent-status-'.$query->site_agents_id.'" onchange="change_status_agent('.$query->site_agents_id.')" 
+                ';
+                if($query->site_agents_status == 1)
+                {
+                    $html .= 'checked';
+                }
+                $html .= '            
+                        value="1">
+                        <span></span>
+                    </label>
+                </div>
+            ';
+            return $html;
+        })
+        ->rawColumns(['chk', 'chk_status', 'action'])
         ->make(true);
     }
 
@@ -727,9 +791,12 @@ class AgentManagementController extends Controller
         
         $query_schedule = AgentScanLog::
                         join('site', 'agent_scan_log.site_id', 'site.id')
+                        // ->join('site_agents', 'yara_log.agent_id', 'site_agents.id')
                         ->select(
                             'site.name as site_name',
                             'site.logo as site_logo',
+                            'site.ip_key as site_ip_key',
+                            // 'site_agents.ip_private as site_agents_ip_private',
                             'agent_scan_log.mode',
                             'agent_scan_log.first_scan',
                             'agent_scan_log.last_scan',
@@ -785,5 +852,55 @@ class AgentManagementController extends Controller
         // })
         ->rawColumns(['chk'])
         ->make(true);
+    }
+
+    public function update_status_agent(Request $request)
+    {
+        $input = $request->all();
+        
+        $id = $request->id;
+        $status = $request->status;
+
+        $update_status = FXSiteAgents::where('id', $id)->update(['status' => $status]);
+
+        return response()->json([
+            'status_code' => '200'
+        ]);
+
+    }
+
+    public function agent_delete_modal(Request $request)
+    {
+        $_id = $request->get('_id');
+
+        return view('agentmanagement::modal.agent_delete')->with(compact('_id'));
+    }
+
+    public function agent_delete(Request $request)
+    {
+        $input = $request->all();
+        
+        $_id = $request->get('hd_delete_id');
+
+        if(!empty($_id))
+        {
+            // $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
+
+            $date_now = date('Y-m-d H:i:s');
+
+            $update_status = FXSiteAgents::where('id', $_id)->update(['deleted_at' => $date_now]);
+
+            return response()->json([
+                'status_code' => '200',
+                'redirect' => route('agentmanagement.index')
+            ]);
+        }
+        else
+        {
+            return response()->json([
+                'status_code' => '500'
+            ]);
+        }
+
     }
 }
