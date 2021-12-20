@@ -300,7 +300,7 @@ class ApiNewsController extends ApiController
 
                         $news_all = $news->count();
                         
-                        $news = $news->orderBy('created_at','desc')->take(PAGINATE_NUM)->offset($page >= 1 ? $page * 10 : 0)->get();
+                        $news = $news->orderBy('public_date','desc')->take(PAGINATE_NUM)->offset($page >= 1 ? $page * 10 : 0)->get();
 
                         $count_model = count($news);
 
@@ -398,7 +398,7 @@ class ApiNewsController extends ApiController
                         
                         $news_all = $news->count();
                         
-                        $news = $news->orderBy('created_at','desc')->take(PAGINATE_NUM)->offset($page >= 1 ? $page * 10 : 0)->get();
+                        $news = $news->orderBy('public_date','desc')->take(PAGINATE_NUM)->offset($page >= 1 ? $page * 10 : 0)->get();
                         
                         $count_model = count($news);
 
