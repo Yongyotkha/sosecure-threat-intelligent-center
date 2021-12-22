@@ -721,6 +721,7 @@ $(function() {
                     name: 'site_name'
                 },--}}
                 {
+                    orderable: false,
                     data: 'content_detail',
                     name: 'content_detail'
                 },
