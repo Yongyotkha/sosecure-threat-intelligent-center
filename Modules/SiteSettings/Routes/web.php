@@ -147,6 +147,35 @@ Route::group(
     }
 );
 
+// webserver
+Route::group(
+    ['middleware' => ['web', 'permission:role_center', 'permission:web_defacement']],
+    function () {
+        Route::get('/dfm_feed/{code}', 'DefacementController@dfm_feed')->name('dfm_feed.index')->middleware('can:menu_items');
+        Route::get('/dfm_data/{code}', 'DefacementController@dfm_data')->name('dfm_data.index')->middleware('can:menu_items');
+        Route::post('/dfm_feed/dfm_feed_datatables', 'DefacementController@dfm_feed_datatables')->name('dfm_feed.dfm_feed_datatables')->middleware('can:menu_items');
+        Route::post('/dfm_feed/approve/dataFeed', 'DefacementController@dfm_feed_approve_data_feed')->name('dfm_feed.approve_data_feed');
+        Route::post('/dfm_feed/cancle/dataFeed', 'DefacementController@dfm_feed_cancle_data_feed')->name('dfm_feed.cancle_data_feed');
+        Route::post('/dfm_feed/dfm_feed_darkweb_all_site_tb', 'DefacementController@dfm_feed_darkweb_all_site_tb')->name('dfm_feed.darkweb_all_site_tb');
+        Route::post('dfm_feed/dfm_feed_change_status', 'DefacementController@dfm_feed_change_status')->name('dfm_feed.change_status')->middleware('can:menu_items');
+        Route::post('/dfm_feed/dfm_feed_delete_select', 'DefacementController@dfm_feed_delete_select')->name('dfm_feed.delete_select_process');
+        Route::get('/dfm_feed/delete_dfm_feed_modal/{code}', 'DefacementController@delete_dfm_feed_modal')->name('darkweb.delete_dfm_feed_modal');
+        Route::post('/dfm_feed/delete_dfm_feed_process/{code}', 'DefacementController@delete_dfm_feed_process')->name('dfm_feed.delete_dfm_feed_process');
+        Route::get('/dfm_web_server/{code}', 'DefacementController@dfm_web_server')->name('dfm_web_server.index')->middleware('can:menu_items');
+        Route::post('/dfm_web_server/table_web_server', 'DefacementController@table_web_server')->name('dfm_web_server.table_web_server')->middleware('can:menu_items');
+        Route::post('/dfm_web_server/web_server_delete', 'DefacementController@web_server_delete')->name('dfm_web_server.web_server_delete')->middleware('can:menu_items');
+        Route::get('/dfm_web_server/web_server_edit_modal/{code}', 'DefacementController@web_server_edit_modal')->name('dfm_web_server.web_server_edit_modal')->middleware('can:menu_items');
+        Route::post('/dfm_web_server/web_server_edit/{id}', 'DefacementController@web_server_edit')->name('dfm_web_server.web_server_edit')->middleware('can:menu_items');
+        Route::post('/dfm_web_server/web_server_create', 'DefacementController@web_server_create')->name('dfm_web_server.web_server_create')->middleware('can:menu_items');
+        Route::post('/dfm_web_server/web_server_change_status', 'DefacementController@web_server_change_status')->name('dfm_web_server.web_server_change_status')->middleware('can:menu_items');
+
+        Route::post('/dfm_web_server_ip/checkwebserverIP', 'DefacementController@checkWebserverIP')->name('dfm_web_server.checkWebserverIP')->middleware('can:menu_items');
+        Route::post('/dfm_web_server/web_server_add_user', 'DefacementController@web_server_add_user')->name('dfm_web_server.web_server_add_user')->middleware('can:menu_items');
+        Route::post('/dfm_web_server_ip/load_data_connection', 'DefacementController@load_data_connection')->name('dfm_web_server.load_data_connection')->middleware('can:menu_items');
+    }
+);
+
+
 // Compromised
 Route::group(
     ['middleware' => ['web', 'permission:role_center', 'permission:compromised']],
@@ -174,6 +203,8 @@ Route::group(
         Route::post('/compromised_web_server_ip/load_data_connection', 'DataLeakController@load_data_connection')->name('compromised_web_server.load_data_connection')->middleware('can:menu_items');
     }
 );
+
+
 
 // credentials
 Route::group(
