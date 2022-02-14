@@ -2,10 +2,11 @@
 
 namespace Modules\PhishingDetection\Http\Controllers;
 
+use App\LogPhishing;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-
+use Yajra\DataTables\DataTables;
 class PhishingDetectionController extends Controller
 {
     /**
@@ -94,5 +95,25 @@ class PhishingDetectionController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function datatable(Request $request){
+        $logPhishing = LogPhishing::where('transaction_status', 3)->where('url_is_work', 1)->get();
+        return DataTables::of($logPhishing)
+        ->addColumn('severity', function ( $collection) {
+            if($collection -> is_found == 1){
+                $html = '<span class="badge" style="background-color: #e64732;">High</span>';
+            }else{
+                $html = '<span class="badge" style="background-color: #88ce4f;">Low</span>';
+            }
+            return $html;
+        })
+        ->addColumn('action', function ( $collection) {
+            return '<a target="_blank" href="'.$collection -> url.'" class="btn btn-info btn-xs">
+                <i class="fas fa-eye"></i>
+            </a>';
+        })
+        ->rawColumns(['severity', 'action'])
+        ->toJson();
     }
 }

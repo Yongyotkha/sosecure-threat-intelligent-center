@@ -277,7 +277,7 @@
                         <table class="table table-striped" id="table-phishing-template" style="width: 100%">
                             <thead>
                                 <tr>
-                                    <th></th>
+                                    {{-- <th></th> --}}
                                     <th>URL</th>
                                     <th>IP Address</th>
                                     <th>Type</th>
@@ -287,7 +287,7 @@
                                     <th style="width: 10%" class="text-center">Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            {{-- <tbody>
                                 <tr>
                                     <td>
                                         <div style="position: relative;width:150px;">
@@ -393,7 +393,7 @@
                                     </td>
                                 </tr>
 
-                            </tbody>
+                            </tbody> --}}
                         </table>
                     </div>
                 </div>
@@ -431,7 +431,7 @@
 
 active_btn('#btngroup_sort_by .btn-grey');
 active_btn('#filter-type .btn-grey');
-
+datatable();
 
 if($('.filter_agent_agent').hasClass('active')){
     $('#filter_alert_main').hide();
@@ -457,7 +457,52 @@ $('#btngroup_sort_by .btn-grey').on('click',function(){
 }
 });
 
-$('#table-phishing-template').DataTable();
+function datatable(){
+    $.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    $('#table-phishing-template').DataTable({
+        cache: false,
+        processData: false,
+        contentType: false,
+        processing: true,
+        serverSide: true,
+        destroy: true,
+        ajax: 
+        {
+            url: "{{route('phishing_detection.datatable')}}",
+            type: "POST",
+        },
+        columns: [
+            {
+                data: 'url',
+            },
+            {
+                data: 'ip',
+            },
+            {
+                data: 'type',
+            },
+            {
+                data: 'score',
+            },
+            {
+                data: 'severity',
+            },
+            {
+                data: 'start_date',
+            },
+            {
+                data: 'action',
+                "orderable": false,
+            }
+        ],
+    });
+}
+
+
 
 function mychart(myid){
     const chart_top_source = Highcharts.chart(myid, {
