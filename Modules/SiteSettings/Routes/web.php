@@ -144,8 +144,21 @@ Route::group(
         Route::post('/WebDefacement-update_item_width_height', 'WebDefacementController@update_item_width_height')->name('webdefacement_website.update_item_width_height')->middleware('can:menu_items');
         // Route::post('/webdefacement/detail/update_original', 'WebDefacementController@update_original')->name('webdefacement.update_original')->middleware('can:menu_items');
         // Route::post('/webdefacement/detail/update_image', 'WebDefacementController@update_image')->name('webdefacement.update_image')->middleware('can:menu_items');
+
+
+        Route::get('/WebDefacement-feed/{id}', 'WebDefacementController@webdefacement_feed')->name('webdefacement_feed.index')->middleware('can:menu_items');
     }
 );
+
+// WebDefacement
+Route::group(
+    ['middleware' => ['web', 'permission:role_center', 'permission:web_defacement']],
+    function () {
+        Route::get('/phishing/detection/{id}', 'PhishingController@phishing_detection')->name('phishing.detection')->middleware('can:menu_items');
+        Route::get('/phishing/logs/{id}', 'PhishingController@phishing_logs')->name('phishing.logs')->middleware('can:menu_items');
+    }
+);
+
 
 // webserver
 Route::group(
@@ -234,6 +247,8 @@ Route::group(
         Route::post('/socialdatas/delete_dataleakdata/{code}', 'DataLeakController@delete_dataleakdata')->name('socialdatas.delete_dataleakdata');
         Route::post('/socialdatas/change_status_dataleakdata', 'DataLeakController@change_status_dataleakdata')->name('socialdatas.change_status_dataleakdata');
         Route::post('/socialdatas/change_delete_dataleakdata', 'DataLeakController@change_delete_dataleakdata')->name('socialdatas.change_delete_dataleakdata');
+
+        Route::get('/dataleak_url/{code}', 'DataLeakController@dataleak_url')->name('dataleak_url.index')->middleware('can:menu_items');
     }
 );
 // Compromise

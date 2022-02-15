@@ -359,7 +359,7 @@
 @push('pagestyle')
 @include('stacks.css.datatables')
 @include('stacks.css.form')
-
+@include('stacks.css.c3')
 @include('stacks.css.datepicker')
 @include('stacks.css.form')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
@@ -374,6 +374,7 @@
 @include('stacks.js.lightbox')
 @include('stacks.js.advanced_search')
 @include('stacks.js.activebutton')
+@include('stacks.js.c3')
 
 <script>
 
@@ -496,6 +497,15 @@
                     $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
                 }); 
 
+                // chart_c3(
+                //     '#chart_wdfm_01',
+                //     [
+                //         ['Hash', 20],
+                //         ['Filesize', 10],
+                //         ['Element', 70],
+                //     ]
+                //     ,70
+                // );
           
              
         }).fail(function(jqXHR, ajaxOptions, thrownError){
@@ -1031,6 +1041,32 @@
 
     }
   
+
+
+    function chart_c3(id,value,score_mid) {
+        const myc3 = c3.generate({
+            bindto: id,
+            data: {
+                columns: value,
+                type : 'donut',
+            },
+            donut: {
+                title: score_mid,
+                label: {
+                format: function(value, ratio, id) {
+                    return value;
+                    }
+                }
+            },
+            legend: {
+                position: 'top'
+            },
+
+            color: {
+                pattern: ['#4398d4', '#40cd8f','#f4d757','#fcc838','#b93624']
+            }
+        });
+    }
 
 
 </script>

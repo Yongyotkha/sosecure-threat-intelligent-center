@@ -33,6 +33,63 @@
                             </div>
                         </header>
                         <div class="panel-body">
+
+                            {{-- <div class="wdfm-container">
+                                <div class="item-wdfm wdfm-inner">
+                                    <div class="wdfm-card">
+                                        <div class="wdfm-header">
+                                            <div class="wdfm-img">
+                                                <a href="#">
+                                                    <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" alt="">
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="wdfm-body">
+                                            <div class="wdfm-btn">
+                                                <a class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
+                                            <h4>Targeted Brand: paypal</h4>
+                                            <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
+                                        </div>
+
+                                        <div class="wdfm-footer start-top">
+                                            <div class="wdfm-ft-left flex" style="width: 50%">
+                                                <div><strong>Site </strong> : บริษัท เมจิกเทคโซลูชั่น จำกัด</div>
+                                                <div class="status-flex"><strong>Status</strong> : &nbsp; <span class="dot low"></span> Normal</div>
+                                                <div style="word-break: break-all"><strong>Hash</strong> f4f69f950577b8b3a81a185385dd4ef5</div>
+                                                <div>Filesize 24.17 KB</div>
+                                                <div>Element 0</div>
+                                                <div>Image Screen
+                                                    <a href="http://10.104.0.7:8082/images/webdefacment_mages/59/62/59_62_2021_08_12_093128.png"
+                                                        data-lightbox="name-img-2" class="btn btn-info btn-xs">
+                                                        @icon('solid/eye')
+                                                    </a>
+                                                </div>
+                                                <div class="text-sm-date" style="margin-top:5px;">Last Online: 2021-08-12 09:31:32</div>
+                                                <div class="text-sm-date">Last Check: 2021-08-12 09:31:32</div>
+                                                <div class="text-sm-date">Last Update: 2021-08-12 21:57:11</div>
+                                            </div>
+
+                                            <div class="wdfm-ft-left flex" style="width: 50%">
+                                                <div id="chart_wdfm_01" style="height: 180px"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="wdfm-footer-action">
+                                            <div>
+                                                <strong>Update Original</strong>
+                                            </div>
+                                            <div class="flex-end">
+                                                <a href="" class="btn btn-info btn-sm">@icon('solid/pen-alt') Edit</a>
+                                                <a href="" class="btn btn-danger btn-sm">@icon('solid/trash-alt') Delete</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> --}}
+
                             <div class="wdfm-container" id='data_card'>
                                 {{-- <div class="item-wdfm wdfm-inner">
                                     <div class="wdfm-card">
@@ -80,104 +137,92 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="item-wdfm wdfm-inner">
-                                    <div class="wdfm-card">
-                                        <div class="wdfm-header">
-                                            <div class="wdfm-img">
-                                                <a href="#">
-                                                    <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" alt="">
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <div class="wdfm-body">
-                                            <div class="wdfm-btn">
-                                                <a class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                            </div>
-                                            <h4>Targeted Brand: paypal</h4>
-                                            <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
-                                        </div>
-                                        <div class="wdfm-footer start-top">
-                                            <div class="wdfm-ft-left flex">
-                                                <div>Site : ออมสิน</div>
-                                                <div class="status-flex">Status : &nbsp; <span class="dot critical"></span> Critical</div>
-                                                <div>Hash xxxxxxx</div>
-                                                <div>Filesize 12kb</div>
-                                                <div>Element 522</div>
-                                                <div>Image Screen 
-                                                    <a href="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" data-lightbox="name-img-2" class="btn btn-info btn-xs">@icon('solid/eye')</a>
-                                                </div>
-                                            </div>
-                                            <div class="wdfm-ft-right flex">
-                                                <div>Last Online: 10 second ago</div>
-                                                <div>Last Check: 10 second ago</div>
-                                                <div>&nbsp;</div>
-                                                <div>Last Update: 2021-01-01 11:11</div>
-                                            </div>
-                                        </div>
-                                        <div class="wdfm-footer-action">
-                                            <div>
-                                                <strong>Update Original</strong>
-                                            </div>
-                                            <div class="flex-end">
-                                                <a href="" class="btn btn-info btn-sm">@icon('solid/pen-alt') Edit</a>
-                                                <a href="" class="btn btn-danger btn-sm">@icon('solid/trash-alt') Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="item-wdfm wdfm-inner">
-                                    <div class="wdfm-card">
-                                        <div class="wdfm-header">
-                                            <div class="wdfm-img">
-                                                <a href="#">
-                                                    <img src="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" alt="">
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <div class="wdfm-body">
-                                            <div class="wdfm-btn">
-                                                <a class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                            </div>
-                                            <h4>Targeted Brand: paypal</h4>
-                                            <p class="mdfm-text-muted">https://limited-login-paypai.com/egg.php?secret_key=89k0rwa5zltyjg1f32oiqdv4nhems6</p>
-                                        </div>
-                                        <div class="wdfm-footer start-top">
-                                            <div class="wdfm-ft-left flex">
-                                                <div>Site : ออมสิน</div>
-                                                <div class="status-flex">Status : &nbsp; <span class="dot low"></span> Normal</div>
-                                                <div>Hash xxxxxxx</div>
-                                                <div>Filesize 12kb</div>
-                                                <div>Element 522</div>
-                                                <div>Image Screen 
-                                                    <a a href="https://firebasestorage.googleapis.com/v0/b/phish-ai-production.appspot.com/o/LYfzlRVdZPftsYKBQgKf0LkyP3z2%2Fscreenshot%2F92964b45-7858-4725-baf0-f16f5fd1bf89?alt=media&token=63c602fd-a364-4a9c-b89c-4ce09a88ab4a" data-lightbox="name-img-2" class="btn btn-info btn-xs">@icon('solid/eye')</a>
-                                                </div>
-                                            </div>
-                                            <div class="wdfm-ft-right flex">
-                                                <div>Last Online: 10 second ago</div>
-                                                <div>Last Check: 10 second ago</div>
-                                                <div>&nbsp;</div>
-                                                <div>Last Update: 2021-01-01 11:11</div>
-                                            </div>
-                                        </div>
-                                        <div class="wdfm-footer-action">
-                                            <div>
-                                                <strong>Update Original</strong>
-                                            </div>
-                                            <div class="flex-end">
-                                                <a href="" class="btn btn-info btn-sm">@icon('solid/pen-alt') Edit</a>
-                                                <a href="" class="btn btn-danger btn-sm">@icon('solid/trash-alt') Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div> --}}
                             </div>
                         </div>
                     </section>
+
+
+                    <section class="panel panel-default">
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <i class="fas fa-table"></i> Table
+                                </div>
+                            </div>
+                        </header>
+                        <div class="panel-body">
+
+                            <div class="row mb-2">
+                                <div class="col-md-12">
+                                    <h5 class="font-weight-bold">Severity</h5>
+                                    <div class="st-dt-leak">
+                                        <span class="st-dt vrh" data-toggle="tooltip" data-placement="right" data-html="true" title=""
+                                            data-original-title="<div class='st-flex'><div class='box-st-tooltip vrh'>Critical</div><div class='text-st-tooltip'>Criticalข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Critical</span><span
+                                            class="st-dt high" data-toggle="tooltip" data-placement="right" data-html="true" title=""
+                                            data-original-title="<div class='st-flex'><div class='box-st-tooltip high'>High</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">High</span><span
+                                            class="st-dt md" data-toggle="tooltip" data-placement="right" data-html="true" title=""
+                                            data-original-title="<div class='st-flex'><div class='box-st-tooltip md'>Medium</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Medium</span><span
+                                            class="st-dt low" data-toggle="tooltip" data-placement="right" data-html="true" title=""
+                                            data-original-title="<div class='st-flex'><div class='box-st-tooltip low'>Low</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของลูกค้าเช่น ข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">Low</span><span
+                                            class="st-dt vrl" data-toggle="tooltip" data-placement="right" data-html="true" title=""
+                                            data-original-title="<div class='st-flex'><div class='box-st-tooltip vrl'>Informational</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลที่เป็นข้อมูลทั่วไปหรือเป็นข่าวที่ยังไม่ได้รับการยืนยันว่าเป็นข้อมูลรั่วไหลจริง</div></div>">Very
+                                            Low</span>
+                                    </div>
+                                </div>
+                            </div>
+                           
+    
+
+                            <div class="table-responsive">
+                                <div style="width: 100%">
+                                    <table id="tbl_server" class="table table-borered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>IP</th>
+                                                <th>Path</th>
+                                                <th>File Name</th>
+                                                <th>Keyword</th>
+                                                <th>DateTime</th>
+                                                <th>Severity</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>192.168.0.1</td>
+                                                <td>C:/file/dd</td>
+                                                <td>test</td>
+                                                <td>sosecure</td>
+                                                <td>11-03-2022 16:44:23</td>
+                                                <td>
+                                                    <span class="badge" style="background-color: #28A745;">Severity</span>
+                                                </td>
+                                                <td>
+                                                    <label class="switch">
+                                                        <input type="checkbox" id="status" name="status" checked value="1">
+                                                        <span></span>
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-info btn-xs">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                
+                                                    <button type="button" class="btn btn-danger btn-xs">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </section>
+
                 </section>
             </section>
      
@@ -349,6 +394,13 @@
     @include('stacks.css.datatables')
     @include('stacks.css.form')
     @include('stacks.css.lightbox')
+    @include('stacks.css.c3')
+
+    <style>
+        .c3-chart-arc text {
+            display: none;
+        }
+    </style>
 @endpush
 
 @push('pagescript')
@@ -359,7 +411,7 @@
 @include('stacks.js.site_hidesettings')
 @include('stacks.js.lightbox')
 @include('stacks.js.fullscreen')
- 
+@include('stacks.js.c3')
 
 <script>
 
@@ -403,7 +455,7 @@
 
     
     
-
+    $('#tbl_server').DataTable();
     
     function load_card(){
         site_id = '{{$siteSettings->id}}';
@@ -437,6 +489,16 @@
                 }); 
 
           
+                chart_c3(
+                    '#chart_wdfm_'+data.id,
+                    [
+                        ['Hash', 20],
+                        ['Filesize', 10],
+                        ['Element', 70],
+                    ]
+                    ,70
+                );
+
              
         }).fail(function(jqXHR, ajaxOptions, thrownError){
             {{--$('.ajax-loading').hide();--}}
@@ -950,6 +1012,34 @@
             }
         }) 
     }
+
+
+    function chart_c3(id,value,score_mid) {
+        const myc3 = c3.generate({
+            bindto: id,
+            data: {
+                columns: value,
+                type : 'donut',
+            },
+            donut: {
+                title: score_mid,
+                label: {
+                format: function(value, ratio, id) {
+                    return value;
+                    }
+                }
+            },
+            legend: {
+                position: 'top'
+            },
+
+            color: {
+                pattern: ['#4398d4', '#40cd8f','#f4d757','#fcc838','#b93624']
+            }
+        });
+    }
+
+
 
 
 </script>

@@ -4628,5 +4628,14 @@ class DataLeakController extends Controller
     }
 
     
+    public function dataleak_url($id)
+    {
+        $get_data = $this->siteSettings->get_data($id);
+        $data['siteSettings'] = $get_data;
+        $data['page'] = 'Phishing Detection';
+
+        return view('sitesettings::data_leak_url')->with($data);
+    }
+
 
 }

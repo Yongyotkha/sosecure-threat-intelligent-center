@@ -903,4 +903,12 @@ class AgentManagementController extends Controller
         }
 
     }
+
+
+    public function agent_rule(Request $request)
+    {
+        $data['page'] = langapp('agent_rule');
+        return view('agentmanagement::rule')->with($data);
+    }
+
 }
