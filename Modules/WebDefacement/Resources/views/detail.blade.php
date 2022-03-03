@@ -50,11 +50,11 @@
                     </div>
                 </header>
                 <div class="panel-body" id="wdfm-analytics">
-                    <h3 class="text-center">Last Update : 13-03-2022 15:20:11</h3>
+                    <h3 class="text-center">Last Update : {{@$webdefacement->last_check}}</h3>
                     <div class="wrapper-circle">
                         <div>
-                            <div class="c100 p30 green">
-                                <span>30%</span>
+                            <div class="c100 p{{@$webdefacment_data_check->hash_percent}} green">
+                                <span>{{@$webdefacment_data_check->hash_percent}}%</span>
                                 <div class="slice">
                                   <div class="bar"></div>
                                   <div class="fill"></div>
@@ -64,8 +64,8 @@
                         </div>
                       
                         <div>
-                            <div class="c100 p40 green">
-                                <span>40%</span>
+                            <div class="c100 p{{@$webdefacment_data_check->filesize_percent}} green">
+                                <span>{{@$webdefacment_data_check->filesize_percent}}%</span>
                                 <div class="slice">
                                   <div class="bar"></div>
                                   <div class="fill"></div>
@@ -74,8 +74,8 @@
                             <h3 class="text-center text-dark font-weight-bold">Filesize</h3>
                         </div>
                         <div>
-                            <div class="c100 p90 danger">
-                                <span>90%</span>
+                            <div class="c100 p{{@$webdefacment_data_check->element_percent}} danger">
+                                <span>{{@$webdefacment_data_check->element_percent}}%</span>
                                 <div class="slice">
                                   <div class="bar"></div>
                                   <div class="fill"></div>
