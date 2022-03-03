@@ -67,8 +67,64 @@
                                                     </label>
                                                 </td>
                                                 <td>1</td>
-                                                <td>http://sosecure/login</td>
-                                                <td>11/01/2022 10:13:29</td>
+                                                <td>https://www.thairath.co.th/tags/Cyber%20Security</td>
+                                                <td>03/01/2022 15:25:22</td>
+                                                <td><span class="text-success">Online</span></td>
+                                                <td>
+                                                    <label class="switch">
+                                                        <input type="hidden" value="FALSE" name="">
+                                                        <input type="checkbox" name="status" value="TRUE" checked>
+                                                        <span></span>
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-info btn-xs">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                
+                                                    <button type="button" class="btn btn-danger btn-xs">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <label>
+                                                        <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk" />
+                                                        <span class="label-text"></span>
+                                                    </label>
+                                                </td>
+                                                <td>2</td>
+                                                <td>https://www.blognone.com/topics/cybersecurity</td>
+                                                <td>03/01/2022 15:24:29</td>
+                                                <td><span class="text-success">Online</span></td>
+                                                <td>
+                                                    <label class="switch">
+                                                        <input type="hidden" value="FALSE" name="">
+                                                        <input type="checkbox" name="status" value="TRUE" checked>
+                                                        <span></span>
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-info btn-xs">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                
+                                                    <button type="button" class="btn btn-danger btn-xs">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <label>
+                                                        <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk" />
+                                                        <span class="label-text"></span>
+                                                    </label>
+                                                </td>
+                                                <td>3</td>
+                                                <td>https://www.techtalkthai.com/tag/cybersecurity/</td>
+                                                <td>03/01/2022 15:24:11</td>
                                                 <td><span class="text-success">Online</span></td>
                                                 <td>
                                                     <label class="switch">
