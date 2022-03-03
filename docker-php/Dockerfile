@@ -4,7 +4,7 @@ FROM php:7.4-fpm-alpine
 WORKDIR /var/www/html
 
 # Setup GD extension
-RUN apk add --no-cache \
+RUN apk add \
     freetype \
     libjpeg-turbo \
     libpng \
@@ -17,7 +17,7 @@ RUN apk add --no-cache \
       --with-jpeg=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-enable gd \
-    && apk del --no-cache \
+    && apk del \
     freetype-dev \
     libjpeg-turbo-dev \
     libpng-dev \
