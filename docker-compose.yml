@@ -25,4 +25,4 @@ services:
     working_dir: /var/www/laravel
     volumes_from:
       - php
-    #command: "composer update" # คำสั่ง สำหรับ install package
+    command: "composer update" # คำสั่ง สำหรับ install package

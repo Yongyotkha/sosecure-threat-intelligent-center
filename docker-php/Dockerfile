@@ -5,20 +5,16 @@ WORKDIR /var/www/html
 
 # Setup GD extension
 RUN apk add \
-    freetype \
     libjpeg-turbo \
     libpng \
     imap-dev \
-    freetype-dev \
     libjpeg-turbo-dev \
     libpng-dev \
     && docker-php-ext-configure gd \
-      --with-freetype=/usr/include/ \
       --with-jpeg=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-enable gd \
     && apk del \
-    freetype-dev \
     libjpeg-turbo-dev \
     libpng-dev \
     && rm -rf /tmp/* 
