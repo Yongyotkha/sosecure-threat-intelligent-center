@@ -17,11 +17,11 @@ services:
     volumes_from:
       - php # คือการ volume จาก php container นะครับ
     ports:
-      - 8000:80 # port ที่เราต้องการจะใช้ระหว่าง {host}:{container} นะครับ
+      - 8500:80 # port ที่เราต้องการจะใช้ระหว่าง {host}:{container} นะครับ
 
   composer: # เป็น container สำหรับการรัน install package laravel ที่จะสั่งรันครั้งเดียวแล้วหยุดรัน container ไป
     build: ./docker-php # ใช้ dockerfile เดียวกันกับ container php
     working_dir: /var/www/laravel
     volumes_from:
       - php
-    command: "composer update" # คำสั่ง สำหรับ install package
+    #command: "composer update" # คำสั่ง สำหรับ install package
