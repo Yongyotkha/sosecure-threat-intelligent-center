@@ -273,17 +273,39 @@
                     </div>
                 </header>
                 <div class="panel-body">
+
+                    <div class="row mb-2">
+                        <div class="col-md-12">
+                            <h5 class="font-weight-bold">Severity</h5>
+                            <div class="st-dt-leak">
+                                <span class="st-dt vrh" data-toggle="tooltip" data-placement="right" data-html="true" title=""
+                                    data-original-title="<div class='st-flex'><div class='box-st-tooltip vrh'>Critical</div><div class='text-st-tooltip'>Criticalข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Critical</span><span
+                                    class="st-dt high" data-toggle="tooltip" data-placement="right" data-html="true" title=""
+                                    data-original-title="<div class='st-flex'><div class='box-st-tooltip high'>High</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">High</span><span
+                                    class="st-dt md" data-toggle="tooltip" data-placement="right" data-html="true" title=""
+                                    data-original-title="<div class='st-flex'><div class='box-st-tooltip md'>Medium</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Medium</span><span
+                                    class="st-dt low" data-toggle="tooltip" data-placement="right" data-html="true" title=""
+                                    data-original-title="<div class='st-flex'><div class='box-st-tooltip low'>Low</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของลูกค้าเช่น ข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">Low</span><span
+                                    class="st-dt vrl" data-toggle="tooltip" data-placement="right" data-html="true" title=""
+                                    data-original-title="<div class='st-flex'><div class='box-st-tooltip vrl'>Informational</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลที่เป็นข้อมูลทั่วไปหรือเป็นข่าวที่ยังไม่ได้รับการยืนยันว่าเป็นข้อมูลรั่วไหลจริง</div></div>">Very Low</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table class="table table-striped" id="table-phishing-template" style="width: 100%">
                             <thead>
                                 <tr>
                                     {{-- <th></th> --}}
+                                    <th>Site Name</th>
+                                    <th>URL Detection</th>
                                     <th>URL</th>
                                     <th>IP Address</th>
                                     <th>Type</th>
                                     <th>Score</th>
                                     <th>Severity</th>
                                     <th>Date</th>
+                                    <th>Status</th>
                                     <th style="width: 10%" class="text-center">Action</th>
                                 </tr>
                             </thead>
@@ -477,6 +499,12 @@ function datatable(){
         },
         columns: [
             {
+                data: 'site_name',
+            },
+            {
+                data: 'url_detection',
+            },
+            {
                 data: 'url',
             },
             {
@@ -493,6 +521,9 @@ function datatable(){
             },
             {
                 data: 'start_date',
+            },
+            {
+                data: 'status',
             },
             {
                 data: 'action',
@@ -539,7 +570,7 @@ function mychart(myid){
 
         series: [{
             name: 'Alert',
-            data: [0,0,0,0,0,5,0,0,0,0,0,0,10,0,50,30,0,0,0,0,0,0,0,0,0,0,0,0,0,7],
+            data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0],
             type: 'area',
             fillColor: '#c8dcf17d',
         }],
@@ -595,10 +626,10 @@ function circle_chart(id){
         series: [{
             colorByPoint: false,
             data: [
-            {  name: 'Referrer', y: 5, color: '#e64732'}, 
-            {  name: 'Threat Feed',  y: 4 , color: '#fcc838'}, 
-            {  name: 'Domain name', y: 4, color: '#00dcff'  }, 
-            {  name: 'other', y: 4, color: '#c1c0c0'  }, 
+            {  name: 'Referrer', y: 2, color: '#e64732'}, 
+            {  name: 'Threat Feed',  y: 0 , color: '#fcc838'}, 
+            {  name: 'Domain name', y: 0, color: '#00dcff'  }, 
+            {  name: 'other', y: 0, color: '#c1c0c0'  }, 
             ]
         }],
     });
