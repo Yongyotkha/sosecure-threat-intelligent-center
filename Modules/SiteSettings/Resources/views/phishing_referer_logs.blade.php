@@ -45,10 +45,17 @@
                                         <tbody>
                                             <tr>
                                                 <td>1</td>
-                                                <td>123.234.555</td>
-                                                <td>http://sosecure/login</td>
-                                                <td>http://sosecure/login</td>
-                                                <td>21/01/2022 09:10:29</td>
+                                                <td>192.168.1.44</td>
+                                                <td>https://demo01.mtsc.co.th/login</td>
+                                                <td>https://demo02.mtsc.co.th/login</td>
+                                                <td>2021-12-27 15:18:00</td>
+                                            </tr>
+                                            <tr>
+                                                <td>2</td>
+                                                <td>192.168.1.44</td>
+                                                <td>https://demo04.mtsc.co.th/login</td>
+                                                <td>https://demo02.mtsc.co.th/login</td>
+                                                <td>2021-12-27 15:18:00</td>
                                             </tr>
                                         </tbody>
                                     </table>

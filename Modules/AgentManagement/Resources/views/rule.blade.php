@@ -109,7 +109,7 @@
                                                 <div class="box-item-keyword">
                                                     <!-- Mockup Data -->
                                                     <?php
-                                                        $data = [
+                                                        $data_email = [
                                                         'EMAIL_Cryptowall',
                                                         'Email_PHP_Mailer',
                                                         'Email_fake_it_maintenance_bulletin',
@@ -122,19 +122,53 @@
                                                         'scam',
                                                         'urls',
                                                         ];
+                                                        $length_data_email = count($data_email);
 
-                                                        $length_data = count($data);
+                                                        $data_cve = [
+                                                            // Group CVE
+                                                            'CVE-2010-0805',
+                                                            'CVE-2010-0887',
+                                                            'CVE-2010-1297',
+                                                            'CVE-2012-0158',
+                                                            'CVE-2013-0074',
+                                                            'CVE-2013-0422',
+                                                            'CVE-2015-1701',
+                                                            'CVE-2015-2426',
+                                                            'CVE-2015-2545',
+                                                            'CVE-2015-5119',
+                                                            'CVE-2016-5195',
+                                                            'CVE-2017-11882',
+                                                            'CVE-2018-20250',
+                                                            'CVE-2018-4878',
+                                                        ];
+
+                                                        $length_data_cve = count($data_cve);
 
                                                     ?>
                                                     <ul id="keyword_rule" class="main-list keyword-list">
                                                         <!-- Mockup Data -->
                                                         <?php
-                                                            for($i = 0 ; $i < $length_data ; $i++)  {
+                                                            for($i = 0 ; $i < $length_data_email ; $i++)  {
                                                         ?>
                                                         <li class="item-list item--keyword">
                                                             <div class="left-side-item">
                                                                 <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
-                                                                <span class="text-keyword"><?php echo $data[$i] ?></span>
+                                                                <span class="text-keyword"><?php echo $data_email[$i] ?></span>
+                                                            </div>
+                                                            <div class="action-keyword">
+                                                                <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
+                                                                <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
+                                                            </div>
+                                                        </li>
+                                                        <?php }  ?>
+                                                        <!-- Mockup Data -->
+                                                        <?php
+                                                            for($i = 0 ; $i < $length_data_cve ; $i++)  {
+                                                        ?>
+                                                        <li class="item-list item--keyword">
+                                                            <div class="left-side-item">
+                                                                <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
+                                                                <span class="text-keyword"><?php echo $data_cve[$i] ?></span>
                                                             </div>
                                                             <div class="action-keyword">
                                                                 <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
@@ -151,12 +185,28 @@
                                                     <ul id="site_rule" class="main-list site-list">
                                                         <!-- Mockup Data -->
                                                         <?php
-                                                            for($i = 0 ; $i < $length_data ; $i++)  {
+                                                            for($i = 0 ; $i < $length_data_email ; $i++)  {
                                                         ?>
                                                         <li class="item-list item--keyword">
                                                             <div class="left-side-item">
                                                                 <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
-                                                                <span class="text-keyword"><?php echo $data[$i] ?></span>
+                                                                <span class="text-keyword"><?php echo $data_email[$i] ?></span>
+                                                            </div>
+                                                            <div class="action-keyword">
+                                                                <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
+                                                                <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
+                                                            </div>
+                                                        </li>
+                                                        <?php }  ?>
+
+                                                         <!-- Mockup Data -->
+                                                        <?php
+                                                            for($i = 0 ; $i < $length_data_cve ; $i++)  {
+                                                        ?>
+                                                        <li class="item-list item--keyword">
+                                                            <div class="left-side-item">
+                                                                <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
+                                                                <span class="text-keyword"><?php echo $data_cve[$i] ?></span>
                                                             </div>
                                                             <div class="action-keyword">
                                                                 <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
@@ -210,22 +260,99 @@
                                                         <th>Rule Category</th>
                                                         <th>File Name</th>
                                                         <th>Rule Name</th>
-                                                        <th>Remark</th>
+                                                        <th>Description</th>
                                                         <th>Severity</th>
                                                         <th>Status</th>
                                                         <th>Last Update</th>
                                                         <th class="text-center">Action</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
-                                                    {{-- <tr>
+                                                <tbody>                                                  
+                                                    <tr>
                                                         <td>
                                                             <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
                                                                 <span class="label-text"></span>
                                                             </label>
                                                         </td>
-                                                        
-                                                    </tr> --}}
+                                                        <td>1</td>
+                                                        <td>Email</td>
+                                                        <td>
+                                                            <?php
+                                                                for($i = 0 ; $i < $length_data_email ; $i++)  {
+                                                            ?>
+                                                                <div>
+                                                                    <?php echo $data_email[$i].'.yar' ?>
+                                                                </div>
+                                                            <?php } ?>
+                                                        </td>
+                                                        <td>
+                                                            <?php
+                                                                for($i = 0 ; $i < $length_data_email ; $i++)  {
+                                                            ?>
+                                                                <div>
+                                                                    <?php echo $data_email[$i] ?>
+                                                                </div> 
+                                                            <?php } ?>
+                                                        </td>
+                                                        <td>-</td>
+                                                        <td>
+                                                            <span class="badge" style="background-color: #409967;">Low</span>
+                                                        </td>
+                                                        <td>
+                                                            <label class="switch"><input type="checkbox" id="status" name="status" checked="" value="1">
+                                                                <span></span>
+                                                            </label>
+                                                        </td>
+                                                        <td>2021-12-27 15:18:00</td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></button>
+                                                            <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></button>
+                                                        </td>
+                                                    </tr>
+
+
+                                                    <tr>
+                                                        <td>
+                                                            <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
+                                                                <span class="label-text"></span>
+                                                            </label>
+                                                        </td>
+                                                        <td>2</td>
+                                                        <td>CVE</td>
+                                                        <td>
+                                                            <?php
+                                                                for($i = 0 ; $i < $length_data_cve ; $i++)  {
+                                                            ?>
+                                                                <div>
+                                                                    <?php echo $data_cve[$i].'.yar' ?>
+                                                                </div>
+                                                            <?php } ?>
+                                                        </td>
+                                                        <td>
+                                                            <?php
+                                                                for($i = 0 ; $i < $length_data_cve ; $i++)  {
+                                                            ?>
+                                                                <div>
+                                                                    <?php echo $data_cve[$i] ?>
+                                                                </div> 
+                                                            <?php } ?>
+                                                        </td>
+                                                        <td>-</td>
+                                                        <td>
+                                                            <span class="badge" style="background-color: #409967;">Low</span>
+                                                        </td>
+                                                        <td>
+                                                            <label class="switch"><input type="checkbox" id="status" name="status" checked="" value="1">
+                                                                <span></span>
+                                                            </label>
+                                                        </td>
+                                                        <td>2021-12-27 15:18:00</td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></button>
+                                                            <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></button>
+                                                        </td>
+                                                    </tr>
+
                                                 </tbody>
                                             </table>
                                         </div>
