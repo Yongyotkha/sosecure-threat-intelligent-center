@@ -78,8 +78,16 @@
                                             <div class="col-lg-4">
                                                 <div class="form-group m-b-md">
                                                     <label for="" class="">Site</label>
-                                                    <select type="text" class="form-control select_2_site" name="" id="" placeholder="">
-                                                        <option value=""></option>
+                                                    <select name="site" id="site" class="tselect2-option form-control select-site" >
+                                                        <option value="">All Site</option>
+                                                            @if ($site_settings)
+                                
+                                                            @foreach ($site_settings as $site_settings)
+                                                            <option value="{{$site_settings->id}}">{{$site_settings->name}}
+                                                            </option>
+                                                            @endforeach
+                                
+                                                            @endif
                                                     </select>
                                                 </div>
                                             </div>
@@ -388,7 +396,7 @@
         },
         series: [{
             name: 'Population',
-            data: [["None",48],["sanook",25],["schneier",6],["krebsonsecurity",4],["itsecurityguru",4],["trendmicro",4],["posttoday",2],["bleepingcomputer",1],["hackercombat",1],["thehackernews",1]],
+            data: [["Email",11],["CVE",14],["Malware",7],["Crypto",0],["Deprecated",0],["Maldocs",0]],
             dataLabels: {
                 enabled: true,
                 color: '#333',
