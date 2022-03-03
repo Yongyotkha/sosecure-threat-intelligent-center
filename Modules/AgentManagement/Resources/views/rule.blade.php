@@ -398,7 +398,7 @@
                                     <input type="text" id="" class="form-control">
                                 </div>
                                 <div class="col-lg-12 mb-1">
-                                    <input type="file" id="" class="form-control">
+                                    <input type="file" id="file_rule" class="form-control">
                                 </div>
                                 <div class="col-lg-12">
                                     <span style="color:red;">รองรับเฉพาะไฟล์ .zip เท่านั้น</span>
@@ -502,6 +502,136 @@
   $('.select-2--rule').select2();
 
   $('#table-agent-rule').DataTable();
+
+  $('#file_rule').on('change', function(){
+    if(this.files.length > 0){
+        $('#rule_item tbody').empty();
+        let html = ``;
+        html += `<tr>
+                    <td style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="" selected>EMAIL_Cryptowall</option>
+                            <option value="">Email_PHP_Mailer</option>
+                            <option value="">Email_generic_phishing</option>
+                            <option value="">Email_quota_limit_warning</option>
+                            <option value="">attachment</option>
+                            <option value="">image</option>
+                            <option value="">scam</option>
+                            <option value="">urls</option>
+                        </select>
+                    </td>
+                    <td  style="width: 33.33%">
+                        <input type="text" id="" class="form-control">
+                    </td>
+                    <td  style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="">Critical</option>
+                            <option value="">High</option>
+                            <option value="">Meduim</option>
+                            <option value="">Low</option>
+                            <option value="">Informational</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="" >EMAIL_Cryptowall</option>
+                            <option value="" selected>Email_PHP_Mailer</option>
+                            <option value="">Email_generic_phishing</option>
+                            <option value="">Email_quota_limit_warning</option>
+                            <option value="">attachment</option>
+                            <option value="">image</option>
+                            <option value="">scam</option>
+                            <option value="">urls</option>
+                        </select>
+                    </td>
+                    <td  style="width: 33.33%">
+                        <input type="text" id="" class="form-control">
+                    </td>
+                    <td  style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="">Critical</option>
+                            <option value="">High</option>
+                            <option value="">Meduim</option>
+                            <option value="">Low</option>
+                            <option value="">Informational</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="" >EMAIL_Cryptowall</option>
+                            <option value="">Email_PHP_Mailer</option>
+                            <option value="">Email_generic_phishing</option>
+                            <option value="">Email_quota_limit_warning</option>
+                            <option value="">attachment</option>
+                            <option value="">image</option>
+                            <option value="">scam</option>
+                            <option value="">urls</option>
+                        </select>
+                    </td>
+                    <td  style="width: 33.33%">
+                        <input type="text" id="" class="form-control">
+                    </td>
+                    <td  style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="">Critical</option>
+                            <option value="">High</option>
+                            <option value="">Meduim</option>
+                            <option value="">Low</option>
+                            <option value="">Informational</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="" >EMAIL_Cryptowall</option>
+                            <option value="">Email_PHP_Mailer</option>
+                            <option value="" selected>Email_generic_phishing</option>
+                            <option value="">Email_quota_limit_warning</option>
+                            <option value="">attachment</option>
+                            <option value="">image</option>
+                            <option value="">scam</option>
+                            <option value="">urls</option>
+                        </select>
+                    </td>
+                    <td  style="width: 33.33%">
+                        <input type="text" id="" class="form-control">
+                    </td>
+                    <td  style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="">Critical</option>
+                            <option value="">High</option>
+                            <option value="">Meduim</option>
+                            <option value="">Low</option>
+                            <option value="">Informational</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+                `;
+        $('#rule_item tbody').append(html);
+        $('.select-2--rule').select2();
+    }
+  });
+
+
+
+
 
     $('.loadrule').hide();
     const chart_top_rule = Highcharts.chart('chart-top-rule-cate', {
