@@ -167,6 +167,115 @@
                 </div>
             </section>
 
+
+            <section class="panel panel-default">
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <i class="fas fa-table"></i> Table
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body">
+
+                    <div class="row mb-2">
+                        <div class="col-md-12">
+                            <h5 class="font-weight-bold">Severity</h5>
+                            <div class="st-dt-leak">
+                                <span class="st-dt vrh" data-toggle="tooltip" data-placement="right" data-html="true" title=""
+                                    data-original-title="<div class='st-flex'><div class='box-st-tooltip vrh'>Critical</div><div class='text-st-tooltip'>Criticalข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Critical</span><span
+                                    class="st-dt high" data-toggle="tooltip" data-placement="right" data-html="true" title=""
+                                    data-original-title="<div class='st-flex'><div class='box-st-tooltip high'>High</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">High</span><span
+                                    class="st-dt md" data-toggle="tooltip" data-placement="right" data-html="true" title=""
+                                    data-original-title="<div class='st-flex'><div class='box-st-tooltip md'>Medium</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Medium</span><span
+                                    class="st-dt low" data-toggle="tooltip" data-placement="right" data-html="true" title=""
+                                    data-original-title="<div class='st-flex'><div class='box-st-tooltip low'>Low</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของลูกค้าเช่น ข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">Low</span><span
+                                    class="st-dt vrl" data-toggle="tooltip" data-placement="right" data-html="true" title=""
+                                    data-original-title="<div class='st-flex'><div class='box-st-tooltip vrl'>Informational</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลที่เป็นข้อมูลทั่วไปหรือเป็นข่าวที่ยังไม่ได้รับการยืนยันว่าเป็นข้อมูลรั่วไหลจริง</div></div>">Very
+                                    Low</span>
+                            </div>
+                        </div>
+                    </div>
+                   
+
+
+                    <div class="table-responsive">
+                        <div style="width: 100%">
+                            <table id="tbl_server" class="table table-borered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Site Name</th>
+                                        <th>IP</th>
+                                        <th>Path</th>
+                                        <th>File Name</th>
+                                        <th>Keyword</th>
+                                        <th>DateTime</th>
+                                        <th>Severity</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>บริษัท เมจิกเทคโซลูชั่น จำกัด</td>
+                                        <td>192.168.0.1</td>
+                                        <td>/var/www/html/threat-intelligent-center/threat-intelligent-client</td>
+                                        <td>server.php</td>
+                                        <td>server</td>
+                                        <td>11-03-2022 16:44:23</td>
+                                        <td>
+                                            <span class="badge" style="background-color: #28A745;">Severity</span>
+                                        </td>
+                                        <td>
+                                            <label class="switch">
+                                                <input type="checkbox" id="status" name="status" checked value="1">
+                                                <span></span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-info btn-xs">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                        
+                                            <button type="button" class="btn btn-danger btn-xs">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>บริษัท เมจิกเทคโซลูชั่น จำกัด</td>
+                                        <td>192.168.0.1</td>
+                                        <td>/var/www/html/threat-intelligent-center/threat-intelligent-client</td>
+                                        <td>phpunit.xml</td>
+                                        <td>server</td>
+                                        <td>11-03-2022 16:44:23</td>
+                                        <td>
+                                            <span class="badge" style="background-color: #28A745;">Severity</span>
+                                        </td>
+                                        <td>
+                                            <label class="switch">
+                                                <input type="checkbox" id="status" name="status" checked value="1">
+                                                <span></span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-info btn-xs">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                        
+                                            <button type="button" class="btn btn-danger btn-xs">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
         </section>
     </section>
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
@@ -364,6 +473,13 @@
 @include('stacks.css.form')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @include('stacks.css.lightbox')
+
+<style>
+    .c3-chart-arc text {
+        display: none;
+    }
+</style>
+
 @endpush
 
 @push('pagescript')
@@ -377,7 +493,7 @@
 @include('stacks.js.c3')
 
 <script>
-
+    $('#tbl_server').dataTable();
     active_btn('#btngroup_status .btn');
     var id_select_site = 'site';
     var keywords = null;
@@ -486,9 +602,9 @@
                 f_loading(null, '#data_card');
                 $("#data_card").html('');  
             },
-        }).done(function(data){
+        }).done(function(result){
             f_loading_stop(null, '#data_card');
-                $("#data_card").html(data.html);  
+                $("#data_card").html(result.html);  
 
                 $('.wdfm-card').hover(function(){
                     $(this).find('.wdfm-header').addClass('wdfm-header-upper');
@@ -497,15 +613,15 @@
                     $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
                 }); 
 
-                // chart_c3(
-                //     '#chart_wdfm_01',
-                //     [
-                //         ['Hash', 20],
-                //         ['Filesize', 10],
-                //         ['Element', 70],
-                //     ]
-                //     ,70
-                // );
+                chart_c3(
+                    '#chart_wdfm_132',
+                    [
+                        ['Hash', 20],
+                        ['Filesize', 10],
+                        ['Element', 70],
+                    ]
+                    ,70
+                );
           
              
         }).fail(function(jqXHR, ajaxOptions, thrownError){

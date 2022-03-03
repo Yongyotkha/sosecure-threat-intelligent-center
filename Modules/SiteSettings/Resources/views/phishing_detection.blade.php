@@ -44,15 +44,9 @@
                                     <table id="tbl_dfm_feed" class="table table-borered table-striped">
                                         <thead>
                                             <tr>
-                                                <th class="no-sort">
-                                                    <label>
-                                                        <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk" />
-                                                        <span class="label-text"></span>
-                                                    </label>
-                                                </th>
-                                                <th>No.</th>
+                                                <th>Site Name</th>
+                                                <th>URL Detection</th>
                                                 <th>Page Name</th>
-                                                <th>URL</th>
                                                 <th>Key Word</th>
                                                 <th>Status</th>
                                                 <th>Action</th>
@@ -60,16 +54,11 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td>
-                                                    <label>
-                                                        <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk" />
-                                                        <span class="label-text"></span>
-                                                    </label>
-                                                </td>
-                                                <td>1</td>
-                                                <td>Login Sosecure 1-1</td>
-                                                <td>http://sosecure/login</td>
-                                                <td>password,Sosecure,Login</td>
+
+                                                <td>บริษัท เมจิกเทคโซลูชั่น จำกัด</td>
+                                                <td>https://demo02.mtsc.co.th/login</td>
+                                                <td>Login</td>
+                                                <td>password,Login</td>
                                                 <td>
                                                     <label class="switch">
                                                         <input type="hidden" value="FALSE" name="">

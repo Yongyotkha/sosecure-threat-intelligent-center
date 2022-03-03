@@ -78,8 +78,13 @@
                                             <div class="col-lg-4">
                                                 <div class="form-group m-b-md">
                                                     <label for="" class="">Site</label>
-                                                    <select type="text" class="form-control select_2_site" name="" id="" placeholder="">
-                                                        <option value=""></option>
+                                                    <select name="site" id="site" class="tselect2-option form-control select-site" >
+                                                        <option value="">All Site</option>
+                                                            @if ($site_settings)
+                                                            @foreach ($site_settings as $site_settings)
+                                                                <option value="{{$site_settings->id}}" {{$site_settings->id == 59 ? 'selected' : '' }}>{{$site_settings->name}}</option>
+                                                            @endforeach
+                                                            @endif
                                                     </select>
                                                 </div>
                                             </div>
@@ -102,25 +107,113 @@
                                             <div class="col-lg-6">
                                                 <h5 class="font-weight-bold">Rule</h5>
                                                 <div class="box-item-keyword">
+                                                    <!-- Mockup Data -->
+                                                    <?php
+                                                        $data_email = [
+                                                        'EMAIL_Cryptowall',
+                                                        'Email_PHP_Mailer',
+                                                        'Email_fake_it_maintenance_bulletin',
+                                                        'Email_generic_phishing',
+                                                        'Email_quota_limit_warning',
+                                                        'attachment',
+                                                        'attachment',
+                                                        'attachment',
+                                                        'image',
+                                                        'scam',
+                                                        'urls',
+                                                        ];
+                                                        $length_data_email = count($data_email);
+
+                                                        $data_cve = [
+                                                            // Group CVE
+                                                            'CVE-2010-0805',
+                                                            'CVE-2010-0887',
+                                                            'CVE-2010-1297',
+                                                            'CVE-2012-0158',
+                                                            'CVE-2013-0074',
+                                                            'CVE-2013-0422',
+                                                            'CVE-2015-1701',
+                                                            'CVE-2015-2426',
+                                                            'CVE-2015-2545',
+                                                            'CVE-2015-5119',
+                                                            'CVE-2016-5195',
+                                                            'CVE-2017-11882',
+                                                            'CVE-2018-20250',
+                                                            'CVE-2018-4878',
+                                                        ];
+
+                                                        $length_data_cve = count($data_cve);
+
+                                                    ?>
                                                     <ul id="keyword_rule" class="main-list keyword-list">
+                                                        <!-- Mockup Data -->
+                                                        <?php
+                                                            for($i = 0 ; $i < $length_data_email ; $i++)  {
+                                                        ?>
                                                         <li class="item-list item--keyword">
                                                             <div class="left-side-item">
                                                                 <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
-                                                                <span class="text-keyword">Rule</span>
+                                                                <span class="text-keyword"><?php echo $data_email[$i] ?></span>
                                                             </div>
                                                             <div class="action-keyword">
                                                                 <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
                                                                 <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
                                                             </div>
                                                         </li>
+                                                        <?php }  ?>
+                                                        <!-- Mockup Data -->
+                                                        <?php
+                                                            for($i = 0 ; $i < $length_data_cve ; $i++)  {
+                                                        ?>
+                                                        <li class="item-list item--keyword">
+                                                            <div class="left-side-item">
+                                                                <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
+                                                                <span class="text-keyword"><?php echo $data_cve[$i] ?></span>
+                                                            </div>
+                                                            <div class="action-keyword">
+                                                                <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
+                                                                <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
+                                                            </div>
+                                                        </li>
+                                                        <?php }  ?>
                                                     </ul>
                                                 </div>
                                             </div>
                                             <div class="col-lg-6">
-                                                <h5 class="font-weight-bold">Site : Demo</h5>
+                                                <h5 class="font-weight-bold">บริษัท เมจิกเทคโซลูชั่น จำกัด</h5>
                                                 <div class="box-item-keyword">
                                                     <ul id="site_rule" class="main-list site-list">
-                                                        
+                                                        <!-- Mockup Data -->
+                                                        <?php
+                                                            for($i = 0 ; $i < $length_data_email ; $i++)  {
+                                                        ?>
+                                                        <li class="item-list item--keyword">
+                                                            <div class="left-side-item">
+                                                                <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
+                                                                <span class="text-keyword"><?php echo $data_email[$i] ?></span>
+                                                            </div>
+                                                            <div class="action-keyword">
+                                                                <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
+                                                                <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
+                                                            </div>
+                                                        </li>
+                                                        <?php }  ?>
+
+                                                         <!-- Mockup Data -->
+                                                        <?php
+                                                            for($i = 0 ; $i < $length_data_cve ; $i++)  {
+                                                        ?>
+                                                        <li class="item-list item--keyword">
+                                                            <div class="left-side-item">
+                                                                <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
+                                                                <span class="text-keyword"><?php echo $data_cve[$i] ?></span>
+                                                            </div>
+                                                            <div class="action-keyword">
+                                                                <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
+                                                                <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
+                                                            </div>
+                                                        </li>
+                                                        <?php }  ?>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -167,22 +260,99 @@
                                                         <th>Rule Category</th>
                                                         <th>File Name</th>
                                                         <th>Rule Name</th>
-                                                        <th>Remark</th>
+                                                        <th>Description</th>
                                                         <th>Severity</th>
                                                         <th>Status</th>
                                                         <th>Last Update</th>
                                                         <th class="text-center">Action</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
-                                                    {{-- <tr>
+                                                <tbody>                                                  
+                                                    <tr>
                                                         <td>
                                                             <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
                                                                 <span class="label-text"></span>
                                                             </label>
                                                         </td>
-                                                        
-                                                    </tr> --}}
+                                                        <td>1</td>
+                                                        <td>Email</td>
+                                                        <td>
+                                                            <?php
+                                                                for($i = 0 ; $i < $length_data_email ; $i++)  {
+                                                            ?>
+                                                                <div>
+                                                                    <?php echo $data_email[$i].'.yar' ?>
+                                                                </div>
+                                                            <?php } ?>
+                                                        </td>
+                                                        <td>
+                                                            <?php
+                                                                for($i = 0 ; $i < $length_data_email ; $i++)  {
+                                                            ?>
+                                                                <div>
+                                                                    <?php echo $data_email[$i] ?>
+                                                                </div> 
+                                                            <?php } ?>
+                                                        </td>
+                                                        <td>-</td>
+                                                        <td>
+                                                            <span class="badge" style="background-color: #409967;">Low</span>
+                                                        </td>
+                                                        <td>
+                                                            <label class="switch"><input type="checkbox" id="status" name="status" checked="" value="1">
+                                                                <span></span>
+                                                            </label>
+                                                        </td>
+                                                        <td>2021-12-27 15:18:00</td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></button>
+                                                            <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></button>
+                                                        </td>
+                                                    </tr>
+
+
+                                                    <tr>
+                                                        <td>
+                                                            <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
+                                                                <span class="label-text"></span>
+                                                            </label>
+                                                        </td>
+                                                        <td>2</td>
+                                                        <td>CVE</td>
+                                                        <td>
+                                                            <?php
+                                                                for($i = 0 ; $i < $length_data_cve ; $i++)  {
+                                                            ?>
+                                                                <div>
+                                                                    <?php echo $data_cve[$i].'.yar' ?>
+                                                                </div>
+                                                            <?php } ?>
+                                                        </td>
+                                                        <td>
+                                                            <?php
+                                                                for($i = 0 ; $i < $length_data_cve ; $i++)  {
+                                                            ?>
+                                                                <div>
+                                                                    <?php echo $data_cve[$i] ?>
+                                                                </div> 
+                                                            <?php } ?>
+                                                        </td>
+                                                        <td>-</td>
+                                                        <td>
+                                                            <span class="badge" style="background-color: #409967;">Low</span>
+                                                        </td>
+                                                        <td>
+                                                            <label class="switch"><input type="checkbox" id="status" name="status" checked="" value="1">
+                                                                <span></span>
+                                                            </label>
+                                                        </td>
+                                                        <td>2021-12-27 15:18:00</td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></button>
+                                                            <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></button>
+                                                        </td>
+                                                    </tr>
+
                                                 </tbody>
                                             </table>
                                         </div>
@@ -228,7 +398,7 @@
                                     <input type="text" id="" class="form-control">
                                 </div>
                                 <div class="col-lg-12 mb-1">
-                                    <input type="file" id="" class="form-control">
+                                    <input type="file" id="file_rule" class="form-control">
                                 </div>
                                 <div class="col-lg-12">
                                     <span style="color:red;">รองรับเฉพาะไฟล์ .zip เท่านั้น</span>
@@ -333,6 +503,136 @@
 
   $('#table-agent-rule').DataTable();
 
+  $('#file_rule').on('change', function(){
+    if(this.files.length > 0){
+        $('#rule_item tbody').empty();
+        let html = ``;
+        html += `<tr>
+                    <td style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="" selected>EMAIL_Cryptowall</option>
+                            <option value="">Email_PHP_Mailer</option>
+                            <option value="">Email_generic_phishing</option>
+                            <option value="">Email_quota_limit_warning</option>
+                            <option value="">attachment</option>
+                            <option value="">image</option>
+                            <option value="">scam</option>
+                            <option value="">urls</option>
+                        </select>
+                    </td>
+                    <td  style="width: 33.33%">
+                        <input type="text" id="" class="form-control">
+                    </td>
+                    <td  style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="">Critical</option>
+                            <option value="">High</option>
+                            <option value="">Meduim</option>
+                            <option value="">Low</option>
+                            <option value="">Informational</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="" >EMAIL_Cryptowall</option>
+                            <option value="" selected>Email_PHP_Mailer</option>
+                            <option value="">Email_generic_phishing</option>
+                            <option value="">Email_quota_limit_warning</option>
+                            <option value="">attachment</option>
+                            <option value="">image</option>
+                            <option value="">scam</option>
+                            <option value="">urls</option>
+                        </select>
+                    </td>
+                    <td  style="width: 33.33%">
+                        <input type="text" id="" class="form-control">
+                    </td>
+                    <td  style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="">Critical</option>
+                            <option value="">High</option>
+                            <option value="">Meduim</option>
+                            <option value="">Low</option>
+                            <option value="">Informational</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="" >EMAIL_Cryptowall</option>
+                            <option value="">Email_PHP_Mailer</option>
+                            <option value="">Email_generic_phishing</option>
+                            <option value="">Email_quota_limit_warning</option>
+                            <option value="">attachment</option>
+                            <option value="">image</option>
+                            <option value="">scam</option>
+                            <option value="">urls</option>
+                        </select>
+                    </td>
+                    <td  style="width: 33.33%">
+                        <input type="text" id="" class="form-control">
+                    </td>
+                    <td  style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="">Critical</option>
+                            <option value="">High</option>
+                            <option value="">Meduim</option>
+                            <option value="">Low</option>
+                            <option value="">Informational</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="" >EMAIL_Cryptowall</option>
+                            <option value="">Email_PHP_Mailer</option>
+                            <option value="" selected>Email_generic_phishing</option>
+                            <option value="">Email_quota_limit_warning</option>
+                            <option value="">attachment</option>
+                            <option value="">image</option>
+                            <option value="">scam</option>
+                            <option value="">urls</option>
+                        </select>
+                    </td>
+                    <td  style="width: 33.33%">
+                        <input type="text" id="" class="form-control">
+                    </td>
+                    <td  style="width: 33.33%">
+                        <select class="select-2--rule form-control" id="" style="max-width:33%;">
+                            <option value="">Critical</option>
+                            <option value="">High</option>
+                            <option value="">Meduim</option>
+                            <option value="">Low</option>
+                            <option value="">Informational</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+                `;
+        $('#rule_item tbody').append(html);
+        $('.select-2--rule').select2();
+    }
+  });
+
+
+
+
+
     $('.loadrule').hide();
     const chart_top_rule = Highcharts.chart('chart-top-rule-cate', {
         chart: {
@@ -388,7 +688,7 @@
         },
         series: [{
             name: 'Population',
-            data: [["None",48],["sanook",25],["schneier",6],["krebsonsecurity",4],["itsecurityguru",4],["trendmicro",4],["posttoday",2],["bleepingcomputer",1],["hackercombat",1],["thehackernews",1]],
+            data: [["Email",11],["CVE",14],["Malware",7],["Crypto",0],["Deprecated",0],["Maldocs",0]],
             dataLabels: {
                 enabled: true,
                 color: '#333',
