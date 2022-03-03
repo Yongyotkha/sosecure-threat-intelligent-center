@@ -81,12 +81,9 @@
                                                     <select name="site" id="site" class="tselect2-option form-control select-site" >
                                                         <option value="">All Site</option>
                                                             @if ($site_settings)
-                                
                                                             @foreach ($site_settings as $site_settings)
-                                                            <option value="{{$site_settings->id}}">{{$site_settings->name}}
-                                                            </option>
+                                                                <option value="{{$site_settings->id}}" {{$site_settings->id == 59 ? 'selected' : '' }}>{{$site_settings->name}}</option>
                                                             @endforeach
-                                
                                                             @endif
                                                     </select>
                                                 </div>
@@ -110,25 +107,63 @@
                                             <div class="col-lg-6">
                                                 <h5 class="font-weight-bold">Rule</h5>
                                                 <div class="box-item-keyword">
+                                                    <!-- Mockup Data -->
+                                                    <?php
+                                                        $data = [
+                                                        'EMAIL_Cryptowall',
+                                                        'Email_PHP_Mailer',
+                                                        'Email_fake_it_maintenance_bulletin',
+                                                        'Email_generic_phishing',
+                                                        'Email_quota_limit_warning',
+                                                        'attachment',
+                                                        'attachment',
+                                                        'attachment',
+                                                        'image',
+                                                        'scam',
+                                                        'urls',
+                                                        ];
+
+                                                        $length_data = count($data);
+
+                                                    ?>
                                                     <ul id="keyword_rule" class="main-list keyword-list">
+                                                        <!-- Mockup Data -->
+                                                        <?php
+                                                            for($i = 0 ; $i < $length_data ; $i++)  {
+                                                        ?>
                                                         <li class="item-list item--keyword">
                                                             <div class="left-side-item">
                                                                 <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
-                                                                <span class="text-keyword">Rule</span>
+                                                                <span class="text-keyword"><?php echo $data[$i] ?></span>
                                                             </div>
                                                             <div class="action-keyword">
                                                                 <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
                                                                 <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
                                                             </div>
                                                         </li>
+                                                        <?php }  ?>
                                                     </ul>
                                                 </div>
                                             </div>
                                             <div class="col-lg-6">
-                                                <h5 class="font-weight-bold">Site : Demo</h5>
+                                                <h5 class="font-weight-bold">บริษัท เมจิกเทคโซลูชั่น จำกัด</h5>
                                                 <div class="box-item-keyword">
                                                     <ul id="site_rule" class="main-list site-list">
-                                                        
+                                                        <!-- Mockup Data -->
+                                                        <?php
+                                                            for($i = 0 ; $i < $length_data ; $i++)  {
+                                                        ?>
+                                                        <li class="item-list item--keyword">
+                                                            <div class="left-side-item">
+                                                                <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
+                                                                <span class="text-keyword"><?php echo $data[$i] ?></span>
+                                                            </div>
+                                                            <div class="action-keyword">
+                                                                <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
+                                                                <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
+                                                            </div>
+                                                        </li>
+                                                        <?php }  ?>
                                                     </ul>
                                                 </div>
                                             </div>

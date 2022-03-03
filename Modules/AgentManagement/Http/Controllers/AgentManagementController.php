@@ -908,6 +908,9 @@ class AgentManagementController extends Controller
     public function agent_rule(Request $request)
     {
         $data['page'] = langapp('agent_rule');
+        $get_role_custom_first = @get_role_custom();
+        $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        $data['site_settings'] = $SiteSettings;
         return view('agentmanagement::rule')->with($data);
     }
 
