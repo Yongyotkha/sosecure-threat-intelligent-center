@@ -43,7 +43,20 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-
+                                            <tr>
+                                                <td>http://10.104.0.7/</td>
+                                                <td>/var/www/html/owasp_node_vul</td>
+                                                <td>Dockerfile.php</td>
+                                                <td>keyword01</td>
+                                                <td>03/03/2022 10:30:45</td>
+                                            </tr>
+                                            <tr>
+                                                <td>http://10.104.0.7/</td>
+                                                <td>/var/www/html/owasp_node_vul</td>
+                                                <td>Profile.php</td>
+                                                <td>urls.yar</td>
+                                                <td>03/03/2022 9:20:33</td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
