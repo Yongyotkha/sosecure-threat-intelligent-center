@@ -1,0 +1,27 @@
+version: '3' # version ของ docker compose
+services:
+
+  # Php สำหรับการสร้าง php container
+  php:
+    build: ./docker-php # ชี้ไป path ของ Dockerfile เพื่อที่จะใช้ในการสร้าง container
+    working_dir: /var/www/laravel # directory ที่จะเป็นจัดที่เราทำงาน
+    volumes:
+      # เป็น volume ไฟล์ จากเครื่องเราไปยัง container จะเป็นการเชื่อมต่อกันแบบ 
+      # ถ้าไฟล์ในเครื่องเราเปลี่ยนแปลงใน container ก็จะเปลี่ยนแปลงตามครับ
+      - ./:/var/www/laravel 
+
+  # Web Server สำหรับการสร้าง nginx container
+  nginx:
+    build: ./docker-nginx
+    working_dir: /var/www/laravel # directory ที่จะเป็นจัดที่เราทำงาน
+    volumes_from:
+      - php # คือการ volume จาก php container นะครับ
+    ports:
+      - 8000:80 # port ที่เราต้องการจะใช้ระหว่าง {host}:{container} นะครับ
+
+  composer: # เป็น container สำหรับการรัน install package laravel ที่จะสั่งรันครั้งเดียวแล้วหยุดรัน container ไป
+    build: ./docker-php # ใช้ dockerfile เดียวกันกับ container php
+    working_dir: /var/www/laravel
+    volumes_from:
+      - php
+    command: "composer update" # คำสั่ง สำหรับ install package
