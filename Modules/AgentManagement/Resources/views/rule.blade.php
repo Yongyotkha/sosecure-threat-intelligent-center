@@ -214,7 +214,7 @@
                     Add Rule
                 </h4>
             </div>
-            <form id='add_asset_click' method="POST">
+            <form id='form_add_rule' enctype="multipart/form-data">
                 <div class="modal-body">
 
 
@@ -225,10 +225,12 @@
                         <div class="col-lg-9">
                             <div class="row">
                                 <div class="col-lg-12 mb-1">
-                                    <input type="text" id="" class="form-control">
+                                    <input type="text" name="name" id="name" class="form-control">
+                                    <span id="error_name" style="color:red;"></span>
                                 </div>
                                 <div class="col-lg-12 mb-1">
-                                    <input type="file" id="" class="form-control">
+                                    <input type="file" name="file_rule_name" id="file_rule_name" class="form-control" accept="zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed">
+                                    <span id="error_file" style="color:red;"></span>
                                 </div>
                                 <div class="col-lg-12">
                                     <span style="color:red;">รองรับเฉพาะไฟล์ .zip เท่านั้น</span>
@@ -236,7 +238,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group row">
+                    <div id="div_rule" class="form-group row">
                         <label style="padding-top: 7px" class="col-lg-3 control-label">
                             Rule  <span class="text-danger">*</span>
                         </label>
@@ -245,6 +247,11 @@
                             <table id="rule_item" class="table mb-0">
                                 <tbody>
                                     <tr>
+                                        <td class="text-center">
+                                            <span> Select file for data.. </span>
+                                        </td>
+                                    </tr>
+                                    {{-- <tr>
                                         <td style="width: 33.33%">
                                             <select class="select-2--rule form-control" id="">
                                                 <option value=""></option>
@@ -261,12 +268,11 @@
                                         <td>
                                             <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
                                         </td>
-                                    </tr>
+                                    </tr> --}}
                                 </tbody>
-                              
                             </table>
-
-                            <button type="button" class="btn btn-sm btn-info btn-block" onclick="add_rule();">Add</button>
+                            <span id="error_detail" style="color:red;"></span>
+                            {{-- <button type="button" class="btn btn-sm btn-info btn-block" onclick="add_rule();">Add</button> --}}
                         </div>
                     </div>
 
@@ -287,7 +293,7 @@
                         <i class="fas fa-times"></i>
                         Close
                     </button>
-                    <button type="submit" value="Submit" required class="btn btn-info btn-rounded" id="">
+                    <button type="button" value="Submit" required class="btn btn-info btn-rounded" id="btn_save_rule">
                         <i class="fas fa-paper-plane"></i>
                         Save
                     </button>
@@ -332,6 +338,169 @@
   $('.select-2--rule').select2();
 
   $('#table-agent-rule').DataTable();
+
+    $('#add_rule_modal').on('hidden.bs.modal', function () {
+        $('#form_add_rule')[0].reset();
+
+        $('#error_name').empty();
+        $('#error_file').empty();
+        $('#error_detail').empty();
+
+        $('#btn_save_rule').html('<i class="fas fa-paper-plane"></i> Save');
+        $('#btn_save_rule').attr('disabled', false);
+
+        let html_reset_tbl_rule = 
+        `
+        <tr>
+            <td class="text-center">
+                <span> Select file for data.. </span>
+            </td>
+        </tr>
+        `;
+
+        $('#rule_item tbody').empty();
+        $('#rule_item tbody').append(html_reset_tbl_rule);
+
+    });
+
+    $('#btn_save_rule').click(function(e){
+        e.preventDefault();
+
+        var formData = new FormData(document.getElementById("form_add_rule"));
+
+        $('#btn_save_rule').html('Processing.. <i class="fas fa-spin fa-spinner"></i>');
+        $('#btn_save_rule').attr('disabled', true);
+
+        $.ajax({
+            url: "{{ route('agentmanagement.agent_rule_insert') }}",
+            type: 'post',
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            beforesend: function(){
+                
+            },
+            success:function(response){
+
+                if(response.status == 'success')
+                {
+                    toastr.success(response.message);
+
+                    $('#btn_save_rule').html('Success');
+
+                    setTimeout(function(){
+                        {{-- window.location.href = response.route; --}}
+                    }, 3000);
+                }
+                else if(response.status == '422')
+                {
+                    $('#btn_save_rule').html('Try again');
+                    $('#btn_save_rule').attr('disabled', false);
+
+                    var errors = response.errors;
+                    console.log(errors);
+
+                    toastr.error(response.message);
+
+                    $('#error_name').empty();
+                    $('#error_file').empty();
+                    $('#error_detail').empty();
+
+                    if(errors.name)
+                    {
+                        $('#error_name').append(errors.name[0]);
+                    }
+                    if(errors.file_rule_name)
+                    {
+                        $('#error_file').append(errors.file_rule_name[0]);
+                    }
+                    if(errors.detail)
+                    {
+                        $('#error_detail').append(errors.detail[0]);
+                    }
+                }
+                else
+                {
+                    $('#btn_save_rule').html('Try again');
+                    $('#btn_save_rule').attr('disabled', false);
+
+                    toastr.error(response.message);
+                }
+
+            }
+        });
+    });
+
+    $('#file_rule_name').change(function(){
+        
+        var formData = new FormData(document.getElementById("form_add_rule"));
+
+        $.ajax({
+            url: "{{ route('agentmanagement.agent_rule_get_zip')}}",
+            type: 'post',
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            beforesend: function(){
+
+            },
+            success: function(response){
+
+                $('#error_file').empty();
+                $('#div_rule').removeClass('d-none');
+
+                var html = ``;
+                if(response.name_file.length > 0)
+                {
+                    const name_file = response.name_file;
+                    for(let i in name_file)
+                    {
+                        const name_file_arr = name_file[i];
+    
+                        html += 
+                        `
+                        <tr>
+                            <td style="width: 33.33%">
+                                <input type="text" id="detail_${i}_file_name" name="detail[${i}][file_name]" value="${name_file_arr.file_name}" class="form-control" readonly>
+                                <input type="hidden" id="detail_${i}_rule_name" name="detail[${i}][rule_name]" value="${name_file_arr.rule_name}">
+                            </td>
+                            <td style="width: 33.33%">
+                                <input type="text" id="detail_${i}_description" name="detail[${i}][description]" class="form-control">
+                            </td>
+                            <td style="width: 33.33%">
+                                <select class="select-2--rule form-control" id="detail_${i}_severity" name="detail[${i}][severity]">
+                                    <option value="Information">Information</option>
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Critical">Critical</option>
+                                </select>
+                            </td>
+                        </tr>
+                        `;
+                    }
+
+                    $('#error_detail').empty();
+                }
+                else
+                {
+                    html += 
+                    `
+                    <tr>
+                        <td style="text-align: center;">
+                            <span> Not Data... </span>
+                        </td>
+                    </tr>
+                    `;
+                }
+
+                $('#rule_item tbody').empty();
+                $('#rule_item tbody').append(html);
+            }
+        });
+    });
 
     $('.loadrule').hide();
     const chart_top_rule = Highcharts.chart('chart-top-rule-cate', {

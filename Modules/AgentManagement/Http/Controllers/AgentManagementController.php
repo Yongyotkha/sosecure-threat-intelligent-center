@@ -8,6 +8,9 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use DB;
+use File;
+use Validator;
+use ZipArchive;
 use App\FXOSType;
 use App\FXSeverityType;
 use App\FXSiteAgents;
@@ -16,6 +19,9 @@ use App\FXAgentLogs;
 use App\FXAgentRules;
 use App\FXAgentSchedule;
 use App\YaraLog;
+use App\TBLRuleCategory;
+use App\TBLRuleFiles;
+use App\TBLRuleName;
 use Modules\SiteSettings\Entities\Menu;
 use Modules\SiteSettings\Entities\Menu_sub;
 use Modules\SiteSettings\Entities\site_config_email_alert;
@@ -239,7 +245,7 @@ class AgentManagementController extends Controller
                                         $query_site->where('site_id', '!=', null);
                                     }
                                 })
-                                ->where('status', 'Y')
+                                ->where('status', '1')
                                 ->where('severity', $data_severity->name)
                                 ->get();
 
@@ -909,6 +915,137 @@ class AgentManagementController extends Controller
     {
         $data['page'] = langapp('agent_rule');
         return view('agentmanagement::rule')->with($data);
+    }
+
+    public function agent_rule_insert(Request $request)
+    {
+        // dd($request->all());
+
+        try
+        {
+            $message = [
+                'name.required' => 'Catagory name is required.',
+                'file_rule_name.required' => 'File rule is required.',
+                'detail.required' => 'File is not data'
+            ];
+
+            $validate = Validator::make($request->all(), [
+                'name' => 'required',
+                'file_rule_name' => 'required',
+                'detail' => 'required'
+            ], $message);
+
+            if($validate->fails())
+            {
+                $validate = $validate->getMessageBag()->toArray();
+
+                return response()->json([
+                    'status' => '422',
+                    'errors' => $validate,
+                    'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน.'
+                ]);
+            }
+            else
+            {
+                $category_data = [];
+                $category_data['name'] = @$request->name;
+                $category_data['status'] = @$request->status ? ( $request->status == 1 ? 'Y' : 'N' ) : '';
+
+                $id_catagory = TBLRuleCategory::create($category_data)->id;
+
+                if(@$request->file_rule_name)
+                {
+                    $path = public_path('rule_files/');
+        
+                    if(!File::isDirectory($path)){
+                        File::makeDirectory($path, 0777, true, true);
+                    }
+        
+                    $fileFinalName = $request->file_rule_name->getClientOriginalName();
+                    $fileFinalName_explode = explode('.', $fileFinalName);
+                    $path_save = 'rule_files/';
+                    $request->file_rule_name->move($path_save, $fileFinalName);
+
+                    $rule_file_data = [];
+        
+                    $rule_file_data['path'] = $path_save.$fileFinalName;
+                    $rule_file_data['rule_name'] = $fileFinalName_explode[0];
+                    $rule_file_data['version'] = '0';
+                    $rule_file_data['transaction_download_client'] = 1;
+        
+                    $id_file = TBLRuleFiles::create($rule_file_data)->id;
+
+                    if(@$request->detail)
+                    {
+                        foreach($request->detail as $detail)
+                        {
+                            $detail_rule_name = $detail;
+                            $detail_rule_name['rule_category_id'] = @$id_catagory;
+                            $detail_rule_name['rule_file_id'] = @$id_file;
+                            $detail_rule_name['status'] = $category_data['status'];
+        
+                            TBLRuleName::create($detail_rule_name);
+                        }
+                    }
+                }
+
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Success!! | '
+                ];
+            }
+        }
+        catch (Exception $e)
+        {
+            $response = [
+                'status' => 'error',
+                'message' => 'ไม่สำเร็จ!!! | มีบางอย่างผิดพลาด กรุณาแจ้งเจ้าหน้าที่.',
+                'ms' => $e->getMessage()
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function agent_rule_get_zip(Request $request)
+    {
+        $filezip = zip_open($request->file_rule_name);
+
+        $name_file = [];
+        if ($filezip)
+        {
+            while ($zip_entry = zip_read($filezip))
+            {
+                // Name: zip_entry_name($zip_entry)
+
+                $chk_ext = explode('.', zip_entry_name($zip_entry));
+
+                if($chk_ext[1] == 'yar')
+                {
+                    $data = [];
+                    $data['file_name'] = zip_entry_name($zip_entry);
+                    $data['rule_name'] = $chk_ext[0];
+
+                    $name_file[] = $data;
+                }
+
+                // if (zip_entry_open($zip, $zip_entry))
+                // {
+                //     // echo "File Contents:<br/>";
+                //     // $contents = zip_entry_read($zip_entry);
+                //     // echo "$contents<br />";
+                //     zip_entry_close($zip_entry);
+                // }
+            }
+            
+            // zip_close($filezip);
+        }
+
+        $response = [
+            'name_file' => $name_file
+        ];
+
+        return response()->json($response);
     }
 
 }
