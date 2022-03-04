@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 use MongoDB\BSON\UTCDateTime;
 use Artisan;
 
-class MDMISPFeedDaily extends Command
+class MDMISPFeedDaily_v1 extends Command
 {
     /**
      * The name and signature of the console command.
