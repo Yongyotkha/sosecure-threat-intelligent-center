@@ -792,9 +792,13 @@
                                                     <thead>
                                                         <tr>
                                                             <th>
-                                                                <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
+                                                                {{-- <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
                                                                     <span class="label-text"></span>
-                                                                </label>
+                                                                </label> --}}
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" name="selectAll" id="selectAll" value="all"/>
+                                                                    <label class="custom-control-label font-weight-normal" for="selectAll"></label>
+                                                                </div>
                                                             </th>
                                                             <th>Site</th>
                                                             <th>IP</th>

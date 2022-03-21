@@ -920,6 +920,289 @@ class AgentManagementController extends Controller
         return view('agentmanagement::rule')->with($data);
     }
 
+    public function agent_rule_chart_top(Request $request)
+    {
+        $querys = TBLRuleCategory::
+            // where(['status' => 'Y'])
+            get();
+
+        foreach($querys as $query)
+        {
+            $query_rule_name = TBLRuleName::
+                where([
+                    'rule_category_id' => $query->id,
+                    'status' => 'Y'
+                ])
+                ->select(
+                    'file_name',
+                    'rule_name',
+                    'description',
+                    'severity'
+                )
+                ->get();
+
+            $query['arr_rule_name'] = $query_rule_name;
+        }
+
+        // dd($querys);
+
+        return DataTables::of($querys)
+            ->addIndexColumn()
+            ->editColumn('test', function($querys){
+                return '';
+            })
+            ->editColumn('c_checkbox', function($querys){
+                $html = '';
+
+                $html .= '
+                    <label>
+                        <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
+                        <span class="label-text"></span>
+                    </label>
+                '; 
+
+                return $html;
+            })
+            ->editColumn('c_file_name', function($querys){
+                $html = '';
+
+                $arr = [];
+                foreach ($querys->arr_rule_name as $arr_rule_name)
+                {
+                    $arr[] = $arr_rule_name->file_name;
+                }
+
+                return $arr ? implode('<br>', $arr) : '-';
+            })
+            ->editColumn('c_rule_name', function($querys){
+                $html = '';
+
+                $arr = [];
+                foreach ($querys->arr_rule_name as $arr_rule_name)
+                {
+                    $arr[] = $arr_rule_name->rule_name;
+                }
+
+                return $arr ? implode('<br>', $arr) : '-';
+            })
+            ->editColumn('c_severity', function($querys){
+                $html = '';
+
+                if(@$querys->severity == 'Critical')
+                {
+                    $html .= '<span class="badge" style="background-color: #b93624;">Critical</span>';
+                }
+                else if(@$querys->severity == 'High')
+                {
+                    $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
+                }
+                else if(@$querys->severity == 'Medium')
+                {
+                    $html .= '<span class="badge" style="background-color: #f2ff15;color: #333;">Medium</span>';
+                }
+                else if(@$querys->severity == 'Low')
+                {
+                    $html .= '<span class="badge" style="background-color: #409967;">Low</span>';
+                }
+                else if(@$querys->severity == 'Information')
+                {
+                    $html .= '<span class="badge" style="background-color: #00dcff;">Information</span>';
+                }
+                else
+                {
+                    $html .= '<span class="badge"> No Severity </span>';
+                }
+
+                return $html;
+            })
+            ->editColumn('c_status', function($querys){
+                $html = '';
+
+                $html .= '
+                    <label class="switch">
+                        <input type="checkbox" id="status" name="status" 
+                ';
+
+                if($querys->status == 'Y')
+                {
+                    $html .= 'checked';
+                }
+
+                $html .=  ' value="1">
+                        <span></span>
+                    </label>          
+                '; 
+
+                return $html;
+            })
+            ->editColumn('c_action', function($querys){
+                $html = '';
+
+                $html .= '
+                    <button type="button" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></button>
+                    <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></button>                
+                '; 
+
+                return $html;
+            })
+            ->rawColumns(['c_checkbox', 'c_file_name', 'c_rule_name', 'c_severity', 'c_status', 'c_action'])
+            ->make(true);
+    }
+
+    public function agent_rule_tbl_all_rule(Request $request)
+    {
+        $querys = TBLRuleCategory::
+            // where(['status' => 'Y'])
+            get();
+
+        foreach($querys as $query)
+        {
+            $query_rule_name = TBLRuleName::
+                where([
+                    'rule_category_id' => $query->id,
+                    'status' => 'Y'
+                ])
+                ->select(
+                    'file_name',
+                    'rule_name',
+                    'description',
+                    'severity'
+                )
+                ->get();
+
+            $query['arr_rule_name'] = $query_rule_name;
+        }
+
+        // dd($querys);
+
+        return DataTables::of($querys)
+            ->addIndexColumn()
+            ->editColumn('test', function($querys){
+                return '';
+            })
+            ->editColumn('c_checkbox', function($querys){
+                $html = '';
+
+                $html .= '
+                    <label>
+                        <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
+                        <span class="label-text"></span>
+                    </label>
+                '; 
+
+                return $html;
+            })
+            ->editColumn('c_file_name', function($querys){
+                $html = '';
+
+                $arr = [];
+                foreach ($querys->arr_rule_name as $arr_rule_name)
+                {
+                    $arr[] = $arr_rule_name->file_name ;
+                }
+
+                return $arr ? implode(',<br>', $arr) : '-';
+            })
+            ->editColumn('c_rule_name', function($querys){
+                $html = '';
+
+                $arr = [];
+                foreach ($querys->arr_rule_name as $arr_rule_name)
+                {
+                    $arr[] = $arr_rule_name->rule_name;
+                }
+
+                return $arr ? implode(',<br>', $arr) : '-';
+            })
+            ->editColumn('c_description', function($querys){
+                $html = '';
+
+                $arr = [];
+                foreach ($querys->arr_rule_name as $arr_rule_name)
+                {
+                    $arr[] = $arr_rule_name->description ? $arr_rule_name->description : ' - ';
+                }
+
+                return $arr ? implode(',<br>', $arr) : '-';
+            })
+            ->editColumn('c_severity', function($querys){
+                $html = '';
+
+                if(count(@$querys->arr_rule_name) > 0)
+                {
+                    foreach ($querys->arr_rule_name as $arr_rule_name)
+                    {
+                        // $arr[] = $arr_rule_name->severity;
+                        
+                        if(@$arr_rule_name->severity == 'Critical')
+                        {
+                            $html .= '<span class="badge" style="background-color: #b93624;">Critical</span>';
+                        }
+                        else if(@$arr_rule_name->severity == 'High')
+                        {
+                            $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
+                        }
+                        else if(@$arr_rule_name->severity == 'Medium')
+                        {
+                            $html .= '<span class="badge" style="background-color: #f2ff15;color: #333;">Medium</span>';
+                        }
+                        else if(@$arr_rule_name->severity == 'Low')
+                        {
+                            $html .= '<span class="badge" style="background-color: #409967;">Low</span>';
+                        }
+                        else if(@$arr_rule_name->severity == 'Information')
+                        {
+                            $html .= '<span class="badge" style="background-color: #00dcff;">Information</span>';
+                        }
+                        else
+                        {
+                            $html .= '<span class="badge"> No Severity </span>';
+                        }
+    
+                        $html .= '<br>';
+                    }
+                }
+                else
+                {
+                    $html = ' - ';
+                }
+
+                return $html;
+            })
+            ->editColumn('c_status', function($querys){
+                $html = '';
+
+                $html .= '
+                    <label class="switch">
+                        <input type="checkbox" id="status" name="status" 
+                ';
+
+                if($querys->status == 'Y')
+                {
+                    $html .= 'checked';
+                }
+
+                $html .=  ' value="1">
+                        <span></span>
+                    </label>          
+                '; 
+
+                return $html;
+            })
+            ->editColumn('c_action', function($querys){
+                $html = '';
+
+                $html .= '
+                    <button type="button" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></button>
+                    <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></button>                
+                '; 
+
+                return $html;
+            })
+            ->rawColumns(['c_checkbox', 'c_file_name', 'c_rule_name', 'c_description', 'c_severity', 'c_status', 'c_action'])
+            ->make(true);
+    }
+
     public function agent_rule_insert(Request $request)
     {
         // dd($request->all());
