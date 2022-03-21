@@ -251,11 +251,6 @@
                                             <table class="table table-bordered table-striped" id="table-agent-rule" style="width: 100%">
                                                 <thead>
                                                     <tr>
-                                                        <th>
-                                                            <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
-                                                                <span class="label-text"></span>
-                                                            </label>
-                                                        </th>
                                                         <th>No.</th>
                                                         <th>Rule Category</th>
                                                         <th>File Name</th>
@@ -268,91 +263,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>                                                  
-                                                    <tr>
-                                                        <td>
-                                                            <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
-                                                                <span class="label-text"></span>
-                                                            </label>
-                                                        </td>
-                                                        <td>1</td>
-                                                        <td>Email</td>
-                                                        <td>
-                                                            <?php
-                                                                for($i = 0 ; $i < $length_data_email ; $i++)  {
-                                                            ?>
-                                                                <div>
-                                                                    <?php echo $data_email[$i].'.yar' ?>
-                                                                </div>
-                                                            <?php } ?>
-                                                        </td>
-                                                        <td>
-                                                            <?php
-                                                                for($i = 0 ; $i < $length_data_email ; $i++)  {
-                                                            ?>
-                                                                <div>
-                                                                    <?php echo $data_email[$i] ?>
-                                                                </div> 
-                                                            <?php } ?>
-                                                        </td>
-                                                        <td>-</td>
-                                                        <td>
-                                                            <span class="badge" style="background-color: #409967;">Low</span>
-                                                        </td>
-                                                        <td>
-                                                            <label class="switch"><input type="checkbox" id="status" name="status" checked="" value="1">
-                                                                <span></span>
-                                                            </label>
-                                                        </td>
-                                                        <td>2021-12-27 15:18:00</td>
-                                                        <td>
-                                                            <button type="button" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></button>
-                                                            <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></button>
-                                                        </td>
-                                                    </tr>
-
-
-                                                    <tr>
-                                                        <td>
-                                                            <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
-                                                                <span class="label-text"></span>
-                                                            </label>
-                                                        </td>
-                                                        <td>2</td>
-                                                        <td>CVE</td>
-                                                        <td>
-                                                            <?php
-                                                                for($i = 0 ; $i < $length_data_cve ; $i++)  {
-                                                            ?>
-                                                                <div>
-                                                                    <?php echo $data_cve[$i].'.yar' ?>
-                                                                </div>
-                                                            <?php } ?>
-                                                        </td>
-                                                        <td>
-                                                            <?php
-                                                                for($i = 0 ; $i < $length_data_cve ; $i++)  {
-                                                            ?>
-                                                                <div>
-                                                                    <?php echo $data_cve[$i] ?>
-                                                                </div> 
-                                                            <?php } ?>
-                                                        </td>
-                                                        <td>-</td>
-                                                        <td>
-                                                            <span class="badge" style="background-color: #409967;">Low</span>
-                                                        </td>
-                                                        <td>
-                                                            <label class="switch"><input type="checkbox" id="status" name="status" checked="" value="1">
-                                                                <span></span>
-                                                            </label>
-                                                        </td>
-                                                        <td>2021-12-27 15:18:00</td>
-                                                        <td>
-                                                            <button type="button" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></button>
-                                                            <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></button>
-                                                        </td>
-                                                    </tr>
-
+                                                    
                                                 </tbody>
                                             </table>
                                         </div>
@@ -505,138 +416,28 @@
 
 <script>
 
-  $('.select-2--rule').select2();
+    $('.select-2--rule').select2();
 
-  $('#table-agent-rule').DataTable();
+    tbl_all_rule = $('#table-agent-rule').DataTable({
+        ajax:{
+            url: "{{ route('agentmanagement.agent_rule_tbl_all_rule') }}",
+            type: "get",
+            data: function(d) {
 
-    {{-- $('#file_rule').on('change', function(){
-        if(this.files.length > 0){
-            $('#rule_item tbody').empty();
-            let html = ``;
-            html += `<tr>
-                        <td style="width: 33.33%">
-                            <select class="select-2--rule form-control" id="" style="max-width:33%;">
-                                <option value="" selected>EMAIL_Cryptowall</option>
-                                <option value="">Email_PHP_Mailer</option>
-                                <option value="">Email_generic_phishing</option>
-                                <option value="">Email_quota_limit_warning</option>
-                                <option value="">attachment</option>
-                                <option value="">image</option>
-                                <option value="">scam</option>
-                                <option value="">urls</option>
-                            </select>
-                        </td>
-                        <td  style="width: 33.33%">
-                            <input type="text" id="" class="form-control">
-                        </td>
-                        <td  style="width: 33.33%">
-                            <select class="select-2--rule form-control" id="" style="max-width:33%;">
-                                <option value="">Critical</option>
-                                <option value="">High</option>
-                                <option value="">Meduim</option>
-                                <option value="">Low</option>
-                                <option value="">Informational</option>
-                            </select>
-                        </td>
-                        <td>
-                            <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width: 33.33%">
-                            <select class="select-2--rule form-control" id="" style="max-width:33%;">
-                                <option value="" >EMAIL_Cryptowall</option>
-                                <option value="" selected>Email_PHP_Mailer</option>
-                                <option value="">Email_generic_phishing</option>
-                                <option value="">Email_quota_limit_warning</option>
-                                <option value="">attachment</option>
-                                <option value="">image</option>
-                                <option value="">scam</option>
-                                <option value="">urls</option>
-                            </select>
-                        </td>
-                        <td  style="width: 33.33%">
-                            <input type="text" id="" class="form-control">
-                        </td>
-                        <td  style="width: 33.33%">
-                            <select class="select-2--rule form-control" id="" style="max-width:33%;">
-                                <option value="">Critical</option>
-                                <option value="">High</option>
-                                <option value="">Meduim</option>
-                                <option value="">Low</option>
-                                <option value="">Informational</option>
-                            </select>
-                        </td>
-                        <td>
-                            <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width: 33.33%">
-                            <select class="select-2--rule form-control" id="" style="max-width:33%;">
-                                <option value="" >EMAIL_Cryptowall</option>
-                                <option value="">Email_PHP_Mailer</option>
-                                <option value="">Email_generic_phishing</option>
-                                <option value="">Email_quota_limit_warning</option>
-                                <option value="">attachment</option>
-                                <option value="">image</option>
-                                <option value="">scam</option>
-                                <option value="">urls</option>
-                            </select>
-                        </td>
-                        <td  style="width: 33.33%">
-                            <input type="text" id="" class="form-control">
-                        </td>
-                        <td  style="width: 33.33%">
-                            <select class="select-2--rule form-control" id="" style="max-width:33%;">
-                                <option value="">Critical</option>
-                                <option value="">High</option>
-                                <option value="">Meduim</option>
-                                <option value="">Low</option>
-                                <option value="">Informational</option>
-                            </select>
-                        </td>
-                        <td>
-                            <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width: 33.33%">
-                            <select class="select-2--rule form-control" id="" style="max-width:33%;">
-                                <option value="" >EMAIL_Cryptowall</option>
-                                <option value="">Email_PHP_Mailer</option>
-                                <option value="" selected>Email_generic_phishing</option>
-                                <option value="">Email_quota_limit_warning</option>
-                                <option value="">attachment</option>
-                                <option value="">image</option>
-                                <option value="">scam</option>
-                                <option value="">urls</option>
-                            </select>
-                        </td>
-                        <td  style="width: 33.33%">
-                            <input type="text" id="" class="form-control">
-                        </td>
-                        <td  style="width: 33.33%">
-                            <select class="select-2--rule form-control" id="" style="max-width:33%;">
-                                <option value="">Critical</option>
-                                <option value="">High</option>
-                                <option value="">Meduim</option>
-                                <option value="">Low</option>
-                                <option value="">Informational</option>
-                            </select>
-                        </td>
-                        <td>
-                            <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    `;
-            $('#rule_item tbody').append(html);
-            $('.select-2--rule').select2();
-        }
-    }); --}}
-
-
-
+            },
+        },
+        columns:[
+            { data: 'DT_Row_Index' },
+            { data: 'name' },
+            { data: 'c_file_name' },
+            { data: 'c_rule_name' },
+            { data: 'c_description' },
+            { data: 'c_severity' },
+            { data: 'c_status' },
+            { data: 'updated_at' },
+            { data: 'c_action' }
+        ]
+    });
 
     $('#add_rule_modal').on('hidden.bs.modal', function () {
         $('#form_add_rule')[0].reset();
@@ -933,7 +734,6 @@
         animation: 150,
         dataIdAttr: 'data-id'
     });
-
 
 </script>
 
