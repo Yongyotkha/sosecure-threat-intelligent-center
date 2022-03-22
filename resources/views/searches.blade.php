@@ -1005,9 +1005,6 @@
         $('#exampleModal').modal('show');
     }
 
-    function load_frame(){
-        loading('stop_load');
-    }
 
     function close_modal_frame(){
         $('#exampleModal').modal('hide');
