@@ -148,7 +148,7 @@ use Carbon\Carbon;
                                                 <img src="{{asset('images/Agent.png')}}" alt="">
                                             </div>
                                             <div style="width: 50%" class="text-center">
-                                                <span class="number-card green" id='agent-count'>4</span>
+                                                <span class="number-card green" id='agent-count'>0</span>
                                                 <h3 class="name-dash-text-compro text-dark text-upper">Agent</h3>
                                             </div>
                                         </div>
@@ -159,7 +159,7 @@ use Carbon\Carbon;
                                                 <img src="{{asset('images/nw.png')}}" alt="">
                                             </div>
                                             <div style="width: 50%" class="text-center">
-                                                <span class="number-card green" id='network-count'>10</span>
+                                                <span class="number-card green" id='network-count'>0</span>
                                                 <h3 class="name-dash-text-compro text-dark text-upper">Network</h3>
                                             </div>
                                         </div>
