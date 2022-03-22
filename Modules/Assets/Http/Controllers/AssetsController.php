@@ -517,11 +517,14 @@ class AssetsController extends Controller
         if(TYPE_WEB == 'center'){
             $menu = $request->menu;
             $Assets_list = [];
+            $asset_limit = null;
             if($menu=='site'){
                 $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request->site)->first();
                 $Assets_data = Assets::where('status', 1)->where('site_id', $SiteSettingsfor->id)->get();
+                $asset_limit = @$SiteSettingsfor -> asset_limit;
             }else if($menu=='scan'){
                 $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request->site)->first();
+                $asset_limit = @$SiteSettingsfor -> asset_limit;
                 $DomainFor = Domain::withTrashed()->where('code',$request->domaincode)->first();
                 if($SiteSettingsfor&&$DomainFor){
                     $Assets_data = Assets::where('status', 1)->where('site_id', $SiteSettingsfor->id)->where('domain_id', $DomainFor->id)->get();
@@ -695,6 +698,7 @@ class AssetsController extends Controller
             }
            
             $dataOut["countAssets"] = 0;
+            $dataOut["assetLimit"] = $asset_limit;
             foreach ($datacountAssets as $key => $value) {
                 if($request -> site){
                     $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])
@@ -821,16 +825,18 @@ class AssetsController extends Controller
         if(TYPE_WEB == 'center'){
             $menu = $request->menu;
             $Assets_list = [];
+            $asset_limit = null;
             if($menu=='site'){
                 $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request->site)->first();
                 $Assets_data = Assets::where('status', 1)->where('site_id', $SiteSettingsfor->id)->get();
+                $asset_limit = @$SiteSettingsfor -> asset_limit;
             }else if($menu=='scan'){
                 $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request->site)->first();
                 $DomainFor = Domain::withTrashed()->where('code',$request->domaincode)->first();
                 if($SiteSettingsfor&&$DomainFor){
                     $Assets_data = Assets::where('status', 1)->where('site_id', $SiteSettingsfor->id)->where('domain_id', $DomainFor->id)->get();
                 }
-    
+                $asset_limit = @$SiteSettingsfor -> asset_limit;
             }else{
                 $Assets_data = Assets::where('status', 1)->get();
             }
@@ -1094,6 +1100,7 @@ class AssetsController extends Controller
                 ->get();
             }
             $dataOut["countAssets"] = 0;
+            $dataOut["assetLimit"] = $asset_limit;
             foreach ($datacountAssets as $key => $value) {
                 if($request -> site){
                     $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])
@@ -1189,6 +1196,7 @@ class AssetsController extends Controller
         if($request->sitecode){
             $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request->sitecode)->first();
             $dataOut["SiteSettingsfor"] = $SiteSettingsfor;
+            $dataOut["assetLimit"] = $SiteSettingsfor -> asset_limit;
             // $dataOut["countAssets"] = @Assets::select('id')->where('site_id',$SiteSettingsfor->id)->whereHas('get_assets_data', function($q) use ($SiteSettingsfor) {
             //     $q->whereIn('data_type_id', [5,6]);
             // })->count();

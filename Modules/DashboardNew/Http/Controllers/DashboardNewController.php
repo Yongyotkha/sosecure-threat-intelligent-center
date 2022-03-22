@@ -537,6 +537,7 @@ class DashboardNewController extends Controller
                     $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request -> site)->first();
                     $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.site_id',$SiteSettingsfor->id)->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
                     $dataOut["countAssets"] = 0;
+                    $dataOut["assetLimit"] = $SiteSettingsfor -> asset_limit;
                     foreach ($datacountAssets as $key => $value) {
                         $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('site_id',$site_id_active)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
                         $countfn = count($AssetsData_data);
@@ -567,6 +568,7 @@ class DashboardNewController extends Controller
                         $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request -> site)->first();
                         $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id',$site_id_arr)->where('assets.site_id',$SiteSettingsfor->id)->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
                         $dataOut["countAssets"] = 0;
+                        $dataOut["assetLimit"] = $SiteSettingsfor -> asset_limit;
                         foreach ($datacountAssets as $key => $value) {
                             $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('site_id',$site_id_active)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
                             $countfn = count($AssetsData_data);
@@ -580,7 +582,7 @@ class DashboardNewController extends Controller
                 }
             }
         }
-        $assets = @$dataOut["countAssets"];
+        $assets = @$dataOut;
         $response = array(
             'error' => '', 
             'status_code' => '200',
