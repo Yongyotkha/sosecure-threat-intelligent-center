@@ -570,7 +570,7 @@ function mychart(myid){
 
         series: [{
             name: 'Alert',
-            data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0],
+            data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
             type: 'area',
             fillColor: '#c8dcf17d',
         }],
@@ -626,7 +626,7 @@ function circle_chart(id){
         series: [{
             colorByPoint: false,
             data: [
-            {  name: 'Referrer', y: 2, color: '#e64732'}, 
+            {  name: 'Referrer', y: 0, color: '#e64732'}, 
             {  name: 'Threat Feed',  y: 0 , color: '#fcc838'}, 
             {  name: 'Domain name', y: 0, color: '#00dcff'  }, 
             {  name: 'other', y: 0, color: '#c1c0c0'  }, 
