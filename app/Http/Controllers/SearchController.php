@@ -16,6 +16,7 @@ use Modules\MonitoringVulnerabilitys\Entities\CVEMappingAssets;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use MongoDB\Client as MongoClient;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator as FacadesValidator;
@@ -1686,7 +1687,13 @@ class SearchController extends Controller
                $site_request_limit_api_count = $site->search_api_loookup_Use;
    
         }else{
-               $center_search_api_loookup_limit = env('center_search_api_loookup_limit', 1000);
+            if(!empty(Auth::user()->site_id)){
+                $site = SiteSettings::where('id', Auth::user()->site_id)->first();
+                $center_search_api_loookup_limit =$site->search_api_loookup_limit;
+            }else{
+                $center_search_api_loookup_limit = env('center_search_api_loookup_limit', 1000);
+            }
+              
                $site_request_limit_api_query = SiteRequestLimitApi::where('mode', 'api_limit')->where('site_id',0)->first();
                $site_request_limit_api_count =$site_request_limit_api_query->count;
         }
@@ -2218,7 +2225,7 @@ class SearchController extends Controller
             'site_code' =>$site_code,
             'center_search_api_loookup_limit' =>$center_search_api_loookup_limit,
             'site_request_limit_api_count' =>$site_request_limit_api_count,
-            'search_api_loookup_allow' =>$center_search_api_loookup_allow
+            'search_api_loookup_allow' =>$center_search_api_loookup_allow,
         );
         return response()->json($response_data);
     }
