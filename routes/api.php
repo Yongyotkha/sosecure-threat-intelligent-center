@@ -150,6 +150,10 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('agentCenter/downloadRuleComplete', 'Api\ApiAgentController@downloadRuleComplete');
     Route::post('agentCenter/sendLogYara', 'Api\ApiAgentController@sendLogYara');
     Route::post('agentCenter/sendAgentScanLog', 'Api\ApiAgentController@sendAgentScanLog');
+
+    //asset
+    Route::post('tranferAsset', 'Api\ApiTransferAssetController@tranferAsset');
+    
 });
 
 Route::group(['prefix' => 'v1/client-transfer'], function () {
