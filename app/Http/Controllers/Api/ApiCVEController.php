@@ -761,6 +761,11 @@ class ApiCVEController extends ApiController
                     $response['count_CVEMapping'] = $model_count_CVEMapping->count();
                     $response['count_isFix'] = $model_count_isFix->count().'/'.$model_count_isFix_all->count();
 
+                    $sitecode = $request -> code;
+                    $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $sitecode)->first();
+                    if($SiteSettingsfor){
+                        $response["assetLimit"] = $SiteSettingsfor -> asset_limit;
+                    }
 
                     $data_transcation = json_encode($response);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);

@@ -261,7 +261,7 @@ class ApiAssetController extends ApiController
                     })->count();
 
                     $dataOut["data"] =  $Assets_list;
-
+                    $dataOut["assetLimit"] = $SiteSettingsfor -> asset_limit;
                     $data_transcation = json_encode($dataOut);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
@@ -322,7 +322,8 @@ class ApiAssetController extends ApiController
                                 ->orWhereNull('os_type')->orWhere('os_type','');
                         });
                     })->count();
-
+                    $dataOut["assetLimit"] = $SiteSettingsfor -> asset_limit;
+                    
                     $data_transcation = json_encode($dataOut);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
