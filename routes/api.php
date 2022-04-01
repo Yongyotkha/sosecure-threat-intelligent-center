@@ -153,6 +153,9 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
 
     //asset
     Route::post('tranferAsset', 'Api\ApiTransferAssetController@tranferAsset');
+
+     //phishing
+     Route::post('phishing/table', 'Api\ApiPhishingController@table');
     
 });
 
