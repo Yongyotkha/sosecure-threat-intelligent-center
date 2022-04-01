@@ -225,6 +225,20 @@
                                         @endif
                                     </div>
                                 </div>
+
+
+                                <div class="form-group row">
+                                    <label class="col-lg-6 control-label">Configure Log Storage Quotas and Expiration Periods</label>
+                                    <div class="col-lg-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="" name="" value="">
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn btn-info">Day</button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <hr>
 
                                 <div class="form-group row">
