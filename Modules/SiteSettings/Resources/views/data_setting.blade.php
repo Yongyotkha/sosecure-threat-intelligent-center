@@ -231,7 +231,7 @@
                                     <label class="col-lg-6 control-label">Configure Log Storage Quotas and Expiration Periods</label>
                                     <div class="col-lg-3">
                                         <div class="input-group">
-                                            <input type="text" class="form-control" id="" name="" value="">
+                                            <input type="text" class="form-control" id="" name="log_storage_quotas" value="{{$siteSettings->log_storage_quotas}}">
                                             <span class="input-group-btn">
                                                 <button type="button" class="btn btn-info">Day</button>
                                             </span>

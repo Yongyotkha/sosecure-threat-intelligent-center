@@ -65,7 +65,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     protected $fillable = [
         'username', 'email', 'email_verified_at', 'name', 'banned', 'ban_reason', 'last_ip', 'last_login', 'slack_webhook_url',
         'calendar_token', 'access_token', 'email_preferences', 'locale', 'unsubscribed_at', 'remember_token', 'google2fa_secret',
-        'google2fa_enable', 'password', 'on_holiday', 'active', 'site_id', 'site_role_id', 'password_time_expire', 'verify', 'first_login', 'last_change_pass', 'site_add_user_token'
+        'google2fa_enable', 'password', 'on_holiday', 'active', 'site_id', 'site_role_id', 'password_time_expire', 'verify', 'first_login', 'last_change_pass', 'site_add_user_token','log_storage_quotas'
     ];
 
     /**

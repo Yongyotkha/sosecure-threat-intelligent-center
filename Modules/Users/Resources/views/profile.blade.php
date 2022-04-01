@@ -196,7 +196,7 @@ $user = Auth::user();
                                 <div class="form-group">
                                     <label>Configure Log Storage Quotas and Expiration Periods</label>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" id="" name="" value="" readonly>
+                                        <input type="text" class="form-control" id="" name="log_storage_quotas" value="{{ $user->log_storage_quotas }}" readonly>
                                         <span class="input-group-btn">
                                             <button type="button" class="btn btn-info">Day</button>
                                         </span>
