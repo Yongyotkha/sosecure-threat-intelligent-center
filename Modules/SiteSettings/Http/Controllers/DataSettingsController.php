@@ -71,6 +71,9 @@ class DataSettingsController extends Controller
         $data['menus'] = $Menu;
         $data['page'] = 'DataSetting';
         $data['page'] = langapp('data_setting');
+
+        $data['file_agent_name'] = $data['siteSettings']['name'].'_(Agent-'.$data['siteSettings']['id'].').zip';
+
         return view('sitesettings::data_setting')->with($data);
     }
 
@@ -155,7 +158,7 @@ class DataSettingsController extends Controller
             $SiteSettings->server_log_port = trim($request->port);
             $SiteSettings->server_log_protocol = trim($request->protocol);
             $SiteSettings->server_log_ip = trim($request->ip);
-
+            $SiteSettings->log_storage_quotas = $request -> log_storage_quotas;
             $SiteSettings->save();
         }
         // $SiteSettings->active = $request->active ? 1 : 0;

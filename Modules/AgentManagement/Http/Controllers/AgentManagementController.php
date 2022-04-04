@@ -2,11 +2,15 @@
 
 namespace Modules\AgentManagement\Http\Controllers;
 
+use App\AgentScanLog;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use DB;
+use File;
+use Validator;
+use ZipArchive;
 use App\FXOSType;
 use App\FXSeverityType;
 use App\FXSiteAgents;
@@ -14,6 +18,10 @@ use App\FXAgentAlerts;
 use App\FXAgentLogs;
 use App\FXAgentRules;
 use App\FXAgentSchedule;
+use App\YaraLog;
+use App\TBLRuleCategory;
+use App\TBLRuleFiles;
+use App\TBLRuleName;
 use Modules\SiteSettings\Entities\Menu;
 use Modules\SiteSettings\Entities\Menu_sub;
 use Modules\SiteSettings\Entities\site_config_email_alert;
@@ -138,39 +146,42 @@ class AgentManagementController extends Controller
 
     public function data_chart_incident(Request $request)
     {
-        $site_id = $request->site_id;
-        $query_incident = FXAgentAlerts::
-                            select('incident')
-                            ->groupBy('incident')
-                            ->get();
+        // $site_id = $request->site_id;
+        // $query_incident = FXAgentAlerts::
+        //                     select('incident')
+        //                     ->groupBy('incident')
+        //                     ->get();
 
-        $data = [];
-        $count_all = 0;
-        foreach($query_incident as $data_incident)
-        {
-            $query_count = FXAgentAlerts::
-                            where(function ($query_site) use ($site_id) {
-                                if($site_id != null)
-                                {
-                                    $query_site->where('site_id', $site_id);
-                                }
-                                else
-                                {
-                                    $query_site->where('site_id', '!=', null);
-                                }
-                            })
-                            ->where('status', 'Y')
-                            ->where('incident',$data_incident->incident)
-                            ->get();
+        // $data = [];
+        // $count_all = 0;
+        // foreach($query_incident as $data_incident)
+        // {
+        //     $query_count = FXAgentAlerts::
+        //                     where(function ($query_site) use ($site_id) {
+        //                         if($site_id != null)
+        //                         {
+        //                             $query_site->where('site_id', $site_id);
+        //                         }
+        //                         else
+        //                         {
+        //                             $query_site->where('site_id', '!=', null);
+        //                         }
+        //                     })
+        //                     ->where('status', 'Y')
+        //                     ->where('incident',$data_incident->incident)
+        //                     ->get();
 
-            $count = count($query_count);
+        //     $count = count($query_count);
 
-            $count_all = $count_all + $count;
+        //     $count_all = $count_all + $count;
 
-            $data['chart'][] = [$data_incident->incident, $count];
-        }
+        //     $data['chart'][] = [$data_incident->incident, $count];
+        // }
         
-        $data['count_all'] = $count_all;
+        // $data['count_all'] = $count_all;
+
+        $data['chart'][] = [0, 0];
+        $data['count_all'] = 0;
         
         return response()->json($data);
     }
@@ -197,7 +208,7 @@ class AgentManagementController extends Controller
                                 $query_site->where('site_id', '!=', null);
                             }
                         })
-                        ->where('status', '1')
+                        ->where(['deleted_at' => null])
                         ->where('os_type', $data_type->id)
                         ->get();
                     
@@ -222,7 +233,8 @@ class AgentManagementController extends Controller
         $count_all = 0;
         foreach($query_severity as $data_severity)
         {
-            $query_count = FXAgentAlerts::
+            // FXAgentAlerts
+            $query_count = YaraLog::
                                 where(function ($query_site) use ($site_id) {
                                     if($site_id != null)
                                     {
@@ -233,8 +245,8 @@ class AgentManagementController extends Controller
                                         $query_site->where('site_id', '!=', null);
                                     }
                                 })
-                                ->where('status', 'Y')
-                                ->where('severity',$data_severity->name)
+                                ->where('status', '1')
+                                ->where('severity', $data_severity->name)
                                 ->get();
 
             $count = count($query_count);
@@ -251,7 +263,9 @@ class AgentManagementController extends Controller
     public function data_chart_rule(Request $request)
     {
         $site_id = $request->site_id;
-        $query_rule = FXAgentAlerts::
+
+        // FXAgentAlerts
+        $query_rule = YaraLog::
                         select('rule',DB::raw('count(*) as total'))
                         ->orderBy('total', 'desc')
                         ->groupBy('rule')
@@ -261,7 +275,7 @@ class AgentManagementController extends Controller
         $data = [];
         foreach($query_rule as $data_rule)
         {
-            $query_rule = FXAgentAlerts::
+            $query_rule = YaraLog::
                             where(function ($query_site) use ($site_id) {
                                 if($site_id != null)
                                 {
@@ -272,7 +286,7 @@ class AgentManagementController extends Controller
                                     $query_site->where('site_id', '!=', null);
                                 }
                             })
-                            ->where('status', 'Y')
+                            ->where(['status' => '1', 'deleted_at' => null])
                             ->where('rule', $data_rule->rule)
                             ->get();
 
@@ -314,7 +328,8 @@ class AgentManagementController extends Controller
             
             $day = explode('-', $Store);
 
-            $query_timeline = FXAgentAlerts::
+            //FXAgentAlerts
+            $query_timeline = YaraLog::
                                 where(function ($query_site) use ($site_id) {
                                     if(@$site_id != null)
                                     {
@@ -325,8 +340,8 @@ class AgentManagementController extends Controller
                                         $query_site->where('site_id', '!=', null);
                                     }
                                 })
-                                ->where('status', 'Y')
-                                ->whereBetween('created', [$Store, $Store2])
+                                ->where('status', '1')
+                                ->whereBetween('created_at', [$Store, $Store2.' 23:59:59'])
                                 ->get();
 
             $count = count($query_timeline);
@@ -356,11 +371,26 @@ class AgentManagementController extends Controller
                         $query_site->where('site_id', '!=', null);
                     }
                 })
-                ->where('status', '1')
+                ->where(['deleted_at' => null])
                 ->get();
         $count_agent = count($query_agent);
 
-        $query_alert = FXAgentAlerts::
+        // $query_alert = FXAgentAlerts::
+        //         where(function ($query_site) use ($site_log_id) {
+        //             if($site_log_id != null)
+        //             {
+        //                 $query_site->where('site_id', $site_log_id);
+        //             }
+        //             else
+        //             {
+        //                 $query_site->where('site_id', '!=', null);
+        //             }
+        //         })
+        //         ->where('status', 'Y')
+        //         ->get();
+        // $count_alert = count($query_alert);
+
+        $query_alert = YaraLog::
                 where(function ($query_site) use ($site_log_id) {
                     if($site_log_id != null)
                     {
@@ -371,7 +401,7 @@ class AgentManagementController extends Controller
                         $query_site->where('site_id', '!=', null);
                     }
                 })
-                ->where('status', 'Y')
+                ->where(['deleted_at' => null])
                 ->get();
         $count_alert = count($query_alert);
 
@@ -390,7 +420,8 @@ class AgentManagementController extends Controller
                 ->get();
         $count_log = count($query_log);
 
-        $query_rule = FXAgentRules::
+        // FXAgentRules
+        $count_rule = YaraLog::
                 where(function ($query_site) use ($site_log_id) {
                     if($site_log_id != null)
                     {
@@ -401,9 +432,11 @@ class AgentManagementController extends Controller
                         $query_site->where('site_id', '!=', null);
                     }
                 })
-                ->where('status', 'Y')
-                ->get();
-        $count_rule = count($query_rule);
+                ->where('status', '1')
+                ->distinct('rule')
+                ->count('rule');
+
+        // $count_rule = count($query_rule);
 
         $response = [
             'count_agent' => $count_agent,
@@ -422,33 +455,50 @@ class AgentManagementController extends Controller
         // dd($input);
 
         $site_log_id = $request->site_log_id;
-        $query = FXAgentLogs::
-                    join('site', 'agent_logs.site_id', 'site.id')
-                    // ->where('site_id', $request->site_id)
-                    ->where(function ($query_site) use ($site_log_id) {
-                        if($site_log_id != null)
-                        {
-                            $query_site->where('agent_logs.site_id', $site_log_id);
-                        }
-                        else
-                        {
-                            $query_site->where('agent_logs.site_id', '!=', null);
-                        }
-                    })
-                    ->where('status', 'Y')
+        // $query = FXAgentLogs::
+        //             join('site', 'agent_logs.site_id', 'site.id')
+        //             // ->where('site_id', $request->site_id)
+        //             ->where(function ($query_site) use ($site_log_id) {
+        //                 if($site_log_id != null)
+        //                 {
+        //                     $query_site->where('agent_logs.site_id', $site_log_id);
+        //                 }
+        //                 else
+        //                 {
+        //                     $query_site->where('agent_logs.site_id', '!=', null);
+        //                 }
+        //             })
+        //             ->where('status', 'Y')
+        //             ->select(
+        //                 'site.name as site_name',
+        //                 'site.logo as site_logo',
+        //                 'site.ip_key as site_ip_key',
+        //                 'agent_logs.id as agent_logs_id',
+        //                 'agent_logs.agent_id as agent_logs_agent_id',
+        //                 'agent_logs.title as agent_logs_title',
+        //                 'agent_logs.ip_address as agent_logs_ip_address',
+        //                 'agent_logs.description as agent_logs_description',
+        //                 'agent_logs.rules as agent_logs_rules',
+        //                 'agent_logs.created as agent_logs_created'
+        //             )
+        //             ->orderBy('created', 'desc')
+        //             ->get();
+
+        $query = AgentScanLog::
+                    join('site', 'agent_scan_log.site_id', 'site.id')
+                    ->join('site_agents', 'agent_scan_log.agent_id', 'site_agents.id')
+                    ->orderBy('agent_scan_log.created_at', 'desc')
                     ->select(
                         'site.name as site_name',
                         'site.logo as site_logo',
                         'site.ip_key as site_ip_key',
-                        'agent_logs.id as agent_logs_id',
-                        'agent_logs.agent_id as agent_logs_agent_id',
-                        'agent_logs.title as agent_logs_title',
-                        'agent_logs.ip_address as agent_logs_ip_address',
-                        'agent_logs.description as agent_logs_description',
-                        'agent_logs.rules as agent_logs_rules',
-                        'agent_logs.created as agent_logs_created'
+                        'site_agents.ip_private as site_agents_ip_private',
+                        'agent_scan_log.mode',
+                        'agent_scan_log.first_scan',
+                        'agent_scan_log.last_scan',
+                        'agent_scan_log.description',
+                        'agent_scan_log.created_at'
                     )
-                    ->orderBy('created', 'desc')
                     ->get();
                     
         // dd($query);
@@ -468,21 +518,25 @@ class AgentManagementController extends Controller
 
         // dd($input);
 
-        $query = FXAgentAlerts::
-                    join('site', 'agent_alerts.site_id', 'site.id')
+        $query = YaraLog::
+                    join('site', 'yara_log.site_id', 'site.id')
+                    ->join('site_agents', 'yara_log.agent_id', 'site_agents.id')
                     ->select(
                         'site.name as site_name',
                         'site.logo as site_logo',
-                        'agent_alerts.id as agent_alerts_id',
-                        'agent_alerts.rule as agent_alerts_rule',
-                        'agent_alerts.description as agent_alerts_description',
-                        'agent_alerts.incident as agent_alerts_incident',
-                        'agent_alerts.severity as agent_alerts_severity',
-                        'agent_alerts.status as agent_alerts_status',
-                        'agent_alerts.created as agent_alerts_created'
+                        'site_agents.ip_private as site_agents_ip_private',
+                        'yara_log.id as agent_alerts_id',
+                        'yara_log.rule as agent_alerts_rule',
+                        'yara_log.description as agent_alerts_description',
+                        'yara_log.severity as agent_alerts_severity',
+                        'yara_log.status as agent_alerts_status',
+                        'yara_log.created_at as agent_alerts_created',
+                        'yara_log.device_name',
+                        'yara_log.first_scan',
+                        'yara_log.last_scan'
                     )
-                    ->where('status', 'Y')
-                    ->orderBy('created', 'desc');
+                    ->where('yara_log.status', 1)
+                    ->orderBy('agent_alerts_created', 'desc');
 
         if($request->site_id != null)
         {
@@ -493,35 +547,35 @@ class AgentManagementController extends Controller
         {
             $query->where('site.name', 'like', '%'.$request->keyword_search.'%')
                 //   ->orwhere('agent_alerts.rule', 'like', '%'.$request->keyword_search.'%')
-                  ->orwhere('agent_alerts.description', 'like', '%'.$request->keyword_search.'%')
-                  ->orwhere('agent_alerts.incident', 'like', '%'.$request->keyword_search.'%')
-                  ->orwhere('agent_alerts.log_file', 'like', '%'.$request->keyword_search.'%');
+                  ->orwhere('yara_log.description', 'like', '%'.$request->keyword_search.'%');
+                //   ->orwhere('yara_log.incident', 'like', '%'.$request->keyword_search.'%')
+                //   ->orwhere('yara_log.log_file', 'like', '%'.$request->keyword_search.'%');
         }
 
-        if($start_date_input != null && $end_date_input != null)
-        {
-            $query->whereBetween('agent_alerts.created', [$start_date_input, $end_date_input]);
-        }
+        // if($start_date_input != null && $end_date_input != null)
+        // {
+        //     $query->whereBetween('agent_alerts.created', [$start_date_input, $end_date_input]);
+        // }
 
-        if($request->filter_alert_rule != null)
-        {
-            $query->where('agent_alerts.rule', 'like', '%'.$request->filter_alert_rule.'%');
-        }
+        // if($request->filter_alert_rule != null)
+        // {
+        //     $query->where('agent_alerts.rule', 'like', '%'.$request->filter_alert_rule.'%');
+        // }
 
-        if($request->filter_alert_des != null)
-        {
-            $query->where('agent_alerts.description', 'like', '%'.$request->filter_alert_des.'%');
-        }
+        // if($request->filter_alert_des != null)
+        // {
+        //     $query->where('agent_alerts.description', 'like', '%'.$request->filter_alert_des.'%');
+        // }
 
-        if($request->check_alert != null)
-        {
-            $query->where('agent_alerts.incident', $request->check_alert);
-        }
+        // if($request->check_alert != null)
+        // {
+        //     $query->where('agent_alerts.incident', $request->check_alert);
+        // }
 
-        if($request->check_alert_severity != null)
-        {
-            $query->where('agent_alerts.severity', $request->check_alert_severity);
-        }
+        // if($request->check_alert_severity != null)
+        // {
+        //     $query->where('agent_alerts.severity', $request->check_alert_severity);
+        // }
 
         return DataTables::of($query)
         ->addColumn('chk', function($query) {
@@ -569,7 +623,7 @@ class AgentManagementController extends Controller
                 <label class="switch">
                     <input type="checkbox" id="" onchange="" name="active" value="1"
             ';
-                    if($query->agent_alerts_status == 'Y')
+                    if($query->agent_alerts_status == 1)
                     {
             $html .= 'checked';
                     }
@@ -580,16 +634,31 @@ class AgentManagementController extends Controller
             ';
             return $html;
         })
+        ->addColumn('device_name', function($query) {
+            $html = '';
+            $html .= '     
+            <div class="wrapper-new">
+                <span class="tooltip-new">'.$query -> device_name.'</span>
+                <button class="btn btn-secondary"><i class="fas fa-file"></i></button>
+            </div>  
+            ';
+            return $html;
+        })
+        
         ->addColumn('action', function($query) {
             $html = '';
+            // <a href="'.route('agentmanagement.view_txt').'" data-toggle="ajaxModal"  class="btn btn-info btn-xs">
+            //             <i class="fas fa-eye"></i>
+            //         </a>
             $html .= '
-                    <a href="'.route('agentmanagement.view_txt').'" data-toggle="ajaxModal"  class="btn btn-info btn-xs">
-                        <i class="fas fa-eye"></i>
+                    
+                    <a href="#" class="btn btn-danger btn-xs">
+                        <i class="fas fa-ban"></i>
                     </a>
             ';
             return $html;
         })
-        ->rawColumns(['chk', 'sev_status', 'chk_status', 'action'])
+        ->rawColumns(['chk', 'sev_status', 'chk_status', 'device_name', 'action'])
         ->make(true);
     }
 
@@ -617,9 +686,9 @@ class AgentManagementController extends Controller
                         'site_agents.ip_private as site_agents_ip_private',
                         'site_agents.last_online as site_agents_last_online',
                         'site_agents.status as site_agents_status',
-                        'site_agents.created as site_agents_created'
+                        'site_agents.created_at as site_agents_created'
                     )
-                    ->where('status', '1');
+                    ->where('site_agents.deleted_at', null);
 
         if($request->site_id != null)
         {
@@ -694,10 +763,30 @@ class AgentManagementController extends Controller
                         <li><a href="#"><i class="fas fa-eye"></i> View Log Error</a></li>
                     </ul>
                 </div>
+                <a href="'.route('agentmanagement.agent_delete_modal', ['_id' => $query->site_agents_id]).'" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>
             ';
             return $html;
         })
-        ->rawColumns(['chk','action'])
+        ->addColumn('chk_status', function($query) {
+            $html = '';
+            $html .= '
+                <div class="text-center">
+                    <label class="switch">
+                        <input type="checkbox" id="agent-status-'.$query->site_agents_id.'" onchange="change_status_agent('.$query->site_agents_id.')" 
+                ';
+                if($query->site_agents_status == 1)
+                {
+                    $html .= 'checked';
+                }
+                $html .= '            
+                        value="1">
+                        <span></span>
+                    </label>
+                </div>
+            ';
+            return $html;
+        })
+        ->rawColumns(['chk', 'chk_status', 'action'])
         ->make(true);
     }
 
@@ -706,20 +795,19 @@ class AgentManagementController extends Controller
         // $start_date_input = $request->start_date;
         // $end_date_input = $request->end_date;
         
-        $query_schedule = FXAgentSchedule::
-                        join('site', 'agent_schedule.site_id', 'site.id')
+        $query_schedule = AgentScanLog::
+                        join('site', 'agent_scan_log.site_id', 'site.id')
+                        // ->join('site_agents', 'yara_log.agent_id', 'site_agents.id')
                         ->select(
                             'site.name as site_name',
                             'site.logo as site_logo',
-                            'agent_schedule.name as agent_schedule_name',
-                            'agent_schedule.start_date as agent_schedule_start_date',
-                            'agent_schedule.end_date as agent_schedule_end_date',
-                            'agent_schedule.username as agent_schedule_username',
-                            'agent_schedule.status as agent_schedule_status',
-                            'agent_schedule.source as agent_schedule_source',
-                            'agent_schedule.duration as agent_schedule_duration'
-                        )
-                        ->where('status', 'Y');
+                            'site.ip_key as site_ip_key',
+                            // 'site_agents.ip_private as site_agents_ip_private',
+                            'agent_scan_log.mode',
+                            'agent_scan_log.first_scan',
+                            'agent_scan_log.last_scan',
+                            'agent_scan_log.description'
+                        );
 
         if($request->site_id != null)
         {
@@ -771,4 +859,479 @@ class AgentManagementController extends Controller
         ->rawColumns(['chk'])
         ->make(true);
     }
+
+    public function update_status_agent(Request $request)
+    {
+        $input = $request->all();
+        
+        $id = $request->id;
+        $status = $request->status;
+
+        $update_status = FXSiteAgents::where('id', $id)->update(['status' => $status]);
+
+        return response()->json([
+            'status_code' => '200'
+        ]);
+
+    }
+
+    public function agent_delete_modal(Request $request)
+    {
+        $_id = $request->get('_id');
+
+        return view('agentmanagement::modal.agent_delete')->with(compact('_id'));
+    }
+
+    public function agent_delete(Request $request)
+    {
+        $input = $request->all();
+        
+        $_id = $request->get('hd_delete_id');
+
+        if(!empty($_id))
+        {
+            // $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
+
+            $date_now = date('Y-m-d H:i:s');
+
+            $update_status = FXSiteAgents::where('id', $_id)->update(['deleted_at' => $date_now]);
+
+            return response()->json([
+                'status_code' => '200',
+                'redirect' => route('agentmanagement.index')
+            ]);
+        }
+        else
+        {
+            return response()->json([
+                'status_code' => '500'
+            ]);
+        }
+
+    }
+
+
+    public function agent_rule(Request $request)
+    {
+        $data['page'] = langapp('agent_rule');
+        $get_role_custom_first = @get_role_custom();
+        $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        $data['site_settings'] = $SiteSettings;
+        return view('agentmanagement::rule')->with($data);
+    }
+
+    public function agent_rule_chart_top(Request $request)
+    {
+        $querys = TBLRuleCategory::
+            // where(['status' => 'Y'])
+            get();
+
+        foreach($querys as $query)
+        {
+            $query_rule_name = TBLRuleName::
+                where([
+                    'rule_category_id' => $query->id,
+                    'status' => 'Y'
+                ])
+                ->select(
+                    'file_name',
+                    'rule_name',
+                    'description',
+                    'severity'
+                )
+                ->get();
+
+            $query['arr_rule_name'] = $query_rule_name;
+        }
+
+        // dd($querys);
+
+        return DataTables::of($querys)
+            ->addIndexColumn()
+            ->editColumn('test', function($querys){
+                return '';
+            })
+            ->editColumn('c_checkbox', function($querys){
+                $html = '';
+
+                $html .= '
+                    <label>
+                        <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
+                        <span class="label-text"></span>
+                    </label>
+                '; 
+
+                return $html;
+            })
+            ->editColumn('c_file_name', function($querys){
+                $html = '';
+
+                $arr = [];
+                foreach ($querys->arr_rule_name as $arr_rule_name)
+                {
+                    $arr[] = $arr_rule_name->file_name;
+                }
+
+                return $arr ? implode('<br>', $arr) : '-';
+            })
+            ->editColumn('c_rule_name', function($querys){
+                $html = '';
+
+                $arr = [];
+                foreach ($querys->arr_rule_name as $arr_rule_name)
+                {
+                    $arr[] = $arr_rule_name->rule_name;
+                }
+
+                return $arr ? implode('<br>', $arr) : '-';
+            })
+            ->editColumn('c_severity', function($querys){
+                $html = '';
+
+                if(@$querys->severity == 'Critical')
+                {
+                    $html .= '<span class="badge" style="background-color: #b93624;">Critical</span>';
+                }
+                else if(@$querys->severity == 'High')
+                {
+                    $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
+                }
+                else if(@$querys->severity == 'Medium')
+                {
+                    $html .= '<span class="badge" style="background-color: #f2ff15;color: #333;">Medium</span>';
+                }
+                else if(@$querys->severity == 'Low')
+                {
+                    $html .= '<span class="badge" style="background-color: #409967;">Low</span>';
+                }
+                else if(@$querys->severity == 'Information')
+                {
+                    $html .= '<span class="badge" style="background-color: #00dcff;">Information</span>';
+                }
+                else
+                {
+                    $html .= '<span class="badge"> No Severity </span>';
+                }
+
+                return $html;
+            })
+            ->editColumn('c_status', function($querys){
+                $html = '';
+
+                $html .= '
+                    <label class="switch">
+                        <input type="checkbox" id="status" name="status" 
+                ';
+
+                if($querys->status == 'Y')
+                {
+                    $html .= 'checked';
+                }
+
+                $html .=  ' value="1">
+                        <span></span>
+                    </label>          
+                '; 
+
+                return $html;
+            })
+            ->editColumn('c_action', function($querys){
+                $html = '';
+
+                $html .= '
+                    <button type="button" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></button>
+                    <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></button>                
+                '; 
+
+                return $html;
+            })
+            ->rawColumns(['c_checkbox', 'c_file_name', 'c_rule_name', 'c_severity', 'c_status', 'c_action'])
+            ->make(true);
+    }
+
+    public function agent_rule_tbl_all_rule(Request $request)
+    {
+        $querys = TBLRuleCategory::
+            // where(['status' => 'Y'])
+            get();
+
+        foreach($querys as $query)
+        {
+            $query_rule_name = TBLRuleName::
+                where([
+                    'rule_category_id' => $query->id,
+                    'status' => 'Y'
+                ])
+                ->select(
+                    'file_name',
+                    'rule_name',
+                    'description',
+                    'severity'
+                )
+                ->get();
+
+            $query['arr_rule_name'] = $query_rule_name;
+        }
+
+        // dd($querys);
+
+        return DataTables::of($querys)
+            ->addIndexColumn()
+            ->editColumn('test', function($querys){
+                return '';
+            })
+            ->editColumn('c_checkbox', function($querys){
+                $html = '';
+
+                $html .= '
+                    <label>
+                        <input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
+                        <span class="label-text"></span>
+                    </label>
+                '; 
+
+                return $html;
+            })
+            ->editColumn('c_file_name', function($querys){
+                $html = '';
+
+                $arr = [];
+                foreach ($querys->arr_rule_name as $arr_rule_name)
+                {
+                    $arr[] = $arr_rule_name->file_name ;
+                }
+
+                return $arr ? implode(',<br>', $arr) : '-';
+            })
+            ->editColumn('c_rule_name', function($querys){
+                $html = '';
+
+                $arr = [];
+                foreach ($querys->arr_rule_name as $arr_rule_name)
+                {
+                    $arr[] = $arr_rule_name->rule_name;
+                }
+
+                return $arr ? implode(',<br>', $arr) : '-';
+            })
+            ->editColumn('c_description', function($querys){
+                $html = '';
+
+                $arr = [];
+                foreach ($querys->arr_rule_name as $arr_rule_name)
+                {
+                    $arr[] = $arr_rule_name->description ? $arr_rule_name->description : ' - ';
+                }
+
+                return $arr ? implode(',<br>', $arr) : '-';
+            })
+            ->editColumn('c_severity', function($querys){
+                $html = '';
+
+                if(count(@$querys->arr_rule_name) > 0)
+                {
+                    foreach ($querys->arr_rule_name as $arr_rule_name)
+                    {
+                        // $arr[] = $arr_rule_name->severity;
+                        
+                        if(@$arr_rule_name->severity == 'Critical')
+                        {
+                            $html .= '<span class="badge" style="background-color: #b93624;">Critical</span>';
+                        }
+                        else if(@$arr_rule_name->severity == 'High')
+                        {
+                            $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
+                        }
+                        else if(@$arr_rule_name->severity == 'Medium')
+                        {
+                            $html .= '<span class="badge" style="background-color: #f2ff15;color: #333;">Medium</span>';
+                        }
+                        else if(@$arr_rule_name->severity == 'Low')
+                        {
+                            $html .= '<span class="badge" style="background-color: #409967;">Low</span>';
+                        }
+                        else if(@$arr_rule_name->severity == 'Information')
+                        {
+                            $html .= '<span class="badge" style="background-color: #00dcff;">Information</span>';
+                        }
+                        else
+                        {
+                            $html .= '<span class="badge"> No Severity </span>';
+                        }
+    
+                        $html .= '<br>';
+                    }
+                }
+                else
+                {
+                    $html = ' - ';
+                }
+
+                return $html;
+            })
+            ->editColumn('c_status', function($querys){
+                $html = '';
+
+                $html .= '
+                    <label class="switch">
+                        <input type="checkbox" id="status" name="status" 
+                ';
+
+                if($querys->status == 'Y')
+                {
+                    $html .= 'checked';
+                }
+
+                $html .=  ' value="1">
+                        <span></span>
+                    </label>          
+                '; 
+
+                return $html;
+            })
+            ->editColumn('c_action', function($querys){
+                $html = '';
+
+                $html .= '
+                    <button type="button" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></button>
+                    <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></button>                
+                '; 
+
+                return $html;
+            })
+            ->rawColumns(['c_checkbox', 'c_file_name', 'c_rule_name', 'c_description', 'c_severity', 'c_status', 'c_action'])
+            ->make(true);
+    }
+
+    public function agent_rule_insert(Request $request)
+    {
+        // dd($request->all());
+
+        try
+        {
+            $message = [
+                'name.required' => 'Catagory name is required.',
+                'file_rule_name.required' => 'File rule is required.',
+                'detail.required' => 'File is not data'
+            ];
+
+            $validate = Validator::make($request->all(), [
+                'name' => 'required',
+                'file_rule_name' => 'required',
+                'detail' => 'required'
+            ], $message);
+
+            if($validate->fails())
+            {
+                $validate = $validate->getMessageBag()->toArray();
+
+                return response()->json([
+                    'status' => '422',
+                    'errors' => $validate,
+                    'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน.'
+                ]);
+            }
+            else
+            {
+                $category_data = [];
+                $category_data['name'] = @$request->name;
+                $category_data['status'] = @$request->status ? ( $request->status == 1 ? 'Y' : 'N' ) : '';
+
+                $id_catagory = TBLRuleCategory::create($category_data)->id;
+
+                if(@$request->file_rule_name)
+                {
+                    $path = public_path('rule_files/');
+        
+                    if(!File::isDirectory($path)){
+                        File::makeDirectory($path, 0777, true, true);
+                    }
+        
+                    $fileFinalName = $request->file_rule_name->getClientOriginalName();
+                    $fileFinalName_explode = explode('.', $fileFinalName);
+                    $path_save = 'rule_files/';
+                    $request->file_rule_name->move($path_save, $fileFinalName);
+
+                    $rule_file_data = [];
+        
+                    $rule_file_data['path'] = $path_save.$fileFinalName;
+                    $rule_file_data['rule_name'] = $fileFinalName_explode[0];
+                    $rule_file_data['version'] = '0';
+                    $rule_file_data['transaction_download_client'] = 1;
+        
+                    $id_file = TBLRuleFiles::create($rule_file_data)->id;
+
+                    if(@$request->detail)
+                    {
+                        foreach($request->detail as $detail)
+                        {
+                            $detail_rule_name = $detail;
+                            $detail_rule_name['rule_category_id'] = @$id_catagory;
+                            $detail_rule_name['rule_file_id'] = @$id_file;
+                            $detail_rule_name['status'] = $category_data['status'];
+        
+                            TBLRuleName::create($detail_rule_name);
+                        }
+                    }
+                }
+
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Success!! | '
+                ];
+            }
+        }
+        catch (Exception $e)
+        {
+            $response = [
+                'status' => 'error',
+                'message' => 'ไม่สำเร็จ!!! | มีบางอย่างผิดพลาด กรุณาแจ้งเจ้าหน้าที่.',
+                'ms' => $e->getMessage()
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function agent_rule_get_zip(Request $request)
+    {
+        $filezip = zip_open($request->file_rule_name);
+
+        $name_file = [];
+        if ($filezip)
+        {
+            while ($zip_entry = zip_read($filezip))
+            {
+                // Name: zip_entry_name($zip_entry)
+
+                $chk_ext = explode('.', zip_entry_name($zip_entry));
+
+                if($chk_ext[1] == 'yar')
+                {
+                    $data = [];
+                    $data['file_name'] = zip_entry_name($zip_entry);
+                    $data['rule_name'] = $chk_ext[0];
+
+                    $name_file[] = $data;
+                }
+
+                // if (zip_entry_open($zip, $zip_entry))
+                // {
+                //     // echo "File Contents:<br/>";
+                //     // $contents = zip_entry_read($zip_entry);
+                //     // echo "$contents<br />";
+                //     zip_entry_close($zip_entry);
+                // }
+            }
+            
+            // zip_close($filezip);
+        }
+
+        $response = [
+            'name_file' => $name_file
+        ];
+
+        return response()->json($response);
+    }
+
 }

@@ -15,5 +15,6 @@ Route::group(
 	['middleware' => 'web', 'prefix' => 'phishing_detection'],
 	function () {
 		Route::get('/', 'PhishingDetectionController@index')->name('phishing_detection.index')->middleware('can:menu_items');
+		Route::post('/datatable', 'PhishingDetectionController@datatable')->name('phishing_detection.datatable');
 	}
 );

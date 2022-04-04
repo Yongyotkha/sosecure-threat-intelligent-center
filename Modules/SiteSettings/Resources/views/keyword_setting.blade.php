@@ -94,7 +94,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-3">
                                         <h5 class="font-weight-bold">Keyword</h5>
                                         <div class="box-item-keyword">
                                             <ul id="keyword_main" class="main-list keyword-list">
@@ -110,9 +110,8 @@
                                                 </li> --}}
                                             </ul>
                                         </div>
-
                                     </div>
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-3">
                                         <h5 class="font-weight-bold">Social</h5>
                                         <div class="box-item-keyword">
                                             <ul id="social_main" class="main-list social-list">
@@ -120,12 +119,46 @@
                                             </ul>
                                         </div>
                                     </div>
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-3">
                                         <h5 class="font-weight-bold">Dark Web</h5>
                                         <div class="box-item-keyword">
 
                                             <ul id="darkweb_main" class="main-list darkweb-list">
 
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <h5 class="font-weight-bold">Web Defacememt</h5>
+                                        <div class="box-item-keyword">
+
+                                            <ul id="defacement_main" class="main-list defacement-list">
+                                                <li class="item-list item--keyword" data-id="">
+                                                    <div class="left-side-item">
+                                                        <span class="drag-handle m-r-xs">
+                                                            <i class="fa fa-arrows-alt"></i>
+                                                        </span>
+                                                        <span class="text-keyword">keyword01</span>
+                                                    </div>
+                                                    <div class="action-keyword">
+                                                        <a href="#" class="text-white delete-item-keyword-main" data-keywords_main_id="">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </a>
+                                                    </div>
+                                                </li>
+                                                <li class="item-list item--keyword" data-id="">
+                                                    <div class="left-side-item">
+                                                        <span class="drag-handle m-r-xs">
+                                                            <i class="fa fa-arrows-alt"></i>
+                                                        </span>
+                                                        <span class="text-keyword">urls.yar</span>
+                                                    </div>
+                                                    <div class="action-keyword">
+                                                        <a href="#" class="text-white delete-item-keyword-main" data-keywords_main_id="">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </a>
+                                                    </div>
+                                                </li>
                                             </ul>
                                         </div>
                                     </div>
@@ -691,6 +724,7 @@ function check_insert_keyword_process(from_id,to_id,attributes_id) {
 var keyword_item = document.getElementById('keyword_main'),
 	social_item = document.getElementById('social_main'),
 	darkweb_item = document.getElementById('darkweb_main');
+	defacement_item = document.getElementById('defacement_main');
 
 new Sortable(keyword_item, {
 	group: {
@@ -731,6 +765,25 @@ new Sortable(social_item, {
 	},
 });
 new Sortable(darkweb_item, {
+    group: {
+        name: 'shared'
+    },
+    sort: false,
+    animation: 150,
+    onSort: reportActivity(3),
+    onAdd: function (evt) {
+        console.log(evt.from.id);
+        console.log(evt.to.id);
+        console.log(evt.item.attributes['data-id'].value);
+		console.log(evt);
+        let from_id = evt.from.id;
+        let to_id = evt.to.id;
+        let attributes_id = evt.item.attributes['data-id'].value;
+        check_insert_keyword_process(''+from_id+'',''+to_id+'',attributes_id);
+	},
+});
+
+new Sortable(defacement_item, {
     group: {
         name: 'shared'
     },

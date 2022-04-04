@@ -16,6 +16,7 @@ use Modules\MonitoringVulnerabilitys\Entities\CVEMappingAssets;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use MongoDB\Client as MongoClient;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator as FacadesValidator;
@@ -75,7 +76,7 @@ class SearchController extends Controller
             }
 
             if(@$role_custom['vulnerabilities']) {
-                if($type == 'news'){
+                if($type == 'vulnerabilities'){
                     if(@get_role_custom()['superadmin'] == 1) {
                         $CVEMappingAssets_name = CVEMappingAssets::select('namecve')->get();
 
@@ -201,13 +202,13 @@ class SearchController extends Controller
                     }
                 }
             }
-
+           
             if(@$role_custom['indicators']) {
-                if($type == 'indicators_1'){
+                if($type == 'events'){
                     $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
                     $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                     $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
-    
+                    return $pipeLine;
                 
     
                     if($dataWait['count']>0){
@@ -307,11 +308,13 @@ class SearchController extends Controller
             }
 
             if(@$role_custom['indicators']) {
-                if($type == 'indicators_2'){
+                if($type == 'events'){
+                    
                     $dataWait = null;
                     $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
                     $pipeLine = array('indicator' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                     $dataWait['count'] = $col_fx_transaction_otx_indicators_data->count($pipeLine);
+                    
                     if($dataWait['count']>0){
                         $options = [
                             'allowDiskUse' => TRUE
@@ -348,50 +351,101 @@ class SearchController extends Controller
                                             $dataWait['queryData'] = $col_fx_transaction_otx_indicators_data->aggregate($pipeline,$options);
                                             $dataWait['queryData'] = $dataWait['queryData']->toArray();
                                             $event_ids = [];
-                                      
+                                            $indicator_id = [];
+
                                             foreach($dataWait['queryData'] as $key => $value){
+                                                         
+                                                    if(!in_array($value['id'],$indicator_id ) )
+                                                    {
+                                                        array_push($indicator_id,$value['id']);
+                                                        
+                                                    }
+                                            }
+                                           
+                                            if(!empty($indicator_id)){
+                                                $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+                                                $options = [
+                                                    'allowDiskUse' => TRUE
+                                                ];
+                                                $pipeline = [
+                                                    [
+                                                        '$match' => [
+                                                            'indicator_id'  => ['$in'=>$indicator_id],
+                                                        ]
+                                                    ],
+                                                    [
+                                                        '$project' => [
+                                                            '_id' => 0,
+                                                            'pulse_id' => '$pulse_id',
+                                                        ]
+                                                    ],
+                                                    [
+                                                        '$sort' => [
+                                                            'modified'  => -1,
+                                                        ]
+                                                    ],
+                                                    [
+                                                        '$limit' => $limit
+                                                    ]
+                                                ];
+                                                $document_all = $col_fx_otx_events_indicator_ref->aggregate($pipeline,$options)->toArray();
+                                            }
+                                            
+                                            if(!empty($document_all)){
+                                                foreach($document_all as $key_plus => $value_plus){
+                                                        if(!in_array($value_plus['pulse_id'],$event_ids ) )
+                                                        {
+                                                            array_push($event_ids,$value_plus['pulse_id']);
+                                                            
+                                                        }
+                                                }
+                                            }
+                                           
+                                            // foreach($dataWait['queryData'] as $key => $value){
     
     
        
-                                                $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+                                            //     $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
                                          
                                         
-                                                $query = [
-                                                    'indicator_id' => $value['id'],
+                                            //     $query = [
+                                            //         'indicator_id' => $value['id'],
                                                     
-                                                ];
+                                            //     ];
                                         
                                         
-                                                $options = [
-                                                    'sort' => [
-                                                        // $order => $dir
-                                                    ],
-                                                    'skip' =>  0,
-                                                    'limit' => 20,
-                                                ];
+                                            //     $options = [
+                                            //         'sort' => [
+                                            //             // $order => $dir
+                                            //         ],
+                                            //         'skip' =>  0,
+                                            //         'limit' => 20,
+                                            //     ];
                                         
-                                                $cursor = $col_fx_otx_events_indicator_ref->find($query,$options);    
-                                                $document_all = $cursor->toArray();
+                                            //     $cursor = $col_fx_otx_events_indicator_ref->find($query,$options);    
+                                            //     $document_all = $cursor->toArray();
     
                                                
-                                                        foreach($document_all as $key_plus => $value_plus){
+                                            //             // foreach($document_all as $key_plus => $value_plus){
                                                          
-                                                               if(!in_array($value_plus['pulse_id'],$event_ids ) )
-                                                                {
-                                                                    array_push($event_ids,$value_plus['pulse_id']);
+                                            //             //        if(!in_array($value_plus['pulse_id'],$event_ids ) )
+                                            //             //         {
+                                            //             //             array_push($event_ids,$value_plus['pulse_id']);
                                                                  
-                                                                }
-                                                        }
+                                            //             //         }
+                                            //             // }
     
     
     
-                                            }
+                                            // }
                                          
-                                            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-                                            $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
-                                            $dataWait['count'] =count($event_ids);
-                                           
-                                            if($dataWait['count']>0){
+                                     
+                                          
+                                            if(!empty($event_ids)){
+                                                $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                                                $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
+                                                $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
+                                                
                                                 $options = [
                                                     'allowDiskUse' => TRUE
                                                 ];
@@ -427,27 +481,31 @@ class SearchController extends Controller
                                                     ]
                                                 ];
                                                  $dataWait['queryData'] = $col_fx_otx_events->aggregate($pipeline,$options);
-                                             
+                                                
                                                if(count($data['dataSearch']["Events"]) > 0){
                                                     foreach ($dataWait['queryData']->toArray() as $queryData_data) {
                                                           array_push($data['dataSearch']["Events"],$queryData_data);
                                                       }
-    
+                                                      $data['dataSearch']["Events"]["count"] = $dataWait['count'];
                                                 }else{
+                                                   
                                                     $dataWait['queryData'] = $dataWait['queryData']->toArray();
                                                     $dataWait['moreDetail'] = $dataWait['count']<101?"":"/indicators/events?Search_Link_All=".$this->request->keyword;
+                                                    $data['dataSearch']["Events"]["count"] = $dataWait['count'];
                                                     $data['dataSearch']["Events"] = $dataWait;
                                                 }
                                                 
                                                
                                             }
-                                            //===============================================================
+                                            
+                                           // ===============================================================
                     }
                 }
+                // return 
             }
-
+           
             if(@$role_custom['indicators']) {
-                if($type == 'indicators_3'){
+                if($type == 'malware'){
                 //Malware
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
@@ -556,7 +614,7 @@ class SearchController extends Controller
             }
 
             if(@$role_custom['indicators']) {
-                if($type == 'indicators_4'){
+                if($type == 'adversaries'){
                 //Adversaries
               
                 $this->request->keyword = trim($this->request->keyword);
@@ -669,7 +727,7 @@ class SearchController extends Controller
             }
 
             if(@$role_custom['indicators']) {
-                if($type == 'indicators_5'){
+                if($type == 'malware'){
                 //Malware
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
@@ -717,7 +775,7 @@ class SearchController extends Controller
             }
 
             if(@$role_custom['indicators']) {
-                if($type == 'indicators_6'){
+                if($type == 'adversaries'){
                 //Adversaries
               
                 $this->request->keyword = trim($this->request->keyword);
@@ -1425,6 +1483,7 @@ class SearchController extends Controller
                                              $data['dataSearch']["Events"] = $dataWait;
                                             
                                         }
+                                      
                                         //===============================================================
 
                     // $dataWait['queryData'] = $col_fx_transaction_otx_indicators_data->aggregate($pipeline,$options);
@@ -1628,7 +1687,13 @@ class SearchController extends Controller
                $site_request_limit_api_count = $site->search_api_loookup_Use;
    
         }else{
-               $center_search_api_loookup_limit = env('center_search_api_loookup_limit', 1000);
+            if(!empty(Auth::user()->site_id)){
+                $site = SiteSettings::where('id', Auth::user()->site_id)->first();
+                $center_search_api_loookup_limit =$site->search_api_loookup_limit;
+            }else{
+                $center_search_api_loookup_limit = env('center_search_api_loookup_limit', 1000);
+            }
+              
                $site_request_limit_api_query = SiteRequestLimitApi::where('mode', 'api_limit')->where('site_id',0)->first();
                $site_request_limit_api_count =$site_request_limit_api_query->count;
         }
@@ -2160,7 +2225,7 @@ class SearchController extends Controller
             'site_code' =>$site_code,
             'center_search_api_loookup_limit' =>$center_search_api_loookup_limit,
             'site_request_limit_api_count' =>$site_request_limit_api_count,
-            'search_api_loookup_allow' =>$center_search_api_loookup_allow
+            'search_api_loookup_allow' =>$center_search_api_loookup_allow,
         );
         return response()->json($response_data);
     }

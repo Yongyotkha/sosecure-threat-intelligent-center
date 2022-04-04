@@ -1016,4 +1016,5 @@ return [
     'actor'                                     => 'Threat Actor',
     'agent_management'                          => 'Agent Management',
     'phishing_detection'                        => 'Phishing Detection',
+    'agent_rule'                        => 'Agent Rule',
 ];

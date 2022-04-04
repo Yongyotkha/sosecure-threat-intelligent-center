@@ -53,6 +53,7 @@ class WebDefacementController extends Controller
     public function load_card_by_site(Request $request)
     {
         $html = ''; 
+        $id = ''; 
         $site_id = $request->site_id;
         $site_code = SiteSettings::where("id", '=', $site_id)->first();
         $modal = WebdefacmentSetting::where("active", '=', 1)->where('site_id', $site_id)->where("deleted_at",null)->get();
@@ -76,10 +77,10 @@ class WebDefacementController extends Controller
                                 <p class="mdfm-text-muted">'.@$key->url.'</p>
                             </div>
                             <div class="wdfm-footer start-top">
-                                <div class="wdfm-ft-left flex">
+                                <div class="wdfm-ft-left flex" style="width: 50%">
                                     <div><strong>Site </strong> : '.@$key->get_site->name.'</div>
                                     <div class="status-flex"><strong>Status</strong> : &nbsp; '.get_webdefacment_status($key->status_val,'color').'</div>
-                                    <div>Hash '.@$key->webdefacment_data_original_last($key->id)->hash.'</div>
+                                    <div style="word-break: break-all"><strong>Hash</strong> '.@$key->webdefacment_data_original_last($key->id)->hash.'</div>
                                     <div>Filesize '.formatSizeUnits(@$key->webdefacment_data_original_last($key->id)->filesize).'</div>
                                     <div>Element '.@$key->webdefacment_data_original_last($key->id)->element.'</div>
                                     <div>Image Screen 
@@ -89,7 +90,11 @@ class WebDefacementController extends Controller
                                     <div class="text-sm-date">Last Check: '.@$key->last_check.'</div>
                                     <div class="text-sm-date">Last Update: '.@$key->updated_at.'</div>
                                 </div>
-                           
+
+                                <div class="wdfm-ft-left flex" style="width: 50%">
+                                    <div id="chart_wdfm_'.$key->id.'" class="chart_wdfm_01" style="height: 180px"></div>
+                                </div>
+
                             </div>
                             <div class="wdfm-footer-action">
                                 <div>
@@ -103,13 +108,13 @@ class WebDefacementController extends Controller
                             </div>
                         </div>
                     </div>';
-                     
-  
+            $id = $key->id; 
         }
 
         if ($request->ajax()) {
             $data = [
                 "html" => $html,
+                "id" => $id,
             ];
             return response()->json($data);
         }
@@ -701,4 +706,17 @@ class WebDefacementController extends Controller
     {
         //
     }
+
+
+
+    public function webdefacement_feed($id)
+    {
+       $get_data = $this->siteSettings->get_data($id);
+    //    dd($get_data);
+       $data['siteSettings'] = $get_data;
+       $data['page'] = 'Webdefacement Feed';
+
+       return view('sitesettings::webdefacement_feed')->with($data);
+    }
+
 }

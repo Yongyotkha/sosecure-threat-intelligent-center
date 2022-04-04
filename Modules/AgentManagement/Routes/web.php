@@ -26,5 +26,20 @@ Route::group(
 		Route::post('/data_chart_severity', 'AgentManagementController@data_chart_severity')->name('agentmanagement.data_chart_severity');
 		Route::post('/data_chart_rule', 'AgentManagementController@data_chart_rule')->name('agentmanagement.data_chart_rule');
 		Route::post('/data_chart_timeline', 'AgentManagementController@data_chart_timeline')->name('agentmanagement.data_chart_timeline');
+		Route::post('/update_status_agent', 'AgentManagementController@update_status_agent')->name('agentmanagement.update_status_agent');
+		Route::get('/agent_delete_modal', 'AgentManagementController@agent_delete_modal')->name('agentmanagement.agent_delete_modal');
+		Route::post('/agent_delete', 'AgentManagementController@agent_delete')->name('agentmanagement.agent_delete');
+		
+		Route::post('/agent_delete', 'AgentManagementController@agent_delete')->name('agentmanagement.agent_delete');
+	}
+);
+
+Route::group(
+	['middleware' => 'web'],
+	function () {
+		Route::get('/agent_rule', 'AgentManagementController@agent_rule')->name('agentmanagement.agent_rule');
+		Route::get('/agent_rule_tbl_all_rule', 'AgentManagementController@agent_rule_tbl_all_rule')->name('agentmanagement.agent_rule_tbl_all_rule');
+		Route::post('/agent_rule_insert', 'AgentManagementController@agent_rule_insert')->name('agentmanagement.agent_rule_insert');
+		Route::post('/agent_rule_get_zip', 'AgentManagementController@agent_rule_get_zip')->name('agentmanagement.agent_rule_get_zip');
 	}
 );

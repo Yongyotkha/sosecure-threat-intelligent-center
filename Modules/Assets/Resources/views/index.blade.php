@@ -776,7 +776,12 @@
             },
         }).done(function(data){
             $('#count_other').html(data.countOther+"");
-            $('#count_assets').html(data.countAssets+"");
+            if(data.assetLimit){
+                $('#count_assets').html(data.countAssets+"/"+data.assetLimit);
+            }else{
+                $('#count_assets').html(data.countAssets+"");
+            }
+           
             $('#count_windows').html(data.countWindows+"");
             $('#count_linux').html(data.countLinux+"");
             
@@ -810,7 +815,11 @@
                 }
             },
             initComplete : function( settings, json){
-                $('#count_assets').html(json.countAssets+"");
+                if(json.assetLimit){
+                    $('#count_assets').html(json.countAssets+"/"+json.assetLimit);
+                }else{
+                    $('#count_assets').html(json.countAssets+"");
+                }
                 $('#count_windows').html(json.countWindows+"");
                 $('#count_linux').html(json.countLinux+"");
                 $('#count_other').html(json.countOther+"");
@@ -1012,7 +1021,11 @@
                 }
             },
             initComplete : function( settings, json){
-                $('#count_assets').html(json.countAssets+"");
+                if(json.assetLimit){
+                    $('#count_assets').html(json.countAssets+"/"+json.assetLimit);
+                }else{
+                    $('#count_assets').html(json.countAssets+"");
+                }
                 $('#count_windows').html(json.countWindows+"");
                 $('#count_linux').html(json.countLinux+"");
                 $('#count_other').html(json.countOther+"");

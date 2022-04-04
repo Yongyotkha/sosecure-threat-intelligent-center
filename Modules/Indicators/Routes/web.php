@@ -64,5 +64,7 @@ Route::group(
         Route::get('/iframe', 'IndicatorsController@iframe')->name('indicators.iframe');
 
 
+        Route::get('/newGroups', 'IndicatorsController@new_link_group')->middleware('can:menu_items');
+        Route::get('/newTags', 'IndicatorsController@new_link_tags')->middleware('can:menu_items');
     }
 );

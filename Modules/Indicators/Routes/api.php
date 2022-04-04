@@ -16,3 +16,7 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/indicators', function (Request $request) {
     return $request->user();
 });
+
+Route::group(['prefix' => 'v1/indicators'], function () {
+    Route::post('events_table', 'IndicatorsController@datatableEvent')->name('indicators.events_table')->middleware('can:menu_items');
+});

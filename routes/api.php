@@ -139,6 +139,24 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('search/loadSearchAPI', 'Api\ApiSearchController@loadSearchAPI');
 
     Route::post('transaction_send_log_error', 'Api\ReciveLogErrorController@recive_log_error');
+
+    //Agent
+    Route::post('agentCenter/dataInfo', 'Api\ApiAgentController@dataInfo');
+    Route::post('agentCenter/loginAgent', 'Api\ApiAgentController@loginAgent');
+    Route::post('agentCenter/checkedAgentApproved', 'Api\ApiAgentController@checkedAgentApproved');
+    Route::post('agentCenter/agentOnlineTimestamp', 'Api\ApiAgentController@agentOnlineTimestamp');
+    Route::post('agentCenter/updateRuleDownload', 'Api\ApiAgentController@updateRuleDownload');
+    Route::post('agentCenter/downloadRule', 'Api\ApiAgentController@downloadRule');
+    Route::post('agentCenter/downloadRuleComplete', 'Api\ApiAgentController@downloadRuleComplete');
+    Route::post('agentCenter/sendLogYara', 'Api\ApiAgentController@sendLogYara');
+    Route::post('agentCenter/sendAgentScanLog', 'Api\ApiAgentController@sendAgentScanLog');
+
+    //asset
+    Route::post('tranferAsset', 'Api\ApiTransferAssetController@tranferAsset');
+
+     //phishing
+     Route::post('phishing/table', 'Api\ApiPhishingController@table');
+    
 });
 
 Route::group(['prefix' => 'v1/client-transfer'], function () {
@@ -184,6 +202,12 @@ Route::group([
 Route::group(['prefix' => 'v1/agent'], function () {
     Route::get('connection', 'Api\ApiAgentController@index_client');
 
+});
+
+Route::group(['prefix' => 'v1/saveData/{code}'], function () {
+    Route::get('saveCVE', 'Api\ApiNewSaveDataController@saveCVE');
+    Route::get('saveIndicator', 'Api\ApiNewSaveDataController@saveIndicator');
+    Route::get('saveSetting', 'Api\ApiNewSaveDataController@saveSetting');
 });
 
 // Route::middleware('auth:api')->get('/user', function (Request $request) {

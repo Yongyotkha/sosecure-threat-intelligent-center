@@ -192,6 +192,16 @@ $user = Auth::user();
                                     <label>@langapp('username')  @required</label>
                                     <input type="text" class="form-control" name="username" placeholder="@langapp('new_username') " value="{{ $user->username }}" required readonly>
                                 </div>
+
+                                <div class="form-group">
+                                    <label>Configure Log Storage Quotas and Expiration Periods</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="" name="log_storage_quotas" value="{{ $user->log_storage_quotas }}" readonly>
+                                        <span class="input-group-btn">
+                                            <button type="button" class="btn btn-info">Day</button>
+                                        </span>
+                                    </div>
+                                </div>
                                 {{-- <div class="form-group">
                                     <label>@langapp('password')</label>
                                     <input type="password" class="form-control" name="password"

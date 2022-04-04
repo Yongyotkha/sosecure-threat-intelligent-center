@@ -769,7 +769,11 @@ Highcharts.setOptions({
             success: function(result){
                 f_loading_stop(null, '.number_asset');
                 if(result.status_code == 200){
-                    $('.number_asset').text(result.data);
+                    if(result.data.assetLimit){
+                        $('.number_asset').text(result.data.countAssets + '/' + result.data.assetLimit);
+                    }else{
+                        $('.number_asset').text(result.data.countAssets);
+                    }
                 }
             }
         });

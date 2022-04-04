@@ -58,7 +58,7 @@ Route::get('cron/schedule/{token}', 'ScheduleController@run')->name('artisan.sch
 
 Route::any('search', 'SearchController@search')->name('search.app');
 Route::any('newSearch', 'SearchController@searchPage')->name('search.page');
-Route::post('newSearchAPI', 'SearchController@newSearchAPI')->name('search.newSearchAPI');
+Route::post('newSearchAPI', 'SearchController@searchAPI')->name('search.newSearchAPI');
 Route::any('search/{mode}', 'SearchController@search')->name('search.lookup');
 Route::post('loadSearchAPI', 'SearchController@loadSearchAPI');
 

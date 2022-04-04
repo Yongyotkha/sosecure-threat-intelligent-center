@@ -43,11 +43,12 @@ class ApiDashboardController extends ApiController
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
                     $get_role_custom = $data['data']['get_role_custom'];
-                    $site = $data['data']['site'];
+                    $site = $request -> code;
                     if (@$get_role_custom['superadmin'] == 1) {
-                        if (!$site) {
+                        if (empty($site)) {
                             $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
                             $dataOut["countAssets"] = 0;
+                            $dataOut["assetLimit"] = 0;
                             foreach ($datacountAssets as $key => $value) {
                                 $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
                                 $countfn = count($AssetsData_data);
@@ -61,6 +62,7 @@ class ApiDashboardController extends ApiController
                             $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $site)->first();
                             $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.site_id', $SiteSettingsfor->id)->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
                             $dataOut["countAssets"] = 0;
+                            $dataOut["assetLimit"] = $SiteSettingsfor -> asset_limit;
                             foreach ($datacountAssets as $key => $value) {
                                 $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
                                 $countfn = count($AssetsData_data);
@@ -73,9 +75,10 @@ class ApiDashboardController extends ApiController
                         }
                     } else {
                         $site_id_arr = $data['data']['site_id_arr'];
-                        if (!$site) {
+                        if (empty($site)) {
                             $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id', $site_id_arr)->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
                             $dataOut["countAssets"] = 0;
+                            $dataOut["assetLimit"] = 0;
                             foreach ($datacountAssets as $key => $value) {
                                 $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
                                 $countfn = count($AssetsData_data);
@@ -89,6 +92,7 @@ class ApiDashboardController extends ApiController
                             $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $site)->first();
                             $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id', $site_id_arr)->where('assets.site_id', $SiteSettingsfor->id)->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
                             $dataOut["countAssets"] = 0;
+                            $dataOut["assetLimit"] = $SiteSettingsfor -> asset_limit;
                             foreach ($datacountAssets as $key => $value) {
                                 $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
                                 $countfn = count($AssetsData_data);
@@ -100,7 +104,7 @@ class ApiDashboardController extends ApiController
                             }
                         }
                     }
-                    $assets = $dataOut["countAssets"];
+                    $assets = $dataOut;
 
                     $data_transcation = json_encode($assets);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);

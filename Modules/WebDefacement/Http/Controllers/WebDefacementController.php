@@ -364,10 +364,10 @@ class WebDefacementController extends Controller
             
         $modal = $modal->get();
         
-
+        $id = ''; 
         foreach ($modal as $key) {
             $html .= 
-            '<div class="item-wdfm wdfm-inner-4">
+            '<div class="item-wdfm wdfm-inner-3">
                 <div class="wdfm-card">
                     <div class="wdfm-header">
                         <div class="wdfm-img">
@@ -386,12 +386,17 @@ class WebDefacementController extends Controller
                         <p class="mdfm-text-muted">'.@$key->url.'</p>
                     </div>
                     <div class="wdfm-footer">
-                        <div class="wdfm-ft-left flex">
+                        <div class="wdfm-ft-left flex" style="width: 50%">
                             <div><strong>Site </strong>: '.@$key->get_site->name.'</div>
                             <div class="status-flex mr-2"><strong>Status</strong> : &nbsp; '.@get_webdefacment_status($key->status_val,'color').'</div>
                             <div class="text-sm-date">Last Online: '.@$key->last_online.'</div>
                             <div class="text-sm-date">Last Check: '.@$key->last_check.'</div>
                         </div>
+
+                        <div class="wdfm-ft-left flex" style="width: 50%">
+                            <div id="chart_wdfm_'.$key->id.'" style="height: 180px"></div>
+                        </div>
+
                     </div>
                     <div class="wdfm-footer-action">
                         <div style="display: flex;justify-content:center;">';
@@ -410,12 +415,15 @@ class WebDefacementController extends Controller
                         </div>
                     </div>
                 </div>
-            </div>';                    
+            </div>';      
+            
+            $id = $key->id; 
         }
 
         if ($request->ajax()) {
             $data = [
                 "html" => $html,
+                "id" => $id,
             ];
             return response()->json($data);
         }

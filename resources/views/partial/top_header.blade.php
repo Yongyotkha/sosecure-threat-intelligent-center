@@ -48,7 +48,7 @@
         <ul class="nav navbar-nav hidden-xs navbar-center">
             
             <li class="dropdown hidden-xs">
-                <form action="{{ route('search.app') }}" method="GET" role="search">
+                <form action="{{ route('search.page') }}" method="GET" role="search">
                     {!! csrf_field() !!}
                     <div class="form-group form-custom" style="margin-bottom:0;">
                         <div class="input-group w-400px" style="width:500px;padding: .8rem;">
@@ -127,7 +127,7 @@
     <script>
         $('.lookup').click(function(){
             let keyword = $('#search_input').val();
-            window.location.href = '/search?keyword=' + keyword + '&mode=lookup';
+            window.location.href = '/newSearch?keyword=' + keyword + '&mode=lookup';
         })
     </script>
 @endpush

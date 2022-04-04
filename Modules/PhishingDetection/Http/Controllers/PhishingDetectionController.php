@@ -2,10 +2,11 @@
 
 namespace Modules\PhishingDetection\Http\Controllers;
 
+use App\LogPhishing;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-
+use Yajra\DataTables\DataTables;
 class PhishingDetectionController extends Controller
 {
     /**
@@ -94,5 +95,45 @@ class PhishingDetectionController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function datatable(Request $request){
+        $logPhishing = LogPhishing::where('transaction_status', 3)->where('url_is_work', 1)->get();
+        return DataTables::of($logPhishing)
+        ->editColumn('site_name', function ($collection) {
+            return 'บริษัท เมจิกเทคโซลูชั่น จำกัด';
+        })
+        ->editColumn('url_detection', function ($collection) {
+            return 'https://demo02.mtsc.co.th/login';
+        })
+        ->editColumn('status', function ($collection) {
+            $html = '';
+            $html .= '<label class="switch">
+                        <input type="checkbox" id="status_' . $collection->id . '" onchange="change_status(\'' . $collection->id . '\')" name="status" value="1" checked>
+                        <span></span>
+                    </label>';
+            return $html;
+        })
+        ->addColumn('severity', function ( $collection) {
+            if($collection -> is_found == 1){
+                $html = '<span class="badge" style="background-color: #e64732;">High</span>';
+            }else{
+                $html = '<span class="badge" style="background-color: #88ce4f;">Low</span>';
+            }
+            return $html;
+        })
+
+        ->addColumn('action', function ( $collection) {
+            return '<a target="_blank" href="'.$collection -> url.'" class="btn btn-info btn-xs">
+                        <i class="fas fa-eye"></i>
+                    </a>
+
+                    <a href="#" class="btn btn-danger btn-xs">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                    ';
+        })
+        ->rawColumns(['severity','status', 'action'])
+        ->toJson();
     }
 }

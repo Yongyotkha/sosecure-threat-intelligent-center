@@ -28,7 +28,7 @@
         <header class="header panel-heading bg-white b-b b-light">
             <div class="bc-head">@langapp('search_results_for_tag',['keyword' => $keyword])</div>
             <span class="pull-right" style="margin-top: 1.2rem;font-size: 16px;font-weight: bold;">
-                Total Result : 
+                Total Result : <span id="total_all">0</span>
                 <button class="btn btn-info lookup" style="display:none;"><i class="fas fa-search"></i> Threat Lookup</button>
             </span>
         </header>
@@ -38,40 +38,40 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div id="fillter_click" class="button-group">
-                                <a href="javascript:void(0)" data-btn="all" class="btn btn-selector btn_filter active">All </a>
+                                <a href="javascript:void(0)" data-btn="all" class="btn btn-selector btn_filter active">All <span id="all">0</span></a>
                                 @if($role_custom['news'])
-                                    <a href="javascript:void(0)" data-btn="news" class="btn btn-selector btn_filter">News </a>
+                                    <a href="javascript:void(0)" data-btn="news" class="btn btn-selector btn_filter">News <span id="news">0</label></a>
                                 @endif
                                 @if($role_custom['indicators'])
-                                    <a href="javascript:void(0)" data-btn="events" class="btn btn-selector btn_filter">Event </a>
+                                    <a href="javascript:void(0)" data-btn="events" id="" class="btn btn-selector btn_filter">Event <span id="events">0</label></a>
                                 @endif
                                 @if($role_custom['data_leak'])
-                                    <a href="javascript:void(0)" data-btn="data-leak" class="btn btn-selector btn_filter">Data Leak </a>
+                                    <a href="javascript:void(0)" data-btn="data-leak" id="" class="btn btn-selector btn_filter">Data Leak <span id="data_leak">0</label></a>
                                 @endif
                                 @if($role_custom['compromised'])
-                                    <a href="javascript:void(0)" data-btn="compromised" class="btn btn-selector btn_filter">Compromised </a>
+                                    <a href="javascript:void(0)" data-btn="compromised" id="" class="btn btn-selector btn_filter">Compromised <span id="compromised">0</span></a>
                                 @endif
                                 @if($role_custom['vulnerabilities'])
-                                    <a href="javascript:void(0)" data-btn="vulnerabilities" class="btn btn-selector btn_filter">Vulnerabilities </a>
+                                    <a href="javascript:void(0)" data-btn="vulnerabilities" id="" class="btn btn-selector btn_filter">Vulnerabilities <span id="vulnerabilities">0</span></a>
                                 @endif
                                 
-                                @if($role_custom['indicators'])
-                                    <a href="javascript:void(0)" data-btn="indicators" class="btn btn-selector btn_filter">Indicators </a>
-                                @endif
+                                {{-- @if($role_custom['indicators'])
+                                    <a href="javascript:void(0)" data-btn="indicators" id="" class="btn btn-selector btn_filter">Indicators <span id="indicators">0</span></a>
+                                @endif --}}
 
                                      
                                 @if($role_custom['indicators'])
-                                    <a href="javascript:void(0)" data-btn="adversaries" class="btn btn-selector btn_filter">Threat Actor </a>
+                                    <a href="javascript:void(0)" data-btn="adversaries" id="" class="btn btn-selector btn_filter">Threat Actor <span id="adversaries">0</span></a>
                                 @endif
                                      
                                 @if($role_custom['indicators'])
-                                    <a href="javascript:void(0)" data-btn="malware" class="btn btn-selector btn_filter">Malware </a>
+                                    <a href="javascript:void(0)" data-btn="malware" id="" class="btn btn-selector btn_filter">Malware <span id="malware">0</span></a>
                                 @endif
                             </div>
                         </div>
                     </div>
 
-                    <div class="row type_indicator" style="display: none;">
+                    {{-- <div class="row type_indicator" style="display: none;">
                         <div class="col-md-12">
                             <label style="margin-top: 5px;"><b>Type</b></label>
                         </div>
@@ -79,15 +79,15 @@
                     <div class="row type_indicator" style="display: none;">
                         <div class="col-md-12">
                             <div id="fillter_click" class="button-group">
-                                {{-- @if($indicators_type_unique)
+                                @if($indicators_type_unique)
                                 <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter_indicators_type active" data-btn_i_type="type_all">All</a>
                                     @foreach($indicators_type_unique as $indicators_type_unique_val)
                                         <a href="#table-container" data-btn="all" class="btn btn-selector btn_filter_indicators_type" data-btn_i_type="type_{{$indicators_type_unique_val}}">{{$indicators_type_unique_val}}</a>
                                     @endforeach
-                                @endif --}}
+                                @endif
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </section>
 
@@ -548,7 +548,7 @@
 
             <div class="panel-group m-b" id="accordion2">
                 <ul class="list no-style" id="clauses-list">
-
+                    
                 </ul>
             </div>
         </section>
@@ -585,9 +585,13 @@
 @include('stacks.js.multitext')
 <script>
     active_btn('#fillter_click .btn-selector');
+    var text_search_new = '{{request()->keyword}}';
     var mode_search = '{{ request()->mode }}';
     var btn_val;
     var btn_filter_indicators_type;
+    var count_all = 0;
+    var count_rows = 0;
+    var count_rows_finish = 0;
     $(".btn_filter").click(function() {
         btn_val = $(this).data("btn");
         if(btn_val == 'all') {
@@ -709,7 +713,7 @@
         $('#iframe_source').attr('src', '');
         loading('stop_load');
     }
-
+var interval;
 $(function(){
     if(mode_search == 'lookup'){
   
@@ -765,8 +769,521 @@ $(function(){
                     }).fail(function(jqXHR, ajaxOptions, thrownError){
                 console.log("No response from server");
         });
+    }else{
+        @if($role_custom['news'])
+            loadNews();
+            count_rows++;
+        @endif
+        @if($role_custom['vulnerabilities'])
+            loadVulnerabilities();
+            count_rows++;
+        @endif
+        @if($role_custom['compromised'])
+            loadCompromised();
+            count_rows++;
+        @endif
+        @if($role_custom['data_leak'])
+            loadDataLeak();
+            count_rows++;
+        @endif
+        @if($role_custom['web_defacement'])
+            loadWebDefacement();
+            count_rows++;
+        @endif
+        @if($role_custom['indicators'])
+            loadEvents();
+            count_rows++;
+        @endif
+        @if($role_custom['indicators'])
+            loadAdversaries();
+            count_rows++;
+        @endif
+        @if($role_custom['indicators'])
+            loadMalware();
+            count_rows++;
+        @endif
+
+        interval = setInterval(
+            function(){ 
+                if(count_rows == count_rows_finish){
+                    $('#all').text(count_all);
+                    $('#total_all').text(count_all);
+                    if(count_all == 0){
+                        let html = '';
+                        html += `<div class="notfound">
+                            <img src="{{asset('images/notfound.png')}}" alt="" style="max-width: 500px;width:100%:">
+                            <h1>Sorry. no result found</h1>
+                            <p>What you searched was unfortunately <br>not found or doesn't exist.</p>
+                        </div>`;
+                        $('#clauses-list').append(html);
+                    }
+                    clearInterval(interval);
+                }
+            }
+        , 1000);
     }
+    
 });
+
+function loadNews(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'news',
+        }),
+    }).done(function(res){
+        let data = [];
+        for(let i in res.dataSearch){
+            const news = res.dataSearch[i];
+            data = news;
+        }
+        $('#news').text(data.count);
+        let html = '';
+        if(parseInt(data.count) > 0){
+            html += `
+            <li id="news_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#news_coll">
+                        @icon('solid/caret-right') 
+                        News ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="news_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const news = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${news.link}')" class="fz-search-20px">
+                                        ${news.name}
+                                    </a>
+
+                                    ${news.content}
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${news.link}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadVulnerabilities(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'vulnerabilities',
+        }),
+    }).done(function(res){
+        let data = [];
+        for(let i in res.dataSearch){
+            const data_leak = res.dataSearch[i];
+            data = data_leak;
+        }
+        $('#vulnerabilities').text(data.count);
+        let html = '';
+        if(parseInt(data.count) > 0){
+            html += `
+            <li id="vulnerabilities_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#vulnerabilities_coll">
+                        @icon('solid/caret-right') 
+                        Vulnerabilities ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="vulnerabilities_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const vulnerabilities = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${vulnerabilities.link}')" class="fz-search-20px">
+                                        ${vulnerabilities.name}
+                                    </a>
+
+                                    ${vulnerabilities.content}
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${vulnerabilities.link}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadCompromised(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'compromised',
+        }),
+    }).done(function(res){
+        let data = [];
+        for(let i in res.dataSearch){
+            const data_leak = res.dataSearch[i];
+            data = data_leak;
+        }
+        $('#compromised').text(data.count);
+        let html = '';
+        if(parseInt(data.count) > 0){
+            html += `
+            <li id="compromised_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#compromised_coll">
+                        @icon('solid/caret-right') 
+                        Compromised ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="compromised_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const compromised = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${compromised.link}')" class="fz-search-20px">
+                                        ${compromised.name}
+                                    </a>
+
+                                    ${compromised.content}
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${compromised.link}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadDataLeak(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'data_leak',
+        }),
+    }).done(function(res){
+        let data = [];
+        for(let i in res.dataSearch){
+            const data_leak = res.dataSearch[i];
+            data = data_leak;
+        }
+        $('#data_leak').text(data.count);
+        let html = '';
+        if(parseInt(data.count) > 0){
+            html += `
+            <li id="data_leak_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#data_leak_coll">
+                        @icon('solid/caret-right') 
+                        Data Leak ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="data_leak_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const data_leak = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${data_leak.link}')" class="fz-search-20px">
+                                        ${data_leak.name}
+                                    </a>
+
+                                    ${data_leak.content}
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${data_leak.link}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadWebDefacement(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'web_defacement',
+        }),
+    }).done(function(res){
+        let data = [];
+        for(let i in res.dataSearch){
+            const data_leak = res.dataSearch[i];
+            data = data_leak;
+        }
+        $('#web_defacement').text(data.count);
+        let html = '';
+        if(parseInt(data.count) > 0){
+            html += `
+            <li id="web_defacement_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#web_defacement_coll">
+                        @icon('solid/caret-right') 
+                        Web Defacement ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="web_defacement_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const web_defacement = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${web_defacement.link}')" class="fz-search-20px">
+                                        ${web_defacement.name}
+                                    </a>
+
+                                    ${web_defacement.content}
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${web_defacement.link}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadEvents(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'events',
+        }),
+    }).done(function(res){
+        let data = [];
+        for(let i in res.dataSearch){
+            const data_leak = res.dataSearch[i];
+            data = data_leak;
+        }
+        $('#events').text(data.count);
+        let html = '';
+        if(parseInt(data.count) > 0){
+            html += `
+            <li id="events_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#events_coll">
+                        @icon('solid/caret-right') 
+                        Events ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="events_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const events = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${events.link}')" class="fz-search-20px">
+                                        ${events.name}
+                                    </a>
+
+                                    <p class="">Last Status : ${js_check_last_status(events.is_modified)} | Public : ${js_check_publish(events.public)}</p>
+                                                           
+                                    <p>Tags : ${js_explode_val(events.tags,'tags')}</p>
+                                    <p>Groups : ${js_explode_val(events.groups,'groups')}</p>
+                                    <p>Industries : ${js_explode_val(events.industries,'industries')}</p>
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${events.link}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadAdversaries(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'adversaries',
+        }),
+    }).done(function(res){
+        let data = [];
+        for(let i in res.dataSearch){
+            const data_leak = res.dataSearch[i];
+            data = data_leak;
+        }
+        $('#adversaries').text(data.count);
+        let html = '';
+        if(parseInt(data.count) > 0){
+            html += `
+            <li id="adversaries_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#adversaries_coll">
+                        @icon('solid/caret-right') 
+                        Threat Actor ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="adversaries_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const adversaries = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${adversaries.link}')" class="fz-search-20px">
+                                        ${adversaries.name}
+                                    </a>
+
+                                    ${adversaries.content}
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('${adversaries.link}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
+
+function loadMalware(){
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "/newSearchAPI",
+        method: 'post',
+        data: ({
+            keyword:text_search_new,
+            type:'malware',
+        }),
+    }).done(function(res){
+        let data = [];
+        for(let i in res.dataSearch){
+            const data_leak = res.dataSearch[i];
+            data = data_leak;
+        }
+        $('#malware').text(data.count);
+        let html = '';
+        if(parseInt(data.count) > 0){
+            html += `
+            <li id="malware_head" class="panel panel-default">
+                <div class="panel-heading fontw-weight-bold">
+                    <a class="accordion-toggle name" data-toggle="collapse" data-parent="#accordion2" href="#malware_coll">
+                        @icon('solid/caret-right') 
+                        Malware ${data.count ? parseInt(data.count) : 0}
+                    </a>
+                </div>
+                <div id="malware_coll" class="panel-collapse collapse in">`;
+                    for(let i in data.queryData){
+                        const malware = data.queryData[i];
+                        html += `<div class="panel-body clause" data-div_i_type="">
+                            <div class="item-search">
+                                <div style="width: 90%;">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('/indicators/detail_malware?malware_uuid=${encodeURIComponent(malware.name)}')" class="fz-search-20px">
+                                        ${malware.name}
+                                    </a>
+
+                                    ${malware.content}
+                                </div>
+                                <div style="width: 10%" class="text-center">
+                                    <a href="javascript:void(0);" onclick="modal_iframe_source('/indicators/detail_malware?malware_uuid=${encodeURIComponent(malware.name)}')" class="btn btn-info"><i class="fas fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                html += `</div>
+            </li>`;
+        }
+        $('#clauses-list').append(html);
+        count_all += data.count ? parseInt(data.count) : 0;
+        count_rows_finish++;
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        console.log("No response from server");
+    });
+}
 
     $(".btn_filter_indicators_type").click(function() {
         $("#indicators").collapse("show");
@@ -822,6 +1339,57 @@ $(function(){
             console.log("No response from server");
         });
     }
+
+    function js_check_last_status(val) {
+        if(val== true) {
+            result = 'Modified';
+        } else {
+            result = 'Created';
+        }
+        return result;
+    }
+
+    function js_check_publish(val) {
+        if(val==1) {
+            let result = '<i class="fas fa-check"></i>';
+        } else {
+            let result = '';
+        }
+        return result;
+    }
+
+    function js_explode_val(val, type) {
+        let result = '';
+        if(val) {
+            let val_arr = val.split(',');
+            if(val_arr) {
+                result += '<div>';
+                for(let i in val_arr){
+                    const tag = val_arr[i];
+                    if(type == 'tags') {
+                        result +=  `<a href="/indicators/newTags?id=${tag}">${tag}</a> ,`;
+                    } else if (type == 'groups') {
+                        result +=  `<a href="/indicators/newGroups?id=${tag}">${tag}</a> ,`;
+                    } else {
+                        result +=  `<a href="#">${tag}</a> ,`;
+                    }
+                }
+                    
+                result += '</div>';
+                result += result.rtrim(',');
+            }
+        } else {
+            result = '';
+        }
+        return result;
+    }
+
+    String.prototype.rtrim = function (s) {
+        if (s == undefined)
+            s = '\\s';
+        return this.replace(new RegExp("[" + s + "]*$"), '');
+    };
+
 
 
     $('.int-lookup-main').hide();
@@ -914,8 +1482,6 @@ $(function(){
         });      
     }
 
-
-    var text_search_new = '{{request()->keyword}}';
     let status_value_ibmcloud = 0;
     let status_value_virustotal = 0;
     let status_value_hybrid = 0;
@@ -945,45 +1511,48 @@ $.ajax({
         if(res.status_code == 400){
             $('.load-ibmcloud').remove();
         }else{
-            if(data.error){
-                $('#not-ibmcloud').show();
-                $('#table-ibmcloud').DataTable({
-                    "dom": 'tp',
-                    "searching": false,
-                    "bPaginate": true,
-                    "bLengthChange": false,
-                    "bFilter": false,
-                    "bInfo": false,
-                    "bAutoWidth": false ,
-                });
-            }else{
-                number_new_row++;
-                let num_total = 0;
-                if(data.score && data.score > 0){
-                    num_total = data.score;
-                }else if(data.malware){
-                    const malware = data.malware;
-                    num_total = malware.origins.external.detectionCoverage == 0 ? 0 : malware.origins.external.detectionCoverage / 10;
-                }else if(data.result.score > 0){
-                    num_total = data.result.score;
+            if(data){
+                if(data.error){
+                    $('#not-ibmcloud').show();
+                    $('#table-ibmcloud').DataTable({
+                        "dom": 'tp',
+                        "searching": false,
+                        "bPaginate": true,
+                        "bLengthChange": false,
+                        "bFilter": false,
+                        "bInfo": false,
+                        "bAutoWidth": false ,
+                    });
+                }else{
+                    number_new_row++;
+                    let num_total = 0;
+                    if(data.score && data.score > 0){
+                        num_total = data.score;
+                    }else if(data.malware){
+                        const malware = data.malware;
+                        num_total = malware.origins.external.detectionCoverage == 0 ? 0 : malware.origins.external.detectionCoverage / 10;
+                    }else if(data.result.score > 0){
+                        num_total = data.result.score;
+                    }
+                    
+                    $('#text_' + source).text(num_total);
+                    const elem = $("#circle-ibmcloud");
+                    if(num_total <= 3.9){
+                        status_value_ibmcloud = 1;
+                    }else if(num_total <= 6.9){
+                        status_value_ibmcloud = 2;
+                        elem[0].style.removeProperty('background-color');
+                        elem[0].style.setProperty('background-color', '#f2ff15', 'important');
+                        $('#text_' + source).css('color', '#f2ff15');
+                    }else if(num_total >= 7.0){
+                        status_value_ibmcloud = 3;
+                        elem[0].style.removeProperty('background-color');
+                        elem[0].style.setProperty('background-color', '#fcc838', 'important');
+                        $('#text_' + source).css('color', '#fcc838');
+                    }
                 }
+
                 
-                $('#text_' + source).text(num_total);
-                const elem = $("#circle-ibmcloud");
-                if(num_total <= 3.9){
-                    status_value_ibmcloud = 1;
-                }else if(num_total <= 6.9){
-                    status_value_ibmcloud = 2;
-                    elem[0].style.removeProperty('background-color');
-                    elem[0].style.setProperty('background-color', '#f2ff15', 'important');
-                    $('#text_' + source).css('color', '#f2ff15');
-                }else if(num_total >= 7.0){
-                    status_value_ibmcloud = 3;
-                    elem[0].style.removeProperty('background-color');
-                    elem[0].style.setProperty('background-color', '#fcc838', 'important');
-                    $('#text_' + source).css('color', '#fcc838');
-                }
-            }
             
             
             let html = ``;
@@ -1117,101 +1686,17 @@ $.ajax({
             
             $('.load-ibmcloud').remove();
             click_ibmcloud();
+            }else{
+                $('.load-ibmcloud').remove();
+            }
         }
     }else if(source == 'virustotal'){
         if(res.status_code == 400){
             $('.load-virustotal').remove();
         }else{
-            if(data.error){
-                $('#not-virustotal').show();
-                $('#table-virustotal').DataTable({
-                    "dom": 'tp',
-                    "searching": false,
-                    "bPaginate": true,
-                    "bLengthChange": false,
-                    "bFilter": false,
-                    "bInfo": false,
-                    "bAutoWidth": false ,
-                });
-            }else{
-                number_new_row++;
-                if(data.data){
-                    var last_analysis_stats = data.data.attributes.last_analysis_stats;
-                    if(data.data.attributes.last_analysis_stats.malicious && data.data.attributes.last_analysis_stats.malicious > 0){
-                        $('#text_' + source).text(data.data.attributes.last_analysis_stats.malicious);
-                        const elem = $("#circle-virustotal");
-                        if(last_analysis_stats.malicious > 0 && last_analysis_stats.malicious <= 3){
-                            status_value_virustotal = 1;
-                            elem[0].style.removeProperty('background-color');
-                            elem[0].style.setProperty('background-color', '#b93624', 'important');
-                            $('#text_' + source).css('color', '#b93624');
-                        }else if(last_analysis_stats.malicious <= 5){
-                            status_value_virustotal = 2;
-                            elem[0].style.removeProperty('background-color');
-                            elem[0].style.setProperty('background-color', '#b93624', 'important');
-                            $('#text_' + source).css('color', '#b93624');
-                        }else if(last_analysis_stats.malicious <= 7){
-                            status_value_virustotal = 3;
-                            elem[0].style.removeProperty('background-color');
-                            elem[0].style.setProperty('background-color', '#b93624', 'important');
-                            $('#text_' + source).css('color', '#b93624');
-                        }else if(last_analysis_stats.malicious >= 10){
-                            status_value_virustotal = 4;
-                            elem[0].style.removeProperty('background-color');
-                            elem[0].style.setProperty('background-color', '#b93624', 'important');
-                            $('#text_' + source).css('color', '#b93624');
-                        }
-                    }
-                    let total = (parseInt(last_analysis_stats.harmless) + parseInt(last_analysis_stats.malicious) + parseInt(last_analysis_stats.suspicious) + parseInt(last_analysis_stats.timeout) + parseInt(last_analysis_stats.undetected));
-                    $('#text_virustotal_sum').text('/ '+total);
-                    
-                    
-                    let html = ``;
-                    let count_data_virus = 0;
-                    for(let i in data.data.attributes.last_analysis_results){
-                        count_data_virus++;
-                        const last_analysis_results = data.data.attributes.last_analysis_results[i];
-                        html += `
-                        <tr>
-                            <td>${last_analysis_results.engine_name}</td>
-                            <td>${last_analysis_results.category}</td>
-                            <td>
-                                ${last_analysis_results.method} 
-                            </td>
-                            <td>`;
-                                if(last_analysis_results.result == 'malicious' || last_analysis_results.result == 'phishing' || last_analysis_results.result == 'malware'){
-                                    html += `<span class="label label-danger">
-                                        ${last_analysis_results.result}
-                                    </span>`; 
-                                }else if(last_analysis_results.result == 'suspicious'){
-                                    html += `<span class="label label-warning">
-                                        ${last_analysis_results.result}
-                                    </span>`;
-                                }else if(last_analysis_results.result == 'clean'){
-                                    html += `<span class="label label-success">
-                                        ${last_analysis_results.result}
-                                    </span>`;
-                                }else if(last_analysis_results.result == 'unrated'){
-                                    html += `<span class="label label-secondary">
-                                        ${last_analysis_results.result}
-                                    </span>`;
-                                }else if(last_analysis_results.result == null){
-                                    html += `<span class="label label-success">
-                                        undetected
-                                    </span>`;
-                                }else{
-                                    html += `<span class="label label-danger">
-                                        ${last_analysis_results.result}
-                                    </span>`; 
-                                }
-                            html += `</td>
-                        </tr>
-                        `;
-                    }
-                    if(count_data_virus == 0){
-                        $('#not-virustotal').show();
-                    }
-                    document.getElementById("tbody-virustotal").innerHTML = html;
+            if(data){
+                if(data.error){
+                    $('#not-virustotal').show();
                     $('#table-virustotal').DataTable({
                         "dom": 'tp',
                         "searching": false,
@@ -1221,155 +1706,250 @@ $.ajax({
                         "bInfo": false,
                         "bAutoWidth": false ,
                     });
+                }else{
+                    number_new_row++;
+                    if(data.data){
+                        var last_analysis_stats = data.data.attributes.last_analysis_stats;
+                        if(data.data.attributes.last_analysis_stats.malicious && data.data.attributes.last_analysis_stats.malicious > 0){
+                            $('#text_' + source).text(data.data.attributes.last_analysis_stats.malicious);
+                            const elem = $("#circle-virustotal");
+                            if(last_analysis_stats.malicious > 0 && last_analysis_stats.malicious <= 3){
+                                status_value_virustotal = 1;
+                                elem[0].style.removeProperty('background-color');
+                                elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                $('#text_' + source).css('color', '#b93624');
+                            }else if(last_analysis_stats.malicious <= 5){
+                                status_value_virustotal = 2;
+                                elem[0].style.removeProperty('background-color');
+                                elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                $('#text_' + source).css('color', '#b93624');
+                            }else if(last_analysis_stats.malicious <= 7){
+                                status_value_virustotal = 3;
+                                elem[0].style.removeProperty('background-color');
+                                elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                $('#text_' + source).css('color', '#b93624');
+                            }else if(last_analysis_stats.malicious >= 10){
+                                status_value_virustotal = 4;
+                                elem[0].style.removeProperty('background-color');
+                                elem[0].style.setProperty('background-color', '#b93624', 'important');
+                                $('#text_' + source).css('color', '#b93624');
+                            }
+                        }
+                        let total = (parseInt(last_analysis_stats.harmless) + parseInt(last_analysis_stats.malicious) + parseInt(last_analysis_stats.suspicious) + parseInt(last_analysis_stats.timeout) + parseInt(last_analysis_stats.undetected));
+                        $('#text_virustotal_sum').text('/ '+total);
+                        
+                        
+                        let html = ``;
+                        let count_data_virus = 0;
+                        for(let i in data.data.attributes.last_analysis_results){
+                            count_data_virus++;
+                            const last_analysis_results = data.data.attributes.last_analysis_results[i];
+                            html += `
+                            <tr>
+                                <td>${last_analysis_results.engine_name}</td>
+                                <td>${last_analysis_results.category}</td>
+                                <td>
+                                    ${last_analysis_results.method} 
+                                </td>
+                                <td>`;
+                                    if(last_analysis_results.result == 'malicious' || last_analysis_results.result == 'phishing' || last_analysis_results.result == 'malware'){
+                                        html += `<span class="label label-danger">
+                                            ${last_analysis_results.result}
+                                        </span>`; 
+                                    }else if(last_analysis_results.result == 'suspicious'){
+                                        html += `<span class="label label-warning">
+                                            ${last_analysis_results.result}
+                                        </span>`;
+                                    }else if(last_analysis_results.result == 'clean'){
+                                        html += `<span class="label label-success">
+                                            ${last_analysis_results.result}
+                                        </span>`;
+                                    }else if(last_analysis_results.result == 'unrated'){
+                                        html += `<span class="label label-secondary">
+                                            ${last_analysis_results.result}
+                                        </span>`;
+                                    }else if(last_analysis_results.result == null){
+                                        html += `<span class="label label-success">
+                                            undetected
+                                        </span>`;
+                                    }else{
+                                        html += `<span class="label label-danger">
+                                            ${last_analysis_results.result}
+                                        </span>`; 
+                                    }
+                                html += `</td>
+                            </tr>
+                            `;
+                        }
+                        if(count_data_virus == 0){
+                            $('#not-virustotal').show();
+                        }
+                        document.getElementById("tbody-virustotal").innerHTML = html;
+                        $('#table-virustotal').DataTable({
+                            "dom": 'tp',
+                            "searching": false,
+                            "bPaginate": true,
+                            "bLengthChange": false,
+                            "bFilter": false,
+                            "bInfo": false,
+                            "bAutoWidth": false ,
+                        });
+                    }
                 }
+                $('.load-virustotal').remove();
+                click_virustotal();
+            }else{
+                $('.load-virustotal').remove();
             }
-            $('.load-virustotal').remove();
-            click_virustotal();
         }
     }else if(source == 'hybrid'){
         if(res.status_code == 400){
             $('.load-hybrid').remove();
         }else{
-            let html = ``;
-            let total = 0;
-            if(res.type == 'Domain'){
-                $('#table-hybrid').hide();
-                $('#table-hybrid-url').show();
-                for(let i in data.search_terms){
-                    const search_terms = data.search_terms[i];
-                    total += data.count;
-                    html += `
-                    <tr>
-                        <td>${search_terms.id}</td>
-                        <td>${search_terms.value}</td>
-                    </tr>
-                    `;
-                }
-                document.getElementById("tbody-hybrid-url").innerHTML = html;
-                $('#table-hybrid-url').DataTable({
-                    "dom": 'tp',
-                    "searching": false,
-                    "bPaginate": true,
-                    "bLengthChange": false,
-                    "bFilter": false,
-                    "bInfo": false,
-                    "bAutoWidth": false ,
-                });
-            }else if(data.result){
-                for(let i in data.result){
-                    const results = data.result[i];
-                    if(results.threat_score){
-                        total += results.threat_score;
-                    }else{
-                        total += results.av_detect;
+            if(res && data){
+                let html = ``;
+                let total = 0;
+                if(res.type == 'Domain'){
+                    $('#table-hybrid').hide();
+                    $('#table-hybrid-url').show();
+                    for(let i in data.search_terms){
+                        const search_terms = data.search_terms[i];
+                        total += data.count;
+                        html += `
+                        <tr>
+                            <td>${search_terms.id}</td>
+                            <td>${search_terms.value}</td>
+                        </tr>
+                        `;
                     }
-                    html += `
-                    <tr>
-                        <td>${results.environment_description}</td>
-                        <td>${results.sha256}</td>
-                        <td>${results.submit_name}</td>
-                        <td>${results.type_short}</td>
-                        <td>${results.threat_score ? results.threat_score : 0}/100</td>
-                        <td>${results.av_detect ? results.av_detect : 0}%</td>
-                        <td>${results.verdict}</td>
-                        <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
-                    </tr>
-                    `;
-                }
-                if(data.count == 0 || (total / data.count) == 0 || data.validation_errors){
-                    
-                }
-                let total_number = (total / (100 * data.count)).toFixed(2);
-                if(data.count && data.count > 0){
-                    $('#text_' + source).text(total_number);
-                }
-                const elem = $("#circle-hybrid");
-                if(total_number <= 0.39){
-                    status_value_hybrid = 1;
-                }else if(total_number <= 0.69){
-                    status_value_hybrid = 2;
-                    elem[0].style.removeProperty('background-color');
-                    elem[0].style.setProperty('background-color', '#f2ff15', 'important');
-                    $('#text_' + source).css('color', '#f2ff15');
-                }else if(total_number >= 0.70){
-                    status_value_hybrid = 3;
-                    elem[0].style.removeProperty('background-color');
-                    elem[0].style.setProperty('background-color', '#fcc838', 'important');
-                    $('#text_' + source).css('color', '#fcc838');
-                }
-                document.getElementById("tbody-hybrid").innerHTML = html;
-                $('#table-hybrid').DataTable({
-                    "dom": 'tp',
-                    "searching": false,
-                    "bPaginate": true,
-                    "bLengthChange": false,
-                    "bFilter": false,
-                    "bInfo": false,
-                    "bAutoWidth": false ,
-                });
-            }else if(data){
-                let count = 0;
-                for(let i in data){
-                    count++;
-                    const results = data[i];
-                    if(results.threat_score){
-                        total += results.threat_score;
-                    }else{
-                        total += results.av_detect;
+                    document.getElementById("tbody-hybrid-url").innerHTML = html;
+                    $('#table-hybrid-url').DataTable({
+                        "dom": 'tp',
+                        "searching": false,
+                        "bPaginate": true,
+                        "bLengthChange": false,
+                        "bFilter": false,
+                        "bInfo": false,
+                        "bAutoWidth": false ,
+                    });
+                }else if(data.result){
+                    for(let i in data.result){
+                        const results = data.result[i];
+                        if(results.threat_score){
+                            total += results.threat_score;
+                        }else{
+                            total += results.av_detect;
+                        }
+                        html += `
+                        <tr>
+                            <td>${results.environment_description}</td>
+                            <td>${results.sha256}</td>
+                            <td>${results.submit_name}</td>
+                            <td>${results.type_short}</td>
+                            <td>${results.threat_score ? results.threat_score : 0}/100</td>
+                            <td>${results.av_detect ? results.av_detect : 0}%</td>
+                            <td>${results.verdict}</td>
+                            <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
+                        </tr>
+                        `;
                     }
-                    
-                    html += `
-                    <tr>
-                        <td>${results.environment_description}</td>
-                        <td>${results.sha256}</td>
-                        <td>${results.submit_name}</td>
-                        <td>${results.type_short}</td>
-                        <td>${results.threat_score ? results.threat_score : 0}/100</td>
-                        <td>${results.av_detect ? results.av_detect : 0}%</td>
-                        <td>${results.verdict}</td>
-                        <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
-                    </tr>
-                    `;
-                }
-                if(count == 0 || (total / count) == 0 || data.validation_errors){
+                    if(data.count == 0 || (total / data.count) == 0 || data.validation_errors){
+                        
+                    }
+                    let total_number = (total / (100 * data.count)).toFixed(2);
+                    if(data.count && data.count > 0){
+                        $('#text_' + source).text(total_number);
+                    }
+                    const elem = $("#circle-hybrid");
+                    if(total_number <= 0.39){
+                        status_value_hybrid = 1;
+                    }else if(total_number <= 0.69){
+                        status_value_hybrid = 2;
+                        elem[0].style.removeProperty('background-color');
+                        elem[0].style.setProperty('background-color', '#f2ff15', 'important');
+                        $('#text_' + source).css('color', '#f2ff15');
+                    }else if(total_number >= 0.70){
+                        status_value_hybrid = 3;
+                        elem[0].style.removeProperty('background-color');
+                        elem[0].style.setProperty('background-color', '#fcc838', 'important');
+                        $('#text_' + source).css('color', '#fcc838');
+                    }
+                    document.getElementById("tbody-hybrid").innerHTML = html;
+                    $('#table-hybrid').DataTable({
+                        "dom": 'tp',
+                        "searching": false,
+                        "bPaginate": true,
+                        "bLengthChange": false,
+                        "bFilter": false,
+                        "bInfo": false,
+                        "bAutoWidth": false ,
+                    });
+                }else if(data){
+                    let count = 0;
+                    for(let i in data){
+                        count++;
+                        const results = data[i];
+                        if(results.threat_score){
+                            total += results.threat_score;
+                        }else{
+                            total += results.av_detect;
+                        }
+                        
+                        html += `
+                        <tr>
+                            <td>${results.environment_description}</td>
+                            <td>${results.sha256}</td>
+                            <td>${results.submit_name}</td>
+                            <td>${results.type_short}</td>
+                            <td>${results.threat_score ? results.threat_score : 0}/100</td>
+                            <td>${results.av_detect ? results.av_detect : 0}%</td>
+                            <td>${results.verdict}</td>
+                            <td>${moment(new Date(results.analysis_start_time)).format('DD-MM-YYYY HH:MM:SS')}</td>
+                        </tr>
+                        `;
+                    }
+                    if(count == 0 || (total / count) == 0 || data.validation_errors){
 
-                }
-                let total_number = (total / (100 * count)).toFixed(2);
-                if(count && count > 0){
-                    $('#text_' + source).text(total_number);
-                }
+                    }
+                    let total_number = (total / (100 * count)).toFixed(2);
+                    if(count && count > 0){
+                        $('#text_' + source).text(total_number);
+                    }
 
-                const elem = $("#circle-hybrid");
-                if(total_number <= 0.39){
-                    status_value_hybrid = 1;
-                }else if(total_number <= 0.69){
-                    status_value_hybrid = 2;
-                    elem[0].style.removeProperty('background-color');
-                    elem[0].style.setProperty('background-color', '#f2ff15', 'important');
-                    $('#text_' + source).css('color', '#f2ff15');
-                }else if(total_number >= 0.70){
-                    status_value_hybrid = 3;
-                    elem[0].style.removeProperty('background-color');
-                    elem[0].style.setProperty('background-color', '#fcc838', 'important');
-                    $('#text_' + source).css('color', '#fcc838');
+                    const elem = $("#circle-hybrid");
+                    if(total_number <= 0.39){
+                        status_value_hybrid = 1;
+                    }else if(total_number <= 0.69){
+                        status_value_hybrid = 2;
+                        elem[0].style.removeProperty('background-color');
+                        elem[0].style.setProperty('background-color', '#f2ff15', 'important');
+                        $('#text_' + source).css('color', '#f2ff15');
+                    }else if(total_number >= 0.70){
+                        status_value_hybrid = 3;
+                        elem[0].style.removeProperty('background-color');
+                        elem[0].style.setProperty('background-color', '#fcc838', 'important');
+                        $('#text_' + source).css('color', '#fcc838');
+                    }
+                    document.getElementById("tbody-hybrid").innerHTML = html;
+                    $('#table-hybrid').DataTable({
+                        "dom": 'tp',
+                        "searching": false,
+                        "bPaginate": true,
+                        "bLengthChange": false,
+                        "bFilter": false,
+                        "bInfo": false,
+                        "bAutoWidth": false ,
+                    });
+                }else{
+                    number_new_row++;
+                    $('#not-hybrid').show();
                 }
-                document.getElementById("tbody-hybrid").innerHTML = html;
-                $('#table-hybrid').DataTable({
-                    "dom": 'tp',
-                    "searching": false,
-                    "bPaginate": true,
-                    "bLengthChange": false,
-                    "bFilter": false,
-                    "bInfo": false,
-                    "bAutoWidth": false ,
-                });
+                
+                $('.load-hybrid').remove();
+                click_hybrid();
             }else{
-                number_new_row++;
-                $('#not-hybrid').show();
+                $('.load-hybrid').remove();
             }
-            
-            $('.load-hybrid').remove();
-            click_hybrid();
         }
     }else if(source == 'otx_indicators'){
         if(res.status_code == 400){

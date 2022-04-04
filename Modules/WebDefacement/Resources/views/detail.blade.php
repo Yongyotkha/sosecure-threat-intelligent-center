@@ -35,7 +35,79 @@
     </header>
 
         <section class="scrollable wrapper">
+
             <section class="panel panel-default">
+                <header class="panel-heading font-bold panel-header-blue">
+                    <div class="row d-flex-center">
+                        <div class="col-xs-6">
+                            <i class="fas fa-globe-europe"></i> Analytics
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <button id="toggle_ana" style="margin-left:5px;" class="btn btn-xs text-dark" onclick="collpase_chart('#wdfm-analytics','#toggle_ana')">
+                                <i class="fas fa-minus-square"></i>Collapse
+                            </button>
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body" id="wdfm-analytics">
+                    <h3 class="text-center">Last Update : {{@$webdefacement->last_check}}</h3>
+                    <div class="wrapper-circle">
+                        <div>
+                            <div class="c100 p{{@$webdefacment_data_check->hash_percent}} green">
+                                <span>{{@$webdefacment_data_check->hash_percent}}%</span>
+                                <div class="slice">
+                                  <div class="bar"></div>
+                                  <div class="fill"></div>
+                                </div>
+                            </div>
+                            <h3 class="text-center text-dark font-weight-bold">HASH</h3>
+                        </div>
+                      
+                        <div>
+                            <div class="c100 p{{@$webdefacment_data_check->filesize_percent}} green">
+                                <span>{{@$webdefacment_data_check->filesize_percent}}%</span>
+                                <div class="slice">
+                                  <div class="bar"></div>
+                                  <div class="fill"></div>
+                                </div>
+                            </div>
+                            <h3 class="text-center text-dark font-weight-bold">Filesize</h3>
+                        </div>
+                        <div>
+                            <div class="c100 p{{@$webdefacment_data_check->element_percent}} danger">
+                                <span>{{@$webdefacment_data_check->element_percent}}%</span>
+                                <div class="slice">
+                                  <div class="bar"></div>
+                                  <div class="fill"></div>
+                                </div>
+                            </div>
+                            <h3 class="text-center text-dark font-weight-bold">Element</h3>
+                        </div>
+                        <div>
+                            <div class="c100 p60 warning">
+                                <span>60%</span>
+                                <div class="slice">
+                                  <div class="bar"></div>
+                                  <div class="fill"></div>
+                                </div>
+                            </div>
+                            <h3 class="text-center text-dark font-weight-bold">Image</h3>
+                        </div>
+                        <div>
+                            <div class="c100 p90 danger">
+                                <span>90%</span>
+                                <div class="slice">
+                                  <div class="bar"></div>
+                                  <div class="fill"></div>
+                                </div>
+                            </div>
+                            <h3 class="text-center text-dark font-weight-bold">Blacklist</h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel panel-default d-none">
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row d-flex-center">
                         <div class="col-xs-6">
@@ -272,8 +344,11 @@
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img" id='updateImage_original'>
-                                                <a href="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_original}}" data-lightbox="name-img-2">
+                                                {{-- <a href="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_original}}" data-lightbox="name-img-2">
                                                     <img src="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_original}}" onerror="setDefaultPic(this)"/>
+                                                </a> --}}
+                                                <a href="http://10.104.0.7:8082{{@$webdefacement->image_original}}" data-lightbox="name-img-2">
+                                                    <img src="http://10.104.0.7:8082{{@$webdefacement->image_original}}" onerror="setDefaultPic(this)"/>
                                                 </a>
                                             </div>
                                         </div>
@@ -299,8 +374,11 @@
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
-                                                <a href="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_last}}" data-lightbox="name-img-2">
+                                                {{-- <a href="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_last}}" data-lightbox="name-img-2">
                                                     <img src="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_last}}" onerror="setDefaultPic(this)"/>
+                                                </a> --}}
+                                                <a href="http://10.104.0.7:8082{{@$webdefacement->image_last}}" data-lightbox="name-img-2">
+                                                    <img src="http://10.104.0.7:8082{{@$webdefacement->image_last}}" onerror="setDefaultPic(this)"/>
                                                 </a>
                                             </div>
                                         </div>
@@ -341,9 +419,10 @@
     @include('stacks.css.datatables')
     @include('stacks.css.form')
     @include('stacks.css.lightbox')
-
+    @include('stacks.css.c3')
     @include('stacks.css.datepicker')
     @include('stacks.css.form')
+    @include('stacks.css.circle_chart')
     <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
 @endpush
 
@@ -353,6 +432,7 @@
 @include('stacks.js.datepicker')
 @include('stacks.js.daterangpicker')
 @include('stacks.js.lightbox')
+@include('stacks.js.c3')
 
 <script>
     function collpase_chart(id,text){
@@ -369,6 +449,44 @@
             $(this).find('.wdfm-header').toggleClass('wdfm-header-upper');
         }); 
     });
+
+    chart_circle('#chart_01');
+
+    function chart_circle(id){
+        const myc3 = c3.generate({
+            bindto: id,
+            data: {
+                columns: [
+                    ['data', 91.4]
+                ],
+                type: 'gauge',
+            },
+            gauge: {
+               label: {
+                   format: function(value, ratio) {
+                       return value;
+                   },
+                   show: false 
+               },
+           min: 0, 
+           max: 360,
+           units: ' %',
+           width: 39
+            },
+            color: {
+                pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'], 
+                threshold: {
+                   unit: 'value',
+                   max: 200,
+                    values: [30, 60, 90, 100]
+                }
+            },
+            size: {
+                height: 180
+            }
+        });
+    }
+
 
     function accept_risk() { 
      
