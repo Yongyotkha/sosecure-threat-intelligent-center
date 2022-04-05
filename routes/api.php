@@ -205,9 +205,9 @@ Route::group(['prefix' => 'v1/agent'], function () {
 });
 
 Route::group(['prefix' => 'v1/saveData/{code}'], function () {
-    Route::get('saveCVE', 'Api\ApiNewSaveDataController@saveCVE');
-    Route::get('saveIndicator', 'Api\ApiNewSaveDataController@saveIndicator');
-    Route::get('saveSetting', 'Api\ApiNewSaveDataController@saveSetting');
+    Route::post('saveCVE', 'Api\ApiNewSaveDataController@saveCVE');
+    Route::post('saveIndicator', 'Api\ApiNewSaveDataController@saveIndicator');
+    Route::post('saveSetting', 'Api\ApiNewSaveDataController@saveSetting');
 });
 
 // Route::middleware('auth:api')->get('/user', function (Request $request) {

@@ -24,15 +24,17 @@ class ApiNewSaveDataController extends Controller
 
             $siteSettings = SiteSettings::where('code', $code)->first();
             if(!empty($siteSettings)){
-                $siteSettings->server_log_port = trim($request->port);
-                $siteSettings->server_log_protocol = trim($request->protocol);
-                $siteSettings->server_log_ip = trim($request->ip);
+                $data_request = $request -> data;
+                $data = $this -> dataFalse($data_request);
+                $siteSettings->server_log_port = trim($data['data']['port']);
+                $siteSettings->server_log_protocol = trim($data['data']['protocol']);
+                $siteSettings->server_log_ip = trim($data['data']['ip']);
                 $siteSettings->save();
     
                 site_config_email_alert::where('site_id', $siteSettings->id)->delete();
-                if (!empty($request->email_alert)) {
-                    if (count($request->email_alert) > 0) {
-                        foreach ($request->email_alert as $email_alert) {
+                if (!empty($data['data']['email_alert'])) {
+                    if (count($data['data']['email_alert']) > 0) {
+                        foreach ($data['data']['email_alert'] as $email_alert) {
                             $site_config_email_alert = new site_config_email_alert;
                             $site_config_email_alert->site_id = $siteSettings->id;
                             $site_config_email_alert->email = $email_alert;
@@ -46,5 +48,20 @@ class ApiNewSaveDataController extends Controller
             return response()->json(['message' => $e->getMessage(), 'error' => $e->getLine(), 'status_code' => '500']);
         }
     
+    }
+
+    private function dataFalse($data){
+        try {
+            $data_return = [
+                'data' => json_decode($data, true),
+            ];
+            return $data_return;
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => 0,
+                'message' => $e -> getMessage(),
+            );
+            return response()->json($response);
+        }
     }
 }
