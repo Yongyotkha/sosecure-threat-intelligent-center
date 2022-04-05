@@ -4,18 +4,86 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use Modules\SiteSettings\Entities\LogsSetting;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\site_config_email_alert;
 
 class ApiNewSaveDataController extends Controller
 {
-    public function saveCVE(Request $request){
+    public function getData(Request $request){
+        try {
+            $code = $request -> code;
 
+            $siteSettings = SiteSettings::where('code', $code)->with('get_site_config_email_alert')->first();
+            $LogsSetting = LogsSetting::where('site_id', $siteSettings->id)->where('type','cve')->first();
+            $LogsSettingIn = LogsSetting::where('site_id', $siteSettings->id)->where('type','indicator')->first();
+
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => [
+                'siteSettings' => $siteSettings,
+                'LogsSetting' => $LogsSetting,
+                'LogsSettingIn' => $LogsSettingIn
+            ]]);  
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'error' => $e->getLine(), 'status_code' => '500']);
+        }
+    }
+
+    public function saveCVE(Request $request){
+        try {
+            $code = $request -> code;
+
+            $siteSettings = SiteSettings::where('code', $code)->first();
+            if(!empty($siteSettings)){
+                $data_request = $request -> data;
+                $data = $this -> dataFalse($data_request);
+                $LogsSetting = LogsSetting::where('site_id', $siteSettings->id)->where('type','cve')->first();
+                if($LogsSetting){
+                    $LogsSetting->site_id = $siteSettings->id;
+                    $LogsSetting->type = "cve";
+                    $LogsSetting->content = $data['data']['text_protocal_format'];
+                    $LogsSetting->save();
+                }else{
+                    $LogsSetting = new LogsSetting;
+                    $LogsSetting->site_id = $siteSettings->id;
+                    $LogsSetting->type = "cve";
+                    $LogsSetting->content = $data['data']['text_protocal_format'];
+                    $LogsSetting->save();
+                    
+                }
+            }
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200']);  
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'error' => $e->getLine(), 'status_code' => '500']);
+        }
     }
 
     public function saveIndicator(Request $request){
+        try {
+            $code = $request -> code;
 
+            $siteSettings = SiteSettings::where('code', $code)->first();
+            if(!empty($siteSettings)){
+                $data_request = $request -> data;
+                $data = $this -> dataFalse($data_request);
+                $LogsSetting = LogsSetting::where('site_id', $siteSettings->id)->where('type','indicator')->first();
+                if($LogsSetting){
+                    $LogsSetting->site_id = $siteSettings->id;
+                    $LogsSetting->type = "indicator";
+                    $LogsSetting->content = $data['data']['text_protocal_format'];
+                    $LogsSetting->save();
+                }else{
+                    $LogsSetting = new LogsSetting;
+                    $LogsSetting->site_id = $siteSettings->id;
+                    $LogsSetting->type = "indicator";
+                    $LogsSetting->content = $data['data']['text_protocal_format'];
+                    $LogsSetting->save();
+                    
+                }
+            }
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200']);  
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'error' => $e->getLine(), 'status_code' => '500']);
+        }
     }
 
     public function saveSetting(Request $request){
