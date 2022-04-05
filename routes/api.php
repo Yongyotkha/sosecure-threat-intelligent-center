@@ -209,6 +209,7 @@ Route::group(['prefix' => 'v1/saveData/{code}'], function () {
     Route::post('saveIndicator', 'Api\ApiNewSaveDataController@saveIndicator');
     Route::post('saveSetting', 'Api\ApiNewSaveDataController@saveSetting');
     Route::post('getData', 'Api\ApiNewSaveDataController@getData');
+    Route::post('getIndicator', 'Api\ApiNewSaveDataController@getIndicator');
 });
 
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
