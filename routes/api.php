@@ -151,8 +151,6 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('agentCenter/sendLogYara', 'Api\ApiAgentController@sendLogYara');
     Route::post('agentCenter/sendAgentScanLog', 'Api\ApiAgentController@sendAgentScanLog');
 
-    Route::post('agentCenter/downloadRuleSite', 'Api\ApiAgentController@downloadRuleSite');
-
     //asset
     Route::post('tranferAsset', 'Api\ApiTransferAssetController@tranferAsset');
 

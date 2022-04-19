@@ -7,6 +7,9 @@ use App\Entities\Sites;
 use App\FXSiteAgents;
 use App\RuleFile;
 use App\RuleSite;
+use App\RuleNameSite;
+use App\RuleFileSiteDownload;
+use App\RuleFileSiteAgentDownload;
 use App\YaraLog;
 use Carbon\Carbon;
 use Firebase\JWT\JWT;
@@ -282,11 +285,54 @@ class ApiAgentController extends ApiController
                     'data' => []
                 ];
             } else {
-                $ruleFiles = RuleFile::where('transaction_download_client', 0)->get();
+                $statusCode = 200;
+                $error = '';
+                $items = [];
+
+                $ruleFileSiteDownload = RuleFileSiteDownload::select('rule_files_id')->where('site_id', $data['site']['data']['id'])->get();
+                if(!empty($ruleFileSiteDownload)){
+                    $ruleFilesID = [];
+                    foreach($ruleFileSiteDownload as $item){
+                        $ruleFilesID[] = $item -> rule_files_id;
+                    }
+
+                    $ip_private = $data['data']['ip_private'];
+                    $siteAgent = FXSiteAgents::select('id', 'active_date', 'status')
+                    ->where('site_id', $data['site']['data']['id'])
+                    ->where('ip_private', $ip_private)
+                    ->where('status', 1)
+                    ->whereIsNull('deleted_at')
+                    ->first();
+
+                    if(!empty($siteAgent)){
+                        $ruleFileSiteAgentDownload = RuleFileSiteAgentDownload::whereIn('rule_files_id', $ruleFilesID)
+                        ->where('site_id', $data['site']['data']['id'])
+                        ->where('agent_id', $siteAgent -> id)
+                        ->where('transaction_download_client', 1)
+                        ->where('status', 'Y')
+                        ->get();
+
+                        foreach($ruleFileSiteAgentDownload as $item){
+                            $rileFile = RuleFile::select('path')->where('id', $item -> rule_files_id)->first();
+                            $items[] = [
+                                'path' => $rileFile -> path,
+                                'id' => $item -> id
+                            ];
+
+                            $item -> transaction_download_client = 2;
+                            $item -> save();
+                        }
+                    }
+                    
+                }else{
+                    $statusCode = 404;
+                    $error = 'Not Found';
+                }
+
                 $response = [
-                    'error' => '', 
-                    'status_code' => 200,
-                    'data' => $ruleFiles
+                    'error' => $error, 
+                    'status_code' => $statusCode,
+                    'data' => $items
                 ];
             }
 
@@ -318,10 +364,10 @@ class ApiAgentController extends ApiController
                 ];
             } else {
                 $id = $data['data']['id'];
-                $ruleFiles = RuleFile::where('id', $id)->where('transaction_download_client', 0)->first();
-                if($ruleFiles){
-                    $ruleFiles -> transaction_download_client = 1;
-                    $ruleFiles -> save();
+                $ruleFileSiteAgentDownload = RuleFileSiteAgentDownload::where('id', $id)->where('transaction_download_client', 2)->first();
+                if($ruleFileSiteAgentDownload){
+                    $ruleFileSiteAgentDownload -> transaction_download_client = 3;
+                    $ruleFileSiteAgentDownload -> save();
                 }
                 $response = [
                     'error' => '', 
@@ -577,41 +623,6 @@ class ApiAgentController extends ApiController
                     'error' => '', 
                     'status_code' => 200,
                     'data' => $agentScanLogs
-                ];
-            }
-
-            $data_transcation = json_encode($response);
-            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
-            return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
-        } catch (\Exception $e) {
-            $response = array(
-                'status_code' => 500,
-                'error' => $e -> getMessage(),
-            );
-            $data_transcation = json_encode($response);
-            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
-            return response()->json(['error' => '', 'status_code' => 500, 'data' => $datas]);
-        }
-    }
-
-    public function downloadRuleSite(Request $request){
-        try {
-            $header = $request->bearerToken();
-            $mode = $request->mode;
-            $data_request = $request->data;
-            $data = $this->dataFalse($header, $mode, $data_request);
-            if ($data === false) {
-                $response =[
-                    'error' => 'The request parameters are invalid',
-                    'status_code' => 400,
-                    'data' => []
-                ];
-            } else {
-                
-                $response = [
-                    'error' => '', 
-                    'status_code' => 200,
-                    'data' => ''
                 ];
             }
 
