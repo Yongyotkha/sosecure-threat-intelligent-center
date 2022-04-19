@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\AgentScanLog;
+use App\Entities\Sites;
 use App\FXSiteAgents;
 use App\RuleFile;
 use App\RuleSite;
@@ -72,16 +73,34 @@ class ApiAgentController extends ApiController
                 }else{
                     $siteAgentsHasData = FXSiteAgents::where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
                     if(empty($siteAgentsHasData)){
-                        $siteAgents = new FXSiteAgents();
-                        $siteAgents -> site_id = $data['site']['data']['id'];
-                        $siteAgents -> device_name = $device_name;
-                        $siteAgents -> os_type = $os_type;
-                        $siteAgents -> os_description = $os_description;
-                        $siteAgents -> system_info = $system_info;
-                        $siteAgents -> domain = $domain;
-                        $siteAgents -> ip_private = $ip_private;
-                        $siteAgents -> status = 0;
-                        $siteAgents -> save();
+                        $site = Sites::select('agent_count')->where('id', $data['site']['data']['id'])->first();
+                        $siteAgentsRows = FXSiteAgents::where('site_id', $data['site']['data']['id'])->count();
+                        if(!empty($site)){
+                            if($site -> agent_count < $siteAgentsRows){
+                                $siteAgents = new FXSiteAgents();
+                                $siteAgents -> site_id = $data['site']['data']['id'];
+                                $siteAgents -> device_name = $device_name;
+                                $siteAgents -> os_type = $os_type;
+                                $siteAgents -> os_description = $os_description;
+                                $siteAgents -> system_info = $system_info;
+                                $siteAgents -> domain = $domain;
+                                $siteAgents -> ip_private = $ip_private;
+                                $siteAgents -> status = 1;
+                                $siteAgents -> save();
+                            }else{
+                                $siteAgents = new FXSiteAgents();
+                                $siteAgents -> site_id = $data['site']['data']['id'];
+                                $siteAgents -> device_name = $device_name;
+                                $siteAgents -> os_type = $os_type;
+                                $siteAgents -> os_description = $os_description;
+                                $siteAgents -> system_info = $system_info;
+                                $siteAgents -> domain = $domain;
+                                $siteAgents -> ip_private = $ip_private;
+                                $siteAgents -> status = 0;
+                                $siteAgents -> save();
+                            }
+                        }
+                        
     
                         $response = [
                             'error' => '', 
@@ -575,8 +594,42 @@ class ApiAgentController extends ApiController
         }
     }
 
-    protected function jwt($user)
-    {
+    public function downloadRuleSite(Request $request){
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            if ($data === false) {
+                $response =[
+                    'error' => 'The request parameters are invalid',
+                    'status_code' => 400,
+                    'data' => []
+                ];
+            } else {
+                
+                $response = [
+                    'error' => '', 
+                    'status_code' => 200,
+                    'data' => ''
+                ];
+            }
+
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'error' => $e -> getMessage(),
+            );
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 500, 'data' => $datas]);
+        }
+    }
+
+    protected function jwt($user){
         $payload = [
             'iss' => "lumen-jwt", // Issuer of the token
             'sub' => $user->id, // Subject of the token
