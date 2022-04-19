@@ -305,10 +305,63 @@
                         </label>
                         <div class="col-lg-9">
                             <div class="row">
-                                <div class="col-lg-12 mb-1">
-                                    <input type="text" name="name" id="name" class="form-control">
-                                    <span id="error_name" style="color:red;"></span>
+                                <div class="form-group">
+                                    <div class="col-lg-8 mb-1">
+                                        {{-- <input type="text" name="name" id="name" class="form-control"> --}}
+                                        <select name="name" id="name" class="form-control check_test_select">
+                                            <option value="">Choose an Category</option>
+                                            @foreach ($select_category as $category)
+                                            <option value="{{$category['id']}}">{{$category['name']}}</option>
+                                            @endforeach
+                                        </select>
+                                        <span id="error_name" style="color:red;"></span>
+                                    </div>
+                                    <div class="col-lg-4 mb-1">
+                                        <button type="button" data-toggle="collapse" href="#demo" class="btn btn-{{ get_option('theme_color')  }} add-assets-new">
+                                            <i class="fas fa-plus"></i>
+                                            &nbsp; Add New
+                                        </button>
+                                    </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+
+                            <div id="demo" class="collapse box">
+
+                                <fieldset class="collapsible">
+                
+                                    <legend>Add Category</legend>
+                                    <div class="form-group row">
+                                        <label style="padding-top: 7px" class="col-lg-3 control-label">Name <span
+                                                class="text-danger">*</span> </label>
+                                        <div class="col-lg-8">
+                                            <input type="text" name="name_new" id="name_new" class="form-control check_test">
+                                            <span style="color:red;" id="check_name_new" class="d-none"><small>Please enter your name category</small></span>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" id="close_add_category" class="btn btn-danger btn-rounded" data-toggle="collapse"
+                                            data-target="#demo">
+                                            <i class="fas fa-times"></i>
+                                            Close
+                                        </button>
+                                        <button type="button" onclick="add_new_category()" class="btn btn-info btn-rounded">
+                                            <i class="fas fa-paper-plane"></i>
+                                            Save
+                                        </button>
+                                    </div>
+                                    <hr>
+                
+                                </fieldset>
+                
+                            </div>
+
+                        </div>
+                        <div class="col-lg-3">
+                        </div>
+                        <div class="col-lg-9">
+                            <div class="row">
                                 <div class="col-lg-12 mb-1">
                                     <input type="file" name="file_rule_name" id="file_rule_name" class="form-control" accept="zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed">
                                     <span id="error_file" style="color:red;"></span>
@@ -327,7 +380,7 @@
 
                             <table id="rule_item" class="table mb-0">
                                 <tbody>
-                                    <tr>
+                                    <tr id="tr_no_data">
                                         <td class="text-center">
                                             <span> Select file for data.. </span>
                                         </td>
@@ -446,6 +499,8 @@
         $('#error_file').empty();
         $('#error_detail').empty();
 
+        $('#close_add_category').trigger('click');
+
         $('#btn_save_rule').html('<i class="fas fa-paper-plane"></i> Save');
         $('#btn_save_rule').attr('disabled', false);
 
@@ -532,6 +587,8 @@
         });
     });
 
+    let row_append_rule = 0;
+
     $('#file_rule_name').change(function(){
         
         var formData = new FormData(document.getElementById("form_add_rule"));
@@ -561,15 +618,15 @@
     
                         html += 
                         `
-                        <tr>
-                            <td style="width: 33.33%">
+                        <tr id="tr_${row_append_rule}">
+                            <td style="width: 25%">
                                 <input type="text" id="detail_${i}_file_name" name="detail[${i}][file_name]" value="${name_file_arr.file_name}" class="form-control" readonly>
                                 <input type="hidden" id="detail_${i}_rule_name" name="detail[${i}][rule_name]" value="${name_file_arr.rule_name}">
                             </td>
-                            <td style="width: 33.33%">
+                            <td style="width: 25%">
                                 <input type="text" id="detail_${i}_description" name="detail[${i}][description]" class="form-control">
                             </td>
-                            <td style="width: 33.33%">
+                            <td style="width: 25%">
                                 <select class="select-2--rule form-control" id="detail_${i}_severity" name="detail[${i}][severity]">
                                     <option value="Information">Information</option>
                                     <option value="Low">Low</option>
@@ -578,11 +635,18 @@
                                     <option value="Critical">Critical</option>
                                 </select>
                             </td>
+                            <td style="width: 25%">
+                                <button type="button" class="btn btn-danger btn-xs btn_remove_row" onclick="delete_row('#tr_${row_append_rule}')"><i class="fas fa-trash-alt"></i></button>
+                            </td>
                         </tr>
                         `;
+
+                        row_append_rule++;
                     }
 
                     $('#error_detail').empty();
+
+                    {{-- delete_row(); --}}
                 }
                 else
                 {
@@ -596,7 +660,8 @@
                     `;
                 }
 
-                $('#rule_item tbody').empty();
+                $('#tr_no_data').remove();
+                {{-- $('#rule_item tbody').empty(); --}}
                 $('#rule_item tbody').append(html);
             }
         });
@@ -734,6 +799,82 @@
         animation: 150,
         dataIdAttr: 'data-id'
     });
+
+    function add_new_category()
+    {
+        let select_category_name = $('#name :selected').val();
+        let new_category_name = $('#name_new').val();
+
+        if(new_category_name)
+        {
+            $.ajax({
+                url: "{{ route('agentmanagement.add_new_category') }}",
+                type: 'POST',
+                data: {
+                    new_category_name:new_category_name
+                },
+                success:function(response)
+                {
+                    if(response.status == 'success')
+                    {
+
+                        toastr.error(response.message);
+
+                        let html = `
+                            <option value="">Choose an Category</option>
+                        `;
+
+                        const select_category = response.select_category;
+                        for(let i in select_category)
+                        {
+                            html += `
+                                <option value="${select_category[i].id}" ${select_category_name == select_category[i].id ? 'selected' : ''}>${select_category[i].name}</option>
+                            `;
+                        }
+
+                        $('#name').empty().append(html);
+
+                        $('#name_new').val('');
+                        $('#check_name_new').addClass('d-none');
+                        $('#close_add_category').trigger('click');
+
+                    }
+                    else if(response.status == 'error')
+                    {
+                        toastr.error(response.message);
+                    }
+                }
+            });
+        }
+        else
+        {
+            input_check_err('#name_new', '#check_name_new')
+        }
+
+    }
+
+    function input_check_err(id_input, id_err)
+    {
+        $(id_err).removeClass('d-none');
+
+        $(id_input).keyup(function(){
+            if($(id_input).val().length == 0)
+            {
+                $(id_err).removeClass('d-none');
+            }
+            else
+            {
+                $(id_err).addClass('d-none');
+            }
+        });
+    }
+
+    function delete_row(id)
+    {
+        {{-- var whichtr = $(this).closest('tr');
+        alert('1'); --}}
+        $(id).remove();     
+    }
 
 </script>
 

@@ -917,6 +917,12 @@ class AgentManagementController extends Controller
         $get_role_custom_first = @get_role_custom();
         $SiteSettings = @$get_role_custom_first['SiteSettings'];
         $data['site_settings'] = $SiteSettings;
+
+        $select_category = TBLRuleCategory::where(['status' => 'Y'])->select('id', 'name')->get()->toArray();
+        $data['select_category'] = $select_category;
+
+        // dd($data['select_category']);
+
         return view('agentmanagement::rule')->with($data);
     }
 
@@ -1205,39 +1211,40 @@ class AgentManagementController extends Controller
 
     public function agent_rule_insert(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
 
-        try
-        {
-            $message = [
-                'name.required' => 'Catagory name is required.',
-                'file_rule_name.required' => 'File rule is required.',
-                'detail.required' => 'File is not data'
-            ];
+        // try
+        // {
+        //     $message = [
+        //         'name.required' => 'Catagory name is required.',
+        //         'file_rule_name.required' => 'File rule is required.',
+        //         'detail.required' => 'File is not data'
+        //     ];
 
-            $validate = Validator::make($request->all(), [
-                'name' => 'required',
-                'file_rule_name' => 'required',
-                'detail' => 'required'
-            ], $message);
+        //     $validate = Validator::make($request->all(), [
+        //         'name' => 'required',
+        //         'file_rule_name' => 'required',
+        //         'detail' => 'required'
+        //     ], $message);
 
-            if($validate->fails())
-            {
-                $validate = $validate->getMessageBag()->toArray();
+        //     if($validate->fails())
+        //     {
+        //         $validate = $validate->getMessageBag()->toArray();
 
-                return response()->json([
-                    'status' => '422',
-                    'errors' => $validate,
-                    'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน.'
-                ]);
-            }
-            else
-            {
-                $category_data = [];
-                $category_data['name'] = @$request->name;
-                $category_data['status'] = @$request->status ? ( $request->status == 1 ? 'Y' : 'N' ) : '';
+        //         return response()->json([
+        //             'status' => '422',
+        //             'errors' => $validate,
+        //             'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน.'
+        //         ]);
+        //     }
+        //     else
+        //     {
+            
+                // $category_data = [];
+                // $category_data['name'] = @$request->name;
+                // $category_data['status'] = @$request->status ? ( $request->status == 1 ? 'Y' : 'N' ) : '';
 
-                $id_catagory = TBLRuleCategory::create($category_data)->id;
+                // $id_catagory = TBLRuleCategory::create($category_data)->id;
 
                 if(@$request->file_rule_name)
                 {
@@ -1266,11 +1273,12 @@ class AgentManagementController extends Controller
                         foreach($request->detail as $detail)
                         {
                             $detail_rule_name = $detail;
-                            $detail_rule_name['rule_category_id'] = @$id_catagory;
+                            // $detail_rule_name['rule_category_id'] = @$id_catagory;
+                            $detail_rule_name['rule_category_id'] = @$request->name;
                             $detail_rule_name['rule_file_id'] = @$id_file;
                             $detail_rule_name['status'] = $category_data['status'];
         
-                            TBLRuleName::create($detail_rule_name);
+                            $id_rule = TBLRuleName::create($detail_rule_name)->id;
                         }
                     }
                 }
@@ -1279,16 +1287,16 @@ class AgentManagementController extends Controller
                     'status' => 'success',
                     'message' => 'Success!! | '
                 ];
-            }
-        }
-        catch (Exception $e)
-        {
-            $response = [
-                'status' => 'error',
-                'message' => 'ไม่สำเร็จ!!! | มีบางอย่างผิดพลาด กรุณาแจ้งเจ้าหน้าที่.',
-                'ms' => $e->getMessage()
-            ];
-        }
+        //     }
+        // }
+        // catch (Exception $e)
+        // {
+        //     $response = [
+        //         'status' => 'error',
+        //         'message' => 'ไม่สำเร็จ!!! | มีบางอย่างผิดพลาด กรุณาแจ้งเจ้าหน้าที่.',
+        //         'ms' => $e->getMessage()
+        //     ];
+        // }
 
         return response()->json($response);
     }
@@ -1297,6 +1305,8 @@ class AgentManagementController extends Controller
     {
         $filezip = zip_open($request->file_rule_name);
 
+        // dd($filezip);
+
         $name_file = [];
         if ($filezip)
         {
@@ -1304,9 +1314,11 @@ class AgentManagementController extends Controller
             {
                 // Name: zip_entry_name($zip_entry)
 
+                // dd($zip_entry);
+
                 $chk_ext = explode('.', zip_entry_name($zip_entry));
 
-                if($chk_ext[1] == 'yar')
+                if(@$chk_ext[1] == 'yar')
                 {
                     $data = [];
                     $data['file_name'] = zip_entry_name($zip_entry);
@@ -1332,6 +1344,41 @@ class AgentManagementController extends Controller
         ];
 
         return response()->json($response);
+    }
+
+    public function add_new_category(Request $request)
+    {
+        // dd($request->all());
+
+        $check_category = TBLRuleCategory::where(['name' => $request->new_category_name])->first();
+
+        if(!$check_category)
+        {
+            $main_data = [];
+            $main_data['name'] = $request->new_category_name;
+            $main_data['status'] = 'Y';
+    
+            TBLRuleCategory::create($main_data);
+    
+            $select_category = TBLRuleCategory::where(['status' => 'Y'])->select('id', 'name')->get()->toArray();
+    
+            $response = [
+                'status' => 'success',
+                'message' => 'Add category success.',
+                'select_category' => $select_category
+            ];
+        }
+        else
+        {
+            $response = [
+                'status' => 'error',
+                'message' => 'This category already exists.'
+            ];
+        }
+
+
+        return response()->json($response);
+
     }
 
 }
