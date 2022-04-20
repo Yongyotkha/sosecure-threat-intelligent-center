@@ -2,57 +2,22 @@
     <div class="modal-content">
         <div class="modal-header bg-info">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Control Agent</h4>
+            <h4 class="modal-title">Manage Rules</h4>
         </div>
         {!! Form::open() !!}
         <div class="modal-body">
-            <div class="row mt-2">
-                <div class="col-lg-12">
-                    <button class="btn btn-info">
-                        คำสั่ง
-                    </button>
-                    <button class="btn btn-info">
-                        คำสั่ง
-                    </button>
-                    <button class="btn btn-info">
-                        คำสั่ง
-                    </button>
-                </div>
-            </div>
-
-            <div class="row mt-2">
-                <div class="col-lg-12">
-                    <label for="">
-                    CMD :
-                    </label>
-                    <textarea class="form-control" name="" id="" cols="30" rows="10">
-
-                    </textarea>
-                    <div class="text-center  mt-2">
-                        <button class="btn btn-info btn-block">Add</button>
-                    </div>
-                </div>
-            </div>
-            <br>
             <table class="table table-striped table-bordered">
                 <thead>
                     <tr>
-                        <th>Site</th>
-                        <th>Agent</th>
-                        <th>Mode</th>
-                        <th>Status</th>
-                        <th>Date</th>
+                        <th>Category Rule</th>
+                        <th>Rule Name</th>
+                        <th>Description</th>
+                        <th>Serverity</th>
+                        <th>Ignore</th>
+                        <th>Update Date</th>
+                        <th>Update By</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>MTSC</td>
-                        <td>192.10.1.1</td>
-                        <td>Scan</td>
-                        <td><span class="text-success">กำลังทำงาน</span></td>
-                        <td>04-20-2022</td>
-                    </tr>
-                </tbody>
             </table>
         </div>
         <div class="modal-footer">

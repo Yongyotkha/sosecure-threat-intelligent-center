@@ -2,10 +2,27 @@
     <div class="modal-content">
         <div class="modal-header bg-info">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Manage Rule</h4>
+            <h4 class="modal-title">Manage Rules</h4>
         </div>
         {!! Form::open() !!}
         <div class="modal-body">
+
+            <div class="form-group row">
+                <label class="col-lg-2 control-label">Extension<span class="text-danger">*</span> </label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" id="" name="">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-lg-2 control-label">Custom<span class="text-danger">*</span> </label>
+                <div class="col-lg-10">
+                    <select name="" id="scan_interval" class="select2-option form-control">
+                        <option value="1" disabled selected>Choose Select</option>
+                    </select>
+                </div>
+            </div>
+
             <table class="table table-striped table-bordered">
                 <thead>
                     <tr>
@@ -18,6 +35,24 @@
                         <th>Update By</th>
                     </tr>
                 </thead>
+                <tbody>
+                    <tr>
+                        <td>dall</td>
+                        <td>Rule Name 01</td>
+                        <td>
+                            Description
+                        </td>
+                        <td>Serverity</td>
+                        <td>
+                            <label>
+                                <input name="" value="1" id="-all" type="checkbox" class="">
+                                <span class="label-text"></span>
+                            </label>
+                        </td>
+                        <td>04-20-2022 15:22:00</td>
+                        <td>MTSC</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
         <div class="modal-footer">

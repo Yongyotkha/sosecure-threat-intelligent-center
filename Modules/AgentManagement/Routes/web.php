@@ -30,7 +30,7 @@ Route::group(
 		Route::get('/agent_delete_modal', 'AgentManagementController@agent_delete_modal')->name('agentmanagement.agent_delete_modal');
 		
 		Route::get('/agent_modal_control_agent', 'AgentManagementController@agent_modal_control_agent')->name('agentmanagement.agent_modal_control_agent');
-		Route::get('/agent_modal_manage_rule', 'AgentManagementController@agent_moda_manage_rule')->name('agentmanagement.agent_modal_manage_rule');
+		Route::get('/agent_modal_manage_rule', 'AgentManagementController@agent_modal_manage_rule')->name('agentmanagement.agent_modal_manage_rule');
 		
 		Route::post('/agent_delete', 'AgentManagementController@agent_delete')->name('agentmanagement.agent_delete');
 		
