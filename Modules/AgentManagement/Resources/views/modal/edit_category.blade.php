@@ -6,7 +6,7 @@
             <h4 class="modal-title text-white">
                 <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip"
                     title="Fullscreen" data-placement="right"></i>
-                Edit Category
+                Edit
             </h4>
         </div>
         <form id='form_edit_category' enctype="multipart/form-data">

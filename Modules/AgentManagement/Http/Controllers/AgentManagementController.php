@@ -927,6 +927,197 @@ class AgentManagementController extends Controller
 
     }
 
+    public function get_rule_site(Request $request)
+    {
+        // dd($request->all());
+
+        $site_id = $request->search_site;
+        $keyword_search = $request->keyword_search;
+
+        $data_site = DB::table('site')->where(['id' => $site_id])->first();
+
+        $site_rule = RuleNameSite::where(['site_id' => $site_id, 'deleted_at' => null])->pluck('rule_id')->toArray();
+
+        $site_name_rule = TBLRuleName::
+            leftjoin('rule_category', 'rule_name.rule_category_id', 'rule_category.id')
+            ->select(
+                'rule_name.*',
+                'rule_category.id as category_id',
+                'rule_category.name as category_name',
+            )
+            ->where(function ($master_rule) use ($keyword_search) {
+
+                if($keyword_search)
+                {
+                    // $master_rule->where(TBLRuleName::raw("(CONCAT(category_name,' - ',rule_name.rule_name))"), 'like','%'.$keyword_search.'%');
+                    $master_rule->where('rule_name.rule_name', 'like','%'.$keyword_search.'%')
+                        ->orwhere('rule_category.name', 'like','%'.$keyword_search.'%');
+                }
+
+            })
+            ->whereIn('rule_name.id', $site_rule)
+            ->where(['rule_name.deleted_at' => null])
+            ->get();
+        
+        $master_rule = TBLRuleName::
+            leftjoin('rule_category', 'rule_name.rule_category_id', 'rule_category.id')
+            ->select(
+                'rule_name.*',
+                'rule_category.id as category_id',
+                'rule_category.name as category_name',
+            )
+            ->where(function ($master_rule) use ($keyword_search) {
+
+                if($keyword_search)
+                {
+                    // $master_rule->where(TBLRuleName::raw("(CONCAT(category_name,' - ',rule_name.rule_name))"), 'like','%'.$keyword_search.'%');
+                    $master_rule->where('rule_name.rule_name', 'like','%'.$keyword_search.'%')
+                        ->orwhere('rule_category.name', 'like','%'.$keyword_search.'%');
+                }
+
+            })
+            ->whereNotIn('rule_name.id', $site_rule)
+            ->where(['rule_name.deleted_at' => null])
+            ->get();
+
+        $html = '';
+
+        foreach($site_name_rule as $name_rule)
+        {
+            $html .= '
+                <li class="item-list item--keyword" data-id="'. $name_rule->id .'">
+                    <div class="left-side-item">
+                        <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
+                        <span class="text-keyword">'. $name_rule->get_name_category->name .' - '. $name_rule->rule_name .'</span>
+                    </div>
+                    <div class="action-keyword">
+                        <a href="#" class="text-white delete_rule_site_master" data-delete_rule_site_master="'. $name_rule->id .'" data-mode_delete="site"><i class="fas fa-trash-alt"></i></a>
+                    </div>
+                </li>
+            ';
+            // <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
+        }
+
+        $html_master_rule = '';
+
+        foreach($master_rule as $mas_rule)
+        {
+            $html_master_rule .= '
+                <li class="item-list item--keyword" data-id="'. $mas_rule->id .'">
+                    <div class="left-side-item">
+                        <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
+                        <span class="text-keyword">'. $mas_rule->get_name_category->name .' - '. $mas_rule->rule_name .'</span>
+                    </div>
+                    <div class="action-keyword">
+                        <a href="#" class="text-white delete_rule_site_master" data-delete_rule_site_master="'. $name_rule->id .'" data-mode_delete="master"><i class="fas fa-trash-alt"></i></a>
+                    </div>
+                </li>
+            ';
+            // <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
+        }
+
+        $response = [
+            'data_site' => $data_site,
+            'html' => $html,
+            'html_master_rule' => $html_master_rule,
+            'site_name_rule' => $site_name_rule
+        ];
+
+        return response()->json($response);
+    }
+
+    public function check_insert_rule_process(Request $request)
+    {
+
+        // dd($request->all());
+
+        $message = '';
+        $status = 0;
+
+        $from_id = $request->from_id;
+        $to_id = $request->to_id;
+        $attributes_id = $request->attributes_id;
+        $code_site = $request->code_site;
+
+        $main_data = [];
+        $main_data['site_id'] = $code_site;
+        $main_data['rule_id'] = $attributes_id;
+        $main_data['create_by'] = Auth::user()->id;
+        $main_data['update_by'] = Auth::user()->id;
+
+        $site_rule = RuleNameSite::create($main_data);
+
+        // $site = SiteSettings::select('id')->where('code', $code_site)->first();
+
+        // if(($from_id) && ($to_id || $attributes_id)) 
+        // {
+        //     $select_order = Site_keywords::select('order')->orderBy('order','desc')->first();
+
+        //     if($from_id == 'keyword_main') 
+        //     {
+        //         $site_keywords_main = site_keywords_main::where('id',$attributes_id)->first();
+
+        //         $Site_keywords_check = Site_keywords::where('keywords_main_id',$attributes_id)->where('site_id',$site->id)->where('type','social')->first();
+        //         if($Site_keywords_check) 
+        //         {
+        //             $message = langapp('changes_saved_successful');
+        //             $status = 1;
+        //         } 
+        //         else 
+        //         {
+        //             $Site_keywords_insert = new Site_keywords;
+        //             $Site_keywords_insert->code = generator_uuid();
+        //             $Site_keywords_insert->keywords_main_id = $attributes_id;
+        //             $Site_keywords_insert->site_id = $site->id;
+        //             $Site_keywords_insert->name = $site_keywords_main->name;
+        //             $Site_keywords_insert->type = 'social';
+        //             $Site_keywords_insert->status = 1;
+        //             $Site_keywords_insert->created_by = Auth::user()->id;
+        //             $Site_keywords_insert->order = $select_order->order+1;
+        //             $Site_keywords_insert->save();
+
+        //             $message = langapp('changes_saved_successful');
+        //             $status = 1;
+        //         }
+        //     }
+        // }
+
+        // dd($message);
+
+        return ajaxResponse(
+            [
+                'data' => '',
+                'message' => 'Change save success',
+                'status' => 'success'
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function delete_rule_site(Request $request)
+    {
+        // dd($request->all());
+
+        $date_now = date('Y-m-d H:i:s');
+
+        if($request->delete_mode == 'master')
+        {
+            TBLRuleName::where(['id' => $request->delete_rule_id])->update(['deleted_at' => $date_now, 'deleted_by' => Auth::user()->id]);
+            RuleNameSite::where(['rule_id' => $request->delete_rule_id])->update(['deleted_at' => $date_now, 'deleted_by' => Auth::user()->id]);
+        }
+        else
+        {
+            RuleNameSite::where(['rule_id' => $request->delete_rule_id, 'site_id' => $request->delete_site])->update(['deleted_at' => $date_now, 'deleted_by' => Auth::user()->id]);
+        }
+
+        $response = [
+            'status' => 'success',
+            'message' => 'Delete rule success.'
+        ];
+
+        return response()->json($response);
+    }
 
     public function agent_rule(Request $request)
     {
@@ -1275,7 +1466,7 @@ class AgentManagementController extends Controller
     public function tbl_category_rule(Request $request)
     {
         $querys = TBLRuleCategory::
-            where(['deleted_at' => null])
+            where(['mode' => 'category', 'deleted_at' => null])
             ->orderBy('id', 'desc')
             ->get();
 
@@ -1324,15 +1515,70 @@ class AgentManagementController extends Controller
             ->make(true);
     }
 
+    public function tbl_extention_rule(Request $request)
+    {
+        $querys = TBLRuleCategory::
+            where(['mode' => 'extention', 'deleted_at' => null])
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return DataTables::of($querys)
+            ->addIndexColumn()
+            ->editColumn('test', function($querys){
+                return '';
+            })
+            ->editColumn('c_status', function($querys){
+                $html = '';
+
+                $html .= '
+                    <label class="switch">
+                        <input type="checkbox" id="extension_status_'.$querys->id.'" name="extension_status_'.$querys->id.'" 
+                ';
+
+                if($querys->status == 'Y')
+                {
+                    $html .= 'checked';
+                }
+
+                $html .=  ' value="1" onchange="update_status_category('.$querys->id.')">
+                        <span></span>
+                    </label>          
+                '; 
+
+                return $html;
+            })
+            ->editColumn('c_action', function($querys){
+                $html = '';
+
+                // <button type="button" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></button>
+                // <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></button> 
+
+                $html .= '
+                    <a href="'.route('agentmanagement.category_edit', ['id' => $querys->id]).'" class="btn btn-info btn-xs" data-toggle="ajaxModal">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="'.route('agentmanagement.modal_category_delete', ['id' => $querys->id]).'" class="btn btn-danger btn-xs" data-toggle="ajaxModal">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                '; 
+                                   
+
+                return $html;
+            })
+            ->rawColumns(['c_status', 'c_action'])
+            ->make(true);
+    }
+
     public function category_insert(Request $request)
     {
 
-        $check_category = TBLRuleCategory::where(['name' => $request->category_name])->first();
+        $check_category = TBLRuleCategory::where(['name' => $request->category_name, 'mode' => 'category', 'deleted_at' => null])->first();
 
         if(!$check_category)
         {
             $main_data = [];
             $main_data['name'] = $request->category_name;
+            $main_data['mode'] = 'category';
             $main_data['status'] = @$request->status ? 'Y' : 'N';
     
             TBLRuleCategory::create($main_data);
@@ -1761,12 +2007,13 @@ class AgentManagementController extends Controller
     {
         // dd($request->all());
 
-        $check_category = TBLRuleCategory::where(['name' => $request->new_category_name, 'deleted_at' => null])->first();
+        $check_category = TBLRuleCategory::where(['name' => $request->new_category_name, 'mode' => 'category', 'deleted_at' => null])->first();
 
         if(!$check_category)
         {
             $main_data = [];
             $main_data['name'] = $request->new_category_name;
+            $main_data['mode'] = 'category';
             $main_data['status'] = 'Y';
     
             TBLRuleCategory::create($main_data);
