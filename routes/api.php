@@ -154,6 +154,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('agentCenter/downloadRuleSite', 'Api\ApiAgentController@downloadRuleSite');
     Route::post('agentCenter/downloadRuleSiteComplete', 'Api\ApiAgentController@downloadRuleSiteComplete');
     Route::post('agentCenter/updateConfig', 'Api\ApiAgentController@updateConfig');
+    Route::post('agentCenter/getConfig', 'Api\ApiAgentController@getConfig');
 
     //asset
     Route::post('tranferAsset', 'Api\ApiTransferAssetController@tranferAsset');
