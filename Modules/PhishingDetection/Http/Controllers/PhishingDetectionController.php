@@ -106,7 +106,8 @@ class PhishingDetectionController extends Controller
             $html = '';
             $query = Sites::where('id', $collection->site_id)
                 ->first();
-      
+                
+            // dd($query);
             $html = $query->name;
             return $html;
         })
