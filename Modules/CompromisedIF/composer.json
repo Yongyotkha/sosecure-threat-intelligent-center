@@ -1,0 +1,25 @@
+{
+    "name": "nwidart/compromisedif",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\CompromisedIF\\Providers\\CompromisedIFServiceProvider"
+            ],
+            "aliases": {
+                
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\CompromisedIF\\": ""
+        }
+    }
+}
