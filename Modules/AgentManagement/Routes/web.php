@@ -37,9 +37,20 @@ Route::group(
 Route::group(
 	['middleware' => 'web'],
 	function () {
+		Route::get('/tbl_category_rule', 'AgentManagementController@tbl_category_rule')->name('agentmanagement.tbl_category_rule');
+		Route::post('/category_insert', 'AgentManagementController@category_insert')->name('agentmanagement.category_insert');
+		Route::get('/category_edit', 'AgentManagementController@category_edit')->name('agentmanagement.category_edit');
+		Route::post('/category_update', 'AgentManagementController@category_update')->name('agentmanagement.category_update');
+		Route::get('/modal_category_delete', 'AgentManagementController@modal_category_delete')->name('agentmanagement.modal_category_delete');
+		Route::post('/category_delete', 'AgentManagementController@category_delete')->name('agentmanagement.category_delete');
+		Route::post('/status_category_update', 'AgentManagementController@status_category_update')->name('agentmanagement.status_category_update');
+		Route::post('/status_rule_update', 'AgentManagementController@status_rule_update')->name('agentmanagement.status_rule_update');
+		Route::get('/get_select_category_rule', 'AgentManagementController@get_select_category_rule')->name('agentmanagement.get_select_category_rule');
 		Route::get('/agent_rule', 'AgentManagementController@agent_rule')->name('agentmanagement.agent_rule');
 		Route::get('/agent_rule_tbl_all_rule', 'AgentManagementController@agent_rule_tbl_all_rule')->name('agentmanagement.agent_rule_tbl_all_rule');
 		Route::post('/agent_rule_insert', 'AgentManagementController@agent_rule_insert')->name('agentmanagement.agent_rule_insert');
+		Route::get('/agent_rule_edit', 'AgentManagementController@agent_rule_edit')->name('agentmanagement.agent_rule_edit');
+		Route::post('/agent_rule_update', 'AgentManagementController@agent_rule_update')->name('agentmanagement.agent_rule_update');
 		Route::post('/agent_rule_get_zip', 'AgentManagementController@agent_rule_get_zip')->name('agentmanagement.agent_rule_get_zip');
 		Route::post('/add_new_category', 'AgentManagementController@add_new_category')->name('agentmanagement.add_new_category');
 	}

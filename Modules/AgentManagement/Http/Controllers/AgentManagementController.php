@@ -11,6 +11,7 @@ use DB;
 use File;
 use Validator;
 use ZipArchive;
+use Auth;
 use App\FXOSType;
 use App\FXSeverityType;
 use App\FXSiteAgents;
@@ -22,6 +23,7 @@ use App\YaraLog;
 use App\TBLRuleCategory;
 use App\TBLRuleFiles;
 use App\TBLRuleName;
+use App\RuleNameSite;
 use Modules\SiteSettings\Entities\Menu;
 use Modules\SiteSettings\Entities\Menu_sub;
 use Modules\SiteSettings\Entities\site_config_email_alert;
@@ -921,7 +923,10 @@ class AgentManagementController extends Controller
         $select_category = TBLRuleCategory::where(['status' => 'Y'])->select('id', 'name')->get()->toArray();
         $data['select_category'] = $select_category;
 
-        // dd($data['select_category']);
+        // dd($data['site_settings']);
+
+        $select_site = DB::table('site')->select('code', 'name')->pluck('name', 'code')->toArray();
+        $data['select_site'] = $select_site;
 
         return view('agentmanagement::rule')->with($data);
     }
@@ -1058,21 +1063,24 @@ class AgentManagementController extends Controller
     public function agent_rule_tbl_all_rule(Request $request)
     {
         $querys = TBLRuleCategory::
-            // where(['status' => 'Y'])
-            get();
+            where(['deleted_at' => null])
+            ->get();
 
         foreach($querys as $query)
         {
             $query_rule_name = TBLRuleName::
                 where([
                     'rule_category_id' => $query->id,
-                    'status' => 'Y'
+                    'deleted_at' => null
+                    // 'status' => 'Y'
                 ])
                 ->select(
+                    'id',
                     'file_name',
                     'rule_name',
                     'description',
-                    'severity'
+                    'severity',
+                    'status'
                 )
                 ->get();
 
@@ -1104,10 +1112,10 @@ class AgentManagementController extends Controller
                 $arr = [];
                 foreach ($querys->arr_rule_name as $arr_rule_name)
                 {
-                    $arr[] = $arr_rule_name->file_name ;
+                    $arr[] = '<div style="margin: 8px;">'. $arr_rule_name->file_name .'</div>';
                 }
 
-                return $arr ? implode(',<br>', $arr) : '-';
+                return $arr ? implode('', $arr) : '-';
             })
             ->editColumn('c_rule_name', function($querys){
                 $html = '';
@@ -1115,10 +1123,10 @@ class AgentManagementController extends Controller
                 $arr = [];
                 foreach ($querys->arr_rule_name as $arr_rule_name)
                 {
-                    $arr[] = $arr_rule_name->rule_name;
+                    $arr[] = '<div style="margin: 8px;">'.$arr_rule_name->rule_name.'</div>';
                 }
 
-                return $arr ? implode(',<br>', $arr) : '-';
+                return $arr ? implode('', $arr) : '-';
             })
             ->editColumn('c_description', function($querys){
                 $html = '';
@@ -1126,10 +1134,10 @@ class AgentManagementController extends Controller
                 $arr = [];
                 foreach ($querys->arr_rule_name as $arr_rule_name)
                 {
-                    $arr[] = $arr_rule_name->description ? $arr_rule_name->description : ' - ';
+                    $arr[] = '<div style="margin: 8px;">'. ( $arr_rule_name->description ? $arr_rule_name->description : ' - ' ) .'</div>';
                 }
 
-                return $arr ? implode(',<br>', $arr) : '-';
+                return $arr ? implode('', $arr) : '-';
             })
             ->editColumn('c_severity', function($querys){
                 $html = '';
@@ -1139,6 +1147,7 @@ class AgentManagementController extends Controller
                     foreach ($querys->arr_rule_name as $arr_rule_name)
                     {
                         // $arr[] = $arr_rule_name->severity;
+                        $html .= '<div style="margin: 8px;">';
                         
                         if(@$arr_rule_name->severity == 'Critical')
                         {
@@ -1164,8 +1173,10 @@ class AgentManagementController extends Controller
                         {
                             $html .= '<span class="badge"> No Severity </span>';
                         }
+
+                        $html .= '</div>';
     
-                        $html .= '<br>';
+                        // $html .= '<br>';
                     }
                 }
                 else
@@ -1178,9 +1189,89 @@ class AgentManagementController extends Controller
             ->editColumn('c_status', function($querys){
                 $html = '';
 
+                if(count(@$querys->arr_rule_name) > 0)
+                {
+                    foreach ($querys->arr_rule_name as $arr_rule_name)
+                    {
+                        // $arr[] = $arr_rule_name->severity;
+                        
+                        $html .= '
+                            <label class="switch">
+                                <input type="checkbox" id="status_rule_'.$arr_rule_name->id.'" name="status_rule_'.$arr_rule_name->id.'" 
+                        ';
+
+                        if(@$arr_rule_name->status == 'Y')
+                        {
+                            $html .= 'checked';
+                        }
+
+                        $html .=  ' value="1" onchange="update_status_rule('.$arr_rule_name->id.')">
+                                <span></span>
+                            </label>          
+                        '; 
+    
+                        $html .= '<br>';
+                    }
+                }
+                else
+                {
+                    $html = ' - ';
+                }
+                
+                // $html .= '
+                //     <label class="switch">
+                //         <input type="checkbox" id="status" name="status" 
+                // ';
+
+                // if($querys->status == 'Y')
+                // {
+                //     $html .= 'checked';
+                // }
+
+                // $html .=  ' value="1">
+                //         <span></span>
+                //     </label>          
+                // '; 
+
+                return $html;
+            })
+            ->editColumn('c_action', function($querys){
+                $html = '';
+
+                // <button type="button" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></button>
+                $html .= '
+                    <a href="'.route('agentmanagement.agent_rule_edit', ['id' => $querys->id]).'" class="btn btn-info btn-xs" data-toggle="ajaxModal">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="'.route('agentmanagement.modal_category_delete', ['id' => $querys->id]).'" class="btn btn-danger btn-xs" data-toggle="ajaxModal">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>               
+                '; 
+
+                return $html;
+            })
+            ->rawColumns(['c_checkbox', 'c_file_name', 'c_rule_name', 'c_description', 'c_severity', 'c_status', 'c_action'])
+            ->make(true);
+    }
+
+    public function tbl_category_rule(Request $request)
+    {
+        $querys = TBLRuleCategory::
+            where(['deleted_at' => null])
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return DataTables::of($querys)
+            ->addIndexColumn()
+            ->editColumn('test', function($querys){
+                return '';
+            })
+            ->editColumn('c_status', function($querys){
+                $html = '';
+
                 $html .= '
                     <label class="switch">
-                        <input type="checkbox" id="status" name="status" 
+                        <input type="checkbox" id="status_'.$querys->id.'" name="status_'.$querys->id.'" 
                 ';
 
                 if($querys->status == 'Y')
@@ -1188,7 +1279,7 @@ class AgentManagementController extends Controller
                     $html .= 'checked';
                 }
 
-                $html .=  ' value="1">
+                $html .=  ' value="1" onchange="update_status_category('.$querys->id.')">
                         <span></span>
                     </label>          
                 '; 
@@ -1198,47 +1289,173 @@ class AgentManagementController extends Controller
             ->editColumn('c_action', function($querys){
                 $html = '';
 
+                // <button type="button" class="btn btn-info btn-xs" onclick="edit_category('.$querys->id.')"><i class="fas fa-edit"></i></button>
                 $html .= '
-                    <button type="button" class="btn btn-info btn-xs"><i class="fas fa-edit"></i></button>
-                    <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></button>                
+                    <a href="'.route('agentmanagement.category_edit', ['id' => $querys->id]).'" class="btn btn-info btn-xs" data-toggle="ajaxModal">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="'.route('agentmanagement.modal_category_delete', ['id' => $querys->id]).'" class="btn btn-danger btn-xs" data-toggle="ajaxModal">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
                 '; 
+                    // <button type="button" class="btn btn-danger btn-xs"><i class="fas fa-trash-alt"></i></button>                
 
                 return $html;
             })
-            ->rawColumns(['c_checkbox', 'c_file_name', 'c_rule_name', 'c_description', 'c_severity', 'c_status', 'c_action'])
+            ->rawColumns(['c_status', 'c_action'])
             ->make(true);
+    }
+
+    public function category_insert(Request $request)
+    {
+
+        $check_category = TBLRuleCategory::where(['name' => $request->category_name])->first();
+
+        if(!$check_category)
+        {
+            $main_data = [];
+            $main_data['name'] = $request->category_name;
+            $main_data['status'] = @$request->status ? 'Y' : 'N';
+    
+            TBLRuleCategory::create($main_data);
+    
+            $response = [
+                'status' => 'success',
+                'message' => 'Add category success.'
+            ];
+        }
+        else
+        {
+            $response = [
+                'status' => 'error',
+                'message' => 'This category already exists.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function category_edit(Request $request)
+    {
+        $edit = true;
+
+        $query = TBLRuleCategory::where(['id' => $request->id])->first();
+
+        return view('agentmanagement::modal.edit_category')->with(compact('edit', 'query'));   
+    }
+
+    public function category_update(Request $request)
+    {
+        $main_data = [];
+        $main_data['name'] = $request->edit_category_name;
+        $main_data['status'] = @$request->status ? 'Y' : 'N';
+
+        TBLRuleCategory::where(['id' => $request->hd_id])->update($main_data);
+
+        $response = [
+            'status' => 'success',
+            'message' => 'Update category success.'
+        ];
+
+        return response()->json($response);
+    }
+
+    public function modal_category_delete(Request $request)
+    {
+        $query = TBLRuleCategory::where(['id' => $request->id])->first();
+
+        return view('agentmanagement::modal.delete_category')->with(compact('query'));   
+    }
+
+    public function category_delete(Request $request)
+    {
+        $id = $request->hd_delete_id;
+
+        $date_now = date('Y-m-d H:i:s');
+
+        TBLRuleCategory::where(['id' => $id])->update(['deleted_at' => $date_now, 'deleted_by' => Auth::user()->id]);
+
+        $arr_rule_id = TBLRuleName::where(['rule_category_id' => $id])->pluck('id')->toArray();
+
+        // dd($arr_rule_id);
+
+        TBLRuleName::where(['rule_category_id' => $id])->update(['deleted_at' => $date_now, 'deleted_by' => Auth::user()->id]);
+        TBLRuleFiles::where(['rule_category_id' => $id])->update(['deleted_at' => $date_now, 'deleted_by' => Auth::user()->id]);
+        RuleNameSite::whereIn('rule_id', $arr_rule_id)->update(['deleted_at' => $date_now, 'deleted_by' => Auth::user()->id]);
+
+        $response = [
+            'status' => 'success',
+            'message' => 'Delete category success.'
+        ];
+
+        return response()->json($response);
+    }
+
+    public function status_category_update(Request $request)
+    {
+        TBLRuleCategory::where(['id' => $request->id])->update(['status' => $request->chk_status == 1 ? 'Y' : 'N']);
+
+        $response = [
+            'status' => 'success',
+            'message' => 'Update status success.'
+        ];
+
+        return response()->json($response);
+    }
+
+    public function status_rule_update(Request $request)
+    {
+        TBLRuleName::where(['id' => $request->id])->update(['status' => $request->chk_status == 1 ? 'Y' : 'N']);
+
+        $response = [
+            'status' => 'success',
+            'message' => 'Update status success.'
+        ];
+
+        return response()->json($response);
+    }
+
+    public function get_select_category_rule(Request $request)
+    {
+        $select_category = TBLRuleCategory::where(['status' => 'Y', 'deleted_at' => null])->select('id', 'name')->get()->toArray();
+
+        $response = [
+            'select_category' => $select_category
+        ];
+
+        return response()->json($response);
     }
 
     public function agent_rule_insert(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
 
-        // try
-        // {
-        //     $message = [
-        //         'name.required' => 'Catagory name is required.',
-        //         'file_rule_name.required' => 'File rule is required.',
-        //         'detail.required' => 'File is not data'
-        //     ];
+        try
+        {
+            $message = [
+                'name.required' => 'Catagory name is required.',
+                'file_rule_name.required' => 'File rule is required.',
+                'detail.required' => 'File is not data'
+            ];
 
-        //     $validate = Validator::make($request->all(), [
-        //         'name' => 'required',
-        //         'file_rule_name' => 'required',
-        //         'detail' => 'required'
-        //     ], $message);
+            $validate = Validator::make($request->all(), [
+                'name' => 'required',
+                'file_rule_name' => 'required',
+                'detail' => 'required'
+            ], $message);
 
-        //     if($validate->fails())
-        //     {
-        //         $validate = $validate->getMessageBag()->toArray();
+            if($validate->fails())
+            {
+                $validate = $validate->getMessageBag()->toArray();
 
-        //         return response()->json([
-        //             'status' => '422',
-        //             'errors' => $validate,
-        //             'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน.'
-        //         ]);
-        //     }
-        //     else
-        //     {
+                return response()->json([
+                    'status' => '422',
+                    'errors' => $validate,
+                    'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน.'
+                ]);
+            }
+            else
+            {
             
                 // $category_data = [];
                 // $category_data['name'] = @$request->name;
@@ -1261,6 +1478,7 @@ class AgentManagementController extends Controller
 
                     $rule_file_data = [];
         
+                    $rule_file_data['rule_category_id'] = @$request->name;
                     $rule_file_data['path'] = $path_save.$fileFinalName;
                     $rule_file_data['rule_name'] = $fileFinalName_explode[0];
                     $rule_file_data['version'] = '0';
@@ -1268,35 +1486,198 @@ class AgentManagementController extends Controller
         
                     $id_file = TBLRuleFiles::create($rule_file_data)->id;
 
-                    if(@$request->detail)
-                    {
-                        foreach($request->detail as $detail)
-                        {
-                            $detail_rule_name = $detail;
-                            // $detail_rule_name['rule_category_id'] = @$id_catagory;
-                            $detail_rule_name['rule_category_id'] = @$request->name;
-                            $detail_rule_name['rule_file_id'] = @$id_file;
-                            $detail_rule_name['status'] = $category_data['status'];
+                    // if(@$request->detail)
+                    // {
+                    //     foreach($request->detail as $detail)
+                    //     {
+                    //         $detail_rule_name = $detail;
+                    //         // $detail_rule_name['rule_category_id'] = @$id_catagory;
+                    //         $detail_rule_name['rule_category_id'] = @$request->name;
+                    //         $detail_rule_name['rule_file_id'] = @$id_file;
+                    //         $detail_rule_name['status'] = @$request->status ? ( $request->status == 1 ? 'Y' : 'N' ) : '';
         
-                            $id_rule = TBLRuleName::create($detail_rule_name)->id;
+                    //         $id_rule = TBLRuleName::create($detail_rule_name)->id;
+
+                    //         $detail_rule_site = [];
+                    //         $detail_rule_site['site_id'] = Auth::user()->site_id;
+                    //         $detail_rule_site['rule_id'] = $id_rule;
+                    //         $detail_rule_site['create_by'] = Auth::user()->id;
+                    //         $detail_rule_site['update_by'] = Auth::user()->id;
+
+                    //         RuleNameSite::create($detail_rule_site);
+                    //     }
+                    // }
+
+                    if(in_array('all', $request->site))
+                    {
+                        $arr_site = DB::table('site')->select('id')->get();
+
+                        if(@$request->detail)
+                        {
+                            foreach($request->detail as $detail)
+                            {
+                                $detail_rule_name = $detail;
+                                // $detail_rule_name['rule_category_id'] = @$id_catagory;
+                                $detail_rule_name['rule_category_id'] = @$request->name;
+                                $detail_rule_name['rule_file_id'] = @$id_file;
+                                $detail_rule_name['status'] = @$request->status ? ( $request->status == 1 ? 'Y' : 'N' ) : '';
+            
+                                $id_rule = TBLRuleName::create($detail_rule_name)->id;
+    
+                                foreach($arr_site as $site)
+                                {
+                                    $detail_rule_site = [];
+                                    $detail_rule_site['site_id'] = $site->id;
+                                    $detail_rule_site['rule_id'] = $id_rule;
+                                    $detail_rule_site['create_by'] = Auth::user()->id;
+                                    $detail_rule_site['update_by'] = Auth::user()->id;
+        
+                                    RuleNameSite::create($detail_rule_site);
+                                }
+                            }
                         }
                     }
+                    else if(!in_array('all', $request->site) && count($request->site) > 0)
+                    {
+                        if(@$request->detail)
+                        {
+                            foreach($request->detail as $detail)
+                            {
+                                $detail_rule_name = $detail;
+                                // $detail_rule_name['rule_category_id'] = @$id_catagory;
+                                $detail_rule_name['rule_category_id'] = @$request->name;
+                                $detail_rule_name['rule_file_id'] = @$id_file;
+                                $detail_rule_name['status'] = @$request->status ? ( $request->status == 1 ? 'Y' : 'N' ) : '';
+            
+                                $id_rule = TBLRuleName::create($detail_rule_name)->id;
+    
+                                foreach($request->site as $site)
+                                {
+                                    $id_site = DB::table('site')->where(['code' => $site])->first()->id;
+
+                                    $detail_rule_site = [];
+                                    $detail_rule_site['site_id'] = $id_site;
+                                    $detail_rule_site['rule_id'] = $id_rule;
+                                    $detail_rule_site['create_by'] = Auth::user()->id;
+                                    $detail_rule_site['update_by'] = Auth::user()->id;
+        
+                                    RuleNameSite::create($detail_rule_site);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(@$request->detail)
+                        {
+                            foreach($request->detail as $detail)
+                            {
+                                $detail_rule_name = $detail;
+                                // $detail_rule_name['rule_category_id'] = @$id_catagory;
+                                $detail_rule_name['rule_category_id'] = @$request->name;
+                                $detail_rule_name['rule_file_id'] = @$id_file;
+                                $detail_rule_name['status'] = @$request->status ? ( $request->status == 1 ? 'Y' : 'N' ) : '';
+                                $detail_rule_name['create_by'] = Auth::user()->id;
+                                $detail_rule_name['update_by'] = Auth::user()->id;
+            
+                                $id_rule = TBLRuleName::create($detail_rule_name)->id;
+    
+                                $detail_rule_site = [];
+                                $detail_rule_site['site_id'] = '';
+                                $detail_rule_site['rule_id'] = $id_rule;
+                                $detail_rule_site['create_by'] = Auth::user()->id;
+                                $detail_rule_site['update_by'] = Auth::user()->id;
+    
+                                RuleNameSite::create($detail_rule_site);
+                            }
+                        }
+                    }
+
                 }
 
                 $response = [
                     'status' => 'success',
                     'message' => 'Success!! | '
                 ];
-        //     }
-        // }
-        // catch (Exception $e)
-        // {
-        //     $response = [
-        //         'status' => 'error',
-        //         'message' => 'ไม่สำเร็จ!!! | มีบางอย่างผิดพลาด กรุณาแจ้งเจ้าหน้าที่.',
-        //         'ms' => $e->getMessage()
-        //     ];
-        // }
+            }
+        }
+        catch (Exception $e)
+        {
+            $response = [
+                'status' => 'error',
+                'message' => 'ไม่สำเร็จ!!! | มีบางอย่างผิดพลาด กรุณาแจ้งเจ้าหน้าที่.',
+                'ms' => $e->getMessage()
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function agent_rule_edit(Request $request)
+    {
+        $edit = true;
+
+        $query = TBLRuleCategory::where(['id' => $request->id])->first();
+
+        $query_rule = TBLRuleName::where(['rule_category_id' => $query->id, 'deleted_at' => null])->get();
+
+        $query_site = DB::table('site')->select('code', 'name')->pluck('name', 'code')->toArray();
+
+        return view('agentmanagement::modal.edit_rule')->with(compact('edit', 'query', 'query_rule', 'query_site'));   
+    }
+
+    public function agent_rule_update(Request $request)
+    {
+        foreach($request->detail as $detail)
+        {
+
+            // dd($detail);
+
+            $main_data = [];
+            $main_data['description'] = $detail['description'];
+            $main_data['severity'] = $detail['severity'];
+            $main_data['updated_by'] = Auth::user()->id;
+
+            TBLRuleName::where(['id' => $detail['id']])->update($main_data);
+        }
+
+        TBLRuleName::where(['id' => $request->hd_id])->update(['status' => $request->status == 1 ? 'Y' : 'N']);
+
+        $response = [
+            'status' => 'success',
+            'message' => 'Update rule success.'
+        ];
+
+        return response()->json($response);
+    }
+
+    public function modal_agent_rule_delete(Request $request)
+    {
+        $query = TBLRuleCategory::where(['id' => $request->id])->first();
+
+        return view('agentmanagement::modal.delete_rule')->with(compact('query'));   
+    }
+
+    public function agent_rule_delete(Request $request)
+    {
+        $id = $request->hd_delete_id;
+
+        $date_now = date('Y-m-d H:i:s');
+
+        TBLRuleCategory::where(['id' => $id])->update(['deleted_at' => $date_now, 'deleted_by' => Auth::user()->id]);
+
+        $arr_rule_id = TBLRuleName::where(['rule_category_id' => $id])->pluck('id')->toArray();
+
+        // dd($arr_rule_id);
+
+        TBLRuleName::where(['rule_category_id' => $id])->update(['deleted_at' => $date_now, 'deleted_by' => Auth::user()->id]);
+        TBLRuleFiles::where(['rule_category_id' => $id])->update(['deleted_at' => $date_now, 'deleted_by' => Auth::user()->id]);
+        RuleNameSite::whereIn('rule_id', $arr_rule_id)->update(['deleted_at' => $date_now, 'deleted_by' => Auth::user()->id]);
+
+        $response = [
+            'status' => 'success',
+            'message' => 'Delete category success.'
+        ];
 
         return response()->json($response);
     }
@@ -1324,6 +1705,18 @@ class AgentManagementController extends Controller
                     $data['file_name'] = zip_entry_name($zip_entry);
                     $data['rule_name'] = $chk_ext[0];
 
+                    // $chk_rule = TBLRuleName::where(['rule_category_id' => $request->name, 'rule_name' => $chk_ext[0]])->get();
+                    $chk_rule = TBLRuleName::where(['rule_name' => $chk_ext[0], 'deleted_at' => null])->get();
+
+                    if(count($chk_rule) > 0)
+                    {
+                        $data['status'] = 1;
+                    }
+                    else
+                    {
+                        $data['status'] = 0;
+                    }
+
                     $name_file[] = $data;
                 }
 
@@ -1350,7 +1743,7 @@ class AgentManagementController extends Controller
     {
         // dd($request->all());
 
-        $check_category = TBLRuleCategory::where(['name' => $request->new_category_name])->first();
+        $check_category = TBLRuleCategory::where(['name' => $request->new_category_name, 'deleted_at' => null])->first();
 
         if(!$check_category)
         {
@@ -1360,7 +1753,7 @@ class AgentManagementController extends Controller
     
             TBLRuleCategory::create($main_data);
     
-            $select_category = TBLRuleCategory::where(['status' => 'Y'])->select('id', 'name')->get()->toArray();
+            $select_category = TBLRuleCategory::where(['status' => 'Y', 'deleted_at' => null])->select('id', 'name')->get()->toArray();
     
             $response = [
                 'status' => 'success',

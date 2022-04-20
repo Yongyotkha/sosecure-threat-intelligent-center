@@ -16,10 +16,15 @@
                 
                     <button id="add_rule" data-toggle="modal" data-target="#add_rule_modal"
                         class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                        <span data-rel="tooltip" title="Add" data-placement="top">@icon('solid/plus')<span class="hide-text">Add</span></span>
+                        <span data-rel="tooltip" title="Add Rule" data-placement="top">@icon('solid/plus')<span class="hide-text">Add Rule</span></span>
+                    </button>
+
+                    <button id="add_category" data-toggle="modal" data-target="#add_category_modal"
+                        class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                        <span data-rel="tooltip" title="Add Category" data-placement="top">@icon('solid/plus')<span class="hide-text">Add Category</span></span>
                     </button>
                     
-                    <button type="button" id="btn_del_select" class="btn btn-sm btn-danger"
+                    {{-- <button type="button" id="btn_del_select" class="btn btn-sm btn-danger"
                     value="bulk-delete" disabled>
                     <span data-rel="tooltip" title="Delete" data-placement="top">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
                     </button>
@@ -27,7 +32,7 @@
                     <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }}"
                         data-toggle="modal" data-target="#change_status" disabled>
                         <span data-rel="tooltip" title="Change Status" data-placement="bottom"><i class="fas fa-exchange-alt"></i><span class="hide-text">Change Status</span></span>
-                    </button>
+                    </button> --}}
      
 
                 </div>     
@@ -62,6 +67,7 @@
                         <ul class="nav nav-tabs nav-tabs-highlight">
                             <li class="active"><a href="#tab_rule_site" data-toggle="tab" id="tab_rule_site_click">Rule Site</a></li>
                             <li><a href="#tab_agent" data-toggle="tab" id="tab_agent_click">All Rule</a></li>   
+                            <li><a href="#tab_category" data-toggle="tab" id="tab_category_click">Category</a></li>   
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane active" id="tab_rule_site">
@@ -271,6 +277,36 @@
                                 </section>
                             </div>
 
+                            <div class="tab-pane" id="tab_category">
+                                <section class="panel panel-default">
+                                    <header class="panel-heading font-bold panel-header-blue">
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <i class="fas fa-table"></i> Table Category
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <div class="panel-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped" id="table-category-rule" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No.</th>
+                                                        <th>Name</th>
+                                                        <th>Update</th>
+                                                        <th>Status</th>
+                                                        <th class="text-center">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>                                                  
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -281,161 +317,243 @@
 
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
+    <div class="modal in fixed-left" id="add_category_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
 
-    <div class="modal in fixed-left" id="add_rule_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-aside" role="document">
-        <div class="modal-content">
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip"
+                            title="Fullscreen" data-placement="right"></i>
+                        Add Category
+                    </h4>
+                </div>
+                <form id='form_add_category' enctype="multipart/form-data">
+                    <div class="modal-body">
 
-            <div class="modal-header bg-blue">
-                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title text-white">
-                    <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip"
-                        title="Fullscreen" data-placement="right"></i>
-                    Add Rule
-                </h4>
-            </div>
-            <form id='form_add_rule' enctype="multipart/form-data">
-                <div class="modal-body">
-
-
-                    <div class="form-group row">
-                        <label style="padding-top: 7px" class="col-lg-3 control-label">
-                            Rule Category <span class="text-danger">*</span>
-                        </label>
-                        <div class="col-lg-9">
-                            <div class="row">
-                                <div class="form-group">
-                                    <div class="col-lg-8 mb-1">
-                                        {{-- <input type="text" name="name" id="name" class="form-control"> --}}
-                                        <select name="name" id="name" class="form-control check_test_select">
-                                            <option value="">Choose an Category</option>
-                                            @foreach ($select_category as $category)
-                                            <option value="{{$category['id']}}">{{$category['name']}}</option>
-                                            @endforeach
-                                        </select>
-                                        <span id="error_name" style="color:red;"></span>
-                                    </div>
-                                    <div class="col-lg-4 mb-1">
-                                        <button type="button" data-toggle="collapse" href="#demo" class="btn btn-{{ get_option('theme_color')  }} add-assets-new">
-                                            <i class="fas fa-plus"></i>
-                                            &nbsp; Add New
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-
-                            <div id="demo" class="collapse box">
-
-                                <fieldset class="collapsible">
-                
-                                    <legend>Add Category</legend>
-                                    <div class="form-group row">
-                                        <label style="padding-top: 7px" class="col-lg-3 control-label">Name <span
-                                                class="text-danger">*</span> </label>
-                                        <div class="col-lg-8">
-                                            <input type="text" name="name_new" id="name_new" class="form-control check_test">
-                                            <span style="color:red;" id="check_name_new" class="d-none"><small>Please enter your name category</small></span>
+                        <div class="form-group row">
+                            <label style="padding-top: 7px" class="col-lg-3 control-label">
+                                Name <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-lg-9">
+                                <div class="row">
+                                    <div class="form-group">
+                                        <div class="col-lg-8 mb-1">
+                                            <input type="text" name="category_name" id="category_name" class="form-control">
+                                            <span style="color:red;" id="error_category_name" class="d-none"><small>Please enter your name category</small></span>
                                         </div>
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" id="close_add_category" class="btn btn-danger btn-rounded" data-toggle="collapse"
-                                            data-target="#demo">
-                                            <i class="fas fa-times"></i>
-                                            Close
-                                        </button>
-                                        <button type="button" onclick="add_new_category()" class="btn btn-info btn-rounded">
-                                            <i class="fas fa-paper-plane"></i>
-                                            Save
-                                        </button>
-                                    </div>
-                                    <hr>
-                
-                                </fieldset>
-                
-                            </div>
-
-                        </div>
-                        <div class="col-lg-3">
-                        </div>
-                        <div class="col-lg-9">
-                            <div class="row">
-                                <div class="col-lg-12 mb-1">
-                                    <input type="file" name="file_rule_name" id="file_rule_name" class="form-control" accept="zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed">
-                                    <span id="error_file" style="color:red;"></span>
-                                </div>
-                                <div class="col-lg-12">
-                                    <span style="color:red;">รองรับเฉพาะไฟล์ .zip เท่านั้น</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="div_rule" class="form-group row">
-                        <label style="padding-top: 7px" class="col-lg-3 control-label">
-                            Rule  <span class="text-danger">*</span>
-                        </label>
-                        <div class="col-lg-9">
 
-                            <table id="rule_item" class="table mb-0">
-                                <tbody>
-                                    <tr id="tr_no_data">
-                                        <td class="text-center">
-                                            <span> Select file for data.. </span>
-                                        </td>
-                                    </tr>
-                                    {{-- <tr>
-                                        <td style="width: 33.33%">
-                                            <select class="select-2--rule form-control" id="">
-                                                <option value=""></option>
-                                            </select>
-                                        </td>
-                                        <td  style="width: 33.33%">
-                                            <input type="text" id="" class="form-control">
-                                        </td>
-                                        <td  style="width: 33.33%">
-                                            <select class="select-2--rule form-control" id="">
-                                                <option value=""></option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr> --}}
-                                </tbody>
-                            </table>
-                            <span id="error_detail" style="color:red;"></span>
-                            {{-- <button type="button" class="btn btn-sm btn-info btn-block" onclick="add_rule();">Add</button> --}}
+                        <div class="form-group row" style="padding-top: 7px">
+                            <label class="col-lg-3 control-label">Status </label>
+                            <div class="col-lg-8">
+                                <label class="switch">
+                                    <input type="checkbox" id="status" name="status" checked value="1">
+                                    <span></span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
-
-                    <div class="form-group row" style="padding-top: 7px">
-                        <label class="col-lg-3 control-label">Status </label>
-                        <div class="col-lg-8">
-                            <label class="switch">
-                                <input type="checkbox" id="status" name="status" checked value="1">
-                                <span></span>
-                            </label>
-                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                            <i class="fas fa-times"></i>
+                            Close
+                        </button>
+                        <button type="button" value="Submit" required class="btn btn-info btn-rounded" id="btn_save_category">
+                            <i class="fas fa-paper-plane"></i>
+                            Save
+                        </button>
                     </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
-                        <i class="fas fa-times"></i>
-                        Close
-                    </button>
-                    <button type="button" value="Submit" required class="btn btn-info btn-rounded" id="btn_save_rule">
-                        <i class="fas fa-paper-plane"></i>
-                        Save
-                    </button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+
+    <div class="modal in fixed-left" id="add_rule_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip"
+                            title="Fullscreen" data-placement="right"></i>
+                        Add Rule
+                    </h4>
+                </div>
+                <form id='form_add_rule' enctype="multipart/form-data">
+                    <div class="modal-body">
+
+
+                        <div class="form-group row">
+                            <label style="padding-top: 7px" class="col-lg-3 control-label">
+                                Rule Category <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-lg-9">
+                                <div class="row">
+                                    <div class="form-group">
+                                        <div class="col-lg-8 mb-1">
+                                            {{-- <input type="text" name="name" id="name" class="form-control"> --}}
+                                            <select name="name" id="name" class="form-control check_test_select">
+                                                <option value="">Choose an Category</option>
+                                                {{-- @foreach ($select_category as $category)
+                                                <option value="{{$category['id']}}">{{$category['name']}}</option>
+                                                @endforeach --}}
+                                            </select>
+                                            <span id="error_name" style="color:red;"></span>
+                                        </div>
+                                        <div class="col-lg-4 mb-1">
+                                            <button type="button" data-toggle="collapse" href="#demo" class="btn btn-{{ get_option('theme_color')  }} add-assets-new">
+                                                <i class="fas fa-plus"></i>
+                                                &nbsp; Add New
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+
+                                <div id="demo" class="collapse box">
+
+                                    <fieldset class="collapsible">
+                    
+                                        <legend>Add Category</legend>
+                                        <div class="form-group row">
+                                            <label style="padding-top: 7px" class="col-lg-3 control-label">Name <span
+                                                    class="text-danger">*</span> </label>
+                                            <div class="col-lg-8">
+                                                <input type="text" name="name_new" id="name_new" class="form-control check_test">
+                                                <span style="color:red;" id="check_name_new" class="d-none"><small>Please enter your name category</small></span>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" id="close_add_category" class="btn btn-danger btn-rounded" data-toggle="collapse"
+                                                data-target="#demo">
+                                                <i class="fas fa-times"></i>
+                                                Close
+                                            </button>
+                                            <button type="button" onclick="add_new_category()" class="btn btn-info btn-rounded">
+                                                <i class="fas fa-paper-plane"></i>
+                                                Save
+                                            </button>
+                                        </div>
+                                        <hr>
+                    
+                                    </fieldset>
+                    
+                                </div>
+
+                            </div>
+                            <div class="col-lg-3">
+                            </div>
+                            <div class="col-lg-9">
+                                <div class="row">
+                                    <div class="col-lg-12 mb-1">
+                                        <input type="file" name="file_rule_name" id="file_rule_name" class="form-control" accept="zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed">
+                                        <span id="error_file" style="color:red;"></span>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <span style="color:red;">รองรับเฉพาะไฟล์ .zip เท่านั้น</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="div_rule" class="form-group row">
+                            <label style="padding-top: 7px" class="col-lg-3 control-label">
+                                Rule  <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-lg-9">
+
+                                <table id="rule_item" class="table mb-0">
+                                    <tbody>
+                                        <tr id="tr_no_data">
+                                            <td class="text-center">
+                                                <span> Select file for data.. </span>
+                                            </td>
+                                        </tr>
+                                        {{-- <tr>
+                                            <td style="width: 33.33%">
+                                                <select class="select-2--rule form-control" id="">
+                                                    <option value=""></option>
+                                                </select>
+                                            </td>
+                                            <td  style="width: 33.33%">
+                                                <input type="text" id="" class="form-control">
+                                            </td>
+                                            <td  style="width: 33.33%">
+                                                <select class="select-2--rule form-control" id="">
+                                                    <option value=""></option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr> --}}
+                                    </tbody>
+                                </table>
+                                <span id="error_detail" style="color:red;"></span>
+                                {{-- <button type="button" class="btn btn-sm btn-info btn-block" onclick="add_rule();">Add</button> --}}
+                            </div>
+                        </div>
+
+                        <div class="form-group row" style="padding-top: 7px">
+                            <label class="col-lg-3 control-label">Site </label>
+                            <div class="col-lg-8">
+                                <span class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="site[]" value="all">
+                                        <span class="label-text" data-rel="tooltip" title="" data-original-title="">
+                                            All Site
+                                        </span>
+                                    </label>
+                                </span>
+                                @foreach ($select_site as $key => $name)
+                                {{-- <label>
+                                    <input type="checkbox" id="site_{{@$key}}" name="site[]" value="{{@$key}}">
+                                    <span>{{@$name}}</span>
+                                </label> --}}
+                                <span class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="site[]" value="{{@$key}}">
+                                        <span class="label-text" data-rel="tooltip" title="" data-original-title="">
+                                            {{@$name}}
+                                        </span>
+                                    </label>
+                                </span>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="form-group row" style="padding-top: 7px">
+                            <label class="col-lg-3 control-label">Status </label>
+                            <div class="col-lg-8">
+                                <label class="switch">
+                                    <input type="checkbox" id="status" name="status" checked value="1">
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                            <i class="fas fa-times"></i>
+                            Close
+                        </button>
+                        <button type="button" value="Submit" required class="btn btn-info btn-rounded" id="btn_save_rule">
+                            <i class="fas fa-paper-plane"></i>
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 </section>
 
@@ -455,6 +573,7 @@
 @push('pagescript')
 @include('stacks.js.datatables')
 @include('stacks.js.form')
+@include('stacks.js.fullscreen')
 @include('stacks.js.datepicker')
 @include('scripts.summernote')
 @include('stacks.js.markdown')
@@ -492,6 +611,23 @@
         ]
     });
 
+    tbl_category_rule = $('#table-category-rule').DataTable({
+        ajax:{
+            url: "{{ route('agentmanagement.tbl_category_rule') }}",
+            type: "get",
+            data: function(d) {
+
+            },
+        },
+        columns:[
+            { data: 'DT_Row_Index' },
+            { data: 'name' },
+            { data: 'updated_at' },
+            { data: 'c_status' },
+            { data: 'c_action' }
+        ]
+    });
+
     $('#add_rule_modal').on('hidden.bs.modal', function () {
         $('#form_add_rule')[0].reset();
 
@@ -506,7 +642,7 @@
 
         let html_reset_tbl_rule = 
         `
-        <tr>
+        <tr id="tr_no_data">
             <td class="text-center">
                 <span> Select file for data.. </span>
             </td>
@@ -517,6 +653,128 @@
         $('#rule_item tbody').append(html_reset_tbl_rule);
 
     });
+
+    $('#add_rule_modal').on('show.bs.modal', function () {
+
+        $('#demo').hide();
+
+        $.ajax({
+            url: "{{ route('agentmanagement.get_select_category_rule') }}",
+            type: "get",
+            data: {
+
+            },
+            success:function(response)
+            {
+                let html = `
+                    <option value="">Choose an Category</option>
+                `;
+
+                const select_category = response.select_category;
+                for(let i in select_category)
+                {
+                    html += `
+                        <option value="${select_category[i].id}">${select_category[i].name}</option>
+                    `;
+                }
+
+                $('#name').empty().append(html);
+            }
+        });
+
+    });
+
+    function update_status_rule(id)
+    {
+        let chk_status = $("#status_rule_" + id).is(":checked") ? 1 : 0;
+
+        $.ajax({
+            url: "{{ route('agentmanagement.status_rule_update') }}",
+            type: "POST",
+            data: {
+                id:id,
+                chk_status:chk_status,
+            },
+            success:function(response)
+            {
+                toastr.success(response.message);
+            }
+        });
+    }
+
+    $('#btn_save_category').click(function(e){
+        e.preventDefault();
+
+        let category_name = $('#category_name').val();
+
+        if(category_name)
+        {
+            var formData = new FormData(document.getElementById("form_add_category"));
+
+            $('#btn_save_category').html('Processing.. <i class="fas fa-spin fa-spinner"></i>');
+            $('#btn_save_category').attr('disabled', true);
+
+            $.ajax({
+                url: "{{ route('agentmanagement.category_insert') }}",
+                type: 'post',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforesend: function(){
+                    
+                },
+                success:function(response){
+
+                    if(response.status == 'success')
+                    {
+                        toastr.success(response.message);
+
+                        $('#btn_save_category').html('Success');
+
+                        tbl_category_rule.ajax.reload();
+                        tbl_all_rule.ajax.reload();
+
+                        setTimeout(function(){
+                            {{-- window.location.href = response.route; --}}
+                        }, 3000);
+                    }
+                    else
+                    {
+                        $('#btn_save_category').html('Try again');
+                        $('#btn_save_category').attr('disabled', false);
+
+                        toastr.error(response.message);
+                    }
+
+                }
+            });
+        }
+        else
+        {
+            input_check_err('#category_name', '#error_category_name')
+        }
+
+        
+    });
+
+    function update_status_category(id)
+    {
+        let chk_status = $("#status_" + id).is(":checked") ? 1 : 0;
+
+        $.ajax({
+            url: "{{ route('agentmanagement.status_category_update') }}",
+            type: "POST",
+            data: {
+                id:id,
+                chk_status:chk_status,
+            },
+            success:function(response)
+            {
+                toastr.success(response.message);
+            }
+        });
+    }
 
     $('#btn_save_rule').click(function(e){
         e.preventDefault();
@@ -622,6 +880,18 @@
                             <td style="width: 25%">
                                 <input type="text" id="detail_${i}_file_name" name="detail[${i}][file_name]" value="${name_file_arr.file_name}" class="form-control" readonly>
                                 <input type="hidden" id="detail_${i}_rule_name" name="detail[${i}][rule_name]" value="${name_file_arr.rule_name}">
+                        `;
+
+                        if(name_file_arr.status == 1)
+                        {
+                            html += 
+                            `
+                                <span style="color:red;">มีข้อมูลในฐานข้อมูลแล้ว</span>
+                            `;
+                        }
+
+                        html += 
+                        `
                             </td>
                             <td style="width: 25%">
                                 <input type="text" id="detail_${i}_description" name="detail[${i}][description]" class="form-control">
@@ -837,6 +1107,9 @@
                         $('#name_new').val('');
                         $('#check_name_new').addClass('d-none');
                         $('#close_add_category').trigger('click');
+
+                        tbl_category_rule.ajax.reload();
+                        tbl_all_rule.ajax.reload();
 
                     }
                     else if(response.status == 'error')
