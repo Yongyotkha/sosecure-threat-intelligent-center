@@ -28,6 +28,10 @@ Route::group(
 		Route::post('/data_chart_timeline', 'AgentManagementController@data_chart_timeline')->name('agentmanagement.data_chart_timeline');
 		Route::post('/update_status_agent', 'AgentManagementController@update_status_agent')->name('agentmanagement.update_status_agent');
 		Route::get('/agent_delete_modal', 'AgentManagementController@agent_delete_modal')->name('agentmanagement.agent_delete_modal');
+		
+		Route::get('/agent_modal_control_agent', 'AgentManagementController@agent_modal_control_agent')->name('agentmanagement.agent_modal_control_agent');
+		Route::get('/agent_modal_manage_rule', 'AgentManagementController@agent_moda_manage_rule')->name('agentmanagement.agent_modal_manage_rule');
+		
 		Route::post('/agent_delete', 'AgentManagementController@agent_delete')->name('agentmanagement.agent_delete');
 		
 		Route::post('/agent_delete', 'AgentManagementController@agent_delete')->name('agentmanagement.agent_delete');

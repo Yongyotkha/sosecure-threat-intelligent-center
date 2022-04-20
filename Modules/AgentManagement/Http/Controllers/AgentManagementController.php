@@ -763,7 +763,9 @@ class AgentManagementController extends Controller
                         <li><a href="#"><i class="fas fa-search"></i> Scan Yara</a></li>
                         <li><a href="#"><i class="fas fa-eye"></i> View Log Data</a></li>
                         <li><a href="#"><i class="fas fa-eye"></i> View Log Error</a></li>
-                    </ul>
+                        <li><a href="'.route('agentmanagement.agent_modal_control_agent').'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Control Agent</a></li>
+                        <li><a href="'.route('agentmanagement.agent_modal_manage_rule').'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Manage Rule</a></li>
+                        </ul>
                 </div>
                 <a href="'.route('agentmanagement.agent_delete_modal', ['_id' => $query->site_agents_id]).'" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>
             ';
@@ -884,6 +886,19 @@ class AgentManagementController extends Controller
         return view('agentmanagement::modal.agent_delete')->with(compact('_id'));
     }
 
+    public function agent_modal_control_agent(Request $request)
+    {
+        // $_id = $request->get('_id');
+        return view('agentmanagement::modal.agent_modal_control_agent');
+    }
+
+    public function agent_modal_manage_rule(Request $request)
+    {
+        // $_id = $request->get('_id');
+        return view('agentmanagement::modal.agent_modal_manage_rule');
+    }
+
+
     public function agent_delete(Request $request)
     {
         $input = $request->all();
@@ -927,6 +942,9 @@ class AgentManagementController extends Controller
 
         $select_site = DB::table('site')->select('code', 'name')->pluck('name', 'code')->toArray();
         $data['select_site'] = $select_site;
+
+        $master_rule = TBLRuleName::where(['deleted_at' => null])->get();
+        $data['master_rule'] = $master_rule;
 
         return view('agentmanagement::rule')->with($data);
     }
