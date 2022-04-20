@@ -635,7 +635,9 @@ class ApiAgentController extends ApiController
                 $error = '';
                 $items = [];
 
-                $ruleFileSiteDownload = RuleFileSiteDownload::select('rule_files_id')->where('site_id', $data['site']['data']['id'])->get();
+                $ruleFileSiteDownload = RuleFileSiteDownload::select('rule_files_id')->where('site_id', $data['site']['data']['id'])
+                ->where('transaction_download_client', 3)
+                ->get();
                 if(!empty($ruleFileSiteDownload)){
                     $ruleFilesID = [];
                     foreach($ruleFileSiteDownload as $item){
@@ -647,11 +649,11 @@ class ApiAgentController extends ApiController
                     ->where('site_id', $data['site']['data']['id'])
                     ->where('ip_private', $ip_private)
                     ->where('status', 1)
-                    ->whereIsNull('deleted_at')
+                    ->where('deleted_at', null)
                     ->first();
 
                     if(!empty($siteAgent)){
-                        $ruleFileSiteAgentDownload = RuleFileSiteAgentDownload::select('rule_files_id')->whereIn('rule_files_id', $ruleFilesID)
+                        $ruleFileSiteAgentDownload = RuleFileSiteAgentDownload::whereIn('rule_files_id', $ruleFilesID)
                         ->where('site_id', $data['site']['data']['id'])
                         ->where('agent_id', $siteAgent -> id)
                         ->where('transaction_download_client', 1)
@@ -659,8 +661,12 @@ class ApiAgentController extends ApiController
                         ->get();
 
                         foreach($ruleFileSiteAgentDownload as $item){
-                            $items[] = RuleFile::select('path')->where('id', $item -> rule_files_id)->first();
-
+                            $ruleFile = RuleFile::select('path','rule_name')->where('id', $item -> rule_files_id)->first();
+                            $items[] = [
+                                'path' => $ruleFile -> path,
+                                'rule_name' => $ruleFile -> rule_name,
+                                'id' => $item -> id,
+                            ];
                             $item -> transaction_download_client = 2;
                             $item -> save();
                         }
