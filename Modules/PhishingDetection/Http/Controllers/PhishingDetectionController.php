@@ -2,6 +2,7 @@
 
 namespace Modules\PhishingDetection\Http\Controllers;
 
+use App\Sites;
 use App\LogPhishing;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -99,9 +100,16 @@ class PhishingDetectionController extends Controller
 
     public function datatable(Request $request){
         $logPhishing = LogPhishing::where('transaction_status', 3)->where('url_is_work', 1)->get();
+
         return DataTables::of($logPhishing)
         ->editColumn('site_name', function ($collection) {
-            return 'บริษัท เมจิกเทคโซลูชั่น จำกัด';
+            $html = '';
+            $query = Sites::where('id', $collection->site_id)
+                ->first();
+                
+            // dd($query);
+            $html = $query->name;
+            return $html;
         })
         ->editColumn('url_detection', function ($collection) {
             return 'https://demo02.mtsc.co.th/login';
