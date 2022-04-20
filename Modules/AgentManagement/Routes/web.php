@@ -42,6 +42,7 @@ Route::group(
 	['middleware' => 'web'],
 	function () {
 		Route::get('/tbl_category_rule', 'AgentManagementController@tbl_category_rule')->name('agentmanagement.tbl_category_rule');
+		Route::get('/tbl_extention_rule', 'AgentManagementController@tbl_extention_rule')->name('agentmanagement.tbl_extention_rule');
 		Route::post('/category_insert', 'AgentManagementController@category_insert')->name('agentmanagement.category_insert');
 		Route::get('/category_edit', 'AgentManagementController@category_edit')->name('agentmanagement.category_edit');
 		Route::post('/category_update', 'AgentManagementController@category_update')->name('agentmanagement.category_update');
@@ -57,5 +58,9 @@ Route::group(
 		Route::post('/agent_rule_update', 'AgentManagementController@agent_rule_update')->name('agentmanagement.agent_rule_update');
 		Route::post('/agent_rule_get_zip', 'AgentManagementController@agent_rule_get_zip')->name('agentmanagement.agent_rule_get_zip');
 		Route::post('/add_new_category', 'AgentManagementController@add_new_category')->name('agentmanagement.add_new_category');
+
+		Route::get('/get_rule_site', 'AgentManagementController@get_rule_site')->name('agentmanagement.get_rule_site');
+		Route::post('/check_insert_rule_process', 'AgentManagementController@check_insert_rule_process')->name('agentmanagement.check_insert_rule_process');
+		Route::post('/delete_rule_site', 'AgentManagementController@delete_rule_site')->name('agentmanagement.delete_rule_site');
 	}
 );

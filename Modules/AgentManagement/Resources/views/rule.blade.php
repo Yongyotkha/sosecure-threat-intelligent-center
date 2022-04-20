@@ -68,6 +68,7 @@
                             <li class="active"><a href="#tab_rule_site" data-toggle="tab" id="tab_rule_site_click">Rule Site</a></li>
                             <li><a href="#tab_agent" data-toggle="tab" id="tab_agent_click">All Rule</a></li>   
                             <li><a href="#tab_category" data-toggle="tab" id="tab_category_click">Category</a></li>   
+                            <li><a href="#tab_extention" data-toggle="tab" id="tab_extention_click">Extention</a></li>   
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane active" id="tab_rule_site">
@@ -84,7 +85,7 @@
                                             <div class="col-lg-4">
                                                 <div class="form-group m-b-md">
                                                     <label for="" class="">Site</label>
-                                                    <select name="site" id="site" class="tselect2-option form-control select-site" >
+                                                    <select name="search_site" id="search_site" class="tselect2-option form-control select-search_site" >
                                                         <option value="" disabled selected>Select Site</option>
                                                             @if ($site_settings)
                                                             @foreach ($site_settings as $site_settings)
@@ -101,7 +102,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-lg-2">
-                                                <button type="button" class="btn btn-info btn-responsive btn-fz-13" style="margin-top: 22px;">
+                                                <button type="button" id="btn_search_rule" class="btn btn-info btn-responsive btn-fz-13" style="margin-top: 22px;">
                                                     <i class="fas fa-search"></i>
                                                     @langapp('apply')
                                                 </button>
@@ -115,14 +116,14 @@
                                                 <div class="box-item-keyword">
                                                     <ul id="keyword_rule" class="main-list keyword-list">
                                                         @foreach($master_rule as $rule)
-                                                        <li class="item-list item--keyword">
+                                                        <li class="item-list item--keyword" data-id="{{$rule->id}}">
                                                             <div class="left-side-item">
                                                                 <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
                                                                 <span class="text-keyword">{{@$rule->get_name_category->name}} - {{$rule->rule_name}}</span>
                                                             </div>
                                                             <div class="action-keyword">
-                                                                <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
-                                                                <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
+                                                                {{-- <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a> --}}
+                                                                <a href="#" class="text-white delete_rule_site_master" data-delete_rule_site_master="{{$rule->id}}" data-mode_delete="master"><i class="fas fa-trash-alt"></i></a>
                                                             </div>
                                                         </li>
                                                         @endforeach
@@ -131,6 +132,7 @@
                                             </div>
                                             <div class="col-lg-6">
                                                 <h5 class="font-weight-bold" id="txt_name_site">&nbsp;</h5>
+                                                <input type="hidden" name="hd_site_id" id="hd_site_id" value="">
                                                 <div class="box-item-keyword">
                                                     <ul id="site_rule" class="main-list site-list">
                                                         {{-- <li class="item-list item--keyword">
@@ -222,6 +224,36 @@
                                     <div class="panel-body">
                                         <div class="table-responsive">
                                             <table class="table table-bordered table-striped" id="table-category-rule" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No.</th>
+                                                        <th>Name</th>
+                                                        <th>Update</th>
+                                                        <th>Status</th>
+                                                        <th class="text-center">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>                                                  
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+
+                            <div class="tab-pane" id="tab_extention">
+                                <section class="panel panel-default">
+                                    <header class="panel-heading font-bold panel-header-blue">
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <i class="fas fa-table"></i> Table Extention
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <div class="panel-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped" id="table-extention-rule" style="width: 100%">
                                                 <thead>
                                                     <tr>
                                                         <th>No.</th>
@@ -488,6 +520,29 @@
         </div>
     </div>
 
+    <div class="modal" id="delete_select" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@langapp('delete')</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <p class="text-danger">@langapp('delete_warning')  </p>
+                    </div>
+                    <input type="hidden" id="delete_rule_id" name="delete_rule_id">
+                    <input type="hidden" id="delete_mode" name="delete_mode">
+                    <input type="hidden" id="delete_site" name="delete_site">
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
+                    <button type="button" id="btn_delete_rule_site" class="btn btn-info submit btn-rounded delete-select"><i class="fas fa-paper-plane"></i> OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </section>
 
 @push('pagestyle')
@@ -521,6 +576,10 @@
 
 <script>
 
+    $(document).ready(function(){
+        delete_rule_site_master();
+    });
+
     $('.select-2--rule').select2();
 
     tbl_all_rule = $('#table-agent-rule').DataTable({
@@ -547,6 +606,23 @@
     tbl_category_rule = $('#table-category-rule').DataTable({
         ajax:{
             url: "{{ route('agentmanagement.tbl_category_rule') }}",
+            type: "get",
+            data: function(d) {
+
+            },
+        },
+        columns:[
+            { data: 'DT_Row_Index' },
+            { data: 'name' },
+            { data: 'updated_at' },
+            { data: 'c_status' },
+            { data: 'c_action' }
+        ]
+    });
+
+    tbl_extention_rule = $('#table-extention-rule').DataTable({
+        ajax:{
+            url: "{{ route('agentmanagement.tbl_extention_rule') }}",
             type: "get",
             data: function(d) {
 
@@ -667,6 +743,7 @@
 
                         tbl_category_rule.ajax.reload();
                         tbl_all_rule.ajax.reload();
+                        tbl_extention_rule.ajax.reload();
 
                         setTimeout(function(){
                             {{-- window.location.href = response.route; --}}
@@ -694,6 +771,24 @@
     function update_status_category(id)
     {
         let chk_status = $("#status_" + id).is(":checked") ? 1 : 0;
+
+        $.ajax({
+            url: "{{ route('agentmanagement.status_category_update') }}",
+            type: "POST",
+            data: {
+                id:id,
+                chk_status:chk_status,
+            },
+            success:function(response)
+            {
+                toastr.success(response.message);
+            }
+        });
+    }
+
+    function update_status_extention(id)
+    {
+        let chk_status = $("#extension_status_" + id).is(":checked") ? 1 : 0;
 
         $.ajax({
             url: "{{ route('agentmanagement.status_category_update') }}",
@@ -976,6 +1071,158 @@
             $(this).closest('tr').remove();
         });
     });
+
+    $('#btn_search_rule').click(function(){
+
+        let search_site = $('#search_site :selected').val();
+        let keyword_search = $('#keyword_search').val();
+
+        if(search_site)
+        {
+            $.ajax({
+                url: "{{ route('agentmanagement.get_rule_site') }}",
+                type: "get",
+                data: {
+                    search_site:search_site,
+                    keyword_search:keyword_search
+                },
+                success:function(response){
+
+                    $('#txt_name_site').empty().append(response.data_site.name);
+                    $('#hd_site_id').val(response.data_site.id);
+
+                    $('#keyword_rule').empty().append(response.html_master_rule);
+                    $('#site_rule').empty().append(response.html);
+
+                    delete_rule_site_master();
+
+                }
+            });
+        }
+        else
+        {
+            toastr.error('Please select site.');
+        }
+
+    });
+
+    function check_insert_rule_process(from_id,to_id,attributes_id) {
+        let result = 0;
+
+        let site_id = $('#hd_site_id').val();
+
+        $.ajax({
+            type:"POST",
+            url:"{{ route('agentmanagement.check_insert_rule_process') }}",
+            data:{
+                code_site:site_id,
+                from_id:from_id,
+                to_id:to_id,
+                attributes_id:attributes_id
+            },
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) {
+                loading('stop_load');
+
+                if(response.status == 'success')
+                {
+                    $('#btn_search_rule').trigger('click');
+                    toastr.success(response.message);
+                }
+                else
+                {
+                    toastr.error(response.message);
+                }
+
+                {{-- if(response.status == 1) {
+                    console.log(response);
+                    result = 1;
+                    if(response && response.message) {
+                        $("#delete_select").modal("hide");
+                        get_keyword_main();
+                        get_keyword_sub('social');
+                        get_keyword_sub('darkweb');
+                        toastr.success(response.message, '@langapp('response_status')');
+                        
+                    }
+                } else {
+                    console.log(response);
+                    toastr.error('@langapp('request_failed')', '@langapp('response_status')');
+                    get_keyword_main();
+                    get_keyword_sub('social');
+                    get_keyword_sub('darkweb');
+                } --}}
+            },
+            error: function (error){
+                console.log(error);
+                result = 0;
+                loading('stop_load');
+                var errors = error.response.data.errors;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += '<li>' + value[0] + '</li>';
+                });
+                toastr.error(errorsHtml, '@langapp('response_status') ');
+            }
+        });
+        return result;
+    }
+
+    function delete_rule_site_master() 
+    {
+        $('.delete_rule_site_master').on("click",function(){
+            let rule_id = $(this).data('delete_rule_site_master');
+            let mode = $(this).data('mode_delete');
+            let site_id = $('#hd_site_id').val();
+            console.log(rule_id, mode);
+            $('#delete_site').val(site_id);
+            $('#delete_mode').val(mode);
+            $('#delete_rule_id').val(rule_id);
+            $("#delete_select").modal("show");
+            {{--$(this).closest('li').remove();--}}
+        });
+    }
+
+    $('#btn_delete_rule_site').click(function(){
+
+        let delete_site = $('#delete_site').val();
+        let delete_mode = $('#delete_mode').val();
+        let delete_rule_id = $('#delete_rule_id').val();
+
+        $.ajax({
+            url: "{{ route('agentmanagement.delete_rule_site')}}",
+            type: "POST",
+            data: {
+                delete_site: delete_site,
+                delete_mode: delete_mode,
+                delete_rule_id: delete_rule_id
+            },
+            success: function(response){
+
+                if(response.status == 'success')
+                {
+                    $("#delete_select").modal("hide");
+                    if(delete_mode == 'master')
+                    {
+                        $('li[data-id='+delete_rule_id+']').remove();
+                    }
+                    else
+                    {
+                        $('#btn_search_rule').trigger('click');
+                    }
+                    toastr.success(response.message);
+                }
+                else
+                {
+                    toastr.error(response.message);
+                }
+
+            }
+        });
+
+    });
    
     var keyword_rule = document.getElementById('keyword_rule'),
 	site_rule = document.getElementById('site_rule');
@@ -1000,7 +1247,18 @@
         },
         sort: false,
         animation: 150,
-        dataIdAttr: 'data-id'
+        dataIdAttr: 'data-id',
+        onAdd: function (evt) {
+            console.log(evt.from.id);
+            console.log(evt.to.id);
+            console.log(evt.item.attributes['data-id'].value);
+            console.log(evt);
+            console.log(evt);
+            let from_id = evt.from.id;
+            let to_id = evt.to.id;
+            let attributes_id = evt.item.attributes['data-id'].value;
+            check_insert_rule_process(''+from_id+'',''+to_id+'',attributes_id);
+        },
     });
 
     function add_new_category()
@@ -1043,6 +1301,7 @@
 
                         tbl_category_rule.ajax.reload();
                         tbl_all_rule.ajax.reload();
+                        tbl_extention_rule.ajax.reload();
 
                     }
                     else if(response.status == 'error')
