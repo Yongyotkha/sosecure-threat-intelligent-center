@@ -71,9 +71,9 @@
 
         $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
         $('.formSaving').attr('disabled',true);
-        
+    
         var data = new FormData(this);
-
+        
         axios.post($(this).attr("action"), data)
             .then(function (response) {
                 toastr.success('Deleted Successfully');

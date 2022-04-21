@@ -518,11 +518,12 @@ class AgentManagementController extends Controller
         $start_date_input = $request->start_date;
         $end_date_input = $request->end_date;
 
-        // dd($input);
-
+        $site_id = $request->site_id;
+        $keyword_search = $request->keyword_search;
         $query = YaraLog::
                     join('site', 'yara_log.site_id', 'site.id')
                     ->join('site_agents', 'yara_log.agent_id', 'site_agents.id')
+                    ->leftjoin('rule_name', 'yara_log.rule', 'rule_name.rule_name')
                     ->select(
                         'site.name as site_name',
                         'site.logo as site_logo',
@@ -530,29 +531,44 @@ class AgentManagementController extends Controller
                         'yara_log.id as agent_alerts_id',
                         'yara_log.rule as agent_alerts_rule',
                         'yara_log.description as agent_alerts_description',
-                        'yara_log.severity as agent_alerts_severity',
+                        // 'yara_log.severity as agent_alerts_severity',
                         'yara_log.status as agent_alerts_status',
                         'yara_log.created_at as agent_alerts_created',
                         'yara_log.device_name',
                         'yara_log.first_scan',
-                        'yara_log.last_scan'
+                        'yara_log.last_scan',
+                        'rule_name.severity as severity_status'
                     )
                     ->where('yara_log.status', 1)
-                    ->orderBy('agent_alerts_created', 'desc');
+                    ->where(function($query) use ($site_id ){
+                        if($site_id  != null){
+                            $query->where('site_id', $site_id );
+                        }
+                    })
+                    ->where(function($query) use ($keyword_search){
+                        if($keyword_search != null) {
+                            $query->where('site.name', 'like', '%'.$keyword_search.'%')
+                                ->orwhere('yara_log.description', 'like', '%'.$keyword_search.'%');     
+                        }
+                    })
+                    ->orderBy('agent_alerts_created', 'desc')
+                    ->limit(50)
+                    ->get();
+        // dd($query);     
 
-        if($request->site_id != null)
-        {
-            $query->where('site_id', $request->site_id);
-        }
+        // if($request->site_id != null)
+        // {
+        //     $query->where('site_id', $request->site_id);
+        // }
 
-        if($request->keyword_search != null)
-        {
-            $query->where('site.name', 'like', '%'.$request->keyword_search.'%')
-                //   ->orwhere('agent_alerts.rule', 'like', '%'.$request->keyword_search.'%')
-                  ->orwhere('yara_log.description', 'like', '%'.$request->keyword_search.'%');
-                //   ->orwhere('yara_log.incident', 'like', '%'.$request->keyword_search.'%')
-                //   ->orwhere('yara_log.log_file', 'like', '%'.$request->keyword_search.'%');
-        }
+        // if($request->keyword_search != null)
+        // {
+        //     $query->where('site.name', 'like', '%'.$request->keyword_search.'%')
+        //         //   ->orwhere('agent_alerts.rule', 'like', '%'.$request->keyword_search.'%')
+        //           ->orwhere('yara_log.description', 'like', '%'.$request->keyword_search.'%');
+        //         //   ->orwhere('yara_log.incident', 'like', '%'.$request->keyword_search.'%')
+        //         //   ->orwhere('yara_log.log_file', 'like', '%'.$request->keyword_search.'%');
+        // }
 
         // if($start_date_input != null && $end_date_input != null)
         // {
@@ -578,6 +594,7 @@ class AgentManagementController extends Controller
         // {
         //     $query->where('agent_alerts.severity', $request->check_alert_severity);
         // }
+        
 
         return DataTables::of($query)
         ->addColumn('chk', function($query) {
