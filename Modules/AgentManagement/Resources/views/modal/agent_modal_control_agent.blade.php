@@ -6,7 +6,7 @@
         </div>
         {!! Form::open() !!}
         <div class="modal-body">
-            <div class="row mt-2">
+            {{-- <div class="row mt-2">
                 <div class="col-lg-12">
                     <button class="btn btn-info">
                         คำสั่ง
@@ -34,6 +34,7 @@
                 </div>
             </div>
             <br>
+
             <table class="table table-striped table-bordered">
                 <thead>
                     <tr>
@@ -53,7 +54,45 @@
                         <td>04-20-2022</td>
                     </tr>
                 </tbody>
-            </table>
+            </table> --}}
+
+            <div class="row mt-2">
+                <div class="col-lg-12">
+                    <p>Batch Job Every Day</p>
+                </div>
+                <div class="col-lg-2">
+                    <span>start:</span>
+                </div>
+                
+                <div class="col-lg-10">
+                    <select name="batch_start" id="batch_start" class="text-left select2-option form-control select-site" >
+                        <?php for($hours=0; $hours<24; $hours++) // the interval for hours is '1'
+                            for($mins=0; $mins<60; $mins+=30) // the interval for mins is '30'
+                            echo '<option value="'.str_pad($hours,2,'0',STR_PAD_LEFT).':'
+                            .str_pad($mins,2,'0',STR_PAD_LEFT).':00">'.str_pad($hours,2,'0',STR_PAD_LEFT).':'
+                            .str_pad($mins,2,'0',STR_PAD_LEFT).'</option>';
+                        ?>
+                    </select>
+                </div>
+
+                <div class="col-lg-12 ">
+                    <p>Real-time protection</p>
+                    <label>
+                        <input name="real_time" value="Y" id="real_time" type="checkbox" class="select-chk">
+                        <span class="label-text">On</span>
+                    </label>
+                </div>
+
+                <div class="col-lg-12">
+                    <p>USB Protection</p>
+                    <label>
+                        <input name="usb" value="Y" id="usb" type="checkbox" class="select-chk">
+                        <span class="label-text">On</span>
+                    </label>
+                   
+                </div>
+
+            </div>
         </div>
         <div class="modal-footer">
             {!! closeModalButton() !!}
@@ -63,6 +102,8 @@
         {!! Form::close() !!}
     </div>
 </div>
+
+
 
 <script>
     var form_save = '.formSaving';
