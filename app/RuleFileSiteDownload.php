@@ -8,4 +8,5 @@ class RuleFileSiteDownload extends Model
 {
     //
     protected $table = 'rule_files_site_downloads';
+    protected $guarded = ['id'];
 }

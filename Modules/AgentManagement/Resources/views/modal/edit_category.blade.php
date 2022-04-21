@@ -100,6 +100,7 @@ $('#btn_update_category').click(function(e){
 
                     tbl_category_rule.ajax.reload();
                     tbl_all_rule.ajax.reload();
+                    tbl_extention_rule.ajax.reload();
 
                     setTimeout(function(){
                         {{-- window.location.href = response.route; --}}

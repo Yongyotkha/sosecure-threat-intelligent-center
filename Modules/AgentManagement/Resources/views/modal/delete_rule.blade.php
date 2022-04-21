@@ -42,6 +42,7 @@
 
                 tbl_category_rule.ajax.reload();
                 tbl_all_rule.ajax.reload();
+                tbl_extention_rule.ajax.reload();
             })
             .catch(function (error) {
                 if(error.response.data.exception)
