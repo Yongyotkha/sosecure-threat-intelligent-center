@@ -20,6 +20,7 @@ use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
 use App\SiteAgentExtention;
 use App\SiteAgentIgnore;
+use DB;
 
 class ApiAgentController extends ApiController
 {
@@ -817,9 +818,10 @@ class ApiAgentController extends ApiController
                     ->where('status', 'Y')
                     ->pluck('ref_id');
 
-                    $extentions = SiteAgentExtention::select('extention_id')->where('site_id', $data['site']['data']['id'])
-                    ->where('agent_id', $siteAgentsHasData->id)
-                    ->whereNotIn('extention_id', $ignore)
+                    $extentions = SiteAgentExtention::select('site_agent_extention.extention_id','rule_category.name')->where('site_id', $data['site']['data']['id'])
+                    ->where('site_agent_extention.agent_id', $siteAgentsHasData->id)
+                    ->whereNotIn('site_agent_extention.extention_id', $ignore)
+                    ->join('rule_category', 'rule_category.id', '=', 'site_agent_extention.extention_id')
                     ->get();
 
                     $response = [
@@ -829,6 +831,75 @@ class ApiAgentController extends ApiController
                             'agent' => $siteAgentsHasData,
                             'extentions' => $extentions
                         ]
+                    ];
+                }else{
+                    $response = [
+                        'error' => 'Data not found', 
+                        'status_code' => 200,
+                        'data' => []
+                    ];
+                }
+            }
+
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'error' => $e -> getMessage(),
+            );
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 500, 'data' => $datas]);
+        }
+    }
+
+    public function getRule(Request $request){
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            if ($data === false) {
+                $response =[
+                    'error' => 'The request parameters are invalid',
+                    'status_code' => 400,
+                    'data' => []
+                ];
+            } else {
+                $data_key = $data['data'];
+                $ip_private = $data_key['ip_private'];
+                $siteAgentsHasData = FXSiteAgents::select('id', 'batchjob_everydate', 'real_time_protection', 'extention_all_flag')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
+                if($siteAgentsHasData){
+                    $ignore = SiteAgentIgnore::select(DB::raw('"N" AS status'), 'rule_name.file_name','rule_name.rule_name','rule_name.description','rule_name.severity')
+                    ->join('rule_name', 'rule_name.id', '=', 'site_agent_ignore.ref_id')
+                    ->where('site_agent_ignore.site_id', $data['site']['data']['id'])
+                    ->where('site_agent_ignore.agent_id', $siteAgentsHasData->id)
+                    ->where('site_agent_ignore.type', 'rule')
+                    ->where('site_agent_ignore.status', 'Y');
+
+                    $ignoreRef = SiteAgentIgnore::select('ref_id')
+                    ->where('site_id', $data['site']['data']['id'])
+                    ->where('agent_id', $siteAgentsHasData->id)
+                    ->where('type', 'rule')
+                    ->where('status', 'Y')
+                    ->pluck('ref_id');
+
+                    $rules = RuleSite::select(DB::raw('"Y" AS status'), 'rule_name.file_name','rule_name.rule_name','rule_name.description','rule_name.severity')
+                    ->join('rule_name', 'rule_name.id', '=', 'rule_site.rule_id')
+                    ->where('rule_site.site_id', $data['site']['data']['id'])
+                    ->where('rule_site.agent_id', $siteAgentsHasData->id)
+                    ->where('rule_name.status', 'Y')
+                    ->whereNotIn('rule_id', $ignoreRef)
+                    ->union($ignore)
+                    ->orderBy('rule_name', 'ASC')
+                    ->get();
+
+                    $response = [
+                        'error' => '', 
+                        'status_code' => 200,
+                        'data' => $rules
                     ];
                 }else{
                     $response = [
