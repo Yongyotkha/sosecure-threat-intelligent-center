@@ -35,7 +35,7 @@
               toastr.success('Deleted Successfully');
               $('#ajaxModal').modal("hide");
               $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
-
+              count_head();
               tbl_alert.ajax.reload();
           })
           .catch(function (error) {

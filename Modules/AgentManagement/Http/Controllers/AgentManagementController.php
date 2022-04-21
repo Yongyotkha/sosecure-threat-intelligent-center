@@ -406,6 +406,7 @@ class AgentManagementController extends Controller
                     }
                 })
                 ->where(['deleted_at' => null])
+                ->where('ignore_flag', 'Y')
                 ->get();
         $count_alert = count($query_alert);
 
@@ -558,7 +559,7 @@ class AgentManagementController extends Controller
                     ->orderBy('agent_alerts_created', 'desc')               
                     ->get();
           
-
+               
         // if($request->site_id != null)
         // {
         //     $query->where('site_id', $request->site_id);
@@ -800,7 +801,7 @@ class AgentManagementController extends Controller
                         <li class="d-none"><a href="#"><i class="fas fa-search"></i> Scan Yara</a></li>
                         <li><a href="#"><i class="fas fa-eye"></i> View Log Data</a></li>
                         <li class="d-none"><a href="#"><i class="fas fa-eye"></i> View Log Error</a></li>
-                        <li><a href="'.route('agentmanagement.agent_modal_control_agent').'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Control Agent</a></li>
+                        <li><a href="'.route('agentmanagement.agent_modal_control_agent', $query->batchjob_everydate,$query->batchjob_everydate, $query->batchjob_everydate ).'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Control Agent</a></li>
                         <li><a href="'.route('agentmanagement.agent_modal_manage_rule', $query->site_agents_id).'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Manage Rule</a></li>
                         </ul>
                 </div>
