@@ -798,7 +798,7 @@ class AgentManagementController extends Controller
                         <li><a href="#"><i class="fas fa-eye"></i> View Log Data</a></li>
                         <li class="d-none"><a href="#"><i class="fas fa-eye"></i> View Log Error</a></li>
                         <li><a href="'.route('agentmanagement.agent_modal_control_agent').'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Control Agent</a></li>
-                        <li><a href="'.route('agentmanagement.agent_modal_manage_rule').'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Manage Rule</a></li>
+                        <li><a href="'.route('agentmanagement.agent_modal_manage_rule', $query->site_id).'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Manage Rule</a></li>
                         </ul>
                 </div>
                 <a href="'.route('agentmanagement.agent_delete_modal', ['_id' => $query->site_agents_id]).'" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>
@@ -928,8 +928,12 @@ class AgentManagementController extends Controller
 
     public function agent_modal_manage_rule(Request $request)
     {
-        // $_id = $request->get('_id');
-        return view('agentmanagement::modal.agent_modal_manage_rule');
+        $id = $request->get('id');
+        $ruleNameSite = RuleNameSite::select('rule_category.name as category_name','rule_name_site.id','rule_name.file_name', 'rule_name.rule_name', 'rule_name.description', 'rule_name.severity', 'rule_name.status', 'rule_name_site.create_by', 'rule_name_site.update_by', 'rule_name_site.created_at')->where('site_id', $request -> site_id)
+        ->join('rule_name', 'rule_name.id', '=', 'rule_name_site.rule_id')
+        ->join('rule_category', 'rule_category.id', '=', 'rule_name.rule_category_id')
+        ->get();
+        return view('agentmanagement::modal.agent_modal_manage_rule', compact('ruleNameSite'));
     }
 
 

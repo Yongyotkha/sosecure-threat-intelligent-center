@@ -812,7 +812,7 @@ class ApiAgentController extends ApiController
             } else {
                 $data_key = $data['data'];
                 $ip_private = $data_key['ip_private'];
-                $siteAgentsHasData = FXSiteAgents::select('id', 'batchjob_everydate', 'real_time_protection', 'extention_all_flag')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
+                $siteAgentsHasData = FXSiteAgents::select('id', 'batchjob_everydate', 'real_time_protection', 'extention_all_flag','usb_protection')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
                 if($siteAgentsHasData){
                     $ignore = SiteAgentIgnore::select('ref_id')->where('site_id', $data['site']['data']['id'])
                     ->where('agent_id', $siteAgentsHasData->id)
