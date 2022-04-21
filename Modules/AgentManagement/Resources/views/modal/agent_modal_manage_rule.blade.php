@@ -9,7 +9,7 @@
             </h4>
         </div>
         {{-- {!! Form::open() !!} --}}
-        <form class="modal-body" action="{{ url('agentmanagement.updateManageRule') }}" method="POST">
+        <form class="modal-body" action="{{ route('agentmanagement.updateManageRule') }}" method="POST">
             @csrf
             <input type="hidden" name="site_id" value="{{ $id }}">
             <input type="hidden" name="agent_id" value="{{ $agent_id }}">
@@ -58,8 +58,8 @@
                                 <td>{{  $item -> severity }}</td>
                                 <td>
                                     <label>
-                                        <input type="hidden" name="rule_id" value="{{ $item -> rule_id }}">
-                                        <input name="ignore" value="1" id="-all" type="checkbox" class="">
+                                        <input type="hidden" name="rule_id[]" value="{{ $item -> rule_id }}">
+                                        <input name="ignore[]" value="1" id="-all" type="checkbox" class="">
                                         <span class="label-text"></span>
                                     </label>
                                 </td>
