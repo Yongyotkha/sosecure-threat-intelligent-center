@@ -98,6 +98,8 @@ $('#btn_update_category').click(function(e){
 
                     $('#btn_update_category').html('Success');
 
+                    $('#ajaxModal').modal("hide");
+
                     tbl_category_rule.ajax.reload();
                     tbl_all_rule.ajax.reload();
                     tbl_extention_rule.ajax.reload();

@@ -823,6 +823,8 @@
 
                         $('#btn_save_category').html('Success');
 
+                        $('#add_category_modal').modal("hide");
+
                         tbl_category_rule.ajax.reload();
                         tbl_all_rule.ajax.reload();
 
@@ -878,6 +880,10 @@
                         toastr.success(response.message);
 
                         $('#btn_save_extension').html('Success');
+
+                        $('#form_add_extension').reset();
+
+                        $('#add_extension_modal').modal("hide");
 
                         tbl_extention_rule.ajax.reload();
 
@@ -967,6 +973,7 @@
                     tbl_all_rule.ajax.reload();
 
                     $('#btn_save_rule').html('Success');
+                    $('#add_rule_modal').modal("hide");
 
                     setTimeout(function(){
                         {{-- window.location.href = response.route; --}}
@@ -1249,7 +1256,7 @@
     $('#extension_rule_site').change(function(){
 
         let value_type = $(this).val();
-
+        let value_site = $('#hd_site_id').val();
         if(value_type == 'custom')
         {
             $('.row_extension_custom_set').removeClass('d-none');
@@ -1258,7 +1265,8 @@
                 url: "{{ route('agentmanagement.get_extension_rule_site') }}",
                 type: 'get',
                 data:{
-
+                    value_type:value_type,
+                    value_site:value_site
                 },
                 success: function(response){
 

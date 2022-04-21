@@ -40,6 +40,8 @@
                 $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
                 {{-- window.location.href = response.data.redirect; --}}
 
+                $('#ajaxModal').modal("hide");
+
                 tbl_category_rule.ajax.reload();
                 tbl_all_rule.ajax.reload();
                 tbl_extention_rule.ajax.reload();
