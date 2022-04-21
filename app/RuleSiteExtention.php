@@ -4,8 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class RuleSiteExtention extends Model
+class SiteAgentExtention extends Model
 {
     //
-    protected $table = 'rule_site_extention';
+    protected $table = 'site_agent_extention';
 }

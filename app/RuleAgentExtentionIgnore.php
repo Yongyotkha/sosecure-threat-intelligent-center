@@ -4,8 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class RuleAgentExtentionIgnore extends Model
+class SiteAgentIgnore extends Model
 {
     //
-    protected $table = 'rule_agent_extention_ignore';
+    protected $table = 'site_agent_ignore';
 }

@@ -656,7 +656,7 @@ class ApiAgentController extends ApiController
                         $ruleFileSiteAgentDownload = RuleFileSiteAgentDownload::whereIn('rule_files_id', $ruleFilesID)
                         ->where('site_id', $data['site']['data']['id'])
                         ->where('agent_id', $siteAgent -> id)
-                        ->where('transaction_download_client', 1)
+                        ->where('transaction_download_client', '!=', 3)
                         ->where('status', 'Y')
                         ->get();
 
