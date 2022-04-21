@@ -1001,7 +1001,7 @@ class AgentManagementController extends Controller
 
         $html = '';
         
-        if(count($site_name_rules) > 0)
+        if(count($site_name_rule) > 0)
         {
             foreach($site_name_rule as $name_rule)
             {
