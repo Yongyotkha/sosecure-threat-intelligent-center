@@ -1,8 +1,12 @@
-<div class="modal-dialog modal-dialog-aside">
+<div class="modal-dialog modal-dialog-aside fullscreen">
     <div class="modal-content">
         <div class="modal-header bg-info">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Manage Rules</h4>
+            <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title text-white">
+                <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip"
+                    title="Fullscreen" data-placement="right"></i>
+                Manage Rules
+            </h4>
         </div>
         {!! Form::open() !!}
         <div class="modal-body">
@@ -27,39 +31,41 @@
                 </div>
             </div>
 
-            <table class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>Category Rule</th>
-                        <th>Rule Name</th>
-                        <th>Description</th>
-                        <th>Serverity</th>
-                        <th>Ignore</th>
-                        <th>Update Date</th>
-                        <th>Update By</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($ruleNameSite as $item)
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead>
                         <tr>
-                            <td>{{ $item -> category_name }}</td>
-                            <td>{{ $item -> rule_name }}</td>
-                            <td>
-                                {{ $item -> description }}
-                            </td>
-                            <td>{{  $item -> severity }}</td>
-                            <td>
-                                <label>
-                                    <input name="" value="1" id="-all" type="checkbox" class="">
-                                    <span class="label-text"></span>
-                                </label>
-                            </td>
-                            <td>{{  $item -> created_at }}</td>
-                            <td>-</td>
+                            <th>Category Rule</th>
+                            <th>Rule Name</th>
+                            <th>Description</th>
+                            <th>Serverity</th>
+                            <th>Ignore</th>
+                            <th>Update Date</th>
+                            <th>Update By</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($ruleNameSite as $item)
+                            <tr>
+                                <td>{{ $item -> category_name }}</td>
+                                <td>{{ $item -> rule_name }}</td>
+                                <td>
+                                    {{ $item -> description }}
+                                </td>
+                                <td>{{  $item -> severity }}</td>
+                                <td>
+                                    <label>
+                                        <input name="" value="1" id="-all" type="checkbox" class="">
+                                        <span class="label-text"></span>
+                                    </label>
+                                </td>
+                                <td>{{  $item -> created_at }}</td>
+                                <td>-</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div class="modal-footer">
             {!! closeModalButton() !!}
