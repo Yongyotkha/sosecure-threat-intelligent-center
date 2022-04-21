@@ -4,7 +4,7 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>
             <h4 class="modal-title">Control Agent</h4>
         </div>
-        {!! Form::open() !!}
+        {!! Form::open(['route' => ['agentmanagement.update_control_agent'], 'class' => 'ajaxifyForm_custom', 'id'=> 'form_update', 'method' => 'post']) !!}
         <div class="modal-body">
             {{-- <div class="row mt-2">
                 <div class="col-lg-12">
@@ -55,7 +55,8 @@
                     </tr>
                 </tbody>
             </table> --}}
-
+            {{-- {{ $batchjob == str_pad($hours,2,'0',STR_PAD_LEFT):str_pad($mins,2,'0',STR_PAD_LEFT)  }} --}}
+            
             <div class="row mt-2">
                 <div class="col-lg-12">
                     <p>Batch Job Every Day</p>
@@ -63,22 +64,22 @@
                 <div class="col-lg-2">
                     <span>start:</span>
                 </div>
-                <h1>{{ $usb }}</h1>
+                
                 <div class="col-lg-10">
+                    <input type="hidden" name="hd_id" value="{{ $id }}">
                     <select name="batch_start" id="batch_start" class="text-left select2-option form-control select-site" >
-                        <?php for($hours=0; $hours<24; $hours++) // the interval for hours is '1'
-                            for($mins=0; $mins<60; $mins+=30) // the interval for mins is '30'
-                            echo '<option value="'.str_pad($hours,2,'0',STR_PAD_LEFT).':'
-                            .str_pad($mins,2,'0',STR_PAD_LEFT).':00">'.str_pad($hours,2,'0',STR_PAD_LEFT).':'
-                            .str_pad($mins,2,'0',STR_PAD_LEFT).'</option>';
-                        ?>
+                        @for($hours=0; $hours<24; $hours++)
+                            @for($mins=0; $mins<60; $mins+=30)
+                                <option value="{{ str_pad($hours,2,'0',STR_PAD_LEFT)}}:{{str_pad($mins,2,'0',STR_PAD_LEFT) }}">{{str_pad($hours,2,'0',STR_PAD_LEFT)}}:{{str_pad($mins,2,'0',STR_PAD_LEFT)}}</option>
+                            @endfor
+                        @endfor
                     </select>
                 </div>
 
                 <div class="col-lg-12 ">
                     <p>Real-time protection</p>
                     <label>
-                        <input name="real_time" value="Y" id="real_time" type="checkbox" class="select-chk">
+                        <input name="real_time" value="Y" id="real_time" type="checkbox" class="select-chk" {{ $real_time == 'Y' ? 'checked' : ''}}>
                         <span class="label-text">On</span>
                     </label>
                 </div>
@@ -86,7 +87,7 @@
                 <div class="col-lg-12">
                     <p>USB Protection</p>
                     <label>
-                        <input name="usb" value="Y" id="usb" type="checkbox" class="select-chk">
+                        <input name="usb" value="Y" id="usb" type="checkbox" class="select-chk" {{ $usb == 'Y' ? 'checked' : ''}}>
                         <span class="label-text">On</span>
                     </label>
                    
@@ -106,8 +107,15 @@
 
 
 <script>
+    $(document).ready(function () {    
+        let time = "{{ $batchjob }}";
+        setTimeout(() => {
+            $('#batch_start').val(time).triger('change');
+        }, 1000);
+    });
+
     var form_save = '.formSaving';
-    $('#form_delete_agent').submit(function (event) {
+    $('#form_update').submit(function (event) {
         event.preventDefault();
 
         $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');

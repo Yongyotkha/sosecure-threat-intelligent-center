@@ -728,7 +728,10 @@ class AgentManagementController extends Controller
                         'site_agents.ip_private as site_agents_ip_private',
                         'site_agents.last_online as site_agents_last_online',
                         'site_agents.status as site_agents_status',
-                        'site_agents.created_at as site_agents_created'
+                        'site_agents.created_at as site_agents_created',
+                        'site_agents.batchjob_everydate',
+                        'site_agents.real_time_protection',
+                        'site_agents.usb_protection'
                     )
                     ->where('site_agents.deleted_at', null);
 
@@ -804,7 +807,7 @@ class AgentManagementController extends Controller
                         <li><a href="#"><i class="fas fa-eye"></i> View Log Data</a></li>
                         <li class="d-none"><a href="#"><i class="fas fa-eye"></i> View Log Error</a></li>
                         <li><a href="'.route('agentmanagement.agent_modal_manage_rule', ['agent_id' => $query->site_agents_id, 'id' => $query->site_agents_id]).'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Manage Rule</a></li>
-                        <li><a href="'.route('agentmanagement.agent_modal_control_agent', ['batchjob' => $query->batchjob_everydate, 'real_time' =>$query->real_time_protection, 'usb' => $query->usb_protection] ).'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Control Agent</a></li>
+                        <li><a href="'.route('agentmanagement.agent_modal_control_agent', ['id' => $query->id, 'batchjob' => $query->batchjob_everydate, 'real_time' => $query->real_time_protection, 'usb' => $query->usb_protection] ).'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Control Agent</a></li>
                     
                         </ul>
                 </div>
@@ -929,8 +932,16 @@ class AgentManagementController extends Controller
 
     public function agent_modal_control_agent(Request $request)
     {
-        // $_id = $request->get('_id');
-        return view('agentmanagement::modal.agent_modal_control_agent');
+        $id = $request->id;
+        $batchjob = $request->batchjob;
+        $real_time = $request->real_time;
+        $usb = $request->usb;
+
+        return view('agentmanagement::modal.agent_modal_control_agent', compact('batchjob', 'real_time', 'usb', 'id'));
+    }
+
+    public function update_control_agent(Request $request){
+        
     }
 
     public function agent_modal_manage_rule(Request $request)
