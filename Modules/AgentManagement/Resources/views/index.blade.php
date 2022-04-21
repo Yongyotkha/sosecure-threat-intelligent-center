@@ -701,6 +701,7 @@
                                                             <th>Domain</th>
                                                             <th>IP</th>
                                                             <th>Last Online</th>
+                                                            <th>Online Status</th>
                                                             <th>Status</th>
                                                             <th class="text-center">Action</th>
                                                         </tr>
@@ -1520,6 +1521,41 @@
                 },
                 {
                     data: 'site_agents_last_online',
+                    className : 'nowrap',
+                },
+                {
+                    targets: 9,
+                    className : 'nowrap',
+                    render: function (data, type, full, meta) {
+
+                   
+                        let html = '';
+                        let date1 = new Date(full.site_agents_last_online);
+                        let date2 = new Date();
+
+                        let onlineTime = date1.getMinutes();
+                        let currentTime = date2.getMinutes();
+
+                        if(onlineTime < currentTime){
+                            var sumTime = currentTime - onlineTime;
+                            if(sumTime > 2){
+                                html = '<div class="status-flex mr-2"><span class="dot critical "></span> Offline</div>';
+                            }else{
+                                html = '<div class="status-flex mr-2"><span class="dot low"></span> Online</div>'
+                            }
+                        }else{
+                            var sumTime = onlineTime - currentTime;
+                            if(sumTime > 2){
+                                html = '<div class="status-flex mr-2"><span class="dot critical"></span> Offline</div>';
+                            }else{
+                                html = '<div class="status-flex mr-2"><span class="dot low"></span> Online</div>'
+                            }
+                        }
+
+
+                        return ` ${html} `;
+
+                    },
                 },
                 {
                     data: 'chk_status',

@@ -10,11 +10,15 @@
             <div class="form-group row">
                 <label class="col-lg-2 control-label">Extension<span class="text-danger">*</span> </label>
                 <div class="col-lg-10">
-                    <input type="text" class="form-control" id="" name="">
+                    <select name="" id="extentions" class="select2-option form-control">
+                        <option value="1" disabled selected>Choose Select</option>
+                        <option value="Y">All</option>
+                        <option value="N">Custom</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="form-group row">
+            <div id="custom_select" class="form-group row" style="display: none">
                 <label class="col-lg-2 control-label">Custom<span class="text-danger">*</span> </label>
                 <div class="col-lg-10">
                     <select name="" id="scan_interval" class="select2-option form-control">
@@ -65,6 +69,15 @@
 </div>
 
 <script>
+
+    $('#extentions').change(function(){
+        if($(this).val() == 'Y'){
+            $('#custom_select').hide();
+        }else{
+            $('#custom_select').show();
+        }
+    });
+
     var form_save = '.formSaving';
     $('#form_delete_agent').submit(function (event) {
         event.preventDefault();
