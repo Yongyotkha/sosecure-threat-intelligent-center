@@ -1165,6 +1165,78 @@ class AgentManagementController extends Controller
         );
     }
 
+    public function select_rule_all_master(Request $request)
+    {
+        // dd($request->all());
+
+        $code_site = $request->code_site;
+
+        $date_now = date('Y-m-d H:i:s');
+
+        $site_rule = RuleNameSite::where(['site_id' => $code_site])->update(['deleted_at' => $date_now, 'deleted_by' => Auth::user()->id]);
+        
+        $get_data_category = TBLRuleName::where(['status' => 'Y', 'deleted_at' => null])->get();
+
+        foreach($get_data_category as $data_category)
+        {
+            $main_data = [];
+            $main_data['site_id'] = $code_site;
+            $main_data['rule_id'] = $data_category->id;
+            $main_data['create_by'] = Auth::user()->id;
+            $main_data['update_by'] = Auth::user()->id;
+
+            RuleNameSite::create($main_data);
+
+            $chk_file_site = RuleFileSiteDownload::where(['site_id' => $code_site, 'rule_files_id' => $data_category->rule_file_id])
+                ->where('transaction_download_client', '!=', 3)
+                ->get();
+    
+            if(count(@$chk_file_site) == 0)
+            {
+                $main_data_rule_file_site = [];
+                $main_data_rule_file_site['site_id'] = $code_site;
+                $main_data_rule_file_site['rule_files_id'] = $data_category->rule_file_id;
+                $main_data_rule_file_site['status'] = 'Y';
+                $main_data_rule_file_site['transaction_download_client'] = 1;
+                $main_data_rule_file_site['created_by'] = Auth::user()->id;
+                $main_data_rule_file_site['updated_by'] = Auth::user()->id;
+        
+                RuleFileSiteDownload::create($main_data_rule_file_site);
+            }
+        }
+
+        return ajaxResponse(
+            [
+                'data' => '',
+                'message' => 'Change save success',
+                'status' => 'success'
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function delete_rule_all_site(Request $request)
+    {
+        // dd($request->all());
+
+        $code_site = $request->code_site;
+
+        $date_now = date('Y-m-d H:i:s');
+
+        $site_rule = RuleNameSite::where(['site_id' => $code_site])->update(['deleted_at' => $date_now, 'deleted_by' => Auth::user()->id]);
+
+        return ajaxResponse(
+            [
+                'data' => '',
+                'message' => 'Change save success',
+                'status' => 'success'
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
     public function delete_rule_site(Request $request)
     {
         // dd($request->all());

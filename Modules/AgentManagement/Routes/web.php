@@ -61,6 +61,8 @@ Route::group(
 		Route::post('/add_new_category', 'AgentManagementController@add_new_category')->name('agentmanagement.add_new_category');
 
 		Route::get('/get_rule_site', 'AgentManagementController@get_rule_site')->name('agentmanagement.get_rule_site');
+		Route::post('/select_rule_all_master', 'AgentManagementController@select_rule_all_master')->name('agentmanagement.select_rule_all_master');
+		Route::post('/delete_rule_all_site', 'AgentManagementController@delete_rule_all_site')->name('agentmanagement.delete_rule_all_site');
 		Route::post('/check_insert_rule_process', 'AgentManagementController@check_insert_rule_process')->name('agentmanagement.check_insert_rule_process');
 		Route::post('/delete_rule_site', 'AgentManagementController@delete_rule_site')->name('agentmanagement.delete_rule_site');
 		Route::get('/get_extension_rule_site', 'AgentManagementController@get_extension_rule_site')->name('agentmanagement.get_extension_rule_site');
