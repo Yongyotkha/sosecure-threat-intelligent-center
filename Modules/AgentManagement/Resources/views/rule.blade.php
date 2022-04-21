@@ -130,7 +130,7 @@
                                             <div class="col-lg-4">
                                                 <div class="form-group m-b-md">
                                                     <label for="" class="">Custom</label>
-                                                    <select name="custom_select_rule_site" id="custom_select_rule_site" class="tselect2-option form-control select-search_site">
+                                                    <select name="custom_select_rule_site" id="custom_select_rule_site" class="select2-option form-control" multiple="multiple">
                                                     </select>
                                                 </div>
                                             </div>
@@ -1254,9 +1254,30 @@
         {
             $('.row_extension_custom_set').removeClass('d-none');
 
-            {{-- $.ajax({
-                url: "{{ route('') }}"
-            }) --}}
+            $.ajax({
+                url: "{{ route('agentmanagement.get_extension_rule_site') }}",
+                type: 'get',
+                data:{
+
+                },
+                success: function(response){
+
+                    let html = `
+                        <option value="" disabled>Choose an Extension</option>
+                    `;
+
+                    const select_extension = response.select_extension;
+                    for(let i in select_extension)
+                    {
+                        html += `
+                            <option value="${select_extension[i].id}">${select_extension[i].name}</option>
+                        `;
+                    }
+
+                    $('#custom_select_rule_site').empty().append(html);
+
+                }
+            });
         }
         else
         {
