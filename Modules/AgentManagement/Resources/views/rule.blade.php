@@ -139,7 +139,14 @@
 
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <h5 class="font-weight-bold">Rule</h5>
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <h5 class="font-weight-bold">Rule</h5>
+                                                    </div>
+                                                    <div class="col-lg-6 text-right">
+                                                        <button type="button" id="btn_select_all_master" class="btn btn-primary">เลือกทั้งหมด</button>
+                                                    </div>
+                                                </div>
                                                 <div class="box-item-keyword">
                                                     <ul id="keyword_rule" class="main-list keyword-list">
                                                         @foreach($master_rule as $rule)
@@ -158,7 +165,14 @@
                                                 </div>
                                             </div>
                                             <div class="col-lg-6">
-                                                <h5 class="font-weight-bold" id="txt_name_site">&nbsp;</h5>
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <h5 class="font-weight-bold" id="txt_name_site">&nbsp;</h5>
+                                                    </div>
+                                                    <div class="col-lg-6 text-right">
+                                                        <button type="button" id="btn_delete_all_site" class="btn btn-primary">ลบทั้งหมด</button>
+                                                    </div>
+                                                </div>
                                                 <input type="hidden" name="hd_site_id" id="hd_site_id" value="">
                                                 <div class="box-item-keyword">
                                                     <ul id="site_rule" class="main-list site-list" height="100%">
@@ -1421,6 +1435,68 @@
                     toastr.error(response.message);
                 }
 
+            }
+        });
+
+    });
+
+    $('#btn_select_all_master').click(function(){
+
+        let site_id = $('#hd_site_id').val();
+
+        $.ajax({
+            url: "{{ route('agentmanagement.select_rule_all_master') }}",
+            type: "POST",
+            data: {
+                site_id:site_id
+            },
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) 
+            {
+                loading('stop_load');
+
+                if(response.status == 'success')
+                {
+                    $('#btn_search_rule').trigger('click');
+                    toastr.success(response.message);
+                }
+                else
+                {
+                    toastr.error(response.message);
+                }
+            }
+        });
+
+    });
+
+    $('#btn_delete_all_site').click(function(){
+
+        let site_id = $('#hd_site_id').val();
+
+        $.ajax({
+            url: "{{ route('agentmanagement.delete_rule_all_site') }}",
+            type: "POST",
+            data: {
+                site_id:site_id
+            },
+            beforeSend: function(){
+                loading('load');
+            },
+            success:function(response) 
+            {
+                loading('stop_load');
+
+                if(response.status == 'success')
+                {
+                    $('#btn_search_rule').trigger('click');
+                    toastr.success(response.message);
+                }
+                else
+                {
+                    toastr.error(response.message);
+                }
             }
         });
 
