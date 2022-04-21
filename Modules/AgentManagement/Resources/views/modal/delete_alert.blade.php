@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-dialog-aside">
+<div class="modal-dialog modal-dialog-aside" id="m_alert_delete">
   <div class="modal-content">
       <div class="modal-header bg-danger">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -9,7 +9,7 @@
 
       <div class="modal-body">
           <p class="text-danger">@langapp('delete_warning')  </p>
-          <input type="hidden" name="hd_delete_id" value="{{}}">
+          <input type="hidden" name="hd_delete_id" value="{{ $query->id }}">
       </div>
       <div class="modal-footer">
           {!! closeModalButton() !!}
@@ -33,12 +33,10 @@
       axios.post($(this).attr("action"), data)
           .then(function (response) {
               toastr.success('Deleted Successfully');
+              $('#m_alert_delete').modal('hide');
               $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
-              {{-- window.location.href = response.data.redirect; --}}
 
-              tbl_category_rule.ajax.reload();
-              tbl_all_rule.ajax.reload();
-              tbl_extention_rule.ajax.reload();
+              datatable_alert.ajax.reload();
           })
           .catch(function (error) {
               if(error.response.data.exception)
