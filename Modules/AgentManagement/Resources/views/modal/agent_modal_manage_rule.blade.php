@@ -40,22 +40,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>dall</td>
-                        <td>Rule Name 01</td>
-                        <td>
-                            Description
-                        </td>
-                        <td>Serverity</td>
-                        <td>
-                            <label>
-                                <input name="" value="1" id="-all" type="checkbox" class="">
-                                <span class="label-text"></span>
-                            </label>
-                        </td>
-                        <td>04-20-2022 15:22:00</td>
-                        <td>MTSC</td>
-                    </tr>
+                    @foreach ($ruleNameSite as $item)
+                        <tr>
+                            <td>{{ $item -> category_name }}</td>
+                            <td>{{ $item -> rule_name }}</td>
+                            <td>
+                                {{ $item -> description }}
+                            </td>
+                            <td>{{  $item -> severity }}</td>
+                            <td>
+                                <label>
+                                    <input name="" value="1" id="-all" type="checkbox" class="">
+                                    <span class="label-text"></span>
+                                </label>
+                            </td>
+                            <td>{{  $item -> created_at }}</td>
+                            <td>-</td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
