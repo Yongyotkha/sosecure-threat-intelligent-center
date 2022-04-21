@@ -691,6 +691,10 @@ class AgentManagementController extends Controller
         return view('agentmanagement::modal.delete_alert')->with(compact('query'));   
     }
 
+    public function alert_delete_id(){
+        
+    }
+
     public function tb_agent(Request $request)
     {
         $input = $request->all();

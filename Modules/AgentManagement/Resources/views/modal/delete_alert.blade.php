@@ -5,11 +5,11 @@
           <h4 class="modal-title">@langapp('delete')   </h4>
       </div>
       
-      {!! Form::open(['route' => ['agentmanagement.rule_delete'], 'class' => 'ajaxifyForm_custom', 'id'=> 'form_alert_delete', 'method' => 'post']) !!}
+      {!! Form::open(['route' => ['agentmanagement.alert_delete_id'], 'class' => 'ajaxifyForm_custom', 'id'=> 'form_alert_delete', 'method' => 'post']) !!}
 
       <div class="modal-body">
           <p class="text-danger">@langapp('delete_warning')  </p>
-          <input type="hidden" name="hd_delete_id" value="{{$query->id}}">
+          <input type="hidden" name="hd_delete_id" value="{{}}">
       </div>
       <div class="modal-footer">
           {!! closeModalButton() !!}
