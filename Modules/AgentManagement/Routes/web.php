@@ -64,5 +64,7 @@ Route::group(
 		Route::post('/check_insert_rule_process', 'AgentManagementController@check_insert_rule_process')->name('agentmanagement.check_insert_rule_process');
 		Route::post('/delete_rule_site', 'AgentManagementController@delete_rule_site')->name('agentmanagement.delete_rule_site');
 		Route::get('/get_extension_rule_site', 'AgentManagementController@get_extension_rule_site')->name('agentmanagement.get_extension_rule_site');
+	
+		Route::get('/alert_delete', 'AgentManagementController@modal_agent_alert_delete')->name('agentmanagement.modal_agent_alert_delete');
 	}
 );

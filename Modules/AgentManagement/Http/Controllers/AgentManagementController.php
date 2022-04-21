@@ -667,20 +667,28 @@ class AgentManagementController extends Controller
         })
         
         ->addColumn('action', function($query) {
+            
             $html = '';
-            // <a href="'.route('agentmanagement.view_txt').'" data-toggle="ajaxModal"  class="btn btn-info btn-xs">
-            //             <i class="fas fa-eye"></i>
-            //         </a>
             $html .= '
-                    
-                    <a href="#" class="btn btn-danger btn-xs">
+                     
+                    <a href="'.route('agentmanagement.modal_agent_alert_delete', ['id' => $query->id]).'"  class="btn btn-danger btn-xs" data-toggle="ajaxModal">
                         <i class="fas fa-ban"></i>
                     </a>
+                    
             ';
             return $html;
         })
         ->rawColumns(['chk', 'severity_status', 'chk_status', 'device_name', 'action'])
         ->make(true);
+    }
+
+
+    public function modal_agent_alert_delete(Request $request)
+    {
+        // dd($request->all());
+        // $query = YaraLog::where(['id' => $request->id])->first();
+        $query = '';
+        return view('agentmanagement::modal.delete_alert')->with(compact('query'));   
     }
 
     public function tb_agent(Request $request)
