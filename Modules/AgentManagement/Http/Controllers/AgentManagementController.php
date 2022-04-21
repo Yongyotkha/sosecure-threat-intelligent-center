@@ -1173,7 +1173,7 @@ class AgentManagementController extends Controller
     {
         // dd($request->all());
 
-        $code_site = $request->code_site;
+        $code_site = $request->site_id;
 
         $date_now = date('Y-m-d H:i:s');
 
@@ -1224,7 +1224,7 @@ class AgentManagementController extends Controller
     {
         // dd($request->all());
 
-        $code_site = $request->code_site;
+        $code_site = $request->site_id;
 
         $date_now = date('Y-m-d H:i:s');
 
