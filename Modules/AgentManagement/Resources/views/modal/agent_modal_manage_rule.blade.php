@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-dialog-aside fullscreen">
+<div class="modal-dialog modal-dialog-aside fullscreen size-half-50">
     <div class="modal-content">
         <div class="modal-header bg-info">
             <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
