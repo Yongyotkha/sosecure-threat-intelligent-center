@@ -747,6 +747,22 @@
 
     });
 
+    $('#add_category_modal').on('hidden.bs.modal', function () {
+        $('#form_add_category')[0].reset();
+
+        $('#btn_save_category').html('<i class="fas fa-paper-plane"></i> Save');
+        $('#btn_save_category').attr('disabled', false);
+
+    });
+
+    $('#add_extension_modal').on('hidden.bs.modal', function () {
+        $('#form_add_extension')[0].reset();
+
+        $('#btn_save_extension').html('<i class="fas fa-paper-plane"></i> Save');
+        $('#btn_save_extension').attr('disabled', false);
+
+    });
+
     $('#add_rule_modal').on('show.bs.modal', function () {
 
         $.ajax({
@@ -880,8 +896,6 @@
                         toastr.success(response.message);
 
                         $('#btn_save_extension').html('Success');
-
-                        $('#form_add_extension').reset();
 
                         $('#add_extension_modal').modal("hide");
 
