@@ -1011,7 +1011,7 @@ class AgentManagementController extends Controller
                         <span class="text-keyword">'. $mas_rule->get_name_category->name .' - '. $mas_rule->rule_name .'</span>
                     </div>
                     <div class="action-keyword">
-                        <a href="#" class="text-white delete_rule_site_master" data-delete_rule_site_master="'. $name_rule->id .'" data-mode_delete="master"><i class="fas fa-trash-alt"></i></a>
+                        <a href="#" class="text-white delete_rule_site_master" data-delete_rule_site_master="'. $mas_rule->id .'" data-mode_delete="master"><i class="fas fa-trash-alt"></i></a>
                     </div>
                 </li>
             ';
