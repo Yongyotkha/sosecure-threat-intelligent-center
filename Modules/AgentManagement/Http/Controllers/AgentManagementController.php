@@ -541,6 +541,7 @@ class AgentManagementController extends Controller
                         'yara_log.last_scan',
                         'rule_name.severity as severity_status'
                     )
+                    
                     ->where('yara_log.status', 1)
                     ->where(function($query) use ($site_id ){
                         if($site_id  != null){
@@ -553,10 +554,9 @@ class AgentManagementController extends Controller
                                 ->orwhere('yara_log.description', 'like', '%'.$keyword_search.'%');     
                         }
                     })
-                    ->orderBy('agent_alerts_created', 'desc')
-                    ->limit(50)
+                    ->orderBy('agent_alerts_created', 'desc')               
                     ->get();
-        // dd($query);     
+          
 
         // if($request->site_id != null)
         // {
@@ -609,25 +609,25 @@ class AgentManagementController extends Controller
             ';
             return $html;
         })
-        ->addColumn('sev_status', function($query) {
+        ->addColumn('severity_status', function($query) {
             $html = '';
-                    if($query->agent_alerts_severity == 'Critical')
+                    if($query->severity_status == 'Critical')
                     {
             $html .= '<span class="badge" style="background-color: #b93624;">Critical</span>';
                     }
-                    else if($query->agent_alerts_severity == 'High')
+                    else if($query->severity_status == 'High')
                     {
             $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
                     }
-                    else if($query->agent_alerts_severity == 'Medium')
+                    else if($query->severity_status == 'Medium')
                     {
             $html .= '<span class="badge" style="background-color: #f2ff15;color: #333;">Medium</span>';
                     }
-                    else if($query->agent_alerts_severity == 'Low')
+                    else if($query->severity_status == 'Low')
                     {
             $html .= '<span class="badge" style="background-color: #409967;">Low</span>';
                     }
-                    else if($query->agent_alerts_severity == 'Information')
+                    else if($query->severity_status == 'Information')
                     {
             $html .= '<span class="badge" style="background-color: #00dcff;">Information</span>';
                     }
@@ -679,7 +679,7 @@ class AgentManagementController extends Controller
             ';
             return $html;
         })
-        ->rawColumns(['chk', 'sev_status', 'chk_status', 'device_name', 'action'])
+        ->rawColumns(['chk', 'severity_status', 'chk_status', 'device_name', 'action'])
         ->make(true);
     }
 

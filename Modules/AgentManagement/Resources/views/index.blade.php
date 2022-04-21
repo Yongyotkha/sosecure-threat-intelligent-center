@@ -1448,9 +1448,7 @@
                 {
                     data: 'last_scan',
                 },
-                // {
-                //     data: 'sev_status',
-                // },
+               
                 {
                     data: 'severity_status',
                 },
