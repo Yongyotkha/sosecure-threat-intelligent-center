@@ -125,9 +125,10 @@
 
         axios.post($(this).attr("action"), data)
             .then(function (response) {
-                toastr.success('Deleted Successfully');
+                toastr.success('Update Successfully');
+                $('#ajaxModal').modal("hide");
                 $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
-                window.location.href = response.data.redirect;
+                tbl_agent.ajax.reload();
             })
             .catch(function (error) {
                 if(error.response.data.exception)

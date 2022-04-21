@@ -1471,7 +1471,7 @@
     {
         var site_id = site_val;
 
-        $('#table-agent-template').DataTable({
+        tbl_agent = $('#table-agent-template').DataTable({
             cache: false,
             processData: false,
             contentType: false,
