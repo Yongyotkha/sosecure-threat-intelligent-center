@@ -944,11 +944,13 @@ class AgentManagementController extends Controller
         $agent_id = $request -> agent_id;
         $site_id = $request -> site_id;
         $rule_id = $request -> rule_id;
+        $ignore = $request -> ignore;
 
         $res = [
             'agent_id' => $agent_id,
             'site_id' => $site_id,
-            'rule_id' => $rule_id
+            'rule_id' => $rule_id,
+            'ignore' => $ignore
         ];
         dd($res);
     }
