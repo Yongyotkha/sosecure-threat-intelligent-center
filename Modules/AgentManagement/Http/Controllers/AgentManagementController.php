@@ -26,6 +26,7 @@ use App\TBLRuleName;
 use App\RuleNameSite;
 use App\RuleFileSiteDownload;
 use App\RuleFileSiteAgentDownload;
+use App\SiteAgentExtention;
 use Modules\SiteSettings\Entities\Menu;
 use Modules\SiteSettings\Entities\Menu_sub;
 use Modules\SiteSettings\Entities\site_config_email_alert;
@@ -489,9 +490,9 @@ class AgentManagementController extends Controller
         //             ->get();
 
         $query = AgentScanLog::
-                    join('site', 'agent_scan_log.site_id', 'site.id')
-                    ->join('site_agents', 'agent_scan_log.agent_id', 'site_agents.id')
-                    ->orderBy('agent_scan_log.created_at', 'desc')
+                    leftjoin('site', 'agent_scan_log.site_id', 'site.id')
+                    ->leftjoin('site_agents', 'agent_scan_log.agent_id', 'site_agents.id')
+                    ->orderBy('agent_scan_log.first_scan', 'desc')
                     ->select(
                         'site.name as site_name',
                         'site.logo as site_logo',
@@ -503,6 +504,7 @@ class AgentManagementController extends Controller
                         'agent_scan_log.description',
                         'agent_scan_log.created_at'
                     )
+                    ->limit(5)
                     ->get();
                     
         // dd($query);
@@ -1077,11 +1079,21 @@ class AgentManagementController extends Controller
             }
         }
 
+        $select_type_extension = SiteAgentExtention::where('site_id', $site_id)->get();
+
+        $extension_all = 1;
+
+        if(count($select_type_extension) > 0)
+        {
+            $extension_all = 0;
+        }
+
         $response = [
             'data_site' => $data_site,
             'html' => $html,
             'html_master_rule' => $html_master_rule,
-            'site_name_rule' => $site_name_rule
+            'site_name_rule' => $site_name_rule,
+            'extension_all' => $extension_all
         ];
 
         return response()->json($response);
@@ -1098,8 +1110,16 @@ class AgentManagementController extends Controller
             ->get()
             ->toArray();
 
+        $select_type_extension = SiteAgentExtention::where('site_id', $request->value_site)->pluck('extention_id')->toArray();
+
+        if($request->value_type == 'all')
+        {
+            SiteAgentExtention::where('site_id', $request->value_site)->delete();
+        }
+
         $response = [
-            'select_extension' => $select_extension
+            'select_extension' => $select_extension,
+            'select_type_extension' => $select_type_extension
         ];
 
         return response()->json($response);
@@ -1738,6 +1758,32 @@ class AgentManagementController extends Controller
             })
             ->rawColumns(['c_status', 'c_action'])
             ->make(true);
+    }
+
+    public function update_site_extension(Request $request)
+    {
+
+        SiteAgentExtention::where('site_id', $request->value_site)->delete();
+
+        foreach($request->arr_extension as $arr_extension)
+        {
+            $main_data = [];
+            $main_data['site_id'] = $request->value_site;
+            $main_data['agent_id'] = '';
+            $main_data['extention_id'] = $arr_extension;
+            $main_data['status'] = 'Y';
+            $main_data['create_by'] = Auth::user()->id;
+            $main_data['update_by'] = Auth::user()->id;
+
+            SiteAgentExtention::create($main_data);
+        }
+
+        $response = [
+            'status' => 'success',
+            'message' => ''
+        ];
+
+        return response()->json($response);
     }
 
     public function extension_insert(Request $request)
