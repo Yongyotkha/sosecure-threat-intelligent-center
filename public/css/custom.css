@@ -5479,3 +5479,8 @@ input.form-policy[type=password] {
 .risk-status.high-risk{
     background-color: #c00;
 }
+
+.box-tooltip .tooltip-inner{
+    max-width: fit-content !important;
+    width: 100%;
+}

@@ -1399,7 +1399,7 @@
     {
         var site_id = site_val;
 
-        $('#table-activities-template').DataTable({
+        tbl_alert = $('#table-activities-template').DataTable({
             cache: false,
             processData: false,
             contentType: false,
@@ -1421,6 +1421,9 @@
                     d.end_date = end_date;
                     return d ;
                 }
+            },
+            initComplete : function( settings, json){
+                $('[data-toggle="tooltip"]').tooltip();
             },
             columns: [
                 {
