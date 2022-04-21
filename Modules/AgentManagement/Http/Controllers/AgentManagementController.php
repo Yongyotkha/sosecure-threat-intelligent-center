@@ -804,7 +804,7 @@ class AgentManagementController extends Controller
                         <li><a href="#"><i class="fas fa-eye"></i> View Log Data</a></li>
                         <li class="d-none"><a href="#"><i class="fas fa-eye"></i> View Log Error</a></li>
                         <li><a href="'.route('agentmanagement.agent_modal_manage_rule', ['agent_id' => $query->site_agents_id, 'id' => $query->site_agents_id]).'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Manage Rule</a></li>
-                        <li><a href="'.route('agentmanagement.agent_modal_control_agent', $query->batchjob_everydate,$query->batchjob_everydate, $query->batchjob_everydate ).'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Control Agent</a></li>
+                        <li><a href="'.route('agentmanagement.agent_modal_control_agent', ['batchjob' => $query->batchjob_everydate, 'real_time' =>$query->real_time_protection, 'usb' => $query->usb_protection] ).'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Control Agent</a></li>
                     
                         </ul>
                 </div>

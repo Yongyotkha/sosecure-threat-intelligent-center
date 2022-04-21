@@ -63,7 +63,7 @@
                 <div class="col-lg-2">
                     <span>start:</span>
                 </div>
-                
+                <h1>{{ $usb }}</h1>
                 <div class="col-lg-10">
                     <select name="batch_start" id="batch_start" class="text-left select2-option form-control select-site" >
                         <?php for($hours=0; $hours<24; $hours++) // the interval for hours is '1'
