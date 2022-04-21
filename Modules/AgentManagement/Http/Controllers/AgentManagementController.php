@@ -1569,6 +1569,36 @@ class AgentManagementController extends Controller
             ->make(true);
     }
 
+    public function extension_insert(Request $request)
+    {
+
+        $check_extension = TBLRuleCategory::where(['name' => $request->extension_name, 'mode' => 'extention', 'deleted_at' => null])->first();
+
+        if(!$check_extension)
+        {
+            $main_data = [];
+            $main_data['name'] = $request->extension_name;
+            $main_data['mode'] = 'extention';
+            $main_data['status'] = @$request->status ? 'Y' : 'N';
+    
+            TBLRuleCategory::create($main_data);
+    
+            $response = [
+                'status' => 'success',
+                'message' => 'Add extention success.'
+            ];
+        }
+        else
+        {
+            $response = [
+                'status' => 'error',
+                'message' => 'This extention already exists.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
     public function category_insert(Request $request)
     {
 

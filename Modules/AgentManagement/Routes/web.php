@@ -43,6 +43,7 @@ Route::group(
 	function () {
 		Route::get('/tbl_category_rule', 'AgentManagementController@tbl_category_rule')->name('agentmanagement.tbl_category_rule');
 		Route::get('/tbl_extention_rule', 'AgentManagementController@tbl_extention_rule')->name('agentmanagement.tbl_extention_rule');
+		Route::post('/extension_insert', 'AgentManagementController@extension_insert')->name('agentmanagement.extension_insert');
 		Route::post('/category_insert', 'AgentManagementController@category_insert')->name('agentmanagement.category_insert');
 		Route::get('/category_edit', 'AgentManagementController@category_edit')->name('agentmanagement.category_edit');
 		Route::post('/category_update', 'AgentManagementController@category_update')->name('agentmanagement.category_update');

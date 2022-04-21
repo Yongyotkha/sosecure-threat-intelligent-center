@@ -23,6 +23,11 @@
                         class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                         <span data-rel="tooltip" title="Add Category" data-placement="top">@icon('solid/plus')<span class="hide-text">Add Category</span></span>
                     </button>
+
+                    <button id="add_category" data-toggle="modal" data-target="#add_extension_modal"
+                        class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                        <span data-rel="tooltip" title="Add Category" data-placement="top">@icon('solid/plus')<span class="hide-text">Add Extension</span></span>
+                    </button>
                     
                     {{-- <button type="button" id="btn_del_select" class="btn btn-sm btn-danger"
                     value="bulk-delete" disabled>
@@ -68,7 +73,7 @@
                             <li class="active"><a href="#tab_rule_site" data-toggle="tab" id="tab_rule_site_click">Rule Site</a></li>
                             <li><a href="#tab_agent" data-toggle="tab" id="tab_agent_click">All Rule</a></li>   
                             <li><a href="#tab_category" data-toggle="tab" id="tab_category_click">Category</a></li>   
-                            <li><a href="#tab_extention" data-toggle="tab" id="tab_extention_click">Extention</a></li>   
+                            <li><a href="#tab_extention" data-toggle="tab" id="tab_extention_click">Extension</a></li>   
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane active" id="tab_rule_site">
@@ -330,6 +335,63 @@
                             Close
                         </button>
                         <button type="button" value="Submit" required class="btn btn-info btn-rounded" id="btn_save_category">
+                            <i class="fas fa-paper-plane"></i>
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal in fixed-left" id="add_extension_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip"
+                            title="Fullscreen" data-placement="right"></i>
+                        Add extension
+                    </h4>
+                </div>
+                <form id='form_add_extension' enctype="multipart/form-data">
+                    <div class="modal-body">
+
+                        <div class="form-group row">
+                            <label style="padding-top: 7px" class="col-lg-3 control-label">
+                                Name <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-lg-9">
+                                <div class="row">
+                                    <div class="form-group">
+                                        <div class="col-lg-8 mb-1">
+                                            <input type="text" name="extension_name" id="extension_name" class="form-control">
+                                            <span style="color:red;" id="error_extension_name" class="d-none"><small>Please enter your name extension</small></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" style="padding-top: 7px">
+                            <label class="col-lg-3 control-label">Status </label>
+                            <div class="col-lg-8">
+                                <label class="switch">
+                                    <input type="checkbox" id="status" name="status" checked value="1">
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                            <i class="fas fa-times"></i>
+                            Close
+                        </button>
+                        <button type="button" value="Submit" required class="btn btn-info btn-rounded" id="btn_save_extension">
                             <i class="fas fa-paper-plane"></i>
                             Save
                         </button>
@@ -763,6 +825,63 @@
         else
         {
             input_check_err('#category_name', '#error_category_name')
+        }
+
+        
+    });
+
+    $('#btn_save_extension').click(function(e){
+        e.preventDefault();
+
+        let extension_name = $('#extension_name').val();
+
+        if(extension_name)
+        {
+            var formData = new FormData(document.getElementById("form_add_extension"));
+
+            $('#btn_save_extension').html('Processing.. <i class="fas fa-spin fa-spinner"></i>');
+            $('#btn_save_extension').attr('disabled', true);
+
+            $.ajax({
+                url: "{{ route('agentmanagement.extension_insert') }}",
+                type: 'post',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforesend: function(){
+                    
+                },
+                success:function(response){
+
+                    if(response.status == 'success')
+                    {
+                        toastr.success(response.message);
+
+                        $('#btn_save_extension').html('Success');
+
+                        tbl_category_rule.ajax.reload();
+                        tbl_all_rule.ajax.reload();
+                        tbl_extention_rule.ajax.reload();
+
+                        setTimeout(function(){
+                            {{-- window.location.href = response.route; --}}
+                        }, 3000);
+                    }
+                    else
+                    {
+                        $('#btn_save_extension').html('Try again');
+                        $('#btn_save_extension').attr('disabled', false);
+
+                        toastr.error(response.message);
+                    }
+
+                }
+            });
+        }
+        else
+        {
+            input_check_err('#extension_name', '#error_extension_name')
         }
 
         
