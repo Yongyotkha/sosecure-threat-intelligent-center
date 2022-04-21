@@ -1448,8 +1448,11 @@
                 {
                     data: 'last_scan',
                 },
+                // {
+                //     data: 'sev_status',
+                // },
                 {
-                    data: 'sev_status',
+                    data: 'severity_status',
                 },
                 {
                     data: 'agent_alerts_created',
