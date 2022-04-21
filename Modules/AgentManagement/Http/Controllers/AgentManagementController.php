@@ -1000,39 +1000,45 @@ class AgentManagementController extends Controller
             ->get();
 
         $html = '';
-
-        foreach($site_name_rule as $name_rule)
+        
+        if(count($site_name_rules) > 0)
         {
-            $html .= '
-                <li class="item-list item--keyword" data-id="'. $name_rule->id .'">
-                    <div class="left-side-item">
-                        <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
-                        <span class="text-keyword">'. $name_rule->get_name_category->name .' - '. $name_rule->rule_name .'</span>
-                    </div>
-                    <div class="action-keyword">
-                        <a href="#" class="text-white delete_rule_site_master" data-delete_rule_site_master="'. $name_rule->id .'" data-mode_delete="site"><i class="fas fa-trash-alt"></i></a>
-                    </div>
-                </li>
-            ';
-            // <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
+            foreach($site_name_rule as $name_rule)
+            {
+                $html .= '
+                    <li class="item-list item--keyword" data-id="'. $name_rule->id .'">
+                        <div class="left-side-item">
+                            <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
+                            <span class="text-keyword">'. $name_rule->get_name_category->name .' - '. $name_rule->rule_name .'</span>
+                        </div>
+                        <div class="action-keyword">
+                            <a href="#" class="text-white delete_rule_site_master" data-delete_rule_site_master="'. $name_rule->id .'" data-mode_delete="site"><i class="fas fa-trash-alt"></i></a>
+                        </div>
+                    </li>
+                ';
+                // <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
+            }
         }
 
         $html_master_rule = '';
 
-        foreach($master_rule as $mas_rule)
+        if(count($master_rule) > 0)
         {
-            $html_master_rule .= '
-                <li class="item-list item--keyword" data-id="'. $mas_rule->id .'">
-                    <div class="left-side-item">
-                        <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
-                        <span class="text-keyword">'. $mas_rule->get_name_category->name .' - '. $mas_rule->rule_name .'</span>
-                    </div>
-                    <div class="action-keyword">
-                        <a href="#" class="text-white delete_rule_site_master" data-delete_rule_site_master="'. $mas_rule->id .'" data-mode_delete="master"><i class="fas fa-trash-alt"></i></a>
-                    </div>
-                </li>
-            ';
-            // <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
+            foreach($master_rule as $mas_rule)
+            {
+                $html_master_rule .= '
+                    <li class="item-list item--keyword" data-id="'. $mas_rule->id .'">
+                        <div class="left-side-item">
+                            <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
+                            <span class="text-keyword">'. $mas_rule->get_name_category->name .' - '. $mas_rule->rule_name .'</span>
+                        </div>
+                        <div class="action-keyword">
+                            <a href="#" class="text-white delete_rule_site_master" data-delete_rule_site_master="'. $mas_rule->id .'" data-mode_delete="master"><i class="fas fa-trash-alt"></i></a>
+                        </div>
+                    </li>
+                ';
+                // <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
+            }
         }
 
         $response = [
