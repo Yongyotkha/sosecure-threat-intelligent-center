@@ -1272,7 +1272,6 @@
                     $('.row_extension_set').removeClass('d-none');
 
                     let type_extension = (response.extension_all == 1 ? 'all' : 'custom');
-                    console.log(type_extension);
 
                     $('#extension_rule_site').val(type_extension).trigger('change');
                     
@@ -1309,6 +1308,8 @@
                 value_site:value_site
             },
             success: function(response){
+
+                toastr.success('Update extension success.');
 
                 let html = `
                     <option value="" disabled>Choose an Extension</option>
@@ -1358,7 +1359,7 @@
             },
             success:function(response)
             {
-
+                toastr.success('Update extension success.');
             }
         });
 
