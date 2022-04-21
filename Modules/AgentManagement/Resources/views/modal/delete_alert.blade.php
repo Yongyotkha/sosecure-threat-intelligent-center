@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-dialog-aside" id="m_alert_delete">
+<div class="modal-dialog modal-dialog-aside" >
   <div class="modal-content">
       <div class="modal-header bg-danger">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -33,10 +33,10 @@
       axios.post($(this).attr("action"), data)
           .then(function (response) {
               toastr.success('Deleted Successfully');
-              $('#m_alert_delete').modal('hide');
+              $('#ajaxModal').modal("hide");
               $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
 
-              datatable_alert.ajax.reload();
+              tbl_alert.ajax.reload();
           })
           .catch(function (error) {
               if(error.response.data.exception)

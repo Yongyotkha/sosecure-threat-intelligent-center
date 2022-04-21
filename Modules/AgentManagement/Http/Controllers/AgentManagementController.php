@@ -658,10 +658,13 @@ class AgentManagementController extends Controller
         })
         ->addColumn('device_name', function($query) {
             $html = '';
-            $html .= '     
-            <div class="wrapper-new">
-                <span class="tooltip-new">'.$query -> device_name.'</span>
-                <button class="btn btn-secondary"><i class="fas fa-file"></i></button>
+            $html .= '  
+            
+            
+            <div class="box-tooltip">
+                <span data-toggle="tooltip" data-placement="right" data-html="true" title="" data-original-title="'.$query -> device_name.'">
+                    <button class="btn btn-secondary"><i class="fas fa-file"></i></button>
+                </span>
             </div>  
             ';
             return $html;
@@ -798,7 +801,7 @@ class AgentManagementController extends Controller
                         <li><a href="#"><i class="fas fa-eye"></i> View Log Data</a></li>
                         <li class="d-none"><a href="#"><i class="fas fa-eye"></i> View Log Error</a></li>
                         <li><a href="'.route('agentmanagement.agent_modal_control_agent').'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Control Agent</a></li>
-                        <li><a href="'.route('agentmanagement.agent_modal_manage_rule', $query->site_id).'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Manage Rule</a></li>
+                        <li><a href="'.route('agentmanagement.agent_modal_manage_rule', $query->site_agents_id).'" data-toggle="ajaxModal"><i class="fas fa-eye"></i> Manage Rule</a></li>
                         </ul>
                 </div>
                 <a href="'.route('agentmanagement.agent_delete_modal', ['_id' => $query->site_agents_id]).'" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><i class="fas fa-trash-alt"></i></a>
