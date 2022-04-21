@@ -18,6 +18,8 @@ use Illuminate\Http\Request;
 use Modules\Users\Entities\model_has_roles;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
+use App\SiteAgentExtention;
+use App\SiteAgentIgnore;
 
 class ApiAgentController extends ApiController
 {
@@ -807,32 +809,27 @@ class ApiAgentController extends ApiController
             } else {
                 $data_key = $data['data'];
                 $ip_private = $data_key['ip_private'];
-                $siteAgentsHasData = FXSiteAgents::select('id', 'active_date', 'status')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
+                $siteAgentsHasData = FXSiteAgents::select('id', 'batchjob_everydate', 'real_time_protection', 'extention_all_flag')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
                 if($siteAgentsHasData){
-                    if($siteAgentsHasData -> status == 1){
-                        $ruleSites = RuleSite::where('site_id', $data['site']['data']['id'])
-                        ->where('agent_id', $siteAgentsHasData->id)
-                        ->where('transaction_download', 0)
-                        ->get();
-                        $ruleFiles = [];
-                        foreach($ruleSites as $ruleSite){
-                            $ruleFiles[] = RuleFile::where('id', $ruleSite -> rule_id)->where('transaction_download_client', 1)->first();
-                        }
-                        $response = [
-                            'error' => '', 
-                            'status_code' => 200,
-                            'data' => [
-                                'agent' => $siteAgentsHasData,
-                                'rules' => $ruleFiles
-                            ]
-                        ];
-                    }else{
-                        $response = [
-                            'error' => '', 
-                            'status_code' => 200,
-                            'data' => $siteAgentsHasData
-                        ];
-                    }
+                    $ignore = SiteAgentIgnore::select('ref_id')->where('site_id', $data['site']['data']['id'])
+                    ->where('agent_id', $siteAgentsHasData->id)
+                    ->where('type', 'extention')
+                    ->where('status', 'Y')
+                    ->pluck('ref_id');
+
+                    $extentions = SiteAgentExtention::select('extention_id')->where('site_id', $data['site']['data']['id'])
+                    ->where('agent_id', $siteAgentsHasData->id)
+                    ->whereNotIn('extention_id', $ignore)
+                    ->get();
+
+                    $response = [
+                        'error' => '', 
+                        'status_code' => 200,
+                        'data' => [
+                            'agent' => $siteAgentsHasData,
+                            'extentions' => $extentions
+                        ]
+                    ];
                 }else{
                     $response = [
                         'error' => 'Data not found', 
