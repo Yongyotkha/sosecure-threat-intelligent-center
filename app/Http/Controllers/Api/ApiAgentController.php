@@ -757,6 +757,7 @@ class ApiAgentController extends ApiController
                 $ip_private = $data_key['ip_private'];
                 $batchjob_everydate = $data_key['batchjob_everydate'];
                 $real_time_protection = $data_key['real_time_protection'];
+                $usb_protection = $data_key['usb_protection'];
 
                 $FXSiteAgents = FXSiteAgents::where('site_id', $data['site']['data']['id'])
                 ->where('ip_private', $ip_private)
@@ -766,6 +767,7 @@ class ApiAgentController extends ApiController
                 if($FXSiteAgents){
                     $FXSiteAgents -> batchjob_everydate = $batchjob_everydate;
                     $FXSiteAgents -> real_time_protection = $real_time_protection;
+                    $FXSiteAgents -> usb_protection = $usb_protection;
                     $FXSiteAgents -> save();
                     $response = [
                         'error' => '', 
