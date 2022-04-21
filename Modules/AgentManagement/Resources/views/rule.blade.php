@@ -130,7 +130,7 @@
                                             <div class="col-lg-4">
                                                 <div class="form-group m-b-md">
                                                     <label for="" class="">Custom</label>
-                                                    <select name="custom_select_rule_site" id="custom_select_rule_site" class="select2-option form-control" multiple="multiple">
+                                                    <select name="custom_select_rule_site[]" id="custom_select_rule_site" class="select2-option form-control" multiple="multiple">
                                                     </select>
                                                 </div>
                                             </div>
@@ -1271,6 +1271,12 @@
 
                     $('.row_extension_set').removeClass('d-none');
 
+                    let type_extension = (response.extension_all == 1 ? 'all' : 'custom');
+                    console.log(type_extension);
+
+                    $('#extension_rule_site').val(type_extension).trigger('change');
+                    
+
                 }
             });
         }
@@ -1285,40 +1291,76 @@
 
         let value_type = $(this).val();
         let value_site = $('#hd_site_id').val();
+
         if(value_type == 'custom')
         {
             $('.row_extension_custom_set').removeClass('d-none');
-
-            $.ajax({
-                url: "{{ route('agentmanagement.get_extension_rule_site') }}",
-                type: 'get',
-                data:{
-                    value_type:value_type,
-                    value_site:value_site
-                },
-                success: function(response){
-
-                    let html = `
-                        <option value="" disabled>Choose an Extension</option>
-                    `;
-
-                    const select_extension = response.select_extension;
-                    for(let i in select_extension)
-                    {
-                        html += `
-                            <option value="${select_extension[i].id}">${select_extension[i].name}</option>
-                        `;
-                    }
-
-                    $('#custom_select_rule_site').empty().append(html);
-
-                }
-            });
         }
         else
         {
             $('.row_extension_custom_set').addClass('d-none');
         }
+
+        $.ajax({
+            url: "{{ route('agentmanagement.get_extension_rule_site') }}",
+            type: 'get',
+            data:{
+                value_type:value_type,
+                value_site:value_site
+            },
+            success: function(response){
+
+                let html = `
+                    <option value="" disabled>Choose an Extension</option>
+                `;
+
+                const select_extension = response.select_extension;
+                for(let i in select_extension)
+                {
+                    html += `
+                        <option value="${select_extension[i].id}" 
+                    `;
+
+                    if(jQuery.inArray(select_extension[i].id, response.select_type_extension) !== -1)
+                    {
+                        html += `selected`;
+                    }
+
+                    html += `
+                        >${select_extension[i].name}</option>
+                    `;
+                }
+
+                $('#custom_select_rule_site').empty().append(html);
+
+            }
+        });
+
+    });
+
+    $('#custom_select_rule_site').change(function(){
+
+        let value_site = $('#hd_site_id').val();
+        let arr_extension = [];
+
+        $('#custom_select_rule_site :selected').each(function(){ 
+            
+            arr_extension.push($(this).val());
+
+        });
+
+        $.ajax({
+            url: "{{ route('agentmanagement.update_site_extension')}}",
+            type: "POST",
+            data: {
+                value_site:value_site,
+                arr_extension:arr_extension,
+            },
+            success:function(response)
+            {
+
+            }
+        });
 
     });
 
@@ -1327,63 +1369,71 @@
 
         let site_id = $('#hd_site_id').val();
 
-        $.ajax({
-            type:"POST",
-            url:"{{ route('agentmanagement.check_insert_rule_process') }}",
-            data:{
-                code_site:site_id,
-                from_id:from_id,
-                to_id:to_id,
-                attributes_id:attributes_id
-            },
-            beforeSend: function(){
-                loading('load');
-            },
-            success:function(response) {
-                loading('stop_load');
-
-                if(response.status == 'success')
-                {
-                    $('#btn_search_rule').trigger('click');
-                    toastr.success(response.message);
-                }
-                else
-                {
-                    toastr.error(response.message);
-                }
-
-                {{-- if(response.status == 1) {
-                    console.log(response);
-                    result = 1;
-                    if(response && response.message) {
-                        $("#delete_select").modal("hide");
+        if(site_id)
+        {
+            $.ajax({
+                type:"POST",
+                url:"{{ route('agentmanagement.check_insert_rule_process') }}",
+                data:{
+                    code_site:site_id,
+                    from_id:from_id,
+                    to_id:to_id,
+                    attributes_id:attributes_id
+                },
+                beforeSend: function(){
+                    loading('load');
+                },
+                success:function(response) {
+                    loading('stop_load');
+    
+                    if(response.status == 'success')
+                    {
+                        $('#btn_search_rule').trigger('click');
+                        toastr.success(response.message);
+                    }
+                    else
+                    {
+                        toastr.error(response.message);
+                    }
+    
+                    {{-- if(response.status == 1) {
+                        console.log(response);
+                        result = 1;
+                        if(response && response.message) {
+                            $("#delete_select").modal("hide");
+                            get_keyword_main();
+                            get_keyword_sub('social');
+                            get_keyword_sub('darkweb');
+                            toastr.success(response.message, '@langapp('response_status')');
+                            
+                        }
+                    } else {
+                        console.log(response);
+                        toastr.error('@langapp('request_failed')', '@langapp('response_status')');
                         get_keyword_main();
                         get_keyword_sub('social');
                         get_keyword_sub('darkweb');
-                        toastr.success(response.message, '@langapp('response_status')');
-                        
-                    }
-                } else {
-                    console.log(response);
-                    toastr.error('@langapp('request_failed')', '@langapp('response_status')');
-                    get_keyword_main();
-                    get_keyword_sub('social');
-                    get_keyword_sub('darkweb');
-                } --}}
-            },
-            error: function (error){
-                console.log(error);
-                result = 0;
-                loading('stop_load');
-                var errors = error.response.data.errors;
-                var errorsHtml = '';
-                $.each(errors, function (key, value) {
-                    errorsHtml += '<li>' + value[0] + '</li>';
-                });
-                toastr.error(errorsHtml, '@langapp('response_status') ');
-            }
-        });
-        return result;
+                    } --}}
+                },
+                error: function (error){
+                    console.log(error);
+                    result = 0;
+                    loading('stop_load');
+                    var errors = error.response.data.errors;
+                    var errorsHtml = '';
+                    $.each(errors, function (key, value) {
+                        errorsHtml += '<li>' + value[0] + '</li>';
+                    });
+                    toastr.error(errorsHtml, '@langapp('response_status') ');
+                }
+            });
+            return result;
+        }
+        else
+        {
+            toastr.error('Please select site.');
+        }
+
     }
 
     function delete_rule_site_master() 
@@ -1444,30 +1494,38 @@
 
         let site_id = $('#hd_site_id').val();
 
-        $.ajax({
-            url: "{{ route('agentmanagement.select_rule_all_master') }}",
-            type: "POST",
-            data: {
-                site_id:site_id
-            },
-            beforeSend: function(){
-                loading('load');
-            },
-            success:function(response) 
-            {
-                loading('stop_load');
+        if(site_id)
+        {
+            $.ajax({
+                url: "{{ route('agentmanagement.select_rule_all_master') }}",
+                type: "POST",
+                data: {
+                    site_id:site_id
+                },
+                beforeSend: function(){
+                    loading('load');
+                },
+                success:function(response) 
+                {
+                    loading('stop_load');
+    
+                    if(response.status == 'success')
+                    {
+                        $('#btn_search_rule').trigger('click');
+                        toastr.success(response.message);
+                    }
+                    else
+                    {
+                        toastr.error(response.message);
+                    }
+                }
+            });
+        }
+        else
+        {
+            toastr.error('Please select site.');
+        }
 
-                if(response.status == 'success')
-                {
-                    $('#btn_search_rule').trigger('click');
-                    toastr.success(response.message);
-                }
-                else
-                {
-                    toastr.error(response.message);
-                }
-            }
-        });
 
     });
 
@@ -1475,30 +1533,37 @@
 
         let site_id = $('#hd_site_id').val();
 
-        $.ajax({
-            url: "{{ route('agentmanagement.delete_rule_all_site') }}",
-            type: "POST",
-            data: {
-                site_id:site_id
-            },
-            beforeSend: function(){
-                loading('load');
-            },
-            success:function(response) 
-            {
-                loading('stop_load');
+        if(site_id)
+        {
+            $.ajax({
+                url: "{{ route('agentmanagement.delete_rule_all_site') }}",
+                type: "POST",
+                data: {
+                    site_id:site_id
+                },
+                beforeSend: function(){
+                    loading('load');
+                },
+                success:function(response) 
+                {
+                    loading('stop_load');
 
-                if(response.status == 'success')
-                {
-                    $('#btn_search_rule').trigger('click');
-                    toastr.success(response.message);
+                    if(response.status == 'success')
+                    {
+                        $('#btn_search_rule').trigger('click');
+                        toastr.success(response.message);
+                    }
+                    else
+                    {
+                        toastr.error(response.message);
+                    }
                 }
-                else
-                {
-                    toastr.error(response.message);
-                }
-            }
-        });
+            });
+        }
+        else
+        {
+            toastr.error('Please select site.');
+        }
 
     });
    

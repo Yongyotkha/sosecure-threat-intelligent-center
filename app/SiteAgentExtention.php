@@ -8,4 +8,5 @@ class SiteAgentExtention extends Model
 {
     //
     protected $table = 'site_agent_extention';
+    protected $guarded = ['id'];
 }
