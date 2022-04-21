@@ -24,6 +24,8 @@ use App\TBLRuleCategory;
 use App\TBLRuleFiles;
 use App\TBLRuleName;
 use App\RuleNameSite;
+use App\RuleFileSiteDownload;
+use App\RuleFileSiteAgentDownload;
 use Modules\SiteSettings\Entities\Menu;
 use Modules\SiteSettings\Entities\Menu_sub;
 use Modules\SiteSettings\Entities\site_config_email_alert;
@@ -1047,6 +1049,22 @@ class AgentManagementController extends Controller
 
         $site_rule = RuleNameSite::create($main_data);
 
+        $get_data_category = TBLRuleName::where(['id' => $attributes_id])->first();
+
+        $chk_file_site = RuleFileSiteDownload::where(['site_id' => $code_site, 'rule_files_id' => $get_data_category->rule_file_id])
+            ->where('transaction_download_client', '!=', 3)
+            ->get();
+
+        $main_data_rule_file_site = [];
+        $main_data_rule_file_site['site_id'] = $code_site;
+        $main_data_rule_file_site['rule_files_id'] = $get_data_category->rule_file_id;
+        $main_data_rule_file_site['status'] = 'Y';
+        $main_data_rule_file_site['transaction_download_client'] = 1;
+        $main_data_rule_file_site['created_by'] = Auth::user()->id;
+        $main_data_rule_file_site['updated_by'] = Auth::user()->id;
+
+        RuleFileSiteDownload::create($main_data_rule_file_site);
+
         // $site = SiteSettings::select('id')->where('code', $code_site)->first();
 
         // if(($from_id) && ($to_id || $attributes_id)) 
@@ -1272,7 +1290,8 @@ class AgentManagementController extends Controller
     public function agent_rule_tbl_all_rule(Request $request)
     {
         $querys = TBLRuleCategory::
-            where(['deleted_at' => null])
+            where(['mode' => 'category', 'deleted_at' => null])
+            ->orderBy('id', 'desc')
             ->get();
 
         foreach($querys as $query)
@@ -1585,14 +1604,14 @@ class AgentManagementController extends Controller
     
             $response = [
                 'status' => 'success',
-                'message' => 'Add extention success.'
+                'message' => 'Add extension success.'
             ];
         }
         else
         {
             $response = [
                 'status' => 'error',
-                'message' => 'This extention already exists.'
+                'message' => 'This extension already exists.'
             ];
         }
 
@@ -1711,7 +1730,14 @@ class AgentManagementController extends Controller
 
     public function get_select_category_rule(Request $request)
     {
-        $select_category = TBLRuleCategory::where(['status' => 'Y', 'deleted_at' => null])->select('id', 'name')->get()->toArray();
+        $select_category = TBLRuleCategory::where([
+                'mode' => 'category', 
+                'status' => 'Y', 
+                'deleted_at' => null
+            ])
+            ->select('id', 'name')
+            ->get()
+            ->toArray();
 
         $response = [
             'select_category' => $select_category
@@ -1802,60 +1828,67 @@ class AgentManagementController extends Controller
                     //     }
                     // }
 
-                    if(in_array('all', $request->site))
+                    if(@$request->site)
                     {
-                        $arr_site = DB::table('site')->select('id')->get();
-
-                        if(@$request->detail)
+                        if(in_array('all', $request->site))
                         {
-                            foreach($request->detail as $detail)
+                            $arr_site = DB::table('site')->select('id')->get();
+
+                            if(@$request->detail)
                             {
-                                $detail_rule_name = $detail;
-                                // $detail_rule_name['rule_category_id'] = @$id_catagory;
-                                $detail_rule_name['rule_category_id'] = @$request->name;
-                                $detail_rule_name['rule_file_id'] = @$id_file;
-                                $detail_rule_name['status'] = @$request->status ? ( $request->status == 1 ? 'Y' : 'N' ) : '';
-            
-                                $id_rule = TBLRuleName::create($detail_rule_name)->id;
-    
-                                foreach($arr_site as $site)
+                                foreach($request->detail as $detail)
                                 {
-                                    $detail_rule_site = [];
-                                    $detail_rule_site['site_id'] = $site->id;
-                                    $detail_rule_site['rule_id'] = $id_rule;
-                                    $detail_rule_site['create_by'] = Auth::user()->id;
-                                    $detail_rule_site['update_by'] = Auth::user()->id;
+                                    $detail_rule_name = $detail;
+                                    // $detail_rule_name['rule_category_id'] = @$id_catagory;
+                                    $detail_rule_name['rule_category_id'] = @$request->name;
+                                    $detail_rule_name['rule_file_id'] = @$id_file;
+                                    $detail_rule_name['status'] = @$request->status ? ( $request->status == 1 ? 'Y' : 'N' ) : '';
+                                    $detail_rule_name['created_by'] = Auth::user()->id;
+                                    $detail_rule_name['updated_by'] = Auth::user()->id;
+                
+                                    $id_rule = TBLRuleName::create($detail_rule_name)->id;
         
-                                    RuleNameSite::create($detail_rule_site);
+                                    foreach($arr_site as $site)
+                                    {
+                                        $detail_rule_site = [];
+                                        $detail_rule_site['site_id'] = $site->id;
+                                        $detail_rule_site['rule_id'] = $id_rule;
+                                        $detail_rule_site['create_by'] = Auth::user()->id;
+                                        $detail_rule_site['update_by'] = Auth::user()->id;
+            
+                                        RuleNameSite::create($detail_rule_site);
+                                    }
                                 }
                             }
                         }
-                    }
-                    else if(!in_array('all', $request->site) && count($request->site) > 0)
-                    {
-                        if(@$request->detail)
+                        else if(!in_array('all', $request->site) && count($request->site) > 0)
                         {
-                            foreach($request->detail as $detail)
+                            if(@$request->detail)
                             {
-                                $detail_rule_name = $detail;
-                                // $detail_rule_name['rule_category_id'] = @$id_catagory;
-                                $detail_rule_name['rule_category_id'] = @$request->name;
-                                $detail_rule_name['rule_file_id'] = @$id_file;
-                                $detail_rule_name['status'] = @$request->status ? ( $request->status == 1 ? 'Y' : 'N' ) : '';
-            
-                                $id_rule = TBLRuleName::create($detail_rule_name)->id;
-    
-                                foreach($request->site as $site)
+                                foreach($request->detail as $detail)
                                 {
-                                    $id_site = DB::table('site')->where(['code' => $site])->first()->id;
-
-                                    $detail_rule_site = [];
-                                    $detail_rule_site['site_id'] = $id_site;
-                                    $detail_rule_site['rule_id'] = $id_rule;
-                                    $detail_rule_site['create_by'] = Auth::user()->id;
-                                    $detail_rule_site['update_by'] = Auth::user()->id;
+                                    $detail_rule_name = $detail;
+                                    // $detail_rule_name['rule_category_id'] = @$id_catagory;
+                                    $detail_rule_name['rule_category_id'] = @$request->name;
+                                    $detail_rule_name['rule_file_id'] = @$id_file;
+                                    $detail_rule_name['status'] = @$request->status ? ( $request->status == 1 ? 'Y' : 'N' ) : '';
+                                    $detail_rule_name['created_by'] = Auth::user()->id;
+                                    $detail_rule_name['updated_by'] = Auth::user()->id;
+                
+                                    $id_rule = TBLRuleName::create($detail_rule_name)->id;
         
-                                    RuleNameSite::create($detail_rule_site);
+                                    foreach($request->site as $site)
+                                    {
+                                        $id_site = DB::table('site')->where(['code' => $site])->first()->id;
+
+                                        $detail_rule_site = [];
+                                        $detail_rule_site['site_id'] = $id_site;
+                                        $detail_rule_site['rule_id'] = $id_rule;
+                                        $detail_rule_site['create_by'] = Auth::user()->id;
+                                        $detail_rule_site['update_by'] = Auth::user()->id;
+            
+                                        RuleNameSite::create($detail_rule_site);
+                                    }
                                 }
                             }
                         }
@@ -1871,8 +1904,8 @@ class AgentManagementController extends Controller
                                 $detail_rule_name['rule_category_id'] = @$request->name;
                                 $detail_rule_name['rule_file_id'] = @$id_file;
                                 $detail_rule_name['status'] = @$request->status ? ( $request->status == 1 ? 'Y' : 'N' ) : '';
-                                $detail_rule_name['create_by'] = Auth::user()->id;
-                                $detail_rule_name['update_by'] = Auth::user()->id;
+                                $detail_rule_name['created_by'] = Auth::user()->id;
+                                $detail_rule_name['updated_by'] = Auth::user()->id;
             
                                 $id_rule = TBLRuleName::create($detail_rule_name)->id;
     
@@ -2048,7 +2081,14 @@ class AgentManagementController extends Controller
     
             TBLRuleCategory::create($main_data);
     
-            $select_category = TBLRuleCategory::where(['status' => 'Y', 'deleted_at' => null])->select('id', 'name')->get()->toArray();
+            $select_category = TBLRuleCategory::where([
+                    'mode' => 'category', 
+                    'status' => 'Y', 
+                    'deleted_at' => null
+                ])
+                ->select('id', 'name')
+                ->get()
+                ->toArray();
     
             $response = [
                 'status' => 'success',

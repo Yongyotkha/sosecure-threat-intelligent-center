@@ -114,6 +114,28 @@
                                             </div>
                                         </div>
 
+                                        <div class="row row_extension_set d-none">
+                                            <div class="col-lg-4">
+                                                <div class="form-group m-b-md">
+                                                    <label for="" class="">Extension</label>
+                                                    <select name="extension_rule_site" id="extension_rule_site" class="tselect2-option form-control select-search_site">
+                                                        <option value="all">All</option>
+                                                        <option value="custom">Custom</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row row_extension_custom_set d-none">
+                                            <div class="col-lg-4">
+                                                <div class="form-group m-b-md">
+                                                    <label for="" class="">Custom</label>
+                                                    <select name="custom_select_rule_site" id="custom_select_rule_site" class="tselect2-option form-control select-search_site">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
 
                                         <div class="row">
                                             <div class="col-lg-6">
@@ -139,7 +161,7 @@
                                                 <h5 class="font-weight-bold" id="txt_name_site">&nbsp;</h5>
                                                 <input type="hidden" name="hd_site_id" id="hd_site_id" value="">
                                                 <div class="box-item-keyword">
-                                                    <ul id="site_rule" class="main-list site-list">
+                                                    <ul id="site_rule" class="main-list site-list" height="100%">
                                                         {{-- <li class="item-list item--keyword">
                                                             <div class="left-side-item">
                                                                 <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
@@ -727,8 +749,6 @@
 
     $('#add_rule_modal').on('show.bs.modal', function () {
 
-        $('#demo').hide();
-
         $.ajax({
             url: "{{ route('agentmanagement.get_select_category_rule') }}",
             type: "get",
@@ -805,7 +825,6 @@
 
                         tbl_category_rule.ajax.reload();
                         tbl_all_rule.ajax.reload();
-                        tbl_extention_rule.ajax.reload();
 
                         setTimeout(function(){
                             {{-- window.location.href = response.route; --}}
@@ -860,8 +879,6 @@
 
                         $('#btn_save_extension').html('Success');
 
-                        tbl_category_rule.ajax.reload();
-                        tbl_all_rule.ajax.reload();
                         tbl_extention_rule.ajax.reload();
 
                         setTimeout(function(){
@@ -946,6 +963,8 @@
                 if(response.status == 'success')
                 {
                     toastr.success(response.message);
+
+                    tbl_all_rule.ajax.reload();
 
                     $('#btn_save_rule').html('Success');
 
@@ -1215,12 +1234,33 @@
 
                     delete_rule_site_master();
 
+                    $('.row_extension_set').removeClass('d-none');
+
                 }
             });
         }
         else
         {
             toastr.error('Please select site.');
+        }
+
+    });
+
+    $('#extension_rule_site').change(function(){
+
+        let value_type = $(this).val();
+
+        if(value_type == 'custom')
+        {
+            $('.row_extension_custom_set').removeClass('d-none');
+
+            {{-- $.ajax({
+                url: "{{ route('') }}"
+            }) --}}
+        }
+        else
+        {
+            $('.row_extension_custom_set').addClass('d-none');
         }
 
     });
@@ -1398,7 +1438,7 @@
                     if(response.status == 'success')
                     {
 
-                        toastr.error(response.message);
+                        toastr.success(response.message);
 
                         let html = `
                             <option value="">Choose an Category</option>
@@ -1420,7 +1460,6 @@
 
                         tbl_category_rule.ajax.reload();
                         tbl_all_rule.ajax.reload();
-                        tbl_extention_rule.ajax.reload();
 
                     }
                     else if(response.status == 'error')
