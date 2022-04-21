@@ -144,7 +144,7 @@
                                                         <h5 class="font-weight-bold">Rule</h5>
                                                     </div>
                                                     <div class="col-lg-6 text-right">
-                                                        <button type="button" id="btn_select_all_master" class="btn btn-primary">เลือกทั้งหมด</button>
+                                                        <button type="button" id="btn_select_all_master" class="btn btn-info btn-responsive">เลือกทั้งหมด</button>
                                                     </div>
                                                 </div>
                                                 <div class="box-item-keyword">
@@ -170,7 +170,7 @@
                                                         <h5 class="font-weight-bold" id="txt_name_site">&nbsp;</h5>
                                                     </div>
                                                     <div class="col-lg-6 text-right">
-                                                        <button type="button" id="btn_delete_all_site" class="btn btn-primary">ลบทั้งหมด</button>
+                                                        <button type="button" id="btn_delete_all_site" class="btn btn-danger btn-responsive">ลบทั้งหมด</button>
                                                     </div>
                                                 </div>
                                                 <input type="hidden" name="hd_site_id" id="hd_site_id" value="">
