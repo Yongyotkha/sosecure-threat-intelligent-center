@@ -912,6 +912,7 @@
 @include('stacks.js.highchart')
 @include('stacks.js.c3')
 @include('stacks.js.multitext')
+@include('stacks.js.fullscreen')
 
 <script>
     var start_date_tl = null;

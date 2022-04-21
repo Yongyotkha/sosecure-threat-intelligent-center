@@ -8,8 +8,8 @@
                 Manage Rules
             </h4>
         </div>
-        {!! Form::open() !!}
-        <div class="modal-body">
+        {{-- {!! Form::open() !!} --}}
+        <form class="modal-body">
 
             <div class="form-group row">
                 <label class="col-lg-2 control-label">Extension<span class="text-danger">*</span> </label>
@@ -32,7 +32,7 @@
             </div>
 
             <div class="table-responsive">
-                <table class="table table-striped table-bordered">
+                <table id="tbl_manage_rule" class="table table-striped table-bordered">
                     <thead>
                         <tr>
                             <th>Category Rule</th>
@@ -66,24 +66,29 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-        <div class="modal-footer">
-            {!! closeModalButton() !!}
-            <button type="submit" class="btn btn-info formSaving btn-rounded"><i class="fas fa-paper-plane"></i>Submit</button>
-        </div>
-        
-        {!! Form::close() !!}
+
+            <div class="modal-footer">
+                {!! closeModalButton() !!}
+                <button type="submit" class="btn btn-info formSaving btn-rounded"><i class="fas fa-paper-plane"></i>Submit</button>
+            </div>
+        </form>
+      
+        {{-- {!! Form::close() !!} --}}
     </div>
 </div>
 
-<script>
 
+<script>
     $('#extentions').change(function(){
         if($(this).val() == 'Y'){
             $('#custom_select').hide();
         }else{
             $('#custom_select').show();
         }
+    });
+
+    $('#tbl_manage_rule').DataTable({
+
     });
 
     var form_save = '.formSaving';
