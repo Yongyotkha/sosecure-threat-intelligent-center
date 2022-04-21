@@ -1051,6 +1051,24 @@ class AgentManagementController extends Controller
         return response()->json($response);
     }
 
+    public function get_extension_rule_site(Request $request)
+    {
+        $select_extension = TBLRuleCategory::where([
+                'mode' => 'extention', 
+                'status' => 'Y',
+                'deleted_at' => null
+            ])
+            ->select('id', 'name')
+            ->get()
+            ->toArray();
+
+        $response = [
+            'select_extension' => $select_extension
+        ];
+
+        return response()->json($response);
+    }
+
     public function check_insert_rule_process(Request $request)
     {
 
@@ -1078,15 +1096,18 @@ class AgentManagementController extends Controller
             ->where('transaction_download_client', '!=', 3)
             ->get();
 
-        $main_data_rule_file_site = [];
-        $main_data_rule_file_site['site_id'] = $code_site;
-        $main_data_rule_file_site['rule_files_id'] = $get_data_category->rule_file_id;
-        $main_data_rule_file_site['status'] = 'Y';
-        $main_data_rule_file_site['transaction_download_client'] = 1;
-        $main_data_rule_file_site['created_by'] = Auth::user()->id;
-        $main_data_rule_file_site['updated_by'] = Auth::user()->id;
-
-        RuleFileSiteDownload::create($main_data_rule_file_site);
+        if(count(@$chk_file_site) == 0)
+        {
+            $main_data_rule_file_site = [];
+            $main_data_rule_file_site['site_id'] = $code_site;
+            $main_data_rule_file_site['rule_files_id'] = $get_data_category->rule_file_id;
+            $main_data_rule_file_site['status'] = 'Y';
+            $main_data_rule_file_site['transaction_download_client'] = 1;
+            $main_data_rule_file_site['created_by'] = Auth::user()->id;
+            $main_data_rule_file_site['updated_by'] = Auth::user()->id;
+    
+            RuleFileSiteDownload::create($main_data_rule_file_site);
+        }
 
         // $site = SiteSettings::select('id')->where('code', $code_site)->first();
 
