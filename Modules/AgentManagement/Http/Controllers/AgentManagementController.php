@@ -554,6 +554,7 @@ class AgentManagementController extends Controller
                                 ->orwhere('yara_log.description', 'like', '%'.$keyword_search.'%');     
                         }
                     })
+                    ->where('yara_log.ignore_flag', 'Y')
                     ->orderBy('agent_alerts_created', 'desc')               
                     ->get();
           
@@ -667,14 +668,12 @@ class AgentManagementController extends Controller
         })
         
         ->addColumn('action', function($query) {
-            
             $html = '';
-            $html .= '
-                     
-                    <a href="'.route('agentmanagement.modal_agent_alert_delete', ['id' => $query->id]).'"  class="btn btn-danger btn-xs" data-toggle="ajaxModal">
-                        <i class="fas fa-ban"></i>
-                    </a>
-                    
+            $html .= ' 
+                
+                <a href="'.route('agentmanagement.modal_agent_alert_delete', ['id' => $query->agent_alerts_id]).'"  class="btn btn-danger btn-xs" data-toggle="ajaxModal">
+                    <i class="fas fa-ban"></i>
+                </a>
             ';
             return $html;
         })
@@ -685,14 +684,18 @@ class AgentManagementController extends Controller
 
     public function modal_agent_alert_delete(Request $request)
     {
-        // dd($request->all());
-        // $query = YaraLog::where(['id' => $request->id])->first();
-        $query = '';
+        $query = YaraLog::where(['id' => $request->id])->first();
         return view('agentmanagement::modal.delete_alert')->with(compact('query'));   
     }
 
-    public function alert_delete_id(){
-        
+    public function alert_delete_id(Request $request){
+        $id = $request->hd_delete_id;
+
+        $query = YaraLog::where('id', $id)
+            ->update([
+                'ignore_flag' => 'N'
+            ]);
+
     }
 
     public function tb_agent(Request $request)
