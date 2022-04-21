@@ -987,7 +987,7 @@ class AgentManagementController extends Controller
 
             })
             ->whereIn('rule_name.id', $site_rule)
-            ->where(['rule_name.deleted_at' => null])
+            ->where(['rule_name.status' => 'Y', 'rule_name.deleted_at' => null])
             ->get();
         
         $master_rule = TBLRuleName::
@@ -1008,7 +1008,7 @@ class AgentManagementController extends Controller
 
             })
             ->whereNotIn('rule_name.id', $site_rule)
-            ->where(['rule_name.deleted_at' => null])
+            ->where(['rule_name.status' => 'Y', 'rule_name.deleted_at' => null])
             ->get();
 
         $html = '';
