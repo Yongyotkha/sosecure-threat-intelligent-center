@@ -1538,27 +1538,40 @@
                         let date1 = new Date(full.site_agents_last_online);
                         let date2 = new Date();
 
-                        let onlineTime = date1.getMinutes();
-                        let currentTime = date2.getMinutes();
 
-                        if(onlineTime < currentTime){
-                            var sumTime = currentTime - onlineTime;
-                            if(sumTime > 2){
-                                html = '<div class="status-flex mr-2"><span class="dot critical "></span> Offline</div>';
-                            }else{
-                                html = '<div class="status-flex mr-2"><span class="dot low"></span> Online</div>'
-                            }
+                        let onlineTime = date1.getMinutes();
+                        let onlineTimeH = date1.getHours();
+
+                    
+                        let currentTime = date2.getMinutes();
+                        let currentTimeH = date2.getHours();
+
+                        if(date1 < date2){
+                            html = '<div class="status-flex mr-2"><span class="dot critical "></span> Offline</div>';
                         }else{
-                            var sumTime = onlineTime - currentTime;
-                            if(sumTime > 2){
-                                html = '<div class="status-flex mr-2"><span class="dot critical"></span> Offline</div>';
+                            if(onlineTimeH == currentTimeH){
+                                if(onlineTime < currentTime){
+                                    var sumTime = currentTime - onlineTime;
+                                    if(sumTime > 2){
+                                        html = '<div class="status-flex mr-2"><span class="dot critical "></span> Offline</div>';
+                                    }else{
+                                        html = '<div class="status-flex mr-2"><span class="dot low"></span> Online</div>'
+                                    }
+                                }else{
+                                    var sumTime = onlineTime - currentTime;
+                                    if(sumTime > 2){
+                                        html = '<div class="status-flex mr-2"><span class="dot critical"></span> Offline</div>';
+                                    }else{
+                                        html = '<div class="status-flex mr-2"><span class="dot low"></span> Online</div>'
+                                    }
+                                }
                             }else{
-                                html = '<div class="status-flex mr-2"><span class="dot low"></span> Online</div>'
+                                html = '<div class="status-flex mr-2"><span class="dot critical"></span> Offline</div>';
                             }
                         }
 
 
-                        return ` ${html} `;
+                        return `${html} `;
 
                     },
                 },
