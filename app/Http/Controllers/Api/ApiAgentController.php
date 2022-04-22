@@ -888,12 +888,10 @@ class ApiAgentController extends ApiController
                     ->where('status', 'Y')
                     ->pluck('ref_id');
 
-                    $rules = RuleSite::select(DB::raw('"Y" AS status'), 'rule_name.file_name','rule_name.rule_name','rule_name.description','rule_name.severity')
-                    ->join('rule_name', 'rule_name.id', '=', 'rule_site.rule_id')
-                    ->where('rule_site.site_id', $data['site']['data']['id'])
-                    ->where('rule_site.agent_id', $siteAgentsHasData->id)
-                    ->where('rule_name.status', 'Y')
-                    ->whereNotIn('rule_id', $ignoreRef)
+                    $rules = RuleNameSite::select(DB::raw('"Y" AS status'), 'rule_name.file_name','rule_name.rule_name','rule_name.description','rule_name.severity')
+                    ->join('rule_name', 'rule_name.id', '=', 'rule_name_site.rule_id')
+                    ->where('rule_name_site.site_id', $data['site']['data']['id'])
+                    ->whereNotIn('rule_name_site.rule_id', $ignoreRef)
                     ->union($ignore)
                     ->orderBy('rule_name', 'ASC')
                     ->get();
