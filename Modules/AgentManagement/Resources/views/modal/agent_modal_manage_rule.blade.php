@@ -9,7 +9,7 @@
             </h4>
         </div>
         {{-- {!! Form::open() !!} --}}
-        <form class="modal-body" action="{{ route('agentmanagement.updateManageRule') }}" method="POST">
+        <form id="form_submit_manage_rule" class="modal-body" action="{{ route('agentmanagement.updateManageRule') }}" method="POST">
             @csrf
             <input type="hidden" name="site_id" value="{{ $id }}">
             <input type="hidden" name="agent_id" value="{{ $agent_id }}">
@@ -18,9 +18,9 @@
                 <label class="col-lg-2 control-label">Extension<span class="text-danger">*</span> </label>
                 <div class="col-lg-10">
                     <select name="" id="extentions" class="select2-option form-control">
-                        <option value="1" disabled selected>Choose Select</option>
-                        <option value="Y">All</option>
-                        <option value="N">Custom</option>
+                        <option value="" disabled selected>Choose Select</option>
+                        <option value="all">All</option>
+                        <option value="custom">Custom</option>
                     </select>
                 </div>
             </div>
@@ -48,7 +48,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($ruleNameSite as $item)
+                        @foreach ($ruleNameSite as $key => $item)
                             <tr>
                                 <td>{{ $item -> category_name }}</td>
                                 <td>{{ $item -> rule_name }}</td>
@@ -58,8 +58,8 @@
                                 <td>{{  $item -> severity }}</td>
                                 <td>
                                     <label>
-                                        <input type="hidden" name="rule_id[]" value="{{ $item -> rule_id }}">
-                                        <input name="ignore[]" value="1" id="-all" type="checkbox" class="">
+                                        <input type="hidden" name="rule_id[{{$key}}]" value="{{ $item -> rule_id }}">
+                                        <input name="ignore[{{$key}}]" value="1" id="-all" type="checkbox" class="">
                                         <span class="label-text"></span>
                                     </label>
                                 </td>
@@ -92,11 +92,11 @@
     });
 
     $('#tbl_manage_rule').DataTable({
-
+        paging: false
     });
 
     var form_save = '.formSaving';
-    $('#form_delete_agent').submit(function (event) {
+    $('#form_submit_manage_rule').submit(function (event) {
         event.preventDefault();
 
         $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
@@ -106,7 +106,7 @@
         
         axios.post($(this).attr("action"), data)
             .then(function (response) {
-                toastr.success('Deleted Successfully');
+                toastr.success('Successfully');
                 $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
                 window.location.href = response.data.redirect;
             })
