@@ -27,6 +27,7 @@ use App\RuleNameSite;
 use App\RuleFileSiteDownload;
 use App\RuleFileSiteAgentDownload;
 use App\SiteAgentExtention;
+use App\SiteAgentIgnore;
 use Modules\SiteSettings\Entities\Menu;
 use Modules\SiteSettings\Entities\Menu_sub;
 use Modules\SiteSettings\Entities\site_config_email_alert;
@@ -969,7 +970,8 @@ class AgentManagementController extends Controller
         return view('agentmanagement::modal.agent_modal_manage_rule', compact('ruleNameSite', 'id', 'agent_id'));
     }
 
-    public function updateManageRule(Request $request){
+    public function updateManageRule(Request $request)
+    {
         $agent_id = $request -> agent_id;
         $site_id = $request -> site_id;
         $rule_id = $request -> rule_id;
@@ -981,7 +983,44 @@ class AgentManagementController extends Controller
             'rule_id' => $rule_id,
             'ignore' => $ignore
         ];
-        dd($res);
+
+        // dd($res);
+
+        foreach($rule_id as $key => $rule_id)
+        {
+            if(!@$ignore[$key])
+            {
+                // $main_data = [];
+                // $main_data['site_id'] = $site_id;
+                // $main_data['agent_id'] = $agent_id;
+                // $main_data['extention_id'] = $rule_id;
+                // $main_data['status'] = 'Y';
+                // $main_data['create_by'] = Auth::user()->id;
+                // $main_data['update_by'] = Auth::user()->id;
+    
+                // SiteAgentExtention::create($main_data);
+            }
+            else
+            {
+                $main_data = [];
+                $main_data['site_id'] = $site_id;
+                $main_data['agent_id'] = $agent_id;
+                $main_data['ref_id'] = $rule_id;
+                $main_data['type'] = 'rule';
+                $main_data['status'] = 'Y';
+                $main_data['create_by'] = Auth::user()->id;
+                $main_data['update_by'] = Auth::user()->id;
+    
+                SiteAgentIgnore::create($main_data);
+            }
+        }
+
+        $response = [
+            'status' => 'success',
+            'message' => 'Success'
+        ];
+
+        return response()->json($response);
     }
 
 

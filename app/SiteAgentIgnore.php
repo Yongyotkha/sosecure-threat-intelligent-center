@@ -8,4 +8,5 @@ class SiteAgentIgnore extends Model
 {
     //
     protected $table = 'site_agent_ignore';
+    protected $guarded = ['id'];
 }
