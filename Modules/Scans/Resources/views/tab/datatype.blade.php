@@ -188,6 +188,8 @@
             serverSide: true,
             destroy: true,
             "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            aLengthMenu: [[25, 50, 100, 200, 500, 1000, -1], [25, 50, 100, 200, 500, 1000, 'All']],
+            iDisplayLength:25,
             ajax: {
                 contentType: "application/json",
                 dataType: 'JSON',

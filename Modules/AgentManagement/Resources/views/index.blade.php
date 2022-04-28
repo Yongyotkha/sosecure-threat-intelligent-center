@@ -564,21 +564,24 @@
                                                             <th>
                                                                 Site Name            
                                                             </th>
-                                                            <th>
+                                                            {{-- <th>
                                                                 IP            
-                                                            </th>
+                                                            </th> --}}
                                                             <th>
+                                                                Detail
+                                                            </th>
+                                                            {{-- <th>
                                                                 Rule
                                                             </th>
                                                             <th>
                                                                 Description
                                                             </th>
-                                                            <th>Path</th>
-                                                            <th>Date Scan</th>
-                                                            <th>Date Last Scan</th>
+                                                            <th>Path</th> --}}
+                                                            {{-- <th>Date Scan</th>
+                                                            <th>Date Last Scan</th> --}}
                                                             <th>Severity</th>
                                                             <th>Datetime</th>
-                                                            <th class="text-center">Action</th>
+                                                            <th class="text-center">Ignore</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -1435,23 +1438,30 @@
                     data: 'site_name',
                 },
                 {
-                    data: 'site_agents_ip_private',
+                    data: 'detail_all',
                 },
-                {
-                    data: 'agent_alerts_rule',
-                },
-                {
-                    data: 'agent_alerts_description',
-                },
-                {
-                    data: 'device_name',
-                },
-                {
-                    data: 'first_scan',
-                },
-                {
-                    data: 'last_scan',
-                },
+              
+                {{-- 
+                    {
+                        data: 'site_agents_ip_private',
+                    },
+                    {
+                        data: 'agent_alerts_rule',
+                    },
+                    {
+                        data: 'agent_alerts_description',
+                    },
+                    {
+                        data: 'device_name',
+                    },
+                    {
+                        data: 'first_scan',
+                    },
+                    {
+                        data: 'last_scan',
+                    },
+
+                --}}
                
                 {
                     data: 'severity_status',
@@ -1531,13 +1541,23 @@
                 {
                     targets: 9,
                     className : 'nowrap',
-                    render: function (data, type, full, meta) {
+                        render: function (data, type, full, meta) {
 
                    
                         let html = '';
                         let date1 = new Date(full.site_agents_last_online);
-                        let date2 = new Date();
 
+                        let date1_d = date1.getDay();
+                        let date1_m = date1.getMonth();
+                        let date1_y = date1.getFullYear();
+                        let sumdate_1 = date1_d+''+date1_m+''+date1_y;
+
+                        let date2 = new Date();
+                        let date2_d = date2.getDay();
+                        let date2_m = date2.getMonth();
+                        let date2_y = date2.getFullYear();
+
+                        let sumdate_2 = date2_d+''+date2_m+''+date2_y;
 
                         let onlineTime = date1.getMinutes();
                         let onlineTimeH = date1.getHours();
@@ -1546,9 +1566,7 @@
                         let currentTime = date2.getMinutes();
                         let currentTimeH = date2.getHours();
 
-                        if(date1 < date2){
-                            html = '<div class="status-flex mr-2"><span class="dot critical "></span> Offline</div>';
-                        }else{
+                        if(sumdate_1 == sumdate_2){
                             if(onlineTimeH == currentTimeH){
                                 if(onlineTime < currentTime){
                                     var sumTime = currentTime - onlineTime;
@@ -1568,6 +1586,8 @@
                             }else{
                                 html = '<div class="status-flex mr-2"><span class="dot critical"></span> Offline</div>';
                             }
+                        }else{
+                            html = '<div class="status-flex mr-2"><span class="dot critical "></span> Offline</div>';
                         }
 
 
@@ -1835,6 +1855,17 @@
         }).catch(function (error) {
             toastr.error('error!!');
         });
+    }
+
+
+    function copyToClipboard(element) {
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val($(element).val()).select();
+        setTimeout(function(){ document.execCommand("copy"); }, 1000);
+        document.execCommand("copy");
+        $temp.remove();
+        toastr.success('Copy Success', 'Copy Path');
     }
 
 </script>

@@ -612,6 +612,40 @@ class AgentManagementController extends Controller
             ';
             return $html;
         })
+        ->addColumn('detail_all', function($query) {
+            $html = '';
+            $html .= '
+
+                <div>
+                    <strong>Rule</strong> : '.$query->agent_alerts_rule.'
+                </div>
+
+                <div>
+                     <strong>Description</strong> : '.$query->agent_alerts_description.'
+                </div>
+
+                <div>
+                    <strong>Path</strong> :'.$query -> device_name.'
+                    <button type="button" onclick="copyToClipboard(\'#valuecopy_'.$query->agent_alerts_id.'\')" id="btn_copy_link_'.$query->agent_alerts_id.'" data-text="'.$query -> device_name.'" class="btn btn-xs btn-secondary">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <input type="hidden" id="valuecopy_'.$query->agent_alerts_id.'" value="'.$query -> device_name.'">
+                </div>  
+
+                <div>
+                    <strong>Start Date</strong> : '.$query->first_scan.'
+                </div>
+                <div>
+                    <strong>Last Scan</strong> : '.$query->last_scan.'
+                </div>
+                <div>
+                    <strong>IP</strong> : '.$query->site_agents_ip_private.'
+                </div>
+
+
+            ';
+            return $html;
+        })
         ->addColumn('severity_status', function($query) {
             $html = '';
                     if($query->severity_status == 'Critical')
@@ -658,19 +692,19 @@ class AgentManagementController extends Controller
             ';
             return $html;
         })
-        ->addColumn('device_name', function($query) {
-            $html = '';
-            $html .= '  
+        // ->addColumn('device_name', function($query) {
+        //     $html = '';
+        //     $html .= '  
             
             
-            <div class="box-tooltip">
-                <span data-toggle="tooltip" data-placement="right" data-html="true" title="" data-original-title="'.$query -> device_name.'">
-                    <button class="btn btn-secondary"><i class="fas fa-file"></i></button>
-                </span>
-            </div>  
-            ';
-            return $html;
-        })
+        //     <div class="box-tooltip">
+        //         <span data-toggle="tooltip" data-placement="right" data-html="true" title="" data-original-title="'.$query -> device_name.'">
+        //             <button class="btn btn-secondary"><i class="fas fa-file"></i></button>
+        //         </span>
+        //     </div>  
+        //     ';
+        //     return $html;
+        // })
         
         ->addColumn('action', function($query) {
             $html = '';
@@ -682,7 +716,7 @@ class AgentManagementController extends Controller
             ';
             return $html;
         })
-        ->rawColumns(['chk', 'severity_status', 'chk_status', 'device_name', 'action'])
+        ->rawColumns(['chk','detail_all', 'severity_status', 'chk_status', 'action'])
         ->make(true);
     }
 
