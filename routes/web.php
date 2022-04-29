@@ -74,3 +74,11 @@ Route::get('phpinfo', function () {
 });
 
 Route::get('emailtest', 'Welcome@emailtest');
+
+Route::get('phishing_detection/login-1', function(){
+    return view('demo_login');
+})->name('phishing_detection_login-1');
+
+Route::get('phishing_detection/login-2', function(){
+    return view('demo_login');
+})->name('phishing_detection_login-2');
