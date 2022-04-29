@@ -127,6 +127,18 @@ class WebDefacementController extends Controller
         return view('webdefacement::index')->with($data);
     }
 
+    public function tbl_server(Request $request){
+        if($request->ajax()){
+            dd(1);
+            $query = DB::table('fx_webdefacment_data_detection')
+                ->where()
+                ->get();
+
+            return DataTables::of($query);
+        }
+
+    }
+
     public function detail($code,Request $request)
     {
         $role_custom = @check_role_custom();
