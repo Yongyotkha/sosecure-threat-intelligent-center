@@ -364,7 +364,7 @@ class WebDefacementController extends Controller
             
         $modal = $modal->get();
         
-        $id = ''; 
+        $id = []; 
         foreach ($modal as $key) {
             $html .= 
             '<div class="item-wdfm wdfm-inner-3">
@@ -417,7 +417,7 @@ class WebDefacementController extends Controller
                 </div>
             </div>';      
             
-            $id = $key->id; 
+            $id[] = $key->id; 
         }
 
         if ($request->ajax()) {

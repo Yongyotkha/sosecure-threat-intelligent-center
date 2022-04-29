@@ -613,15 +613,18 @@
                     $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
                 }); 
 
-                chart_c3(
-                    '#chart_wdfm_132',
-                    [
-                        ['Hash', 20],
-                        ['Filesize', 10],
-                        ['Element', 70],
-                    ]
-                    ,70
-                );
+                for(let i in result.id){
+                    const data_id = result.id[i];
+                    chart_c3(
+                        '#chart_wdfm_'+data_id,
+                        [
+                            ['Hash', 10],
+                            ['Filesize', 10],
+                            ['Element', 10],
+                        ]
+                        ,30
+                    );
+                }
           
              
         }).fail(function(jqXHR, ajaxOptions, thrownError){
