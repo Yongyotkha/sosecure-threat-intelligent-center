@@ -129,10 +129,10 @@ class WebDefacementController extends Controller
 
     public function tbl_server(Request $request){
         if($request->ajax()){
-            dd(1);
             $query = DB::table('fx_webdefacment_data_detection')
-                ->where()
+                ->where('deleted_at', null)
                 ->get();
+            dd($query);
 
             return DataTables::of($query);
         }
