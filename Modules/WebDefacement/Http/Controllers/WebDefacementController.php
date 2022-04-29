@@ -417,7 +417,11 @@ class WebDefacementController extends Controller
                 </div>
             </div>';      
             
-            $id[] = $key->id; 
+            $arr = [];
+            $arr['id'] = $key->id;
+            $arr['detection_score_all'] = $key->detection_score_all;
+
+            $id[] = $arr; 
         }
 
         if ($request->ajax()) {
