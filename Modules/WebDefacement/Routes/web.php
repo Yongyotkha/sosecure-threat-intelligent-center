@@ -14,6 +14,7 @@ Route::group(
     ['middleware' => ['web', 'permission:web_defacement'], 'prefix' => 'webdefacement'],
     function () {
         Route::get('/', 'WebDefacementController@index')->name('webdefacement.index')->middleware('can:menu_items');
+        Route::post('/', 'WebDefacementController@tbl_server')->name('webdefacement.tbl_server')->middleware('can:menu_items');
         Route::get('/detail/{code}', 'WebDefacementController@detail')->name('webdefacement.detail')->middleware('can:menu_items');
         Route::post('/load_card', 'WebDefacementController@load_card')->name('webdefacement.load_card')->middleware('can:menu_items');
         Route::post('/detail/change_status', 'WebDefacementController@change_status')->name('webdefacement.change_status')->middleware('can:menu_items');

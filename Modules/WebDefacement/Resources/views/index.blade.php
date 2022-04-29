@@ -493,7 +493,25 @@
 @include('stacks.js.c3')
 
 <script>
-    $('#tbl_server').dataTable();
+
+    $(document).ready(function () {
+        tbl_server = $('#tbl_server').dataTable({
+            cache: false,
+            processData: false,
+            contentType: false,
+            processing: true,
+            serverSide: true,
+            destroy: true,
+            ajax: {
+                url: "{{route('webdefacement.tbl_server')}}",
+                type: "POST",
+            },
+            
+        });
+    });
+    
+    
+
     active_btn('#btngroup_status .btn');
     var id_select_site = 'site';
     var keywords = null;
