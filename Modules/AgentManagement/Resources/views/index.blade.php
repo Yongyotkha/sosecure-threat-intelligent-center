@@ -953,6 +953,10 @@
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
         })
+
+
+       
+
     });
 
     active_btn('#groupby-btn .btn-grey');
@@ -1475,6 +1479,10 @@
                 }
             ],
         });
+
+        setInterval(() => {   
+            tbl_alert.ajax.reload();  
+        }, 60000);
     }
 
     function datatable_agent(site_val)
@@ -1543,7 +1551,6 @@
                     className : 'nowrap',
                         render: function (data, type, full, meta) {
 
-                   
                         let html = '';
                         let date1 = new Date(full.site_agents_last_online);
 
@@ -1603,7 +1610,13 @@
                     "orderable": false,
                 }
             ]
+
         });
+        
+        setInterval(() => {   
+            tbl_agent.ajax.reload();  
+        }, 60000);
+
     }
     
     function datatable_schedule(site_val)

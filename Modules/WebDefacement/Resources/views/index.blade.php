@@ -495,7 +495,7 @@
 <script>
 
     $(document).ready(function () {
-        tbl_server = $('#tbl_server').dataTable({
+        var tbl_server = $('#tbl_server').dataTable({
             cache: false,
             processData: false,
             contentType: false,
@@ -518,9 +518,12 @@
                 { data: 'action' },
             ]
         });
+       
+        setInterval(() => {   
+            $('#tbl_server').DataTable().ajax.reload();
+        }, 60000);
+        
     });
-    
-    
 
     active_btn('#btngroup_status .btn');
     var id_select_site = 'site';

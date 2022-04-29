@@ -558,7 +558,7 @@ class AgentManagementController extends Controller
                         }
                     })
                     ->where('yara_log.ignore_flag', 'Y')
-                    ->orderBy('agent_alerts_created', 'desc')              
+                    ->orderBy('yara_log.last_scan', 'desc')              
                     ->get();
           
         // dd($query);

@@ -485,7 +485,8 @@ function datatable(){
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-    $('#table-phishing-template').DataTable({
+
+    tbl_phishing = $('#table-phishing-template').DataTable({
         cache: false,
         processData: false,
         contentType: false,
@@ -531,6 +532,11 @@ function datatable(){
             }
         ],
     });
+
+    setInterval(() => {
+        tbl_phishing.ajax.reload();
+    }, 60000);
+
 }
 
 
