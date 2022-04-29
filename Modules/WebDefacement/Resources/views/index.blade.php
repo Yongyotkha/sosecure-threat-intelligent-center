@@ -216,7 +216,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    {{-- <tr>
                                         <td>บริษัท เมจิกเทคโซลูชั่น จำกัด</td>
                                         <td>192.168.0.1</td>
                                         <td>/var/www/html/threat-intelligent-center/threat-intelligent-client</td>
@@ -267,7 +267,7 @@
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </td>
-                                    </tr>
+                                    </tr> --}}
                                 </tbody>
                             </table>
                         </div>
@@ -506,7 +506,17 @@
                 url: "{{route('webdefacement.tbl_server')}}",
                 type: "POST",
             },
-            
+            columns: [
+                { data: 'site_name' },
+                { data: 'IP' },
+                { data: 'Path' },
+                { data: 'FileName' },
+                { data: 'Keyword' },
+                { data: 'transaction_date' },
+                { data: 'serverity' },
+                { data: 'status' },
+                { data: 'action' },
+            ]
         });
     });
     

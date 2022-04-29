@@ -13,6 +13,8 @@ use Artisan;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
 use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
+use DB;
+use Yajra\DataTables\DataTables;
 
 class WebDefacementController extends Controller
 {
@@ -129,12 +131,82 @@ class WebDefacementController extends Controller
 
     public function tbl_server(Request $request){
         if($request->ajax()){
-            $query = DB::table('fx_webdefacment_data_detection')
-                ->where('deleted_at', null)
+            $query = DB::table('webdefacment_data_detection as data_detection')
+                ->leftjoin('site', 'data_detection.site_id', 'site.id')
+                ->where('data_detection.deleted_at', null)
+                ->select('data_detection.*', 'site.name as site_name')
                 ->get();
-            dd($query);
 
-            return DataTables::of($query);
+            return DataTables::of($query)
+                ->editColumn('serverity', function($query){
+                    $html = '';
+                    $serverity = $query->serverity;
+                    $html = '';
+
+                    if($serverity == 'Critical')
+                    {
+                        $html .= '<span class="badge" style="background-color: #b93624;">Critical</span>';
+                    }
+                    else if($serverity == 'High')
+                    {
+                        $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
+                    }
+                    else if($serverity == 'Medium')
+                    {
+                        $html .= '<span class="badge" style="background-color: #f2ff15;color: #333;">Medium</span>';
+                    }
+                    else if($serverity == 'Low')
+                    {
+                        $html .= '<span class="badge" style="background-color: #409967;">Low</span>';
+                    }
+                        else if($serverity == 'Information')
+                    {
+                        $html .= '<span class="badge" style="background-color: #00dcff;">Information</span>';
+                    }
+                    else
+                    {
+                        $html .= '<span class="badge"> No Severity </span>';
+                    }
+                    
+                    $html .= '';
+
+                    return $html;
+                })
+                ->editColumn('status', function($query){
+                    $html = '';
+                    $html .= '
+                        <label class="switch">
+                            <input type="checkbox" id="" onchange="" name="active" value="Y"
+                    ';
+                            if($query->status == 'Y')
+                            {
+                    $html .= 'checked';
+                            }
+                    $html .= '        
+                            >
+                            <span></span>
+                        </label>
+                    ';
+
+                    return $html;
+
+                })
+                ->addColumn('action', function($query){
+                    $html = '';
+                    $html .= ' 
+                        
+                        <button type="button" class="btn btn-info btn-xs">
+                            <i class="fas fa-edit"></i>
+                        </button>
+
+                        <button type="button" class="btn btn-danger btn-xs">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    ';
+                    return $html;
+                })
+                ->rawColumns(['serverity', 'status', 'action'])
+                ->make(true);
         }
 
     }
