@@ -649,9 +649,9 @@
                     chart_c3(
                         '#chart_wdfm_'+data_id.id,
                         [
-                            ['Hash', 10],
-                            ['Filesize', 10],
-                            ['Element', 10],
+                            ['Hash', data_id.hash],
+                            ['Filesize', data_id.filesize],
+                            ['Element', data_id.element],
                         ]
                         ,data_id.detection_score_all
                     );

@@ -447,7 +447,6 @@ class WebDefacementController extends Controller
 
             
         $modal = $modal->get();
-        
         $id = []; 
         foreach ($modal as $key) {
             $html .= 
@@ -504,6 +503,9 @@ class WebDefacementController extends Controller
             $arr = [];
             $arr['id'] = $key->id;
             $arr['detection_score_all'] = $key->detection_score_all;
+            $arr['hash'] = $key->hash;
+            $arr['filesize'] = $key->filesize;
+            $arr['element'] = $key->element;
 
             $id[] = $arr; 
         }
