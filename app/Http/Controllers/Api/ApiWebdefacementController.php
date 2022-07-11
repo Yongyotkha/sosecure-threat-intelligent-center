@@ -124,7 +124,7 @@ class ApiWebdefacementController extends ApiController
                         
                     $modal = $modal->get();
 
-
+                    $id = []; 
                     foreach ($modal as $key) {
                         $html .= 
                         '<div class="item-wdfm wdfm-inner-4">
@@ -170,12 +170,22 @@ class ApiWebdefacementController extends ApiController
                                     </div>
                                 </div>
                             </div>
-                        </div>';                    
+                        </div>';      
+                        
+                        $arr = [];
+                        $arr['id'] = $key->id;
+                        $arr['detection_score_all'] = $key->detection_score_all;
+                        $arr['hash'] = $key->hash;
+                        $arr['filesize'] = $key->filesize;
+                        $arr['element'] = $key->element;
+
+                        $id[] = $arr; 
                     }
 
 
                     $response = [
                         "html" => $html,
+                        "id" => $id
                     ];
 
                     $data_transcation = json_encode($response);

@@ -202,6 +202,7 @@
         });
         return result;
     }
+    
 </script>
 @endpush
 @endsection
