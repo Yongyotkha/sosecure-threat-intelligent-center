@@ -569,7 +569,60 @@ class KeywordsController extends Controller
                         $message = langapp('changes_saved_successful');
                         $status = 1;
                     }
+                } 
+                else if ($to_id == 'defacement_main') 
+                {
+                    $Site_keywords_check = Site_keywords::where('keywords_main_id',$attributes_id)->where('site_id',$site->id)->where('type','defacement')->first();
+                    
+                    if($Site_keywords_check) 
+                    {
+                        $message = langapp('changes_saved_successful');
+                        $status = 1;
+                    } 
+                    else 
+                    {
+                        $Site_keywords_insert = new Site_keywords;
+                        $Site_keywords_insert->code = generator_uuid();
+                        $Site_keywords_insert->keywords_main_id = $attributes_id;
+                        $Site_keywords_insert->site_id = $site->id;
+                        $Site_keywords_insert->name = $site_keywords_main->name;
+                        $Site_keywords_insert->type = 'defacement';
+                        $Site_keywords_insert->status = 1;
+                        $Site_keywords_insert->created_by = Auth::user()->id;
+                        $Site_keywords_insert->order = $select_order->order+1;
+                        $Site_keywords_insert->save();
+
+                        $message = langapp('changes_saved_successful');
+                        $status = 1;
+                    }
                 }
+                else if ($to_id == 'credit_card_main') 
+                {
+                    $Site_keywords_check = Site_keywords::where('keywords_main_id',$attributes_id)->where('site_id',$site->id)->where('type','credit_card')->first();
+                    
+                    if($Site_keywords_check) 
+                    {
+                        $message = langapp('changes_saved_successful');
+                        $status = 1;
+                    } 
+                    else 
+                    {
+                        $Site_keywords_insert = new Site_keywords;
+                        $Site_keywords_insert->code = generator_uuid();
+                        $Site_keywords_insert->keywords_main_id = $attributes_id;
+                        $Site_keywords_insert->site_id = $site->id;
+                        $Site_keywords_insert->name = $site_keywords_main->name;
+                        $Site_keywords_insert->type = 'credit_card';
+                        $Site_keywords_insert->status = 1;
+                        $Site_keywords_insert->created_by = Auth::user()->id;
+                        $Site_keywords_insert->order = $select_order->order+1;
+                        $Site_keywords_insert->save();
+
+                        $message = langapp('changes_saved_successful');
+                        $status = 1;
+                    }
+                }
+
             } else if ($from_id == 'social_main') {
                 $Site_keywords = Site_keywords::where('id',$attributes_id)->first();
                 $Site_keywords_name = $Site_keywords->name;
@@ -625,6 +678,76 @@ class KeywordsController extends Controller
                     $message = langapp('changes_saved_successful');
                     $status = 1;
                 } else {
+                    $message = '';
+                    $status = 0;
+                }
+            } 
+            else if ($from_id == 'defacement_main') 
+            {
+                $Site_keywords = Site_keywords::where('id',$attributes_id)->first();
+                $Site_keywords_name = $Site_keywords->name;
+                $check_repeat = Site_keywords::where('name',$Site_keywords_name)->where('type','defacement')->first();
+
+                $keywords_main_id = $Site_keywords->keywords_main_id;
+                $site_keywords_main = site_keywords_main::where('id',$keywords_main_id)->first();
+                if($Site_keywords) 
+                {
+                    $Site_keywords->delete();
+
+                    if(!$check_repeat) 
+                    {
+                        $Site_keywords_insert = new Site_keywords;
+                        $Site_keywords_insert->code = generator_uuid();
+                        $Site_keywords_insert->keywords_main_id = $keywords_main_id;
+                        $Site_keywords_insert->site_id = $site->id;
+                        $Site_keywords_insert->name = $site_keywords_main->name;
+                        $Site_keywords_insert->type = 'defacement';
+                        $Site_keywords_insert->status = 1;
+                        $Site_keywords_insert->created_by = Auth::user()->id;
+                        $Site_keywords_insert->order = $select_order->order+1;
+                        $Site_keywords_insert->save();
+                    }
+
+                    $message = langapp('changes_saved_successful');
+                    $status = 1;
+                } 
+                else 
+                {
+                    $message = '';
+                    $status = 0;
+                }
+            }
+            else if ($from_id == 'credit_card_main') 
+            {
+                $Site_keywords = Site_keywords::where('id',$attributes_id)->first();
+                $Site_keywords_name = $Site_keywords->name;
+                $check_repeat = Site_keywords::where('name',$Site_keywords_name)->where('type','credit_card')->first();
+
+                $keywords_main_id = $Site_keywords->keywords_main_id;
+                $site_keywords_main = site_keywords_main::where('id',$keywords_main_id)->first();
+                if($Site_keywords) 
+                {
+                    $Site_keywords->delete();
+
+                    if(!$check_repeat) 
+                    {
+                        $Site_keywords_insert = new Site_keywords;
+                        $Site_keywords_insert->code = generator_uuid();
+                        $Site_keywords_insert->keywords_main_id = $keywords_main_id;
+                        $Site_keywords_insert->site_id = $site->id;
+                        $Site_keywords_insert->name = $site_keywords_main->name;
+                        $Site_keywords_insert->type = 'credit_card';
+                        $Site_keywords_insert->status = 1;
+                        $Site_keywords_insert->created_by = Auth::user()->id;
+                        $Site_keywords_insert->order = $select_order->order+1;
+                        $Site_keywords_insert->save();
+                    }
+
+                    $message = langapp('changes_saved_successful');
+                    $status = 1;
+                } 
+                else 
+                {
                     $message = '';
                     $status = 0;
                 }
