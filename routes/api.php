@@ -162,6 +162,10 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
 
      //phishing
      Route::post('phishing/table', 'Api\ApiPhishingController@table');
+
+     //keyword
+     Route::post('keyword/get_keyword_main', 'Api\ApiKeywordController@get_keyword_main');
+     Route::post('keyword/get_keyword_sub', 'Api\ApiKeywordController@get_keyword_sub');
     
 });
 
