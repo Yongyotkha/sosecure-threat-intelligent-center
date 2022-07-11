@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use MongoDB\Client as MongoClient;
+use Modules\SiteSettings\Entities\Activity;
+use Illuminate\Support\Facades\DB;
 class KeywordsController extends Controller
 {
     /**
@@ -770,11 +772,17 @@ class KeywordsController extends Controller
         );
     }
 
-
-
     public function show_keyword()
     {
+        $query_user =  DB::table('users')
+            ->select('site.code')
+            ->leftjoin('site', 'users.site_id', 'site.id')
+            ->where(['users.id' => Auth::user()->id])
+            ->first();
+
+        $data['site_code'] = @$query_user->code;
         $data['page'] = langapp('keywords');
+
         return view('keywords::show_keyword')->with($data);
     }
 }
