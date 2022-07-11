@@ -94,7 +94,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-2">
                                         <h5 class="font-weight-bold">Keyword</h5>
                                         <div class="box-item-keyword">
                                             <ul id="keyword_main" class="main-list keyword-list">
@@ -111,7 +111,7 @@
                                             </ul>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-2">
                                         <h5 class="font-weight-bold">Social</h5>
                                         <div class="box-item-keyword">
                                             <ul id="social_main" class="main-list social-list">
@@ -119,7 +119,7 @@
                                             </ul>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-2">
                                         <h5 class="font-weight-bold">Dark Web</h5>
                                         <div class="box-item-keyword">
 
@@ -128,37 +128,21 @@
                                             </ul>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-2">
                                         <h5 class="font-weight-bold">Web Defacememt</h5>
                                         <div class="box-item-keyword">
 
                                             <ul id="defacement_main" class="main-list defacement-list">
-                                                <li class="item-list item--keyword" data-id="">
-                                                    <div class="left-side-item">
-                                                        <span class="drag-handle m-r-xs">
-                                                            <i class="fa fa-arrows-alt"></i>
-                                                        </span>
-                                                        <span class="text-keyword">keyword01</span>
-                                                    </div>
-                                                    <div class="action-keyword">
-                                                        <a href="#" class="text-white delete-item-keyword-main" data-keywords_main_id="">
-                                                            <i class="fas fa-trash-alt"></i>
-                                                        </a>
-                                                    </div>
-                                                </li>
-                                                <li class="item-list item--keyword" data-id="">
-                                                    <div class="left-side-item">
-                                                        <span class="drag-handle m-r-xs">
-                                                            <i class="fa fa-arrows-alt"></i>
-                                                        </span>
-                                                        <span class="text-keyword">urls.yar</span>
-                                                    </div>
-                                                    <div class="action-keyword">
-                                                        <a href="#" class="text-white delete-item-keyword-main" data-keywords_main_id="">
-                                                            <i class="fas fa-trash-alt"></i>
-                                                        </a>
-                                                    </div>
-                                                </li>
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <h5 class="font-weight-bold">Credit Cards</h5>
+                                        <div class="box-item-keyword">
+
+                                            <ul id="credit_card_main" class="main-list credit_card-list">
+                                                
                                             </ul>
                                         </div>
                                     </div>
@@ -336,6 +320,8 @@ $( document ).ready(function() {
     get_keyword_main();
     get_keyword_sub('social');
     get_keyword_sub('darkweb');
+    get_keyword_sub('defacement');
+    get_keyword_sub('credit_card');
 });
 
 $("#btn_edit_keyword").click(function() {
@@ -584,6 +570,8 @@ function edit_keyword_process() {
                     get_keyword_main();
                     get_keyword_sub('social');
                     get_keyword_sub('darkweb');
+                    get_keyword_sub('defacement');
+                    get_keyword_sub('credit_card');
                     toastr.success(response.message, '@langapp('response_status')');
                     
                 }
@@ -593,6 +581,8 @@ function edit_keyword_process() {
                 get_keyword_main();
                 get_keyword_sub('social');
                 get_keyword_sub('darkweb');
+                get_keyword_sub('defacement');
+                get_keyword_sub('credit_card');
             }
         },
         error: function (error){
@@ -637,6 +627,8 @@ function del_keyword_process() {
                     get_keyword_main();
                     get_keyword_sub('social');
                     get_keyword_sub('darkweb');
+                    get_keyword_sub('defacement');
+                    get_keyword_sub('credit_card');
                     toastr.success(response.message, '@langapp('response_status')');
                     
                 }
@@ -646,6 +638,8 @@ function del_keyword_process() {
                 get_keyword_main();
                 get_keyword_sub('social');
                 get_keyword_sub('darkweb');
+                get_keyword_sub('defacement');
+                get_keyword_sub('credit_card');
             }
         },
         error: function (error){
@@ -689,6 +683,8 @@ function check_insert_keyword_process(from_id,to_id,attributes_id) {
                     get_keyword_main();
                     get_keyword_sub('social');
                     get_keyword_sub('darkweb');
+                    get_keyword_sub('defacement');
+                    get_keyword_sub('credit_card');
                     toastr.success(response.message, '@langapp('response_status')');
                     
                 }
@@ -698,6 +694,8 @@ function check_insert_keyword_process(from_id,to_id,attributes_id) {
                 get_keyword_main();
                 get_keyword_sub('social');
                 get_keyword_sub('darkweb');
+                get_keyword_sub('defacement');
+                get_keyword_sub('credit_card');
             }
         },
         error: function (error){
@@ -725,6 +723,7 @@ var keyword_item = document.getElementById('keyword_main'),
 	social_item = document.getElementById('social_main'),
 	darkweb_item = document.getElementById('darkweb_main');
 	defacement_item = document.getElementById('defacement_main');
+	credit_card_item = document.getElementById('credit_card_main');
 
 new Sortable(keyword_item, {
 	group: {
@@ -789,7 +788,26 @@ new Sortable(defacement_item, {
     },
     sort: false,
     animation: 150,
-    onSort: reportActivity(3),
+    onSort: reportActivity(4),
+    onAdd: function (evt) {
+        console.log(evt.from.id);
+        console.log(evt.to.id);
+        console.log(evt.item.attributes['data-id'].value);
+		console.log(evt);
+        let from_id = evt.from.id;
+        let to_id = evt.to.id;
+        let attributes_id = evt.item.attributes['data-id'].value;
+        check_insert_keyword_process(''+from_id+'',''+to_id+'',attributes_id);
+	},
+});
+
+new Sortable(credit_card_item, {
+    group: {
+        name: 'shared'
+    },
+    sort: false,
+    animation: 150,
+    onSort: reportActivity(5),
     onAdd: function (evt) {
         console.log(evt.from.id);
         console.log(evt.to.id);
