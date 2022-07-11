@@ -648,4 +648,10 @@ class KeywordsController extends Controller
     }
 
 
+
+    public function show_keyword()
+    {
+        $data['page'] = langapp('keywords');
+        return view('keywords::show_keyword')->with($data);
+    }
 }

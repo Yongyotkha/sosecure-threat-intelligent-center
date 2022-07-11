@@ -27,5 +27,14 @@ Route::group(
         Route::post('/dataleak/social/edit_keyword_process', 'KeywordsController@edit_keyword_process')->name('KeywordsController.edit_keyword_process');
         Route::post('/dataleak/social/del_keyword_process', 'KeywordsController@del_keyword_process')->name('KeywordsController.del_keyword_process');
         Route::post('/dataleak/social/check_insert_keyword_process', 'KeywordsController@check_insert_keyword_process')->name('KeywordsController.check_insert_keyword_process');
+     
+      
+    }
+);
+
+Route::group(
+    ['middleware' => 'web'],
+    function () {
+        Route::get('/show_keywords', 'KeywordsController@show_keyword')->name('show_keywords')->middleware('can:menu_items');
     }
 );

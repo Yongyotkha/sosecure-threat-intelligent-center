@@ -133,32 +133,7 @@
                                         <div class="box-item-keyword">
 
                                             <ul id="defacement_main" class="main-list defacement-list">
-                                                <li class="item-list item--keyword" data-id="">
-                                                    <div class="left-side-item">
-                                                        <span class="drag-handle m-r-xs">
-                                                            <i class="fa fa-arrows-alt"></i>
-                                                        </span>
-                                                        <span class="text-keyword">keyword01</span>
-                                                    </div>
-                                                    <div class="action-keyword">
-                                                        <a href="#" class="text-white delete-item-keyword-main" data-keywords_main_id="">
-                                                            <i class="fas fa-trash-alt"></i>
-                                                        </a>
-                                                    </div>
-                                                </li>
-                                                <li class="item-list item--keyword" data-id="">
-                                                    <div class="left-side-item">
-                                                        <span class="drag-handle m-r-xs">
-                                                            <i class="fa fa-arrows-alt"></i>
-                                                        </span>
-                                                        <span class="text-keyword">urls.yar</span>
-                                                    </div>
-                                                    <div class="action-keyword">
-                                                        <a href="#" class="text-white delete-item-keyword-main" data-keywords_main_id="">
-                                                            <i class="fas fa-trash-alt"></i>
-                                                        </a>
-                                                    </div>
-                                                </li>
+
                                             </ul>
                                         </div>
                                     </div>
