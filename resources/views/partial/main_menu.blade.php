@@ -135,7 +135,7 @@ if($model_has_roles) {
                                 foreach($menu as $menu_val) {
 
                            
-                                    if(!empty($role_menu_permission_arr) || @$role_id == 1) {
+                                    if(!empty($role_menu_permission_arr) || @$role_id == 1 && @$menu_val['id'] != 16) {
                                         if (in_array($menu_val['id'], $role_menu_permission_arr) || @$role_id == 1) {
 
                                                 $active = '';
