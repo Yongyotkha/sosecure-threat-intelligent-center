@@ -4,14 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\SiteSettings\Entities\LogsSetting;
 use Modules\SiteSettings\Entities\SiteSettings;
-use Modules\SiteSettings\Entities\site_config_email_alert;
 use Modules\SiteSettings\Entities\Site_keywords;
 use Modules\SiteSettings\Entities\site_keywords_main;
-use MongoDB\Client as MongoClient;
 
-class ApiKeywordController extends Controller
+class ApiKeywordController extends ApiController
 {
     public function get_keyword_main(Request $request)
     {
@@ -20,7 +17,7 @@ class ApiKeywordController extends Controller
             $mode = $request->mode;
             $data_request = $request -> data;
             $data = $this -> dataFalse($header, $mode, $data_request);
-         
+
             if(!$data){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{ 
@@ -118,12 +115,26 @@ class ApiKeywordController extends Controller
         }
     }
 
-    private function dataFalse($data){
+    private function dataFalse($bearerToken, $mode, $data){
         try {
-            $data_return = [
-                'data' => json_decode($data, true),
-            ];
-            return $data_return;
+            $header = $bearerToken;
+            $site = $this->AuthorizationRegister($header, $mode);
+            if($site['status_code'] !== '200'){
+                return $this->AuthorizationRegister($header, $mode);
+            }
+            $value = $data;
+            $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+
+            if($data === false){
+                return $data;
+            }else{
+                $data_return = [
+                    'site' => $site,
+                    'data' => json_decode($data, true),
+                ];
+                return $data_return;
+            }
+
         } catch (\Exception $e) {
             $response = array(
                 'status' => 0,
