@@ -1,0 +1,25 @@
+{
+    "name": "nwidart/brandabuse",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\BrandAbuse\\Providers\\BrandAbuseServiceProvider"
+            ],
+            "aliases": {
+                
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\BrandAbuse\\": ""
+        }
+    }
+}

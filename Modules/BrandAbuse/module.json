@@ -1,0 +1,14 @@
+{
+    "name": "BrandAbuse",
+    "alias": "brandabuse",
+    "description": "",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\BrandAbuse\\Providers\\BrandAbuseServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
