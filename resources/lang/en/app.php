@@ -1017,4 +1017,7 @@ return [
     'agent_management'                          => 'Agent Management',
     'phishing_detection'                        => 'Phishing Detection',
     'agent_rule'                        => 'Agent Rule',
+    'host'                        => 'Host',
+    'brand_abuse'                        => 'Brand Abuse',
+    'brand_abuse_feed'                        => 'Brand Abuse Feed',
 ];
