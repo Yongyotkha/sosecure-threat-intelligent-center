@@ -22,7 +22,7 @@
                 </header>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-lg-2">
+                        <div class="col-lg-2 d-none">
                             <h5 class="font-weight-bold">Keyword</h5>
                             <div class="box-item-keyword">
                                 <ul id="keyword_main" class="main-list keyword-list">
@@ -106,7 +106,7 @@
             success:function(response) {
                 loading('stop_load');
                 if(response.status == 1) {
-                    console.log(response);
+                    {{-- console.log(response); --}}
                     result = 1;
                     if(response && response.data) {
                         let data = response.data;
@@ -127,13 +127,13 @@
                         $("ul.keyword-list").append(newToDo);
                     }
                 } else {
-                    console.log(response);
+                    {{-- console.log(response); --}}
                     toastr.warning(response.message, '@langapp('response_status')');
                 }
 
             },
             error: function (error){
-                console.log(error);
+                {{-- console.log(error); --}}
                 result = 0;
                 loading('stop_load');
                 var errors = error.response.data.errors;
@@ -162,7 +162,7 @@
             success:function(response) {
                 loading('stop_load');
                 if(response.status == 1) {
-                    console.log(response);
+                    {{-- console.log(response); --}}
                     result = 1;
                     if(response && response.data) {
                         let data = response.data;
@@ -183,13 +183,13 @@
                         $('ul.'+type+'-list').append(newToDo);
                     }
                 } else {
-                    console.log(response);
+                    {{-- console.log(response); --}}
                     toastr.warning(response.message, '@langapp('response_status')');
                 }
 
             },
             error: function (error){
-                console.log(error);
+                {{-- console.log(error); --}}
                 result = 0;
                 loading('stop_load');
                 var errors = error.response.data.errors;

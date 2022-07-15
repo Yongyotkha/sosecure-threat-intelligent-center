@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\DB;
 class PhishingDetectionController extends Controller
 {
     /**
@@ -104,7 +105,8 @@ class PhishingDetectionController extends Controller
         return DataTables::of($logPhishing)
         ->editColumn('site_name', function ($collection) {
             $html = '';
-            $query = Sites::where('id', $collection->site_id)
+            // $query = Sites::where('id', $collection->site_id)
+            $query = DB::table('site')->where('id', $collection->site_id)
                 ->first();
                 
             // dd($query);
