@@ -47,7 +47,7 @@ use Carbon\Carbon;
                                 @endif
                             @endif
                             <span>
-                                Brand Abuse Data
+                                Brand Abuse
                             </span>
                         </div>
 
@@ -439,7 +439,7 @@ use Carbon\Carbon;
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table Brand Abuse Data
+                                    <i class="fas fa-table"></i> Table Brand Abuse
                                 </div>
                             </div>
                         </header>

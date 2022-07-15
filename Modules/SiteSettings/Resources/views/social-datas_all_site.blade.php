@@ -47,7 +47,7 @@ use Carbon\Carbon;
                                 @endif
                             @endif
                             <span>
-                                Data Leak Data
+                                Data Leak
                             </span>
                         </div>
 
@@ -439,7 +439,7 @@ use Carbon\Carbon;
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table Data Leak Data
+                                    <i class="fas fa-table"></i> Table Data Leak
                                 </div>
                             </div>
                         </header>

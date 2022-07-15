@@ -340,7 +340,8 @@ class RoleController extends Controller
             if ($request->menu) {
                 if (count($request->menu) > 0) {
                     foreach ($request->menu as $menu) {
-                        $tb_menu = Menu::select("id")->where("code", $menu)->first();
+                        // $tb_menu = Menu::select("id")->where("code", $menu)->first();
+                        $tb_menu = DB::table('menu')->select("id")->where("code", $menu)->first();
                         $role_menu_permission = new role_menu_permission;
                         $role_menu_permission->role_id = $request->role_id;
                         $role_menu_permission->menu_id = $tb_menu->id;
@@ -358,13 +359,20 @@ class RoleController extends Controller
                                 } else {
                                     $role_permissions_last = 1;
                                 }
-                                
-                                $role_permissions = new role_permissions;
-                                $role_permissions->permission_id = $permission_menu_val;
-                                $role_permissions->role_id = $request->role_id;
-                                $role_permissions->id = $role_permissions_last;
-                                $role_permissions->save();
 
+                                $role_permissions_check = role_permissions::where([
+                                        'permission_id' => $permission_menu_val, 
+                                        'role_id' => $request->role_id
+                                    ])->first();
+
+                                if(!$role_permissions_check)
+                                {
+                                    $role_permissions = new role_permissions;
+                                    $role_permissions->permission_id = $permission_menu_val;
+                                    $role_permissions->role_id = $request->role_id;
+                                    $role_permissions->id = $role_permissions_last;
+                                    $role_permissions->save();
+                                }
 
                                 $SiteSettings_id_arr = SiteSettings::select('id')->get()->pluck('id')->toArray();
                                 if(!empty($SiteSettings_id_arr)) {
@@ -396,11 +404,25 @@ class RoleController extends Controller
                                 $role_permissions_last = 1;
                             }
 
-                            $role_permissions = new role_permissions;
-                            $role_permissions->permission_id = $permission_arr_val;
-                            $role_permissions->role_id = $request->role_id;
-                            $role_permissions->id = $role_permissions_last;
-                            $role_permissions->save();
+                            $role_permissions_check = role_permissions::where([
+                                'permission_id' => $permission_arr_val, 
+                                'role_id' => $request->role_id
+                            ])->first();
+
+                            if(!$role_permissions_check)
+                            {
+                                $role_permissions = new role_permissions;
+                                $role_permissions->permission_id = $permission_arr_val;
+                                $role_permissions->role_id = $request->role_id;
+                                $role_permissions->id = $role_permissions_last;
+                                $role_permissions->save();
+                            }
+
+                            // $role_permissions = new role_permissions;
+                            // $role_permissions->permission_id = $permission_arr_val;
+                            // $role_permissions->role_id = $request->role_id;
+                            // $role_permissions->id = $role_permissions_last;
+                            // $role_permissions->save();
 
 
                             $SiteSettings_id_arr = SiteSettings::select('id')->get()->pluck('id')->toArray();
@@ -439,12 +461,26 @@ class RoleController extends Controller
                                 } else {
                                     $role_permissions_last = 1;
                                 }
+
+                                $role_permissions_check = role_permissions::where([
+                                    'permission_id' => $permission_arr_val, 
+                                    'role_id' => $request->role_id
+                                ])->first();
     
-                                $role_permissions = new role_permissions;
-                                $role_permissions->permission_id = $permission_arr_val;
-                                $role_permissions->role_id = $request->role_id;
-                                $role_permissions->id = $role_permissions_last;
-                                $role_permissions->save();
+                                if(!$role_permissions_check)
+                                {
+                                    $role_permissions = new role_permissions;
+                                    $role_permissions->permission_id = $permission_arr_val;
+                                    $role_permissions->role_id = $request->role_id;
+                                    $role_permissions->id = $role_permissions_last;
+                                    $role_permissions->save();
+                                }
+    
+                                // $role_permissions = new role_permissions;
+                                // $role_permissions->permission_id = $permission_arr_val;
+                                // $role_permissions->role_id = $request->role_id;
+                                // $role_permissions->id = $role_permissions_last;
+                                // $role_permissions->save();
     
     
                                 $SiteSettings_id_arr = SiteSettings::select('id')->get()->pluck('id')->toArray();
@@ -481,12 +517,26 @@ class RoleController extends Controller
                                 } else {
                                     $role_permissions_last = 1;
                                 }
+
+                                $role_permissions_check = role_permissions::where([
+                                    'permission_id' => $permission_arr_val, 
+                                    'role_id' => $request->role_id
+                                ])->first();
     
-                                $role_permissions = new role_permissions;
-                                $role_permissions->permission_id = $permission_arr_val;
-                                $role_permissions->role_id = $request->role_id;
-                                $role_permissions->id = $role_permissions_last;
-                                $role_permissions->save();
+                                if(!$role_permissions_check)
+                                {
+                                    $role_permissions = new role_permissions;
+                                    $role_permissions->permission_id = $permission_arr_val;
+                                    $role_permissions->role_id = $request->role_id;
+                                    $role_permissions->id = $role_permissions_last;
+                                    $role_permissions->save();
+                                }
+    
+                                // $role_permissions = new role_permissions;
+                                // $role_permissions->permission_id = $permission_arr_val;
+                                // $role_permissions->role_id = $request->role_id;
+                                // $role_permissions->id = $role_permissions_last;
+                                // $role_permissions->save();
     
     
                                 $SiteSettings_id_arr = SiteSettings::select('id')->get()->pluck('id')->toArray();
@@ -523,12 +573,26 @@ class RoleController extends Controller
                                 } else {
                                     $role_permissions_last = 1;
                                 }
+
+                                $role_permissions_check = role_permissions::where([
+                                    'permission_id' => $permission_arr_val, 
+                                    'role_id' => $request->role_id
+                                ])->first();
     
-                                $role_permissions = new role_permissions;
-                                $role_permissions->permission_id = $permission_arr_val;
-                                $role_permissions->role_id = $request->role_id;
-                                $role_permissions->id = $role_permissions_last;
-                                $role_permissions->save();
+                                if(!$role_permissions_check)
+                                {
+                                    $role_permissions = new role_permissions;
+                                    $role_permissions->permission_id = $permission_arr_val;
+                                    $role_permissions->role_id = $request->role_id;
+                                    $role_permissions->id = $role_permissions_last;
+                                    $role_permissions->save();
+                                }
+    
+                                // $role_permissions = new role_permissions;
+                                // $role_permissions->permission_id = $permission_arr_val;
+                                // $role_permissions->role_id = $request->role_id;
+                                // $role_permissions->id = $role_permissions_last;
+                                // $role_permissions->save();
     
     
                                 $SiteSettings_id_arr = SiteSettings::select('id')->get()->pluck('id')->toArray();
@@ -571,11 +635,25 @@ class RoleController extends Controller
                                 $role_permissions_last = 1;
                             }
 
-                            $role_permissions = new role_permissions;
-                            $role_permissions->permission_id = $permission_arr_val;
-                            $role_permissions->role_id = $request->role_id;
-                            $role_permissions->id = $role_permissions_last;
-                            $role_permissions->save();
+                            $role_permissions_check = role_permissions::where([
+                                'permission_id' => $permission_arr_val, 
+                                'role_id' => $request->role_id
+                            ])->first();
+
+                            if(!$role_permissions_check)
+                            {
+                                $role_permissions = new role_permissions;
+                                $role_permissions->permission_id = $permission_arr_val;
+                                $role_permissions->role_id = $request->role_id;
+                                $role_permissions->id = $role_permissions_last;
+                                $role_permissions->save();
+                            }
+
+                            // $role_permissions = new role_permissions;
+                            // $role_permissions->permission_id = $permission_arr_val;
+                            // $role_permissions->role_id = $request->role_id;
+                            // $role_permissions->id = $role_permissions_last;
+                            // $role_permissions->save();
 
 
                             $SiteSettings_id_arr = SiteSettings::select('id')->get()->pluck('id')->toArray();
@@ -628,12 +706,26 @@ class RoleController extends Controller
                                 } else {
                                     $role_permissions_last = 1;
                                 }
+
+                                $role_permissions_check = role_permissions::where([
+                                    'permission_id' => $permission_menu_sub_val, 
+                                    'role_id' => $request->role_id
+                                ])->first();
+    
+                                if(!$role_permissions_check)
+                                {
+                                    $role_permissions = new role_permissions;
+                                    $role_permissions->permission_id = $permission_menu_sub_val;
+                                    $role_permissions->role_id = $request->role_id;
+                                    $role_permissions->id = $role_permissions_last;
+                                    $role_permissions->save();
+                                }
                                 
-                                $role_permissions = new role_permissions;
-                                $role_permissions->permission_id = $permission_menu_sub_val;
-                                $role_permissions->role_id = $request->role_id;
-                                $role_permissions->id = $role_permissions_last;
-                                $role_permissions->save();
+                                // $role_permissions = new role_permissions;
+                                // $role_permissions->permission_id = $permission_menu_sub_val;
+                                // $role_permissions->role_id = $request->role_id;
+                                // $role_permissions->id = $role_permissions_last;
+                                // $role_permissions->save();
 
 
 

@@ -587,8 +587,8 @@ class BrandAbuseController extends Controller
             if ($request->site) {
                 $SiteSettings = SiteSettings::where('code', @$request->site)->first();
 
-                $model = $model->where('status', 1)->where('site_id', $SiteSettings->id);
-                $BrandAbuseSocialRef_data->where('status', 1)->where('brand_abuse_socail_ref.site_id', $SiteSettings->id)->where('brand_abuse_socail_ref.status', 1);
+                $model = $model->where('brand_abuse_socail_ref.status', 1)->where('brand_abuse_socail_ref.site_id', $SiteSettings->id);
+                $BrandAbuseSocialRef_data->where('brand_abuse_socail_ref.status', 1)->where('brand_abuse_socail_ref.site_id', $SiteSettings->id)->where('brand_abuse_socail_ref.status', 1);
             }
 
             if ($request->click_key) {
