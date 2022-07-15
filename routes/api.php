@@ -166,6 +166,29 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
      //keyword
      Route::post('keyword/get_keyword_main', 'Api\ApiKeywordController@get_keyword_main');
      Route::post('keyword/get_keyword_sub', 'Api\ApiKeywordController@get_keyword_sub');
+
+     //brandabuse
+    Route::post('brandabuse/table', 'Api\ApiBrandabuseController@brandabuse_table');
+    Route::post('brandabuse/view', 'Api\ApiBrandabuseController@brandabuse_view');
+    Route::post('brandabuse/count_val', 'Api\ApiBrandabuseController@brandabuse_count_val');
+    Route::post('brandabuse/delete', 'Api\ApiBrandabuseController@brandabuse_delete');
+    Route::post('brandabuse/delete_select', 'Api\ApiBrandabuseController@brandabuse_delete_select');
+    Route::post('brandabuse/delete_change', 'Api\ApiBrandabuseController@brandabuse_delete_change');
+    Route::post('brandabuse/count_keyword', 'Api\ApiBrandabuseController@count_keyword');
+    Route::post('brandabuse/count_icon', 'Api\ApiBrandabuseController@count_icon');
+    Route::post('brandabuse/getDataLeakSocial', 'Api\ApiBrandabuseController@getDataLeakSocial');
+
+    Route::post('brandabuse/activity_dataleak_modal', 'Api\ApiBrandabuseController@activity_dataleak_modal');
+    Route::post('brandabuse/activity_history_reload', 'Api\ApiBrandabuseController@activity_history_reload');
+    Route::post('brandabuse/activity_get_edit_data', 'Api\ApiBrandabuseController@activity_get_edit_data');
+    Route::post('brandabuse/activity_save', 'Api\ApiBrandabuseController@activity_save');
+    Route::post('brandabuse/activity_delete', 'Api\ApiBrandabuseController@activity_delete');
+
+    Route::post('brandabuse/compromise_activity_dataleak_modal', 'Api\ApiBrandabuseController@compromise_activity_dataleak_modal');
+    Route::post('brandabuse/compromise_activity_history_reload', 'Api\ApiBrandabuseController@compromise_activity_history_reload');
+    Route::post('brandabuse/compromise_activity_get_edit_data', 'Api\ApiBrandabuseController@compromise_activity_get_edit_data');
+    Route::post('brandabuse/compromise_activity_save', 'Api\ApiBrandabuseController@compromise_activity_save');
+    Route::post('brandabuse/compromise_activity_delete', 'Api\ApiBrandabuseController@compromise_activity_delete');
     
 });
 
