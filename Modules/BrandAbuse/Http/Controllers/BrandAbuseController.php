@@ -125,7 +125,8 @@ class BrandAbuseController extends Controller
         //
     }
 
-    public function count_val(Request $request){
+    public function count_val(Request $request)
+    {
         $role_custom = @check_role_custom();
         if(!$role_custom['data_leak']) {
             check_permission403();
@@ -429,7 +430,7 @@ class BrandAbuseController extends Controller
 
     }
 
-    public function socialdatas_all_site_tb(Request $request)
+    public function socialdatas_all_site_tb(Request $request) //
     {
     
         $model = BrandAbuseSocialRef::where('deleted_at', null)
@@ -439,8 +440,8 @@ class BrandAbuseController extends Controller
             ->with('get_site')
             ->with('get_brand_abuse_feed_one');
 
-           $BrandAbuseSocialRef_data = BrandAbuseSocialRef::join('brand_abuse_feed', 'brand_abuse_socail_ref.brand_abuse_feed_id', '=', 'brand_abuse_feed.id')
-           ->whereIn('brand_abuse_feed.feel_type', ['social','darkweb_public'])->join('site','site.id','brand_abuse_socail_ref.site_id')
+        $BrandAbuseSocialRef_data = BrandAbuseSocialRef::join('brand_abuse_feed', 'brand_abuse_socail_ref.brand_abuse_feed_id', '=', 'brand_abuse_feed.id')
+            ->whereIn('brand_abuse_feed.feel_type', ['social','darkweb_public'])->join('site','site.id','brand_abuse_socail_ref.site_id')
             ->select('brand_abuse_socail_ref.*','brand_abuse_feed.*','site.name as site_name','brand_abuse_socail_ref.code as code_data','brand_abuse_socail_ref.id as id_data','brand_abuse_socail_ref.status as status_data');
 
         if ($request->search_val == 1) {

@@ -3,6 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
+
+use App\BrandAbuseFeed;
+use App\BrandAbuseFeedTemp;
+use App\BrandAbuseSocial;
+use App\BrandAbuseSocialRef;
+use App\BrandAbuseSocialRefTemp;
+
 use App\DataLeakFeed;
 use App\DataLeakSocialRef;
 use Modules\Social\Entities\Data_leak_social;
@@ -15,7 +22,9 @@ use Modules\SiteSettings\Entities\Activity;
 
 class ApiBrandabuseController extends ApiController
 {
-    public function data_leak_view(Request $request){
+
+    public function brand_abuse_count_val(Request $request) // count_val
+    {
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
@@ -24,426 +33,7 @@ class ApiBrandabuseController extends ApiController
             if($data === false){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{ 
-                if($data['data']['menu'] !== 'data_leak'){
-                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
-                }else{
-                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
-                    if($auth_site['status_code'] !== '200'){
-                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
-                    }
-
-                    $code = $data['data']['code'];
-                    
-                    $model1 = DataLeakSocialRef::select('data_leak_feed.feedcontent')
-                    ->join('data_leak_feed', 'data_leak_feed.id', '=','data_leak_socail_ref.data_leak_feed_id')
-                    ->where('data_leak_socail_ref.code',$code)->first();
-
-                    $response = [
-                        "code" => $code,
-                        "feedcontent" => $model1->feedcontent,
-                    ];
-
-                    $data_transcation = json_encode($response);
-                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
-                }
-            }
-        } catch (\Exception $e) {
-            $response = array(
-                'status_code' => 500,
-                'message' => $e -> getMessage(),
-            );
-
-            $header = $request->bearerToken();
-            $mode = $request->mode;
-            $data_request = $request -> data;
-            $data = $this -> dataFalse($header, $mode, $data_request);
-            $this->saveLog($data['site']['data']['id'], json_encode($response));
-
-            return response()->json($response);
-        }
-    }
-
-    
-    public function data_leak_table(Request $request){
-        try{
-            $header = $request->bearerToken();
-            $mode = $request->mode;
-            $data_request = $request -> data;
-            $data = $this -> dataFalse($header, $mode, $data_request);
-            if($data === false){
-                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
-            }else{ 
-                if($data['data']['menu'] !== 'data_leak'){
-                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
-                }else{
-                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
-                    if($auth_site['status_code'] !== '200'){
-                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
-                    }
-
-                    $startDate = $data['data']['startDate'];
-                    $endDate = $data['data']['endDate'];
-                    $search_val = $data['data']['search_val'];
-                    $site = $data['data']['site'];
-                    $get_role_custom_first = $data['data']['get_role_custom_first'];
-                    $keywords = $data['data']['keywords'];
-                    $type = $data['data']['type'];
-                    $isDateSearch = $data['data']['isDateSearch'];
-                    $check_type = $data['data']['check_type'];
-                    $source = $data['data']['source'];
-                    $click_type = $data['data']['click_type'];
-                    $click_type2 = $data['data']['click_type2'];
-                    $click_key = $data['data']['click_key'];
-
-
-                    $check_serverity = $data['data']['check_serverity'];
-                    $check_monitoring = $data['data']['check_monitoring'];
-                    $check_social = $data['data']['check_social'];
-
-
-                    $model = DataLeakSocialRef::where('deleted_at', null)
-                    ->where('status',1)
-                    ->whereHas('get_data_leak_feed_one', function ($query) {
-                        $query->whereIn('feel_type', ['social','darkweb_public']);
-                    })
-                    ->with('get_site')
-                    ->with('get_data_leak_feed_one');
-        
-
-                    $DataLeakSocialRef_data = DataLeakSocialRef::join('data_leak_feed', 'data_leak_socail_ref.data_leak_feed_id', '=', 'data_leak_feed.id')
-                    ->whereIn('data_leak_feed.feel_type', ['social','darkweb_public'])->join('site','site.id','data_leak_socail_ref.site_id')
-                    ->select('data_leak_socail_ref.*','data_leak_feed.*','site.name as site_name','data_leak_socail_ref.code as code_data');
-
-
-                    if ($search_val == 1) {
-            
-                    
-
-                        $DataLeakFeed_Data =   DataLeakFeed::where('deleted_at', null)->where('status','1')->whereIn('feel_type', ['social','darkweb_public']);
-            
-            
-                        $site_id_arr = @$get_role_custom_first['site_id_arr'];
-                        if(@$get_role_custom_first['superadmin'] == 1) {
-
-                        }else if(@$get_role_custom_first['client'] == 1) {
-                            $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
-                            $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('data_leak_feed.status', 1);
-                            $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
-            
-                        }else if(@$get_role_custom_first['site_support'] == 1) {
-                            $model = $model->whereIn('site_id', $site_id_arr);
-                            $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
-                            $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
-            
-                        }else if(@$get_role_custom_first['site_admin'] == 1) {
-                            $model = $model->whereIn('site_id', $site_id_arr);
-                            $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
-                            $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
-            
-                        }else if(@$get_role_custom_first['site_client'] == 1) {
-                            $model = $model->whereIn('site_id', $site_id_arr)->where('data_leak_feed.status', 1);
-                            $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('fx_data_leak_feed.status', 1);
-                            $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
-                        }
-
-                        if ($keywords) {
-                        
-                         /*   $DataLeakFeed_data  = $DataLeakFeed_Data->get();
-                            foreach ($DataLeakFeed_data as $value_data) {
-                                  $value_data->feedcontent_decode = html_entity_decode($value_data->feedcontent);
-                            }
-                            $DataLeakFeed_data_id = array();
-                            array_push($DataLeakFeed_data_id, 0);
-                            foreach($DataLeakFeed_data as $a) {
-                                if(strpos(strtoupper($a->feedcontent_decode), strtoupper($keywords)) !== false) {
-                                    array_push($DataLeakFeed_data_id, $a->id);
-                                } 
-                            }
-                            */
-
-                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
-                                $query->where('keyword', 'LIKE', '%' . $keywords . '%');
-                                    //->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
-                                   
-                            });
-                            $DataLeakSocialRef_data->whereRaw('(LOWER(fx_data_leak_feed.keyword) LIKE ? or LOWER(fnStripTags(entity_decode(fx_data_leak_feed.feedcontent))) LIKE ? )', array([trim(strtolower('%' .$keywords.'%'))],[trim(strtolower('%' .$keywords.'%'))]));
-                         //   $DataLeakSocialRef_data->orWhereIn('data_leak_feed.id', $DataLeakFeed_data_id);
-                        }
-            
-                
-            
-                        if ($check_type) {
-                        
-                            $type = $check_type;
-                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($type) {
-                                $query->where('feel_type', 'LIKE', '%' . $type . '%');
-                            });
-                            $DataLeakSocialRef_data->where('data_leak_feed.feel_type', 'LIKE', '%' . $type . '%');
-                        }
-                  
-                        if ($check_social && $check_type =="social") {
-              
-                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($check_social) {
-                                if($check_social =="other"){
-                                    $query->whereNotIn('keyword', ['Mobile','Facebook','Line','Twitter','Website']);
-                                }else{
-                                    $query->where('keyword', $check_social);
-                                }
-                              
-                            });
-                            if($check_social =="other"){
-                                $DataLeakSocialRef_data->whereNotIn('data_leak_feed.keyword', ['Mobile','Facebook','Line','Twitter','Website']);
-                            }else{
-                                    $DataLeakSocialRef_data->where('data_leak_feed.keyword', $check_social);
-            
-                            }
-            
-                        }
-                        if ($check_serverity) {
-                            $model = $model->where('serverity', $check_serverity);
-                            $DataLeakSocialRef_data->where('data_leak_socail_ref.serverity', 'LIKE', '%' . $check_serverity . '%');
-                            // });
-                        }
-            
-                        if ($check_monitoring) {
-                            $model = $model->where('status_monitoring', $check_monitoring);
-                            $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $check_monitoring . '%');
-                            // });
-                        }
-                        // if ($source) {
-            
-                        //     $source = $source;
-                        //     $model->whereHas('get_data_leak_feed_one', function ($query) use ($source) {
-                        //         $query->where('sourceid', 'LIKE', '%' . $source . '%');
-                        //     });
-            
-                        // }
-            
-                      //  if ($isDateSearch == 1) {
-                            $date_start = $startDate;
-                            $date_end = $endDate;
-            
-                            $date_start_explode = explode(" ", $date_start);
-                            $date_start_date = @$date_start_explode[0];
-                            $date_start_time = @$date_start_explode[1] . ' ' . @$date_start_explode[2];
-            
-                            $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
-            
-                            $date_start_time_time = date("H:i", strtotime($date_start_time));
-                           // $date_start_datetime_format = $date_start_date_format . ' ' . $date_start_time_time . ':00';
-                           $date_start_datetime_format = $date_start_date_format . ' '  . '00:00:01';
-            
-                            $date_end_explode = explode(" ", $date_end);
-                            $date_end_date = @$date_end_explode[0];
-                            $date_end_time = @$date_end_explode[1] . ' ' . @$date_end_explode[2];
-                            // dd($date_end_time);
-                            $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
-                            $date_end_time_time = date("H:i", strtotime($date_end_time));
-                           // $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
-                            $date_end_datetime_format = $date_end_date_format . ' '  . '23:59:59';
-            
-                            $source = $source;
-                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($date_start_date_format, $date_end_date_format) {
-                                $query->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
-                            });
-                            $DataLeakSocialRef_data->whereBetween('data_leak_feed.feedtimepost',array($date_start_datetime_format, $date_end_datetime_format));
-                      //  }
-
-                       // $model->orderBy('created_at','desc')->get();
-                    } else {
-
-                        if ($click_type2) {
-                            $keywords = $click_type2;
-                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
-                                if($keywords == 'other') {
-
-                                    $query->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
-                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
-                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
-                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
-                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))]);
-
-
-            
-                                } else {
-                                    if($keywords == 'in_progress') {
-                                        $query->where('status_monitoring', 'LIKE', '%' . $keywords . '%');
-                                    } else if($keywords == 'reported') {
-                                        $query->where('status_monitoring', 'LIKE', '%' . $keywords . '%');
-                                    } else if($keywords == 'close') {
-                                        $query->where('status_monitoring', 'LIKE', '%' . $keywords . '%');
-                                    } else {
-                                        $query->where('keyword', 'LIKE', '%' . $keywords . '%');
-                                    }
-                                }
-                            });
-                            
-                            if($keywords == 'other') {
-                                $DataLeakSocialRef_data->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ',[trim(strtolower('mobile'))])
-                                                        ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ',[trim(strtolower('facebook'))])
-                                                        ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ',[trim(strtolower('line'))])
-                                                        ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ',[trim(strtolower('twitter'))])
-                                                        ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ',[trim(strtolower('website'))]);
-                            } else {
-                                if($keywords == 'in_progress') {
-                                    $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $keywords . '%');
-                                } else if($keywords == 'reported') {
-                                    $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $keywords . '%');
-                                } else if($keywords == 'close') {
-                                    $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $keywords . '%');
-                                } else {
-                                    $DataLeakSocialRef_data->where('data_leak_feed.keyword', 'LIKE', '%' . $keywords . '%');
-                                }
-                            }
-                        }
-
-                        
-                        if($click_type) {
-    
-                            $model = $model-> where('feel_type', '=' ,$click_type);
-                            $DataLeakSocialRef_data->where('data_leak_socail_ref.feel_type',$click_type);
-            
-                        }
-            
-                        if ($click_key) {
-                            $model = $model->where('keyword', $click_key);
-                            $DataLeakSocialRef_data->where('LOWER(`data_leak_feed.keyword`)','LIKE',[trim(strtolower($click_key))]);
-                        }
-
-                        $site_id_arr = @$get_role_custom_first['site_id_arr'];
-                        if(@$get_role_custom_first['superadmin'] == 1) {
-
-                        }else if(@$get_role_custom_first['client'] == 1) {
-                            $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
-                            $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('data_leak_feed.status', 1);
-            
-                        }else if(@$get_role_custom_first['site_support'] == 1) {
-                            $model = $model->whereIn('site_id', $site_id_arr);
-                            $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
-            
-                        }else if(@$get_role_custom_first['site_admin'] == 1) {
-                            $model = $model->whereIn('site_id', $site_id_arr);
-                            $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
-            
-                        }else if(@$get_role_custom_first['site_client'] == 1) {
-                            $model = $model->whereIn('site_id', $site_id_arr)->where('data_leak_feed.status', 1);
-                            $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('fx_data_leak_feed.status', 1);
-                        }
-
-                       // $model->orderBy('created_at','desc')->get();
-                    }
-
-
-                    $order_column = $data['data']['order_column'];
-                    $order_dir = $data['data']['order_dir'];
-                 //   $res =  "";
-                    if($order_column){
-                        $column_order =$order_column;
-                        $column_dir =  $order_dir;
-                        if($column_order == "9"){
-                            $model->orderBy('status',$column_dir);
-                            $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.site_id', $column_dir);
-                        }
-                        else if($column_order == "8"){
-                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
-                                      $query->orderBy('feedtimepost',$column_dir);
-                            });
-                            $DataLeakSocialRef_data->orderBy('data_leak_feed.feedtimepost', $column_dir);
-                        }
-                        else if($column_order == "7"){
-            
-                            $model->orderBy('status_monitoring',$column_dir);
-                            $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.status_monitoring', $column_dir);
-                        }
-                        else if($column_order == "6"){
-            
-                            $model->orderBy('serverity',$column_dir);
-                            $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.serverity', $column_dir);
-                        }
-                        else if($column_order == "5"){
-            
-                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
-                                $query->orderBy('feedcontent',$column_dir);
-                            });
-                            $DataLeakSocialRef_data->orderBy('data_leak_feed.feedcontent', $column_dir);
-                        }
-                        else if($column_order == "4"){
-            
-                            $model->orderBy('keyword',$column_dir);
-                            $DataLeakSocialRef_data->orderBy('data_leak_feed.keyword', $column_dir);
-                        }
-                        else if($column_order == "3"){
-            
-                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
-                                $query->orderBy('source_name',$column_dir);
-                            });
-                            $DataLeakSocialRef_data->orderBy('data_leak_feed.source_name', $column_dir);
-                        }
-                        else if($column_order == "2"){
-            
-                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
-                                $query->orderBy('feel_type',$column_dir);
-                            });
-                            $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.feel_type', $column_dir);
-                        }
-                        else if($column_order == "1"){
-            
-                            $model->whereHas('get_site', function ($query) use ($column_dir) {
-                                $query->orderBy('name',$column_dir);
-                            });
-                            $DataLeakSocialRef_data->orderBy('site.name', $column_dir);
-                       
-                        }else{
-                            $model->orderBy('created_at', 'desc');
-                            $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.created_at', $column_dir);
-                        }
-                    }else{
-                        $model->orderBy('created_at', 'desc');
-                        $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.created_at', $column_dir);
-                    }
-                  //  $model->where('status_monitoring', 'in_progress');
-                 //   $res = DataTables::of($model)->toJson(); 
-                 //  $res =    $data['data']['order_column'];
-                   $data_count = $DataLeakSocialRef_data->count();
-
-                    $response = [
-                        "recordsFiltered_count"=> $data_count,
-                        "recordsTotal_count" => $data_count,
-                        "data" => DataTables::of($DataLeakSocialRef_data->skip($data['data']['start'])->take($data['data']['length'])->get())->rawColumns(['feedcontent','get_data_leak_feed_one.feedcontent'])->toJson(),
-                    ];
-
-                    $data_transcation = json_encode($response);
-                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
-                }
-            }
-        } catch (\Exception $e) {
-            $response = array(
-                'status_code' => 500,
-                'message' => $e -> getMessage(),
-            );
-
-            $header = $request->bearerToken();
-            $mode = $request->mode;
-            $data_request = $request -> data;
-            $data = $this -> dataFalse($header, $mode, $data_request);
-            $this->saveLog($data['site']['data']['id'], json_encode($response));
-
-            return response()->json($response);
-        }
-    }
-
-    public function data_leak_count_val(Request $request){
-        try{
-            $header = $request->bearerToken();
-            $mode = $request->mode;
-            $data_request = $request -> data;
-            $data = $this -> dataFalse($header, $mode, $data_request);
-            if($data === false){
-                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
-            }else{ 
-                if($data['data']['menu'] !== 'data_leak'){
+                if($data['data']['menu'] !== 'brand_abuse'){
                     return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
                 }else{
                     $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
@@ -496,21 +86,21 @@ class ApiBrandabuseController extends ApiController
                     
             
                     if( $f_search == 1){
-                        $model = DataLeakSocialRef::where('deleted_at', null)
+                        $model = BrandAbuseSocialRef::where('deleted_at', null)
                         ->where('status',1)
-                        ->whereIn('feel_type', ['social', 'darkweb_public'])->with('get_site')->with('get_data_leak_feed_one');
-                        $countGroupBy = DataLeakSocialRef::where('deleted_at', null)
+                        ->whereIn('feel_type', ['social', 'darkweb_public'])->with('get_site')->with('get_brand_abuse_feed_one');
+                        $countGroupBy = BrandAbuseSocialRef::where('deleted_at', null)
                         ->where('status',1)
-                        ->whereIn('feel_type', ['social', 'darkweb_public'])->with('get_site')->with('get_data_leak_feed_one');
+                        ->whereIn('feel_type', ['social', 'darkweb_public'])->with('get_site')->with('get_brand_abuse_feed_one');
 
 
                         if ($title) {
-                            $model->whereHas('get_data_leak_feed_one', function ($query) use ($title) {
+                            $model->whereHas('get_brand_abuse_feed_one', function ($query) use ($title) {
                                 $query->where('keyword', 'LIKE', '%' . $title . '%')
                                     ->orWhere('feedcontent', 'LIKE', '%' . $title . '%');
                             });
             
-                            $countGroupBy->whereHas('get_data_leak_feed_one', function ($query) use ($title) {
+                            $countGroupBy->whereHas('get_brand_abuse_feed_one', function ($query) use ($title) {
                                 $query->where('keyword', 'LIKE', '%' . $title . '%')
                                     ->orWhere('feedcontent', 'LIKE', '%' . $title . '%');
                             });
@@ -529,11 +119,11 @@ class ApiBrandabuseController extends ApiController
                                 // $news = $news -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
                                 // $countGroupBy = $countGroupBy -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
                             
-                                $countGroupBy = $countGroupBy->whereHas('get_data_leak_feed_one', function ($qq) use ($request, $date_start_datetime_format, $date_end_datetime_format) {
+                                $countGroupBy = $countGroupBy->whereHas('get_brand_abuse_feed_one', function ($qq) use ($request, $date_start_datetime_format, $date_end_datetime_format) {
                                     $qq->whereBetween('feedtimepost', array($date_start_datetime_format, $date_end_datetime_format));
                                 });
             
-                                $model = $model->whereHas('get_data_leak_feed_one', function ($qq) use ($request, $date_start_datetime_format, $date_end_datetime_format) {
+                                $model = $model->whereHas('get_brand_abuse_feed_one', function ($qq) use ($request, $date_start_datetime_format, $date_end_datetime_format) {
                                     $qq->whereBetween('feedtimepost', array($date_start_datetime_format, $date_end_datetime_format));
                                 });
                             
@@ -588,13 +178,13 @@ class ApiBrandabuseController extends ApiController
             
                         }
 
-                        $Data_leak_feed_all = $model->count();
+                        $brand_abuse_feed_all = $model->count();
                         $countGroupBy = $countGroupBy->select( 'feel_type',DB::raw('count(*) as total'))->groupBy('feel_type')->get();
-                        $model = $model->with('get_data_leak_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
+                        $model = $model->with('get_brand_abuse_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
                     }else{
-                        $Data_leak_feed_all = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public']);
-                        $news = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public']);//->get()
-                        $countGroupBy = DataLeakSocialRef::select( 'feel_type',DB::raw('count(*) as total'))
+                        $brand_abuse_feed_all = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public']);
+                        $news = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public']);//->get()
+                        $countGroupBy = BrandAbuseSocialRef::select( 'feel_type',DB::raw('count(*) as total'))
                         ->where('status',1)
                         ->where('deleted_at', null)
                         ->whereIn('feel_type', ['social', 'darkweb_public'])
@@ -625,23 +215,23 @@ class ApiBrandabuseController extends ApiController
             
                         }else if(@$get_role_custom_first['client'] == 1) {
                             $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
-                            $Data_leak_feed_all = $Data_leak_feed_all->whereIn('site_id', $site_id_arr);
+                            $brand_abuse_feed_all = $brand_abuse_feed_all->whereIn('site_id', $site_id_arr);
             
                         }else if(@$get_role_custom_first['site_support'] == 1) {
                             $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
-                            $Data_leak_feed_all = $Data_leak_feed_all->whereIn('site_id', $site_id_arr);
+                            $brand_abuse_feed_all = $brand_abuse_feed_all->whereIn('site_id', $site_id_arr);
             
                         }else if(@$get_role_custom_first['site_admin'] == 1) {
                             $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
-                            $Data_leak_feed_all = $Data_leak_feed_all->whereIn('site_id', $site_id_arr);
+                            $brand_abuse_feed_all = $brand_abuse_feed_all->whereIn('site_id', $site_id_arr);
             
                         }else if(@$get_role_custom_first['site_client'] == 1) {
                             $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
-                            $Data_leak_feed_all = $Data_leak_feed_all->whereIn('site_id', $site_id_arr);
+                            $brand_abuse_feed_all = $brand_abuse_feed_all->whereIn('site_id', $site_id_arr);
             
                         }
-                        $news = $news->with('get_data_leak_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
-                        $Data_leak_feed_all = $Data_leak_feed_all->count();
+                        $news = $news->with('get_brand_abuse_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
+                        $brand_abuse_feed_all = $brand_abuse_feed_all->count();
                         $countGroupBy = $countGroupBy->get();
             
             
@@ -658,7 +248,7 @@ class ApiBrandabuseController extends ApiController
 
                     $response = [
                         "html" => $html,
-                        "count" => $Data_leak_feed_all,
+                        "count" => $brand_abuse_feed_all,
                         "darkweb" => $count_sub_type["darkweb_public"],
                         "social" => $count_sub_type["social"],
 
@@ -684,61 +274,9 @@ class ApiBrandabuseController extends ApiController
             return response()->json($response);
         }
     }
-    
-    private function dataFalse($bearerToken, $mode, $data){
-        try {
-            $header = $bearerToken;
-            $site = $this->AuthorizationRegister($header, $mode);
-            if($site['status_code'] !== '200'){
-                return $this->AuthorizationRegister($header, $mode);
-            }
-            $value = $data;
-            $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
 
-            if($data === false){
-                return $data;
-            }else{
-                $data_return = [
-                    'site' => $site,
-                    'data' => json_decode($data, true),
-                ];
-                return $data_return;
-            }
-
-        } catch (\Exception $e) {
-            $response = array(
-                'status' => 0,
-                'message' => $e -> getMessage(),
-            );
-            return response()->json($response);
-        }
-    }
-
-    private function explode_val($val,$type=null,$url) {
-        $result = '';
-        if($val) {
-            $val_arr = explode(",",$val);
-            if($val_arr) {
-                foreach($val_arr as $tag) {
-                    if($type == 'tags') {
-                        $result .=  '<a href="'.$url.'/indicators/tags/'.$tag.'">'.$tag.'</a> ,';
-                    } else if ($type == 'groups') {
-                        $result .=  '<a href="'.$url.'/indicators/groups/'.$tag.'">'.$tag.'</a> ,';
-                    } else {
-                        $result .=  '<a href="#">'.$tag.'</a> ,';
-                    }
-    
-                }
-                $result = rtrim($result,',');
-            }
-        } else {
-            $result = '';
-        }
-        return $result;
-    }
-
-
-    public function data_leak_delete(Request $request){
+    public function data_leak_view(Request $request)
+    {
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
@@ -748,6 +286,911 @@ class ApiBrandabuseController extends ApiController
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{ 
                 if($data['data']['menu'] !== 'data_leak'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $code = $data['data']['code'];
+                    
+                    $model1 = DataLeakSocialRef::select('data_leak_feed.feedcontent')
+                    ->join('data_leak_feed', 'data_leak_feed.id', '=','data_leak_socail_ref.data_leak_feed_id')
+                    ->where('data_leak_socail_ref.code',$code)->first();
+
+                    $response = [
+                        "code" => $code,
+                        "feedcontent" => $model1->feedcontent,
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function socialdatas_all_site_tb(Request $request) // socialdatas_all_site_tb
+    { 
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'brand_abuse'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $startDate = $data['data']['startDate'];
+                    $endDate = $data['data']['endDate'];
+                    $search_val = $data['data']['search_val'];
+                    $site = $data['data']['site'];
+                    $get_role_custom_first = $data['data']['get_role_custom_first'];
+                    $keywords = $data['data']['keywords'];
+                    $type = $data['data']['type'];
+                    $isDateSearch = $data['data']['isDateSearch'];
+                    $check_type = $data['data']['check_type'];
+                    $source = $data['data']['source'];
+                    $click_type = $data['data']['click_type'];
+                    $click_type2 = $data['data']['click_type2'];
+                    $click_key = $data['data']['click_key'];
+
+
+                    $check_serverity = $data['data']['check_serverity'];
+                    $check_monitoring = $data['data']['check_monitoring'];
+                    $check_social = $data['data']['check_social'];
+
+
+                    $model = BrandAbuseSocialRef::where('deleted_at', null)
+                    ->where('status',1)
+                    ->whereHas('get_brand_abuse_feed_one', function ($query) {
+                        $query->whereIn('feel_type', ['social','darkweb_public']);
+                    })
+                    ->with('get_site')
+                    ->with('get_brand_abuse_feed_one');
+        
+
+                    $BrandAbuseSocialRef_data = BrandAbuseSocialRef::join('brand_abuse_feed', 'brand_abuse_socail_ref.brand_abuse_feed_id', '=', 'brand_abuse_feed.id')
+                    ->whereIn('brand_abuse_feed.feel_type', ['social','darkweb_public'])->join('site','site.id','brand_abuse_socail_ref.site_id')
+                    ->select('brand_abuse_socail_ref.*','brand_abuse_feed.*','site.name as site_name','brand_abuse_socail_ref.code as code_data');
+
+
+                    if ($search_val == 1) {
+            
+                    
+
+                        $BrandAbuseFeed_Data =   BrandAbuseFeed::where('deleted_at', null)->where('status','1')->whereIn('feel_type', ['social','darkweb_public']);
+            
+            
+                        $site_id_arr = @$get_role_custom_first['site_id_arr'];
+                        if(@$get_role_custom_first['superadmin'] == 1) {
+
+                        }else if(@$get_role_custom_first['client'] == 1) {
+                            $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+                            $BrandAbuseSocialRef_data->whereIn('brand_abuse_socail_ref.site_id', $site_id_arr)->where('brand_abuse_feed.status', 1);
+                            $BrandAbuseFeed_Data->whereIn('site_id', $site_id_arr);
+            
+                        }else if(@$get_role_custom_first['site_support'] == 1) {
+                            $model = $model->whereIn('site_id', $site_id_arr);
+                            $BrandAbuseSocialRef_data->whereIn('brand_abuse_socail_ref.site_id', $site_id_arr);
+                            $BrandAbuseFeed_Data->whereIn('site_id', $site_id_arr);
+            
+                        }else if(@$get_role_custom_first['site_admin'] == 1) {
+                            $model = $model->whereIn('site_id', $site_id_arr);
+                            $BrandAbuseSocialRef_data->whereIn('brand_abuse_socail_ref.site_id', $site_id_arr);
+                            $BrandAbuseFeed_Data->whereIn('site_id', $site_id_arr);
+            
+                        }else if(@$get_role_custom_first['site_client'] == 1) {
+                            $model = $model->whereIn('site_id', $site_id_arr)->where('brand_abuse_feed.status', 1);
+                            $BrandAbuseSocialRef_data->whereIn('brand_abuse_socail_ref.site_id', $site_id_arr)->where('fx_brand_abuse_feed.status', 1);
+                            $BrandAbuseFeed_Data->whereIn('site_id', $site_id_arr);
+                        }
+
+                        if ($keywords) {
+                        
+                         /*   $BrandAbuseFeed_data  = $BrandAbuseFeed_Data->get();
+                            foreach ($BrandAbuseFeed_data as $value_data) {
+                                  $value_data->feedcontent_decode = html_entity_decode($value_data->feedcontent);
+                            }
+                            $BrandAbuseFeed_data_id = array();
+                            array_push($BrandAbuseFeed_data_id, 0);
+                            foreach($BrandAbuseFeed_data as $a) {
+                                if(strpos(strtoupper($a->feedcontent_decode), strtoupper($keywords)) !== false) {
+                                    array_push($BrandAbuseFeed_data_id, $a->id);
+                                } 
+                            }
+                            */
+
+                            $model->whereHas('get_brand_abuse_feed_one', function ($query) use ($keywords) {
+                                $query->where('keyword', 'LIKE', '%' . $keywords . '%');
+                                    //->orWhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+                                   
+                            });
+                            $BrandAbuseSocialRef_data->whereRaw('(LOWER(fx_brand_abuse_feed.keyword) LIKE ? or LOWER(fnStripTags(entity_decode(fx_brand_abuse_feed.feedcontent))) LIKE ? )', array([trim(strtolower('%' .$keywords.'%'))],[trim(strtolower('%' .$keywords.'%'))]));
+                         //   $BrandAbuseSocialRef_data->orWhereIn('brand_abuse_feed.id', $BrandAbuseFeed_data_id);
+                        }
+            
+                
+            
+                        if ($check_type) {
+                        
+                            $type = $check_type;
+                            $model->whereHas('get_brand_abuse_feed_one', function ($query) use ($type) {
+                                $query->where('feel_type', 'LIKE', '%' . $type . '%');
+                            });
+                            $BrandAbuseSocialRef_data->where('brand_abuse_feed.feel_type', 'LIKE', '%' . $type . '%');
+                        }
+                  
+                        if ($check_social && $check_type =="social") {
+              
+                            $model->whereHas('get_brand_abuse_feed_one', function ($query) use ($check_social) {
+                                if($check_social =="other"){
+                                    $query->whereNotIn('keyword', ['Mobile','Facebook','Line','Twitter','Website']);
+                                }else{
+                                    $query->where('keyword', $check_social);
+                                }
+                              
+                            });
+                            if($check_social =="other"){
+                                $BrandAbuseSocialRef_data->whereNotIn('brand_abuse_feed.keyword', ['Mobile','Facebook','Line','Twitter','Website']);
+                            }else{
+                                    $BrandAbuseSocialRef_data->where('brand_abuse_feed.keyword', $check_social);
+            
+                            }
+            
+                        }
+                        if ($check_serverity) {
+                            $model = $model->where('serverity', $check_serverity);
+                            $BrandAbuseSocialRef_data->where('brand_abuse_socail_ref.serverity', 'LIKE', '%' . $check_serverity . '%');
+                            // });
+                        }
+            
+                        if ($check_monitoring) {
+                            $model = $model->where('status_monitoring', $check_monitoring);
+                            $BrandAbuseSocialRef_data->where('brand_abuse_socail_ref.status_monitoring', 'LIKE', '%' . $check_monitoring . '%');
+                            // });
+                        }
+                        // if ($source) {
+            
+                        //     $source = $source;
+                        //     $model->whereHas('get_brand_abuse_feed_one', function ($query) use ($source) {
+                        //         $query->where('sourceid', 'LIKE', '%' . $source . '%');
+                        //     });
+            
+                        // }
+            
+                      //  if ($isDateSearch == 1) {
+                            $date_start = $startDate;
+                            $date_end = $endDate;
+            
+                            $date_start_explode = explode(" ", $date_start);
+                            $date_start_date = @$date_start_explode[0];
+                            $date_start_time = @$date_start_explode[1] . ' ' . @$date_start_explode[2];
+            
+                            $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+            
+                            $date_start_time_time = date("H:i", strtotime($date_start_time));
+                           // $date_start_datetime_format = $date_start_date_format . ' ' . $date_start_time_time . ':00';
+                           $date_start_datetime_format = $date_start_date_format . ' '  . '00:00:01';
+            
+                            $date_end_explode = explode(" ", $date_end);
+                            $date_end_date = @$date_end_explode[0];
+                            $date_end_time = @$date_end_explode[1] . ' ' . @$date_end_explode[2];
+                            // dd($date_end_time);
+                            $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                            $date_end_time_time = date("H:i", strtotime($date_end_time));
+                           // $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
+                            $date_end_datetime_format = $date_end_date_format . ' '  . '23:59:59';
+            
+                            $source = $source;
+                            $model->whereHas('get_brand_abuse_feed_one', function ($query) use ($date_start_date_format, $date_end_date_format) {
+                                $query->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
+                            });
+                            $BrandAbuseSocialRef_data->whereBetween('brand_abuse_feed.feedtimepost',array($date_start_datetime_format, $date_end_datetime_format));
+                      //  }
+
+                       // $model->orderBy('created_at','desc')->get();
+                    } else {
+
+                        if ($click_type2) {
+                            $keywords = $click_type2;
+                            $model->whereHas('get_brand_abuse_feed_one', function ($query) use ($keywords) {
+                                if($keywords == 'other') {
+
+                                    $query->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
+                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
+                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
+                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
+                                            ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))]);
+
+
+            
+                                } else {
+                                    if($keywords == 'in_progress') {
+                                        $query->where('status_monitoring', 'LIKE', '%' . $keywords . '%');
+                                    } else if($keywords == 'reported') {
+                                        $query->where('status_monitoring', 'LIKE', '%' . $keywords . '%');
+                                    } else if($keywords == 'close') {
+                                        $query->where('status_monitoring', 'LIKE', '%' . $keywords . '%');
+                                    } else {
+                                        $query->where('keyword', 'LIKE', '%' . $keywords . '%');
+                                    }
+                                }
+                            });
+                            
+                            if($keywords == 'other') {
+                                $BrandAbuseSocialRef_data->whereRaw('LOWER(fx_brand_abuse_feed.keyword) != ? ',[trim(strtolower('mobile'))])
+                                                        ->whereRaw('LOWER(fx_brand_abuse_feed.keyword) != ? ',[trim(strtolower('facebook'))])
+                                                        ->whereRaw('LOWER(fx_brand_abuse_feed.keyword) != ? ',[trim(strtolower('line'))])
+                                                        ->whereRaw('LOWER(fx_brand_abuse_feed.keyword) != ? ',[trim(strtolower('twitter'))])
+                                                        ->whereRaw('LOWER(fx_brand_abuse_feed.keyword) != ? ',[trim(strtolower('website'))]);
+                            } else {
+                                if($keywords == 'in_progress') {
+                                    $BrandAbuseSocialRef_data->where('brand_abuse_socail_ref.status_monitoring', 'LIKE', '%' . $keywords . '%');
+                                } else if($keywords == 'reported') {
+                                    $BrandAbuseSocialRef_data->where('brand_abuse_socail_ref.status_monitoring', 'LIKE', '%' . $keywords . '%');
+                                } else if($keywords == 'close') {
+                                    $BrandAbuseSocialRef_data->where('brand_abuse_socail_ref.status_monitoring', 'LIKE', '%' . $keywords . '%');
+                                } else {
+                                    $BrandAbuseSocialRef_data->where('brand_abuse_feed.keyword', 'LIKE', '%' . $keywords . '%');
+                                }
+                            }
+                        }
+
+                        
+                        if($click_type) {
+    
+                            $model = $model-> where('feel_type', '=' ,$click_type);
+                            $BrandAbuseSocialRef_data->where('brand_abuse_socail_ref.feel_type',$click_type);
+            
+                        }
+            
+                        if ($click_key) {
+                            $model = $model->where('keyword', $click_key);
+                            $BrandAbuseSocialRef_data->where('LOWER(`brand_abuse_feed.keyword`)','LIKE',[trim(strtolower($click_key))]);
+                        }
+
+                        $site_id_arr = @$get_role_custom_first['site_id_arr'];
+                        if(@$get_role_custom_first['superadmin'] == 1) {
+
+                        }else if(@$get_role_custom_first['client'] == 1) {
+                            $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+                            $BrandAbuseSocialRef_data->whereIn('brand_abuse_socail_ref.site_id', $site_id_arr)->where('brand_abuse_feed.status', 1);
+            
+                        }else if(@$get_role_custom_first['site_support'] == 1) {
+                            $model = $model->whereIn('site_id', $site_id_arr);
+                            $BrandAbuseSocialRef_data->whereIn('brand_abuse_socail_ref.site_id', $site_id_arr);
+            
+                        }else if(@$get_role_custom_first['site_admin'] == 1) {
+                            $model = $model->whereIn('site_id', $site_id_arr);
+                            $BrandAbuseSocialRef_data->whereIn('brand_abuse_socail_ref.site_id', $site_id_arr);
+            
+                        }else if(@$get_role_custom_first['site_client'] == 1) {
+                            $model = $model->whereIn('site_id', $site_id_arr)->where('brand_abuse_feed.status', 1);
+                            $BrandAbuseSocialRef_data->whereIn('brand_abuse_socail_ref.site_id', $site_id_arr)->where('fx_brand_abuse_feed.status', 1);
+                        }
+
+                       // $model->orderBy('created_at','desc')->get();
+                    }
+
+
+                    $order_column = $data['data']['order_column'];
+                    $order_dir = $data['data']['order_dir'];
+                 //   $res =  "";
+                    if($order_column){
+                        $column_order =$order_column;
+                        $column_dir =  $order_dir;
+                        if($column_order == "9"){
+                            $model->orderBy('status',$column_dir);
+                            $BrandAbuseSocialRef_data->orderBy('brand_abuse_socail_ref.site_id', $column_dir);
+                        }
+                        else if($column_order == "8"){
+                            $model->whereHas('get_brand_abuse_feed_one', function ($query) use ($column_dir) {
+                                      $query->orderBy('feedtimepost',$column_dir);
+                            });
+                            $BrandAbuseSocialRef_data->orderBy('brand_abuse_feed.feedtimepost', $column_dir);
+                        }
+                        else if($column_order == "7"){
+            
+                            $model->orderBy('status_monitoring',$column_dir);
+                            $BrandAbuseSocialRef_data->orderBy('brand_abuse_socail_ref.status_monitoring', $column_dir);
+                        }
+                        else if($column_order == "6"){
+            
+                            $model->orderBy('serverity',$column_dir);
+                            $BrandAbuseSocialRef_data->orderBy('brand_abuse_socail_ref.serverity', $column_dir);
+                        }
+                        else if($column_order == "5"){
+            
+                            $model->whereHas('get_brand_abuse_feed_one', function ($query) use ($column_dir) {
+                                $query->orderBy('feedcontent',$column_dir);
+                            });
+                            $BrandAbuseSocialRef_data->orderBy('brand_abuse_feed.feedcontent', $column_dir);
+                        }
+                        else if($column_order == "4"){
+            
+                            $model->orderBy('keyword',$column_dir);
+                            $BrandAbuseSocialRef_data->orderBy('brand_abuse_feed.keyword', $column_dir);
+                        }
+                        else if($column_order == "3"){
+            
+                            $model->whereHas('get_brand_abuse_feed_one', function ($query) use ($column_dir) {
+                                $query->orderBy('source_name',$column_dir);
+                            });
+                            $BrandAbuseSocialRef_data->orderBy('brand_abuse_feed.source_name', $column_dir);
+                        }
+                        else if($column_order == "2"){
+            
+                            $model->whereHas('get_brand_abuse_feed_one', function ($query) use ($column_dir) {
+                                $query->orderBy('feel_type',$column_dir);
+                            });
+                            $BrandAbuseSocialRef_data->orderBy('brand_abuse_socail_ref.feel_type', $column_dir);
+                        }
+                        else if($column_order == "1"){
+            
+                            $model->whereHas('get_site', function ($query) use ($column_dir) {
+                                $query->orderBy('name',$column_dir);
+                            });
+                            $BrandAbuseSocialRef_data->orderBy('site.name', $column_dir);
+                       
+                        }else{
+                            $model->orderBy('created_at', 'desc');
+                            $BrandAbuseSocialRef_data->orderBy('brand_abuse_socail_ref.created_at', $column_dir);
+                        }
+                    }else{
+                        $model->orderBy('created_at', 'desc');
+                        $BrandAbuseSocialRef_data->orderBy('brand_abuse_socail_ref.created_at', $column_dir);
+                    }
+                  //  $model->where('status_monitoring', 'in_progress');
+                 //   $res = DataTables::of($model)->toJson(); 
+                 //  $res =    $data['data']['order_column'];
+                   $data_count = $BrandAbuseSocialRef_data->count();
+
+                    $response = [
+                        "recordsFiltered_count"=> $data_count,
+                        "recordsTotal_count" => $data_count,
+                        "data" => DataTables::of($BrandAbuseSocialRef_data->skip($data['data']['start'])->take($data['data']['length'])->get())->rawColumns(['feedcontent','get_brand_abuse_feed_one.feedcontent'])->toJson(),
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function add_brandabuse(Request $request)
+    {
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'brand_abuse'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $keyword = $data['data']['keyword'];
+                    $other = $data['data']['other'];
+                    $type = $data['data']['type'];
+                    // $content = $data['data']['content'];
+                    $source = $data['data']['source'];
+                    $sites = $data['data']['site'];
+                    $monitoring = $data['data']['monitoring'];
+                    $serverity = $data['data']['serverity'];
+                    $sent_mail = $data['data']['sent_mail'];
+                    $site_code = $data['data']['site_code'];
+
+                    // $keyword = @$request->keyword;
+                    // $other = @$request->other;
+
+                    if($keyword == 'Other') {
+                        $keyword_i = @$other;
+                    } else {
+                        $keyword_i = @$keyword;
+                    }
+            
+                    $BrandAbuseFeed = new BrandAbuseFeed();
+                    $BrandAbuseFeed->code = generator_uuid();
+                    $BrandAbuseFeed->feel_type = @$type;
+                    // $BrandAbuseFeed->feedcontent = @$request->content;
+
+                    $BrandAbuseFeed->keyword = @$keyword_i;
+
+                    $BrandAbuseFeed->source_name = @$source;
+                    $BrandAbuseFeed->feedtimepost = Carbon::now();
+                    $BrandAbuseFeed->status = 1;
+                    $content = @$_POST['content']; //รับค่าจาก messageInput
+                    if($content) {
+                        $dom = new \domdocument();
+                        if($dom->getelementsbytagname('img')){
+                            $dom->loadHtml('<?xml encoding="UTF-8">'.$content,
+                            LIBXML_HTML_NOIMPLIED |
+                            LIBXML_HTML_NODEFDTD |
+                            LIBXML_NOERROR |
+                            LIBXML_NOWARNING 
+                        );
+                            //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
+                            $images = $dom->getelementsbytagname('img');
+                            //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
+                            foreach($images as $k => $img){
+                                $data = $img->getattribute('src');
+
+                                //Link url
+                                $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+                                if(preg_match($reg_exUrl, $data, $url_image)) {
+                                    $url = $url_image[0];
+                                    $image = file_get_contents($url);
+                                    if ($image !== false){
+                                        $data = 'data:image/jpg;base64,'.base64_encode($image);
+                                    }
+                                }
+
+                                $img_check_src = explode(";",$data);
+                                if(@$img_check_src[1]) {
+                                    list($type, $data) = explode(';', $data);
+                                    list(, $data)= explode(',', $data);
+                                    $data = base64_decode($data);
+                                //ตั้งชื่อรูปภาพใหม่โดยอ้างอิงจากเวลา
+                                    $image_name= time().$k.'.png';
+                                //อัพโหลดภาพไปยัง public
+                                    $path = public_path('images/file_editor') .'/'. $image_name;
+                                //ทำการอัพโหลดภาพ
+                                    file_put_contents($path, $data);
+                                    $img->removeattribute('src');
+                                    $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
+                                } else {
+
+                                }
+                            }
+                            $content = $dom->savehtml();
+
+                        }
+                    }
+                    $BrandAbuseFeed->feedcontent = $content;
+                    $BrandAbuseFeed->save();
+                    $BrandAbuseFeed_send_mail[] = $BrandAbuseFeed;
+
+                    if($sites){
+                        foreach($sites as $site){
+                            $SiteSettings = SiteSettings::where('code', $site)->first();
+                            $BrandAbuseSocialRefs = new BrandAbuseSocialRef;
+                            $BrandAbuseSocialRefs->code = generator_uuid();
+                            $BrandAbuseSocialRefs->site_id = $SiteSettings->id;
+                            $BrandAbuseSocialRefs->brand_abuse_feed_id = $BrandAbuseFeed->id;
+                            $BrandAbuseSocialRefs->keyword = $BrandAbuseFeed->keyword;
+                            $BrandAbuseSocialRefs->feel_type = $BrandAbuseFeed->feel_type;
+                            $BrandAbuseSocialRefs->status_monitoring = @$monitoring;
+                            $BrandAbuseSocialRefs->serverity = @$serverity;
+                            $BrandAbuseSocialRefs->status = 1;
+                            $BrandAbuseSocialRefs->save();
+                            if ($sent_mail == true) {
+                                $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
+                                if ($site_email_alert) {
+                                    $email_site_a = [];
+                                    foreach ($site_email_alert as $site_email_alert_val) {
+                                        $email_site_a[] = $site_email_alert_val->email;
+                                    }
+                                    $email_site_alert = array_unique($email_site_a);
+                                    foreach($email_site_alert as $email){
+                                        Mail::to($email)->send(new CompromisedMail($BrandAbuseFeed_send_mail, 'brand_abuse'));
+                                        if( count(Mail::failures()) == 0 ) {
+                                            LogEmail::Create([
+                                                'to' => $email,
+                                                'status' => 'Success',
+                                                'subject' => 'brand_abuse'
+                                            ]);
+                                        }
+                                    }
+                                    if( count(Mail::failures()) > 0 ) {
+                                        foreach(Mail::failures() as $email_address) {
+                                            LogEmail::Create([
+                                                'to' => $email_address,
+                                                'status' => 'Fail',
+                                                'subject' => 'brand_abuse'
+                                            ]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        $site = route('brandabuse.index_all_site');
+                    }else{
+                        $SiteSettings = SiteSettings::where('code', @$site_code)->first();
+                        $BrandAbuseSocialRefs = new BrandAbuseSocialRef;
+                        $BrandAbuseSocialRefs->code = generator_uuid();
+                        $BrandAbuseSocialRefs->site_id = $SiteSettings->id;
+                        $BrandAbuseSocialRefs->brand_abuse_feed_id = $BrandAbuseFeed->id;
+                        $BrandAbuseSocialRefs->keyword = $BrandAbuseFeed->keyword;
+                        $BrandAbuseSocialRefs->feel_type = $BrandAbuseFeed->feel_type;
+                        $BrandAbuseSocialRefs->status_monitoring = @$monitoring;
+                        $BrandAbuseSocialRefs->serverity = @$serverity;
+                        $BrandAbuseSocialRefs->status = 1;
+                        $BrandAbuseSocialRefs->save();
+                        $site = route('socialdatas.index', ['id' => @$site_code]);
+                        if ($sent_mail == true) {
+                            $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
+                            if ($site_email_alert) {
+                                $email_site_a = [];
+                                foreach ($site_email_alert as $site_email_alert_val) {
+                                    $email_site_a[] = $site_email_alert_val->email;
+                                }
+                                $email_site_alert = array_unique($email_site_a);
+                                foreach($email_site_alert as $email){
+                                    Mail::to($email)->send(new CompromisedMail($BrandAbuseFeed_send_mail, 'brand_abuse'));
+                                    if( count(Mail::failures()) == 0 ) {
+                                        LogEmail::Create([
+                                            'to' => $email,
+                                            'status' => 'Success',
+                                            'subject' => 'brand_abuse'
+                                        ]);
+                                    }
+                                }
+                                if( count(Mail::failures()) > 0 ) {
+                                    foreach(Mail::failures() as $email_address) {
+                                        LogEmail::Create([
+                                            'to' => $email_address,
+                                            'status' => 'Fail',
+                                            'subject' => 'brand_abuse'
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    $response = [
+                        'message' => langapp('changes_saved_successful'),
+                        'redirect' => $site,
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function edit_brandabuse_modal($code,Request $request){
+
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'brand_abuse'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $code = $data['data']['code'];
+                    $site = $data['data']['user_id'];
+
+                    $BrandAbuseSocialRefs = BrandAbuseSocialRef::where('code',$code)->first();
+                    $BrandAbuseFeed = BrandAbuseFeed::where('id',$BrandAbuseSocialRefs->brand_abuse_feed_id)->first();
+
+                    $response = [];
+                    $response['BrandAbuseFeed'] = $BrandAbuseFeed;
+                    $response['BrandAbuseSocialRefs'] = $BrandAbuseSocialRefs;
+
+                    $response['site'] = @$site;
+
+                    // return view('brandabuse::modal.edit_brandabuse')->with($response);
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function edit_brandabuse(Request $request){
+
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'brand_abuse'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $id_BrandAbuseFeed = $data['data']['id_BrandAbuseFeed'];
+                    $type = $data['data']['type'];
+                    // $content = $data['data']['content'];
+                    $other = $data['data']['other'];
+                    $keyword = $data['data']['keyword'];
+                    $source = $data['data']['source'];
+                    $sent_mail = $data['data']['sent_mail'];
+                    $monitoring = $data['data']['monitoring'];
+                    $serverity = $data['data']['serverity'];
+                    $site_code = $data['data']['site_code'];
+
+                    $BrandAbuseFeed = BrandAbuseFeed::where('id',@$id_BrandAbuseFeed)->first();
+                    $BrandAbuseFeed->feel_type = @$type;
+                    // $BrandAbuseFeed->feedcontent = @$content;
+                    if(@$other){
+                        $BrandAbuseFeed->keyword = @$other;
+                    }else{
+                        $BrandAbuseFeed->keyword = @$keyword;
+                    }
+                    
+                    $BrandAbuseFeed->source_name = @$source;
+                    if ($sent_mail == true) {
+                        $BrandAbuseFeed->feedtimepost = Carbon::now();
+                    }
+                    $content = @$_POST['content']; //รับค่าจาก messageInput
+                    if($content) {
+                        $dom = new \domdocument();
+                        if($dom->getelementsbytagname('img')){
+                            $dom->loadHtml('<?xml encoding="UTF-8">'.$content,
+                            LIBXML_HTML_NOIMPLIED |
+                            LIBXML_HTML_NODEFDTD |
+                            LIBXML_NOERROR |
+                            LIBXML_NOWARNING 
+                        );
+                            //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
+                            $images = $dom->getelementsbytagname('img');
+                            //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
+                            foreach($images as $k => $img){
+                                $data = $img->getattribute('src');
+
+                                //Link url
+                                $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+                                if(preg_match($reg_exUrl, $data, $url_image)) {
+                                    $url = $url_image[0];
+                                    $image = file_get_contents($url);
+                                    if ($image !== false){
+                                        $data = 'data:image/jpg;base64,'.base64_encode($image);
+                                    }
+                                }
+
+                                $img_check_src = explode(";",$data);
+                                if(@$img_check_src[1]) {
+                                    list($type, $data) = explode(';', $data);
+                                    list(, $data)= explode(',', $data);
+                                    $data = base64_decode($data);
+                                //ตั้งชื่อรูปภาพใหม่โดยอ้างอิงจากเวลา
+                                    $image_name= time().$k.'.png';
+                                //อัพโหลดภาพไปยัง public
+                                    $path = public_path('images/file_editor') .'/'. $image_name;
+                                //ทำการอัพโหลดภาพ
+                                    file_put_contents($path, $data);
+                                    $img->removeattribute('src');
+                                    $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
+                                } else {
+
+                                }
+                            }
+                            $content = $dom->savehtml();
+
+                        }
+                    }
+                    $BrandAbuseFeed->feedcontent = $content;        
+                    $BrandAbuseFeed->save();
+                    $BrandAbuseFeed_send_mail[] = $BrandAbuseFeed;
+
+                    $BrandAbuseSocialRefs = BrandAbuseSocialRef::where('brand_abuse_feed_id',$BrandAbuseFeed->id)->get();
+                    if($BrandAbuseSocialRefs){
+                        foreach($BrandAbuseSocialRefs as $BrandAbuseSocialRefs){
+                            $BrandAbuseSocialRefs->keyword = $BrandAbuseFeed->keyword;
+                            $BrandAbuseSocialRefs->feel_type = $BrandAbuseFeed->feel_type;
+                            $BrandAbuseSocialRefs->status_monitoring = @$monitoring;
+                            $BrandAbuseSocialRefs->serverity = @$serverity;
+                            $BrandAbuseSocialRefs->save();
+                            if ($sent_mail == true) {
+                                $site_email_alert = site_config_email_alert::where("site_id", $BrandAbuseSocialRefs->site_id)->get();
+                                if ($site_email_alert) {
+                                    $email_site_a = [];
+                                    foreach ($site_email_alert as $site_email_alert_val) {
+                                        $email_site_a[] = $site_email_alert_val->email;
+                                    }
+                                    $email_site_alert = array_unique($email_site_a);
+                                    foreach($email_site_alert as $email){
+                                        Mail::to($email)->send(new CompromisedMail($BrandAbuseFeed_send_mail, 'brand_abuse'));
+                                        if( count(Mail::failures()) == 0 ) {
+                                            LogEmail::Create([
+                                                'to' => $email,
+                                                'status' => 'Success',
+                                                'subject' => 'brand_abuse'
+                                            ]);
+                                        }
+                                    }
+                                    if( count(Mail::failures()) > 0 ) {
+                                        foreach(Mail::failures() as $email_address) {
+                                            LogEmail::Create([
+                                                'to' => $email_address,
+                                                'status' => 'Fail',
+                                                'subject' => 'brand_abuse'
+                                            ]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                    }
+
+                    if($site_code){
+                        $site = route('socialdatas.index', ['id' => @$site_code]);
+                    }else{
+                        $site = route('brandabuse.index_all_site');
+                    }
+
+                    $response = [
+                        'message' => langapp('changes_saved_successful'),
+                        'redirect' => $site
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+    
+    // private function dataFalse($bearerToken, $mode, $data){
+    //     try {
+    //         $header = $bearerToken;
+    //         $site = $this->AuthorizationRegister($header, $mode);
+    //         if($site['status_code'] !== '200'){
+    //             return $this->AuthorizationRegister($header, $mode);
+    //         }
+    //         $value = $data;
+    //         $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+
+    //         if($data === false){
+    //             return $data;
+    //         }else{
+    //             $data_return = [
+    //                 'site' => $site,
+    //                 'data' => json_decode($data, true),
+    //             ];
+    //             return $data_return;
+    //         }
+
+    //     } catch (\Exception $e) {
+    //         $response = array(
+    //             'status' => 0,
+    //             'message' => $e -> getMessage(),
+    //         );
+    //         return response()->json($response);
+    //     }
+    // }
+
+    // private function explode_val($val,$type=null,$url) {
+    //     $result = '';
+    //     if($val) {
+    //         $val_arr = explode(",",$val);
+    //         if($val_arr) {
+    //             foreach($val_arr as $tag) {
+    //                 if($type == 'tags') {
+    //                     $result .=  '<a href="'.$url.'/indicators/tags/'.$tag.'">'.$tag.'</a> ,';
+    //                 } else if ($type == 'groups') {
+    //                     $result .=  '<a href="'.$url.'/indicators/groups/'.$tag.'">'.$tag.'</a> ,';
+    //                 } else {
+    //                     $result .=  '<a href="#">'.$tag.'</a> ,';
+    //                 }
+    
+    //             }
+    //             $result = rtrim($result,',');
+    //         }
+    //     } else {
+    //         $result = '';
+    //     }
+    //     return $result;
+    // }
+
+
+    public function brand_abuse_delete(Request $request) // delete_brandabusedata_modal
+    {
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'brand_abuse'){
                     return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
                 }else{
                     $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
@@ -757,9 +1200,9 @@ class ApiBrandabuseController extends ApiController
 
                      $code = $data['data']['code'];
                     
-                    // $model1 = DataLeakSocialRef::select('data_leak_feed.feedcontent')
-                    // ->join('data_leak_feed', 'data_leak_feed.id', '=','data_leak_socail_ref.data_leak_feed_id')
-                    // ->where('data_leak_socail_ref.code',$code)->first();
+                    // $model1 = BrandAbuseSocialRef::select('brand_abuse_feed.feedcontent')
+                    // ->join('brand_abuse_feed', 'brand_abuse_feed.id', '=','brand_abuse_socail_ref.brand_abuse_feed_id')
+                    // ->where('brand_abuse_socail_ref.code',$code)->first();
 
                     $response = [
                         "code" => $code,
@@ -779,7 +1222,8 @@ class ApiBrandabuseController extends ApiController
         }
     }
 
-    public function data_leak_delete_select(Request $request){
+    public function brand_abuse_delete_select(Request $request) // delete_brandabusedata
+    {
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
@@ -788,7 +1232,7 @@ class ApiBrandabuseController extends ApiController
             if($data === false){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{ 
-                if($data['data']['menu'] !== 'data_leak'){
+                if($data['data']['menu'] !== 'brand_abuse'){
                     return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
                 }else{
                     $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
@@ -798,9 +1242,9 @@ class ApiBrandabuseController extends ApiController
 
                     $code = $data['data']['code'];
                     
-                    $DataLeakSocialRef = DataLeakSocialRef::where('code', $code)->first();
-                    if($DataLeakSocialRef){
-                        $DataLeakSocialRef->delete();
+                    $BrandAbuseSocialRef = BrandAbuseSocialRef::where('code', $code)->first();
+                    if($BrandAbuseSocialRef){
+                        $BrandAbuseSocialRef->delete();
                     }
 
                     $response = [
@@ -821,7 +1265,8 @@ class ApiBrandabuseController extends ApiController
         }
     }
 
-    public function data_leak_delete_change(Request $request){
+    public function brand_abuse_delete_change(Request $request) // change_delete_brandabusedata
+    {
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
@@ -830,7 +1275,7 @@ class ApiBrandabuseController extends ApiController
             if($data === false){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{ 
-                if($data['data']['menu'] !== 'data_leak'){
+                if($data['data']['menu'] !== 'brand_abuse'){
                     return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
                 }else{
                     $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
@@ -840,7 +1285,7 @@ class ApiBrandabuseController extends ApiController
 
                     $code = $data['data']['code'];
                     foreach($code as $id){
-                        $DataLeakSocialRef = DataLeakSocialRef::where('id', $id)->delete();
+                        $BrandAbuseSocialRef = BrandAbuseSocialRef::where('id', $id)->delete();
                     }
 
 
@@ -863,7 +1308,8 @@ class ApiBrandabuseController extends ApiController
         }
     }
 
-    public function count_keyword(Request $request){
+    public function count_keyword(Request $request)
+    {
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
@@ -872,7 +1318,7 @@ class ApiBrandabuseController extends ApiController
             if($data === false){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{ 
-                if($data['data']['menu'] !== 'data_leak'){
+                if($data['data']['menu'] !== 'brand_abuse'){
                     return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
                 }else{
                     $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
@@ -882,7 +1328,7 @@ class ApiBrandabuseController extends ApiController
 
                     $get_role_custom_first = $data['data']['get_role_custom_first'];
 
-                    $model = DataLeakSocialRef::select('keyword',DB::raw('count(*)  as count_keyword'))
+                    $model = BrandAbuseSocialRef::select('keyword',DB::raw('count(*)  as count_keyword'))
                             ->where('deleted_at',null)
                             ->whereIn('feel_type', ['social', 'darkweb_public'])
                             ->groupBy('keyword');
@@ -926,7 +1372,8 @@ class ApiBrandabuseController extends ApiController
         }
     }
 
-    public function count_icon(Request $request){
+    public function count_icon(Request $request) // count_icon
+    {
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
@@ -935,7 +1382,7 @@ class ApiBrandabuseController extends ApiController
             if($data === false){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{ 
-                if($data['data']['menu'] !== 'data_leak'){
+                if($data['data']['menu'] !== 'brand_abuse'){
                     return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
                 }else{
                     $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
@@ -953,65 +1400,65 @@ class ApiBrandabuseController extends ApiController
 
                     if(@$get_role_custom_first['superadmin'] == 1) {
                         if(!$site_code) {
-                            $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
-                            $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
-                            $icon_line = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
-                            $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
-                            $icon_website = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
-                            $icon_other = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
+                            $icon_mobile = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
+                            $icon_facebook = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
+                            $icon_line = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
+                            $icon_twitter = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
+                            $icon_website = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
+                            $icon_other = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
-                            $number_in_progress = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
-                            $number_reported = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
-                            $number_close = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()                                                                                                                                    ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
+                            $number_in_progress = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
+                            $number_reported = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
+                            $number_close = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()                                                                                                                                    ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
                         } else {
-                            $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
-                            $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
-                            $icon_line = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
-                            $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
-                            $icon_website = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
-                            $icon_other = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
+                            $icon_mobile = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
+                            $icon_facebook = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
+                            $icon_line = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
+                            $icon_twitter = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
+                            $icon_website = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
+                            $icon_other = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
-                            $number_in_progress = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
-                            $number_reported = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
-                            $number_close = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()                                                                                                                                  ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
+                            $number_in_progress = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
+                            $number_reported = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
+                            $number_close = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()                                                                                                                                  ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
                         }
                     } else {
                         if(!$site_code) {
-                            $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
-                            $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
-                            $icon_line = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
-                            $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
-                            $icon_website = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
-                            $icon_other = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
+                            $icon_mobile = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
+                            $icon_facebook = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
+                            $icon_line = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
+                            $icon_twitter = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
+                            $icon_website = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
+                            $icon_other = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
                          
-                            $number_in_progress = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
-                            $number_reported = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
-                            $number_close = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()                                                                                                                                   ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
+                            $number_in_progress = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
+                            $number_reported = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
+                            $number_close = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()                                                                                                                                   ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
                         } else {
-                            $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
-                            $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
-                            $icon_line = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
-                            $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
-                            $icon_website = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
-                            $icon_other = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
+                            $icon_mobile = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
+                            $icon_facebook = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
+                            $icon_line = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
+                            $icon_twitter = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
+                            $icon_website = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
+                            $icon_other = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
                         
-                            $number_in_progress = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
-                            $number_reported = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
-                            $number_close = DataLeakSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()      
+                            $number_in_progress = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
+                            $number_reported = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
+                            $number_close = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()      
                         }
                     }
 
@@ -1043,7 +1490,8 @@ class ApiBrandabuseController extends ApiController
         }
     }
 
-    public function getDataLeakSocial(Request $request){
+    public function getBrandAbuseSocial(Request $request)
+    {
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
@@ -1052,7 +1500,7 @@ class ApiBrandabuseController extends ApiController
             if($data === false){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{ 
-                if($data['data']['menu'] !== 'data_leak'){
+                if($data['data']['menu'] !== 'brand_abuse'){
                     return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
                 }else{
                     $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
@@ -1070,12 +1518,12 @@ class ApiBrandabuseController extends ApiController
 
                     if(@$get_role_custom_first['superadmin'] == 1) {
                     } else {
-                            $Data_leak_social = Data_leak_social::where('deleted_at', null)->where('status',1)->get();
+                            $Brand_Abuse_social = BrandAbuseSocial::where('deleted_at', null)->where('status',1)->get();
                            
                     }
 
                     $response = [
-                        "Data_leak_social" => $Data_leak_social,
+                        "Brand_Abuse_social" => $Brand_Abuse_social,
                     ];
 
                     $data_transcation = json_encode($response);
@@ -1093,7 +1541,8 @@ class ApiBrandabuseController extends ApiController
     }
 
 
-    public function activity_dataleak_modal(Request $request){
+    public function activity_brandabuse_modal(Request $request) // activity_brandabuse_modal
+    {
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
@@ -1110,7 +1559,7 @@ class ApiBrandabuseController extends ApiController
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
 
-                    $DataLeakSocialRef_code = $data['data']['DataLeakSocialRef_code'];
+                    $BrandAbuseSocialRef_code = $data['data']['BrandAbuseSocialRef_code'];
                     $site = $data['data']['site'];
                   
 
@@ -1124,10 +1573,10 @@ class ApiBrandabuseController extends ApiController
                     // }
 
 
-                    $DataLeakSocialRefs = DataLeakSocialRef::where('code',$DataLeakSocialRef_code)->first();
-                    $ActivityHistory = Activity::select('activity.*','users.name as users_name')->where('activity.data_leak_socail_ref_id',$DataLeakSocialRefs->id)->whereNull('activity.deleted_at')->leftJoin('users', 'activity.user_id', '=', 'users.id')->orderBy('created_at','desc')->get();
-                    // $DataLeakFeed = DataLeakFeed::where('id',$DataLeakSocialRefs->data_leak_feed_id)->first();
-                    $response['DataLeakSocialRefs'] = $DataLeakSocialRefs;
+                    $BrandAbuseSocialRefs = BrandAbuseSocialRef::where('code',$BrandAbuseSocialRef_code)->first();
+                    $ActivityHistory = Activity::select('activity.*','users.name as users_name')->where('activity.data_leak_socail_ref_id',$BrandAbuseSocialRefs->id)->whereNull('activity.deleted_at')->leftJoin('users', 'activity.user_id', '=', 'users.id')->orderBy('created_at','desc')->get();
+                    // $BrandAbuseFeed = BrandAbuseFeed::where('id',$BrandAbuseSocialRefs->data_leak_feed_id)->first();
+                    $response['BrandAbuseSocialRefs'] = $BrandAbuseSocialRefs;
                     $response['site'] = @$site;
                     $response['ActivityHistory'] = $ActivityHistory;
                
@@ -1154,7 +1603,8 @@ class ApiBrandabuseController extends ApiController
         }
     }
 
-    public function activity_history_reload(Request $request){
+    public function activity_history_reload(Request $request) // activity_history_reload
+    {
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
@@ -1163,7 +1613,7 @@ class ApiBrandabuseController extends ApiController
             if($data === false){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{ 
-                if($data['data']['menu'] !== 'data_leak'){
+                if($data['data']['menu'] !== 'brand_abuse'){
                     return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
                 }else{
                     $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
@@ -1171,7 +1621,7 @@ class ApiBrandabuseController extends ApiController
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
 
-                    $DataLeakSocialRef_code = $data['data']['DataLeakSocialRef_code'];
+                    $BrandAbuseSocialRef_code = $data['data']['BrandAbuseSocialRef_code'];
                     // $site = $data['data']['site'];
                   
 
@@ -1185,7 +1635,7 @@ class ApiBrandabuseController extends ApiController
                     // }
 
 
-                    $DataLeakSocialRefs = DataLeakSocialRef::where('id',$DataLeakSocialRef_code)->first();
+                    $BrandAbuseSocialRefs = BrandAbuseSocialRef::where('id',$BrandAbuseSocialRef_code)->first();
                     $ActivityHistory = Activity::select('activity.*','users.name as users_name')->where('activity.data_leak_socail_ref_id',$DataLeakSocialRefs->id)->whereNull('activity.deleted_at')->leftJoin('users', 'activity.user_id', '=', 'users.id')->orderBy('created_at','desc')->get();
                     $html = '';
                     if(!empty($ActivityHistory)){
@@ -1265,7 +1715,8 @@ class ApiBrandabuseController extends ApiController
         }
     }
 
-    public function activity_get_edit_data(Request $request){
+    public function activity_get_edit_data(Request $request) // activity_get_edit_data
+    {
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
@@ -1274,7 +1725,7 @@ class ApiBrandabuseController extends ApiController
             if($data === false){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{ 
-                if($data['data']['menu'] !== 'data_leak'){
+                if($data['data']['menu'] !== 'brand_abuse'){
                     return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
                 }else{
                     $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
@@ -1324,7 +1775,8 @@ class ApiBrandabuseController extends ApiController
         }
     }
 
-    public function activity_save(Request $request){
+    public function activity_save(Request $request) // activity_save
+    {
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
@@ -1333,7 +1785,7 @@ class ApiBrandabuseController extends ApiController
             if($data === false){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{
-                if($data['data']['menu'] !== 'data_leak'){
+                if($data['data']['menu'] !== 'brand_abuse'){
                     return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
                 }else{
                     $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
@@ -1346,7 +1798,7 @@ class ApiBrandabuseController extends ApiController
                     $status_activity = $data['data']['status_activity'];
                     $content = $data['data']['content'];
                     $check_active = $data['data']['check_active'];
-                    $id_DataLeakSocialRefs = $data['data']['id_DataLeakSocialRefs'];
+                    $id_BrandAbuseSocialRefs = $data['data']['id_BrandAbuseSocialRefs'];
                     $title = $data['data']['title'];
                     $site_code = $data['data']['site_code'];
                     // $site = $data['data']['site'];
@@ -1404,7 +1856,7 @@ class ApiBrandabuseController extends ApiController
                     if($check_active=="1"){
                         $Activity = new Activity;
                         $Activity->code = generator_uuid();
-                        $Activity->data_leak_socail_ref_id = $id_DataLeakSocialRefs;
+                        $Activity->data_leak_socail_ref_id = $id_BrandAbuseSocialRefs;
                         $Activity->title = $title;
                         $Activity->content = $content;
                         $Activity->user_id = $data['data']['user_id'];
@@ -1421,28 +1873,28 @@ class ApiBrandabuseController extends ApiController
                         }
                         $Activity->save();
                     }
-                    $Activity_check = Activity::where('data_leak_socail_ref_id',$id_DataLeakSocialRefs)->where('status_activity','close')->first();
+                    $Activity_check = Activity::where('data_leak_socail_ref_id',$id_BrandAbuseSocialRefs)->where('status_activity','close')->first();
 
-                    $DataLeakSocialRef = DataLeakSocialRef::where('id',$id_DataLeakSocialRefs)->first();
-                    // if($DataLeakSocialRef->status_monitoring != 'close') {
+                    $BrandAbuseSocialRef = BrandAbuseSocialRef::where('id',$id_BrandAbuseSocialRefs)->first();
+                    // if($BrandAbuseSocialRef->status_monitoring != 'close') {
                         if($Activity->status_activity == 'close') {
-                            $DataLeakSocialRef->status_monitoring = 'close';
-                            $DataLeakSocialRef->save();
+                            $BrandAbuseSocialRef->status_monitoring = 'close';
+                            $BrandAbuseSocialRef->save();
                         } else if ($Activity->status_activity == 'in_progress') {//reported
                             if($Activity_check) {
-                                $DataLeakSocialRef->status_monitoring = 'close';
-                                $DataLeakSocialRef->save();
+                                $BrandAbuseSocialRef->status_monitoring = 'close';
+                                $BrandAbuseSocialRef->save();
                             } else {
-                                $DataLeakSocialRef->status_monitoring = 'in_progress';//reported
-                                $DataLeakSocialRef->save();
+                                $BrandAbuseSocialRef->status_monitoring = 'in_progress';//reported
+                                $BrandAbuseSocialRef->save();
                             }
                         } else if ($Activity->status_activity == 'in_progress') {
                             if($Activity_check) {
-                                $DataLeakSocialRef->status_monitoring = 'close';
-                                $DataLeakSocialRef->save();
+                                $BrandAbuseSocialRef->status_monitoring = 'close';
+                                $BrandAbuseSocialRef->save();
                             } else {
-                                $DataLeakSocialRef->status_monitoring = 'in_progress';
-                                $DataLeakSocialRef->save();
+                                $BrandAbuseSocialRef->status_monitoring = 'in_progress';
+                                $BrandAbuseSocialRef->save();
                             }
                         }   
                     // }
@@ -1476,7 +1928,8 @@ class ApiBrandabuseController extends ApiController
         }
     }
 
-    public function activity_delete(Request $request){
+    public function activity_delete(Request $request) // activity_delete
+    {
         try{
             $header = $request->bearerToken();
             $mode = $request->mode;
@@ -1485,7 +1938,7 @@ class ApiBrandabuseController extends ApiController
             if($data === false){
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             }else{
-                if($data['data']['menu'] !== 'data_leak'){
+                if($data['data']['menu'] !== 'brand_abuse'){
                     return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
                 }else{
                     $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
@@ -1505,19 +1958,19 @@ class ApiBrandabuseController extends ApiController
                     $Activity_check_last = Activity::where('data_leak_socail_ref_id',$Activity->data_leak_socail_ref_id)->where('deleted_at',null)->orderBy('id','desc')->first();
                     $status_activity = $Activity_check_last->status_activity;
 
-                    $DataLeakSocialRef = DataLeakSocialRef::where('id',$Activity->data_leak_socail_ref_id)->first();
-                    // if($DataLeakSocialRef->status_monitoring != 'close') {
+                    $BrandAbuseSocialRef = BrandAbuseSocialRef::where('id',$Activity->data_leak_socail_ref_id)->first();
+                    // if($BrandAbuseSocialRef->status_monitoring != 'close') {
                         if($Activity_check_last) {
                             if($status_activity) {
-                                $DataLeakSocialRef->status_monitoring = $status_activity;
-                                $DataLeakSocialRef->save();
+                                $BrandAbuseSocialRef->status_monitoring = $status_activity;
+                                $BrandAbuseSocialRef->save();
                             } else {
-                                $DataLeakSocialRef->status_monitoring = 'in_progress';
-                                $DataLeakSocialRef->save();
+                                $BrandAbuseSocialRef->status_monitoring = 'in_progress';
+                                $BrandAbuseSocialRef->save();
                             }
                         } else {
-                            $DataLeakSocialRef->status_monitoring = 'in_progress';
-                            $DataLeakSocialRef->save();
+                            $BrandAbuseSocialRef->status_monitoring = 'in_progress';
+                            $BrandAbuseSocialRef->save();
                         } 
                     // }
                     //--------------------------------//
@@ -1547,6 +2000,10 @@ class ApiBrandabuseController extends ApiController
             return response()->json($response);
         }
     }
+
+
+
+
 
     public function compromise_activity_dataleak_modal(Request $request){
         try{
