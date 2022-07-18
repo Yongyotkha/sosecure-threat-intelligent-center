@@ -1102,86 +1102,13 @@ Highcharts.setOptions({
                     var host_name = [];
                     var data_array = [];
 
-                    for(let b in result.data.host_name){
-                        var data_object = {};
-                        const data_b = result.data.host_name[b];
-                        let total_critical = 0;
-                        let total_high = 0;
-                        let total_medium = 0;
-                        let total_low = 0;
-                        let total_infomation = 0;
-                        data_object.host_name = data_b;
-                        for(let i in result.data.data){
-                            const data = result.data.data[i];
-                            if(data_b == data.title && data.severity == 'HIGH'){
-                                total_high  =total_high+1;
-                                data_object.severity_high = data.severity;
-                            }else if(data_b == data.title && data.severity == 'CRITICAL'){
-                                total_critical =total_critical+1;
-                                data_object.severity_critical = data.severity;
-                            }else if(data_b == data.title && data.severity == 'MEDIUM'){
-                                total_medium = total_medium+1;
-                                data_object.severity_medium = data.severity;
-                            }else if(data_b == data.title && data.severity == 'LOW'){
-                                total_low = total_low+1;
-                                data_object.severity_low = data.severity;
-                            }else if(data_b == data.title && data.severity == 'INFOMATION'){
-                                total_infomation = total_infomation+1;
-                                data_object.severity_infomation = data.severity;
-                            }
-                        }
-                        if(total_critical > 0){
-                            data_object.total_critical = total_critical;
-                        }
-                        if(total_high > 0){
-                            data_object.total_high = total_high;
-                        }
-                        if(total_medium > 0){
-                            data_object.total_medium = total_medium;
-                        }
-                        if(total_low > 0){
-                            data_object.total_low = total_low;
-                        }
-                        if(total_infomation > 0){
-                            data_object.total_infomation = total_infomation;
-                        }
-                        data_array.push(data_object);
-                    }
-                    for(let i in result.data.host_name){
-                        const data = result.data.host_name[i];
-                        host_name.push(data);
-                    }
-                    for(let i in data_array){
-                        const host_name_check = host_name[i];
-                        const data = data_array[i];
-                        if(host_name_check == data.host_name){
-                            if(data.severity_high){
-                                high.push(data.total_high);
-                            }else{
-                                high.push(null);
-                            }
-                            if(data.severity_critical){
-                                critical.push(data.total_critical);
-                            }else{
-                                critical.push(null);
-                            }
-                            if(data.severity_medium){
-                                medium.push(data.total_medium);
-                            }else{
-                                medium.push(null);
-                            }
-                            if(data.severity_low){
-                                low.push(data.total_low);
-                            }else{
-                                low.push(null);
-                            }
-                            if(data.severity_infomation){
-                                infomation.push(data.total_infomation);
-                            }else{
-                                infomation.push(null);
-                            } 
-                        }
-                    }
+       
+                     critical = result.data.total_critical;
+                     high =  result.data.total_high;
+                     medium =result.data.total_medium;
+                     low = result.data.total_low;
+                     infomation = result.data.total_infomation;
+                     host_name = result.data.host_name;
                     const chartstack = new Highcharts.chart('chart-show-hl', {
                         chart: {
                             type: 'bar',

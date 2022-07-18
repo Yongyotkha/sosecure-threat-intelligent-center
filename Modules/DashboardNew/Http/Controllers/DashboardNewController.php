@@ -691,6 +691,7 @@ public function count_data_leak(Request $request){
 }
 
 public function count_vulnerability_host(Request $request){
+/*
     if(Auth::check()) {
         $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
         if(@get_role_custom()['superadmin'] == 1) {
@@ -765,10 +766,13 @@ foreach($CVEMapping as $data){
         }
     }
 }
+
+*/
 $result = array();
-foreach ($host_name as $element) {
-    $result[$element] = $element;
-}
+$CVEMapping= array();
+//foreach ($host_name as $element) {
+  //  $result[$element] = $element;
+//}
 
 $role_custom = @check_role_custom();
 if(!$role_custom['vulnerabilities']) {
@@ -776,12 +780,81 @@ if(!$role_custom['vulnerabilities']) {
     $result = [];
 }
 
+//============ปรับรูปแบบใหม่=====================
+$total_critical = array();
+$total_high = array();
+$total_medium = array();
+$total_low = array();
+$total_infomation  = array();
+
+if(Auth::check()) {
+    $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+    if(@get_role_custom()['superadmin'] == 1) {
+        if(!$request -> site){
+            $cve_host_name_summarys_data =  DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM sosecure_insight.fx_cve_host_name_summarys where site_id = 0 group by title');
+        }else{
+            $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+            $cve_host_name_summarys_data =  DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM sosecure_insight.fx_cve_host_name_summarys where site_id = '.$site_id_m->id.' group by title');
+        }
+    } else {
+        if(!$request -> site){
+          //  $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
+            $site_id_List = '('.implode(',',$site_id_arr).')';
+            $cve_host_name_summarys_data =  DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM sosecure_insight.fx_cve_host_name_summarys where site_id in '.$site_id_List.' group by title');
+        }else{
+            $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+          //  $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $site_id_m->id)->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
+           $cve_host_name_summarys_data =  DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM sosecure_insight.fx_cve_host_name_summarys where site_id = '.$site_id_m->id.' group by title');
+        }
+    }
+}
+
+foreach($cve_host_name_summarys_data as $host_name){
+  
+    array_push($result,$host_name->title);
+    if($host_name->status_high > 0){
+        array_push($total_high,(int)$host_name->status_high);
+    }else{
+        array_push($total_high,0);
+    }
+    if($host_name->status_critical > 0){
+        array_push($total_critical,(int)$host_name->status_critical);
+    }else{
+        array_push($total_critical,0);
+    }
+    if($host_name->status_medium > 0){
+        array_push($total_medium,(int)$host_name->status_medium);
+    }else{
+        array_push($total_medium,0);
+    }
+    if($host_name->status_low > 0){
+        array_push($total_low,(int)$host_name->status_low);
+    }else{
+        array_push($total_low,0);
+    }
+    if($host_name->status_infomation > 0){
+        array_push($total_infomation,(int)$host_name->status_infomation);
+    }else{
+        array_push($total_infomation,0);
+    } 
+
+
+}
+
 $response = array(
     'error' => '', 
     'status_code' => '200',
     'data' => [
         'data' => $CVEMapping,
-        'host_name' => $result
+        'host_name' => $result,
+        'total_critical' => $total_critical,
+        'total_high' => $total_high,
+        'total_medium' => $total_medium,
+        'total_low' => $total_low,
+        'total_infomation' => $total_infomation,
+        'user_id' =>@Auth::user()->id,
+        'side_code' =>$request -> site
+
     ]
 );
 return response()->json($response);
