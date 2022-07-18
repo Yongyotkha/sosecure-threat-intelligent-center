@@ -174,6 +174,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('brandabuse/edit_brandabuse', 'Api\ApiBrandabuseController@edit_brandabuse');
     Route::post('brandabuse/change_status_brandabusedata', 'Api\ApiBrandabuseController@change_status_brandabusedata');
     Route::post('brandabuse/delete_brandabusedata', 'Api\ApiBrandabuseController@delete_brandabusedata');
+    Route::post('brandabuse/change_delete_brandabusedata', 'Api\ApiBrandabuseController@change_delete_brandabusedata');
 
     Route::post('brandabuse/view', 'Api\ApiBrandabuseController@brandabuse_view');
     Route::post('brandabuse/count_val', 'Api\ApiBrandabuseController@brandabuse_count_val');
