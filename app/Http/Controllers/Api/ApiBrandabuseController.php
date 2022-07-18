@@ -1126,6 +1126,156 @@ class ApiBrandabuseController extends ApiController
             return response()->json($response);
         }
     }
+
+    public function change_status_brandabusedata(Request $request)
+    {
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'brand_abuse'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $code = $data['data']['code'];
+                    $status = $data['data']['status'];
+
+                    $BrandAbuseSocialRef = BrandAbuseSocialRef::where('id', $code)->first();
+                    $BrandAbuseSocialRef->status = $status;
+                    $BrandAbuseSocialRef->save();
+
+                    $response = [
+                        'message' => langapp('changes_saved_successful'),
+                        'redirect' => route('brandabuse.index_all_site')
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function delete_brandabusedata(Request $request)
+    {
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'brand_abuse'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $code = $data['data']['code'];
+
+                    // dd($code);
+                    $BrandAbuseSocialRef = BrandAbuseSocialRef::where('code', $code)->first();
+                    $BrandAbuseFeedTemp = BrandAbuseFeedTemp::where('id', $BrandAbuseSocialRef->temp_id)->first();
+                    if($BrandAbuseFeedTemp){
+                        $BrandAbuseFeeds = BrandAbuseFeed::where('temp_id', $BrandAbuseFeedTemp->id)->get();
+                        if($BrandAbuseFeeds){
+                            foreach($BrandAbuseFeeds as $BrandAbuseFeed){
+                                $leak_socail_ref_temp = leak_socail_ref_temp::where('brand_abuse_feed_id', $BrandAbuseFeedTemp->id)->first();
+                                $transaction_client_leak_feed = transaction_client_leak_feed::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $BrandAbuseFeed->id)->first();
+                                if($transaction_client_leak_feed){
+                                    $transaction_client_leak_feed -> transaction_mode = 'delete';
+                                    $transaction_client_leak_feed -> transaction_data_status = 1;
+                                    $transaction_client_leak_feed -> status = 1;
+                                    $transaction_client_leak_feed -> save();
+                                }else{
+                                    $transaction_client_leak_feed = new transaction_client_leak_feed();
+                                    $transaction_client_leak_feed -> site_id = $leak_socail_ref_temp->site_id;
+                                    $transaction_client_leak_feed -> transaction_id = $BrandAbuseFeed->id;
+                                    $transaction_client_leak_feed -> transaction_mode = 'delete';
+                                    $transaction_client_leak_feed -> transaction_data_status = 1;
+                                    $transaction_client_leak_feed -> status = 1;
+                                    $transaction_client_leak_feed -> save();
+                                }
+
+                                $transaction_client_leak_social_ref = transaction_client_leak_social_ref::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $BrandAbuseSocialRef->id)->first();
+                                if($transaction_client_leak_social_ref){
+                                    $transaction_client_leak_social_ref -> transaction_mode = 'delete';
+                                    $transaction_client_leak_social_ref -> transaction_data_status = 1;
+                                    $transaction_client_leak_social_ref -> status = 1;
+                                    $transaction_client_leak_social_ref -> save();
+                                }else{
+                                    $transaction_client_leak_social_ref = new transaction_client_leak_social_ref();
+                                    $transaction_client_leak_social_ref -> site_id = $leak_socail_ref_temp->site_id;
+                                    $transaction_client_leak_social_ref -> transaction_id = $BrandAbuseSocialRef->id;
+                                    $transaction_client_leak_social_ref -> transaction_mode = 'delete';
+                                    $transaction_client_leak_social_ref -> transaction_data_status = 1;
+                                    $transaction_client_leak_social_ref -> status = 1;
+                                    $transaction_client_leak_social_ref -> save();
+                                }
+                            }
+                        }
+                        BrandAbuseFeed::where('temp_id', $BrandAbuseFeedTemp->id)->delete();
+                        $BrandAbuseSocialRef->delete();
+                        $BrandAbuseFeedTemp->approve = 0;
+                        $BrandAbuseFeedTemp->save();
+                    }else{
+                        $BrandAbuseSocialRef->delete();
+                    }
+
+                    return ajaxResponse(
+                        [
+                            'message' => langapp('changes_saved_successful'),
+                            'redirect' => route('brandabuse.index_all_site'),
+                        ],
+                        true,
+                        Response::HTTP_OK
+                    );
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
     
     // private function dataFalse($bearerToken, $mode, $data){
     //     try {
