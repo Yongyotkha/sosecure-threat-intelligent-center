@@ -177,6 +177,15 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('brandabuse/delete_brandabusedata', 'Api\ApiBrandabuseController@delete_brandabusedata');
     Route::post('brandabuse/change_delete_brandabusedata', 'Api\ApiBrandabuseController@change_delete_brandabusedata');
 
+    Route::post('brandabuse/activity_brandabuse_modal', 'Api\ApiBrandabuseController@activity_brandabuse_modal');
+    Route::post('brandabuse/activity_save', 'Api\ApiBrandabuseController@activity_save');
+    Route::post('brandabuse/activity_history_reload', 'Api\ApiBrandabuseController@activity_history_reload');
+    Route::post('brandabuse/activity_get_edit_data', 'Api\ApiBrandabuseController@activity_get_edit_data');
+    Route::post('brandabuse/activity_delete', 'Api\ApiBrandabuseController@activity_delete');
+    Route::post('brandabuse/brandabusefeedsocial_datatables', 'Api\ApiBrandabuseController@brandabusefeedsocial_datatables');
+    Route::post('brandabuse/approve_data_feed', 'Api\ApiBrandabuseController@approve_data_feed');
+    Route::post('brandabuse/cancle_data_feed', 'Api\ApiBrandabuseController@cancle_data_feed');
+
     Route::post('brandabuse/view', 'Api\ApiBrandabuseController@brandabuse_view');
     Route::post('brandabuse/count_val', 'Api\ApiBrandabuseController@brandabuse_count_val');
     Route::post('brandabuse/delete', 'Api\ApiBrandabuseController@brandabuse_delete');

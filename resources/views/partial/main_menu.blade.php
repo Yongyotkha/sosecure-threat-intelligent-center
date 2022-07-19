@@ -74,7 +74,7 @@ if($model_has_roles) {
                         @foreach (mainMenu() as $menu)
                     @if (count($menu['children']) > 0)
 
-                        <li class="nav-w-children {{ $page == langapp($menu['name']) && (in_array($menu['module'], array_pluck($menu['children'], 'parent'))) ? 'active'  : '' }}" id="{{ $menu['module'] }}">
+                        <li class="nav-w-children {{ @$page == langapp($menu['name']) && (in_array($menu['module'], array_pluck($menu['children'], 'parent'))) ? 'active'  : '' }}" id="{{ $menu['module'] }}">
                             <a href="{{ site_url($menu['route']) }}">
                                 <i class="{{ $menu['icon'] }} icon">
                                     <b class="bg-{{ get_option('theme_color') }}"></b>
@@ -90,7 +90,7 @@ if($model_has_roles) {
                             <ul class="nav lt">
                                 @foreach ($menu['children'] as $submenu)
                                 @if (Auth::user()->can($submenu['module']))
-                                   <li class="{{ $page == langapp($submenu['name']) ? 'active' : '' }}">
+                                   <li class="{{ @$page == langapp($submenu['name']) ? 'active' : '' }}">
                                     <a href="{{ site_url($submenu['route']) }}">
                                         <i class="{{ $submenu['icon'] }} icon">
                                             <b class="bg-{{ get_option('theme_color') }}"></b>
@@ -106,7 +106,7 @@ if($model_has_roles) {
                             </ul>
                         </li>
                         @else
-                        <li class="{{ $page === langapp($menu['name']) ? 'active' : '' }}">
+                        <li class="{{ @$page === langapp($menu['name']) ? 'active' : '' }}">
                             <a href="{{ site_url($menu['route']) }}">
                                 <i class="{{ $menu['icon'] }} icon">
                                     <b class="bg-{{ get_option('theme_color') }}"></b>
@@ -306,7 +306,7 @@ if($model_has_roles) {
                                                                     if($check_menu_active_sub_arr) {
                                                                         foreach($check_menu_active_sub_arr as $check_menu_active_sub_val) {
                                                                             // dd($check_menu_active_sub_val);
-                                                                            if($page == $check_menu_active_sub_val) {
+                                                                            if(@$page == $check_menu_active_sub_val) {
                                                                                 // dd($check_menu_active_sub_val);
                                                                                 $active_sub = 'active';
                                                                             }
@@ -371,13 +371,13 @@ if($model_has_roles) {
                         @endphp
 
                     <!-- Start
-                        <li class="{{ $page === langapp('dashboard') ? 'active' : '' }}">
+                        <li class="{{ @$page === langapp('dashboard') ? 'active' : '' }}">
                             <a href="{{ site_url('/dashboardnew') }}">
                                 <i class="fas fa-home icon"><b class="bg-info"></b></i>
                                 <span> @langapp('dashboard') </span>
                             </a>
                         </li>
-                        {{-- <li class="{{ $page === langapp('alert') ? 'active' : '' }}">
+                        {{-- <li class="{{ @$page === langapp('alert') ? 'active' : '' }}">
                             <a href="{{ site_url('/alert') }}">
                                 <i class="fas fa-exclamation-triangle icon"><b class="bg-info"></b></i>
                                 <span> @langapp('alert') </span>
@@ -385,7 +385,7 @@ if($model_has_roles) {
                             </a>
                         </li> --}}
 
-                        <li class="{{ $page === langapp('news') ? 'active' : '' }}">
+                        <li class="{{ @$page === langapp('news') ? 'active' : '' }}">
                             <a href="{{ site_url('/news') }}">
                                 <i class="fas fa-newspaper icon"><b class="bg-info"></b></i>
                                 <span> @langapp('news') </span>
@@ -393,48 +393,48 @@ if($model_has_roles) {
                             </a>
                         </li>
 
-                        {{-- <li class="{{ $page === langapp('manage_assets') ? 'active' : '' }}">
+                        {{-- <li class="{{ @$page === langapp('manage_assets') ? 'active' : '' }}">
                             <a href="{{ site_url('/manageassets') }}">
                                 <i class="fas fa-tasks icon"><b class="bg-info"></b></i>
                                 <span> @langapp('manage_assets') </span>
                             </a>
                         </li> --}}
                         
-                        <li class="{{ $page === langapp('indicators') ? 'active' : '' }}">
+                        <li class="{{ @$page === langapp('indicators') ? 'active' : '' }}">
                             <a href="{{ route('indicators.events') }}">
                                 <i class="fab fa-searchengin icon"><b class="bg-info"></b></i>
                                 <span> @langapp('indicators') </span>
                             </a>
                         </li>
 
-                        <li class="{{ $page === langapp('vulnerabilitys') ? 'active' : '' }}">
+                        <li class="{{ @$page === langapp('vulnerabilitys') ? 'active' : '' }}">
                             <a href="{{ route('monitoringvulnerabilitys.index') }}">
                                 <i class="fas fa-lock icon"><b class="bg-info"></b></i>
                                 <span> @langapp('vulnerabilitys') </span>
                             </a>
                         </li>
 
-                        {{-- <li class="nav-w-children {{ $page === langapp('vulnerabilitys') ? 'active' : '' }}">
-                            <a href="{{ site_url('/vulnerability') }}" class="{{ $page === langapp('vulnerability') ? 'active' : '' }}">
+                        {{-- <li class="nav-w-children {{ @$page === langapp('vulnerabilitys') ? 'active' : '' }}">
+                            <a href="{{ site_url('/vulnerability') }}" class="{{ @$page === langapp('vulnerability') ? 'active' : '' }}">
                                 <i class="fas fa-lock icon"><b class="bg-info"></b></i>
                                 <span class="pull-right"><i class="fas fa-angle-down text"></i>
                                 <i class="fas fa-angle-up text-active"></i></span>
                                 <span> @langapp('vulnerabilitys') </span>
                             </a>
                             <ul class="nav lt">
-                                <li class="{{ $page === langapp('monitoring_vulnerability') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('monitoring_vulnerability') ? 'active' : '' }}">
                                     <a href="{{ route('monitoringvulnerabilitys.index') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('monitoring_vulnerability') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('assets_setting_vulnerabilitys') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('assets_setting_vulnerabilitys') ? 'active' : '' }}">
                                     <a href="{{ route('assetsettingvulnerabilitys.index') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('assets_setting_vulnerability') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('vulnerability_settings') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('vulnerability_settings') ? 'active' : '' }}">
                                     <a href="{{ route('vulnerability_settings.index') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('settings') </span>
@@ -443,21 +443,21 @@ if($model_has_roles) {
                             </ul>
                         </li> --}}
 
-                        <li class="nav-w-children {{ $page === langapp('compromised') ? 'active' : '' }}">
-                            <a href="{{ site_url('/compromised') }}" class="{{ $page === langapp('compromised') ? 'active' : '' }}">
+                        <li class="nav-w-children {{ @$page === langapp('compromised') ? 'active' : '' }}">
+                            <a href="{{ site_url('/compromised') }}" class="{{ @$page === langapp('compromised') ? 'active' : '' }}">
                                 <i class="fas fa-bug icon"><b class="bg-info"></b></i>
                                 <span class="pull-right"><i class="fas fa-angle-down text"></i>
                                 <i class="fas fa-angle-up text-active"></i></span>
                                 <span> @langapp('compromised') </span>
                             </a>
                             <ul class="nav lt">
-                                <li class="{{ $page === langapp('monitoring') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('monitoring') ? 'active' : '' }}">
                                     <a href="{{ route('monitoringcompromised.index') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('monitoring_compromised') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('assets_setting_compromised') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('assets_setting_compromised') ? 'active' : '' }}">
                                     <a href="{{ route('assetsettingcompromised.index')  }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('assets_setting_compromised') </span>
@@ -466,7 +466,7 @@ if($model_has_roles) {
                             </ul>
                         </li>
 
-                        <li class="nav-w-children {{ $page === langapp('data_leak') ? 'active' : '' }}">
+                        <li class="nav-w-children {{ @$page === langapp('data_leak') ? 'active' : '' }}">
                             <a href="#" class="">
                                 <i class="fas fa-database icon"><b class="bg-info"></b></i>
                                 <span class="pull-right"><i class="fas fa-angle-down text"></i>
@@ -474,13 +474,13 @@ if($model_has_roles) {
                                 <span> @langapp('data_leak') </span>
                             </a>
                             <ul class="nav lt">
-                                <li class="{{ $page === langapp('dark_web') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('dark_web') ? 'active' : '' }}">
                                     <a href="{{ site_url('/darkweb') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('dark_web') </span>
                                     </a>
                                 </li>
-                                <li  class="{{ $page === langapp('social') ? 'active' : '' }}">
+                                <li  class="{{ @$page === langapp('social') ? 'active' : '' }}">
                                     <a href="{{ site_url('/social') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('social') </span>
@@ -489,59 +489,59 @@ if($model_has_roles) {
                             </ul>
                         </li>
 
-                        <li class="{{ $page === langapp('webdefacement') ? 'active' : '' }}">
+                        <li class="{{ @$page === langapp('webdefacement') ? 'active' : '' }}">
                             <a href="{{ site_url('/webdefacement') }}">
                                 <i class="fas fa-globe icon"><b class="bg-info"></b></i>
                                 <span> @langapp('webdefacement') </span>
                             </a>
                         </li>
-                        {{-- <li class="{{ $page === langapp('manage_customers') ? 'active' : '' }}">
+                        {{-- <li class="{{ @$page === langapp('manage_customers') ? 'active' : '' }}">
                             <a href="{{ site_url('/clients') }}">
                                 <i class="fas fa-user-cog icon"><b class="bg-info"></b></i>
                                 <span> @langapp('manage_customers') </span>
                             </a>
                         </li> --}}
-                        <li class="{{ $page === langapp('manage_users') ? 'active' : '' }}">
+                        <li class="{{ @$page === langapp('manage_users') ? 'active' : '' }}">
                             <a href="{{ site_url('/users') }}">
                                 <i class="fas fa-users icon"><b class="bg-info"></b></i>
                                 <span> @langapp('manage_users') </span>
                             </a>
                         </li>
-                        {{-- <li class="{{ $page === langapp('settings') ? 'active' : '' }}">
+                        {{-- <li class="{{ @$page === langapp('settings') ? 'active' : '' }}">
                             <a href="{{ site_url('/settings') }}">
                                 <i class="fas fa-cog icon"><b class="bg-info"></b></i>
                                 <span> @langapp('settings') </span>
                             </a>
                         </li> --}}
 
-                        <li class="nav-w-children {{ $page === langapp('settings') ? 'active' : '' }}">
-                            <a href="#" class="{{ $page === langapp('settings') ? 'active' : '' }}">
+                        <li class="nav-w-children {{ @$page === langapp('settings') ? 'active' : '' }}">
+                            <a href="#" class="{{ @$page === langapp('settings') ? 'active' : '' }}">
                                 <i class="fas fa-cog icon"><b class="bg-info"></b></i>
                                 <span class="pull-right"><i class="fas fa-angle-down text"></i>
                                 <i class="fas fa-angle-up text-active"></i></span>
                                 <span> @langapp('settings') </span>
                             </a>
                             <ul class="nav lt">
-                                <li class="{{ $page === langapp('category_settings') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('category_settings') ? 'active' : '' }}">
                                     <a href="{{ site_url('/categorysettings') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('category_settings') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('site_settings') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('site_settings') ? 'active' : '' }}">
                                     <a href="{{ site_url('/sitesettings') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('site_settings') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('scans') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('scans') ? 'active' : '' }}">
                                     <a href="{{ site_url('/scans') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span>@langapp('scans')</span>
                                     </a>
                                 </li>
 
-                                <li class="nav-w-children {{ $page === langapp('data_leak') ? 'active' : '' }}">
+                                <li class="nav-w-children {{ @$page === langapp('data_leak') ? 'active' : '' }}">
                                     <a href="#" class="">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span class="pull-right"><i class="fas fa-angle-down text"></i>
@@ -549,7 +549,7 @@ if($model_has_roles) {
                                         <span> @langapp('data_leak') </span>
                                     </a>
                                     <ul class="nav lt">
-                                        <li class="{{ $page === 'Data Feed(Social)' ? 'active' : '' }}">
+                                        <li class="{{ @$page === 'Data Feed(Social)' ? 'active' : '' }}">
                                             <a href="{{route('datafeed.index')}}">
                                                 <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                                 <span>Data Feed(Social)</span>
@@ -558,40 +558,40 @@ if($model_has_roles) {
                                     </ul>
                                 </li>
 
-                                <li class="{{ $page === langapp('assets') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('assets') ? 'active' : '' }}">
                                     <a href="{{ site_url('/assets') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span>@langapp('assets')</span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('rss_feed') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('rss_feed') ? 'active' : '' }}">
                                     <a href="{{ site_url('/rssfeedsettings') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('rss_feed') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('keywords') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('keywords') ? 'active' : '' }}">
                                     <a href="{{ site_url('/keywords') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('keywords') Setting</span>
                                     </a>
                                 </li>
 
-                                <li class="{{ $page === langapp('cpe_setting') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('cpe_setting') ? 'active' : '' }}">
                                     <a href="{{ site_url('/cpesetting') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('cpe_setting') </span>
                                     </a>
                                 </li>
 
-                                <li class="{{ $page === langapp('function_command') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('function_command') ? 'active' : '' }}">
                                     <a href="{{ site_url('/functioncommandsetting') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('function_command') </span>
                                     </a>
                                 </li>
                                 
-                                <li class="{{ $page === langapp('api_indicators') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('api_indicators') ? 'active' : '' }}">
                                     <a href="{{ site_url('/apiindicators') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('api_indicators') </span>
@@ -601,37 +601,37 @@ if($model_has_roles) {
 
 
 
-                                <li class="{{ $page === langapp('vm_client_settings') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('vm_client_settings') ? 'active' : '' }}">
                                     <a href="{{ site_url('/vmclientsettings') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('vm_client_settings') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('update_code') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('update_code') ? 'active' : '' }}">
                                     <a href="{{ site_url('/updatecode') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('update_code') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === 'settings/general' ? 'active' : '' }}">
+                                <li class="{{ @$page === 'settings/general' ? 'active' : '' }}">
                                     <a href="{{ site_url('/settings/general') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('general_settings') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('system_settings') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('system_settings') ? 'active' : '' }}">
                                     <a href="{{ site_url('/settings/system') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('system_settings') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('theme_settings') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('theme_settings') ? 'active' : '' }}">
                                     <a href="{{ site_url('/settings/theme') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('theme_settings') </span>
                                     </a>
                                 </li>
-                                <li class="{{ $page === langapp('system_info') ? 'active' : '' }}">
+                                <li class="{{ @$page === langapp('system_info') ? 'active' : '' }}">
                                     <a href="{{ site_url('/settings/info') }}">
                                         <i class="fas fa-angle-right icon"><b class="bg-info"></b></i>
                                         <span> @langapp('system_info') </span>

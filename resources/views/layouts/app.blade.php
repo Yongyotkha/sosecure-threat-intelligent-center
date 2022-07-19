@@ -42,7 +42,7 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
-    <title>{{ count(Auth::user()->unreadNotifications) > 0 ? '('.count(Auth::user()->unreadNotifications).')' : '' }} {{ get_option('company_name') }} - {{ $page }}</title>
+    <title>{{ count(Auth::user()->unreadNotifications) > 0 ? '('.count(Auth::user()->unreadNotifications).')' : '' }} {{ get_option('company_name') }} - {{ @$page }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <link rel="stylesheet" href="{{ getAsset('css/theme.css') }}" type="text/css"/>
