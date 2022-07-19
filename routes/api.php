@@ -168,6 +168,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
      Route::post('keyword/get_keyword_sub', 'Api\ApiKeywordController@get_keyword_sub');
 
      //brandabuse
+    Route::post('brandabuse/brand_abuse_count_val', 'Api\ApiBrandabuseController@brand_abuse_count_val');
     Route::post('brandabuse/socialdatas_all_site', 'Api\ApiBrandabuseController@socialdatas_all_site');
     Route::post('brandabuse/socialdatas_all_site_tb', 'Api\ApiBrandabuseController@socialdatas_all_site_tb');
     Route::post('brandabuse/add_brandabuse', 'Api\ApiBrandabuseController@add_brandabuse');

@@ -339,6 +339,7 @@ function check_permission_site_custom_api($user_id, $menu) {
         $arr['vulnerabilities'] = 0;
         $arr['compromised'] = 0;
         $arr['data_leak'] = 0;
+        $arr['brand_abuse'] = 0;
         $arr['web_defacement'] = 0;
         $arr['manage_users'] = 0;
         $arr['settings'] = 0;
@@ -374,6 +375,7 @@ function check_permission_site_custom_api($user_id, $menu) {
             if (in_array("6f580f26-8d46-452e-a84e-211b3f79268a", $result_menu_permission)){$arr['manage_users'] = 1;}
             if (in_array("8df567fb-33c3-4185-b1cd-ed618fe6ac29", $result_menu_permission)){$arr['settings'] = 1;}
             if (in_array("54735dbb-6987-4a7b-8aa3-121538aaad50", $result_menu_permission)){$arr['monitoring'] = 1;}
+            if (in_array("z9b362a5-3789-445a-bd6c-846393ffd19x", $result_menu_permission)){$arr['brand_abuse'] = 1;}
             
         } else {
             if (in_array("45e03854-cc2c-485e-9ac0-81b0350bdec0", $result_user_menu_permission)){$arr['dashboard'] = 1;}
@@ -387,6 +389,7 @@ function check_permission_site_custom_api($user_id, $menu) {
             if (in_array("6f580f26-8d46-452e-a84e-211b3f79268a", $result_user_menu_permission)){$arr['manage_users'] = 1;}
             if (in_array("8df567fb-33c3-4185-b1cd-ed618fe6ac29", $result_user_menu_permission)){$arr['settings'] = 1;}
             if (in_array("54735dbb-6987-4a7b-8aa3-121538aaad50", $result_user_menu_permission)){$arr['monitoring'] = 1;}
+            if (in_array("z9b362a5-3789-445a-bd6c-846393ffd19x", $result_user_menu_permission)){$arr['brand_abuse'] = 1;}
         }
             
 
