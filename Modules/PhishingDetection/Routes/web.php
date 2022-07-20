@@ -16,5 +16,6 @@ Route::group(
 	function () {
 		Route::get('/', 'PhishingDetectionController@index')->name('phishing_detection.index')->middleware('can:menu_items');
 		Route::post('/datatable', 'PhishingDetectionController@datatable')->name('phishing_detection.datatable');
+		Route::post('/update_status_phishing', 'PhishingDetectionController@update_status_phishing')->name('phishing_detection.update_status_phishing');
 	}
 );
