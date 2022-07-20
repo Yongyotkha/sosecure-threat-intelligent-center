@@ -444,7 +444,7 @@ class ApiBrandabuseController extends ApiController
         }
     }
 
-    public function socialdatas_all_site()
+    public function socialdatas_all_site(Request $request)
     {
         try{
             $header = $request->bearerToken();
@@ -463,12 +463,12 @@ class ApiBrandabuseController extends ApiController
                     }
 
                     $SiteSettings = $data['data']['SiteSettings'];
-                    $page = $data['data']['page'];
+                    // $page = $data['data']['page'];
 
                     $response = [];
                     $response['source'] = BrandAbuseSocial::where("status", '=', 1)->get();
                     $response['SiteSettings'] = $SiteSettings;
-                    $response['page'] = $page;
+                    $response['page'] = langapp('brand_abuse');
 
                     $data_transcation = json_encode($response);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
@@ -2027,7 +2027,7 @@ class ApiBrandabuseController extends ApiController
                     }
 
                     $SiteSettings = $data['data']['SiteSettings'];
-                    $page = $data['data']['page'];
+                    // $page = $data['data']['page'];
                     $user_id = $data['data']['user_id'];
 
                     $BrandAbuseSocial = BrandAbuseSocial::where('deleted_at', null)->where('status', 1)->get();
@@ -2036,7 +2036,7 @@ class ApiBrandabuseController extends ApiController
                     $response  = [
                         'site_settings' => $site_settings,
                         'BrandAbuseSocial' => $BrandAbuseSocial,
-                        'page' => $page,
+                        'page' => langapp('brand_abuse')
                     ];
 
                     $data_transcation = json_encode($response);
