@@ -146,4 +146,12 @@ class PhishingDetectionController extends Controller
         ->rawColumns(['severity','status', 'action'])
         ->toJson();
     }
+
+
+    public function create_phishing_detection(Request $request)
+    {
+        $data['page'] = langapp('phishing_detection');
+        return view('phishingdetection::modal.add')->with($data);
+    }
+
 }
