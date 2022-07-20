@@ -132,7 +132,25 @@ class PhishingDetectionController extends Controller
             }
             return $html;
         })
-
+        ->addColumn('c_status', function($query) {
+            $html = '';
+            $html .= '
+                <div class="text-center">
+                    <label class="switch">
+                        <input type="checkbox" id="phishing-status-'.$query->id.'" onchange="change_status_phishing('.$query->id.')" 
+                ';
+                if($query->status == 1)
+                {
+                    $html .= 'checked';
+                }
+                $html .= '            
+                        value="1">
+                        <span></span>
+                    </label>
+                </div>
+            ';
+            return $html;
+        })
         ->addColumn('action', function ( $collection) {
             return '<a target="_blank" href="'.$collection -> url.'" class="btn btn-info btn-xs">
                         <i class="fas fa-eye"></i>
@@ -143,7 +161,7 @@ class PhishingDetectionController extends Controller
                     </a>
                     ';
         })
-        ->rawColumns(['severity','status', 'action'])
+        ->rawColumns(['severity','status','c_status','action'])
         ->toJson();
     }
 
@@ -154,4 +172,18 @@ class PhishingDetectionController extends Controller
         return view('phishingdetection::modal.add')->with($data);
     }
 
+    public function update_status_phishing(Request $request)
+    {
+        $input = $request->all();
+        
+        $id = $request->id;
+        $status = $request->status;
+
+        $update_status = LogPhishing::where('id', $id)->update(['status' => $status]);
+
+        return response()->json([
+            'status_code' => '200'
+        ]);
+
+    }
 }

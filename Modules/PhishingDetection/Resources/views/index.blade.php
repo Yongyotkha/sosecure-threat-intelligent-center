@@ -528,7 +528,7 @@ function datatable(){
                 data: 'start_date',
             },
             {
-                data: 'status',
+                data: 'c_status',
             },
             {
                 data: 'action',
@@ -642,6 +642,19 @@ function circle_chart(id){
             {  name: 'other', y: 0, color: '#c1c0c0'  }, 
             ]
         }],
+    });
+}
+
+function change_status_phishing(id) 
+{
+    let checkState = $("#phishing-status-" + id).is(":checked") ? 1 : 0;
+    axios.post('{{route('phishing_detection.update_status_phishing')}}', {
+        status: checkState,
+        id: id,
+    }).then(function (response) {
+        toastr.success('Update Status Success!!');
+    }).catch(function (error) {
+        toastr.error('error!!');
     });
 }
 
