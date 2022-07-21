@@ -1020,4 +1020,6 @@ return [
     'host'                                      => 'Hosts',
     'brand_abuse'                               => 'Brand Abuse',
     'brand_abuse_feed'                          => 'Brand Abuse Feed',
+    'save_successful'                   => 'Save | successfully',
+    'error_something_went_wrong'                   => 'Error | something went wrong',
 ];
