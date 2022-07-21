@@ -109,6 +109,7 @@ class PhishingDetectionController extends Controller
     public function datatable(Request $request)
     {
 
+        $filter_site = @$request->filter_site;
         $filter_url = @$request->filter_url;
         $filter_ip = @$request->filter_ip;
         $filter_serverity = @$request->filter_serverity;
@@ -123,6 +124,11 @@ class PhishingDetectionController extends Controller
             ->where('log_phishing.transaction_status', 3)
             ->where('log_phishing.url_is_work', 1)
             ->whereNull('log_phishing.deleted_at');
+
+        if($filter_site)
+        {
+            $logPhishing->where('log_phishing.site_id', $filter_site);
+        }
 
         if($filter_url)
         {

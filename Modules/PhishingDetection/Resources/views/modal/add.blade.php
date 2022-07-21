@@ -186,6 +186,8 @@
                         $('.btn').attr('disabled',false);
                         $('#btn_save_phishing').html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
                         $('#ajaxModal').modal('toggle'); 
+                        datachart_timeline();
+                        datachart_circle();
                         tbl_phishing.ajax.reload();
                     }
                     else

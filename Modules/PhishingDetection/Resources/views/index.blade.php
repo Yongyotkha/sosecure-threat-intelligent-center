@@ -424,6 +424,10 @@ $(document).ready(function(){
     datachart_circle();
 });
 
+$('#site').change(function(){
+    tbl_phishing.ajax.reload();
+});
+
 function search()
 {
     tbl_phishing.ajax.reload();
@@ -464,6 +468,7 @@ function datatable(){
             type: "POST",
             data: function(d) 
             { 
+                d.filter_site = $('#site :selected').val();
                 d.filter_url = $('#filter_url').val();
                 d.filter_ip = $('#filter_ip').val();
                 d.filter_serverity = check_serverity;
