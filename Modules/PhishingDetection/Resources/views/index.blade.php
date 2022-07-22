@@ -424,13 +424,20 @@ $(document).ready(function(){
     datachart_circle();
 });
 
+var site_id = '';
+
 $('#site').change(function(){
+    site_id = $('#site :selected').val();
     tbl_phishing.ajax.reload();
+    datachart_timeline();
+    datachart_circle();
 });
 
 function search()
 {
     tbl_phishing.ajax.reload();
+    datachart_timeline();
+    datachart_circle();
 }
 
 function clear_filter()
@@ -446,6 +453,8 @@ function clear_filter()
     $('#type_all').addClass('active');
 
     tbl_phishing.ajax.reload();
+    datachart_timeline();
+    datachart_circle();
 }
 
 function datatable(){
@@ -519,10 +528,6 @@ function datatable(){
 
 function datachart_timeline()
 {
-    {{-- let site_id = site_val;
-    console.log('rule - '+site_id);
-    console.log('s - '+start_date_tl);
-    console.log('e - '+end_date_tl); --}}
     $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -530,10 +535,11 @@ function datachart_timeline()
         url: "{{route('phishing_detection.data_chart_timeline')}}",
         type: "get",
         data: {
-            {{-- keyword_search:keyword_search, 
             site_id:site_id,
-            start_date:start_date_tl,
-            end_date:end_date_tl --}}
+            filter_url:$('#filter_url').val(),
+            filter_ip:$('#filter_ip').val(),
+            filter_serverity:check_serverity,
+            filter_type:check_type
         },
         beforesend:function(){
             {{-- $('.loadder-timeline').show(); --}}
@@ -604,10 +610,6 @@ function timeline_chart(myid,day,data){
 
 function datachart_circle()
 {
-    {{-- let site_id = site_val;
-    console.log('rule - '+site_id);
-    console.log('s - '+start_date_tl);
-    console.log('e - '+end_date_tl); --}}
     $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -615,10 +617,11 @@ function datachart_circle()
         url: "{{route('phishing_detection.data_chart_circle')}}",
         type: "get",
         data: {
-            {{-- keyword_search:keyword_search, 
             site_id:site_id,
-            start_date:start_date_tl,
-            end_date:end_date_tl --}}
+            filter_url:$('#filter_url').val(),
+            filter_ip:$('#filter_ip').val(),
+            filter_serverity:check_serverity,
+            filter_type:check_type
         },
         beforesend:function(){
             {{-- $('.loadder-circle').show(); --}}

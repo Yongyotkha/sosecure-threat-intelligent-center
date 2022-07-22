@@ -162,6 +162,16 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
 
      //phishing
      Route::post('phishing/table', 'Api\ApiPhishingController@table');
+     Route::post('phishing/create_phishing_detection', 'Api\ApiPhishingController@create_phishing_detection');
+     Route::post('phishing/edit_phishing_detection', 'Api\ApiPhishingController@edit_phishing_detection');
+     Route::post('phishing/view_phishing_detection', 'Api\ApiPhishingController@view_phishing_detection');
+
+     Route::post('phishing/save_phishing', 'Api\ApiPhishingController@save_phishing');
+     Route::post('phishing/update_status_phishing', 'Api\ApiPhishingController@update_status_phishing');
+     Route::post('phishing/delete_phishing', 'Api\ApiPhishingController@delete_phishing');
+     
+     Route::post('phishing/data_chart_timeline', 'Api\ApiPhishingController@data_chart_timeline');
+     Route::post('phishing/data_chart_circle', 'Api\ApiPhishingController@data_chart_circle');
 
      //keyword
      Route::post('keyword/get_keyword_main', 'Api\ApiKeywordController@get_keyword_main');

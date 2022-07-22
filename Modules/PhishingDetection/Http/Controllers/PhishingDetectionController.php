@@ -150,7 +150,7 @@ class PhishingDetectionController extends Controller
             $logPhishing->where('log_phishing.type', $filter_type);
         }
 
-        $logPhishing->orderBy('log_phishing.updated_at', 'DESC')->get();
+        $logPhishing->orderBy('log_phishing.created_at', 'DESC')->get();
 
         return DataTables::of($logPhishing)
             ->editColumn('status', function ($collection) {
@@ -347,7 +347,11 @@ class PhishingDetectionController extends Controller
     public function data_chart_timeline(Request $request)
     {
         $input = $request->all();
-        // $site_id = $request->site_id;
+        $site_id = $request->site_id;
+        $filter_url = @$request->filter_url;
+        $filter_ip = @$request->filter_ip;
+        $filter_serverity = @$request->filter_serverity;
+        $filter_type = @$request->filter_type;
         // $start_date_input = $request->start_date;
         // $end_date_input = $request->end_date;
         $data = [];
@@ -375,20 +379,40 @@ class PhishingDetectionController extends Controller
             $day = explode('-', $Store);
 
             $query_timeline = LogPhishing::
-                                // where(function ($query_site) use ($site_id) {
-                                //     if(@$site_id != null)
-                                //     {
-                                //         $query_site->where('site_id', $site_id);
-                                //     }
-                                //     else
-                                //     {
-                                //         $query_site->where('site_id', '!=', null);
-                                //     }
-                                // })
-                                // where('status', '1')
-                                whereNull('deleted_at')
-                                ->whereBetween('created_at', [$Store.' 00:00:00', $Store.' 23:59:59'])
-                                ->get();
+                // where('status', '1')
+                where(function ($query) use ($site_id){
+                    if($site_id)
+                    {
+                        $query->where('site_id', $site_id);
+                    }
+                })
+                ->where(function ($query) use ($filter_url){
+                    if($filter_url)
+                    {
+                        $query->where('url', 'like', '%'.$filter_url.'%');
+                    }
+                })
+                ->where(function ($query) use ($filter_ip){
+                    if($filter_ip)
+                    {
+                        $query->where('ip', 'like', '%'.$filter_ip.'%');
+                    }
+                })
+                ->where(function ($query) use ($filter_serverity){
+                    if($filter_serverity)
+                    {
+                        $query->where('serverity', $filter_serverity);
+                    }
+                })
+                ->where(function ($query) use ($filter_type){
+                    if($filter_type)
+                    {
+                        $query->where('type', $filter_type);
+                    }
+                })
+                ->whereNull('deleted_at')
+                ->whereBetween('created_at', [$Store.' 00:00:00', $Store.' 23:59:59'])
+                ->get();
 
             $count = count($query_timeline);
 
@@ -403,31 +427,153 @@ class PhishingDetectionController extends Controller
     public function data_chart_circle(Request $request)
     {
         $input = $request->all();
-        // $site_id = $request->site_id;
-        // $start_date_input = $request->start_date;
-        // $end_date_input = $request->end_date;
+        $site_id = @$request->site_id;
+        $filter_url = @$request->filter_url;
+        $filter_ip = @$request->filter_ip;
+        $filter_serverity = @$request->filter_serverity;
+        $filter_type = @$request->filter_type;
 
         $count_referrer = LogPhishing::
             // where('status', '1')
-            where('type', 'Referrer')
+            where(function ($query) use ($site_id){
+                if($site_id)
+                {
+                    $query->where('site_id', $site_id);
+                }
+            })
+            ->where(function ($query) use ($filter_url){
+                if($filter_url)
+                {
+                    $query->where('url', 'like', '%'.$filter_url.'%');
+                }
+            })
+            ->where(function ($query) use ($filter_ip){
+                if($filter_ip)
+                {
+                    $query->where('ip', 'like', '%'.$filter_ip.'%');
+                }
+            })
+            ->where(function ($query) use ($filter_serverity){
+                if($filter_serverity)
+                {
+                    $query->where('serverity', $filter_serverity);
+                }
+            })
+            ->where(function ($query) use ($filter_type){
+                if($filter_type)
+                {
+                    $query->where('type', $filter_type);
+                }
+            })
+            ->where('type', 'Referrer')
             ->whereNull('deleted_at')
             ->count();
 
         $count_threat_feed = LogPhishing::
             // where('status', '1')
-            where('type', 'Threat Feed')
+            where(function ($query) use ($site_id){
+                if($site_id)
+                {
+                    $query->where('site_id', $site_id);
+                }
+            })
+            ->where(function ($query) use ($filter_url){
+                if($filter_url)
+                {
+                    $query->where('url', 'like', '%'.$filter_url.'%');
+                }
+            })
+            ->where(function ($query) use ($filter_ip){
+                if($filter_ip)
+                {
+                    $query->where('ip', 'like', '%'.$filter_ip.'%');
+                }
+            })
+            ->where(function ($query) use ($filter_serverity){
+                if($filter_serverity)
+                {
+                    $query->where('serverity', $filter_serverity);
+                }
+            })
+            ->where(function ($query) use ($filter_type){
+                if($filter_type)
+                {
+                    $query->where('type', $filter_type);
+                }
+            })
+            ->where('type', 'Threat Feed')
             ->whereNull('deleted_at')
             ->count();
 
         $count_domain_name = LogPhishing::
             // where('status', '1')
-            where('type', 'Domain name')
+            where(function ($query) use ($site_id){
+                if($site_id)
+                {
+                    $query->where('site_id', $site_id);
+                }
+            })
+            ->where(function ($query) use ($filter_url){
+                if($filter_url)
+                {
+                    $query->where('url', 'like', '%'.$filter_url.'%');
+                }
+            })
+            ->where(function ($query) use ($filter_ip){
+                if($filter_ip)
+                {
+                    $query->where('ip', 'like', '%'.$filter_ip.'%');
+                }
+            })
+            ->where(function ($query) use ($filter_serverity){
+                if($filter_serverity)
+                {
+                    $query->where('serverity', $filter_serverity);
+                }
+            })
+            ->where(function ($query) use ($filter_type){
+                if($filter_type)
+                {
+                    $query->where('type', $filter_type);
+                }
+            })
+            ->where('type', 'Domain name')
             ->whereNull('deleted_at')
             ->count();
 
         $count_other = LogPhishing::
             // where('status', '1')
-            where('type', 'Other')
+            where(function ($query) use ($site_id){
+                if($site_id)
+                {
+                    $query->where('site_id', $site_id);
+                }
+            })
+            ->where(function ($query) use ($filter_url){
+                if($filter_url)
+                {
+                    $query->where('url', 'like', '%'.$filter_url.'%');
+                }
+            })
+            ->where(function ($query) use ($filter_ip){
+                if($filter_ip)
+                {
+                    $query->where('ip', 'like', '%'.$filter_ip.'%');
+                }
+            })
+            ->where(function ($query) use ($filter_serverity){
+                if($filter_serverity)
+                {
+                    $query->where('serverity', $filter_serverity);
+                }
+            })
+            ->where(function ($query) use ($filter_type){
+                if($filter_type)
+                {
+                    $query->where('type', $filter_type);
+                }
+            })
+            ->where('type', 'Other')
             ->whereNull('deleted_at')
             ->count();
 
