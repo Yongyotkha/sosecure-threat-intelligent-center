@@ -490,7 +490,7 @@ class RSSFeedSettingsController extends Controller
         // dd($model);
         $count_model = count($model);
         // ---------------------------------- cve - actor ----------------------------------
-        if($count_model != 0)
+        if($count_model != 0 && 1==2)
         {
             $id = '';
             $actor_id = array();
