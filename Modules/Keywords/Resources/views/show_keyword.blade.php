@@ -8,8 +8,34 @@
 @endphp
 <section id="content" class="bg">
     <section class="vbox">
-        <header class="header panel-heading bg-white b-b b-light">
+    <header class="header bg-white b-b b-light" style="display: flex;justify-content:space-between;">
             <div class="bc-head">Keywords</div>
+            <div class="max-w-select {{ count($site_settings) == 1 ? 'd-none' : '' }}" style="margin-top: 8px;">
+                <select name="site" id="site" class="select2-option form-control select-site"
+                    onchange="changeSite(value)">
+                    @if(count($site_settings) == 1)
+                    @if ($site_settings)
+
+                    @foreach ($site_settings as $site_settings)
+                    <option value="{{$site_settings->code}}" selected data-site_id="{{ $site_settings->code }}">{{$site_settings->name}}
+                    </option>
+                    @endforeach
+
+                    @endif
+                    @else
+                    <option value="0" selected>All Site</option>
+                    @if ($site_settings)
+
+                    @foreach ($site_settings as $site_settings)
+                    <option value="{{$site_settings->code}}">{{$site_settings->name}}
+                    </option>
+                    @endforeach
+
+                    @endif
+                    @endif
+                    
+                </select>
+            </div>
         </header>
         <section class="scrollable wrapper">
             <section class="panel panel-default">
@@ -83,13 +109,51 @@
 @include('stacks.js.fullscreen')
 
 <script>
+    var site_id = 0;
 
-    $( document ).ready(function() {
+    var id_select_site = 'site';
+    var site_code = null;
+    var menu = null;
+    @if(!empty(get_role_custom()))
+        @if(@get_role_custom()['client'] == 1)
+        site_code = $('#site').find(':selected').attr("data-site_code");
+        menu = 'site';
+        @endif
+    @endif
+ 
+    
+    $(document).ready(function () {
+     
+
+        
+    
+        $.when(data_table()).then(cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site));
+        
+    });
+
+    function data_table(){
+   
+    }
+
+
+
+    function changeSite(val){
+        set_cookie_site($(`#${id_select_site}`).val());
         get_keyword_main();
         get_keyword_sub('social');
         get_keyword_sub('darkweb');
         get_keyword_sub('defacement');
         get_keyword_sub('credit_card');
+
+    }
+
+
+
+
+
+
+    $( document ).ready(function() {
+   
     });
 
     function get_keyword_main() {
@@ -98,7 +162,7 @@
             type:"POST",
             url:"{{ route('KeywordsController.get_keyword_main') }}",
             data:{
-                code_site:'{{$last_segments}}'
+                code_site:$('#site').val()
             },
             beforeSend: function(){
                 loading('load');
@@ -153,7 +217,7 @@
             type:"POST",
             url:"{{ route('KeywordsController.get_keyword_sub') }}",
             data:{
-                code_site:'{{$last_segments}}',
+                code_site:$('#site').val(),
                 type: type
             },
             beforeSend: function(){
