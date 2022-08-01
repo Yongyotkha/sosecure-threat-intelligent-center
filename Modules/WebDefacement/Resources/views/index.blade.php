@@ -27,13 +27,14 @@
                     <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} m-l-xs">
                         <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                     </a>
-
+                    @if(Auth::user()->site_role_id == 1)
                     @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
                     <a href="#" id="btn_md_create"
                         class="btn btn-sm btn-{{ get_option('theme_color')  }}" data-toggle="modal"
                         data-target="#wdfm_website">
                         @icon('solid/plus') @langapp('add')
                     </a>
+                    @endif
                     @endif
                 </div>
             </div>
@@ -464,6 +465,8 @@
 </section>
 <input type="hidden" id="url_id">
 <input type="hidden" id="webdefacment_setting_id">
+<input type="hidden" id="chk_role_id" value="{{@$chk_role_id}}">
+
 
 @push('pagestyle')
 @include('stacks.css.datatables')
@@ -494,8 +497,9 @@
 
 <script>
 
+    var chk_role_id = $('#chk_role_id').val();
     $(document).ready(function () {
-        var tbl_server = $('#tbl_server').dataTable({
+        var tbl_server = $('#tbl_server').DataTable({
             cache: false,
             processData: false,
             contentType: false,
@@ -515,13 +519,19 @@
                 { data: 'transaction_date' },
                 { data: 'serverity' },
                 { data: 'status' },
-                { data: 'action' },
+                { data: 'action' }
             ]
         });
        
         setInterval(() => {   
-            $('#tbl_server').DataTable().ajax.reload();
+            tbl_server.ajax.reload();
         }, 60000);
+
+        if(chk_role_id != 1)
+        {
+            tbl_server.column(7).visible(false);
+            tbl_server.column(8).visible(false);
+        }
         
     });
 
