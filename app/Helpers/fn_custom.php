@@ -943,6 +943,13 @@ function get_word_leak_compromise($val, $type)
             $html = 'DARK WEB';
         }
         
+    } else if($type == 'brand_abuse') {
+        if($val == 'social') {
+            $html = 'PUBLIC';
+        } else if($val == 'darkweb_public') {
+            $html = 'DARK WEB';
+        }
+        
     } else if($type == 'compromise') {
         if($val == 'compromise') {
             $html = 'PUBLIC';

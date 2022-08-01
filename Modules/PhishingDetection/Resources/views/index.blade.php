@@ -31,9 +31,11 @@
                         <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                     </a>
 
+                    @if(@$chk_role_id == 1)
                     <a href="{{route('phishing_detection.create')}}" class="btn btn-sm btn-{{ get_option('theme_color')}}" data-toggle="ajaxModal">
                         @icon('solid/plus') @langapp('add')
                     </a>
+                    @endif
 
                 </div>
             </div>
@@ -354,6 +356,8 @@
 
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
+    <input type="hidden" id="chk_role_id" value="{{@$chk_role_id}}">
+
 </section>
 
 @push('pagestyle')
@@ -381,6 +385,7 @@
 
 var check_serverity = '';
 var check_type = '';
+var chk_role_id = $('#chk_role_id').val();
 
 
 active_btn('#btngroup_sort_by .btn-grey');
@@ -524,6 +529,10 @@ function datatable(){
         tbl_phishing.ajax.reload();
     }, 60000);
 
+    if(chk_role_id != 1)
+    {
+        tbl_phishing.column([8, 9]).visible(false);
+    }
 }
 
 function datachart_timeline()

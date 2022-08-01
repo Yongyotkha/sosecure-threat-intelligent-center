@@ -2,6 +2,7 @@
 
 namespace Modules\PhishingDetection\Http\Controllers;
 
+use Auth;
 use App\Sites;
 use App\LogPhishing;
 use Illuminate\Http\Request;
@@ -43,6 +44,7 @@ class PhishingDetectionController extends Controller
         $get_role_custom_first = @get_role_custom();
         $SiteSettings = @$get_role_custom_first['SiteSettings'];
         $data['site_settings'] = $SiteSettings;
+        $data['chk_role_id'] = @Auth::user()->site_role_id;
         return view('phishingdetection::index')->with($data);
     }
 
