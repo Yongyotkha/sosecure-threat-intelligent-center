@@ -77,7 +77,7 @@ class TransactionURLFeed extends Command
                                 $pathFile = '/files/logs_url_feed/'.$code.'.html';
                                 File::put(public_path() . $pathFile, $get_html);
                                 
-                                $return_string = substr($get_html, 0, 800);
+                                $return_string = $this -> excerpt($get_html, $keyword -> name);
 
                                 $LogURLFeed = new LogURLFeed();
                                 $LogURLFeed -> code = $code;
@@ -103,6 +103,27 @@ class TransactionURLFeed extends Command
             $data -> save();
         }
         
+    }
+
+    private function excerpt($text, $query){
+        //words
+        $words = join('|', explode(' ', preg_quote($query)));
+        
+        //lookahead/behind assertions ensures cut between words
+        $s = '\s\x00-/:-@\[-`{-~'; //character set for start/end of words
+        preg_match_all('#(?<=['.$s.']).{1,50}(('.$words.').{1,50})+(?=['.$s.'])#uis', $text, $matches, PREG_SET_ORDER);
+        
+        //delimiter between occurences
+        $results = array();
+        foreach($matches as $line) {
+            $results[] = htmlspecialchars($line[0], 0, 'UTF-8');
+        }
+        $result = join('', $results);
+        
+        //highlight
+        $result = preg_replace('#'.$words.'#iu', "\$0", $result);
+        
+        return $result;
     }
 
     private function getHtml($url) {
