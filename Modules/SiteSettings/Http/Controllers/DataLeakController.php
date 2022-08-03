@@ -834,7 +834,7 @@ class DataLeakController extends Controller
 
 
            
-            $DataLeakFeed_Data =   DataLeakFeed::where('deleted_at', null)->where('status','1')->whereIn('feel_type', ['social','darkweb_public']);
+            $DataLeakFeed_Data =   DataLeakFeed::where('deleted_at', null)->where('data_leak_feed.status','1')->whereIn('data_leak_feed.feel_type', ['social','darkweb_public']);
             $get_role_custom_first = @get_role_custom();
             $site_id_arr = @$get_role_custom_first['site_id_arr'];
             if(@$get_role_custom_first['superadmin'] == 1) {
@@ -995,7 +995,7 @@ class DataLeakController extends Controller
                 $SiteSettings = SiteSettings::where('code', @$request->site)->first();
                 // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
                 $model = $model->where('status', 1)->where('site_id', $SiteSettings->id);
-                $DataLeakSocialRef_data->where('status', 1)->where('data_leak_socail_ref.site_id', $SiteSettings->id)->where('data_leak_socail_ref.status', 1);
+                $DataLeakSocialRef_data->where('data_leak_feed.status', 1)->where('data_leak_socail_ref.site_id', $SiteSettings->id)->where('data_leak_socail_ref.status', 1);
             }
 
             if ($request->click_key) {
@@ -1085,7 +1085,7 @@ class DataLeakController extends Controller
             if(@$get_role_custom_first['superadmin'] == 1) {
 
             }else if(@$get_role_custom_first['client'] == 1) {
-                $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+                $model = $model->whereIn('site_id', $site_id_arr)->where('data_leak_feed.status', 1);
                 $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('data_leak_feed.status', 1);
 
             }else if(@$get_role_custom_first['site_support'] == 1) {
@@ -1110,7 +1110,7 @@ class DataLeakController extends Controller
             $column_order = @$request->order[0]['column'];
             $column_dir = @$request->order[0]['dir'];
             if($column_order == "9"){
-                $model->orderBy('status',$column_dir);
+                $model->orderBy('data_leak_feed.status',$column_dir);
                 $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.site_id', $column_dir);
             }
             else if($column_order == "8"){

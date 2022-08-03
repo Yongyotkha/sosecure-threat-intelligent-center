@@ -490,7 +490,7 @@ class RSSFeedSettingsController extends Controller
         // dd($model);
         $count_model = count($model);
         // ---------------------------------- cve - actor ----------------------------------
-        if($count_model != 0)
+        if($count_model != 0 && 1==2)
         {
             $id = '';
             $actor_id = array();
@@ -611,15 +611,16 @@ class RSSFeedSettingsController extends Controller
                     $html .= 'None';
                 }else{
                     $htmls = '';
-                    foreach($model->get_cate as $cate_val) {
-                        if($cate_val->get_cate_name_news){
+                   // foreach($model->get_cate as $cate_val) {
+                      //  if($cate_val->get_cate_name_news){
                             // $html .= '<a href="javascript:void(0);" onclick="find_category(\''.$cate_val -> get_cate_name_news -> id.'\')">'.$cate_val->get_cate_name_news->name.', </a>';
-                            $htmls .= $cate_val->get_cate_name_news->name.',';
-                        }else{
-                            $htmls .= 'None-delete0';
-                        }
+                       //     $htmls .= $cate_val->get_cate_name_news->name.',';
+                     //   }else{
+                      //      $htmls .= 'None-delete0';
+                     //   }
                         
-                    }
+                 //   }
+                    $htmls .= 'All';
                     if($htmls =='None-delete0'){
                         $html .= str_replace('-delete0','', $htmls);
                     }else{

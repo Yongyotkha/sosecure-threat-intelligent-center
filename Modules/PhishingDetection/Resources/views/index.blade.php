@@ -14,22 +14,28 @@
                 <div class="ml-2 text-right">
                     {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
                     <div class="text-left max-w-select m-r-xs" style="display:inline-block">
-                        <select name="site" id="site" class="text-left select2-option form-control select-site" onchange="changeSite(value)">
+                        <select name="site" id="site" class="text-left select2-option form-control select-site">
                             <option value="">All Site</option>
-                            {{-- @if ($site_settings)
+                            @if ($site_settings)
 
                             @foreach ($site_settings as $site_settings)
                             <option value="{{$site_settings->id}}">{{$site_settings->name}}
                             </option>
                             @endforeach
 
-                            @endif --}}
+                            @endif
                         </select>
                     </div>
                     
                     <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                         <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                     </a>
+
+                    @if(@$chk_role_id == 1)
+                    <a href="{{route('phishing_detection.create')}}" class="btn btn-sm btn-{{ get_option('theme_color')}}" data-toggle="ajaxModal">
+                        @icon('solid/plus') @langapp('add')
+                    </a>
+                    @endif
 
                 </div>
             </div>
@@ -53,7 +59,7 @@
                                 <div>
                                     <div class="form-group m-b-md">
                                         <label for="" class="">URL</label>
-                                        <input type="text" class="form-control" name="" id=""
+                                        <input type="text" class="form-control" name="filter_url" id="filter_url"
                                             placeholder="Search">
                                     </div>
                                 </div>
@@ -62,7 +68,7 @@
                                 <div>
                                     <div class="form-group m-b-md">
                                         <label for="" class="">IP</label>
-                                        <input type="text" class="form-control" name="" id=""
+                                        <input type="text" class="form-control" name="filter_ip" id="filter_ip"
                                             placeholder="Search">
                                     </div>
                                 </div>
@@ -71,22 +77,25 @@
 
                         <div class="row">
                             <div class="col-lg-6 col-md-6 mb-1">
-                                <h5 class="font-weight-bold">Severity</h5>
+                                <h5 class="font-weight-bold">Serverity</h5>
                                 <div id="btngroup_sort_by" class="btn-group special mb-2">
-                                    <button class="btn btn-grey filter_agent_all active" value="" id="btn_search_all">
+                                    <button class="btn btn-grey check_serverity active" value="All" id="serverity_all">
                                         <span> All </span>
                                     </button>
-                                    <button class="btn  btn-grey" value="">
-                                        <span> Information </span>
+                                    <button class="btn btn-grey check_serverity" value="Critical">
+                                        <span> Critical </span>
                                     </button>
-                                    <button class="btn  btn-grey" value="">
-                                        <span> Low </span>
+                                    <button class="btn btn-grey check_serverity" value="High">
+                                        <span> High </span>
                                     </button>
-                                    <button class="btn  btn-grey" value="">
+                                    <button class="btn btn-grey check_serverity" value="Medium">
                                         <span> Medium </span>
                                     </button>
-                                    <button class="btn  btn-grey" value="">
-                                        <span> High </span>
+                                    <button class="btn btn-grey check_serverity" value="Low">
+                                        <span> Low </span>
+                                    </button>
+                                    <button class="btn btn-grey check_serverity" value="Information">
+                                        <span> Information </span>
                                     </button>
                                 </div>
                             </div>
@@ -94,104 +103,25 @@
                                 <div>
                                     <h5 class="font-weight-bold">Type</h5>
                                     <div id="filter-type" class="btn-group special">
-                                        <button class="btn btn-grey check_alert active" id="all_type" value="">
+                                        <button class="btn btn-grey check_type active" id="type_all" value="All">
                                             <span> All </span>
                                         </button>
-                                        <button class="btn btn-grey check_alert" value="1">
+                                        <button class="btn btn-grey check_type" value="Referrer">
                                             <span> Referrer </span>
                                         </button>
-                                        <button class="btn btn-grey check_alert" value="1">
+                                        <button class="btn btn-grey check_type" value="Threat Feed">
                                             <span> Threat Feed </span>
                                         </button>
-                                        <button class="btn btn-grey check_alert" value="2">
+                                        <button class="btn btn-grey check_type" value="Domain name">
                                             <span> Domain name </span>
                                         </button>
-                                        <button class="btn btn-grey check_alert" value="2">
-                                            <span> other </span>
+                                        <button class="btn btn-grey check_type" value="Other">
+                                            <span> Other </span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div id="filter_alert_main" class="row" style="display: none">
-                            <div class="col-lg-4">
-                                <div>
-                                    <div class="form-group m-b-md">
-                                        <label for="" class="">Site Name</label>
-                                        <input type="text" class="form-control" name="keyword" id="keyword"
-                                            placeholder="Search">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div>
-                                    <div class="form-group m-b-md">
-                                        <label for="" class="">Description</label>
-                                        <input type="text" class="form-control" name="keyword" id="keyword"
-                                            placeholder="Search">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <label for="" class="">Description</label>
-                                <div id="filter-alert" class="btn-group special">
-                                    <button class="btn btn-grey check_alert active" id="all" value="">
-                                        <span> All </span>
-                                    </button>
-                                    <button class="btn btn-grey check_alert" value="1">
-                                        <span> Scan </span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="filter_agent_main" class="row"  style="display: none">
-                            <div class="col-lg-3">
-                                <div>
-                                    <div class="form-group m-b-md">
-                                        <label for="" class="">Site Name</label>
-                                        <input type="text" class="form-control" name="keyword" id="keyword"
-                                            placeholder="Search">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div>
-                                    <div class="form-group m-b-md">
-                                        <label for="" class="">Device Name</label>
-                                        <input type="text" class="form-control" name="keyword" id="keyword"
-                                            placeholder="Search">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div>
-                                    <div class="form-group m-b-md">
-                                        <label for="" class="">IP</label>
-                                        <input type="text" class="form-control" name="keyword" id="keyword"
-                                            placeholder="Search">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <label for="" class="">OS Type</label>
-                                <div id="filter-alert" class="btn-group special">
-                                    <button class="btn btn-grey check_os_type active" id="all_os" value="">
-                                        <span> All </span>
-                                    </button>
-                                    <button class="btn btn-grey check_os_type" value="1">
-                                        <span> Scan </span>
-                                    </button>
-                                    <button class="btn btn-grey check_os_type" value="1">
-                                        <span> Window </span>
-                                    </button>
-                                </div>
-                            </div>
-
-                         
-                        </div>
-                        
                     </div>
                 </div>
                 <div class="panel-footer">
@@ -201,8 +131,8 @@
                                 <i class="fas fa-search"></i>
                                 @langapp('apply')
                             </button>
-                            <button type="button" id="btn_rss_news_reset" class="btn btn-default btn-responsive btn-fz-13"
-                                style="white-space: nowrap">
+                            <button type="button" class="btn btn-default btn-responsive btn-fz-13"
+                                style="white-space: nowrap" onclick="clear_filter()">
                                 <i class="fas fa-broom"></i>
                                 <span> Clear </span>
                             </button>
@@ -426,6 +356,8 @@
 
     <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 
+    <input type="hidden" id="chk_role_id" value="{{@$chk_role_id}}">
+
 </section>
 
 @push('pagestyle')
@@ -450,6 +382,11 @@
 @include('stacks.js.highchart')
 
 <script>
+
+var check_serverity = '';
+var check_type = '';
+var chk_role_id = $('#chk_role_id').val();
+
 
 active_btn('#btngroup_sort_by .btn-grey');
 active_btn('#filter-type .btn-grey');
@@ -479,6 +416,52 @@ $('#btngroup_sort_by .btn-grey').on('click',function(){
 }
 });
 
+$('.check_serverity').click(function(){
+    check_serverity = $(this).val();
+});
+
+$('.check_type').click(function(){
+    check_type = $(this).val();
+});
+
+$(document).ready(function(){
+    datachart_timeline();
+    datachart_circle();
+});
+
+var site_id = '';
+
+$('#site').change(function(){
+    site_id = $('#site :selected').val();
+    tbl_phishing.ajax.reload();
+    datachart_timeline();
+    datachart_circle();
+});
+
+function search()
+{
+    tbl_phishing.ajax.reload();
+    datachart_timeline();
+    datachart_circle();
+}
+
+function clear_filter()
+{
+    check_serverity = '';
+    check_type = '';
+    $('#filter_url').val('');
+    $('#filter_ip').val('');
+
+    $('.check_serverity').removeClass('active');
+    $('.check_type').removeClass('active');
+    $('#serverity_all').addClass('active');
+    $('#type_all').addClass('active');
+
+    tbl_phishing.ajax.reload();
+    datachart_timeline();
+    datachart_circle();
+}
+
 function datatable(){
     $.ajaxSetup({
     headers: {
@@ -497,6 +480,15 @@ function datatable(){
         {
             url: "{{route('phishing_detection.datatable')}}",
             type: "POST",
+            data: function(d) 
+            { 
+                d.filter_site = $('#site :selected').val();
+                d.filter_url = $('#filter_url').val();
+                d.filter_ip = $('#filter_ip').val();
+                d.filter_serverity = check_serverity;
+                d.filter_type = check_type;
+                return d;
+            }
         },
         columns: [
             {
@@ -518,13 +510,13 @@ function datatable(){
                 data: 'score',
             },
             {
-                data: 'severity',
+                data: 'c_serverity',
             },
             {
-                data: 'start_date',
+                data: 'updated_at',
             },
             {
-                data: 'status',
+                data: 'c_status',
             },
             {
                 data: 'action',
@@ -537,11 +529,38 @@ function datatable(){
         tbl_phishing.ajax.reload();
     }, 60000);
 
+    if(chk_role_id != 1)
+    {
+        tbl_phishing.column([8, 9]).visible(false);
+    }
 }
 
+function datachart_timeline()
+{
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "{{route('phishing_detection.data_chart_timeline')}}",
+        type: "get",
+        data: {
+            site_id:site_id,
+            filter_url:$('#filter_url').val(),
+            filter_ip:$('#filter_ip').val(),
+            filter_serverity:check_serverity,
+            filter_type:check_type
+        },
+        beforesend:function(){
+            {{-- $('.loadder-timeline').show(); --}}
+        },
+        success:function(data){
+            {{-- $('.loadder-timeline').hide(); --}}
+            timeline_chart('chart-timeline', data.day, data.count);
+        }
+    });
+}
 
-
-function mychart(myid){
+function timeline_chart(myid,day,data){
     const chart_top_source = Highcharts.chart(myid, {
         title: {
             text: ''
@@ -552,7 +571,7 @@ function mychart(myid){
             }
         },
         xAxis: {
-            categories: ['7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18','19','20','21','22','23','24','25','26','27','28','29','30','31','1','2','3','4','5'],
+            categories: day,
             accessibility: {
                 rangeDescription: ''
             }
@@ -576,7 +595,7 @@ function mychart(myid){
 
         series: [{
             name: 'Alert',
-            data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            data: data,
             type: 'area',
             fillColor: '#c8dcf17d',
         }],
@@ -598,7 +617,32 @@ function mychart(myid){
     });
 }
 
-function circle_chart(id){
+function datachart_circle()
+{
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "{{route('phishing_detection.data_chart_circle')}}",
+        type: "get",
+        data: {
+            site_id:site_id,
+            filter_url:$('#filter_url').val(),
+            filter_ip:$('#filter_ip').val(),
+            filter_serverity:check_serverity,
+            filter_type:check_type
+        },
+        beforesend:function(){
+            {{-- $('.loadder-circle').show(); --}}
+        },
+        success:function(data){
+            {{-- $('.loadder-circle').hide(); --}}
+            circle_chart('chart-type', data);
+        }
+    });
+}
+
+function circle_chart(id, data){
     const chart_pie = new Highcharts.chart(id, {
         chart: {
             height: 223, 
@@ -632,18 +676,67 @@ function circle_chart(id){
         series: [{
             colorByPoint: false,
             data: [
-            {  name: 'Referrer', y: 0, color: '#e64732'}, 
-            {  name: 'Threat Feed',  y: 0 , color: '#fcc838'}, 
-            {  name: 'Domain name', y: 0, color: '#00dcff'  }, 
-            {  name: 'other', y: 0, color: '#c1c0c0'  }, 
+            {  name: 'Referrer', y: data.count_referrer, color: '#e64732'}, 
+            {  name: 'Threat Feed', y: data.count_threat_feed, color: '#fcc838'}, 
+            {  name: 'Domain name', y: data.count_domain_name, color: '#00dcff'}, 
+            {  name: 'other', y: data.count_other, color: '#88ce4f'}, 
             ]
         }],
     });
 }
 
+function change_status_phishing(id) 
+{
+    let checkState = $("#phishing-status-" + id).is(":checked") ? 1 : 0;
+    axios.post('{{route('phishing_detection.update_status_phishing')}}', {
+        status: checkState,
+        id: id,
+    }).then(function (response) {
+        toastr.success('Update Status Success!!');
+    }).catch(function (error) {
+        toastr.error('error!!');
+    });
+}
 
-circle_chart('chart-type');
-mychart('chart-timeline');
+function changeSite(val){
+    set_cookie_site($(`#${id_select_site}`).val());
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: '{!! route('assets.countAssets') !!}',
+        type: "get",
+        data: ({
+            sitecode:$('#select-site').val(),
+        }),
+        datatype: "html",
+        beforeSend: function(){
+            
+        },
+    }).done(function(data){
+        $('#count_other').html(data.countOther+"");
+        if(data.assetLimit){
+            $('#count_assets').html(data.countAssets+"/"+data.assetLimit);
+        }else{
+            $('#count_assets').html(data.countAssets+"");
+        }
+        
+        $('#count_windows').html(data.countWindows+"");
+        $('#count_linux').html(data.countLinux+"");
+        
+        
+    }).fail(function(jqXHR, ajaxOptions, thrownError){
+        
+        console.log("No response from server");
+    });
+    searchTB();
+    {{--site_id = val;
+    selectGroupByFirst();--}}
+}
+
+
+{{-- circle_chart('chart-type'); --}}
+{{-- mychart('chart-timeline'); --}}
 
 
 

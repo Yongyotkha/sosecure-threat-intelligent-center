@@ -354,9 +354,20 @@ class KeywordsController extends Controller
         $status = 0;
 
         $code_site = $request->code_site;
-        $site = SiteSettings::select('id')->where('code', $code_site)->first();
+        $site_id_list =array();
+        array_push($site_id_list,0);
+        if($code_site =="0"){
+            $site = SiteSettings::select('id')->where('active','1')->get();
+            foreach($site as $s){
+                array_push($site_id_list,$s->id);
+            }
+        }else{
+            $site = SiteSettings::select('id')->where('code', $code_site)->where('active','1')->first();
+            array_push($site_id_list,$site->id);
+        }
+    
 
-        $site_keywords_main = site_keywords_main::where('site_id', $site->id)->where('status',1)->whereNull('deleted_at')->orderBy('order','asc')->get();
+        $site_keywords_main = site_keywords_main::whereIn('site_id', $site_id_list)->where('status',1)->whereNull('deleted_at')->orderBy('order','asc')->get();
         if(!$site_keywords_main) {
 
             $message = langapp('changes_saved_successful');
@@ -389,9 +400,19 @@ class KeywordsController extends Controller
 
         $type = $request->type;
         $code_site = $request->code_site;
-        $site = SiteSettings::select('id')->where('code', $code_site)->first();
+        $site_id_list =array();
+        array_push($site_id_list,0);
+        if($code_site =="0"){
+            $site = SiteSettings::select('id')->where('active','1')->get();
+            foreach($site as $s){
+                array_push($site_id_list,$s->id);
+            }
+        }else{
+            $site = SiteSettings::select('id')->where('code', $code_site)->where('active','1')->first();
+            array_push($site_id_list,$site->id);
+        }
 
-        $Site_keywords = Site_keywords::where('site_id', $site->id)->where('status',1)->whereNull('deleted_at')->where('type',$type)->orderBy('order','asc')->get();
+        $Site_keywords = Site_keywords::whereIn('site_id', $site_id_list)->where('status',1)->whereNull('deleted_at')->where('type',$type)->orderBy('order','asc')->get();
         if(!$Site_keywords) {
 
             $message = langapp('changes_saved_successful');
@@ -774,6 +795,38 @@ class KeywordsController extends Controller
 
     public function show_keyword()
     {
+        $role_custom = @check_role_custom();
+        if(!$role_custom['dashboard']) {
+            check_permission403();
+        }
+        // $menu = array();
+        // if(isset($_SESSION["menu"])){
+        //     // unset($_SESSION["lastname"]);
+        //     $menu = $_SESSION["menu"];
+        // }
+        
+        // dd($menu[4]->get_menu_sub);
+
+        $get_role_custom_first = @get_role_custom();
+        $SiteSettings = '';
+        $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        $site_id_arr = @$get_role_custom_first['site_id_arr'];
+        if(@$get_role_custom_first['superadmin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_support'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_admin'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }else if(@$get_role_custom_first['site_client'] == 1) {
+            $SiteSettings = @$get_role_custom_first['SiteSettings'];
+        }
+
+
+        $data['site_settings'] = @$SiteSettings;
+
+
         $query_user =  DB::table('users')
             ->select('site.code')
             ->leftjoin('site', 'users.site_id', 'site.id')

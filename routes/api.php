@@ -162,16 +162,40 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
 
      //phishing
      Route::post('phishing/table', 'Api\ApiPhishingController@table');
+     Route::post('phishing/create_phishing_detection', 'Api\ApiPhishingController@create_phishing_detection');
+     Route::post('phishing/edit_phishing_detection', 'Api\ApiPhishingController@edit_phishing_detection');
+     Route::post('phishing/view_phishing_detection', 'Api\ApiPhishingController@view_phishing_detection');
+
+     Route::post('phishing/save_phishing', 'Api\ApiPhishingController@save_phishing');
+     Route::post('phishing/update_status_phishing', 'Api\ApiPhishingController@update_status_phishing');
+     Route::post('phishing/delete_phishing', 'Api\ApiPhishingController@delete_phishing');
+     
+     Route::post('phishing/data_chart_timeline', 'Api\ApiPhishingController@data_chart_timeline');
+     Route::post('phishing/data_chart_circle', 'Api\ApiPhishingController@data_chart_circle');
 
      //keyword
      Route::post('keyword/get_keyword_main', 'Api\ApiKeywordController@get_keyword_main');
      Route::post('keyword/get_keyword_sub', 'Api\ApiKeywordController@get_keyword_sub');
 
      //brandabuse
+    Route::post('brandabuse/brand_abuse_count_val', 'Api\ApiBrandabuseController@brand_abuse_count_val');
+    Route::post('brandabuse/socialdatas_all_site', 'Api\ApiBrandabuseController@socialdatas_all_site');
     Route::post('brandabuse/socialdatas_all_site_tb', 'Api\ApiBrandabuseController@socialdatas_all_site_tb');
     Route::post('brandabuse/add_brandabuse', 'Api\ApiBrandabuseController@add_brandabuse');
     Route::post('brandabuse/edit_brandabuse_modal', 'Api\ApiBrandabuseController@edit_brandabuse_modal');
     Route::post('brandabuse/edit_brandabuse', 'Api\ApiBrandabuseController@edit_brandabuse');
+    Route::post('brandabuse/change_status_brandabusedata', 'Api\ApiBrandabuseController@change_status_brandabusedata');
+    Route::post('brandabuse/delete_brandabusedata', 'Api\ApiBrandabuseController@delete_brandabusedata');
+    Route::post('brandabuse/change_delete_brandabusedata', 'Api\ApiBrandabuseController@change_delete_brandabusedata');
+
+    Route::post('brandabuse/activity_brandabuse_modal', 'Api\ApiBrandabuseController@activity_brandabuse_modal');
+    Route::post('brandabuse/activity_save', 'Api\ApiBrandabuseController@activity_save');
+    Route::post('brandabuse/activity_history_reload', 'Api\ApiBrandabuseController@activity_history_reload');
+    Route::post('brandabuse/activity_get_edit_data', 'Api\ApiBrandabuseController@activity_get_edit_data');
+    Route::post('brandabuse/activity_delete', 'Api\ApiBrandabuseController@activity_delete');
+    Route::post('brandabuse/brandabusefeedsocial_datatables', 'Api\ApiBrandabuseController@brandabusefeedsocial_datatables');
+    Route::post('brandabuse/approve_data_feed', 'Api\ApiBrandabuseController@approve_data_feed');
+    Route::post('brandabuse/cancle_data_feed', 'Api\ApiBrandabuseController@cancle_data_feed');
 
     Route::post('brandabuse/view', 'Api\ApiBrandabuseController@brandabuse_view');
     Route::post('brandabuse/count_val', 'Api\ApiBrandabuseController@brandabuse_count_val');

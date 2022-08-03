@@ -45,6 +45,7 @@ class SearchController extends Controller
     }
 
     public function searchAPI(){
+     
         $type = $this->request->type;
         $keyword = $this->request->keyword;
 
@@ -208,8 +209,8 @@ class SearchController extends Controller
                     $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
                     $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                     $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
-                    return $pipeLine;
-                
+            
+         
     
                     if($dataWait['count']>0){
                         $options = [
@@ -311,10 +312,11 @@ class SearchController extends Controller
                 if($type == 'events'){
                     
                     $dataWait = null;
-                    $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
-                    $pipeLine = array('indicator' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
+                    $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+                    $pipeLine = array('indicator_name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                     $dataWait['count'] = $col_fx_transaction_otx_indicators_data->count($pipeLine);
-                    
+                  
+          
                     if($dataWait['count']>0){
                         $options = [
                             'allowDiskUse' => TRUE
@@ -322,14 +324,14 @@ class SearchController extends Controller
                         $pipeline = [
                             [
                                 '$match' => [
-                                    'indicator'  => ['$regex'=>$this->request->keyword, '$options' => 'i'],
+                                    'indicator_name'  => ['$regex'=>$this->request->keyword, '$options' => 'i'],
                                 ]
                             ],
                             [
                                 '$project' => [
                                     '_id' => 0,
                                     'id' => '$indicator_id',
-                                    'name' => '$indicator',
+                                    'name' => '$indicator_name',
                                     'content' => [ '$concat' => ['type: ', '$type' ]],
                                     'link' => [ '$concat' => ['/indicators/detail?id=','$indicator_id','&type=','$type']],
                                 ]
@@ -1615,6 +1617,8 @@ class SearchController extends Controller
 
     public function loadSearchAPI(Request $request)
     {
+
+      
         $role_custom = @check_role_custom();
         $source = $request->source;
         $keyword = $request->keyword;
