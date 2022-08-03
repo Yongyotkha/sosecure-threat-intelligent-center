@@ -70,25 +70,30 @@ class TransactionURLFeed extends Command
                     if($url_404 == 0){
                         $get_html = $this -> getHtml($url);
                         if(!empty($get_html)){
+                            $this -> info('Find Keyword : ' . $keyword -> name . ' | SITE ID : ' . $site);
                             $checkKeyword = $this -> CheckKeyword($get_html, $keyword -> name);
                             if(!empty($checkKeyword)){
                                 $code = Str::uuid();
                                 $pathFile = '/files/logs_url_feed/'.$code.'.html';
                                 File::put(public_path() . $pathFile, $get_html);
                                 
+                                $return_string = substr($get_html, 0, 800);
+
                                 $LogURLFeed = new LogURLFeed();
                                 $LogURLFeed -> code = $code;
                                 $LogURLFeed -> url = $url;
                                 $LogURLFeed -> keyword = $keyword -> name;
-                                $LogURLFeed -> detection = $checkKeyword;
+                                $LogURLFeed -> detection = $return_string;
                                 $LogURLFeed -> path_file = $pathFile;
                                 $LogURLFeed -> site_id = $site;
                                 $LogURLFeed -> status = 1;
                                 $LogURLFeed -> save();
 
                                 $this -> info('Found Keyword');
-                            }        
-                            $this -> error('Not Found Keyword');
+                            } else {
+                                $this -> error('Not Found Keyword');
+                            }  
+                            $this -> comment('--------------------------------------------------------');     
                         }
                     }
                 }
