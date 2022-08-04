@@ -306,3 +306,16 @@ Route::post('/dataleak/activity_save', 'DataLeakController@activity_save')->name
 Route::get('/dataleak/activity_history_reload', 'DataLeakController@activity_history_reload')->name('dataleak.activity_history_reload')->middleware('can:menu_items');
 Route::get('/dataleak/activity_get_edit_data', 'DataLeakController@activity_get_edit_data')->name('dataleak.activity_get_edit_data')->middleware('can:menu_items');
 Route::delete('/dataleak/activity_delete', 'DataLeakController@activity_delete')->name('dataleak.activity_delete')->middleware('can:menu_items');
+
+// url_feed
+Route::get('/url_feed', 'UrlFeedController@index')->name('urlfeed.index')->middleware('can:menu_items');
+Route::post('/url_feed/tbl_url_feed', 'UrlFeedController@tbl_url_feed')->name('urlfeed.tbl_url_feed')->middleware('can:menu_items');
+Route::post('/url_feed/get_check_site', 'UrlFeedController@get_check_site')->name('urlfeed.get_check_site')->middleware('can:menu_items');
+Route::post('/url_feed/insert_url_feed', 'UrlFeedController@insert_url_feed')->name('urlfeed.insert_url_feed')->middleware('can:menu_items');
+Route::post('/url_feed/change_status', 'UrlFeedController@change_status')->name('urlfeed.change_status')->middleware('can:menu_items');
+
+Route::get('/url_feed/edit_url_feed', 'UrlFeedController@edit_url_feed')->name('urlfeed.edit_url_feed')->middleware('can:menu_items');
+Route::post('/url_feed/update_url_feed', 'UrlFeedController@update_url_feed')->name('urlfeed.update_url_feed')->middleware('can:menu_items');
+Route::get('/url_feed/modal_delete_url_feed', 'UrlFeedController@modal_delete_url_feed')->name('urlfeed.modal_delete_url_feed')->middleware('can:menu_items');
+Route::get('/url_feed/delete_url_feed', 'UrlFeedController@delete_url_feed')->name('urlfeed.delete_url_feed')->middleware('can:menu_items');
+Route::post('/url_feed/delete_url_feed', 'UrlFeedController@delete_url_feed')->name('urlfeed.delete_url_feed')->middleware('can:menu_items');
