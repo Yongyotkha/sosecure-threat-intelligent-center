@@ -168,9 +168,9 @@
             </section>
        
     </section>
-
-    <div class="modal fade fixed-left" id="wdfm_website" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+    {{-- modal fade fixed-left --}}
+    {{-- <div class="modal in fixed-left in" id="wdfm_website" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"> --}}
+    <div class="modal fixed-left in" id="wdfm_website" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-aside" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-blue">
@@ -469,6 +469,10 @@
                 f_loading_stop(null, '#port_web');
                 console.log("No response from server");
             });
+        }
+        else
+        {
+            toastr.error('Enter Url and Port.')
         }
     }
 
