@@ -202,17 +202,36 @@ class UrlFeedController extends Controller
 
                 return $site_name;
             })
-            ->addColumn('c_type', function ($model) {
+            ->addColumn('c_mode', function ($model) {
 
-                $type = '';
+                $mode = '';
 
-                if($model->type == 1)
+                if($model->mode == 1)
                 {
-                    $type = 'Custom';
+                    $mode = 'Custom';
                 }
                 else
                 {
-                    $type = 'Add On';
+                    $mode = 'Add On';
+                }
+
+                return $mode;
+            })
+            ->addColumn('c_type', function ($model) {
+
+                $type = "";
+
+                if(@$model->type && $model->type !== 'Public')
+                {
+                    $type .= $model->type."
+                        <a href='". route('urlfeed.modal_view_url_feed', ['id' => $model->code]) ."' class='btn btn-info btn-xs' data-toggle='ajaxModal'>
+                            <i class='fas fa-eye'></i>
+                        </a>
+                    ";
+                }
+                else
+                {
+                    $type .= $model->type;
                 }
 
                 return $type;
@@ -243,7 +262,7 @@ class UrlFeedController extends Controller
                 ";
                 return $html;
             })
-            ->rawColumns(['chk','link','status','action','transactionRssData_count'])
+            ->rawColumns(['chk','link','c_type','status','action','transactionRssData_count'])
             ->make(true);
             // ->toJson();
     }
@@ -264,10 +283,73 @@ class UrlFeedController extends Controller
             $main_data['created_by'] = Auth::user()->id;
             $main_data['updated_by'] = Auth::user()->id;
             $main_data['feel_last'] = date('Y-m-d H:i:s');
-            $main_data['site_id'] = @$request->site_id;
-            $main_data['type'] = 2;
+            $main_data['site_id'] = 0;
+            $main_data['mode'] = 2;
             $main_data['port'] = @$request->port_web;
             $main_data['transaction_status'] = 1;
+            $main_data['type'] = @$request->type_web;
+
+            if(@$request->type_web == 'DarkWeb')
+            {
+                $detail_th = @$_POST['header_code'];
+
+                if($detail_th) 
+                {
+                    $dom = new \domdocument();
+                    if($dom->getelementsbytagname('img'))
+                    {
+                        $dom->loadHtml('<?xml encoding="UTF-8">'.$detail_th,
+                            LIBXML_HTML_NOIMPLIED |
+                            LIBXML_HTML_NODEFDTD |
+                            LIBXML_NOERROR |
+                            LIBXML_NOWARNING 
+                        );
+                        //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
+                        $images = $dom->getelementsbytagname('img');
+                        //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
+                        foreach($images as $k => $img){
+                            $data = $img->getattribute('src');
+    
+                            //Link url
+                            $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+                            if(preg_match($reg_exUrl, $data, $url_image)) 
+                            {
+                                $url = $url_image[0];
+                                $image = file_get_contents($url);
+                                if ($image !== false)
+                                {
+                                    $data = 'data:image/jpg;base64,'.base64_encode($image);
+                                }
+                            }
+    
+                            //base64
+                            $img_check_src = explode(";",$data);
+                            if(@$img_check_src[1]) 
+                            {
+                                list($type, $data) = explode(';', $data);
+                                list(, $data)= explode(',', $data);
+                                $data = base64_decode($data);
+                            //ตั้งชื่อรูปภาพใหม่โดยอ้างอิงจากเวลา
+                                $image_name= time().$k.'.png';
+                            //อัพโหลดภาพไปยัง public
+                                $path = public_path('images/file_editor') .'/'. $image_name;
+                            //ทำการอัพโหลดภาพ
+                                file_put_contents($path, $data);
+                                $img->removeattribute('src');
+                                $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
+                            } 
+                            else 
+                            {
+    
+                            }
+                        }
+
+                        $detail_th = $dom->savehtml();
+                    }
+                }
+
+                $main_data['header'] = $detail_th;
+            }
     
             DataLeakSocial::create($main_data);
     
@@ -342,7 +424,7 @@ class UrlFeedController extends Controller
 
     public function update_url_feed(request $request)
     {
-        // dd($request->all());
+        // dd(@$_POST['header_code']);
 
         try 
         {
@@ -352,9 +434,76 @@ class UrlFeedController extends Controller
             $main_data['tag'] = @$request->name_web;
             $main_data['updated_by'] = Auth::user()->id;
             $main_data['feel_last'] = date('Y-m-d H:i:s');
-            $main_data['site_id'] = @$request->site_id;
-            $main_data['type'] = 2;
+            $main_data['site_id'] = 0;
+            $main_data['mode'] = 2;
             $main_data['port'] = @$request->port_web;
+            $main_data['type'] = @$request->type_web;
+            
+            if(@$request->type_web == 'DarkWeb')
+            {
+                $detail_th = @$_POST['header_code'];
+                if($detail_th) 
+                {
+                    $dom = new \domdocument();
+                    if($dom->getelementsbytagname('img'))
+                    {
+                        $dom->loadHtml('<?xml encoding="UTF-8">'.$detail_th,
+                            LIBXML_HTML_NOIMPLIED |
+                            LIBXML_HTML_NODEFDTD |
+                            LIBXML_NOERROR |
+                            LIBXML_NOWARNING 
+                        );
+                        //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
+                        $images = $dom->getelementsbytagname('img');
+                        //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
+                        foreach($images as $k => $img)
+                        {
+                            $data = $img->getattribute('src');
+    
+                            //Link url
+                            $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+                            if(preg_match($reg_exUrl, $data, $url_image)) 
+                            {
+                                $url = $url_image[0];
+                                $image = file_get_contents($url);
+                                if ($image !== false)
+                                {
+                                    $data = 'data:image/jpg;base64,'.base64_encode($image);
+                                }
+                            }
+    
+                            //base64
+                            $img_check_src = explode(";",$data);
+                            if(@$img_check_src[1]) 
+                            {
+                                list($type, $data) = explode(';', $data);
+                                list(, $data)= explode(',', $data);
+                                $data = base64_decode($data);
+                            //ตั้งชื่อรูปภาพใหม่โดยอ้างอิงจากเวลา
+                                $image_name= time().$k.'.png';
+                            //อัพโหลดภาพไปยัง public
+                                $path = public_path('images/file_editor') .'/'. $image_name;
+                            //ทำการอัพโหลดภาพ
+                                file_put_contents($path, $data);
+                                $img->removeattribute('src');
+                                $img->setattribute('src', config('app.URL_CENTER_PUBLISH').'/images/file_editor/'.$image_name);
+                            }
+                            else 
+                            {
+    
+                            }
+                        }
+
+                        $detail_th = $dom->savehtml();
+                    }
+                }
+
+                $main_data['header'] = $detail_th;
+            }
+            else
+            {
+                $main_data['header'] = '';
+            }
     
             DataLeakSocial::where('code', $request->hd_code)->update($main_data);
     
@@ -384,6 +533,17 @@ class UrlFeedController extends Controller
         $data['query'] = $query;
 
         return view('sitesettings::modal.delete_url_feed')->with($data);
+    }
+
+    public function modal_view_url_feed(request $request)
+    {
+        $query = DataLeakSocial::where(['code' => $request->id])->first();
+        
+        $data = [];
+        $data['page'] = 'URL Feed';
+        $data['query'] = $query;
+
+        return view('sitesettings::modal.view_url_feed')->with($data);
     }
 
     public function delete_url_feed(request $request)

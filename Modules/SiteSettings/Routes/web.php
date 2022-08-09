@@ -319,3 +319,4 @@ Route::post('/url_feed/update_url_feed', 'UrlFeedController@update_url_feed')->n
 Route::get('/url_feed/modal_delete_url_feed', 'UrlFeedController@modal_delete_url_feed')->name('urlfeed.modal_delete_url_feed')->middleware('can:menu_items');
 Route::get('/url_feed/delete_url_feed', 'UrlFeedController@delete_url_feed')->name('urlfeed.delete_url_feed')->middleware('can:menu_items');
 Route::post('/url_feed/delete_url_feed', 'UrlFeedController@delete_url_feed')->name('urlfeed.delete_url_feed')->middleware('can:menu_items');
+Route::get('/url_feed/modal_view_url_feed', 'UrlFeedController@modal_view_url_feed')->name('urlfeed.modal_view_url_feed')->middleware('can:menu_items');

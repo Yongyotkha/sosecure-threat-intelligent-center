@@ -50,31 +50,36 @@
                         </div>
                         <br>
 
-                        <div class="form-group row">
+                        {{-- <div class="form-group row">
                             <label for="" class="col-lg-12 control-label" id="labelactor">Actor</label>
 
                             <div class="col-sm-12">
                                 <select name="actor[]" id="actor" class="select2-option form-control" multiple>
-                                    @if(@$actors != null)
+                                    @if(@$actors != null && 1 == 2)
                                         @foreach ($actors as $data_actor)
-                                            <option value="{{$data_actor->adversary_uuid}}" selected>{{$data_actor->adversary_name}}</option>
+                                            <option value="{{@$data_actor->adversary_uuid}}" selected>{{@$data_actor->adversary_name}}</option>
                                         @endforeach
                                     @endif
                                 </select>
                             </div>
-                            {{-- <div class="col-sm-2">
+                            <div class="col-sm-2">
                                 <button class="btn btn-info"><i class="fas fa-plus"></i> Add Now</button>
-                            </div> --}}
-                        </div>
+                            </div>
+                        </div> --}}
 
                         <div class="form-group row">
                             <label for="" class="col-lg-12 control-label" id="labelcampainge">Campainge</label>
 
                             <div class="col-sm-12">
                                 <select name="new_campainge[]" id="new_campainge" class="select2-option form-control" multiple>
-                                    @if(@$campainge != null)
+                                    {{-- @if(@$campainge != null && 1 == 2)
                                         @foreach ($campainge as $data_actor)
-                                            <option value="{{$data_actor->adversary_uuid}}" selected>{{$data_actor->adversary_name}}</option>
+                                            <option value="{{@$data_actor->adversary_uuid}}" selected>{{@$data_actor->adversary_name}}</option>
+                                        @endforeach
+                                    @endif --}}
+                                    @if(@$master_campainge)
+                                        @foreach($master_campainge as $data_campainge)
+                                            <option value="{{$data_campainge->campainge_uuid}}" {{ ( $action == 'edit' ? ( $campainge ? ( in_array($data_campainge->campainge_uuid, $campainge) ? 'selected' : '' ) : '' ) : '' ) }}>{{$data_campainge->name}}</option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -147,15 +152,15 @@
                         <div class="col-lg-12">
                             <select name="serverity" id="serverity" class="select2-option form-control" >
                                 <option value="">Select Serverity</option>
-                                <option value="critical" {{@$DataLeakSocialRefs->serverity == 'critical'?'selected':''}}>
+                                <option value="critical" {{@$RSSNews->serverity == 'critical'?'selected':''}}>
                                     Critical</option>
-                                <option value="high" {{@$DataLeakSocialRefs->serverity == 'high'?'selected':''}}>
+                                <option value="high" {{@$RSSNews->serverity == 'high'?'selected':''}}>
                                     High</option>
-                                <option value="medium" {{@$DataLeakSocialRefs->serverity == 'medium'?'selected':''}}>
+                                <option value="medium" {{@$RSSNews->serverity == 'medium'?'selected':''}}>
                                     Medium</option>
-                                <option value="low" {{@$DataLeakSocialRefs->serverity == 'low'?'selected':''}}>
+                                <option value="low" {{@$RSSNews->serverity == 'low'?'selected':''}}>
                                     Low</option>
-                                <option value="information" {{@$DataLeakSocialRefs->serverity == 'information'?'selected':''}}>
+                                <option value="information" {{@$RSSNews->serverity == 'information'?'selected':''}}>
                                     Information</option>
                             </select>
                         </div>
@@ -366,7 +371,7 @@ $('#source_create').select2({
         }
     });
 
-    $('#new_campainge').select2({
+    {{-- $('#new_campainge').select2({
         tag: true,
         tokenSeparators: [' '],
         placeholder: 'select campainge',
@@ -389,7 +394,7 @@ $('#source_create').select2({
             },
             cache: true
         }
-    });
+    }); --}}
 
 function readLogo(input) {
     if (input.files && input.files[0]) {

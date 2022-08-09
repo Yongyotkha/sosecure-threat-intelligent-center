@@ -2593,11 +2593,15 @@ class IndicatorsController extends Controller
         $option_campainge = [];
 
         $connection_campainge = $select_actors->find($query_campainge,$option_campainge);
+        $campainge = $connection_campainge->toArray();
         
-        if($connection_actor != null)
+        if(count($campainge) > 0)
         {
-            $campainge = $connection_campainge->toArray();
-            $data['campainge'] = $campainge;
+            foreach($campainge as $data_campainge)
+            {
+                $data['campainge'][] = $data_campainge['adversary_uuid'];
+            }
+            // $data['campainge'] = $campainge;
         } 
         else
         {
@@ -2623,6 +2627,25 @@ class IndicatorsController extends Controller
         // {
         //     $data['techniques'] = null;
         // }  
+
+        $query_master_campainge = [
+            'status' => '1'
+        ];
+        $option_master_campainge = [];
+
+        $connection_master_campainge = $select_campainge->find($query_master_campainge,$option_master_campainge);
+        
+        if($connection_master_campainge != null)
+        {
+            $master_campainge = $connection_master_campainge->toArray();
+            $data['master_campainge'] = $master_campainge;
+        } 
+        else
+        {
+            $data['master_campainge'] = null;
+        }
+
+        // dd($data['campainge']);
 
         $data['page'] = langapp('indicators');
         return view('indicators::modal.insert_tag')->with($data);

@@ -1251,11 +1251,13 @@ class RSSFeedSettingsController extends Controller
         {
             $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
             $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+            $col_fx_otx_campaign = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
         }
         else
         {
             $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
             $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+            $col_fx_otx_campaign = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
         }
 
         $query_actor = [
@@ -1285,17 +1287,38 @@ class RSSFeedSettingsController extends Controller
         $option_campainge = [];
 
         $connection_campainge = $col_fx_otx_adversaries_related->find($query_campainge,$option_campainge);
+        $campainge = $connection_campainge->toArray();
         
-        if($connection_actor != null)
+        if(count($campainge) > 0)
         {
-            $campainge = $connection_campainge->toArray();
-            $data['campainge'] = $campainge;
+            foreach($campainge as $data_campainge)
+            {
+                $data['campainge'][] = $data_campainge['adversary_uuid'];
+            }
+            // $data['campainge'] = $campainge;
         } 
         else
         {
             $data['campainge'] = null;
         }
+
+        $query_master_campainge = [
+            'status' => '1'
+        ];
+        $option_master_campainge = [];
+
+        $connection_master_campainge = $col_fx_otx_campaign->find($query_master_campainge,$option_master_campainge);
         
+        if($connection_master_campainge != null)
+        {
+            $master_campainge = $connection_master_campainge->toArray();
+            $data['master_campainge'] = $master_campainge;
+        } 
+        else
+        {
+            $data['master_campainge'] = null;
+        }
+
         return view('rssfeedsettings::modal.edit_news')->with($data);
     }
 
@@ -1317,6 +1340,37 @@ class RSSFeedSettingsController extends Controller
         // dd($data['get_source']);
         $data['category'] = CategorySettings::where('active',1)->get();
         $data['public_date'] = $public_date;
+
+        $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
+        $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+        if(app()->environment('local'))
+        {
+            $col_fx_otx_campaign = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
+        }
+        else
+        {
+            $col_fx_otx_campaign = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
+        }
+
+        $query_master_campainge = [
+            'status' => '1'
+        ];
+        $option_master_campainge = [];
+
+        $connection_master_campainge = $col_fx_otx_campaign->find($query_master_campainge,$option_master_campainge);
+        
+        if($connection_master_campainge != null)
+        {
+            $master_campainge = $connection_master_campainge->toArray();
+            $data['master_campainge'] = $master_campainge;
+        } 
+        else
+        {
+            $data['master_campainge'] = null;
+        }
+
+        // dd($data['master_campainge']);
+
         return view('rssfeedsettings::modal.edit_news')->with($data);
     }
 
@@ -1873,7 +1927,7 @@ class RSSFeedSettingsController extends Controller
                 );
             }
 
-            if(!empty($request -> actor))
+            if(!empty(@$request -> actor))
             {
                 $checkSuccess = true;
 
@@ -2231,7 +2285,7 @@ class RSSFeedSettingsController extends Controller
             $new_detail_en = $request->detail_en;
 
             //------------------------- actor ------------------------------
-            if(!empty($request -> actor))
+            if(!empty(@$request -> actor))
             {
                 $checkSuccess = true;
                 $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
