@@ -642,11 +642,19 @@
                                 const data_camp = row.camp[rows];
                                 if(array_row == row.count_camp)
                                 {
-                            inner += `${data_camp.adversary_name}`;
+                            inner += `
+                                    <a href="{{route('actor.campainge_detail')}}`+`?_id=${data_camp.adversary_uuid}&mode=indi">
+                                        ${data_camp.adversary_name}
+                                    </a>
+                            `;
                                 }
                                 else
                                 {
-                            inner += `${data_camp.adversary_name} , `;
+                            inner += `
+                                    <a href="{{route('actor.campainge_detail')}}`+`?_id=${data_camp.adversary_uuid}&mode=indi">
+                                        ${data_camp.adversary_name}
+                                    </a>,  
+                                `;
                                 }
                                 array_row++;
                             }

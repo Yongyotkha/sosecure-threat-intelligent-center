@@ -2629,7 +2629,8 @@ class IndicatorsController extends Controller
         // }  
 
         $query_master_campainge = [
-            'status' => '1'
+            'status' => '1',
+            'delete_at' => null
         ];
         $option_master_campainge = [];
 

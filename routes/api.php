@@ -218,6 +218,9 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('brandabuse/compromise_activity_save', 'Api\ApiBrandabuseController@compromise_activity_save');
     Route::post('brandabuse/compromise_activity_delete', 'Api\ApiBrandabuseController@compromise_activity_delete');
     
+
+    // actor
+    Route::post('actor/ActorIndex', 'Api\ApiActorController@ActorIndex');
 });
 
 Route::group(['prefix' => 'v1/client-transfer'], function () {

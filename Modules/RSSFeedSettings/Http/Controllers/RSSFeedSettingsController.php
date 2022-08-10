@@ -490,7 +490,7 @@ class RSSFeedSettingsController extends Controller
         // dd($model);
         $count_model = count($model);
         // ---------------------------------- cve - actor ----------------------------------
-        if($count_model != 0 && 1==2)
+        if($count_model != 0)
         {
             $id = '';
             $actor_id = array();
@@ -508,47 +508,48 @@ class RSSFeedSettingsController extends Controller
                 $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
             }
 
-            for($i=0;$i<$count_model;$i++)
+            // for($i=0;$i<$count_model;$i++)
+            foreach($model as $data_model)
             {
-                $query= [
-                    'pulse_id' => $model[$i]['id'],
-                    'mode' => 'news',
-                    'join' => 'actor',
-                    'delete_at'  => null
-                ];
-                $option = [];
+                // $query= [
+                //     'pulse_id' => $model[$i]['id'],
+                //     'mode' => 'news',
+                //     'join' => 'actor',
+                //     'delete_at'  => null
+                // ];
+                // $option = [];
         
-                $final_test = $conn->find($query,$option);
-                $result_test = $final_test->toArray();
-                $count_result_test = count($result_test);
+                // $final_test = $conn->find($query,$option);
+                // $result_test = $final_test->toArray();
+                // $count_result_test = count($result_test);
                 
-                $model[$i]['actor'] = $result_test;
-                $model[$i]['count_result'] = $count_result_test;
+                // $model[$i]['actor'] = $result_test;
+                // $model[$i]['count_result'] = $count_result_test;
                 
-                $logo = [];
-                foreach(@$result_test as $sel_data_act)
-                {
-                    $query_sel_act = [
-                        'adversary_uuid' => $sel_data_act['adversary_uuid']
-                    ];
-                    $option_sel_act = [];
-                    $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
+                // $logo = [];
+                // foreach(@$result_test as $sel_data_act)
+                // {
+                //     $query_sel_act = [
+                //         'adversary_uuid' => $sel_data_act['adversary_uuid']
+                //     ];
+                //     $option_sel_act = [];
+                //     $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
                     
-                    if(@$result_sel_act['logo'])
-                    {
-                        $logo[] = $result_sel_act['logo'];
-                    }
-                    else
-                    {
-                        $logo[] = '/asset_salepage/images/AgentBasedDetection.png';
-                    }
+                //     if(@$result_sel_act['logo'])
+                //     {
+                //         $logo[] = $result_sel_act['logo'];
+                //     }
+                //     else
+                //     {
+                //         $logo[] = '/asset_salepage/images/AgentBasedDetection.png';
+                //     }
                     
-                }
-                $model[$i]['logo'] = $logo;
+                // }
+                // $model[$i]['logo'] = $logo;
                 // dd($id);
 
                 $query_camp= [
-                    'pulse_id' => $model[$i]['id'],
+                    'pulse_id' => $data_model->id,
                     'mode' => 'news',
                     'join' => 'campainge',
                     'delete_at'  => null
@@ -559,8 +560,8 @@ class RSSFeedSettingsController extends Controller
                 $result_camp = $final_camp->toArray();
                 $count_result_camp = count($result_camp);
 
-                $model[$i]['campainge'] = $result_camp;
-                $model[$i]['count_campainge'] = $count_result_camp;
+                $data_model->campainge = $result_camp;
+                $data_model->count_campainge = $count_result_camp;
         
             }
         }
@@ -728,7 +729,7 @@ class RSSFeedSettingsController extends Controller
                             $count_campainge = $model->count_campainge;
                             for($i = 0 ; $i < @$model->count_campainge ; $i++)
                             {
-                                // <a href="/actor/detail?_id='.$model->campainge[$i]->adversary_uuid.'&mode=cve">
+                                $html .= '<a href="/actor/campainge_detail?_id='.$model->campainge[$i]->adversary_uuid.'&mode=cve">';
                                 if($array_row == $count_campainge)
                                 {
                                     $html .= ''.$model->campainge[$i]->adversary_name.'';
@@ -737,6 +738,8 @@ class RSSFeedSettingsController extends Controller
                                 {
                                     $html .= ''.$model->campainge[$i]->adversary_name.' , ';
                                 }
+                                $html .= '</a>';
+
                                 $array_row = $array_row+1;
                             }
                             // <span> Name Campainge </span>
@@ -1303,7 +1306,8 @@ class RSSFeedSettingsController extends Controller
         }
 
         $query_master_campainge = [
-            'status' => '1'
+            'status' => '1',
+            'delete_at' => null
         ];
         $option_master_campainge = [];
 
