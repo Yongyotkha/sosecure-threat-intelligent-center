@@ -73,6 +73,7 @@ class ApiCVEController extends ApiController
                     $level = $data['data']['level'];
                     $column = $data['data']['column'];
                     $dir = $data['data']['dir'];
+                    $group = $data['data']['group'];
                     $site_id_arr = @$get_role_custom_first['site_id_arr'];
                     
 
@@ -446,6 +447,261 @@ class ApiCVEController extends ApiController
                 
                     }
                 }
+
+
+
+
+                if (empty($site_id)) {
+     
+
+                    $CVEMappingAssets_data = CVEMappingAssets::distinct()->
+                        select(
+                            'z.vendor', 
+                            'z.title as namecve', 
+                            'z.version', 
+                            'z.edition', 
+                            DB::raw("(select GROUP_CONCAT(a.IP) from (SELECT distinct  c.IP  FROM fx_cve_assets as c where  c.vendor=fx_z.vendor and c.title = fx_z.title and c.version = fx_z.version and c.edition = fx_z.edition and c.site_id = fx_z.site_id) as a ) as IP"),
+                            DB::raw("(select GROUP_CONCAT(a.Hostname) from (SELECT distinct  c.Hostname  FROM fx_cve_assets as c where  c.vendor=fx_z.vendor and c.title = fx_z.title and c.version = fx_z.version and c.edition = fx_z.edition and c.site_id = fx_z.site_id) as a ) as Hostname"),
+                            DB::raw("(select GROUP_CONCAT(a.id) from (SELECT distinct  c.id  FROM fx_cve_assets as c where  c.vendor=fx_z.vendor and c.title = fx_z.title and c.version = fx_z.version and c.edition = fx_z.edition and c.site_id = fx_z.site_id) as a ) as id"),
+                            )
+                        ->Join('cve_assets as z', 'data_datacve_mapping_assets.cve_asset_id', '=', 'z.id');
+                        //->where('data_datacve_mapping_assets.namecve', $request->cvename);
+                } else {
+              
+        
+                    $CVEMappingAssets_data = CVEMappingAssets::distinct()->
+                        select(
+                            'z.vendor', 
+                            'z.title as namecve', 
+                            'z.version', 
+                            'z.edition', 
+                            DB::raw("(select GROUP_CONCAT(a.IP) from (SELECT distinct  c.IP  FROM fx_cve_assets as c where  c.vendor=fx_z.vendor and c.title = fx_z.title and c.version = fx_z.version and c.edition = fx_z.edition and c.site_id = fx_z.site_id) as a ) as IP"),
+                            DB::raw("(select GROUP_CONCAT(a.Hostname) from (SELECT distinct  c.Hostname  FROM fx_cve_assets as c where  c.vendor=fx_z.vendor and c.title = fx_z.title and c.version = fx_z.version and c.edition = fx_z.edition and c.site_id = fx_z.site_id) as a ) as Hostname"),
+                            DB::raw("(select GROUP_CONCAT(a.id) from (SELECT distinct  c.id  FROM fx_cve_assets as c where  c.vendor=fx_z.vendor and c.title = fx_z.title and c.version = fx_z.version and c.edition = fx_z.edition and c.site_id = fx_z.site_id) as a ) as id"),
+        
+                        )
+                        ->Join('cve_assets as z', 'data_datacve_mapping_assets.cve_asset_id', '=', 'z.id')
+                     //   ->where('data_datacve_mapping_assets.namecve', $request->cvename)
+                        ->where('data_datacve_mapping_assets.site_id', $site_id);
+        
+                }
+                if ($request->assets) {
+                    $CVEMappingAssets_data = $CVEMappingAssets_data->where('z.title', '=', $assets);
+                }
+        
+                if ($check == 1) {
+                    $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', $check);
+                } else if ($check== 2) {
+                    $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', 0);
+                } else {
+                    $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', 0);
+                }
+             //  $data['data'] = $CVEMappingAssets_data->get();
+        
+              if($group == 2){
+        
+                $res =  DataTables::of($CVEMappingAssets_data)
+                            ->editColumn('chk', function (CVEMappingAssets $model) {
+                                // return '<label><input type="checkbox"  name="cve_id" class="cve_id" value="' . $model->id . '"><span class="label-text"></span></label>';
+                                return "";
+                            })
+                            ->addColumn('name_cve', function (CVEMappingAssets $model) {
+                                return '<span class="d-inline">' . $model->namecve . '</span>';
+                            })
+                            ->addColumn('description', function (CVEMappingAssets $model) {
+        
+                                $html_status = '';
+                                if (@$model->severity === "") {
+                                    $dummyServerity = 'NONE';
+                                } else {
+                                    $dummyServerity = @$model->severity;
+                                }
+                                $html_status .= get_CVSS_Severity_status(@$model->cvss_score, $dummyServerity, 'badg');
+        
+                                //icon new
+                                $tz = new \DateTimeZone('Asia/Bangkok');
+                                $new_html = '';
+                                $date_day = '1900-01-01 12:51:17';
+                                if(!empty(@$model -> published)){
+                                    $date_day = @$model -> published;
+                                }
+                                $datework = Carbon::parse($date_day)->startOfDay();
+                                $datework = $datework->setTimezone($tz);
+        
+                                $date_now = Carbon::now()->startOfDay();
+                                $date_now = $date_now->setTimezone($tz);
+                                $carbondiff = $datework->diffInDays($date_now);
+                                if($carbondiff === 0){
+                                    $new_html.= '<span class="badge" style="background-color: #2196f3;">New</span>';
+                                }
+        
+                                
+                                $html = '';
+                                $html .= $new_html;
+                                $html .= '<div class="nowrap" style="margin-top:5px;height:25px;padding-top: 5px;color: #3869d4;font-weight: 800;"><strong>'. @$model->vendor.' | '.@$model->namecve.' | '.@$model->version.' | '.@$model->edition.'</strong></div>';
+                                $html .= '<div class="nowrap" style="margin-top:20px;height: 18px;width: 1000px;padding: 0;overflow: hidden;position: relative;margin: 0 5px 0 5px;text-decoration: none;text-overflow: ellipsis;white-space: nowrap;/* color: #000; */"" title="' . @$model->Hostname . '"><strong>Hostname:</strong> ' . @$model->Hostname . '&nbsp; &nbsp; ';
+                                $html .= '<div class="nowrap" style="margin-top:25px;height: 18px;width: 1000px;padding: 0;overflow: hidden;position: relative;margin: 0 5px 0 5px;text-decoration: none;text-overflow: ellipsis;white-space: nowrap;/* color: #000; */"" title="' . @$model->IP . '"><strong>IP:</strong> ' . @$model->IP . '&nbsp; &nbsp; ';
+                                
+                                if($model->count_result > 0)
+                                {
+                                    $html .= '<strong>Actor: </strong> 
+                                            <span style="display: inline-flex;align-items: center;"> 
+                                            <div class="m-r-md">';
+                                            $array_row = 1;
+                                            $count_result = @$model->count_result;
+                                            for($i = 0 ; $i < @$model->count_result ; $i++)
+                                            {
+                                                if($array_row == $count_result)
+                                                {
+                                                    $html .= '<img class="icon_sm_actor m-r-xs" src="'.@$model->logo[$i].'">
+                                                            <a href="/actor/detail?_id='.@$model->actor[$i]->adversary_uuid.'&mode=cve">'.@$model->actor[$i]->adversary_name.'</a>';
+                                                }
+                                                else
+                                                {
+                                                    $html .= '<img class="icon_sm_actor m-r-xs" src="'.@$model->logo[$i].'">
+                                                            <a href="/actor/detail?_id='.@$model->actor[$i]->adversary_uuid.'&mode=cve">'.@$model->actor[$i]->adversary_name.'</a> , ';
+                                                }
+                                                $array_row = $array_row+1;
+                                            }
+        
+                                    $html .= '</div></span>';
+                                }
+        
+                                if($model->count_campainge > 0)
+                                {
+                                    $html .= ' <span class="m-r-md">
+                                            <strong>Campainge: </strong> ';
+        
+                                            $array_row = 1;
+                                            $count_campainge = $model->count_campainge;
+                                            for($i = 0 ; $i < @$model->count_campainge ; $i++)
+                                            {
+                                                $html .= '<a href="/actor/campainge_detail?_id='.$model->campainge[$i]->adversary_uuid.'&mode=cve">';
+                                                if($array_row == $count_campainge)
+                                                {
+                                                    $html .= ''.$model->campainge[$i]->adversary_name.'';
+                                                }
+                                                else
+                                                {
+                                                    $html .= ''.$model->campainge[$i]->adversary_name.' , ';
+                                                }
+                                                $html .= '</a>';
+                                                $array_row = $array_row+1;
+                                            }
+                                            
+                                    $html .='</span> ';
+                                }
+        
+                              //  $html .= ' <span class="m-r-md"><strong>Type: </strong> <span> Passive </span></span> ';
+                                // $html .= '<span class="m-r-md"><strong>Type: </strong> <span> Active </span></span>  ';
+        
+                                $html .= '</div>';
+                                return $html;
+                            })
+                            ->addColumn('site', function (CVEMappingAssets $model) {
+                                $html = '';
+                                $html .= '<div>' . @$model->get_site->name . '</div>';
+                                return $html;
+                            })
+                            ->addColumn('hostname', function (CVEMappingAssets $model) {
+                                $html = '';
+                                $html .= '<div>' . @$model->get_cve_asset->Hostname . '</div>';
+                                return $html;
+                            })
+                            ->addColumn('ip', function (CVEMappingAssets $model) {
+                                $html = '';
+                                $html .= '<div>' . @$model->get_cve_asset->IP . '</div>';
+                                return $html;
+                            })
+                            ->addColumn('vendor', function (CVEMappingAssets $model) {
+                                $html = '';
+                                $html .= '';
+                                return $html;
+                            })
+                            ->addColumn('title', function (CVEMappingAssets $model) {
+                                $html = '';
+                                $html .= '<div>' . @$model->get_cve_asset->title . '</div>';
+                                return $html;
+                            })
+                            ->addColumn('version', function (CVEMappingAssets $model) {
+                                $html = '';
+                                $html .= '<div>' . @$model->get_cve_asset->version . '</div>';
+                                return $html;
+                            })
+                            ->addColumn('edition', function (CVEMappingAssets $model) {
+                                $html = '';
+                                $html .= '<div>' . @$model->get_cve_asset->edition . '</div>';
+                                return $html;
+                            })
+                        // ->addColumn('remark', function (CVEMapping $model) {
+                        //     return '';
+                        // })
+                        // ->addColumn('os_type', function (CVEMapping $model) {
+                        //     return '';
+                        // })
+                        // ->addColumn('delete_cpe', function (CVEMapping $model) {
+                        //     return '';
+                        // })
+        
+                        // ->addColumn('cvss_score', function (CVEMapping $model) {
+                        //     return $model->cvss_score;
+                        // })
+                            ->addColumn('cvss_severity', function (CVEMappingAssets $model) {
+                                $html = '';
+                                if ($model->severity === "") {
+                                    $dummyServerity = 'NONE';
+                                } else {
+                                    $dummyServerity = $model->severity;
+                                }
+                                $html .= get_CVSS_Severity_status($model->cvss_score, $dummyServerity, 'badg');
+                                return $html;
+                            })
+                            ->addColumn('transaction', function (CVEMappingAssets $model) {
+                                return $model->created_at;
+                            })
+                            ->editColumn(
+                                'fixed',
+                                function ($model) {
+                                    // if ($model->is_fix == 1) {
+                                    //     $checked_val = 'checked';
+                                    // } else {
+                                    //     $checked_val = '';
+                                    // }
+                                    // $html = '';
+        
+                                    // $html .= '<label class="switch">
+                                    // <input type="checkbox" id="cve_active_' . $model->id . '" onchange="monitoringvulnerabilitys_active(\'' . $model->id . '\')" ' . $checked_val . ' name="active" value="1">
+                                    // <span></span>
+                                    // </label>';
+        
+                                    return "";
+                                }
+                            )
+                            //----------------------
+                            ->addColumn(
+                                'actor', function (CVEMappingAssets $model) {
+                                    $btn_actor = '';
+                                    $btn_actor .= '';
+                                    return $btn_actor;
+                                }
+                            )
+        
+                            ->rawColumns(['chk', 'name_cve', 'description', 'cvss_severity', 'transaction', 'fixed', 'site', 'hostname', 'ip', 'vendor', 'title', 'version', 'edition'])
+                            ->toJson();
+                            $data_count = $count_row_all;
+                            $response = [
+                                "data" => $res,
+                                "recordsFiltered_count"=> $data_count,
+                                "recordsTotal_count" => $data_count,
+                            ];
+        
+                            $data_transcation = json_encode($response);
+                            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+        
+              }
+
+
 
                 $res = DataTables::of($model)
                     ->editColumn('chk', function (CVEMapping $model) {
@@ -1474,10 +1730,36 @@ class ApiCVEController extends ApiController
                     $id = $data['data']['id'];
                     $active = $data['data']['active'];
 
-                    $CVEMappingAssets = CVEMappingAssets::where("id", $id)->first();
-                        // dd($data);
-                    $CVEMappingAssets->is_fix = $active;
-                    $CVEMappingAssets->save();
+                    $asset_id = $data['data']['asset_id'];
+                    $cvename = $data['data']['cvename'];
+                    $site_id = $data['data']['site_id'];
+                    $group = $data['data']['group'];
+
+                    if($group ==2){
+                        $date_now = date('Y-m-d H:i:s');
+                        $CVEAssets_data = CVEAssets::where("id", $asset_id)->first();
+                        $CVEAssets_data_list = CVEAssets::where("vendor", $CVEAssets_data->vendor)
+                        ->where("title", $CVEAssets_data->title)
+                        ->where("version", $CVEAssets_data->version)
+                        ->where("edition", $CVEAssets_data->edition)
+                        ->where("site_id", $CVEAssets_data->site_id)->where("active", 1)->select('id')->get();
+                        foreach($CVEAssets_data_list as $data_asset_id){
+                            CVEMappingAssets::where('cve_asset_id', $data_asset_id->id)->where('namecve',$cvename)->where('site_id',$site_id)
+                                ->update([
+                                    'is_fix' => $request->active,
+                                    'updated_fix_at' => $date_now
+                                    ]);
+            
+                        }
+            
+                    }else{
+                        $date_now = date('Y-m-d H:i:s');
+                        $data = CVEMappingAssets::where("id", $id)->first();
+                        $data->is_fix = $active;
+                        $data->updated_fix_at = $date_now;
+                        $data->save();
+            
+                    }
 
                     $response = [
                         "data" => 'success',
@@ -2011,46 +2293,166 @@ class ApiCVEController extends ApiController
                     $site_id_arr = @$get_role_custom_first['site_id_arr'];
                     $assets = $data['data']['assets'];
                     $check = $data['data']['check'];
-             
+
+                    $group = $data['data']['group'];
+                    $id = $data['data']['id'];
+
+                                    if($group== 2){
+                                        $data['page'] = langapp('vulnerabilitys');
+                            
+                            
+                                        $model = CVEMapping::with('get_site')->with('get_cve_asset')->select('data_datacve_mapping.*')->distinct(); //::orderBy('id', 'desc')
+                                        //  $model =  $model->join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve');
+                                        //$model = $model->join('cve_assets','cve_assets.id','=','data_datacve_mapping_assets.cve_asset_id');
+                            
+                                    // $CVEMappingAssets_data = CVEMappingAssets::select('data_datacve_mapping_assets.namecve','site.name as site_name','data_datacve_mapping_assets.site_id','namecve as edition')->Join('site', 'data_datacve_mapping_assets.site_id', '=', 'site.id');
+                                    
+                            
+                            
+                            
+                                    $CVEMappingAssets_data = CVEMappingAssets::select('data_datacve_mapping_assets.namecve','site.name as site_name','data_datacve_mapping_assets.site_id','data_datacve_mapping.namecve as Hostname','data_datacve_mapping.description as IP','data_datacve_mapping.published','data_datacve_mapping.cvss_score','data_datacve_mapping.severity')
+                                        ->Join('site', 'data_datacve_mapping_assets.site_id', '=', 'site.id')
+                                        ->Join('data_datacve_mapping', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve');
+                            
+
+                                        if (@$get_role_custom_first['superadmin'] == 1) {
+                            
+                                        } else if (@$get_role_custom_first['client'] == 1) {
+                                            // $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+                                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_arr)->select('namecve')->get();
+                                            $model = $model->whereIn('data_datacve_mapping.namecve', $CVEMappingAssets_name);
+                            
+                                        } else if (@$get_role_custom_first['site_support'] == 1) {
+                                            //$model = $model->whereIn('site_id', $site_id_arr);
+                                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_arr)->select('namecve')->get();
+                                            $model = $model->whereIn('data_datacve_mapping.namecve', $CVEMappingAssets_name);
+                            
+                                        } else if (@$get_role_custom_first['site_admin'] == 1) {
+                                            //$model = $model->whereIn('site_id', $site_id_arr);
+                                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_arr)->select('namecve')->get();
+                                            $model = $model->whereIn('data_datacve_mapping.namecve', $CVEMappingAssets_name);
+                            
+                                        } else if (@$get_role_custom_first['site_client'] == 1) {
+                                            //$model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+                                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_arr)->select('namecve')->get();
+                                            $model = $model->whereIn('data_datacve_mapping.namecve', $CVEMappingAssets_name);
+                                        }
+                            
+                            
+                            
+                                        if ($site) {
+                            
+                                            $site_id = $site;
+                            
+                                            //$CVEMappingAssets_name = CVEMappingAssets::where('site_id',$site_id)->select('namecve')->get();
+                                            // $model = $model->whereIn('data_datacve_mapping.namecve',  $CVEMappingAssets_name);
+                            
+                                            $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.site_id', '=', $site_id);
+                                        }
+                                        $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.cve_asset_id', '=', $id);
+                            
+                                        $data['data'] =  $CVEMappingAssets_data->get();
+                                        foreach($data['data'] as $d){
+                                            $html_status = '';
+                                            if ($d['severity'] === "") {
+                                                $dummyServerity = 'NONE';
+                                            } else {
+                                                $dummyServerity = $d['severity'];
+                                            }
+                                            $html_status .= get_CVSS_Severity_status($d['cvss_score'], $dummyServerity, 'badg');
+                                            $d['title'] = '<strong>Published:'.'</strong> '.$d['published'];
+                                            $d['version'] = '';
+                                            $d['Hostname'] = $html_status.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$d['namecve'];
+                                            $d['is_fix'] = 0;
+                                            $CVEAssets_data = CVEAssets::where("id", $id)->first();
+                                            $CVEAssets_data_list = CVEAssets::where("vendor", $CVEAssets_data->vendor)
+                                            ->where("title", $CVEAssets_data->title)
+                                            ->where("version", $CVEAssets_data->version)
+                                            ->where("edition", $CVEAssets_data->edition)
+                                            ->where("site_id", $CVEAssets_data->site_id)->where("active", 1)->select('id')->get();
+                                            $cve_asset_id_list = array();
+                                            foreach($CVEAssets_data_list as $CVEAssets_data_list_data){
+                                                array_push($cve_asset_id_list,$CVEAssets_data_list_data->id);
+                                            }
+                                            $is_fix_1 = 0;
+                                        $CVEMappingAssets_is_fix_1 =   CVEMappingAssets::whereIn('cve_asset_id', $cve_asset_id_list)->where('namecve',$d['namecve'])->where('site_id',$d['site_id'])->get();
+                                        foreach($CVEMappingAssets_is_fix_1 as $CVEMappingAssets_is_fix_check){
+                                                if($CVEMappingAssets_is_fix_check->is_fix == 1){
+                                                    $is_fix_1++;
+                                                }
+                                        }
+                                        if($is_fix_1 == count($CVEMappingAssets_is_fix_1)){
+                                                $d['is_fix'] = 1;
+                                        }
+                                        
+                                        
+                                        }
+                            
+                                
+                            
+                                    
+                            
+                            
+                                 
+                                        $response = [
+                                            'data' => $data['data']
+                                        ];
+    
+                                        $data_transcation = json_encode($response);
+                                        $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                                        return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                                   
+                            
+                            
+                            
+                                    }else{
 
 
-                    if(empty($site)){
-                        $data['page'] = langapp('vulnerabilitys');
-                
-                        $CVEMappingAssets_data = CVEMappingAssets::select('data_datacve_mapping_assets.id','data_datacve_mapping_assets.namecve','data_datacve_mapping_assets.namecve','data_datacve_mapping_assets.is_fix','data_datacve_mapping_assets.site_id','data_datacve_mapping_assets.code','site.name as site_name','cve_assets.code as cve_assets_code','cve_assets.vendor','cve_assets.title','cve_assets.version','cve_assets.edition','cve_assets.IP','cve_assets.Hostname')
-                        ->Join('site', 'data_datacve_mapping_assets.site_id', '=', 'site.id')
-                        ->Join('cve_assets', 'data_datacve_mapping_assets.cve_asset_id', '=', 'cve_assets.id')
-                        ->where('data_datacve_mapping_assets.namecve',$cvename)->whereIn('data_datacve_mapping_assets.site_id',$site_id_arr);
-                    }else{
-                        $data['page'] = langapp('vulnerabilitys');
-                
-                
-                        $CVEMappingAssets_data = CVEMappingAssets::select('data_datacve_mapping_assets.id','data_datacve_mapping_assets.namecve','data_datacve_mapping_assets.namecve','data_datacve_mapping_assets.is_fix','data_datacve_mapping_assets.site_id','data_datacve_mapping_assets.code','site.name as site_name','cve_assets.code as cve_assets_code','cve_assets.vendor','cve_assets.title','cve_assets.version','cve_assets.edition','cve_assets.IP','cve_assets.Hostname')
-                        ->Join('site', 'data_datacve_mapping_assets.site_id', '=', 'site.id')
-                        ->Join('cve_assets', 'data_datacve_mapping_assets.cve_asset_id', '=', 'cve_assets.id')
-                        ->where('data_datacve_mapping_assets.namecve',$cvename)->where('data_datacve_mapping_assets.site_id',$site)->whereIn('data_datacve_mapping_assets.site_id',$site_id_arr);
-                
-                    }
-                    if ($assets) {
-                        $CVEMappingAssets_data =  $CVEMappingAssets_data->where('cve_assets.title', '=', $assets);
-                    }
-                
-                    if($check==1){
-                        $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', $check);
-                    } else if($check==2) {
-                      $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', 0);
-                    }else{
-                        $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', 0);
-                    }
-                
-                    
-                    $response = [
-                        'data' => $CVEMappingAssets_data->get()
-                    ];
 
-                    $data_transcation = json_encode($response);
-                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+
+
+                            
+
+
+                                    if(empty($site)){
+                                        $data['page'] = langapp('vulnerabilitys');
+                                
+                                        $CVEMappingAssets_data = CVEMappingAssets::select('data_datacve_mapping_assets.id','data_datacve_mapping_assets.namecve','data_datacve_mapping_assets.namecve','data_datacve_mapping_assets.is_fix','data_datacve_mapping_assets.site_id','data_datacve_mapping_assets.code','site.name as site_name','cve_assets.code as cve_assets_code','cve_assets.vendor','cve_assets.title','cve_assets.version','cve_assets.edition','cve_assets.IP','cve_assets.Hostname')
+                                        ->Join('site', 'data_datacve_mapping_assets.site_id', '=', 'site.id')
+                                        ->Join('cve_assets', 'data_datacve_mapping_assets.cve_asset_id', '=', 'cve_assets.id')
+                                        ->where('data_datacve_mapping_assets.namecve',$cvename)->whereIn('data_datacve_mapping_assets.site_id',$site_id_arr);
+                                    }else{
+                                        $data['page'] = langapp('vulnerabilitys');
+                                
+                                
+                                        $CVEMappingAssets_data = CVEMappingAssets::select('data_datacve_mapping_assets.id','data_datacve_mapping_assets.namecve','data_datacve_mapping_assets.namecve','data_datacve_mapping_assets.is_fix','data_datacve_mapping_assets.site_id','data_datacve_mapping_assets.code','site.name as site_name','cve_assets.code as cve_assets_code','cve_assets.vendor','cve_assets.title','cve_assets.version','cve_assets.edition','cve_assets.IP','cve_assets.Hostname')
+                                        ->Join('site', 'data_datacve_mapping_assets.site_id', '=', 'site.id')
+                                        ->Join('cve_assets', 'data_datacve_mapping_assets.cve_asset_id', '=', 'cve_assets.id')
+                                        ->where('data_datacve_mapping_assets.namecve',$cvename)->where('data_datacve_mapping_assets.site_id',$site)->whereIn('data_datacve_mapping_assets.site_id',$site_id_arr);
+                                
+                                    }
+                                    if ($assets) {
+                                        $CVEMappingAssets_data =  $CVEMappingAssets_data->where('cve_assets.title', '=', $assets);
+                                    }
+                                
+                                    if($check==1){
+                                        $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', $check);
+                                    } else if($check==2) {
+                                    $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', 0);
+                                    }else{
+                                        $CVEMappingAssets_data = $CVEMappingAssets_data->where('data_datacve_mapping_assets.is_fix', '=', 0);
+                                    }
+                                
+                                    
+                                    $response = [
+                                        'data' => $CVEMappingAssets_data->get()
+                                    ];
+
+                                    $data_transcation = json_encode($response);
+                                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                               
+                                }
                 }
             }
         } catch (\Exception $e) {
