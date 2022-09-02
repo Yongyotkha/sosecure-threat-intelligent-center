@@ -221,6 +221,17 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
 
     // actor
     Route::post('actor/ActorIndex', 'Api\ApiActorController@ActorIndex');
+    Route::post('actor/ActorDataTable', 'Api\ApiActorController@ActorDataTable');
+    Route::post('actor/CampDataTable', 'Api\ApiActorController@CampDataTable');
+    Route::post('actor/TechDataTable', 'Api\ApiActorController@TechDataTable');
+    Route::post('actor/chart_actor', 'Api\ApiActorController@chart_actor');
+    Route::post('actor/chart_techniques', 'Api\ApiActorController@chart_techniques');
+    Route::post('actor/ActorDetailRelatedNew', 'Api\ApiActorController@ActorDetailRelatedNew');
+    Route::post('actor/ActorDetailRelatedCVE', 'Api\ApiActorController@ActorDetailRelatedCVE');
+    Route::post('actor/ActorDetailRelatedIndi', 'Api\ApiActorController@ActorDetailRelatedIndi');
+    Route::post('actor/ActorDetailRelatedCampainge', 'Api\ApiActorController@ActorDetailRelatedCampainge');
+    Route::post('actor/ActorDetail', 'Api\ApiActorController@ActorDetail');
+    Route::post('actor/CampaingeDetail', 'Api\ApiActorController@CampaingeDetail');
 });
 
 Route::group(['prefix' => 'v1/client-transfer'], function () {

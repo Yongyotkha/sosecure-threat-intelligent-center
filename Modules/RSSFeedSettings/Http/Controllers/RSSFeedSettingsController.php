@@ -729,7 +729,7 @@ class RSSFeedSettingsController extends Controller
                             $count_campainge = $model->count_campainge;
                             for($i = 0 ; $i < @$model->count_campainge ; $i++)
                             {
-                                $html .= '<a href="/actor/campainge_detail?_id='.$model->campainge[$i]->adversary_uuid.'&mode=cve">';
+                                $html .= '<a href="/actor/campainge_detail?_id='.$model->campainge[$i]->adversary_uuid.'&mode=news">';
                                 if($array_row == $count_campainge)
                                 {
                                     $html .= ''.$model->campainge[$i]->adversary_name.'';
