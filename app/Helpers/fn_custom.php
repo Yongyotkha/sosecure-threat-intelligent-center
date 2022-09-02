@@ -378,6 +378,7 @@ function check_permission_site_custom_api($user_id, $menu) {
             if (in_array("54735dbb-6987-4a7b-8aa3-121538aaad50", $result_menu_permission)){$arr['monitoring'] = 1;}
             if (in_array("z9b362a5-3789-445a-bd6c-846393ffd19x", $result_menu_permission)){$arr['brand_abuse'] = 1;}
             if (in_array("556e3907-5n3f-4b32-9db4-a25dv9fbab08", $result_menu_permission)){$arr['phishing_detection'] = 1;}
+            if (in_array("54735dbb-6987-4a7b-8aa3-121538aaa888", $result_menu_permission)){$arr['actor'] = 1;}
             
         } else {
             if (in_array("45e03854-cc2c-485e-9ac0-81b0350bdec0", $result_user_menu_permission)){$arr['dashboard'] = 1;}
@@ -393,6 +394,7 @@ function check_permission_site_custom_api($user_id, $menu) {
             if (in_array("54735dbb-6987-4a7b-8aa3-121538aaad50", $result_user_menu_permission)){$arr['monitoring'] = 1;}
             if (in_array("z9b362a5-3789-445a-bd6c-846393ffd19x", $result_user_menu_permission)){$arr['brand_abuse'] = 1;}
             if (in_array("556e3907-5n3f-4b32-9db4-a25dv9fbab08", $result_user_menu_permission)){$arr['phishing_detection'] = 1;}
+            if (in_array("54735dbb-6987-4a7b-8aa3-121538aaa888", $result_user_menu_permission)){$arr['actor'] = 1;}
         }
             
 
