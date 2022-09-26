@@ -62,6 +62,7 @@ class DashboardNewController extends Controller
      */
     public function index()
     {
+       
         $role_custom = @check_role_custom();
         if(!$role_custom['dashboard']) {
             check_permission403();
@@ -1420,34 +1421,42 @@ public function chart_indicators(Request $request){
 public function load_chart(Request $request)
 {
     //   $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
-
-
+    
     if(Auth::check()) {
         $role_custom = @check_role_custom();
         if($role_custom['vulnerabilities']) {
             $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+          
             if(@get_role_custom()['superadmin'] == 1) {
                 if(!$request -> site){
-                  $model = new CVEMapping;
-                  $model->get();
-                  $high = $model->where('severity', '=', 'HIGH')->count();
-                  $medium = $model->where('severity', '=', 'MEDIUM')->count();
-                  $critical = $model->where('severity', '=', 'CRITICAL')->count();
-                  $low = $model->where('severity', '=', 'LOW')->count();
-                  $none = $model->where('severity', '=', 'NONE')->count();
-              }else{
-                 $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                 $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_id_m->id)->select('namecve')->get();
-                 $model = new CVEMapping;
-                 $model->get();
-                 $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                 $high = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'HIGH')->count();
-                 $medium = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'MEDIUM')->count();
-                 $critical = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'CRITICAL')->count();
-                 $low = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'LOW')->count();
-                 $none = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'NONE')->count();
-             }
-         } else {
+                    $model = new CVEMapping;
+                   
+                    $model->get();
+                    $high = $model->where('severity', '=', 'HIGH')->count();
+                    
+                    $medium = $model->where('severity', '=', 'MEDIUM')->count();
+                    $critical = $model->where('severity', '=', 'CRITICAL')->count();
+                    $low = $model->where('severity', '=', 'LOW')->count();
+                    $none = $model->where('severity', '=', 'NONE')->count();
+              }else{   
+                $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_id_m->id)->select('namecve')->get();
+                $model = new CVEMapping;
+                
+                $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                $high = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'HIGH')->count();
+                $medium = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'MEDIUM')->count();
+                $critical = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'CRITICAL')->count();
+                $low = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'LOW')->count();
+                $none = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'NONE')->count();  
+                
+                $query = DB::table('summary')
+                    ->where('status', 'Y')
+                    ->get();
+               
+            }
+
+         }else {
             if(!$request -> site){
                $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_arr)->select('namecve')->get();
                $model = new CVEMapping;
@@ -1469,7 +1478,7 @@ public function load_chart(Request $request)
                $none = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'NONE')->count();
            }
        }
-   }
+    }
 }
 
 

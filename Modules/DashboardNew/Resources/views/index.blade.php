@@ -1030,7 +1030,7 @@ Highcharts.setOptions({
                 $(".loadvulserverity").show();
             },
         }).done(function(data){
-
+            
             $(".loadvulserverity").hide();
 
             const chart_pie = new Highcharts.chart('chart-show-pie', {
