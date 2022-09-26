@@ -62,6 +62,7 @@ class DashboardNewController extends Controller
      */
     public function index()
     {
+       
         $role_custom = @check_role_custom();
         if(!$role_custom['dashboard']) {
             check_permission403();
@@ -1483,14 +1484,6 @@ public function load_chart(Request $request)
         }
     }
 
-
-
-
-        // $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
-        // $clientMD = new MongoClient($DB_MONGO_KEY);
-        // $html = '';
-        // $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
-
     if($request->ajax()) 
     {
         $data = [
@@ -1504,5 +1497,4 @@ public function load_chart(Request $request)
         return response()->json($data);
     }
 }
-
 }
