@@ -20,7 +20,11 @@ use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
 use App\SiteAgentExtention;
 use App\SiteAgentIgnore;
+use App\HashDetection;
 use DB;
+use MongoDB\Client as MongoClient;
+use MongoDB\BSON\UTCDateTime;
+use Symfony\Polyfill\Intl\Idn\Resources\unidata\Regex;
 
 class ApiAgentController extends ApiController
 {
@@ -900,6 +904,96 @@ class ApiAgentController extends ApiController
                         'error' => '', 
                         'status_code' => 200,
                         'data' => $rules
+                    ];
+                }else{
+                    $response = [
+                        'error' => 'Data not found', 
+                        'status_code' => 200,
+                        'data' => []
+                    ];
+                }
+            }
+
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'error' => $e -> getMessage(),
+            );
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 500, 'data' => $datas]);
+        }
+    }
+
+    public function sendHash(Request $request){
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            if ($data === false) {
+                $response =[
+                    'error' => 'The request parameters are invalid',
+                    'status_code' => 400,
+                    'data' => []
+                ];
+            } else {
+                $data_key = $data['data'];
+                $ip_private = $data_key['ip_private'];
+                $hash_data = $data_key['data'];
+                $dataFound = [];
+
+                $siteAgentsHasData = FXSiteAgents::select('id', 'batchjob_everydate', 'real_time_protection', 'extention_all_flag')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
+                if($siteAgentsHasData){
+                    foreach($hash_data as $item){
+                        $hash = $item['hash'];
+                        $type = $item['type'];
+                        $path = $item['path'];
+
+                        $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+                        $clientMD = new MongoClient($DB_MONGO_KEY);
+                        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+
+                        $options = [
+                            'sort' => [
+                                'updated_at' => -1
+                            ]
+                        ];
+
+                        $dt1 = date("Y-m-d", strtotime("-90 day"));
+                        $dt2 = date("Y-m-d", strtotime("-1 day"));
+                            
+                        $query = array( 
+                            // 'created_at' => array('$gte' => new UTCDateTime(strtotime("$dt1")* 1000), '$lte' => new UTCDateTime(strtotime("$dt2")* 1000)),
+                            'type' => $type,
+                            'indicator_name' => $hash
+                        );
+
+                        $cursor = $col_fx_otx_indicator_detail->find($query,$options);
+                        if(!empty($cursor)){
+                            foreach ($cursor as $document){
+                                $hashDetection = new HashDetection();
+                                $hashDetection -> site_id = $data['site']['data']['id'];
+                                $hashDetection -> agent_id = $siteAgentsHasData -> id;
+                                $hashDetection -> indicator_id = $document['indicator_id'];
+                                $hashDetection -> type = $document["type"];
+                                $hashDetection -> path = $path;
+                                $hashDetection -> hash = $document['indicator_name'];
+                                $hashDetection -> status = 1;
+                                $hashDetection -> save();
+
+                                $dataFound[] = $hashDetection;
+                            }
+                        }
+                    }
+
+                    $response = [
+                        'error' => '', 
+                        'status_code' => 200,
+                        'data' => $dataFound
                     ];
                 }else{
                     $response = [
