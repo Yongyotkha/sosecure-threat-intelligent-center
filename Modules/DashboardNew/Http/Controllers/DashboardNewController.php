@@ -1432,19 +1432,21 @@ public function load_chart(Request $request)
             $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
             if(@get_role_custom()['superadmin'] == 1) 
             {
+                
                 if(!$request -> site)
                 {
-                    $model = new CVEMapping;
-                    $model->get();
-                    $high = $model->where('severity', '=', 'HIGH')->count();
-                    $medium = $model->where('severity', '=', 'MEDIUM')->count();
-                    $critical = $model->where('severity', '=', 'CRITICAL')->count();
-                    $low = $model->where('severity', '=', 'LOW')->count();
-                    $none = $model->where('severity', '=', 'NONE')->count();
+                    // $model = new CVEMapping;
+                    // $model->get();
+                    // $high = $model->where('severity', '=', 'HIGH')->count();
+                    // $medium = $model->where('severity', '=', 'MEDIUM')->count();
+                    // $critical = $model->where('severity', '=', 'CRITICAL')->count();
+                    // $low = $model->where('severity', '=', 'LOW')->count();
+                    // $none = $model->where('severity', '=', 'NONE')->count();
 
                     $none = DB::table('summary')
                         ->where('status', 'Y')
                         ->where('data_text', 'Information')
+                        ->where('data_key_2', 'Vulnerability')
                         ->select( DB::raw('sum(data_value) as sum'))
                         ->first()
                         ->sum;
@@ -1453,6 +1455,7 @@ public function load_chart(Request $request)
                     $low = DB::table('summary')
                         ->where('status', 'Y')
                         ->where('data_text', 'Low')
+                        ->where('data_key_2', 'Vulnerability')
                         ->select( DB::raw('sum(data_value) as sum'))
                         ->first()
                         ->sum;
@@ -1461,6 +1464,7 @@ public function load_chart(Request $request)
                     $medium = DB::table('summary')
                         ->where('status', 'Y')
                         ->where('data_text', 'Medium')
+                        ->where('data_key_2', 'Vulnerability')
                         ->select( DB::raw('sum(data_value) as sum'))
                         ->first()
                         ->sum;
@@ -1469,6 +1473,7 @@ public function load_chart(Request $request)
                     $high = DB::table('summary')
                         ->where('status', 'Y')
                         ->where('data_text', 'High')
+                        ->where('data_key_2', 'Vulnerability')
                         ->select( DB::raw('sum(data_value) as sum'))
                         ->first()
                         ->sum;
@@ -1477,6 +1482,7 @@ public function load_chart(Request $request)
                     $critical = DB::table('summary')
                         ->where('status', 'Y')
                         ->where('data_text', 'Critical')
+                        ->where('data_key_2', 'Vulnerability')
                         ->select( DB::raw('sum(data_value) as sum'))
                         ->first()
                         ->sum;
@@ -1486,11 +1492,12 @@ public function load_chart(Request $request)
                 }
                 else
                 {
-                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                    $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_id_m->id)->select('namecve')->get();
-                    $model = new CVEMapping;
-                    $model->get();
-                    $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    // $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+                    // $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_id_m->id)->select('namecve')->get();
+                    // $model = new CVEMapping;
+                    // $model->get();
+                    // $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
+
                     // $high = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'HIGH')->count();
                     // $medium = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'MEDIUM')->count();
                     // $critical = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'CRITICAL')->count();
@@ -1501,6 +1508,7 @@ public function load_chart(Request $request)
                         ->where('site', $request->site)
                         ->where('status', 'Y')
                         ->where('data_text', 'Information')
+                        ->where('data_key_2', 'Vulnerability')
                         ->select('data_value')
                         ->first()
                         ->data_value;
@@ -1510,6 +1518,7 @@ public function load_chart(Request $request)
                         ->where('site', $request->site)
                         ->where('status', 'Y')
                         ->where('data_text', 'Low')
+                        ->where('data_key_2', 'Vulnerability')
                         ->select('data_value')
                         ->first()
                         ->data_value;
@@ -1519,6 +1528,7 @@ public function load_chart(Request $request)
                         ->where('site', $request->site)
                         ->where('status', 'Y')
                         ->where('data_text', 'Medium')
+                        ->where('data_key_2', 'Vulnerability')
                         ->select('data_value')
                         ->first()
                         ->data_value;
@@ -1528,21 +1538,21 @@ public function load_chart(Request $request)
                         ->where('site', $request->site)
                         ->where('status', 'Y')
                         ->where('data_text', 'High')
+                        ->where('data_key_2', 'Vulnerability')
                         ->select('data_value')
                         ->first()
                         ->data_value;
                     $high = intval($high);
                     
-                        
                     $critical = DB::table('summary')
                         ->where('site', $request->site)
                         ->where('status', 'Y')
                         ->where('data_text', 'Critical')
+                        ->where('data_key_2', 'Vulnerability')
                         ->select('data_value')
                         ->first()
                         ->data_value;
                     $critical = intval($critical);
-
 
                 }
             } 

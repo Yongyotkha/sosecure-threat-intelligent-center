@@ -496,7 +496,7 @@ class Client
      *
      * @link https://www.dropbox.com/developers/documentation/http/documentation#files-upload_session-start
      *
-     * @param string|StreamInterface $contents
+     * @param string|resource|StreamInterface $contents
      * @param bool $close
      *
      * @return UploadSessionCursor
@@ -544,7 +544,7 @@ class Client
      *
      * @link https://www.dropbox.com/developers/documentation/http/documentation#files-upload_session-finish
      *
-     * @param string|StreamInterface $contents
+     * @param string|resource|StreamInterface $contents
      * @param \Spatie\Dropbox\UploadSessionCursor $cursor
      * @param string $path
      * @param string|array $mode
@@ -622,7 +622,7 @@ class Client
      *
      * @throws \Exception
      */
-    public function contentEndpointRequest(string $endpoint, array $arguments, $body = ''): ResponseInterface
+    public function contentEndpointRequest(string $endpoint, array $arguments, $body = '', bool $isRefreshed = false): ResponseInterface
     {
         $headers = ['Dropbox-API-Arg' => json_encode($arguments)];
 
@@ -636,13 +636,20 @@ class Client
                 'body' => $body,
             ]);
         } catch (ClientException $exception) {
-            throw $this->determineException($exception);
+            if (
+                $isRefreshed
+                || ! $this->tokenProvider instanceof RefreshableTokenProvider
+                || ! $this->tokenProvider->refresh($exception)
+            ) {
+                throw $this->determineException($exception);
+            }
+            $response = $this->contentEndpointRequest($endpoint, $arguments, $body, true);
         }
 
         return $response;
     }
 
-    public function rpcEndpointRequest(string $endpoint, array $parameters = null): array
+    public function rpcEndpointRequest(string $endpoint, array $parameters = null, bool $isRefreshed = false): array
     {
         try {
             $options = ['headers' => $this->getHeaders()];
@@ -653,12 +660,18 @@ class Client
 
             $response = $this->client->post($this->getEndpointUrl('api', $endpoint), $options);
         } catch (ClientException $exception) {
-            throw $this->determineException($exception);
+            if (
+                $isRefreshed
+                || ! $this->tokenProvider instanceof RefreshableTokenProvider
+                || ! $this->tokenProvider->refresh($exception)
+            ) {
+                throw $this->determineException($exception);
+            }
+
+            return $this->rpcEndpointRequest($endpoint, $parameters, true);
         }
 
-        $response = json_decode($response->getBody(), true);
-
-        return $response ?? [];
+        return json_decode($response->getBody(), true) ?? [];
     }
 
     protected function determineException(ClientException $exception): Exception

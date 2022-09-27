@@ -537,14 +537,20 @@ Highcharts.setOptions({
     }
 
     $( document ).ready(function() {
+        
         $("#clearValue").addClass('active');
+
         @if($role_custom['indicators'])
-        chart_indicators();
+            chart_indicators();
         @endif
+
         if(get_cookie_site()){
-            cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site);
+            cookie_change_site("{{route('systemsetting.check_cookie_site')}}", id_select_site);
         }else{
             data_table();
+            @if($role_custom['vulnerabilities'])
+                load_chart();
+            @endif
             @if($role_custom['assets'])
                 count_asset();
             @endif
@@ -560,9 +566,7 @@ Highcharts.setOptions({
             @if($role_custom['vulnerabilities'])
                 count_vulnerability_host();
             @endif
-            @if($role_custom['vulnerabilities'])
-                load_chart();
-            @endif
+            
             @if($role_custom['assets'])
                 cve_assets();
             @endif

@@ -9,7 +9,6 @@ return array(
     'UpdateHelper\\' => array($vendorDir . '/kylekatarnls/update-helper/src'),
     'Twocheckout' => array($vendorDir . '/2checkout/2checkout-php/lib'),
     'Sentry\\Laravel\\' => array($vendorDir . '/sentry/sentry-laravel/src'),
-    'Requests' => array($vendorDir . '/rmccue/requests/library'),
     'Pimple' => array($vendorDir . '/pimple/pimple/src'),
     'Parsedown' => array($vendorDir . '/erusev/parsedown'),
     'OAuth\\Unit' => array($vendorDir . '/lusitanian/oauth/tests'),

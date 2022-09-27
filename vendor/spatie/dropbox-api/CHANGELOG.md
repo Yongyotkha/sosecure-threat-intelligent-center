@@ -2,6 +2,22 @@
 
 All notable changes to `dropbox-api` will be documented in this file
 
+## 1.20.1 - 2022-03-29
+
+## What's Changed
+
+- Fix refreshable token response by @einarsozols in https://github.com/spatie/dropbox-api/pull/100
+
+## New Contributors
+
+- @einarsozols made their first contribution in https://github.com/spatie/dropbox-api/pull/100
+
+**Full Changelog**: https://github.com/spatie/dropbox-api/compare/1.20.0...1.20.1
+
+## Unreleased
+
+- Added refreshable token provider interface.
+
 ## 1.19.1 - 2021-07-04
 
 - fix compability with guzzlehttp/psr7 2.0 (#91)
@@ -27,6 +43,7 @@ All notable changes to `dropbox-api` will be documented in this file
 - allow PHP 8
 
 ## 1.16.0 - 2020-09-25
+
 - allow the Client to work with Dropbox business accounts
 
 ## 1.15.0 - 2020-07-09
