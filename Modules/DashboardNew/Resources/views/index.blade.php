@@ -491,29 +491,31 @@ Highcharts.setOptions({
 
     
     function changeSite(value) {
+       
         set_cookie_site($(`#${id_select_site}`).val());
         site = value;
         data_table();
         @if($role_custom['assets'])
-        count_asset();
+            count_asset();
         @endif
         @if($role_custom['vulnerabilities'])
-        count_vulnerability();
+            count_vulnerability();
         @endif
         @if($role_custom['compromised'])
-        count_compromised();
+            count_compromised();
         @endif
         @if($role_custom['data_leak'])
-        count_data_leak();
+            count_data_leak();
         @endif
+        
         @if($role_custom['vulnerabilities'])
-        count_vulnerability_host();
-        @endif
-        @if($role_custom['vulnerabilities'])
-        load_chart();
+            load_chart();
         @endif
         @if($role_custom['assets'])
-        cve_assets();
+            cve_assets();
+        @endif 
+        @if($role_custom['vulnerabilities'])
+            count_vulnerability_host();
         @endif
     }
 
@@ -547,10 +549,11 @@ Highcharts.setOptions({
         if(get_cookie_site()){
             cookie_change_site("{{route('systemsetting.check_cookie_site')}}", id_select_site);
         }else{
-            data_table();
+           
             @if($role_custom['vulnerabilities'])
                 load_chart();
             @endif
+
             @if($role_custom['assets'])
                 count_asset();
             @endif
@@ -563,13 +566,14 @@ Highcharts.setOptions({
             @if($role_custom['data_leak'])
                 count_data_leak();
             @endif
+           
+            @if($role_custom['assets'])
+                cve_assets();
+            @endif 
             @if($role_custom['vulnerabilities'])
                 count_vulnerability_host();
             @endif
-            
-            @if($role_custom['assets'])
-                cve_assets();
-            @endif
+            data_table();
         }
         
         {{--document.getElementById('current-date').innerHTML = today_date;--}}
