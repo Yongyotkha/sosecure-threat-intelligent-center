@@ -492,12 +492,16 @@ Highcharts.setOptions({
     
     function changeSite(value) {
        
-        set_cookie_site($(`#${id_select_site}`).val());
+        
         site = value;
-        data_table();
+
         @if($role_custom['assets'])
             count_asset();
         @endif
+        @if($role_custom['vulnerabilities'])
+            load_chart();
+        @endif
+
         @if($role_custom['vulnerabilities'])
             count_vulnerability();
         @endif
@@ -507,16 +511,16 @@ Highcharts.setOptions({
         @if($role_custom['data_leak'])
             count_data_leak();
         @endif
-        
-        @if($role_custom['vulnerabilities'])
-            load_chart();
-        @endif
+          
         @if($role_custom['assets'])
             cve_assets();
         @endif 
         @if($role_custom['vulnerabilities'])
             count_vulnerability_host();
         @endif
+
+        data_table();
+        set_cookie_site($(`#${id_select_site}`).val());
     }
 
     function clearValue(value) {
@@ -573,6 +577,7 @@ Highcharts.setOptions({
             @if($role_custom['vulnerabilities'])
                 count_vulnerability_host();
             @endif
+            
             data_table();
         }
         

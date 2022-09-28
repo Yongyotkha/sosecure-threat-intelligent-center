@@ -1443,50 +1443,66 @@ public function load_chart(Request $request)
                     // $low = $model->where('severity', '=', 'LOW')->count();
                     // $none = $model->where('severity', '=', 'NONE')->count();
 
-                    $none = DB::table('summary')
-                        ->where('status', 'Y')
-                        ->where('data_text', 'Information')
-                        ->where('data_key_2', 'Vulnerability')
-                        ->select( DB::raw('sum(data_value) as sum'))
-                        ->first()
-                        ->sum;
-                    $none = intval($none);
+                    $query = $none = DB::table('summary')
+                                ->where('status', 'Y')
+                                ->whereIn('data_text', ['Information','Low', 'medium', 'high', 'critical'])
+                                ->where('data_key_2', 'Vulnerability')
+                                ->select('data_text', DB::raw('sum(data_value) as data_value'))
+                                ->groupBy('data_text')
+                                ->orderBy('data_text')
+                                ->get();
 
-                    $low = DB::table('summary')
-                        ->where('status', 'Y')
-                        ->where('data_text', 'Low')
-                        ->where('data_key_2', 'Vulnerability')
-                        ->select( DB::raw('sum(data_value) as sum'))
-                        ->first()
-                        ->sum;
-                    $low = intval($low);
+                    $none = intval($query[2]->data_value);
+                    $low = intval($query[3]->data_value);
+                    $medium = intval($query[4]->data_value);
+                    $high = intval($query[1]->data_value);
+                    $critical = intval($query[0]->data_value);
 
-                    $medium = DB::table('summary')
-                        ->where('status', 'Y')
-                        ->where('data_text', 'Medium')
-                        ->where('data_key_2', 'Vulnerability')
-                        ->select( DB::raw('sum(data_value) as sum'))
-                        ->first()
-                        ->sum;
-                    $medium = intval($medium);
+                   
+                    // $none = DB::table('summary')
+                    //     ->where('status', 'Y')
+                    //     ->where('data_text', 'Information')
+                    //     ->where('data_key_2', 'Vulnerability')
+                    //     ->select( DB::raw('sum(data_value) as sum'))
+                    //     ->first()
+                    //     ->sum;
+                    // $none = intval($none);
 
-                    $high = DB::table('summary')
-                        ->where('status', 'Y')
-                        ->where('data_text', 'High')
-                        ->where('data_key_2', 'Vulnerability')
-                        ->select( DB::raw('sum(data_value) as sum'))
-                        ->first()
-                        ->sum;
-                    $high = intval($high);
+                    // $low = DB::table('summary')
+                    //     ->where('status', 'Y')
+                    //     ->where('data_text', 'Low')
+                    //     ->where('data_key_2', 'Vulnerability')
+                    //     ->select( DB::raw('sum(data_value) as sum'))
+                    //     ->first()
+                    //     ->sum;
+                    // $low = intval($low);
 
-                    $critical = DB::table('summary')
-                        ->where('status', 'Y')
-                        ->where('data_text', 'Critical')
-                        ->where('data_key_2', 'Vulnerability')
-                        ->select( DB::raw('sum(data_value) as sum'))
-                        ->first()
-                        ->sum;
-                    $critical = intval($critical);
+                    // $medium = DB::table('summary')
+                    //     ->where('status', 'Y')
+                    //     ->where('data_text', 'Medium')
+                    //     ->where('data_key_2', 'Vulnerability')
+                    //     ->select( DB::raw('sum(data_value) as sum'))
+                    //     ->first()
+                    //     ->sum;
+                    // $medium = intval($medium);
+
+                    // $high = DB::table('summary')
+                    //     ->where('status', 'Y')
+                    //     ->where('data_text', 'High')
+                    //     ->where('data_key_2', 'Vulnerability')
+                    //     ->select( DB::raw('sum(data_value) as sum'))
+                    //     ->first()
+                    //     ->sum;
+                    // $high = intval($high);
+
+                    // $critical = DB::table('summary')
+                    //     ->where('status', 'Y')
+                    //     ->where('data_text', 'Critical')
+                    //     ->where('data_key_2', 'Vulnerability')
+                    //     ->select( DB::raw('sum(data_value) as sum'))
+                    //     ->first()
+                    //     ->sum;
+                    // $critical = intval($critical);
                     
 
                 }
@@ -1507,56 +1523,73 @@ public function load_chart(Request $request)
                     $count= DB::table('summary')->where('data_key', 'dashboardnew')->where('site', $request->site)->count();
 
                     if($count > 0){
-                        $none = DB::table('summary')
-                            ->where('site', $request->site)
-                            ->where('status', 'Y')
-                            ->where('data_text', 'Information')
-                            ->where('data_key_2', 'Vulnerability')
-                            ->select('data_value')
-                            ->first()
-                            ->data_value;
+
+                        $query =  $none = DB::table('summary')
+                                ->where('site', $request->site)
+                                ->where('status', 'Y')
+                                ->whereIn('data_text', ['Information','Low', 'medium', 'high', 'critical'])
+                                ->where('data_key_2', 'Vulnerability')
+                                ->select('data_text','data_value')
+                                ->orderBy('data_text')
+                                ->get();
+                               
+                        $none = intval($query[2]->data_value);
+                        $low = intval($query[3]->data_value);
+                        $medium = intval($query[4]->data_value);
+                        $high = intval($query[1]->data_value);
+                        $critical = intval($query[0]->data_value);
+                        
+                        // $none = DB::table('summary')
+                        //     ->where('site', $request->site)
+                        //     ->where('status', 'Y')
+                        //     ->where('data_text', 'Information')
+                        //     ->where('data_key_2', 'Vulnerability')
+                        //     ->select('data_value')
+                        //     ->first()
+                        //     ->data_value;
+                        // $none = intval($none);
                     
-                        $none = intval($none);
+                        
+                        
+                        // $low = DB::table('summary')
+                        //     ->where('site', $request->site)
+                        //     ->where('status', 'Y')
+                        //     ->where('data_text', 'Low')
+                        //     ->where('data_key_2', 'Vulnerability')
+                        //     ->select('data_value')
+                        //     ->first()
+                        //     ->data_value;
+                        // $low = intval($low);
 
-                        $low = DB::table('summary')
-                            ->where('site', $request->site)
-                            ->where('status', 'Y')
-                            ->where('data_text', 'Low')
-                            ->where('data_key_2', 'Vulnerability')
-                            ->select('data_value')
-                            ->first()
-                            ->data_value;
-                        $low = intval($low);
+                        // $medium = DB::table('summary')
+                        //     ->where('site', $request->site)
+                        //     ->where('status', 'Y')
+                        //     ->where('data_text', 'Medium')
+                        //     ->where('data_key_2', 'Vulnerability')
+                        //     ->select('data_value')
+                        //     ->first()
+                        //     ->data_value;
+                        // $medium = intval($medium);   
 
-                        $medium = DB::table('summary')
-                            ->where('site', $request->site)
-                            ->where('status', 'Y')
-                            ->where('data_text', 'Medium')
-                            ->where('data_key_2', 'Vulnerability')
-                            ->select('data_value')
-                            ->first()
-                            ->data_value;
-                        $medium = intval($medium);   
-
-                        $high = DB::table('summary')
-                            ->where('site', $request->site)
-                            ->where('status', 'Y')
-                            ->where('data_text', 'High')
-                            ->where('data_key_2', 'Vulnerability')
-                            ->select('data_value')
-                            ->first()
-                            ->data_value;
-                        $high = intval($high);
+                        // $high = DB::table('summary')
+                        //     ->where('site', $request->site)
+                        //     ->where('status', 'Y')
+                        //     ->where('data_text', 'High')
+                        //     ->where('data_key_2', 'Vulnerability')
+                        //     ->select('data_value')
+                        //     ->first()
+                        //     ->data_value;
+                        // $high = intval($high);
                     
-                        $critical = DB::table('summary')
-                            ->where('site', $request->site)
-                            ->where('status', 'Y')
-                            ->where('data_text', 'Critical')
-                            ->where('data_key_2', 'Vulnerability')
-                            ->select('data_value')
-                            ->first()
-                            ->data_value;
-                        $critical = intval($critical);
+                        // $critical = DB::table('summary')
+                        //     ->where('site', $request->site)
+                        //     ->where('status', 'Y')
+                        //     ->where('data_text', 'Critical')
+                        //     ->where('data_key_2', 'Vulnerability')
+                        //     ->select('data_value')
+                        //     ->first()
+                        //     ->data_value;
+                        // $critical = intval($critical);
                     } else{
                         $none = 0;
                         $low = 0;
