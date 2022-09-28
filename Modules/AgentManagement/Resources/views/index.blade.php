@@ -579,9 +579,10 @@
                                                             <th>Path</th> --}}
                                                             {{-- <th>Date Scan</th>
                                                             <th>Date Last Scan</th> --}}
+                                                            <th>Channel</th>
                                                             <th>Severity</th>
-                                                            <th>Datetime</th>
-                                                            <th class="text-center">Ignore</th>
+                                                            <th style="width:140px; max-width: 140px;">Datetime</th>
+                                                            <th>Ignore</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -950,6 +951,17 @@
         datatable_alert();
         datatable_agent();
         datatable_schedule();
+
+        setInterval(() => {   
+            count_head();
+            datachart_Incident();
+            datachart_platform();
+            datachart_severity();
+            datachart_rule();
+            dudit_log_feed();
+            datachart_timeline();
+        }, 60000);
+
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
         })
@@ -1216,11 +1228,11 @@
                                                 Site : ${data_log.site_name}
                                             </span>
                                             <span class="audit-time">
-                                                IP : ${data_log.agent_logs_ip_address}
+                                                IP : ${data_log.agent_logs_ip_address ? data_log.agent_logs_ip_address : ' - '}
                                             </span>
                                         </div>
                                         <span class="audit-log-header">
-                                            ${data_log.agent_logs_created} | ${data_log.agent_logs_description}
+                                            ${data_log.agent_logs_created ? data_log.agent_logs_created : ' - '} | ${data_log.agent_logs_description ? data_log.agent_logs_description : ' - '}
                                         </span>
                                     </div>
                                 </li>
@@ -1231,14 +1243,14 @@
                                     <div class="w-100per">
                                         <div class="audit-log-time">
                                             <span class="audit-by">
-                                                ${data_log.site_name}
+                                                ${data_log.site_name ? data_log.site_name : ' - '}
                                             </span>
                                             <span class="audit-time">
-                                                IP : ${data_log.site_agents_ip_private}
+                                                IP : ${data_log.site_agents_ip_private ? data_log.site_agents_ip_private : ' - '}
                                             </span>
                                         </div>
                                         <span class="audit-log-header">
-                                            ${data_log.mode} : ${data_log.created_at}
+                                            ${data_log.mode ? data_log.mode : ' - '} : ${data_log.created_at ? data_log.created_at : ' - '}
                                         </span>
                                     </div>
                                 </li>
@@ -1378,9 +1390,9 @@
     function datachart_timeline(site_val)
     {
         let site_id = site_val;
-        console.log('rule - '+site_id);
+        {{-- console.log('rule - '+site_id);
         console.log('s - '+start_date_tl);
-        console.log('e - '+end_date_tl);
+        console.log('e - '+end_date_tl); --}}
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1437,6 +1449,7 @@
                 {
                     data: 'chk',
                     "orderable": false,
+                    className: 'text-center'
                 },
                 {
                     data: 'site_name',
@@ -1468,14 +1481,20 @@
                 --}}
                
                 {
-                    data: 'severity_status',
+                    data: 'channel',
+                    className: 'text-center'
                 },
                 {
-                    data: 'agent_alerts_created',
+                    data: 'severity_status',
+                    className: 'text-center'
+                },
+                {
+                    data: 'agent_alerts_created'
                 },
                 {
                     data: 'action',
                     "orderable": false,
+                    className: 'text-center'
                 }
             ],
         });
@@ -1688,7 +1707,7 @@
             },
 
             color: {
-                pattern: ['#4398d4', '#40cd8f','#f4d757','#fcc838','#b93624']
+                pattern: ['#4398d4', '#40cd8f', '#f4d757', '#fcc838', '#b93624', '#bebebe']
             }
         });
     }
@@ -1844,7 +1863,7 @@
         $('.loadder-log').show();
         $('.loadder-timeline').show();
         site_val = $('#site').val();
-        console.log(site_val);
+        {{-- console.log(site_val); --}}
         count_head(site_val);
         datachart_Incident(site_val);
         datachart_platform(site_val);
