@@ -376,60 +376,78 @@
                                 </div>
                             </div> --}}
     
-                            <div id="filter_alert_main" class="row" style="display: none">
-                                <div class="col-lg-3">
-                                    <div>
-                                        <div class="form-group m-b-md">
-                                            <label for="" class="">Rule</label>
-                                            <input type="text" class="form-control" name="filter_alert_rule" id="filter_alert_rule"
-                                                placeholder="Search">
+                            <div id="filter_alert_main" style="display: none">
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <div>
+                                            <div class="form-group m-b-md">
+                                                <label for="" class="">Rule</label>
+                                                <input type="text" class="form-control" name="filter_alert_rule" id="filter_alert_rule"
+                                                    placeholder="Search">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <div>
+                                            <div class="form-group m-b-md">
+                                                <label for="" class="">Description</label>
+                                                <input type="text" class="form-control" name="filter_alert_des" id="filter_alert_des"
+                                                    placeholder="Search">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <label for="" class="">Incident</label>
+                                        <div id="filter-alert-incident" class="btn-group special">
+                                            <button class="btn btn-grey check_alert active" id="incident-status-all" value="">
+                                                <span> All </span>
+                                            </button>
+                                            <button class="btn btn-grey check_alert" value="Agent">
+                                                <span> Agent </span>
+                                            </button>
+                                            <button class="btn btn-grey check_alert" value="Indicator">
+                                                <span> Indicator </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <label for="" class="">Severity</label>
+                                        <div id="filter-alert-severity" class="btn-group special">
+                                            <button class="btn btn-grey check_alert_severity active" id="severity-status-all" value="">
+                                                <span> All </span>
+                                            </button>
+                                            <button class="btn btn-grey check_alert_severity" value="Critical">
+                                                <span> Critical </span>
+                                            </button>
+                                            <button class="btn btn-grey check_alert_severity" value="High">
+                                                <span> High </span>
+                                            </button>
+                                            <button class="btn btn-grey check_alert_severity" value="Medium">
+                                                <span> Medium </span>
+                                            </button>
+                                            <button class="btn btn-grey check_alert_severity" value="Low">
+                                                <span> Low </span>
+                                            </button>
+                                            <button class="btn btn-grey check_alert_severity" value="Information">
+                                                <span> Information </span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-3">
-                                    <div>
-                                        <div class="form-group m-b-md">
-                                            <label for="" class="">Description</label>
-                                            <input type="text" class="form-control" name="filter_alert_des" id="filter_alert_des"
-                                                placeholder="Search">
+                                <div class="row">
+                                    <div class="col-lg-2">
+                                        <label for="" class="">Ignore</label>
+                                        <div id="filter-alert-ignore" class="btn-group special">
+                                            <button class="btn btn-grey check_ignore" id="ignore-status-all" value="all">
+                                                <span> All </span>
+                                            </button>
+                                            <button class="btn btn-grey check_ignore" id="ignore-status-1" value="1">
+                                                <span> Ignore </span>
+                                            </button>
+                                            <button class="btn btn-grey check_ignore active" id="ignore-status-0" value="0">
+                                                <span> Not Ignore </span>
+                                            </button>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-2">
-                                    <label for="" class="">Incident</label>
-                                    <div id="filter-alert-incident" class="btn-group special">
-                                        <button class="btn btn-grey check_alert active" id="incident-status-all" value="">
-                                            <span> All </span>
-                                        </button>
-                                        <button class="btn btn-grey check_alert" value="Agent">
-                                            <span> Agent </span>
-                                        </button>
-                                        <button class="btn btn-grey check_alert" value="Indicator">
-                                            <span> Indicator </span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <label for="" class="">Severity</label>
-                                    <div id="filter-alert-severity" class="btn-group special">
-                                        <button class="btn btn-grey check_alert_severity active" id="severity-status-all" value="">
-                                            <span> All </span>
-                                        </button>
-                                        <button class="btn btn-grey check_alert_severity" value="Critical">
-                                            <span> Critical </span>
-                                        </button>
-                                        <button class="btn btn-grey check_alert_severity" value="High">
-                                            <span> High </span>
-                                        </button>
-                                        <button class="btn btn-grey check_alert_severity" value="Medium">
-                                            <span> Medium </span>
-                                        </button>
-                                        <button class="btn btn-grey check_alert_severity" value="Low">
-                                            <span> Low </span>
-                                        </button>
-                                        <button class="btn btn-grey check_alert_severity" value="Information">
-                                            <span> Information </span>
-                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -541,7 +559,7 @@
                                         </header>
                                         <div class="panel-body">
                                             <div class="row m-b-10">
-                                                <div class="col-md-12">
+                                                <div class="col-md-6">
                                                     <h5 class="font-weight-bold">Severity</h5>
                                                     <div class="st-dt-leak">
                                                         <span class="st-dt vrh" data-toggle="tooltip" data-placement="right" data-html="true" title="" data-original-title="<div class='st-flex'><div class='box-st-tooltip vrh'>Critical</div><div class='text-st-tooltip'>Criticalข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">Critical</span>
@@ -550,6 +568,11 @@
                                                         <span class="st-dt low" data-toggle="tooltip" data-placement="right" data-html="true" title="" data-original-title="<div class='st-flex'><div class='box-st-tooltip low'>Low</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้ภายในกลุ่มจำกัดหรือยังไม่เป็นที่รับรู้กันอย่างแพร่หลาย และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของลูกค้าเช่น ข้อมูลส่วนบุคคลซึ่งเป็นข้อมูลที่สามารถนำมาใช้ประโยชน์ต่อได้</div></div>">Low</span>
                                                         <span class="st-dt vrl" data-toggle="tooltip" data-placement="right" data-html="true" title="" data-original-title="<div class='st-flex'><div class='box-st-tooltip vrl'>Informational</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลที่เป็นข้อมูลทั่วไปหรือเป็นข่าวที่ยังไม่ได้รับการยืนยันว่าเป็นข้อมูลรั่วไหลจริง</div></div>">Informational</span>
                                                     </div>
+                                                </div>
+                                                <div class="col-md-6 text-right">
+                                                    <button type="button" class="btn btn-primary btn-flat" onclick="f_export_tb_alert()">
+                                                        <i class="fas fa-solid fa-file-export"></i> Export Excel
+                                                    </button>
                                                 </div>
                                             </div>
                                             <div class="table-responsive">
@@ -688,6 +711,13 @@
                                             </div>
                                         </header>
                                         <div class="panel-body">
+                                            <div class="row m-b-10">
+                                                <div class="col-md-12 text-right">
+                                                    <button type="button" class="btn btn-primary btn-flat" onclick="f_export_tb_agent()">
+                                                        <i class="fas fa-solid fa-file-export"></i> Export Excel
+                                                    </button>
+                                                </div>
+                                            </div>
                                             <div class="table-responsive">
                                                 <table class="table table-bordered table-striped" id="table-agent-template" style="width: 100%">
                                                     <thead>
@@ -931,6 +961,7 @@
 
     var check_alert = null;
     var check_alert_severity = null;
+    var check_alert_ignore = 0;
     var filter_alert_rule = null;
     var filter_alert_des = null;
 
@@ -960,6 +991,9 @@
             datachart_rule();
             dudit_log_feed();
             datachart_timeline();
+
+            tbl_alert.ajax.reload(); 
+            tbl_agent.ajax.reload();
         }, 60000);
 
         $(function () {
@@ -971,11 +1005,145 @@
 
     });
 
+    function f_export_tb_alert()
+    {
+        let html_site = '';
+        if($('#site').val()) 
+        {
+            html_site = '&site='+$('#site :selected').val();
+        }
+
+        let html_keyword_search = '';
+        if(keyword_search) 
+        {
+            html_keyword_search = '&keyword_search='+keyword_search;
+        }
+
+        let html_filter_alert_rule = '';
+        if(filter_alert_rule) 
+        {
+            html_filter_alert_rule = '&filter_alert_rule='+filter_alert_rule;
+        }
+
+        let html_filter_alert_des = '';
+        if(filter_alert_des) 
+        {
+            html_filter_alert_des = '&filter_alert_des='+filter_alert_des;
+        }
+
+        let html_check_alert = '';
+        if(check_alert) 
+        {
+            html_check_alert = '&check_alert='+check_alert;
+        }
+
+        let html_check_alert_severity = '';
+        if(check_alert_severity) 
+        {
+            html_check_alert_severity = '&check_alert_severity='+check_alert_severity;
+        }
+
+        let html_check_alert_ignore = '';
+        if(check_alert_ignore) 
+        {
+            html_check_alert_ignore = '&check_alert_ignore='+check_alert_ignore;
+        }
+
+        let html_start_date = '';
+        if(start_date) 
+        {
+            html_start_date = '&start_date='+start_date;
+        }
+
+        let html_end_date = '';
+        if(end_date) 
+        {
+            html_end_date = '&end_date='+end_date;
+        }
+
+        let html = "{{ route('agentmanagement.export_excel_tb_alert') }}"+'?'
+            +html_site
+            +html_keyword_search
+            +html_filter_alert_rule
+            +html_filter_alert_des
+            +html_check_alert
+            +html_check_alert_severity
+            +html_check_alert_ignore
+            +html_start_date
+            +html_end_date;
+
+        window.open(html,'_blank');
+    }
+
+    function f_export_tb_agent()
+    {
+        let html_site = '';
+        if($('#site').val()) 
+        {
+            html_site = '&site='+$('#site :selected').val();
+        }
+
+        let html_keyword_search = '';
+        if(keyword_search) 
+        {
+            html_keyword_search = '&keyword_search='+keyword_search;
+        }
+
+        let html_filter_agent_device = '';
+        if(filter_agent_device) 
+        {
+            html_filter_agent_device = '&filter_agent_device='+filter_agent_device;
+        }
+
+        let html_filter_agent_ip = '';
+        if(filter_agent_ip) 
+        {
+            html_filter_agent_ip = '&filter_agent_ip='+filter_agent_ip;
+        }
+
+        let html_filter_agent_os_des = '';
+        if(filter_agent_os_des) 
+        {
+            html_filter_agent_os_des = '&filter_agent_os_des='+filter_agent_os_des;
+        }
+
+        let html_check_os_type = '';
+        if(check_os_type) 
+        {
+            html_check_os_type = '&check_os_type='+check_os_type;
+        }
+
+        let html_start_date = '';
+        if(start_date) 
+        {
+            html_start_date = '&start_date='+start_date;
+        }
+
+        let html_end_date = '';
+        if(end_date) 
+        {
+            html_end_date = '&end_date='+end_date;
+        }
+
+        let html = "{{ route('agentmanagement.export_excel_tb_agent') }}"+'?'
+            +html_site
+            +html_keyword_search
+            +html_filter_agent_device
+            +html_filter_agent_ip
+            +html_filter_agent_os_des
+            +html_check_os_type
+            +html_start_date
+            +html_end_date;
+
+        window.open(html,'_blank');
+    }
+
     active_btn('#groupby-btn .btn-grey');
     active_btn('#groupby-status .btn-grey');
     active_btn('#btngroup_sort_by .btn-grey');
     active_btn('#filter-alert-incident .btn-grey');
     active_btn('#filter-alert-severity .btn-grey');
+    active_btn('#filter-alert-ignore .btn-grey');
     active_btn('#filter-agent-os-type .btn-grey');
 
     if($('.filter_agent_agent').hasClass('active')){
@@ -1080,6 +1248,10 @@
         check_alert_severity = $(this).val();
     });
 
+    $('.check_ignore').click(function(){
+        check_alert_ignore = $(this).val();
+    });
+
     $('.check_os_type').click(function(){
         check_os_type = $(this).val();
     });
@@ -1114,6 +1286,7 @@
             check_type = null;
             check_alert = null;
             check_alert_severity = null;
+            check_alert_ignore = 0;
             check_os_type = null;
             filter_alert_rule = null;
             filter_alert_des = null;
@@ -1144,6 +1317,7 @@
         check_type = null;
         check_alert = null;
         check_alert_severity = null;
+        check_alert_ignore = 0;
         check_os_type = null;
         filter_alert_rule = null;
         filter_alert_des = null;
@@ -1155,10 +1329,12 @@
         $('.check_type').removeClass('active');
         $('.check_alert').removeClass('active');
         $('.check_alert_severity').removeClass('active');
+        $('.check_ignore').removeClass('active');
         $('.check_os_type').removeClass('active');
         $('#btn_search_all').addClass('active');
         $('#incident-status-all').addClass('active');
         $('#severity-status-all').addClass('active');
+        $('#ignore-status-0').addClass('active');
         $('#all_os').addClass('active');
 
         $('#keyword_search').val('');
@@ -1437,6 +1613,7 @@
                     d.filter_alert_des = filter_alert_des;
                     d.check_alert = check_alert;
                     d.check_alert_severity = check_alert_severity;
+                    d.check_alert_ignore = check_alert_ignore;
                     d.start_date = start_date;
                     d.end_date = end_date;
                     return d ;
@@ -1499,9 +1676,9 @@
             ],
         });
 
-        setInterval(() => {   
+        {{-- setInterval(() => {   
             tbl_alert.ajax.reload();  
-        }, 60000);
+        }, 60000); --}}
     }
 
     function datatable_agent(site_val)
@@ -1632,9 +1809,9 @@
 
         });
         
-        setInterval(() => {   
+        {{-- setInterval(() => {   
             tbl_agent.ajax.reload();  
-        }, 60000);
+        }, 60000); --}}
 
     }
     

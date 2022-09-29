@@ -1,20 +1,20 @@
 <div class="modal-dialog modal-dialog-aside" >
   <div class="modal-content">
-      <div class="modal-header bg-danger">
+      <div class="modal-header bg-info">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">@langapp('delete')   </h4>
+          <h4 class="modal-title">Active Data</h4>
       </div>
       
       {!! Form::open(['route' => ['agentmanagement.alert_delete_id'], 'class' => 'ajaxifyForm_custom', 'id'=> 'form_alert_delete', 'method' => 'post']) !!}
 
       <div class="modal-body">
-          <p class="text-danger">@langapp('delete_warning')  </p>
+          <p class="text-info">You are about to active a record from the database.</p>
           <input type="hidden" name="hd_delete_id" value="{{ $query->id }}">
           <input type="hidden" name="hd_ignore_flag" value="{{ @$query->ignore_flag }}">
       </div>
       <div class="modal-footer">
           {!! closeModalButton() !!}
-          <button type="submit" class="btn btn-info formSaving btn-rounded"><i class="fas fa-paper-plane"></i>Delete</button>
+          <button type="submit" class="btn btn-info formSaving btn-rounded"><i class="fas fa-paper-plane"></i>Active</button>
       </div>
       
       {!! Form::close() !!}

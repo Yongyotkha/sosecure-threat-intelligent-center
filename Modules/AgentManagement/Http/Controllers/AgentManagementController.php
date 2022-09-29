@@ -39,6 +39,10 @@ use MongoDB\Client;
 use MongoDB\Client as MongoClient;
 use Yajra\DataTables\DataTables;
 
+use Excel;
+use App\Exports\AgentTBAlert;
+use App\Exports\AgentTBAgent;
+
 class AgentManagementController extends Controller
 {
     /**
@@ -607,11 +611,13 @@ class AgentManagementController extends Controller
         $keyword_search = $request->keyword_search;
         $query = YaraLog::join('site', 'yara_log.site_id', 'site.id')
             ->join('site_agents', 'yara_log.agent_id', 'site_agents.id')
+            ->join('os_type', 'site_agents.os_type', 'os_type.id')
             ->leftjoin('rule_name', 'yara_log.rule', 'rule_name.rule_name')
             ->select(
                 'site.name as site_name',
                 'site.logo as site_logo',
                 'site_agents.ip_private as site_agents_ip_private',
+                'site_agents.os_description as site_agents_os_description',
                 'yara_log.id as agent_alerts_id',
                 'yara_log.rule as agent_alerts_rule',
                 'yara_log.status as agent_alerts_status',
@@ -620,13 +626,15 @@ class AgentManagementController extends Controller
                 'yara_log.first_scan',
                 'yara_log.last_scan',
                 'yara_log.channel',
+                'yara_log.ignore_flag',
                 'rule_name.description as agent_alerts_description',
-                'rule_name.severity as severity_status'
+                'rule_name.severity as severity_status',
+                'os_type.name as os_type_name'
             )
             ->where('yara_log.status', 1)
             ->where(function($query) use ($site_id ){
                 if($site_id  != null){
-                    $query->where('site_id', $site_id );
+                    $query->where('yara_log.site_id', $site_id );
                 }
             })
             ->where(function($query) use ($keyword_search){
@@ -635,49 +643,52 @@ class AgentManagementController extends Controller
                         ->orwhere('yara_log.description', 'like', '%'.$keyword_search.'%');     
                 }
             })
-            ->where('yara_log.ignore_flag', 'Y')
+            // ->where('yara_log.ignore_flag', 'Y')
             ->orderBy('yara_log.last_scan', 'desc');
             // ->get();
           
         // dd($query);
-        // if($request->site_id != null)
-        // {
-        //     $query->where('site_id', $request->site_id);
-        // }
 
-        // if($request->keyword_search != null)
-        // {
-        //     $query->where('site.name', 'like', '%'.$request->keyword_search.'%')
-        //         //   ->orwhere('agent_alerts.rule', 'like', '%'.$request->keyword_search.'%')
-        //           ->orwhere('yara_log.description', 'like', '%'.$request->keyword_search.'%');
-        //         //   ->orwhere('yara_log.incident', 'like', '%'.$request->keyword_search.'%')
-        //         //   ->orwhere('yara_log.log_file', 'like', '%'.$request->keyword_search.'%');
-        // }
+        if($start_date_input != null && $end_date_input != null)
+        {
+            $query->whereBetween('yara_log.last_scan', [$start_date_input, $end_date_input]);
+        }
 
-        // if($start_date_input != null && $end_date_input != null)
-        // {
-        //     $query->whereBetween('agent_alerts.created', [$start_date_input, $end_date_input]);
-        // }
+        if($request->filter_alert_rule != null)
+        {
+            $query->where('yara_log.rule', 'like', '%'.$request->filter_alert_rule.'%');
+        }
 
-        // if($request->filter_alert_rule != null)
-        // {
-        //     $query->where('agent_alerts.rule', 'like', '%'.$request->filter_alert_rule.'%');
-        // }
-
-        // if($request->filter_alert_des != null)
-        // {
-        //     $query->where('agent_alerts.description', 'like', '%'.$request->filter_alert_des.'%');
-        // }
+        if($request->filter_alert_des != null)
+        {
+            $query->where('rule_name.description', 'like', '%'.$request->filter_alert_des.'%');
+        }
 
         // if($request->check_alert != null)
         // {
         //     $query->where('agent_alerts.incident', $request->check_alert);
         // }
 
-        // if($request->check_alert_severity != null)
-        // {
-        //     $query->where('agent_alerts.severity', $request->check_alert_severity);
-        // }
+        if($request->check_alert_severity != null)
+        {
+            $query->where('rule_name.severity', $request->check_alert_severity);
+        }
+
+        if(@$request->check_alert_ignore == 'all' || @$request->check_alert_ignore == '1')
+        {
+            if($request->check_alert_ignore == 'all')
+            {
+                $query->whereIn('yara_log.ignore_flag', ['Y','N']);
+            }
+            else if($request->check_alert_ignore == '1')
+            {
+                $query->where('yara_log.ignore_flag', 'N');
+            }
+        }
+        else
+        {
+            $query->where('yara_log.ignore_flag', 'Y');
+        }
         
 
         return DataTables::of($query)
@@ -694,7 +705,6 @@ class AgentManagementController extends Controller
         ->addColumn('detail_all', function($query) {
             $html = '';
             $html .= '
-
                 <div>
                     <strong>Rule</strong> : '.$query->agent_alerts_rule.'
                 </div>
@@ -712,17 +722,24 @@ class AgentManagementController extends Controller
                 </div>  
 
                 <div>
-                    <strong>Start Date</strong> : '.$query->first_scan.'
-                </div>
-                <div>
                     <strong>Last Scan</strong> : '.$query->last_scan.'
                 </div>
+
                 <div>
                     <strong>IP</strong> : '.$query->site_agents_ip_private.'
                 </div>
 
+                <div>
+                    <strong>OS Type</strong> : '.$query->os_type_name.'
+                </div>
 
+                <div>
+                    <strong>OS Description</strong> : '.$query->site_agents_os_description.'
+                </div>
             ';
+            // <div>
+            //     <strong>Start Date</strong> : '.$query->first_scan.'
+            // </div>
             return $html;
         })
         ->addColumn('severity_status', function($query) {
@@ -787,12 +804,26 @@ class AgentManagementController extends Controller
         
         ->addColumn('action', function($query) {
             $html = '';
+
+            $class_btn_append = '';
+            $class_icon_append = '';
+            if($query->ignore_flag == 'Y')
+            {
+                $class_btn_append = 'btn-danger';
+                $class_icon_append = 'fas fa-ban';
+            }
+            else
+            {
+                $class_btn_append = 'btn-success';
+                $class_icon_append = 'fas fa-solid fa-check';
+            }
+
             $html .= ' 
-                
-                <a href="'.route('agentmanagement.modal_agent_alert_delete', ['id' => $query->agent_alerts_id]).'"  class="btn btn-danger btn-xs" data-toggle="ajaxModal">
-                    <i class="fas fa-ban"></i>
+                <a href="'.route('agentmanagement.modal_agent_alert_delete', ['id' => $query->agent_alerts_id]).'"  class="btn '.$class_btn_append.' btn-xs" data-toggle="ajaxModal">
+                    <i class="'.$class_icon_append.'"></i>
                 </a>
             ';
+
             return $html;
         })
         ->rawColumns(['chk','detail_all', 'severity_status', 'chk_status', 'action'])
@@ -803,7 +834,15 @@ class AgentManagementController extends Controller
     public function modal_agent_alert_delete(Request $request)
     {
         $query = YaraLog::where(['id' => $request->id])->first();
-        return view('agentmanagement::modal.delete_alert')->with(compact('query'));   
+
+        if($query->ignore_flag == 'Y')
+        {
+            return view('agentmanagement::modal.delete_alert')->with(compact('query'));   
+        }
+        else
+        {
+            return view('agentmanagement::modal.change_delete_alert')->with(compact('query'));   
+        }
     }
 
     public function alert_delete_id(Request $request){
@@ -811,7 +850,7 @@ class AgentManagementController extends Controller
 
         $query = YaraLog::where('id', $id)
             ->update([
-                'ignore_flag' => 'N'
+                'ignore_flag' => ($request->hd_ignore_flag == 'Y' ? 'N' : 'Y')
             ]);
 
     }
@@ -849,7 +888,7 @@ class AgentManagementController extends Controller
 
         if($request->site_id != null)
         {
-            $query->where('site_id', $request->site_id);
+            $query->where('site_agents.site_id', $request->site_id);
         }
 
         if($request->keyword_search != null)
@@ -2485,6 +2524,26 @@ class AgentManagementController extends Controller
 
         return response()->json($response);
 
+    }
+
+    public function export_excel_tb_alert(Request $request){
+
+        // dd($request->all());
+        // dd(class_exists('DOMDocument'));
+
+        $data = $request->all();
+
+        return Excel::download(new AgentTBAlert(@$data), 'tb_alert.xls');
+    }
+
+    public function export_excel_tb_agent(Request $request){
+
+        // dd($request->all());
+        // dd(class_exists('DOMDocument'));
+
+        $data = $request->all();
+
+        return Excel::download(new AgentTBAgent(@$data), 'tb_agent.xls');
     }
 
 }
