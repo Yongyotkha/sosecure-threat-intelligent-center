@@ -343,18 +343,22 @@ class RSSFeedSettingsController extends Controller
         //     $model = TransactionRssData::all();
         // }
         $model = New RSSNews();
-        if(($request -> keywords || $request -> startDate || $request -> endDate || $request -> status_news || $request -> news_source || $request -> news_category) && $request -> search_val == 1){
-            
-            if($request -> keywords){
+        if(($request -> keywords || $request -> startDate || $request -> endDate || $request -> status_news || $request -> news_source || $request -> news_category) && $request -> search_val == 1)
+        {
+            if($request -> keywords)
+            {
                 $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$request -> keywords.'%')->first();
                 
-                if($model_where) {
+                if($model_where) 
+                {
                     $model = $model -> where('title_en', 'LIKE' ,'%'.$request -> keywords.'%');
-                } else {
+                } 
+                else 
+                {
                     $model = $model -> where('title_th', 'LIKE' ,'%'.$request -> keywords.'%');
                 }
-                
             }
+
             // if($request -> start_date){
             //     $start_date = date("Y-m-d H:i:s",strtotime($request -> start_date));
             //     $end_date = date("Y-m-d H:i:s",strtotime($request -> end_date));
@@ -362,54 +366,62 @@ class RSSFeedSettingsController extends Controller
             //     $model -> whereBetween('created_at',array($start_date,$end_date));
             // }
 
-            if($request -> isDateSearch == 1){
+            if($request -> isDateSearch == 1)
+            {
                 $date_start = $request->startDate;
                 $date_end = $request->endDate;
 
-                $date_start_explode = explode(" ",$date_start);
-                $date_start_date = @$date_start_explode[0];
-                $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
-                // dd($date_start_time);
-                $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
-                // dd($date_start_date_format);
-                $date_start_time_time = date("H:i", strtotime($date_start_time));
-                $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
-                // dd($date_start);
+                // $date_start_explode = explode(" ",$date_start);
+                // $date_start_date = @$date_start_explode[0];
+                // $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                // // dd($date_start_time);
+                // $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                // // dd($date_start_date_format);
+                // $date_start_time_time = date("H:i", strtotime($date_start_time));
+                // $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                // // dd($date_start);
 
-                $date_end_explode = explode(" ",$date_end);
-                $date_end_date = @$date_end_explode[0];
-                $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
-                // dd($date_end_time);
-                $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
-                $date_end_time_time = date("H:i", strtotime($date_end_time));
-                $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
-                // dd($date_end_time_time);
+                // $date_end_explode = explode(" ",$date_end);
+                // $date_end_date = @$date_end_explode[0];
+                // $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                // // dd($date_end_time);
+                // $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                // $date_end_time_time = date("H:i", strtotime($date_end_time));
+                // $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+                // // dd($date_end_time_time);
+
+                $date_start_datetime_format = Carbon::createFromFormat('Y-m-d h:i A', $date_start)->format('Y-m-d H:i:s');
+                $date_end_datetime_format = Carbon::createFromFormat('Y-m-d h:i A', $date_end)->format('Y-m-d H:i:s');
 
                 // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
                 $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
             }
 
-
             // dd($request -> status_news);
-            if($request -> status_news){
-                if($request -> status_news == 1 || $request -> status_news == 2){
-                    if($request -> status_news == 1) {
+            if($request -> status_news)
+            {
+                if($request -> status_news == 1 || $request -> status_news == 2)
+                {
+                    if($request -> status_news == 1) 
+                    {
                         $model =  $model -> where('save_draft','=',0);
-                        
-                    } else if ($request -> status_news == 2) {
+                    } 
+                    else if ($request -> status_news == 2) 
+                    {
                         $model =  $model -> where('save_draft',1);
                         // dd($model);
                     }
-                    
                 }  
             }
-            if($request -> news_source){
 
+            if($request -> news_source)
+            {
                 // $model -> where('source', 'LIKE' ,'%'.$request -> news_source.'%');
                 $model = $model -> whereIn('source', $request -> news_source);
             }
 
-            if($request -> news_category){
+            if($request -> news_category)
+            {
                 $news_cate_id = $request -> news_category;
                 // CategorySettings::where("code",)->first();
                 // dd($news_cate_id);
@@ -417,22 +429,33 @@ class RSSFeedSettingsController extends Controller
                 // $model -> where('source', 'LIKE' ,'%'.$request -> news_source.'%');
                 // $model -> whereIn('source', $request -> news_source);
        
-                    // dd($news_cate_id_val);
-                    $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
-                        $query->whereIn('news_category_id', $news_cate_id);
-                    });
-        
-
+                // dd($news_cate_id_val);
+                $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
+                    $query->whereIn('news_category_id', $news_cate_id);
+                });
             }
 
-            if($request -> status_serverity){
-
+            if($request -> status_serverity)
+            {
                 $model = $model -> where('serverity', $request -> status_serverity);
             }
-            
         }
-        $model = $model ->orderBy('public_date', 'desc');
-        $model = $model -> get();
+
+        $model = $model -> select(
+                'id',
+                'code',
+                'title_th',
+                'detail_th',
+                'title_en',
+                'detail_en',
+                'source',
+                'save_draft',
+                'serverity',
+                'public_date',
+                'status',
+                'created_at',
+            ) -> orderBy('public_date', 'desc');
+        // $model = $model -> get();
 
         // dd(count($model));
         // $count_row = count($model);
@@ -488,83 +511,83 @@ class RSSFeedSettingsController extends Controller
         //     $i++;
         // }
         // dd($model);
-        $count_model = count($model);
+        // $count_model = count($model);
         // ---------------------------------- cve - actor ----------------------------------
-        if($count_model != 0)
-        {
-            $id = '';
-            $actor_id = array();
+        // if($count_model != 0)
+        // {
+        //     $id = '';
+        //     $actor_id = array();
 
-            $DB_MONGO_KEY = config('app.DB_MONGO_DEV');
-            $client = new MongoClient($DB_MONGO_KEY);
-            if(app()->environment('local'))
-            {
-                $collection_actor = $client->sosecure_threatintelligent->fx_otx_adversaries;
-                $conn = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
-            }
-            else
-            {
-                $collection_actor = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
-                $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
-            }
+        //     $DB_MONGO_KEY = config('app.DB_MONGO_DEV');
+        //     $client = new MongoClient($DB_MONGO_KEY);
+        //     if(app()->environment('local'))
+        //     {
+        //         $collection_actor = $client->sosecure_threatintelligent->fx_otx_adversaries;
+        //         $conn = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
+        //     }
+        //     else
+        //     {
+        //         $collection_actor = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
+        //         $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+        //     }
 
-            // for($i=0;$i<$count_model;$i++)
-            foreach($model as $data_model)
-            {
-                // $query= [
-                //     'pulse_id' => $model[$i]['id'],
-                //     'mode' => 'news',
-                //     'join' => 'actor',
-                //     'delete_at'  => null
-                // ];
-                // $option = [];
+        //     // for($i=0;$i<$count_model;$i++)
+        //     foreach($model as $data_model)
+        //     {
+        //         // $query= [
+        //         //     'pulse_id' => $model[$i]['id'],
+        //         //     'mode' => 'news',
+        //         //     'join' => 'actor',
+        //         //     'delete_at'  => null
+        //         // ];
+        //         // $option = [];
         
-                // $final_test = $conn->find($query,$option);
-                // $result_test = $final_test->toArray();
-                // $count_result_test = count($result_test);
+        //         // $final_test = $conn->find($query,$option);
+        //         // $result_test = $final_test->toArray();
+        //         // $count_result_test = count($result_test);
                 
-                // $model[$i]['actor'] = $result_test;
-                // $model[$i]['count_result'] = $count_result_test;
+        //         // $model[$i]['actor'] = $result_test;
+        //         // $model[$i]['count_result'] = $count_result_test;
                 
-                // $logo = [];
-                // foreach(@$result_test as $sel_data_act)
-                // {
-                //     $query_sel_act = [
-                //         'adversary_uuid' => $sel_data_act['adversary_uuid']
-                //     ];
-                //     $option_sel_act = [];
-                //     $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
+        //         // $logo = [];
+        //         // foreach(@$result_test as $sel_data_act)
+        //         // {
+        //         //     $query_sel_act = [
+        //         //         'adversary_uuid' => $sel_data_act['adversary_uuid']
+        //         //     ];
+        //         //     $option_sel_act = [];
+        //         //     $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
                     
-                //     if(@$result_sel_act['logo'])
-                //     {
-                //         $logo[] = $result_sel_act['logo'];
-                //     }
-                //     else
-                //     {
-                //         $logo[] = '/asset_salepage/images/AgentBasedDetection.png';
-                //     }
+        //         //     if(@$result_sel_act['logo'])
+        //         //     {
+        //         //         $logo[] = $result_sel_act['logo'];
+        //         //     }
+        //         //     else
+        //         //     {
+        //         //         $logo[] = '/asset_salepage/images/AgentBasedDetection.png';
+        //         //     }
                     
-                // }
-                // $model[$i]['logo'] = $logo;
-                // dd($id);
+        //         // }
+        //         // $model[$i]['logo'] = $logo;
+        //         // dd($id);
 
-                $query_camp= [
-                    'pulse_id' => $data_model->id,
-                    'mode' => 'news',
-                    'join' => 'campainge',
-                    'delete_at'  => null
-                ];
-                $option_camp = [];
+        //         $query_camp= [
+        //             'pulse_id' => $data_model->id,
+        //             'mode' => 'news',
+        //             'join' => 'campainge',
+        //             'delete_at'  => null
+        //         ];
+        //         $option_camp = [];
         
-                $final_camp = $conn->find($query_camp,$option_camp);
-                $result_camp = $final_camp->toArray();
-                $count_result_camp = count($result_camp);
+        //         $final_camp = $conn->find($query_camp,$option_camp);
+        //         $result_camp = $final_camp->toArray();
+        //         $count_result_camp = count($result_camp);
 
-                $data_model->campainge = $result_camp;
-                $data_model->count_campainge = $count_result_camp;
+        //         $data_model->campainge = $result_camp;
+        //         $data_model->count_campainge = $count_result_camp;
         
-            }
-        }
+        //     }
+        // }
         // dd($result_test);
         // dd($model);
 
@@ -692,60 +715,117 @@ class RSSFeedSettingsController extends Controller
                     $html .= ' <b class="m-r-5 m-l-xs">Data Status : </b> <span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
                 }  
 
-                if($model->count_result != 0)
-                {
-                    $html .= '<span class="m-r-5 m-l-xs" style="display: inline-flex;align-items: center;">
-                            <b>Actor : </b>
-                            <div class="m-l-xs">';
-                            $array_row = 1;
-                            $count_result = $model->count_result;
-                            for($i = 0 ; $i < $model->count_result ; $i++)
-                            {
-                                if($array_row == $count_result)
-                                {
-                                    $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$model->logo[$i].'"><span>
-                                            <a href="/actor/detail?_id='.$model->actor[$i]->adversary_uuid.'&mode=cve">'.$model->actor[$i]->adversary_name.'</a>';
-                                }
-                                else
-                                {
-                                    $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$model->logo[$i].'"><span>
-                                            <a href="/actor/detail?_id='.$model->actor[$i]->adversary_uuid.'&mode=cve">'.$model->actor[$i]->adversary_name.'</a> , ';
-                                }
-                                $array_row = $array_row+1;
-                            }
+                // --------------------------- actor old ---------------------------
+                // if($model->count_result != 0)
+                // {
+                //     $html .= '<span class="m-r-5 m-l-xs" style="display: inline-flex;align-items: center;">
+                //             <b>Actor : </b>
+                //             <div class="m-l-xs">';
+                //             $array_row = 1;
+                //             $count_result = $model->count_result;
+                //             for($i = 0 ; $i < $model->count_result ; $i++)
+                //             {
+                //                 if($array_row == $count_result)
+                //                 {
+                //                     $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$model->logo[$i].'"><span>
+                //                             <a href="/actor/detail?_id='.$model->actor[$i]->adversary_uuid.'&mode=cve">'.$model->actor[$i]->adversary_name.'</a>';
+                //                 }
+                //                 else
+                //                 {
+                //                     $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$model->logo[$i].'"><span>
+                //                             <a href="/actor/detail?_id='.$model->actor[$i]->adversary_uuid.'&mode=cve">'.$model->actor[$i]->adversary_name.'</a> , ';
+                //                 }
+                //                 $array_row = $array_row+1;
+                //             }
 
-                    $html .= '
-                            </div>
-                            </span>
-                    ';
+                //     $html .= '
+                //             </div>
+                //             </span>
+                //     ';
+                // }
+                // --------------------------- actor old ---------------------------
+
+                // ------------------------ ทกสอบความเร็ว ------------------------
+
+                $DB_MONGO_KEY = config('app.DB_MONGO_DEV');
+                $client = new MongoClient($DB_MONGO_KEY);
+                if(app()->environment('local'))
+                {
+                    $collection_actor = $client->sosecure_threatintelligent->fx_otx_adversaries;
+                    $conn = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
+                }
+                else
+                {
+                    $collection_actor = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
+                    $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
                 }
 
-                if($model->count_campainge > 0)
+                $query_camp= [
+                    'pulse_id' => $model -> id,
+                    'mode' => 'news',
+                    'join' => 'campainge',
+                    'delete_at'  => null
+                ];
+                $option_camp = [];
+        
+                $final_camp = $conn->find($query_camp,$option_camp);
+                $result_camp = $final_camp->toArray();
+                $count_result_camp = count($result_camp);
+
+                if($count_result_camp > 0)
                 {
                     $html .= ' <span class="m-r-md">
                             <b>Campainge : </b>';
-    
-                            $array_row = 1;
-                            $count_campainge = $model->count_campainge;
-                            for($i = 0 ; $i < @$model->count_campainge ; $i++)
-                            {
-                                $html .= '<a href="/actor/campainge_detail?_id='.$model->campainge[$i]->adversary_uuid.'&mode=news">';
-                                if($array_row == $count_campainge)
-                                {
-                                    $html .= ''.$model->campainge[$i]->adversary_name.'';
-                                }
-                                else
-                                {
-                                    $html .= ''.$model->campainge[$i]->adversary_name.' , ';
-                                }
-                                $html .= '</a>';
 
-                                $array_row = $array_row+1;
+                            $a_data_campainge = [];
+                            foreach($result_camp as $camp_data)
+                            {
+                                $a_data_campainge[] = '<a href="/actor/campainge_detail?_id='.$camp_data->adversary_uuid.'&mode=news">'.$camp_data->adversary_name.'</a>';
                             }
-                            // <span> Name Campainge </span>
+
+                            $html .= $a_data_campainge ? implode(", ", $a_data_campainge) : ' - ';
                             
                     $html .='</span> ';
                 }
+
+                // ------------------------ ทกสอบความเร็ว ------------------------
+
+                // --------------------------- campainge old ---------------------------
+                // if($model->count_campainge > 0)
+                // {
+                //     $html .= ' <span class="m-r-md">
+                //             <b>Campainge : </b>';
+    
+                //             // $array_row = 1;
+                //             // $count_campainge = $model->count_campainge;
+                //             // for($i = 0 ; $i < @$model->count_campainge ; $i++)
+                //             // {
+                //             //     $html .= '<a href="/actor/campainge_detail?_id='.$model->campainge[$i]->adversary_uuid.'&mode=news">';
+                //             //     if($array_row == $count_campainge)
+                //             //     {
+                //             //         $html .= ''.$model->campainge[$i]->adversary_name.'';
+                //             //     }
+                //             //     else
+                //             //     {
+                //             //         $html .= ''.$model->campainge[$i]->adversary_name.' , ';
+                //             //     }
+                //             //     $html .= '</a>';
+
+                //             //     $array_row = $array_row+1;
+                //             // }
+
+                //             $a_data_campainge = [];
+                //             foreach($model->campainge as $camp_data)
+                //             {
+                //                 $a_data_campainge[] = '<a href="/actor/campainge_detail?_id='.$camp_data->adversary_uuid.'&mode=news">'.$camp_data->adversary_name.'</a>';
+                //             }
+                //             $html .= $a_data_campainge ? implode(", ", $a_data_campainge) : ' - ';
+                //             // <span> Name Campainge </span>
+                            
+                //     $html .='</span> ';
+                // }
+                // --------------------------- campainge old ---------------------------
+
                 $html .= '</div>';
                 return $html;
             })
@@ -888,112 +968,128 @@ class RSSFeedSettingsController extends Controller
         if(!$role_custom['news']) {
             check_permission403();
         }
-        $model = New RSSNews();
-        if($request -> search_val == 1){
+
+        // ----------------------- old -----------------------
+
+        // $model = New RSSNews();
+        // if($request -> search_val == 1){
             
-            if($request -> keywords){
-                $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$request -> keywords.'%')->first();
+        //     if($request -> keywords){
+        //         $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$request -> keywords.'%')->first();
                 
-                if($model_where) {
-                    $model = $model -> where('title_en', 'LIKE' ,'%'.$request -> keywords.'%');
-                } else {
-                    $model = $model -> where('title_th', 'LIKE' ,'%'.$request -> keywords.'%');
-                }
+        //         if($model_where) {
+        //             $model = $model -> where('title_en', 'LIKE' ,'%'.$request -> keywords.'%');
+        //         } else {
+        //             $model = $model -> where('title_th', 'LIKE' ,'%'.$request -> keywords.'%');
+        //         }
                 
-            }
+        //     }
 
-            if($request -> isDateSearch == 1){
-                $date_start = $request->startDate;
-                $date_end = $request->endDate;
+        //     if($request -> isDateSearch == 1){
+        //         $date_start = $request->startDate;
+        //         $date_end = $request->endDate;
 
-                $date_start_explode = explode(" ",$date_start);
-                $date_start_date = @$date_start_explode[0];
-                $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
-                // dd($date_start_time);
-                $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
-                // dd($date_start_date_format);
-                $date_start_time_time = date("H:i", strtotime($date_start_time));
-                $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
-                // dd($date_start);
+        //         $date_start_explode = explode(" ",$date_start);
+        //         $date_start_date = @$date_start_explode[0];
+        //         $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+        //         // dd($date_start_time);
+        //         $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+        //         // dd($date_start_date_format);
+        //         $date_start_time_time = date("H:i", strtotime($date_start_time));
+        //         $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+        //         // dd($date_start);
 
-                $date_end_explode = explode(" ",$date_end);
-                $date_end_date = @$date_end_explode[0];
-                $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
-                // dd($date_end_time);
-                $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
-                $date_end_time_time = date("H:i", strtotime($date_end_time));
-                $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
-                // dd($date_end_time_time);
+        //         $date_end_explode = explode(" ",$date_end);
+        //         $date_end_date = @$date_end_explode[0];
+        //         $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+        //         // dd($date_end_time);
+        //         $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+        //         $date_end_time_time = date("H:i", strtotime($date_end_time));
+        //         $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+        //         // dd($date_end_time_time);
 
-                // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
-                $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
-            }
+        //         // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+        //         $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
+        //     }
 
-            if($request -> status_news){
-                if($request -> status_news == 1 || $request -> status_news == 2){
-                    if($request -> status_news == 1) {
-                        $model =  $model -> where('save_draft','=',0);
+        //     if($request -> status_news){
+        //         if($request -> status_news == 1 || $request -> status_news == 2){
+        //             if($request -> status_news == 1) {
+        //                 $model =  $model -> where('save_draft','=',0);
                         
-                    } else if ($request -> status_news == 2) {
-                        $model =  $model -> where('save_draft',1);
-                        // dd($model);
-                    }
+        //             } else if ($request -> status_news == 2) {
+        //                 $model =  $model -> where('save_draft',1);
+        //                 // dd($model);
+        //             }
                     
-                }  
-            }
-            if($request -> news_source){
+        //         }  
+        //     }
+        //     if($request -> news_source){
 
-                // $model -> where('source', 'LIKE' ,'%'.$request -> news_source.'%');
-                $model = $model -> whereIn('source', $request -> news_source);
-            }
+        //         // $model -> where('source', 'LIKE' ,'%'.$request -> news_source.'%');
+        //         $model = $model -> whereIn('source', $request -> news_source);
+        //     }
 
-            if($request -> news_category){
-                $news_cate_id = $request -> news_category;
-                $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
-                    $query->whereIn('news_category_id', $news_cate_id);
-                });
-            }
+        //     if($request -> news_category){
+        //         $news_cate_id = $request -> news_category;
+        //         $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
+        //             $query->whereIn('news_category_id', $news_cate_id);
+        //         });
+        //     }
 
-            if($request -> status_serverity){
+        //     if($request -> status_serverity){
 
-                $model = $model -> where('serverity', $request -> status_serverity);
-            }
+        //         $model = $model -> where('serverity', $request -> status_serverity);
+        //     }
             
-        }
+        // }
 
-        $model = $model         
-        ->select(DB::raw('count(*) as source_count , source as source'))
-        ->groupBy('source')
-        ->orderBy('source_count', 'desc')
-        ->limit(11)
-        ->get();
+        // $model = $model         
+        // ->select(DB::raw('count(*) as source_count , source as source'))
+        // ->groupBy('source')
+        // ->orderBy('source_count', 'desc')
+        // ->limit(11)
+        // ->get();
 
-        $host2 = array();
-        foreach($model as $value){
-            if(empty($value->source)||$value->source=='None'){
-                if(!isset($host2['None'])){
-                    $host2['None'] = 0;
-                }
-                $host2['None'] = $host2['None']+(int)$value->source_count;
-            }else{
-                $host2[$value->source] = (int)$value->source_count;
-            }
-        }
-        arsort($host2);
-        $countLimit = 0;
-        $host = array();
-        foreach ($host2 as $key => $value) {
-            $countLimit++;
-            if($countLimit<11){
-                $host[] = [$key,$value];
-            }
-        }
+        // $host2 = array();
+        // foreach($model as $value){
+        //     if(empty($value->source)||$value->source=='None'){
+        //         if(!isset($host2['None'])){
+        //             $host2['None'] = 0;
+        //         }
+        //         $host2['None'] = $host2['None']+(int)$value->source_count;
+        //     }else{
+        //         $host2[$value->source] = (int)$value->source_count;
+        //     }
+        // }
+        // arsort($host2);
+        // $countLimit = 0;
+        // $host = array();
+        // foreach ($host2 as $key => $value) {
+        //     $countLimit++;
+        //     if($countLimit<11){
+        //         $host[] = [$key,$value];
+        //     }
+        // }
+
+        // ----------------------- old -----------------------
 
         // $host = array();
         // foreach($model as $value){
 
         //     $host[] = [empty($value->source)?'None':$value->source,(int)$value->source_count];
         // }
+
+
+        $data_summary = DB::Table('summary')
+            ->where([
+                'data_key' => 'new', 
+                'data_key_2' => 'top_10_source', 
+                'status' => 'Y'
+            ])
+            ->first();
+
+        $host = @$data_summary->data_value ? json_decode($data_summary->data_value, true) : ' ';
     
         if ($request->ajax()) {
 
@@ -1007,132 +1103,148 @@ class RSSFeedSettingsController extends Controller
         if(!$role_custom['news']) {
             check_permission403();
         }
-        $model = New RSSNews();
-        if($request -> search_val == 1){
+
+        // ----------------------- old -----------------------
+
+        // $model = New RSSNews();
+        // if($request -> search_val == 1){
             
-            if($request -> keywords){
-                $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$request -> keywords.'%')->first();
+        //     if($request -> keywords){
+        //         $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$request -> keywords.'%')->first();
                 
-                if($model_where) {
-                    $model = $model -> where('title_en', 'LIKE' ,'%'.$request -> keywords.'%');
-                } else {
-                    $model = $model -> where('title_th', 'LIKE' ,'%'.$request -> keywords.'%');
-                }
+        //         if($model_where) {
+        //             $model = $model -> where('title_en', 'LIKE' ,'%'.$request -> keywords.'%');
+        //         } else {
+        //             $model = $model -> where('title_th', 'LIKE' ,'%'.$request -> keywords.'%');
+        //         }
                 
-            }
+        //     }
 
-            if($request -> isDateSearch == 1){
-                $date_start = $request->startDate;
-                $date_end = $request->endDate;
+        //     if($request -> isDateSearch == 1){
+        //         $date_start = $request->startDate;
+        //         $date_end = $request->endDate;
 
-                $date_start_explode = explode(" ",$date_start);
-                $date_start_date = @$date_start_explode[0];
-                $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
-                // dd($date_start_time);
-                $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
-                // dd($date_start_date_format);
-                $date_start_time_time = date("H:i", strtotime($date_start_time));
-                $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
-                // dd($date_start);
+        //         $date_start_explode = explode(" ",$date_start);
+        //         $date_start_date = @$date_start_explode[0];
+        //         $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+        //         // dd($date_start_time);
+        //         $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+        //         // dd($date_start_date_format);
+        //         $date_start_time_time = date("H:i", strtotime($date_start_time));
+        //         $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+        //         // dd($date_start);
 
-                $date_end_explode = explode(" ",$date_end);
-                $date_end_date = @$date_end_explode[0];
-                $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
-                // dd($date_end_time);
-                $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
-                $date_end_time_time = date("H:i", strtotime($date_end_time));
-                $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
-                // dd($date_end_time_time);
+        //         $date_end_explode = explode(" ",$date_end);
+        //         $date_end_date = @$date_end_explode[0];
+        //         $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+        //         // dd($date_end_time);
+        //         $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+        //         $date_end_time_time = date("H:i", strtotime($date_end_time));
+        //         $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+        //         // dd($date_end_time_time);
 
-                // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
-                $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
-            }
+        //         // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+        //         $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
+        //     }
 
-            if($request -> status_news){
-                if($request -> status_news == 1 || $request -> status_news == 2){
-                    if($request -> status_news == 1) {
-                        $model =  $model -> where('save_draft','=',0);
+        //     if($request -> status_news){
+        //         if($request -> status_news == 1 || $request -> status_news == 2){
+        //             if($request -> status_news == 1) {
+        //                 $model =  $model -> where('save_draft','=',0);
                         
-                    } else if ($request -> status_news == 2) {
-                        $model =  $model -> where('save_draft',1);
-                        // dd($model);
-                    }
+        //             } else if ($request -> status_news == 2) {
+        //                 $model =  $model -> where('save_draft',1);
+        //                 // dd($model);
+        //             }
                     
-                }  
-            }
-            if($request -> news_source){
+        //         }  
+        //     }
+        //     if($request -> news_source){
 
-                // $model -> where('source', 'LIKE' ,'%'.$request -> news_source.'%');
-                $model = $model -> whereIn('source', $request -> news_source);
-            }
+        //         // $model -> where('source', 'LIKE' ,'%'.$request -> news_source.'%');
+        //         $model = $model -> whereIn('source', $request -> news_source);
+        //     }
 
-            if($request -> news_category){
-                $news_cate_id = $request -> news_category;
-                $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
-                    $query->whereIn('news_category_id', $news_cate_id);
-                });
-            }
+        //     if($request -> news_category){
+        //         $news_cate_id = $request -> news_category;
+        //         $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
+        //             $query->whereIn('news_category_id', $news_cate_id);
+        //         });
+        //     }
 
-            if($request -> status_serverity){
+        //     if($request -> status_serverity){
                     
-                $model = $model -> where('serverity', $request -> status_serverity);
-            }
+        //         $model = $model -> where('serverity', $request -> status_serverity);
+        //     }
             
-        }
+        // }
        
-        // $RSSNewsCategory = RSSNewsCategory::select('rss_news_id','categories.name')->join('categories','categories.id','=','r_s_s_news_categories.news_category_id')->where('categories.active',1);
-        // dd($RSSNewsCategory->get());
-        // $model = $model         
-        // ->select('categories.name as categories_name_',DB::raw('count(*) as categories_count'))
-        // ->leftjoin('r_s_s_news_categories','r_s_s_news.id','=','r_s_s_news_categories.rss_news_id')
-        // ->leftjoin('categories','categories.id','=','r_s_s_news_categories.news_category_id')
-        // ->where('categories.active',1)
-        // ->where('categories.deleted_at',null)
-        // ->groupBy('categories.name')
+        // // $RSSNewsCategory = RSSNewsCategory::select('rss_news_id','categories.name')->join('categories','categories.id','=','r_s_s_news_categories.news_category_id')->where('categories.active',1);
+        // // dd($RSSNewsCategory->get());
+        // // $model = $model         
+        // // ->select('categories.name as categories_name_',DB::raw('count(*) as categories_count'))
+        // // ->leftjoin('r_s_s_news_categories','r_s_s_news.id','=','r_s_s_news_categories.rss_news_id')
+        // // ->leftjoin('categories','categories.id','=','r_s_s_news_categories.news_category_id')
+        // // ->where('categories.active',1)
+        // // ->where('categories.deleted_at',null)
+        // // ->groupBy('categories.name')
+        // // ->orderBy('categories_count', 'desc')
+        // // ->limit(10)
+        // // ->get();
+
+        // $model = $model
+        // ->select('name_cat as categories_name_',DB::raw('count(*) as categories_count'))
+        // ->leftjoin(DB::raw('(SELECT fx_r_s_s_news_categories.rss_news_id as rssid ,fx_r_s_s_news_categories.news_category_id as category_id, fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
+        // where fx_r_s_s_news_categories.news_category_id = fx_categories.id 
+        // and fx_categories.active=1 and fx_categories.deleted_at is null) as fx_TotalCatches'), 
+        // function($join)
+        // {
+        //    $join->on('r_s_s_news.id', '=', 'TotalCatches.rssid');
+        // })
+        // ->addSelect('category_id')
+        // ->groupBy('name_cat')
         // ->orderBy('categories_count', 'desc')
         // ->limit(10)
         // ->get();
 
-        $model = $model
-        ->select('name_cat as categories_name_',DB::raw('count(*) as categories_count'))
-        ->leftjoin(DB::raw('(SELECT fx_r_s_s_news_categories.rss_news_id as rssid ,fx_r_s_s_news_categories.news_category_id as category_id, fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
-        where fx_r_s_s_news_categories.news_category_id = fx_categories.id 
-        and fx_categories.active=1 and fx_categories.deleted_at is null) as fx_TotalCatches'), 
-        function($join)
-        {
-           $join->on('r_s_s_news.id', '=', 'TotalCatches.rssid');
-        })
-        ->addSelect('category_id')
-        ->groupBy('name_cat')
-        ->orderBy('categories_count', 'desc')
-        ->limit(10)
-        ->get();
 
+        // // $sql = "SELECT count(*) as categories_count ,name_cat FROM fx_r_s_s_news LEFT JOIN
+        // // (SELECT fx_r_s_s_news_categories.rss_news_id as rssid,fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
+        // // where fx_r_s_s_news_categories.news_category_id = fx_categories.id 
+        // // and fx_categories.active=1) as test
+        // // on fx_r_s_s_news.id = test.rssid
+        // // group by name_cat
+        // // order by categories_count desc
+        // // limit 10" ;
+        // // $model = DB::select( DB::raw($sql));
 
-        // $sql = "SELECT count(*) as categories_count ,name_cat FROM fx_r_s_s_news LEFT JOIN
-        // (SELECT fx_r_s_s_news_categories.rss_news_id as rssid,fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
-        // where fx_r_s_s_news_categories.news_category_id = fx_categories.id 
-        // and fx_categories.active=1) as test
-        // on fx_r_s_s_news.id = test.rssid
-        // group by name_cat
-        // order by categories_count desc
-        // limit 10" ;
-        // $model = DB::select( DB::raw($sql));
+        // //-----------------------------------------------------------------------------
 
+        // $host = array();
+        // $color=['#3B3D50','#ECC44D','#DA4C62','#E95C83','#6F57E9','#7698A0','#02CCCD','#A8C5CC','#A0D0C8','#E7DED4'];
+        // foreach($model as $key => $value){
 
-        $host = array();
-        $color=['#3B3D50','#ECC44D','#DA4C62','#E95C83','#6F57E9','#7698A0','#02CCCD','#A8C5CC','#A0D0C8','#E7DED4'];
-        foreach($model as $key => $value){
-
-            $host[] = array(
-                'name' => empty($value->categories_name_)?'None':$value->categories_name_,
-                'y' => (int)$value->categories_count,
-                'color' => $color[$key] ,
-                'data' => $value->category_id
-            );
+        //     $host[] = array(
+        //         'name' => empty($value->categories_name_)?'None':$value->categories_name_,
+        //         'y' => (int)$value->categories_count,
+        //         'color' => $color[$key] ,
+        //         'data' => $value->category_id
+        //     );
 
             
-        }
+        // }
+
+        // ----------------------- old -----------------------
+
+        $data_summary = DB::Table('summary')
+            ->where([
+                'data_key' => 'new', 
+                'data_key_2' => 'top_10_categories', 
+                'status' => 'Y'
+            ])
+            ->first();
+
+        $host = @$data_summary->data_value ? json_decode($data_summary->data_value, true) : ' ';
     
         if ($request->ajax()) {
 
@@ -1692,6 +1804,9 @@ class RSSFeedSettingsController extends Controller
     }
 //-------------------------------------------------------------------------------
     public function rss_data_store_news_create(Request $request){
+
+        // dd($request->all());
+
         $role_custom = @check_role_custom();
         if(!$role_custom['news']) {
             check_permission403();
@@ -2549,6 +2664,155 @@ class RSSFeedSettingsController extends Controller
         }
 
         
+        // ------------ top 10 source
+        // -------------------------------------------------------------------------------------------------
+
+        $data_graph_source = RSSNews::select(
+                DB::raw('count(*) as source_count, source as source')
+            )
+            ->groupBy('source')
+            ->orderBy('source_count', 'desc')
+            ->limit(11)
+            ->get();
+
+        $data_arr_source = array();
+        foreach($data_graph_source as $value)
+        {
+            if(empty($value->source) || $value->source=='None')
+            {
+                if(!isset($data_arr_source['None']))
+                {
+                    $data_arr_source['None'] = 0;
+                }
+
+                $data_arr_source['None'] = $data_arr_source['None']+(int)$value->source_count;
+            }
+            else
+            {
+                $data_arr_source[$value->source] = (int)$value->source_count;
+            }
+        }
+
+        arsort($data_arr_source);
+        $countLimit = 0;
+        $main_arr_source = array();
+        foreach ($data_arr_source as $key => $value) 
+        {
+            $countLimit++;
+            if($countLimit<11)
+            {
+                $main_arr_source[] = [$key,$value];
+            }
+        }
+
+        $encoded_data_graph_source = json_encode($main_arr_source);
+
+        $main_data_source = [
+            'site' => '',
+            'data_key' => 'new',
+            'data_key_2' => 'top_10_source',
+            'data_value' => $encoded_data_graph_source
+        ];
+
+        $check_data_source = DB::Table('summary')
+            ->where([
+                'data_key' => 'new', 
+                'data_key_2' => 'top_10_source', 
+                'status' => 'Y'
+            ])
+            ->first();
+
+        if($check_data_source)
+        {
+            DB::Table('summary')
+                ->where([
+                    'data_key' => 'new', 
+                    'data_key_2' => 'top_10_source', 
+                    'status' => 'Y'
+                ])
+                ->update($main_data_source);
+        }
+        else
+        {
+            DB::table('summary')->insert($main_data_source);
+        }
+        
+        // ------------ top 10 category
+        // -------------------------------------------------------------------------------------------------
+
+        $data_graph_category = RSSNews::select(
+                'name_cat as categories_name_',
+                DB::raw('count(*) as categories_count')
+            )
+            ->leftjoin(
+                DB::raw('(
+                    SELECT 
+                        fx_r_s_s_news_categories.rss_news_id as rssid ,
+                        fx_r_s_s_news_categories.news_category_id as category_id, 
+                        fx_categories.name as name_cat 
+                    FROM 
+                        fx_r_s_s_news_categories,fx_categories
+                    where 
+                        fx_r_s_s_news_categories.news_category_id = fx_categories.id and 
+                        fx_categories.active=1 and 
+                        fx_categories.deleted_at is null
+                ) as fx_TotalCatches'), 
+                function($join)
+                {
+                    $join->on('r_s_s_news.id', '=', 'TotalCatches.rssid');
+                }
+            )
+            ->addSelect('category_id')
+            ->groupBy('name_cat')
+            ->orderBy('categories_count', 'desc')
+            ->limit(10)
+            ->get();
+
+        $main_arr_category = array();
+        $color=['#3B3D50','#ECC44D','#DA4C62','#E95C83','#6F57E9','#7698A0','#02CCCD','#A8C5CC','#A0D0C8','#E7DED4'];
+        foreach($data_graph_category as $key => $value)
+        {
+            $main_arr_category[] = array(
+                'name' => empty($value->categories_name_)?'None':$value->categories_name_,
+                'y' => (int)$value->categories_count,
+                'color' => $color[$key] ,
+                'data' => $value->category_id
+            );
+        }
+
+        $encoded_data_graph_category = json_encode($main_arr_category);
+
+        $main_data_category = [
+            'site' => '',
+            'data_key' => 'new',
+            'data_key_2' => 'top_10_categories',
+            'data_value' => $encoded_data_graph_category
+        ];
+
+        $check_data_category = DB::Table('summary')
+            ->where([
+                'data_key' => 'new', 
+                'data_key_2' => 'top_10_categories', 
+                'status' => 'Y'
+            ])
+            ->first();
+        
+        if($check_data_category)
+        {
+            DB::Table('summary')
+                ->where([
+                    'data_key' => 'new', 
+                    'data_key_2' => 'top_10_categories', 
+                    'status' => 'Y'
+                ])
+                ->update($main_data_category);
+        }
+        else
+        {
+            DB::table('summary')->insert($main_data_category);
+        }
+
+
         return ajaxResponse(
             [
                 // 'cate' => $SiteCategory,

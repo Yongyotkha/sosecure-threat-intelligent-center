@@ -37,6 +37,9 @@ Route::group(
 		
 		Route::post('/agent_delete', 'AgentManagementController@agent_delete')->name('agentmanagement.agent_delete');
 		Route::post('/updateManageRule', 'AgentManagementController@updateManageRule')->name('agentmanagement.updateManageRule');
+
+		Route::get('/export_tb_alert', 'AgentManagementController@export_excel_tb_alert')->name('agentmanagement.export_excel_tb_alert');
+		Route::get('/export_tb_agent', 'AgentManagementController@export_excel_tb_agent')->name('agentmanagement.export_excel_tb_agent');
 	}
 );
 

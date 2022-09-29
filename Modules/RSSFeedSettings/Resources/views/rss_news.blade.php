@@ -478,8 +478,8 @@ use Carbon\Carbon;
         console.log(news_source);
         console.log(news_category);
         console.log(keywords);--}}
-        load_top_source();
-        load_top_category();
+        {{-- load_top_source();
+        load_top_category(); --}}
         datatable();
         
     }
@@ -543,8 +543,8 @@ use Carbon\Carbon;
             end = moment();
             cb(start, end);
             isDateSearch = null;
-            load_top_source();
-            load_top_category();
+            {{-- load_top_source();
+            load_top_category(); --}}
             datatable();
             
         });
@@ -663,7 +663,7 @@ $(function() {
         news_source = [];
         news_category = [];
         news_source.push(source);
-        load_top_source();
+        {{-- load_top_source(); --}}
     }
 
     function find_category(category){
@@ -671,7 +671,7 @@ $(function() {
         news_category = [];
         news_source = [];
         news_category.push(category);
-        load_top_category();
+        {{-- load_top_category(); --}}
     }
 
     function datatable(){
