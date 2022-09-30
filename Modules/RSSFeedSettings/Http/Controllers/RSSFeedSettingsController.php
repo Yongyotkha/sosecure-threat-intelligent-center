@@ -454,7 +454,18 @@ class RSSFeedSettingsController extends Controller
                 'public_date',
                 'status',
                 'created_at',
-            ) -> orderBy('public_date', 'desc');
+            ) 
+
+            // ---------------- where data client ----------------
+            // ->where(function ($query) {
+            //     $query->where('save_draft',  0)
+            //         ->orWhere('save_draft',  null);
+            // })
+            // ->where('status', 1)
+            // ->where('public_date', '<=', Carbon::now())
+            // ---------------------------------------------------
+            
+            -> orderBy('public_date', 'desc');
         // $model = $model -> get();
 
         // dd(count($model));

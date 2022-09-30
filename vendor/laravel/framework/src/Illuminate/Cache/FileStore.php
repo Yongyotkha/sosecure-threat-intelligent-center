@@ -184,6 +184,8 @@ class FileStore implements Store
             return $this->emptyPayload();
         }
 
+        // $data = unserialize('a:12:{s:13:"selectionType";s:8:"facility";s:8:"dateType";s:5:"daily";s:10:"dateOption";s:9:"drilldown";s:6:"metric";s:13:"bookingAmount";s:9:"companyFK";s:2:"11";s:10:"facilityFK";s:0:"";s:7:"classFK";s:0:"";s:15:"customDateStart";s:4:"null";s:7:"newDate";s:10:"2010-11-01";s:10:"metricName";s:10:"Bookings $";s:16:"currentDateRange";s:10:"11/01/2010";s:23:"currentMetricNavigation";s:8:"DELDELTE";}"');
+        // var_dump($data);
         $data = unserialize(substr($contents, 10));
 
         // Next, we'll extract the number of minutes that are remaining for a cache

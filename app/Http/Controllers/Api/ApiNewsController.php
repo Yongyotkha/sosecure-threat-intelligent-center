@@ -179,24 +179,24 @@ class ApiNewsController extends ApiController
                         $site_id = @$site_id_m->id;
                     }
         
-                    $date_start_explode = explode(" ",$date_start);
-                    $date_start_date = @$date_start_explode[0];
-                    $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
-                    // dd($date_start_time);
-                    $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
-                    // dd($date_start_date_format);
-                    $date_start_time_time = date("H:i", strtotime($date_start_time));
-                    $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
-                    // dd($date_start_time_time);
+                    // $date_start_explode = explode(" ",$date_start);
+                    // $date_start_date = @$date_start_explode[0];
+                    // $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                    // // dd($date_start_time);
+                    // $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                    // // dd($date_start_date_format);
+                    // $date_start_time_time = date("H:i", strtotime($date_start_time));
+                    // $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                    // // dd($date_start_time_time);
         
-                    $date_end_explode = explode(" ",$date_end);
-                    $date_end_date = @$date_end_explode[0];
-                    $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
-                    // dd($date_end_time);
-                    $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
-                    $date_end_time_time = date("H:i", strtotime($date_end_time));
-                    $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
-                    // dd($date_end_time_time);
+                    // $date_end_explode = explode(" ",$date_end);
+                    // $date_end_date = @$date_end_explode[0];
+                    // $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                    // // dd($date_end_time);
+                    // $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                    // $date_end_time_time = date("H:i", strtotime($date_end_time));
+                    // $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+                    // // dd($date_end_time_time);
         
                     // date("H:i", strtotime("04:25 PM"))
                     $html = '';
@@ -269,6 +269,10 @@ class ApiNewsController extends ApiController
                         }
         
                         if($date_start) {
+
+                            $date_start_datetime_format = Carbon::createFromFormat('Y-m-d h:i A', $date_start)->format('Y-m-d H:i:s');
+                            $date_end_datetime_format = Carbon::createFromFormat('Y-m-d h:i A', $date_end)->format('Y-m-d H:i:s');
+
                             // $news = $news -> whereDate('created_at','>', $date_start_datetime_format);
                             $news = $news -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
                         //     ->where(function($query) use ($date_start_datetime_format,$date_end_datetime_format){
@@ -341,44 +345,44 @@ class ApiNewsController extends ApiController
                                 $news[$i]['campainge'] = $result_camp;
                                 $news[$i]['count_campainge'] = $count_result_camp;
 
-                                $query= [
-                                    'pulse_id' => $news[$i]['id'],
-                                    'mode' => 'news',
-                                    'join' => 'actor',
-                                    'delete_at'  => null
-                                ];
-                                $option = [];
+                                // $query= [
+                                //     'pulse_id' => $news[$i]['id'],
+                                //     'mode' => 'news',
+                                //     'join' => 'actor',
+                                //     'delete_at'  => null
+                                // ];
+                                // $option = [];
                         
-                                $final_test = $conn->find($query,$option);
-                                $result_test = $final_test->toArray();
-                                $count_result_test = count($result_test);
+                                // $final_test = $conn->find($query,$option);
+                                // $result_test = $final_test->toArray();
+                                // $count_result_test = count($result_test);
                                 
-                                $news[$i]['actor'] = $result_test;
-                                $news[$i]['count_result'] = $count_result_test;
+                                // $news[$i]['actor'] = $result_test;
+                                // $news[$i]['count_result'] = $count_result_test;
                                 
-                                $logo_actor = array();
-                                if(is_array($result_test) || is_object($result_test)){
-                                    foreach(@$result_test as $sel_data_act)
-                                    {
-                                        $query_sel_act = [
-                                            'adversary_uuid' => $sel_data_act['adversary_uuid']
-                                        ];
-                                        $option_sel_act = [];
-                                        $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
+                                // $logo_actor = array();
+                                // if(is_array($result_test) || is_object($result_test)){
+                                //     foreach(@$result_test as $sel_data_act)
+                                //     {
+                                //         $query_sel_act = [
+                                //             'adversary_uuid' => $sel_data_act['adversary_uuid']
+                                //         ];
+                                //         $option_sel_act = [];
+                                //         $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
                                         
-                                        if(@$result_sel_act['logo'])
-                                        {
-                                            $logo_actor[] = $result_sel_act['logo'];
-                                        }
-                                        else
-                                        {
-                                            $logo_actor[] = '/asset_salepage/images/AgentBasedDetection.png';
-                                        }
+                                //         if(@$result_sel_act['logo'])
+                                //         {
+                                //             $logo_actor[] = $result_sel_act['logo'];
+                                //         }
+                                //         else
+                                //         {
+                                //             $logo_actor[] = '/asset_salepage/images/AgentBasedDetection.png';
+                                //         }
                                         
-                                        // $news[$i]['logo'] = $logo;
-                                        $news[$i]['logo_actor'] = $logo_actor;
-                                    }
-                                }
+                                //         // $news[$i]['logo'] = $logo;
+                                //         $news[$i]['logo_actor'] = $logo_actor;
+                                //     }
+                                // }
                         
                             }
                         }
@@ -437,44 +441,44 @@ class ApiNewsController extends ApiController
                                 $news[$i]['campainge'] = $result_camp;
                                 $news[$i]['count_campainge'] = $count_result_camp;
 
-                                $query= [
-                                    'pulse_id' => $news[$i]['id'],
-                                    'mode' => 'news',
-                                    'join' => 'actor',
-                                    'delete_at'  => null
-                                ];
-                                $option = [];
+                                // $query= [
+                                //     'pulse_id' => $news[$i]['id'],
+                                //     'mode' => 'news',
+                                //     'join' => 'actor',
+                                //     'delete_at'  => null
+                                // ];
+                                // $option = [];
                         
-                                $final_test = $conn->find($query,$option);
-                                $result_test = $final_test->toArray();
-                                $count_result_test = count($result_test);
+                                // $final_test = $conn->find($query,$option);
+                                // $result_test = $final_test->toArray();
+                                // $count_result_test = count($result_test);
                                 
-                                $news[$i]['actor'] = $result_test;
-                                $news[$i]['count_result'] = $count_result_test;
+                                // $news[$i]['actor'] = $result_test;
+                                // $news[$i]['count_result'] = $count_result_test;
                                 
-                                $logo_actor = array();
-                                if(is_array($result_test) || is_object($result_test)){
-                                    foreach(@$result_test as $sel_data_act)
-                                    {
-                                        $query_sel_act = [
-                                            'adversary_uuid' => $sel_data_act['adversary_uuid']
-                                        ];
-                                        $option_sel_act = [];
-                                        $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
+                                // $logo_actor = array();
+                                // if(is_array($result_test) || is_object($result_test)){
+                                //     foreach(@$result_test as $sel_data_act)
+                                //     {
+                                //         $query_sel_act = [
+                                //             'adversary_uuid' => $sel_data_act['adversary_uuid']
+                                //         ];
+                                //         $option_sel_act = [];
+                                //         $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
                                         
-                                        if(@$result_sel_act['logo'])
-                                        {
-                                            $logo_actor[] = $result_sel_act['logo'];
-                                        }
-                                        else
-                                        {
-                                            $logo_actor[] = '/asset_salepage/images/AgentBasedDetection.png';
-                                        }
+                                //         if(@$result_sel_act['logo'])
+                                //         {
+                                //             $logo_actor[] = $result_sel_act['logo'];
+                                //         }
+                                //         else
+                                //         {
+                                //             $logo_actor[] = '/asset_salepage/images/AgentBasedDetection.png';
+                                //         }
                                         
-                                        // $news[$i]['logo'] = $logo;
-                                        $news[$i]['logo_actor'] = $logo_actor;
-                                    }
-                                }
+                                //         // $news[$i]['logo'] = $logo;
+                                //         $news[$i]['logo_actor'] = $logo_actor;
+                                //     }
+                                // }
                         
                             }
                         }
@@ -619,51 +623,58 @@ class ApiNewsController extends ApiController
                                 <span class="entry-view"> <i class="fas fa-eye"></i> '.$item -> view.'</span>
                                 <span class="entry-date"> <i class="fas fa-calendar-alt"></i> '.$item -> public_date.'</span>
                                 <span> <b>Serverity: </b> ';
-                                if($item->serverity=='critical'){
-                                    $html .=  '<span class="badge" style="background-color: #b93624;">Critical</span>';
-                                }else if($item->serverity=='high'){
-                                    $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
-                                }else if($item->serverity=='medium'){
-                                    $html .= '<span class="badge" style="background-color: #f2ff15;color:#333;">Medium</span>';
-                                }else if($item->serverity=='low'){
-                                    $html .= '<span class="badge" style="background-color: #88ce4f;">Low</span>';
-                                }else if($item->serverity=='information'){
-                                    $html .= '<span class="badge" style="background-color: #00dcff;">Information</span>';
-                                }else{
-                                    $html .= '-';
-                                }
+                                    if($item->serverity=='critical'){
+                                        $html .=  '<span class="badge" style="background-color: #b93624;">Critical</span>';
+                                    }else if($item->serverity=='high'){
+                                        $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
+                                    }else if($item->serverity=='medium'){
+                                        $html .= '<span class="badge" style="background-color: #f2ff15;color:#333;">Medium</span>';
+                                    }else if($item->serverity=='low'){
+                                        $html .= '<span class="badge" style="background-color: #88ce4f;">Low</span>';
+                                    }else if($item->serverity=='information'){
+                                        $html .= '<span class="badge" style="background-color: #00dcff;">Information</span>';
+                                    }else{
+                                        $html .= '-';
+                                    }
             
-                                $html .= '</span> &nbsp; <span class="entry-cate"> <b>Categories: </b>'.$html_cate_all.'</span>'
-                                .@$html_source_all_full.
-                                '<span><p class="details-news-elip">&nbsp;'.strip_tags($n_detail).'</p></span>';
+                        $html .= '
+                                </span> &nbsp; 
+                                <span class="entry-cate"> <b>Categories: </b>'.$html_cate_all.'</span>'.@$html_source_all_full.'
+                        ';
+                        if($n_detail)
+                        {
+                            $html .= '
+                                    <span><p class="details-news-elip">&nbsp;'.strip_tags($n_detail).'</p></span>
+                            ';
+                        }
 
-                                if($item->count_campainge > 0)
-                                {
-                                $html .= '<span class="m-r-5 m-l-xs" style="display: inline-flex;align-items: center;">
-                                            <b>Actor : </b>
-                                            <div class="m-l-xs">';
-                                            $array_row = 1;
-                                            $count_result = $item->count_result;
-                                            for($i = 0 ; $i < $item->count_result ; $i++)
-                                            {
-                                                if($array_row == $count_result)
-                                                {
-                                                    $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$item->logo_actor[$i].'"><span>
-                                                            '.$item->actor[$i]->adversary_name.'';
-                                                }
-                                                else
-                                                {
-                                                    $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$item->logo_actor[$i].'"><span>
-                                                            '.$item->actor[$i]->adversary_name.', ';
-                                                }
-                                                $array_row = $array_row+1;
-                                            }
+                                // if($item->count_campainge > 0)
+                                // {
+                                // $html .= '<span class="m-r-5 m-l-xs" style="display: inline-flex;align-items: center;">
+                                //             <b>Actor : </b>
+                                //             <div class="m-l-xs">';
+                                //             $array_row = 1;
+                                //             $count_result = $item->count_result;
+                                //             for($i = 0 ; $i < $item->count_result ; $i++)
+                                //             {
+                                //                 if($array_row == $count_result)
+                                //                 {
+                                //                     $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$item->logo_actor[$i].'"><span>
+                                //                             '.$item->actor[$i]->adversary_name.'';
+                                //                 }
+                                //                 else
+                                //                 {
+                                //                     $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$item->logo_actor[$i].'"><span>
+                                //                             '.$item->actor[$i]->adversary_name.', ';
+                                //                 }
+                                //                 $array_row = $array_row+1;
+                                //             }
 
-                                    $html .= '
-                                            </div>
-                                        </span>
-                                    ';
-                                }
+                                //     $html .= '
+                                //             </div>
+                                //         </span>
+                                //     ';
+                                // }
 
                                 if($item->count_campainge > 0)
                                 {
@@ -1125,142 +1136,153 @@ class ApiNewsController extends ApiController
                     $user_id = $data['data']['user_id'];
      
 
-                    $site_id = '';
+                    // $site_id = '';
         
-                    if($site) {
-                        // $site_id_m = SiteSettings::where('id',$site)->first();
-                        $site_id = @$site;
-                    }
+                    // if($site) {
+                    //     // $site_id_m = SiteSettings::where('id',$site)->first();
+                    //     $site_id = @$site;
+                    // }
         
-                    $model = new RSSNews();
-                    if($search_val == 1){
+                    // $model = new RSSNews();
+                    // if($search_val == 1){
 
-                        $model = $model->where(function ($query) {
-                                                $query->where('save_draft',  0)
-                                                      ->orWhere('save_draft',  null);
-                                        })->where('status', 1)->where('public_date', '<=', Carbon::now());
+                    //     $model = $model->where(function ($query) {
+                    //                             $query->where('save_draft',  0)
+                    //                                   ->orWhere('save_draft',  null);
+                    //                     })->where('status', 1)->where('public_date', '<=', Carbon::now());
                         
-                        if($keywords){
-                            $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$keywords.'%')->first();
+                    //     if($keywords){
+                    //         $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$keywords.'%')->first();
                             
-                            if($model_where) {
-                                $model = $model -> where('title_en', 'LIKE' ,'%'.$keywords.'%');
-                            } else {
-                                $model = $model -> where('title_th', 'LIKE' ,'%'.$keywords.'%');
-                            }
+                    //         if($model_where) {
+                    //             $model = $model -> where('title_en', 'LIKE' ,'%'.$keywords.'%');
+                    //         } else {
+                    //             $model = $model -> where('title_th', 'LIKE' ,'%'.$keywords.'%');
+                    //         }
                             
-                        }
+                    //     }
 
-                        if($isDateSearch == 1){
-                            $date_start = $startDate;
-                            $date_end = $endDate;
+                    //     if($isDateSearch == 1){
+                    //         $date_start = $startDate;
+                    //         $date_end = $endDate;
 
-                            $date_start_explode = explode(" ",$date_start);
-                            $date_start_date = @$date_start_explode[0];
-                            $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
-                            // dd($date_start_time);
-                            $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
-                            // dd($date_start_date_format);
-                            $date_start_time_time = date("H:i", strtotime($date_start_time));
-                            $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
-                            // dd($date_start);
+                    //         $date_start_explode = explode(" ",$date_start);
+                    //         $date_start_date = @$date_start_explode[0];
+                    //         $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                    //         // dd($date_start_time);
+                    //         $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                    //         // dd($date_start_date_format);
+                    //         $date_start_time_time = date("H:i", strtotime($date_start_time));
+                    //         $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                    //         // dd($date_start);
 
-                            $date_end_explode = explode(" ",$date_end);
-                            $date_end_date = @$date_end_explode[0];
-                            $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
-                            // dd($date_end_time);
-                            $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
-                            $date_end_time_time = date("H:i", strtotime($date_end_time));
-                            $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
-                            // dd($date_end_time_time);
+                    //         $date_end_explode = explode(" ",$date_end);
+                    //         $date_end_date = @$date_end_explode[0];
+                    //         $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                    //         // dd($date_end_time);
+                    //         $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                    //         $date_end_time_time = date("H:i", strtotime($date_end_time));
+                    //         $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+                    //         // dd($date_end_time_time);
 
-                            // $model -> whereDate('transcation_date', Carbon::parse($public_date)->format('Y-m-d'));
-                            $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
-                        }
+                    //         // $model -> whereDate('transcation_date', Carbon::parse($public_date)->format('Y-m-d'));
+                    //         $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                    //     }
 
-                        // if($status_news){
-                        //     if($status_news == 1 || $status_news == 2){
-                        //         if($status_news == 1) {
-                        //             $model =  $model -> where('save_draft','=',0);
+                    //     // if($status_news){
+                    //     //     if($status_news == 1 || $status_news == 2){
+                    //     //         if($status_news == 1) {
+                    //     //             $model =  $model -> where('save_draft','=',0);
                                     
-                        //         } else if ($status_news == 2) {
-                        //             $model =  $model -> where('save_draft',1);
-                        //             // dd($model);
-                        //         }
+                    //     //         } else if ($status_news == 2) {
+                    //     //             $model =  $model -> where('save_draft',1);
+                    //     //             // dd($model);
+                    //     //         }
                                 
-                        //     }  
-                        // }
+                    //     //     }  
+                    //     // }
 
-                        if($news_source){
+                    //     if($news_source){
 
-                            // $model -> where('source', 'LIKE' ,'%'.$news_source.'%');
-                            $model = $model -> whereIn('source', $news_source);
-                        }
+                    //         // $model -> where('source', 'LIKE' ,'%'.$news_source.'%');
+                    //         $model = $model -> whereIn('source', $news_source);
+                    //     }
 
-                        // if($news_category){
-                        //     $news_cate_id = $news_category;
-                        //     $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
-                        //         $query->whereIn('news_category_id', $news_cate_id);
-                        //     });
-                        // }
+                    //     // if($news_category){
+                    //     //     $news_cate_id = $news_category;
+                    //     //     $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
+                    //     //         $query->whereIn('news_category_id', $news_cate_id);
+                    //     //     });
+                    //     // }
 
-                        // if($site_id) {
-                        //     $model = $model->wherehas('get_site_news_related', function($q) use ($site_id) {
-                        //         $q->where('site_id', $site_id)->where('deleted_at', null);
-                        //     });
-                        // }
+                    //     // if($site_id) {
+                    //     //     $model = $model->wherehas('get_site_news_related', function($q) use ($site_id) {
+                    //     //         $q->where('site_id', $site_id)->where('deleted_at', null);
+                    //     //     });
+                    //     // }
 
-                        if($news_category) {
-                            // dd($news_category);
-                            $news_category_id_m = CategorySettings::where('code',$news_category)->first();
-                            $news_category_id = @$news_category_id_m->id;
-                            // dd($news_category_id);
-                            $model = $model->whereHas('get_cate', function ($query) use ($news_category_id) {
-                                $query->where('news_category_id', '=', $news_category_id);
-                            });
+                    //     if($news_category) {
+                    //         // dd($news_category);
+                    //         $news_category_id_m = CategorySettings::where('code',$news_category)->first();
+                    //         $news_category_id = @$news_category_id_m->id;
+                    //         // dd($news_category_id);
+                    //         $model = $model->whereHas('get_cate', function ($query) use ($news_category_id) {
+                    //             $query->where('news_category_id', '=', $news_category_id);
+                    //         });
         
-                        }
+                    //     }
 
-                        if($status_serverity){
+                    //     if($status_serverity){
 
-                            $model = $model -> where('serverity', $status_serverity);
-                        }
+                    //         $model = $model -> where('serverity', $status_serverity);
+                    //     }
                         
-                    }
+                    // }
 
-                    $model = $model         
-                    ->select(DB::raw('count(*) as source_count , source as source'))
-                    ->groupBy('source')
-                    ->orderBy('source_count', 'desc')
-                    ->limit(11)
-                    ->get();
+                    // $model = $model         
+                    // ->select(DB::raw('count(*) as source_count , source as source'))
+                    // ->groupBy('source')
+                    // ->orderBy('source_count', 'desc')
+                    // ->limit(11)
+                    // ->get();
 
-                    $host2 = array();
-                    foreach($model as $value){
-                        if(empty($value->source)||$value->source=='None'){
-                            if(!isset($host2['None'])){
-                                $host2['None'] = 0;
-                            }
-                            $host2['None'] = $host2['None']+(int)$value->source_count;
-                        }else{
-                            $host2[$value->source] = (int)$value->source_count;
-                        }
-                    }
-                    arsort($host2);
-                    $countLimit = 0;
-                    $host = array();
-                    foreach ($host2 as $key => $value) {
-                        $countLimit++;
-                        if($countLimit<11){
-                            $host[] = [$key,$value];
-                        }
-                    }
+                    // $host2 = array();
+                    // foreach($model as $value){
+                    //     if(empty($value->source)||$value->source=='None'){
+                    //         if(!isset($host2['None'])){
+                    //             $host2['None'] = 0;
+                    //         }
+                    //         $host2['None'] = $host2['None']+(int)$value->source_count;
+                    //     }else{
+                    //         $host2[$value->source] = (int)$value->source_count;
+                    //     }
+                    // }
+                    // arsort($host2);
+                    // $countLimit = 0;
+                    // $host = array();
+                    // foreach ($host2 as $key => $value) {
+                    //     $countLimit++;
+                    //     if($countLimit<11){
+                    //         $host[] = [$key,$value];
+                    //     }
+                    // }
         
        
                     // $dataOut = [
                     //     "html" => $html,
                     //     "count" => $news_all
                     // ];
+
+                    $data_summary = DB::Table('summary')
+                        ->where([
+                            'data_key' => 'new', 
+                            'data_key_2' => 'top_10_source', 
+                            'status' => 'Y'
+                        ])
+                        ->first();
+
+                    $host = @$data_summary->data_value ? json_decode($data_summary->data_value, true) : ' ';
+
                     $data_transcation = json_encode($host);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
@@ -1313,162 +1335,162 @@ class ApiNewsController extends ApiController
                     $user_id = $data['data']['user_id'];
 
 
-                    $site_id = '';
+                    // $site_id = '';
         
-                    if($site) {
-                        // $site_id_m = SiteSettings::where('id',$site_code)->first();
-                        $site_id = @$site;
-                    }
+                    // if($site) {
+                    //     // $site_id_m = SiteSettings::where('id',$site_code)->first();
+                    //     $site_id = @$site;
+                    // }
         
                     
-                    $model = new RSSNews();
-                    if($search_val == 1){
+                    // $model = new RSSNews();
+                    // if($search_val == 1){
 
-                        $model = $model->where(function ($query) {
-                                                $query->where('save_draft',  0)
-                                                    ->orWhere('save_draft',  null);
-                                        })->where('status', 1)->where('public_date', '<=', Carbon::now());
+                    //     $model = $model->where(function ($query) {
+                    //                             $query->where('save_draft',  0)
+                    //                                 ->orWhere('save_draft',  null);
+                    //                     })->where('status', 1)->where('public_date', '<=', Carbon::now());
 
-                        if($keywords){
-                            $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$keywords.'%')->first();
+                    //     if($keywords){
+                    //         $model_where = RSSNews::where('title_en', 'LIKE' ,'%'.$keywords.'%')->first();
                             
-                            if($model_where) {
-                                $model = $model -> where('title_en', 'LIKE' ,'%'.$keywords.'%');
-                            } else {
-                                $model = $model -> where('title_th', 'LIKE' ,'%'.$keywords.'%');
-                            }
+                    //         if($model_where) {
+                    //             $model = $model -> where('title_en', 'LIKE' ,'%'.$keywords.'%');
+                    //         } else {
+                    //             $model = $model -> where('title_th', 'LIKE' ,'%'.$keywords.'%');
+                    //         }
                             
-                        }
+                    //     }
             
-                        if($isDateSearch == 1){
-                            $date_start = $startDate;
-                            $date_end = $endDate;
+                    //     if($isDateSearch == 1){
+                    //         $date_start = $startDate;
+                    //         $date_end = $endDate;
             
-                            $date_start_explode = explode(" ",$date_start);
-                            $date_start_date = @$date_start_explode[0];
-                            $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
-                            // dd($date_start_time);
-                            $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
-                            // dd($date_start_date_format);
-                            $date_start_time_time = date("H:i", strtotime($date_start_time));
-                            $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
-                            // dd($date_start);
+                    //         $date_start_explode = explode(" ",$date_start);
+                    //         $date_start_date = @$date_start_explode[0];
+                    //         $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                    //         // dd($date_start_time);
+                    //         $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                    //         // dd($date_start_date_format);
+                    //         $date_start_time_time = date("H:i", strtotime($date_start_time));
+                    //         $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                    //         // dd($date_start);
             
-                            $date_end_explode = explode(" ",$date_end);
-                            $date_end_date = @$date_end_explode[0];
-                            $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
-                            // dd($date_end_time);
-                            $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
-                            $date_end_time_time = date("H:i", strtotime($date_end_time));
-                            $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
-                            // dd($date_end_time_time);
+                    //         $date_end_explode = explode(" ",$date_end);
+                    //         $date_end_date = @$date_end_explode[0];
+                    //         $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                    //         // dd($date_end_time);
+                    //         $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                    //         $date_end_time_time = date("H:i", strtotime($date_end_time));
+                    //         $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+                    //         // dd($date_end_time_time);
             
-                            // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
-                            $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
-                        }
+                    //         // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+                    //         $model = $model -> whereBetween('created_at',array($date_start_datetime_format,$date_end_datetime_format));
+                    //     }
             
-                        // if($status_news){
-                        //     if($status_news == 1 || $status_news == 2){
-                        //         if($status_news == 1) {
-                        //             $model =  $model -> where('save_draft','=',0);
+                    //     // if($status_news){
+                    //     //     if($status_news == 1 || $status_news == 2){
+                    //     //         if($status_news == 1) {
+                    //     //             $model =  $model -> where('save_draft','=',0);
                                     
-                        //         } else if ($status_news == 2) {
-                        //             $model =  $model -> where('save_draft',1);
-                        //             // dd($model);
-                        //         }
+                    //     //         } else if ($status_news == 2) {
+                    //     //             $model =  $model -> where('save_draft',1);
+                    //     //             // dd($model);
+                    //     //         }
                                 
-                        //     }  
-                        // }
+                    //     //     }  
+                    //     // }
 
-                        if($news_source){
+                    //     if($news_source){
             
-                            // $model -> where('source', 'LIKE' ,'%'.$news_source.'%');
-                            $model = $model -> whereIn('source', $news_source);
-                        }
+                    //         // $model -> where('source', 'LIKE' ,'%'.$news_source.'%');
+                    //         $model = $model -> whereIn('source', $news_source);
+                    //     }
             
-                        // if($news_category){
-                        //     $news_cate_id = $news_category;
-                        //     $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
-                        //         $query->whereIn('news_category_id', $news_cate_id);
-                        //     });
-                        // }
+                    //     // if($news_category){
+                    //     //     $news_cate_id = $news_category;
+                    //     //     $model =  $model -> whereHas('get_cate', function ($query) use ($news_cate_id) {
+                    //     //         $query->whereIn('news_category_id', $news_cate_id);
+                    //     //     });
+                    //     // }
 
-                        // if($site_id) {
-                        //     $model = $model->wherehas('get_site_news_related', function($q) use ($site_id) {
-                        //         $q->where('site_id', $site_id)->where('deleted_at', null);
-                        //     });
-                        // }
+                    //     // if($site_id) {
+                    //     //     $model = $model->wherehas('get_site_news_related', function($q) use ($site_id) {
+                    //     //         $q->where('site_id', $site_id)->where('deleted_at', null);
+                    //     //     });
+                    //     // }
 
-                        if($news_category) {
-                            // dd($news_category);
-                            $news_category_id_m = CategorySettings::where('code',$news_category)->first();
-                            $news_category_id = @$news_category_id_m->id;
-                            // dd($news_category_id);
-                            $model = $model->whereHas('get_cate', function ($query) use ($news_category_id) {
-                                $query->where('news_category_id', '=', $news_category_id);
-                            });
+                    //     if($news_category) {
+                    //         // dd($news_category);
+                    //         $news_category_id_m = CategorySettings::where('code',$news_category)->first();
+                    //         $news_category_id = @$news_category_id_m->id;
+                    //         // dd($news_category_id);
+                    //         $model = $model->whereHas('get_cate', function ($query) use ($news_category_id) {
+                    //             $query->where('news_category_id', '=', $news_category_id);
+                    //         });
         
-                        }
+                    //     }
 
-                        if($status_serverity){
-                            $model = $model -> where('serverity', $status_serverity);
-                        }
+                    //     if($status_serverity){
+                    //         $model = $model -> where('serverity', $status_serverity);
+                    //     }
                         
-                    }
+                    // }
                    
-                    // $RSSNewsCategory = RSSNewsCategory::select('rss_news_id','categories.name')->join('categories','categories.id','=','r_s_s_news_categories.news_category_id')->where('categories.active',1);
-                    // dd($RSSNewsCategory->get());
-                    // $model = $model         
-                    // ->select('categories.name as categories_name_',DB::raw('count(*) as categories_count'))
-                    // ->leftjoin('r_s_s_news_categories','r_s_s_news.id','=','r_s_s_news_categories.rss_news_id')
-                    // ->leftjoin('categories','categories.id','=','r_s_s_news_categories.news_category_id')
-                    // ->where('categories.active',1)
-                    // ->where('categories.deleted_at',null)
-                    // ->groupBy('categories.name')
+                    // // $RSSNewsCategory = RSSNewsCategory::select('rss_news_id','categories.name')->join('categories','categories.id','=','r_s_s_news_categories.news_category_id')->where('categories.active',1);
+                    // // dd($RSSNewsCategory->get());
+                    // // $model = $model         
+                    // // ->select('categories.name as categories_name_',DB::raw('count(*) as categories_count'))
+                    // // ->leftjoin('r_s_s_news_categories','r_s_s_news.id','=','r_s_s_news_categories.rss_news_id')
+                    // // ->leftjoin('categories','categories.id','=','r_s_s_news_categories.news_category_id')
+                    // // ->where('categories.active',1)
+                    // // ->where('categories.deleted_at',null)
+                    // // ->groupBy('categories.name')
+                    // // ->orderBy('categories_count', 'desc')
+                    // // ->limit(10)
+                    // // ->get();
+            
+                    // $model = $model
+                    // ->select('name_cat as categories_name_',DB::raw('count(*) as categories_count'))
+                    // ->leftjoin(DB::raw('(SELECT fx_r_s_s_news_categories.rss_news_id as rssid ,fx_r_s_s_news_categories.news_category_id as category_id, fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
+                    // where fx_r_s_s_news_categories.news_category_id = fx_categories.id 
+                    // and fx_categories.active=1 and fx_categories.deleted_at is null) as fx_TotalCatches'), 
+                    // function($join)
+                    // {
+                    //    $join->on('r_s_s_news.id', '=', 'TotalCatches.rssid');
+                    // })
+                    // ->addSelect('category_id')
+                    // ->groupBy('name_cat')
                     // ->orderBy('categories_count', 'desc')
                     // ->limit(10)
                     // ->get();
             
-                    $model = $model
-                    ->select('name_cat as categories_name_',DB::raw('count(*) as categories_count'))
-                    ->leftjoin(DB::raw('(SELECT fx_r_s_s_news_categories.rss_news_id as rssid ,fx_r_s_s_news_categories.news_category_id as category_id, fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
-                    where fx_r_s_s_news_categories.news_category_id = fx_categories.id 
-                    and fx_categories.active=1 and fx_categories.deleted_at is null) as fx_TotalCatches'), 
-                    function($join)
-                    {
-                       $join->on('r_s_s_news.id', '=', 'TotalCatches.rssid');
-                    })
-                    ->addSelect('category_id')
-                    ->groupBy('name_cat')
-                    ->orderBy('categories_count', 'desc')
-                    ->limit(10)
-                    ->get();
+            
+                    // // $sql = "SELECT count(*) as categories_count ,name_cat FROM fx_r_s_s_news LEFT JOIN
+                    // // (SELECT fx_r_s_s_news_categories.rss_news_id as rssid,fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
+                    // // where fx_r_s_s_news_categories.news_category_id = fx_categories.id 
+                    // // and fx_categories.active=1) as test
+                    // // on fx_r_s_s_news.id = test.rssid
+                    // // group by name_cat
+                    // // order by categories_count desc
+                    // // limit 10" ;
+                    // // $model = DB::select( DB::raw($sql));
             
             
-                    // $sql = "SELECT count(*) as categories_count ,name_cat FROM fx_r_s_s_news LEFT JOIN
-                    // (SELECT fx_r_s_s_news_categories.rss_news_id as rssid,fx_categories.name as name_cat FROM fx_r_s_s_news_categories,fx_categories
-                    // where fx_r_s_s_news_categories.news_category_id = fx_categories.id 
-                    // and fx_categories.active=1) as test
-                    // on fx_r_s_s_news.id = test.rssid
-                    // group by name_cat
-                    // order by categories_count desc
-                    // limit 10" ;
-                    // $model = DB::select( DB::raw($sql));
+                    // $host = array();
+                    // $color=['#3B3D50','#ECC44D','#DA4C62','#E95C83','#6F57E9','#7698A0','#02CCCD','#A8C5CC','#A0D0C8','#E7DED4'];
+                    // foreach($model as $key => $value){
             
-            
-                    $host = array();
-                    $color=['#3B3D50','#ECC44D','#DA4C62','#E95C83','#6F57E9','#7698A0','#02CCCD','#A8C5CC','#A0D0C8','#E7DED4'];
-                    foreach($model as $key => $value){
-            
-                        $host[] = array(
-                            'name' => empty($value->categories_name_)?'None':$value->categories_name_,
-                            'y' => (int)$value->categories_count,
-                            'color' => $color[$key] ,
-                            'data' => $value->category_id
-                        );
+                    //     $host[] = array(
+                    //         'name' => empty($value->categories_name_)?'None':$value->categories_name_,
+                    //         'y' => (int)$value->categories_count,
+                    //         'color' => $color[$key] ,
+                    //         'data' => $value->category_id
+                    //     );
             
                         
-                    }
+                    // }
             
         
        
@@ -1476,6 +1498,17 @@ class ApiNewsController extends ApiController
                     //     "html" => $html,
                     //     "count" => $news_all
                     // ];
+
+                    $data_summary = DB::Table('summary')
+                        ->where([
+                            'data_key' => 'new', 
+                            'data_key_2' => 'top_10_categories', 
+                            'status' => 'Y'
+                        ])
+                        ->first();
+
+                    $host = @$data_summary->data_value ? json_decode($data_summary->data_value, true) : ' ';
+
                     $data_transcation = json_encode($host);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
