@@ -558,38 +558,128 @@ class ApiDashboardController extends ApiController
                     $get_role_custom = $data['data']['get_role_custom'];
                     $model = new CVEMapping;
 
+                    // $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
+                    // if (@$get_role_custom['superadmin'] == 1) {
+                    //     if (!$site) {
+                    //         $model->get();
+                    //         $high = $model->where('severity', '=', 'HIGH')->count();
+                    //         $medium = $model->where('severity', '=', 'MEDIUM')->count();
+                    //         $critical = $model->where('severity', '=', 'CRITICAL')->count();
+                    //         $low = $model->where('severity', '=', 'LOW')->count();
+                    //         $none = $model->where('severity', '=', 'NONE')->count();
+                    //     } else {
+                    //         $model->get();
+                    //         $site_id_m = SiteSettings::select('id')->where('code', $site)->first();
+                    //         $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_id_m->id)->select('namecve')->get();
+                    //         $high = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'HIGH')->count();
+                    //         $medium = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'MEDIUM')->count();
+                    //         $critical = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'CRITICAL')->count();
+                    //         $low = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'LOW')->count();
+                    //         $none = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'NONE')->count();
+                    //     }
+                    // } else {
+                    //     if (!$site) {
+                    //         $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_arr)->select('namecve')->get();
+                    //         $model->get();
+                    //         $high = $model->where('severity', '=', 'HIGH')->whereIn('namecve', $CVEMappingAssets_name)->count();
+                    //         $medium = $model->where('severity', '=', 'MEDIUM')->whereIn('namecve', $CVEMappingAssets_name)->count();
+                    //         $critical = $model->where('severity', '=', 'CRITICAL')->whereIn('namecve', $CVEMappingAssets_name)->count();
+                    //         $low = $model->where('severity', '=', 'LOW')->whereIn('namecve', $CVEMappingAssets_name)->count();
+                    //         $none = $model->where('severity', '=', 'NONE')->whereIn('namecve', $CVEMappingAssets_name)->count();
+                    //     } else {
+                    //         $model->get();
+                    //         $site_id_m = SiteSettings::select('id')->where('code', $site)->first();
+                    //         $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->select('namecve')->get();
+                    //         $high = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'HIGH')->count();
+                    //         $medium = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'MEDIUM')->count();
+                    //         $critical = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'CRITICAL')->count();
+                    //         $low = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'LOW')->count();
+                    //         $none = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'NONE')->count();
+                    //     }
+                    // }
+
                     $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
-                    if (@$get_role_custom['superadmin'] == 1) {
-                        if (!$site) {
-                            $model->get();
-                            $high = $model->where('severity', '=', 'HIGH')->count();
-                            $medium = $model->where('severity', '=', 'MEDIUM')->count();
-                            $critical = $model->where('severity', '=', 'CRITICAL')->count();
-                            $low = $model->where('severity', '=', 'LOW')->count();
-                            $none = $model->where('severity', '=', 'NONE')->count();
-                        } else {
-                            $model->get();
-                            $site_id_m = SiteSettings::select('id')->where('code', $site)->first();
-                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_id_m->id)->select('namecve')->get();
-                            $high = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'HIGH')->count();
-                            $medium = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'MEDIUM')->count();
-                            $critical = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'CRITICAL')->count();
-                            $low = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'LOW')->count();
-                            $none = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'NONE')->count();
+                    if(@get_role_custom()['superadmin'] == 1) 
+                    {
+                        
+                        if(!$site)
+                        {
+                            // $model = new CVEMapping;
+                            // $model->get();
+                            // $high = $model->where('severity', '=', 'HIGH')->count();
+                            // $medium = $model->where('severity', '=', 'MEDIUM')->count();
+                            // $critical = $model->where('severity', '=', 'CRITICAL')->count();
+                            // $low = $model->where('severity', '=', 'LOW')->count();
+                            // $none = $model->where('severity', '=', 'NONE')->count();
+
+                            $query = $none = DB::table('summary')
+                                        ->where('status', 'Y')
+                                        ->whereIn('data_text', ['Information','Low', 'medium', 'high', 'critical'])
+                                        ->where('data_key_2', 'Vulnerability')
+                                        ->select('data_text', DB::raw('sum(data_value) as data_value'))
+                                        ->groupBy('data_text')
+                                        ->orderBy('data_text')
+                                        ->get();
+
+                            $none = intval($query[2]->data_value);
+                            $low = intval($query[3]->data_value);
+                            $medium = intval($query[4]->data_value);
+                            $high = intval($query[1]->data_value);
+                            $critical = intval($query[0]->data_value); 
+
                         }
-                    } else {
-                        if (!$site) {
+                        else
+                        {
+
+                            $count= DB::table('summary')->where('data_key', 'dashboardnew')->where('site', $site)->count();
+
+                            if($count > 0){
+
+                                $query =  $none = DB::table('summary')
+                                        ->where('site', $site)
+                                        ->where('status', 'Y')
+                                        ->whereIn('data_text', ['Information','Low', 'medium', 'high', 'critical'])
+                                        ->where('data_key_2', 'Vulnerability')
+                                        ->select('data_text','data_value')
+                                        ->orderBy('data_text')
+                                        ->get();
+                                    
+                                $none = intval($query[2]->data_value);
+                                $low = intval($query[3]->data_value);
+                                $medium = intval($query[4]->data_value);
+                                $high = intval($query[1]->data_value);
+                                $critical = intval($query[0]->data_value);
+                                
+                            } else{
+                                $none = 0;
+                                $low = 0;
+                                $medium = 0;
+                                $high = 0;
+                                $critical = 0;
+                            }
+
+                        }
+
+                    } 
+                    else 
+                    {
+                        if(!$site)
+                        {
                             $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_arr)->select('namecve')->get();
+                            $model = new CVEMapping;
                             $model->get();
                             $high = $model->where('severity', '=', 'HIGH')->whereIn('namecve', $CVEMappingAssets_name)->count();
                             $medium = $model->where('severity', '=', 'MEDIUM')->whereIn('namecve', $CVEMappingAssets_name)->count();
                             $critical = $model->where('severity', '=', 'CRITICAL')->whereIn('namecve', $CVEMappingAssets_name)->count();
                             $low = $model->where('severity', '=', 'LOW')->whereIn('namecve', $CVEMappingAssets_name)->count();
                             $none = $model->where('severity', '=', 'NONE')->whereIn('namecve', $CVEMappingAssets_name)->count();
-                        } else {
+                        }
+                        else
+                        {
+                            $site_id_m = SiteSettings::select('id')->where('code',$site)->first();
+                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_id_m->id)->select('namecve')->get();
+                            $model = new CVEMapping;
                             $model->get();
-                            $site_id_m = SiteSettings::select('id')->where('code', $site)->first();
-                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->select('namecve')->get();
                             $high = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'HIGH')->count();
                             $medium = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'MEDIUM')->count();
                             $critical = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'CRITICAL')->count();

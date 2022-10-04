@@ -81,7 +81,7 @@ class ApiKeywordController extends ApiController
 
                 $site = SiteSettings::select('id')->where('code', $code_site)->first();
 
-                $Site_keywords = Site_keywords::where('site_id', $site->id)->where('status',1)->whereNull('deleted_at')->where('type',$type)->orderBy('order','asc')->get();
+                $Site_keywords = Site_keywords::select('id', 'name', 'keywords_main_id', 'site_id', 'status', 'deleted_at', 'type', 'order')->where('site_id', $site->id)->where('status',1)->whereNull('deleted_at')->where('type',$type)->orderBy('order','asc')->get();
                 if(!$Site_keywords) {
                     $message = langapp('changes_saved_successful');
                     $status = 1;

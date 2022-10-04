@@ -2135,7 +2135,7 @@ class ApiBrandabuseController extends ApiController
                             $model = $model->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
                         }
 
-                        $model = $model->get();
+                        // $model = $model->get();
                     } else {
 
                         $model = BrandAbuseFeedTemp::where('keyword', '!=', null)->where('keyword', '!=', '')->whereIn('feed_type', ['social','darkweb_public']);
@@ -2147,7 +2147,7 @@ class ApiBrandabuseController extends ApiController
                                 $query->where('site_id', 'LIKE', '%' . $site->id . '%');
                             });
                         }
-                        $model = $model->get();
+                        // $model = $model->get();
                         // $model = $model->limit(100)->get();
                         
                     }
