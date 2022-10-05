@@ -8,8 +8,111 @@ use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\Site_keywords;
 use Modules\SiteSettings\Entities\site_keywords_main;
 
+use Illuminate\Support\Facades\DB;
+
 class ApiKeywordController extends ApiController
 {
+    public function show_keywords(Request $request)
+    {
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+
+            if(!$data){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                $message = '';
+                $status = 0;
+
+                $user_id = $data['data']['user_id'];
+                $type = ['social', 'darkweb', 'defacement', 'credit_card'];
+
+                $query_user =  DB::table('users')
+                    ->select('site.id', 'site.code')
+                    ->leftjoin('site', 'users.site_id', 'site.id')
+                    ->where(['users.id' => $user_id])
+                    ->first();
+
+                // $site = SiteSettings::select(
+                //         'code'
+                //     )
+                //     ->where('id', $query_user->id)
+                //     ->first();
+
+                $arr_data = [];
+                foreach($type as $data_type)
+                {
+                    $data_keywords = Site_keywords::select(
+                            'id', 
+                            'name', 
+                            'keywords_main_id', 
+                            'site_id', 
+                            'status', 
+                            'deleted_at', 
+                            'type', 
+                            'order'
+                        )
+                        ->where('site_id', $query_user->id)
+                        ->where('status', 1)
+                        ->whereNull('deleted_at')
+                        ->where('type', $data_type)
+                        ->orderBy('order', 'asc')
+                        ->get();
+
+                    $html = '';
+                    if(count($data_keywords) > 0)
+                    {
+                        foreach($data_keywords as $keywords)
+                        {
+                            $html .= '
+                                <li class="item-list item--keyword" data-id="'.$keywords->id.'">
+                                    <div class="left-side-item">
+                                        <span class="text-keyword">'.$keywords->name.'</span>
+                                    </div>
+                                </li>
+                            ';
+                        }
+                    }
+
+                    $arr_data[$data_type] = $html;
+
+                    // $arr = [];
+                    // $arr['type'] = $data_type;
+                    // $arr['data_keyword'] = $data_keywords;
+
+                    // $arr_data[$data_type] = $data_keywords;
+                }
+
+                $response = [
+                    "data_keyword" => @$arr_data,
+                    "site_id" => @$query_user->id,
+                    "site_code" => @$query_user->code,
+                    "message" => '',
+                    "status" => 1,
+                ];
+
+                $data_transcation = json_encode($response);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e -> getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
     public function get_keyword_main(Request $request)
     {
         try{

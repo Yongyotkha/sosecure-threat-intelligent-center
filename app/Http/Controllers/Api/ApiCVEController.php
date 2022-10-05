@@ -573,30 +573,30 @@ class ApiCVEController extends ApiController
                                 //     $html .= '</div></span>';
                                 // }
         
-                                if($model->count_campainge > 0)
-                                {
-                                    $html .= ' <span class="m-r-md">
-                                            <strong>Campainge: </strong> ';
+                                // if($model->count_campainge > 0)
+                                // {
+                                //     $html .= ' <span class="m-r-md">
+                                //             <strong>Campainge: </strong> ';
         
-                                            $array_row = 1;
-                                            $count_campainge = $model->count_campainge;
-                                            for($i = 0 ; $i < @$model->count_campainge ; $i++)
-                                            {
-                                                $html .= '<a href="/actor/campainge_detail?_id='.$model->campainge[$i]->adversary_uuid.'&mode=cve">';
-                                                if($array_row == $count_campainge)
-                                                {
-                                                    $html .= ''.$model->campainge[$i]->adversary_name.'';
-                                                }
-                                                else
-                                                {
-                                                    $html .= ''.$model->campainge[$i]->adversary_name.' , ';
-                                                }
-                                                $html .= '</a>';
-                                                $array_row = $array_row+1;
-                                            }
+                                //             $array_row = 1;
+                                //             $count_campainge = $model->count_campainge;
+                                //             for($i = 0 ; $i < @$model->count_campainge ; $i++)
+                                //             {
+                                //                 $html .= '<a href="/actor/campainge_detail?_id='.$model->campainge[$i]->adversary_uuid.'&mode=cve">';
+                                //                 if($array_row == $count_campainge)
+                                //                 {
+                                //                     $html .= ''.$model->campainge[$i]->adversary_name.'';
+                                //                 }
+                                //                 else
+                                //                 {
+                                //                     $html .= ''.$model->campainge[$i]->adversary_name.' , ';
+                                //                 }
+                                //                 $html .= '</a>';
+                                //                 $array_row = $array_row+1;
+                                //             }
                                             
-                                    $html .='</span> ';
-                                }
+                                //     $html .='</span> ';
+                                // }
         
                               //  $html .= ' <span class="m-r-md"><strong>Type: </strong> <span> Passive </span></span> ';
                                 // $html .= '<span class="m-r-md"><strong>Type: </strong> <span> Active </span></span>  ';
@@ -706,8 +706,8 @@ class ApiCVEController extends ApiController
                             return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
         
               }
-
-
+              else
+              {
 
                 $res = DataTables::of($model)
                     ->editColumn('chk', function (CVEMapping $model) {
@@ -773,10 +773,10 @@ class ApiCVEController extends ApiController
                         //                 }
                         //                 $array_row = $array_row+1;
                         //             }
-
+    
                         //     $html .= '</div></span>';
                         // }
-
+    
                         if($model->count_campainge > 0)
                         {
                             $html .= ' <span class="m-r-md">
@@ -868,8 +868,7 @@ class ApiCVEController extends ApiController
                             return "";
                         }
                     )
-
-
+                        
                     ->rawColumns(['chk', 'name_cve', 'description', 'cvss_severity', 'transaction', 'fixed', 'site', 'hostname', 'ip', 'vendor', 'title', 'version', 'edition'])
                     ->toJson();
                     $data_count = $count_row_all;
@@ -882,7 +881,9 @@ class ApiCVEController extends ApiController
                     $data_transcation = json_encode($response);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
-                }
+               }
+                
+            }
             }
         } catch (\Exception $e) {
             $response = array(

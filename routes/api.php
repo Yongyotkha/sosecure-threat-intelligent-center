@@ -175,6 +175,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
      Route::post('phishing/data_chart_circle', 'Api\ApiPhishingController@data_chart_circle');
 
      //keyword
+     Route::post('show_keywords', 'Api\ApiKeywordController@show_keywords');
      Route::post('keyword/get_keyword_main', 'Api\ApiKeywordController@get_keyword_main');
      Route::post('keyword/get_keyword_sub', 'Api\ApiKeywordController@get_keyword_sub');
 
