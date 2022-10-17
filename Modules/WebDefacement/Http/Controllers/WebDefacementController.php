@@ -126,7 +126,7 @@ class WebDefacementController extends Controller
         $data['SiteSettings'] = $SiteSettings;
         $data['SiteSettings_add'] = $SiteSettings_add;
         $data['chk_role_id'] = @Auth::user()->site_role_id;
-
+        dd($data);
         return view('webdefacement::index')->with($data);
     }
 

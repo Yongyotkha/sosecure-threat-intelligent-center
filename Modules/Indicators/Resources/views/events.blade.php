@@ -363,7 +363,6 @@
         customClass: "Myselectbox",
     });
 
-
     $('#industries_box').hide();
     $('#group_box').hide();
 

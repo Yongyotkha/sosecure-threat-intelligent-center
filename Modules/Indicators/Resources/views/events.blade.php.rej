@@ -1,0 +1,9 @@
+diff a/Modules/Indicators/Resources/views/events.blade.php b/Modules/Indicators/Resources/views/events.blade.php	(rejected hunks)
+@@ -547,6 +547,7 @@
+     $('#table_summary_type').DataTable({
+         "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">'
+     });
++
+ 
+     function load_table(page=1){
+         $('#table_events').DataTable({
