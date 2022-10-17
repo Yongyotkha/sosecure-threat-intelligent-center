@@ -180,139 +180,171 @@
 
 
 
-        <section class="panel panel-default">
-            <header class="panel-heading font-bold panel-header-blue">
-                <div class="row">
-                    <div class="col-xs-12">
-                        <i class="fas fa-table"></i> Table Event
-                    </div>
-                </div>
-            </header>
 
 
-            <div class="panel-body">
+        
+        <div class="tabbable">
+            <ul class="nav nav-tabs nav-tabs-highlight">
+                <li class="active">
+                    <a href="#tab_event" data-toggle="tab">Event</a>
+                </li>
+                <li><a href="#tab_summary_type" data-toggle="tab">Summary Type</a></li>   
+                {{-- <li><a href="#tab_otx" data-toggle="tab">OTX (0)</a></li>   
+                <li><a href="#tab_misp" data-toggle="tab">MISP (0)</a></li>    --}}
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_event">
 
-                <div class="row m-b-12">
-                    <div class="col-md-2 m-b-12">
-                        <select name="sl_group" id="sl_group" class="form-control sl_group c-dropdown-select2" placeholder="Select">
-                            <option value="0" disabled="disabled">Selected</option>
-                            <option></option>
-                            <option value="1">Industries</option>
-                            {{-- <option value="2">Group</option> --}}
-                        </select>
-                    </div>
-                    <div class="col-md-10">
-                        <div id="industries_box" style="display: none;">
-                            <div id="fillter_click" class="button-group">
-                                <span id="btn_industrise"></span>
-                            </div>
-                        </div>
-                        <div id="group_box" class="row" style="display: none;">
-                            <div class="col-md-12">
-                                <div id="fillter_click_group" class="button-group">
-                                    <span id="btn_group"></span>
+                    <section class="panel panel-default">
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <i class="fas fa-table"></i> Table Event
                                 </div>
                             </div>
+                        </header>
+            
+            
+                        <div class="panel-body">
+            
+                            <div class="row m-b-12">
+                                <div class="col-md-2 m-b-12">
+                                    <select name="sl_group" id="sl_group" class="form-control sl_group c-dropdown-select2" placeholder="Select">
+                                        <option value="0" disabled="disabled">Selected</option>
+                                        <option></option>
+                                        <option value="1">Industries</option>
+                                        {{-- <option value="2">Group</option> --}}
+                                    </select>
+                                </div>
+                                <div class="col-md-10">
+                                    <div id="industries_box" style="display: none;">
+                                        <div id="fillter_click" class="button-group">
+                                            <span id="btn_industrise"></span>
+                                        </div>
+                                    </div>
+                                    <div id="group_box" class="row" style="display: none;">
+                                        <div class="col-md-12">
+                                            <div id="fillter_click_group" class="button-group">
+                                                <span id="btn_group"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{-- <div id="industries_box" class="row" style="display: none;">
+                                <div class="col-md-12">
+                                    <h5 class="font-weight-bold">Industries</h5>
+                                    <div id="fillter_click" class="button-group">
+                                        <span id="btn_industrise"></span>
+                                    </div>
+                                </div>
+                            </div> --}}
+                            
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="table_events">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Industries</th>
+                                            <th>Event Name</th>
+                                            <th>Group</th>
+                                            <th>Tags</th>
+                                            <th style="width: 270px;">Actor / Campainge</th>
+                                            <th>Published</th>
+                                            <th>Last Status</th>
+                                            <th class="nowrap">DateTime</th>
+                                            <th>Attribute</th>
+                                            <th>Action</th>
+                                           
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+        
+                                    </tbody>
+                                </table>
+                                <div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;">
+                                </div>
+                                <div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>
+                            </div>
+            
                         </div>
-                    </div>
+                    </section>
+
+          
+                    
                 </div>
-                {{-- <div id="industries_box" class="row" style="display: none;">
-                    <div class="col-md-12">
-                        <h5 class="font-weight-bold">Industries</h5>
-                        <div id="fillter_click" class="button-group">
-                            <span id="btn_industrise"></span>
+                <div class="tab-pane" id="tab_summary_type">
+
+                    <section class="panel panel-default">
+                        <header class="panel-heading font-bold panel-header-blue">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <i class="fas fa-table"></i> Table Summary Type
+                                </div>
+                            </div>
+                        </header>
+            
+            
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped vt-top" id="table_summary_type">
+                                    <thead>
+                                        <tr>
+                                            <th>Year</th>
+                                            <th>Month</th>
+                                            <th>Attribute Type</th>
+                                            <th>Count</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                           <td>
+                                                <p>2022</p>
+                                           </td>
+                                           <td>
+                                                <p>October</p>
+                                           </td>
+                                           <td>
+                                                <ul style="list-style: none;padding:0;">
+                                                    <li class="mb-2">
+                                                        x509 fingerprint sha1
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        x509 fingerprint sha1
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        x509 fingerprint sha1
+                                                    </li>
+                                                </ul>
+                                           </td>
+                                           <td>
+                                                <ul style="list-style: none;padding:0;">
+                                                    <li class="mb-2">
+                                                        1,000
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        1,000
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        1,000
+                                                    </li>
+                                                </ul>
+                                           </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
-                </div> --}}
-                
+                    </section>
 
-                <div class="table-responsive">
-                    <table class="table table-striped" id="table_events">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Industries</th>
-                                <th>Event Name</th>
-                                <th>Group</th>
-                                <th>Tags</th>
-                                <th style="width: 270px;">Actor / Campainge</th>
-                                <th>Published</th>
-                                <th>Last Status</th>
-                                <th class="nowrap">DateTime</th>
-                                <th>Attribute</th>
-                                <th>Action</th>
-                               
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {{-- <tr>
-                                <td>
-                                    <label>
-                                        <input value="" type="checkbox" />
-                                        <span class="label-text"></span>
-                                    </label>
-                                </td>
-                                <td>1</td>
-                                <td>Suspicious proxy agent</td>
-                                <td>
-                                    <a href="">MIST FEED</a>
-                                    <a href="">Phishing,UW</a>
-                                </td>
-                                <td>
-                                    <a href="">Scan,Agent,</a>
-                                    <a href="">Proxy,Spider</a>
-                                </td>
-                                <td>
-                                    <a href="">5421</a>
-                                </td>
-                                <td>
-                                    <i class="fas fa-check"></i>
-                                </td>
-                                <td>
-                                    Modified
-                                </td>
-                                <td>
-                                    2020-12-07 11:11
-                                </td>
-                                <td>
-                                    152
-                                </td>
-                                <td>
-                                    <a href="{{ route('indicators.events_detail') }}" class="btn btn-xs
-                                    btn-info"><i class="far fa-eye"></i> View</a>
-                                </td>
-                            </tr> --}}
-                        </tbody>
-                    </table>
-                    <div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;">
-                    </div>
-                    <div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>
-                </div>
 
-                <div class="tabbable">
-                    <ul class="nav nav-tabs nav-tabs-highlight d-none">
-                        <li class="active"><a href="#tab_event" data-toggle="tab">Event (0)</a></li>
-                        <li><a href="#tab_attr" data-toggle="tab">Attribute (0)</a></li>   
-                        <li><a href="#tab_otx" data-toggle="tab">OTX (0)</a></li>   
-                        <li><a href="#tab_misp" data-toggle="tab">MISP (0)</a></li>   
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane active" id="tab_event">
+          
 
-                        </div>
-                        <div class="tab-pane" id="tab_attr">
 
-                        </div>
-                        <div class="tab-pane" id="tab_otx">
 
-                        </div>
-                        <div class="tab-pane" id="tab_misp">
-
-                        </div>
-                    </div>
                 </div>
             </div>
-        </section>
+        </div>
 
     </section>
 </section>
