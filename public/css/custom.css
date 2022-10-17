@@ -5504,3 +5504,7 @@ input.form-policy[type=password] {
     width: 100%;
     z-index: 99999;
 } */
+
+.panel .table.vt-top td, .table td {
+    vertical-align: top!important;
+}
