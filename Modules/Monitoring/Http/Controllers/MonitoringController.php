@@ -72,20 +72,26 @@ class MonitoringController extends Controller
         $dateNow->setTimezone($tz);
         $htmlCard = '';
         $SiteSettings = SiteSettings::select('id','logo','name','code')->where('active', '1')->whereNull('deleted_at')->with('get_categorys')->get()->toArray();
-        
+      
         if(!empty($SiteSettings)){
            
             foreach ($SiteSettings as $key => $value) {
-                $TransactionBatchjob = TransactionBatchjob::select('transcation_date_start')->where('site_id', $value['id'])->where('status', 1)->orderBy('transcation_date_start','desc')->first()->toArray();
+                $TransactionBatchjob = TransactionBatchjob::select('transcation_date_start')->where('site_id', $value['id'])->where('status', 1)->orderBy('transcation_date_start','desc')->first();
+                if($TransactionBatchjob){
+                    $TransactionBatchjob = $TransactionBatchjob->toArray();
+                }
+                else{
+                    $TransactionBatchjob = ["transcation_date_start" => "0000-00-00 00:00:00"];
+                }
                 $SiteSettings[$key] = array_merge($SiteSettings[$key], $TransactionBatchjob);
             }
-    
+            
             usort($SiteSettings, function($a, $b) {
                 $t1 = strtotime($a['transcation_date_start']);
                 $t2 = strtotime($b['transcation_date_start']);
                 return $t2 - $t1;
             });
-         
+            
             foreach ($SiteSettings as $key => $value) {
                 
                 if(!empty($value['transcation_date_start'])){
@@ -140,8 +146,6 @@ class MonitoringController extends Controller
             }
         }
         
-
-
         $data['page'] = langapp('monitoring_dashboard');
         $data['htmlCard'] = $htmlCard;
         return view('monitoring::dashboard')->with($data);
