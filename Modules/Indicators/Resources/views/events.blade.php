@@ -538,6 +538,12 @@
 
     });
 
+    // Table Summary Type
+    $('#table_summary_type').DataTable({
+        "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">'
+    });
+
+
     function load_table(page=1){
         $('#table_events').DataTable({
             ordering: true,
