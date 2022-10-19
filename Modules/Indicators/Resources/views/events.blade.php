@@ -1,237 +1,246 @@
 @extends('layouts.app')
 @section('content')
-<section id="content" class="bg">
-    <section class="vbox">
+    <section id="content" class="bg">
+        <section class="vbox">
 
-        <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
-            <div class="header-flex-overflow m-t-10">
-                <div class="fwb-16">
-                    <span>
-                        Events
-                    </span>
-                </div>
+            <header class="header panel-heading bg-white b-b b-light bar-header-overflow">
+                <div class="header-flex-overflow m-t-10">
+                    <div class="fwb-16">
+                        <span>
+                            Events
+                        </span>
+                    </div>
 
-                <div class="ml-2 text-right">
-                 {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
-                 {{-- <div class="text-left" style="min-width: 270px;display:inline-block">
+                    <div class="ml-2 text-right">
+                        {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
+                        {{-- <div class="text-left" style="min-width: 270px;display:inline-block">
                     <select name="site" id="site" class="select2-option form-control select-site" style="min-width: 270px;">
                         <option value="">All Site</option>
-                        @if($SiteSettings)
-                        @foreach($SiteSettings as $SiteSettings_val)
+                        @if ($SiteSettings)
+                        @foreach ($SiteSettings as $SiteSettings_val)
                         <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
                         @endforeach
                         @endif
                     </select>
                 </div> --}}
 
-                <a id="" href="" class="btn btn-sm btn-info d-none">
-                    <span data-rel="tooltip" title="Setting Format Log" data-placement="bottom"><i class="fas fa-eye icon"></i><span class="hide-text">Setting Format Log</span></span>
-                </a>
-                @if(!empty(get_role_custom()))
-                    @if(@get_role_custom()['client'] != 1)
-                        <a id="" href="{{url('/monitoring/send_logs')}}?type=indicator" class="btn btn-sm btn-info">
-                            <span data-rel="tooltip" title="View Send Log" data-placement="bottom"><i class="fas fa-eye"></i><span class="hide-text">View Send Log</span></span>
+                        <a id="" href="" class="btn btn-sm btn-info d-none">
+                            <span data-rel="tooltip" title="Setting Format Log" data-placement="bottom"><i
+                                    class="fas fa-eye icon"></i><span class="hide-text">Setting Format Log</span></span>
                         </a>
-                    @endif
-                @endif
-                
+                        @if (!empty(get_role_custom()))
+                            @if (@get_role_custom()['client'] != 1)
+                                <a id="" href="{{ url('/monitoring/send_logs') }}?type=indicator"
+                                    class="btn btn-sm btn-info">
+                                    <span data-rel="tooltip" title="View Send Log" data-placement="bottom"><i
+                                            class="fas fa-eye"></i><span class="hide-text">View Send Log</span></span>
+                                </a>
+                            @endif
+                        @endif
 
-                <a id="advance-search" href="#area_search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
-            </a>
+
+                        <a id="advance-search" href="#area_search" class="btn btn-sm btn-{{ get_option('theme_color') }}">
+                            <span data-rel="tooltip" title="Filter" data-placement="bottom"><i
+                                    class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
+                        </a>
 
 
-        </div>
-    </div>
-</header>
+                    </div>
+                </div>
+            </header>
 
-<section class="scrollable wrapper">
-    <section id="hide-advance-search" class="panel panel-default" style="display: none;">
-        {{-- <div class="panel-heading">
+            <section class="scrollable wrapper">
+                <section id="hide-advance-search" class="panel panel-default" style="display: none;">
+                    {{-- <div class="panel-heading">
             <a class="text-primary" href="{{ route('indicators.events') }}">Events</a>
             |
             <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a>
         </div> --}}
-        <header class="panel-heading font-bold panel-header-blue">
-            <div class="row">
-                <div class="col-md-12">
-                    <i class="fas fa-filter"></i> Filter
-                </div>
-            </header>
-            <div class="panel-body" style="padding: 0 !important">
-                <div class="container-fluid" style="padding: 2rem;">
-                    <div class="row">
-                        <div class="col-lg-4 mb-1">
-                            <h5 class="font-weight-bold">Event Name</h5>
-                            <input type="text" class="form-control" name="event_name" id="event_name"  placeholder="Search">
-                        </div>
-                            <!--<div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="" class="">Group</label>
-                                    {{-- <select name="group[]" id="type" class="select2-option form-control"
+                    <header class="panel-heading font-bold panel-header-blue">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <i class="fas fa-filter"></i> Filter
+                            </div>
+                    </header>
+                    <div class="panel-body" style="padding: 0 !important">
+                        <div class="container-fluid" style="padding: 2rem;">
+                            <div class="row">
+                                <div class="col-lg-4 mb-1">
+                                    <h5 class="font-weight-bold">Event Name</h5>
+                                    <input type="text" class="form-control" name="event_name" id="event_name"
+                                        placeholder="Search">
+                                </div>
+                                <!--<div class="col-md-4">
+                                                                                                    <div class="form-group">
+                                                                                                        <label for="" class="">Group</label>
+                                                                                                        {{-- <select name="group[]" id="type" class="select2-option form-control"
                                         multiple="multiple">
 
                                     </select> --}}
-                                    <input type="text" class="form-control" name="group" id="group" placeholder="Search">
+                                                                                                        <input type="text" class="form-control" name="group" id="group" placeholder="Search">
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="col-md-4">
+                                                                                                    <div class="form-group">
+                                                                                                        <label for="" class="">Tag</label>
+                                                                                                        {{-- <select name="tag[]" id="tag" class="select2-option form-control" multiple="multiple"> --}}
+                                                                                                            <input type="text" class="form-control" name="tag" id="tag" placeholder="Search">
+                                                                                                        </select>
+                                                                                                    </div>
+                                                                                                </div>-->
+                                <div class="col-lg-4 mb-1">
+                                    <h5 class="font-weight-bold">Date</h5>
+                                    <div id="event_date" class="text-center form-control"
+                                        style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="" class="">Tag</label>
-                                    {{-- <select name="tag[]" id="tag" class="select2-option form-control" multiple="multiple"> --}}
-                                        <input type="text" class="form-control" name="tag" id="tag" placeholder="Search">
-                                    </select>
+                                <div class="col-lg-4 mb-1">
+                                    <h5 class="font-weight-bold">Published</h5>
+                                    <div id="groupby-published" class="btn-group special">
+                                        <button class="btn btn-grey check_published  active" id="all" value="">
+                                            <span>All</span>
+                                        </button>
+                                        <button class="btn btn-grey check_published" value="1">
+                                            <span>Published</span>
+                                        </button>
+                                        <button class="btn btn-grey check_published" value="2">
+                                            <span> No Published </span>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>-->
-                            <div class="col-lg-4 mb-1">
-                                <h5 class="font-weight-bold">Date</h5>
-                                <div id="event_date" class="text-center form-control"
-                                style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                <i class="fa fa-calendar"></i>&nbsp;
-                                <span></span> <i class="fa fa-caret-down"></i>
                             </div>
                         </div>
-                        <div class="col-lg-4 mb-1">
-                            <h5 class="font-weight-bold">Published</h5>
-                            <div id="groupby-published" class="btn-group special">
-                                <button class="btn btn-grey check_published  active" id="all" value="">
-                                    <span>All</span>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <button class="btn btn-info" id="btn_search_data">
+                                    <i class="fas fa-search btn-fz-13"></i>
+                                    <span> @langapp('apply') </span>
                                 </button>
-                                <button class="btn btn-grey check_published" value="1">
-                                    <span>Published</span>
+                                <button class="btn btn-default btn-fz-13" id="btn_reset">
+                                    <i class=" fas fa-broom"></i>
+                                    <span> Clear </span>
                                 </button>
-                                <button class="btn btn-grey check_published" value="2">
-                                    <span> No Published </span>
+                                <button class="btn btn-default btn-fz-13" id="close_filter">
+                                    <i class=" fas fa-times"></i>
+                                    <span> Close </span>
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="panel-footer">
-                <div class="row">
-                    <div class="col-md-12 text-right">
-                        <button class="btn btn-info" id="btn_search_data">
-                            <i class="fas fa-search btn-fz-13"></i>
-                            <span> @langapp('apply') </span>
-                        </button>
-                        <button class="btn btn-default btn-fz-13" id="btn_reset">
-                            <i class=" fas fa-broom"></i>
-                            <span> Clear </span>
-                        </button>
-                        <button class="btn btn-default btn-fz-13" id="close_filter">
-                            <i class=" fas fa-times"></i>
-                            <span> Close </span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
+                </section>
 
-        <div class="container-fluid" style="margin-bottom:10px;">
-            <div class="row">
-                <div class="col-lg-4">
+                <div class="container-fluid" style="margin-bottom:10px;">
                     <div class="row">
-                        <div class="col-lg-12 nopadding">
-                            <div class="card-ev">
-                                <div class="header-ev">
-                                    Events
-                                </div>
-                                <div class="card-ev-body">
-                                    <div class="ev-left">
-                                        <span>{{ @number_format( TYPE_WEB == 'center' ? $attr_all->event_count : $attr_all['event_count'] ) }}</span>
-                                        <span class="ev-text-sec">All</span>
-                                    </div>
-                                    <div class="ev-right">
-                                        <span class="cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->event_count : $attr_current['event_count']) }}</span>
-                                        <span>New Event</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-12 nopadding">
-                            <div class="card-ev">
-                                <div class="header-ev">
-                                    Attribute
-                                </div>
-                                <div class="card-ev-body">
-                                    <div class="ev-left">
-                                        <span>{{ @number_format(TYPE_WEB == 'center' ? $attr_all->attribute_count : $attr_all['attribute_count']) }}</span>
-                                        <span class="ev-text-sec">All</span>
-                                    </div>
-                                    <div class="ev-right">
-                                        <span class="cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->attribute_count : $attr_current['attribute_count']) }}</span>
-                                        <span>New Attribute</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-8 nopadding">
-                    <div class="" style="background: #fff">
-                        <span class="header-txt-chart">Top 10 Attribute Type</span>
-                        <div id="chart-pack" style="height: 251px"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-
-
-
-        
-        <div class="tabbable">
-            <ul class="nav nav-tabs nav-tabs-highlight">
-                <li class="active">
-                    <a href="#tab_event" data-toggle="tab">Event</a>
-                </li>
-                <li><a href="#tab_summary_type" data-toggle="tab">Summary Type</a></li>   
-                {{-- <li><a href="#tab_otx" data-toggle="tab">OTX (0)</a></li>   
-                <li><a href="#tab_misp" data-toggle="tab">MISP (0)</a></li>    --}}
-            </ul>
-            <div class="tab-content">
-                <div class="tab-pane active" id="tab_event">
-
-                    <section class="panel panel-default">
-                        <header class="panel-heading font-bold panel-header-blue">
+                        <div class="col-lg-4">
                             <div class="row">
-                                <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table Event
-                                </div>
-                            </div>
-                        </header>
-            
-            
-                        <div class="panel-body">
-            
-                            <div class="row m-b-12">
-                                <div class="col-md-2 m-b-12">
-                                    <select name="sl_group" id="sl_group" class="form-control sl_group c-dropdown-select2" placeholder="Select">
-                                        <option value="0" disabled="disabled">Selected</option>
-                                        <option></option>
-                                        <option value="1">Industries</option>
-                                        {{-- <option value="2">Group</option> --}}
-                                    </select>
-                                </div>
-                                <div class="col-md-10">
-                                    <div id="industries_box" style="display: none;">
-                                        <div id="fillter_click" class="button-group">
-                                            <span id="btn_industrise"></span>
+                                <div class="col-lg-12 nopadding">
+                                    <div class="card-ev">
+                                        <div class="header-ev">
+                                            Events
+                                        </div>
+                                        <div class="card-ev-body">
+                                            <div class="ev-left">
+                                                <span>{{ @number_format(TYPE_WEB == 'center' ? $attr_all->event_count : $attr_all['event_count']) }}</span>
+                                                <span class="ev-text-sec">All</span>
+                                            </div>
+                                            <div class="ev-right">
+                                                <span
+                                                    class="cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->event_count : $attr_current['event_count']) }}</span>
+                                                <span>New Event</span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div id="group_box" class="row" style="display: none;">
-                                        <div class="col-md-12">
-                                            <div id="fillter_click_group" class="button-group">
-                                                <span id="btn_group"></span>
+                                </div>
+                                <div class="col-lg-12 nopadding">
+                                    <div class="card-ev">
+                                        <div class="header-ev">
+                                            Attribute
+                                        </div>
+                                        <div class="card-ev-body">
+                                            <div class="ev-left">
+                                                <span>{{ @number_format(TYPE_WEB == 'center' ? $attr_all->attribute_count : $attr_all['attribute_count']) }}</span>
+                                                <span class="ev-text-sec">All</span>
+                                            </div>
+                                            <div class="ev-right">
+                                                <span
+                                                    class="cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->attribute_count : $attr_current['attribute_count']) }}</span>
+                                                <span>New Attribute</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            {{-- <div id="industries_box" class="row" style="display: none;">
+                        </div>
+
+                        <div class="col-lg-8 nopadding">
+                            <div class="" style="background: #fff">
+                                <span class="header-txt-chart">Top 10 Attribute Type</span>
+                                <div id="chart-pack" style="height: 251px"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+                <div class="tabbable">
+                    <ul class="nav nav-tabs nav-tabs-highlight">
+                        <li class="active">
+                            <a href="#tab_event" data-toggle="tab">Event</a>
+                        </li>
+                        <li><a href="#tab_summary_type" data-toggle="tab">Summary Type</a>
+                        </li>
+                        {{-- <li><a href="#tab_otx" data-toggle="tab">OTX (0)</a></li>   
+                <li><a href="#tab_misp" data-toggle="tab">MISP (0)</a></li>    --}}
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_event">
+
+                            <section class="panel panel-default">
+                                <header class="panel-heading font-bold panel-header-blue">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <i class="fas fa-table"></i> Table Event
+                                        </div>
+                                    </div>
+                                </header>
+
+
+                                <div class="panel-body">
+
+                                    <div class="row m-b-12">
+                                        <div class="col-md-2 m-b-12">
+                                            <select name="sl_group" id="sl_group"
+                                                class="form-control sl_group c-dropdown-select2" placeholder="Select">
+                                                <option value="0" disabled="disabled">Selected</option>
+                                                <option></option>
+                                                <option value="1">Industries</option>
+                                                {{-- <option value="2">Group</option> --}}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-10">
+                                            <div id="industries_box" style="display: none;">
+                                                <div id="fillter_click" class="button-group">
+                                                    <span id="btn_industrise"></span>
+                                                </div>
+                                            </div>
+                                            <div id="group_box" class="row" style="display: none;">
+                                                <div class="col-md-12">
+                                                    <div id="fillter_click_group" class="button-group">
+                                                        <span id="btn_group"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {{-- <div id="industries_box" class="row" style="display: none;">
                                 <div class="col-md-12">
                                     <h5 class="font-weight-bold">Industries</h5>
                                     <div id="fillter_click" class="button-group">
@@ -239,865 +248,871 @@
                                     </div>
                                 </div>
                             </div> --}}
-                            
-                            <div class="table-responsive">
-                                <table class="table table-striped" id="table_events">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Industries</th>
-                                            <th>Event Name</th>
-                                            <th>Group</th>
-                                            <th>Tags</th>
-                                            <th style="width: 270px;">Actor / Campainge</th>
-                                            <th>Published</th>
-                                            <th>Last Status</th>
-                                            <th class="nowrap">DateTime</th>
-                                            <th>Attribute</th>
-                                            <th>Action</th>
-                                           
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-        
-                                    </tbody>
-                                </table>
-                                <div id="showing_amount_text" class="pull-left" style="margin-top: 5px; margin-left: 15px;">
+
+                                    <div class="table-responsive">
+                                        <table class="table table-striped" id="table_events">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Industries</th>
+                                                    <th>Event Name</th>
+                                                    <th>Group</th>
+                                                    <th>Tags</th>
+                                                    <th style="width: 270px;">Actor / Campainge</th>
+                                                    <th>Published</th>
+                                                    <th>Last Status</th>
+                                                    <th class="nowrap">DateTime</th>
+                                                    <th>Attribute</th>
+                                                    <th>Action</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                            </tbody>
+                                        </table>
+                                        <div id="showing_amount_text" class="pull-left"
+                                            style="margin-top: 5px; margin-left: 15px;">
+                                        </div>
+                                        <div class="pull-right" style="padding-right: 10px;" id="pagination_custom">
+                                        </div>
+                                    </div>
+
                                 </div>
-                                <div class="pull-right" style="padding-right: 10px;" id="pagination_custom"></div>
-                            </div>
-            
+                            </section>
+
+
+
                         </div>
-                    </section>
+                        <div class="tab-pane" id="tab_summary_type">
 
-          
-                    
-                </div>
-                <div class="tab-pane" id="tab_summary_type">
+                            <section class="panel panel-default">
+                                <header class="panel-heading font-bold panel-header-blue">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <i class="fas fa-table"></i> Table Summary Type
+                                        </div>
+                                    </div>
+                                </header>
 
-                    <section class="panel panel-default">
-                        <header class="panel-heading font-bold panel-header-blue">
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <i class="fas fa-table"></i> Table Summary Type
+
+                                <div class="panel-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped vt-top" id="table_summary" style="width: 100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Year</th>
+                                                    <th>Month</th>
+                                                    <th>Attribute Type</th>
+                                                    <th>Count</th>
+                                                </tr>
+                                            </thead>
+                                            <tfoot>
+                                                <tr>
+                                                    <th>Year</th>
+                                                    <th>Month</th>
+                                                    <th>Attribute Type</th>
+                                                    <th>Count</th>
+                                                </tr>
+                                            </tfoot>
+                                            <tbody>
+
+                                                @foreach ($summary as $key)
+                                                    <tr>
+                                                        <td>
+                                                            {{ $key->year }}
+                                                        </td>
+
+                                                        <td>
+                                                            {{ $key->month }}
+                                                        </td>
+
+                                                        <td>
+                                                            {{ $key->industries_name }}
+                                                        </td>
+                                                        <td>
+                                                            {{ $key->sumc }}
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
-                        </header>
-            
-            
-                        <div class="panel-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped vt-top" id="table_summary_type">
-                                    <thead>
-                                        <tr>
-                                            <th>Year</th>
-                                            <th>Month</th>
-                                            <th>Attribute Type</th>
-                                            <th>Count</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                           <td>
-                                                <p>2022</p>
-                                           </td>
-                                           <td>
-                                                <p>October</p>
-                                           </td>
-                                           <td>
-                                                <ul style="list-style: none;padding:0;">
-                                                    <li class="mb-2">
-                                                        x509 fingerprint sha1
-                                                    </li>
-                                                    <li class="mb-2">
-                                                        x509 fingerprint sha1
-                                                    </li>
-                                                    <li class="mb-2">
-                                                        x509 fingerprint sha1
-                                                    </li>
-                                                </ul>
-                                           </td>
-                                           <td>
-                                                <ul style="list-style: none;padding:0;">
-                                                    <li class="mb-2">
-                                                        1,000
-                                                    </li>
-                                                    <li class="mb-2">
-                                                        1,000
-                                                    </li>
-                                                    <li class="mb-2">
-                                                        1,000
-                                                    </li>
-                                                </ul>
-                                           </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            </section>
+
+
+
+
+
+
                         </div>
-                    </section>
-
-
-          
-
-
-
+                    </div>
                 </div>
-            </div>
-        </div>
 
+            </section>
+        </section>
+
+        <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
     </section>
-</section>
 
-<a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
-</section>
+    @push('pagestyle')
+        @include('stacks.css.datatables')
+        @include('stacks.css.form')
+        @include('stacks.css.datepicker')
+        @include('stacks.css.highchart')
+        <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
+    @endpush
 
-@push('pagestyle')
-@include('stacks.css.datatables')
-@include('stacks.css.form')
-@include('stacks.css.datepicker')
-@include('stacks.css.highchart')
-<link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
-@endpush
+    @push('pagescript')
+        @include('stacks.js.datatables')
+        @include('stacks.js.form')
+        @include('stacks.js.datepicker')
+        @include('stacks.js.highchart')
+        @include('stacks.js.daterangpicker')
+        @include('stacks.js.advanced_search')
+        <script src="{{ getAsset('plugins/Highcharts-Stock/code/modules/timeline.js') }}"></script>
+        @include('stacks.js.activebutton')
 
-@push('pagescript')
-@include('stacks.js.datatables')
-@include('stacks.js.form')
-@include('stacks.js.datepicker')
-@include('stacks.js.highchart')
-@include('stacks.js.daterangpicker')
-@include('stacks.js.advanced_search')
-<script src="{{ getAsset('plugins/Highcharts-Stock/code/modules/timeline.js') }}"></script>
-@include('stacks.js.activebutton')
+        <script>
+            $('#fillter_click .btn-selector').on('click', function() {
+                $(this).siblings().removeClass('active');
+                $(this).addClass('active');
+            });
 
-<script>
+            active_btn('#fillter_click_group .btn-selector');
+            active_btn('#groupby-published .btn-grey');
 
-    $('#fillter_click .btn-selector').on('click',function(){
-        $(this).siblings().removeClass('active');
-        $(this).addClass('active');
-    });
-
-    active_btn('#fillter_click_group .btn-selector');
-    active_btn('#groupby-published .btn-grey');
-
-    Highcharts.setOptions({
-        lang: {
-          decimalPoint: '.',
-          thousandsSep: ','
-      }
-  });
+            Highcharts.setOptions({
+                lang: {
+                    decimalPoint: '.',
+                    thousandsSep: ','
+                }
+            });
 
 
-    $(".sl_group").select2({
-        placeholder: "Select",
-        allowClear: true,
-        minimumResultsForSearch: Infinity,
-        customClass: "Myselectbox",
-    });
+            $(".sl_group").select2({
+                placeholder: "Select",
+                allowClear: true,
+                minimumResultsForSearch: Infinity,
+                customClass: "Myselectbox",
+            });
 
-    $('#industries_box').hide();
-    $('#group_box').hide();
-
-    $(".sl_group").on('change',function() {
-        if($(this).val() == '1'){
-            $('#industries_box').show();
-            $('#group_box').hide();
-        }else if($(this).val() == '2'){
-            $('#group_box').show();
-            $('#industries_box').hide();
-        }else{
             $('#industries_box').hide();
             $('#group_box').hide();
-        }
-    });
 
-    $('.select2-option').select2();
-
-    var start_date = '';
-    var end_date = '';
-    var f_search= 1;
-    var event_name = '';
-    var count_page = -1;
-    var isDateSearch = 0;
-    var datatable = [];
-    var check_published = null;
-    var industries ="";
-    var group ="";
-
-    $(".check_published").click(function() {
-        check_published = $(this).val();
-
-    });
-
-    $(function() {
-        load_industries();
-        load_group();
-        var chart = new Highcharts.chart('chart-pack', {
-            chart: {
-                type: 'bar',
-                height: '251px'
-            },
-            title: {
-                text: null
-            },
-            xAxis: {
-                categories: ['Attribute']
-            },
-            yAxis: {
-                min: 0,
-                title: {
-                    text: null
+            $(".sl_group").on('change', function() {
+                if ($(this).val() == '1') {
+                    $('#industries_box').show();
+                    $('#group_box').hide();
+                } else if ($(this).val() == '2') {
+                    $('#group_box').show();
+                    $('#industries_box').hide();
+                } else {
+                    $('#industries_box').hide();
+                    $('#group_box').hide();
                 }
-            },
-            legend: {
-                reversed: true,
-                itemMarginTop: 5,
-            },
-            plotOptions: {
-                series: {
-                    stacking: 'normal'
+            });
+
+            $('.select2-option').select2();
+
+            var start_date = '';
+            var end_date = '';
+            var f_search = 1;
+            var event_name = '';
+            var count_page = -1;
+            var isDateSearch = 0;
+            var datatable = [];
+            var check_published = null;
+            var industries = "";
+            var group = "";
+
+            $(".check_published").click(function() {
+                check_published = $(this).val();
+
+            });
+
+            $(function() {
+                load_industries();
+                load_group();
+                var chart = new Highcharts.chart('chart-pack', {
+                    chart: {
+                        type: 'bar',
+                        height: '251px'
+                    },
+                    title: {
+                        text: null
+                    },
+                    xAxis: {
+                        categories: ['Attribute']
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: null
+                        }
+                    },
+                    legend: {
+                        reversed: true,
+                        itemMarginTop: 5,
+                    },
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal'
+                        }
+                    },
+                    series: load_graph()
+                });
+
+                var start = moment().startOf('hour');
+                var end = moment().startOf('hour').add(32, 'hour');
+
+                function cb(start, end) {
+                    $('#event_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                    startDate = start;
+                    endDate = end;
                 }
-            },
-            series: load_graph()
-        });
 
-        var start = moment().startOf('hour');
-        var end = moment().startOf('hour').add(32, 'hour');
-
-        function cb(start, end) {
-            $('#event_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-            startDate = start;
-            endDate = end;
-        }
-
-        $('#event_date').daterangepicker({
-            timePicker: true,
-            startDate: start,
-            endDate: end,
-            locale: {
-                format: 'M/DD hh:mm A'
-            },
-            ranges: {
-                'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-            }
-        }, cb);
-        $('#event_date').on('apply.daterangepicker', function(ev, picker) {
-            isDateSearch = 1;
-            if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
-
-            }
-        });
-
-        cb(start, end);
-
-        $("#btn_search_data").click(function() {
-            {{--console.log(startDate.format('YYYY-MM-DD hh:mm A'));--}}
-
-
-
-            start_date = startDate;
-            end_date = endDate;
-            event_name = $("#event_name").val();
-            
-
-            search_table(1);
-        });
-
-
-        $("#btn_reset").click(function() {
-            $("#event_name").val('');
-            check_published=null;
-            $(".btn-grey").removeClass("active");
-            $("#all").addClass ( "active" );
-            start = moment();
-            end = moment();
-            cb(start, end);
-            load_table(1);
-
-
-        });
-
-
-    });
-
-    $(function() {
-
-        if({!!json_encode($Search_Link_All)!!}===""){
-            load_table(1);
-        }else{
-            event_name = {!!json_encode($Search_Link_All)!!};
-            search_table(1);
-        }
-
-
-    });
-
-    // Table Summary Type
-    $('#table_summary_type').DataTable({
-        "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">'
-    });
-
-
-    function load_table(page=1){
-        $('#table_events').DataTable({
-            ordering: true,
-            pageLength: 25,
-            processing: true,
-            serverSide: true,
-            destroy: true,
-            order: [[ 7, "desc" ]],
-            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
-            ajax: {
-                type: "POST",
-                url: '{!! route('indicators.events_table')!!}',
-                dataSrc: function ( json ) {
-                    count_page = json.recordsTotal;
-                    return json.data;
-                },
-                data:function(d){
-
-                    d.count_page = count_page;
-                }
-            },
-            initComplete : function( settings, json){
-                datatable = json.cursor;
-                $('[data-toggle="tooltip"]').tooltip();
-            },
-
-            columns: [
-
-                {
-                    data: 'No',
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
-                },
-                {
-                    data: 'industries',
-                    "visible": false,
-                },
-                {
-                    data: 'name',
-                },
-                {
-                    data: 'groups',
-                },
-                {
-                    data: 'tags',
-                },
-                {
-                    data: 'actor_and_campainge'
-                },
-                {
-                    data: 'public',
-                },
-                {
-                    data: 'is_modified',
-                },
-                {
-                    data: 'modified',
-                    className : 'nowrap'
-                },
-                {
-                    data: 'attrCount',
-                },
-                {
-                    data: 'pulse_id',
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
-                },
-
-            ],
-            columnDefs: [
-                {
-                    targets: 2,
-                    render: function (data, type, row) {
-                        var inner = '';
-                        inner =  '<div><a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a></div>';
-                        return inner;
+                $('#event_date').daterangepicker({
+                    timePicker: true,
+                    startDate: start,
+                    endDate: end,
+                    locale: {
+                        format: 'M/DD hh:mm A'
+                    },
+                    ranges: {
+                        'Today': [moment(), moment()],
+                        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                        'This Month': [moment().startOf('month'), moment().endOf('month')],
+                        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1,
+                            'month').endOf('month')]
                     }
+                }, cb);
+                $('#event_date').on('apply.daterangepicker', function(ev, picker) {
+                    isDateSearch = 1;
+                    if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
 
-                },
-                {
-                    targets: 5,
-                    render: function (data, type, row) {
-                        var inner = ``;
-                        const test = row.actor;
-                        if(row.count_actor > 0)
+                    }
+                });
+
+                cb(start, end);
+
+                $("#btn_search_data").click(function() {
+                    {{-- console.log(startDate.format('YYYY-MM-DD hh:mm A')); --}}
+
+
+
+                    start_date = startDate;
+                    end_date = endDate;
+                    event_name = $("#event_name").val();
+
+
+                    search_table(1);
+                });
+
+
+                $("#btn_reset").click(function() {
+                    $("#event_name").val('');
+                    check_published = null;
+                    $(".btn-grey").removeClass("active");
+                    $("#all").addClass("active");
+                    start = moment();
+                    end = moment();
+                    cb(start, end);
+                    load_table(1);
+
+
+                });
+
+
+
+            });
+
+            $(function() {
+
+                if ({!! json_encode($Search_Link_All) !!} === "") {
+                    load_table(1);
+                } else {
+                    event_name = {!! json_encode($Search_Link_All) !!};
+                    search_table(1);
+                }
+
+
+            });
+
+
+            var table_summary = $("#table_summary").DataTable({
+                dom: "Blfrtip",
+                buttons: [{
+                        text: 'csv',
+                        extend: 'csvHtml5',
+                    },
+                    {
+                        text: 'excel',
+                        extend: 'excelHtml5',
+                    }
+                ],
+            });
+            $("#table_summary tfoot th").each(function(i) {
+                var select = $('<select><option value=""></option></select>')
+                    .appendTo($(this).empty())
+                    .on('change', function() {
+                        table_summary.column(i)
+                            .search($(this).val())
+                            .draw();
+                    });
+                table_summary.column(i).data().unique().sort().each(function(d, j) {
+                    select.append('<option value="' + d + '">' + d + '</option>')
+                });
+            });
+
+
+
+            function load_table(page = 1) {
+                $('#table_events').DataTable({
+                    ordering: true,
+                    pageLength: 25,
+                    processing: true,
+                    serverSide: true,
+                    destroy: true,
+                    order: [
+                        [7, "desc"]
+                    ],
+                    "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+                    ajax: {
+                        type: "POST",
+                        url: '{!! route('indicators.events_table') !!}',
+                        dataSrc: function(json) {
+                            count_page = json.recordsTotal;
+                            return json.data;
+                        },
+                        data: function(d) {
+
+                            d.count_page = count_page;
+                        }
+                    },
+                    initComplete: function(settings, json) {
+                        datatable = json.cursor;
+                        $('[data-toggle="tooltip"]').tooltip();
+                    },
+
+                    columns: [
+
                         {
-                            inner = `  
+                            data: 'No',
+                            orderable: false,
+                            searchable: false,
+                            sortable: false,
+                        },
+                        {
+                            data: 'industries',
+                            "visible": false,
+                        },
+                        {
+                            data: 'name',
+                        },
+                        {
+                            data: 'groups',
+                        },
+                        {
+                            data: 'tags',
+                        },
+                        {
+                            data: 'actor_and_campainge'
+                        },
+                        {
+                            data: 'public',
+                        },
+                        {
+                            data: 'is_modified',
+                        },
+                        {
+                            data: 'modified',
+                            className: 'nowrap'
+                        },
+                        {
+                            data: 'attrCount',
+                        },
+                        {
+                            data: 'pulse_id',
+                            orderable: false,
+                            searchable: false,
+                            sortable: false,
+                        },
+
+                    ],
+                    columnDefs: [{
+                            targets: 2,
+                            render: function(data, type, row) {
+                                var inner = '';
+                                inner = '<div><a href="{{ route('indicators.events_detail') }}' + '/' + row
+                                    .pulse_id + '">' + row.name + '</a></div>';
+                                return inner;
+                            }
+
+                        },
+                        {
+                            targets: 5,
+                            render: function(data, type, row) {
+                                var inner = ``;
+                                const test = row.actor;
+                                if (row.count_actor > 0) {
+                                    inner = `  
                                     <div>
                                         <strong>Actor : </strong>
                                         <span style="display: inline-flex;align-items: center;">
                             `;
-                            for(let rows in row.actor)
-                            {
-                                let array_rows = 1;
-                                const data_actor = row.actor[rows];
-                            inner += `
+                                    for (let rows in row.actor) {
+                                        let array_rows = 1;
+                                        const data_actor = row.actor[rows];
+                                        inner += `
                                         
                                             `;
-                                            if(array_rows == row.count_actor)
-                                            {
-                            inner += `
+                                        if (array_rows == row.count_actor) {
+                                            inner += `
                                             <a href="/actor/detail?_id=${data_actor.adversary_name}&mode=cve">
                                                 ${data_actor.adversary_name}
                                             </a> 
                             `;
-                                            }
-                                            else
-                                            {
-                            inner += `      
+                                        } else {
+                                            inner += `      
                                             <a href="/actor/detail?_id=${data_actor.adversary_name}&mode=cve">
                                                 ${data_actor.adversary_name}
                                             </a> , 
                             `;
-                                            }
-                                    array_rows++;
-                                            
-                            }
-                            inner += `  </span>
+                                        }
+                                        array_rows++;
+
+                                    }
+                                    inner += `  </span>
                                     </div>
                             `;
-                        }
-                        if(row.count_camp > 0)
-                        {
-                        inner += `
+                                }
+                                if (row.count_camp > 0) {
+                                    inner += `
                                 <div>
                                     <strong>Campainge : </strong> 
                                     <span> 
                                     `;
-                            let array_row = 1;
-                            for(let rows in row.camp)
-                            {
-                                const data_camp = row.camp[rows];
-                                if(array_row == row.count_camp)
-                                {
-                            inner += `
-                                    <a href="{{route('actor.campainge_detail')}}`+`?_id=${data_camp.adversary_uuid}&mode=indi">
+                                    let array_row = 1;
+                                    for (let rows in row.camp) {
+                                        const data_camp = row.camp[rows];
+                                        if (array_row == row.count_camp) {
+                                            inner += `
+                                    <a href="{{ route('actor.campainge_detail') }}` + `?_id=${data_camp.adversary_uuid}&mode=indi">
                                         ${data_camp.adversary_name}
                                     </a>
                             `;
-                                }
-                                else
-                                {
-                            inner += `
-                                    <a href="{{route('actor.campainge_detail')}}`+`?_id=${data_camp.adversary_uuid}&mode=indi">
+                                        } else {
+                                            inner += `
+                                    <a href="{{ route('actor.campainge_detail') }}` + `?_id=${data_camp.adversary_uuid}&mode=indi">
                                         ${data_camp.adversary_name}
                                     </a>,  
                                 `;
-                                }
-                                array_row++;
-                            }
-                            inner += ` 
+                                        }
+                                        array_row++;
+                                    }
+                                    inner += ` 
                                     </span>
                                 </div>
                         `;
-                        }
-                        return inner;
-                    }
+                                }
+                                return inner;
+                            }
 
-                },
-                {
-                    targets: 6,
-                    className: 'text-center',
-                    render: function (data, type, row) {
-                        var inner = '';
-                        if(row.public==1) {
-                            inner = '<i class="fas fa-check text-success"></i>';
-                        } else {
-                            inner = '<i class="fas fa-times text-danger"></i>';
-                        }
-                        return inner;
-                    }
+                        },
+                        {
+                            targets: 6,
+                            className: 'text-center',
+                            render: function(data, type, row) {
+                                var inner = '';
+                                if (row.public == 1) {
+                                    inner = '<i class="fas fa-check text-success"></i>';
+                                } else {
+                                    inner = '<i class="fas fa-times text-danger"></i>';
+                                }
+                                return inner;
+                            }
 
-                },
-                {
-                    targets: 7,
-                    render: function (data, type, row) {
-                        var inner = '';
-                        if(row.is_modified == true) {
-                            inner = 'Modified';
-                        } else {
-                            inner = 'Created';
-                        }
-                        return inner;
-                    }
+                        },
+                        {
+                            targets: 7,
+                            render: function(data, type, row) {
+                                var inner = '';
+                                if (row.is_modified == true) {
+                                    inner = 'Modified';
+                                } else {
+                                    inner = 'Created';
+                                }
+                                return inner;
+                            }
 
-                },
-                {
-                    targets: 8,
-                    render: function (data, type, row) {
-                        var inner = '';
-                        if(row.modified) {
-                            inner = row.modified;
-                        } else {
-                            inner = row.modified;
-                        }
-                        return inner;
-                    }
+                        },
+                        {
+                            targets: 8,
+                            render: function(data, type, row) {
+                                var inner = '';
+                                if (row.modified) {
+                                    inner = row.modified;
+                                } else {
+                                    inner = row.modified;
+                                }
+                                return inner;
+                            }
 
-                },
-            
+                        },
+
                         {
                             targets: 10,
-                            className : 'nowrap',
-                            render: function (data, type, row) {
+                            className: 'nowrap',
+                            render: function(data, type, row) {
                                 var inner = '';
                                 inner += '<div style="display:flex;flex-direction:column;">';
-                                    @if(!empty(get_role_custom()))
-                                    @if(@get_role_custom()['client'] != 1)
-                                    inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.modal_tag')}}'+'?pulse_id='+row.pulse_id+'" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
+                                @if (!empty(get_role_custom()))
+                                    @if (@get_role_custom()['client'] != 1)
+                                        inner +=
+                                            '<a style="max-width:83px;width:100%;" href="{{ route('indicators.modal_tag') }}' +
+                                            '?pulse_id=' + row.pulse_id +
+                                            '" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
                                     @endif
                                 @endif
-                               
-                                inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="m-t-xs btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+
+                                inner +=
+                                    '<a style="max-width:83px;width:100%;" href="{{ route('indicators.events_detail') }}' +
+                                    '/' + row.pulse_id +
+                                    '" class="m-t-xs btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
                                 inner += '</div>';
                                 return inner;
                             }
 
                         }
-                
-            ]
-        });
 
-    }
+                    ]
+                });
 
-    function search_table(page=1){
-        let startDate=  $("#event_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
-        let endDate=  $("#event_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
-        console.log(industries);
-        $('#table_events').DataTable({
-            searching: false,
-            ordering: true,
-            pageLength: 25,
-            processing: true,
-            serverSide: true,
-            destroy: true,
-            order: [[ 6, "desc" ]],
-            "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
-            ajax: {
-                type: "POST",
-                url: '{!! route('indicators.events_table')!!}',
-                dataSrc: function ( json ) {
+            }
 
-                    count_page = json.recordsTotal;
-                    return json.data;
-                },
-                data:function(d){
-                    d.count_page = count_page;
-                    d.startDate = startDate;
-                    d.endDate = endDate;
-                    d.f_search = f_search;
-                    d.keywords = event_name;
-                    d.isDateSearch = isDateSearch;
-                    d.check_published = check_published;
-                    d.industries = industries;
-                    d.groups = group;
-                }
-            },
-            initComplete : function( settings, json){
-                datatable = json.cursor;
-                $('[data-rel="tooltip"]').tooltip();
-            },
+            function search_table(page = 1) {
+                let startDate = $("#event_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
+                let endDate = $("#event_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+                console.log(industries);
+                $('#table_events').DataTable({
+                    searching: false,
+                    ordering: true,
+                    pageLength: 25,
+                    processing: true,
+                    serverSide: true,
+                    destroy: true,
+                    order: [
+                        [6, "desc"]
+                    ],
+                    "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+                    ajax: {
+                        type: "POST",
+                        url: '{!! route('indicators.events_table') !!}',
+                        dataSrc: function(json) {
 
-            columns: [
+                            count_page = json.recordsTotal;
+                            return json.data;
+                        },
+                        data: function(d) {
+                            d.count_page = count_page;
+                            d.startDate = startDate;
+                            d.endDate = endDate;
+                            d.f_search = f_search;
+                            d.keywords = event_name;
+                            d.isDateSearch = isDateSearch;
+                            d.check_published = check_published;
+                            d.industries = industries;
+                            d.groups = group;
+                        }
+                    },
+                    initComplete: function(settings, json) {
+                        datatable = json.cursor;
+                        $('[data-rel="tooltip"]').tooltip();
+                    },
 
-                {
-                    data: 'No',
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
-                },
-                {
-                    data: 'industries',
-                    "visible": true,
-                },
-                {
-                    data: 'name',
-                },
-                {
-                    data: 'groups',
-                },
-                {
-                    data: 'tags',
-                },
-                {
-                    data: 'actor_and_campainge'
-                },
-                {
-                    data: 'public',
-                },
-                {
-                    data: 'is_modified',
-                },
-                {
-                    data: 'modified',
-                    className : 'nowrap'
-                },
-                {
-                    data: 'attrCount',
-                },
-                {
-                    data: 'pulse_id',
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
-                },
+                    columns: [
 
-            ],
-            columnDefs: [
-                {
-                    targets: 2,
-                    render: function (data, type, row) {
-                        var inner = '';
-                        inner =  '<div><a href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'">'+row.name+'</a></div>';
-                        return inner;
-                    }
-
-                },
-                {
-                    targets: 5,
-                    render: function (data, type, row) {
-                        var inner = ``;
-                        const test = row.actor;
-                        if(row.count_actor > 0)
                         {
-                            inner = `  
+                            data: 'No',
+                            orderable: false,
+                            searchable: false,
+                            sortable: false,
+                        },
+                        {
+                            data: 'industries',
+                            "visible": true,
+                        },
+                        {
+                            data: 'name',
+                        },
+                        {
+                            data: 'groups',
+                        },
+                        {
+                            data: 'tags',
+                        },
+                        {
+                            data: 'actor_and_campainge'
+                        },
+                        {
+                            data: 'public',
+                        },
+                        {
+                            data: 'is_modified',
+                        },
+                        {
+                            data: 'modified',
+                            className: 'nowrap'
+                        },
+                        {
+                            data: 'attrCount',
+                        },
+                        {
+                            data: 'pulse_id',
+                            orderable: false,
+                            searchable: false,
+                            sortable: false,
+                        },
+
+                    ],
+                    columnDefs: [{
+                            targets: 2,
+                            render: function(data, type, row) {
+                                var inner = '';
+                                inner = '<div><a href="{{ route('indicators.events_detail') }}' + '/' + row
+                                    .pulse_id + '">' + row.name + '</a></div>';
+                                return inner;
+                            }
+
+                        },
+                        {
+                            targets: 5,
+                            render: function(data, type, row) {
+                                var inner = ``;
+                                const test = row.actor;
+                                if (row.count_actor > 0) {
+                                    inner = `  
                                     <div>
                                         <strong>Actor : </strong>
                                         <span style="display: inline-flex;align-items: center;">
                             `;
-                            for(let rows in row.actor)
-                            {
-                                let array_rows = 1;
-                                const data_actor = row.actor[rows];
-                            inner += `
+                                    for (let rows in row.actor) {
+                                        let array_rows = 1;
+                                        const data_actor = row.actor[rows];
+                                        inner += `
                                         
                                             `;
-                                            if(array_rows == row.count_actor)
-                                            {
-                            inner += `
+                                        if (array_rows == row.count_actor) {
+                                            inner += `
                                             <a href="/actor/detail?_id=${data_actor.adversary_name}&mode=cve">
                                                 ${data_actor.adversary_name}
                                             </a> 
                             `;
-                                            }
-                                            else
-                                            {
-                            inner += `      
+                                        } else {
+                                            inner += `      
                                             <a href="/actor/detail?_id=${data_actor.adversary_name}&mode=cve">
                                                 ${data_actor.adversary_name}
                                             </a> , 
                             `;
-                                            }
-                                    array_rows++;
-                                            
-                            }
-                            inner += `  </span>
+                                        }
+                                        array_rows++;
+
+                                    }
+                                    inner += `  </span>
                                     </div>
                             `;
-                        }
-                        if(row.count_camp > 0)
-                        {
-                        inner += `
+                                }
+                                if (row.count_camp > 0) {
+                                    inner += `
                                 <div>
                                     <strong>Campainge : </strong> 
                                     <span> 
                                     `;
-                            let array_row = 1;
-                            for(let rows in row.camp)
-                            {
-                                const data_camp = row.camp[rows];
-                                if(array_row == row.count_camp)
-                                {
-                            inner += `${data_camp.adversary_name}`;
-                                }
-                                else
-                                {
-                            inner += `${data_camp.adversary_name} , `;
-                                }
-                                array_row++;
-                            }
-                            inner += ` 
+                                    let array_row = 1;
+                                    for (let rows in row.camp) {
+                                        const data_camp = row.camp[rows];
+                                        if (array_row == row.count_camp) {
+                                            inner += `${data_camp.adversary_name}`;
+                                        } else {
+                                            inner += `${data_camp.adversary_name} , `;
+                                        }
+                                        array_row++;
+                                    }
+                                    inner += ` 
                                     </span>
                                 </div>
                         `;
+                                }
+                                return inner;
+                            }
+
+                        },
+                        {
+                            targets: 6,
+                            className: 'text-center',
+                            render: function(data, type, row) {
+                                var inner = '';
+                                if (row.public == 1) {
+                                    inner = '<i class="fas fa-check text-success"></i>';
+                                } else {
+                                    inner = '<i class="fas fa-times text-danger"></i>';
+                                }
+                                return inner;
+                            }
+
+                        },
+                        {
+                            targets: 7,
+                            render: function(data, type, row) {
+                                var inner = '';
+                                if (row.is_modified == true) {
+                                    inner = 'Modified';
+                                } else {
+                                    inner = 'Created';
+                                }
+                                return inner;
+                            }
+
+                        },
+                        {
+                            targets: 8,
+                            render: function(data, type, row) {
+                                var inner = '';
+                                if (row.modified) {
+                                    inner = row.modified;
+                                } else {
+                                    inner = row.modified;
+                                }
+                                return inner;
+                            }
+
+                        },
+                        {
+                            targets: 10,
+                            className: 'nowrap',
+                            render: function(data, type, row) {
+                                var inner = '';
+                                inner += '<div style="display:flex;flex-direction:column;">';
+                                inner +=
+                                    '<a style="max-width:83px;width:100%;" href="{{ route('indicators.modal_tag') }}' +
+                                    '?pulse_id=' + row.pulse_id +
+                                    '" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
+                                inner +=
+                                    '<a style="max-width:83px;width:100%;" href="{{ route('indicators.events_detail') }}' +
+                                    '/' + row.pulse_id +
+                                    '" class="m-t-xs btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                                inner += '</div>';
+                                return inner;
+                            }
+
                         }
-                        return inner;
-                    }
+                    ]
 
-                },
-                {
-                    targets: 6,
-                    className: 'text-center',
-                    render: function (data, type, row) {
-                        var inner = '';
-                        if(row.public==1) {
-                            inner = '<i class="fas fa-check text-success"></i>';
-                        } else {
-                            inner = '<i class="fas fa-times text-danger"></i>';
-                        }
-                        return inner;
-                    }
+                });
 
-                },
-                {
-                    targets: 7,
-                    render: function (data, type, row) {
-                        var inner = '';
-                        if(row.is_modified == true) {
-                            inner = 'Modified';
-                        } else {
-                            inner = 'Created';
-                        }
-                        return inner;
-                    }
-
-                },
-                {
-                    targets: 8,
-                    render: function (data, type, row) {
-                        var inner = '';
-                        if(row.modified) {
-                            inner = row.modified;
-                        } else {
-                            inner = row.modified;
-                        }
-                        return inner;
-                    }
-
-                },
-                {
-                    targets: 10,
-                    className : 'nowrap',
-                    render: function (data, type, row) {
-                        var inner = '';
-                        inner += '<div style="display:flex;flex-direction:column;">';
-                        inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.modal_tag')}}'+'?pulse_id='+row.pulse_id+'" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
-                        inner +=  '<a style="max-width:83px;width:100%;" href="{{route('indicators.events_detail')}}'+'/'+row.pulse_id+'" class="m-t-xs btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
-                        inner += '</div>';
-                        return inner;
-                    }
-
-                }
-            ]
-
-        });
-
-    }
-
-    function load_graph() {
-
-        var graph = {!!json_encode(@$attr_type)!!};
-        return graph;
-
-    }
-
-
-
-    
-
-
-
-
-
-    
-    function load_industries(){
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: "{{route('indicators.industries')}}",
-            type: "get",
-            data: ({
-            }),
-            {{--datatype: "html",--}}
-            beforeSend: function(){
-            },
-        }).done(function(data){
-          if (data.status_code =="00") {
-            var html ="";
-            html +='  <a class="btn btn-selector click_industries click_industries_all active" href="javascript:void(0);" onclick="click_industries(\''+''+'\');">'+'All'+'</a>';
-            for (var i = data.data.length - 1; i >= 0; i--) {
-                html +='  <a class="btn btn-selector click_industries" href="javascript:void(0);" onclick="click_industries(\''+data.data[i].industries_name+'\');">'+data.data[i].industries_name+'</a>';
             }
-            $('#btn_industrise').html(html);
 
-            $('.click_industries').click(function(){
-               $('.click_industries').removeClass('active');
-               $(this).addClass('active');
-           });
-        }else{
+            function load_graph() {
 
+                var graph = {!! json_encode(@$attr_type) !!};
+                return graph;
 
-        }
-
-    }).fail(function(jqXHR, ajaxOptions, thrownError){
-        console.log("No response from server");
-    });
-}
-
-function load_group(){
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: "{{route('indicators.indicator_group')}}",
-            type: "get",
-            data: ({
-            }),
-            {{--datatype: "html",--}}
-            beforeSend: function(){
-            },
-        }).done(function(data){
-          if (data.status_code =="00") {
-            var html ="";
-            html +='  <a class="btn btn-selector click_group click_group_all active" href="javascript:void(0);" onclick="click_group(\''+''+'\');">'+'All'+'</a>';
-            for (var i = data.data.length - 1; i >= 0; i--) {
-                html +='  <a class="btn btn-selector click_group" href="javascript:void(0);" onclick="click_group(\''+data.data[i].industries_name+'\');">'+data.data[i].industries_name+'</a>';
             }
-            $('#btn_group').html(html);
 
-            $('.click_group').click(function(){
-               $('.click_group').removeClass('active');
-               $(this).addClass('active');
-           });
-        }else{
+            function load_industries() {
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{{ route('indicators.industries') }}",
+                    type: "get",
+                    data: ({}),
+                    {{-- datatype: "html", --}}
+                    beforeSend: function() {},
+                }).done(function(data) {
+                    if (data.status_code == "00") {
+                        var html = "";
+                        html +=
+                            '  <a class="btn btn-selector click_industries click_industries_all active" href="javascript:void(0);" onclick="click_industries(\'' +
+                            '' + '\');">' + 'All' + '</a>';
+                        for (var i = data.data.length - 1; i >= 0; i--) {
+                            html +=
+                                '  <a class="btn btn-selector click_industries" href="javascript:void(0);" onclick="click_industries(\'' +
+                                data.data[i].industries_name + '\');">' + data.data[i].industries_name + '</a>';
+                        }
+                        $('#btn_industrise').html(html);
 
-
-        }
-
-    }).fail(function(jqXHR, ajaxOptions, thrownError){
-        console.log("No response from server");
-    });
-}
-
-function click_industries(industries_name){
-    $('.click_group').removeClass('active');
-    $('.click_group_all').addClass('active');
-    group = "";
-    industries = industries_name.trim();
-    search_table(1);
-}
-
-function click_group(group_name){
-    $('.click_industries').removeClass('active');
-    $('.click_industries_all').addClass('active');
-    industries = "";
-    group = group_name.trim();
-    search_table(1);
-}
+                        $('.click_industries').click(function() {
+                            $('.click_industries').removeClass('active');
+                            $(this).addClass('active');
+                        });
+                    } else {
 
 
+                    }
 
-</script>
+                }).fail(function(jqXHR, ajaxOptions, thrownError) {
+                    console.log("No response from server");
+                });
+            }
 
-@endpush
+            function load_group() {
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{{ route('indicators.indicator_group') }}",
+                    type: "get",
+                    data: ({}),
+                    {{-- datatype: "html", --}}
+                    beforeSend: function() {},
+                }).done(function(data) {
+                    if (data.status_code == "00") {
+                        var html = "";
+                        html +=
+                            '  <a class="btn btn-selector click_group click_group_all active" href="javascript:void(0);" onclick="click_group(\'' +
+                            '' + '\');">' + 'All' + '</a>';
+                        for (var i = data.data.length - 1; i >= 0; i--) {
+                            html +=
+                                '  <a class="btn btn-selector click_group" href="javascript:void(0);" onclick="click_group(\'' +
+                                data.data[i].industries_name + '\');">' + data.data[i].industries_name + '</a>';
+                        }
+                        $('#btn_group').html(html);
+
+                        $('.click_group').click(function() {
+                            $('.click_group').removeClass('active');
+                            $(this).addClass('active');
+                        });
+                    } else {
+
+
+                    }
+
+                }).fail(function(jqXHR, ajaxOptions, thrownError) {
+                    console.log("No response from server");
+                });
+            }
+
+            function click_industries(industries_name) {
+                $('.click_group').removeClass('active');
+                $('.click_group_all').addClass('active');
+                group = "";
+                industries = industries_name.trim();
+                search_table(1);
+            }
+
+            function click_group(group_name) {
+                $('.click_industries').removeClass('active');
+                $('.click_industries_all').addClass('active');
+                industries = "";
+                group = group_name.trim();
+                search_table(1);
+            }
+        </script>
+    @endpush
 @endsection

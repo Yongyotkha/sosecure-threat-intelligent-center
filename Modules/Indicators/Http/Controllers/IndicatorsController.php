@@ -15,10 +15,13 @@ use MongoDB\BSON\Regex;
 use MongoDB\Client;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
-use DB;
+// use DB;
 use Auth;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
+use Illuminate\Support\Facades\DB;
+use Nette\Utils\Strings;
+
 class IndicatorsController extends Controller
 {
     /**
@@ -130,12 +133,40 @@ class IndicatorsController extends Controller
             $data['SiteSettings'] = $SiteSettings;
             $data['page'] = langapp('indicators');
 
+            $summary = DB::table('indicator_summary_year')->select('year','month','industries_name',DB::raw("SUM(attribute_count) as sumc"))
+                                                            ->where("status","1")
+                                                            ->where("type","attribute_type")
+                                                            ->groupBy("year","month","industries_name")
+                                                            ->orderBy("month","desc")
+                                                            ->orderBy("sumc","desc")
+                                                            ->get();
+            // $summary = IndicatorSummaryYear::select('year','month','industries_name','attribute_count')->where('status','1')->where('type','attribute_type')->groupBy('month')->get();
+            $arr_months = array('',
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July ',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December',
+            );
+            foreach($summary as $records){
+                $records->month = $arr_months[$records->month];
+                $records->sumc = number_format($records->sumc);
+            }
+            $data['summary']=$summary;        
+            // dd($data['summary']);
             if(isset($this->request->Search_Link_All)){
                 $data['Search_Link_All'] = $this->request->Search_Link_All;
             }else{
                 $data['Search_Link_All'] = "";
             }
-            return view('indicators::events')->with($data);
+            return view('indicators::events')->with($data);//['a'=>'value']
 
         }else{
             $ip = $this->ip;
@@ -1793,7 +1824,8 @@ class IndicatorsController extends Controller
                             7 => 'modified',
                             8 => 'indicator_count',
                             9 => 'pulse_id',
-                        );  
+                        );
+            dd($columns);
             $draw = $_POST['draw'];
             $row = (int)$_POST['start'];
             $rowperpage = (int)$_POST['length'];
