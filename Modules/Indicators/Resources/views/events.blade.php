@@ -71,23 +71,23 @@
                                         placeholder="Search">
                                 </div>
                                 <!--<div class="col-md-4">
-                                                                                                    <div class="form-group">
-                                                                                                        <label for="" class="">Group</label>
-                                                                                                        {{-- <select name="group[]" id="type" class="select2-option form-control"
+                                                                                                                                                                                                                                                                                                                                                    <div class="form-group">
+                                                                                                                                                                                                                                                                                                                                                        <label for="" class="">Group</label>
+                                                                                                                                                                                                                                                                                                                                                        {{-- <select name="group[]" id="type" class="select2-option form-control"
                                         multiple="multiple">
 
                                     </select> --}}
-                                                                                                        <input type="text" class="form-control" name="group" id="group" placeholder="Search">
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                <div class="col-md-4">
-                                                                                                    <div class="form-group">
-                                                                                                        <label for="" class="">Tag</label>
-                                                                                                        {{-- <select name="tag[]" id="tag" class="select2-option form-control" multiple="multiple"> --}}
-                                                                                                            <input type="text" class="form-control" name="tag" id="tag" placeholder="Search">
-                                                                                                        </select>
-                                                                                                    </div>
-                                                                                                </div>-->
+                                                                                                                                                                                                                                                                                                                                                        <input type="text" class="form-control" name="group" id="group" placeholder="Search">
+                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                <div class="col-md-4">
+                                                                                                                                                                                                                                                                                                                                                    <div class="form-group">
+                                                                                                                                                                                                                                                                                                                                                        <label for="" class="">Tag</label>
+                                                                                                                                                                                                                                                                                                                                                        {{-- <select name="tag[]" id="tag" class="select2-option form-control" multiple="multiple"> --}}
+                                                                                                                                                                                                                                                                                                                                                            <input type="text" class="form-control" name="tag" id="tag" placeholder="Search">
+                                                                                                                                                                                                                                                                                                                                                        </select>
+                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                </div>-->
                                 <div class="col-lg-4 mb-1">
                                     <h5 class="font-weight-bold">Date</h5>
                                     <div id="event_date" class="text-center form-control"
@@ -298,7 +298,16 @@
 
                                 <div class="panel-body">
                                     <div class="table-responsive">
+
                                         <table class="table table-striped vt-top" id="table_summary" style="width: 100%">
+                                            <div id="filter-dropdown-min" class="filter-dropdown-min"
+                                                style="text-align:right;">
+                                                <label for="">Select min range</label>
+                                            </div>
+                                            <div id="filter-dropdown-max" class="filter-dropdown-max"
+                                                style="text-align:right;">
+                                                <label for="">Select max range</label>
+                                            </div>
                                             <thead>
                                                 <tr>
                                                     <th>Year</th>
@@ -307,16 +316,8 @@
                                                     <th>Count</th>
                                                 </tr>
                                             </thead>
-                                            <tfoot>
-                                                <tr>
-                                                    <th>Year</th>
-                                                    <th>Month</th>
-                                                    <th>Attribute Type</th>
-                                                    <th>Count</th>
-                                                </tr>
-                                            </tfoot>
                                             <tbody>
-
+                                                {{--
                                                 @foreach ($summary as $key)
                                                     <tr>
                                                         <td>
@@ -335,7 +336,7 @@
                                                         </td>
                                                     </tr>
                                                 @endforeach
-
+                                                    --}}
                                             </tbody>
                                         </table>
                                     </div>
@@ -543,32 +544,102 @@
 
             });
 
-
             var table_summary = $("#table_summary").DataTable({
-                dom: "Blfrtip",
+                dom: '<"button_summary_export"B>lfrtip',
+                pageLength: 25,
+                order: [
+                    [0, 'desc']
+                ],
                 buttons: [{
-                        text: 'csv',
-                        extend: 'csvHtml5',
+                    extend: 'excelHtml5',
+                    text: 'Excel',
+                    action: function(e, dt, node, config) {
+                        window.location = window.location.href.replace("events", 'table_summary_export');
+                    }
+                }],
+                ajax: {
+                    url: "{{ route('indicators.table_summary') }}",
+                    type: "GET",
+                },
+                columns: [{
+                        data: 'year',
                     },
                     {
-                        text: 'excel',
-                        extend: 'excelHtml5',
-                    }
+                        data: 'month',
+                    },
+                    {
+                        data: 'group_industries_name',
+                        render: function(data, type, row) {
+                            return data.split("\n").join("<br>");
+                        }
+                    },
+                    {
+                        data: 'group_sumc',
+                        render: function(data, type, row) {
+                            return data.split("\n").join("<br>");
+                        }
+                    },
                 ],
-            });
-            $("#table_summary tfoot th").each(function(i) {
-                var select = $('<select><option value=""></option></select>')
-                    .appendTo($(this).empty())
-                    .on('change', function() {
-                        table_summary.column(i)
-                            .search($(this).val())
-                            .draw();
+                initComplete: function() {
+                    this.api().columns([0, 1]).every(function(d) {
+                        var column = this;
+                        var tname = $("#table_summary th").eq([d]).text();
+                        var selectmin = $('<select id="min' + tname + '"><option value="">' + tname +
+                                '</option></select>')
+                            .appendTo(
+                                $('#filter-dropdown-min')) {{-- .on('change', function() {
+                                    console.log("0000");
+                                var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                                column.search(val ? '^' + val + '$' : '', true, false).draw();
+                            }) --}};
+                        var selectmax = $('<select id="max' + tname + '"><option value="">' + tname +
+                                '</option></select>')
+                            .appendTo(
+                                $('#filter-dropdown-max')) {{-- .on('change', function() {
+                                    console.log("1111");
+                                var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                                column.search(val ? '^' + val + '$' : '', true, false).draw();
+                            }) --}};
+                        column.data().unique().sort().each(function(d, j) {
+                            selectmin.append('<option value="' + d + '">' + d + '</option>');
+                            selectmax.append('<option value="' + d + '">' + d + '</option>');
+                        });
                     });
-                table_summary.column(i).data().unique().sort().each(function(d, j) {
-                    select.append('<option value="' + d + '">' + d + '</option>')
-                });
+                },
             });
+            $.fn.dataTable.ext.search.push(
+                function(settings, data, dataIndex) {
+                    var min = parseInt($('#minYear').val(), 10);
+                    var max = parseInt($('#maxYear').val(), 10);
+                    var year = parseFloat(data[0]) || 0;
+                    if ((isNaN(min) && isNaN(max)) || (isNaN(min) && year <= max) || (min <= year && isNaN(max)) || (min <=
+                            year && year <= max)) {
+                        return true;
+                    }
+                    return false;
+                }
+            );
 
+            $.fn.dataTable.ext.search.push(
+                function(settings, data, dataIndex) {
+                    var arr_m = ['0', 'January', 'February', 'March', 'April', 'May', 'June', 'July ', 'August', 'September',
+                        'October', 'November', 'December'
+                    ];
+                    var min = arr_m.indexOf($('#minMonth').val());
+                    var max = arr_m.indexOf($('#maxMonth').val());
+                    var month = arr_m.indexOf(data[1]) || 0;
+                    if ((min==-1 && max==-1) ||
+                        (min==-1 && month <= max) ||
+                        (min <= month && max==-1) ||
+                        (min <= month && month <= max)) {
+                        return true;
+                    }
+                    return false;
+                }
+            );
+            $('#filter-dropdown-max,#filter-dropdown-min').on('change', function() {
+                table_summary.draw();
+            });
 
 
             function load_table(page = 1) {
@@ -648,7 +719,8 @@
                             targets: 2,
                             render: function(data, type, row) {
                                 var inner = '';
-                                inner = '<div><a href="{{ route('indicators.events_detail') }}' + '/' + row
+                                inner = '<div><a href="{{ route('indicators.events_detail') }}' + '/' +
+                                    row
                                     .pulse_id + '">' + row.name + '</a></div>';
                                 return inner;
                             }
@@ -884,7 +956,8 @@
                             targets: 2,
                             render: function(data, type, row) {
                                 var inner = '';
-                                inner = '<div><a href="{{ route('indicators.events_detail') }}' + '/' + row
+                                inner = '<div><a href="{{ route('indicators.events_detail') }}' + '/' +
+                                    row
                                     .pulse_id + '">' + row.name + '</a></div>';
                                 return inner;
                             }
