@@ -71,23 +71,23 @@
                                         placeholder="Search">
                                 </div>
                                 <!--<div class="col-md-4">
-                                                                                                                                                                                                                                                                                                                                                    <div class="form-group">
-                                                                                                                                                                                                                                                                                                                                                        <label for="" class="">Group</label>
-                                                                                                                                                                                                                                                                                                                                                        {{-- <select name="group[]" id="type" class="select2-option form-control"
+                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="form-group">
+                                                                                                                                                                                                                                                                                                                                                                                                                                            <label for="" class="">Group</label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                            {{-- <select name="group[]" id="type" class="select2-option form-control"
                                         multiple="multiple">
 
                                     </select> --}}
-                                                                                                                                                                                                                                                                                                                                                        <input type="text" class="form-control" name="group" id="group" placeholder="Search">
-                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                                <div class="col-md-4">
-                                                                                                                                                                                                                                                                                                                                                    <div class="form-group">
-                                                                                                                                                                                                                                                                                                                                                        <label for="" class="">Tag</label>
-                                                                                                                                                                                                                                                                                                                                                        {{-- <select name="tag[]" id="tag" class="select2-option form-control" multiple="multiple"> --}}
-                                                                                                                                                                                                                                                                                                                                                            <input type="text" class="form-control" name="tag" id="tag" placeholder="Search">
-                                                                                                                                                                                                                                                                                                                                                        </select>
-                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                </div>-->
+                                                                                                                                                                                                                                                                                                                                                                                                                                            <input type="text" class="form-control" name="group" id="group" placeholder="Search">
+                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-md-4">
+                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="form-group">
+                                                                                                                                                                                                                                                                                                                                                                                                                                            <label for="" class="">Tag</label>
+                                                                                                                                                                                                                                                                                                                                                                                                                                            {{-- <select name="tag[]" id="tag" class="select2-option form-control" multiple="multiple"> --}}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                <input type="text" class="form-control" name="tag" id="tag" placeholder="Search">
+                                                                                                                                                                                                                                                                                                                                                                                                                                            </select>
+                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>-->
                                 <div class="col-lg-4 mb-1">
                                     <h5 class="font-weight-bold">Date</h5>
                                     <div id="event_date" class="text-center form-control"
@@ -297,16 +297,15 @@
 
 
                                 <div class="panel-body">
+                                    
                                     <div class="table-responsive">
 
                                         <table class="table table-striped vt-top" id="table_summary" style="width: 100%">
-                                            <div id="filter-dropdown-min" class="filter-dropdown-min"
-                                                style="text-align:right;">
-                                                <label for="">Select min range</label>
-                                            </div>
-                                            <div id="filter-dropdown-max" class="filter-dropdown-max"
-                                                style="text-align:right;">
-                                                <label for="">Select max range</label>
+                                            <div id="filter-dropdown" class="filter-dropdown" style="text-align: right;">
+                                                <label for="">Select Range</label>
+                                                <input id="rangepickermin" name="rangepickermin" style="width:57px">
+                                                <label for="">-</label>
+                                                <input id="rangepickermax" name="rangepickermax" style="width:57px">
                                             </div>
                                             <thead>
                                                 <tr>
@@ -317,26 +316,6 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {{--
-                                                @foreach ($summary as $key)
-                                                    <tr>
-                                                        <td>
-                                                            {{ $key->year }}
-                                                        </td>
-
-                                                        <td>
-                                                            {{ $key->month }}
-                                                        </td>
-
-                                                        <td>
-                                                            {{ $key->industries_name }}
-                                                        </td>
-                                                        <td>
-                                                            {{ $key->sumc }}
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                                    --}}
                                             </tbody>
                                         </table>
                                     </div>
@@ -545,7 +524,7 @@
             });
 
             var table_summary = $("#table_summary").DataTable({
-                dom: '<"button_summary_export"B>lfrtip',
+                dom: '<"button_summary_export"B>rtip',
                 pageLength: 25,
                 order: [
                     [0, 'desc']
@@ -566,6 +545,12 @@
                     },
                     {
                         data: 'month',
+                        render: function(data, type, row) {
+                            var arr_months = ['', 'January', 'February', 'March', 'April', 'May', 'June',
+                                'July ', 'August', 'September', 'October', 'November', 'December'
+                            ];
+                            return arr_months[data];
+                        }
                     },
                     {
                         data: 'group_industries_name',
@@ -580,37 +565,42 @@
                         }
                     },
                 ],
+                {{--
                 initComplete: function() {
-                    this.api().columns([0, 1]).every(function(d) {
+                    this.api().columns([1, 0]).every(function(d) {
                         var column = this;
                         var tname = $("#table_summary th").eq([d]).text();
+                        
                         var selectmin = $('<select id="min' + tname + '"><option value="">' + tname +
                                 '</option></select>')
                             .appendTo(
-                                $('#filter-dropdown-min')) {{-- .on('change', function() {
+                                $('#filter-dropdown-min'))//.on('change', function() {
                                     console.log("0000");
                                 var val = $.fn.dataTable.util.escapeRegex($(this).val());
                                 column.search(val ? '^' + val + '$' : '', true, false).draw();
-                            }) --}};
+                            })//;
                         var selectmax = $('<select id="max' + tname + '"><option value="">' + tname +
                                 '</option></select>')
                             .appendTo(
-                                $('#filter-dropdown-max')) {{-- .on('change', function() {
+                                $('#filter-dropdown-max'))//.on('change', function() {
                                     console.log("1111");
                                 var val = $.fn.dataTable.util.escapeRegex($(this).val());
                                 column.search(val ? '^' + val + '$' : '', true, false).draw();
-                            }) --}};
+                            })//;
                         column.data().unique().sort().each(function(d, j) {
                             selectmin.append('<option value="' + d + '">' + d + '</option>');
                             selectmax.append('<option value="' + d + '">' + d + '</option>');
                         });
                     });
                 },
+                --}}
             });
             $.fn.dataTable.ext.search.push(
                 function(settings, data, dataIndex) {
-                    var min = parseInt($('#minYear').val(), 10);
-                    var max = parseInt($('#maxYear').val(), 10);
+                    var arrmin = $('#rangepickermin').val().split("/");
+                    var arrmax = $('#rangepickermax').val().split("/");
+                    var min = parseInt(arrmin[1], 10);
+                    var max = parseInt(arrmax[1], 10);
                     var year = parseFloat(data[0]) || 0;
                     if ((isNaN(min) && isNaN(max)) || (isNaN(min) && year <= max) || (min <= year && isNaN(max)) || (min <=
                             year && year <= max)) {
@@ -622,25 +612,43 @@
 
             $.fn.dataTable.ext.search.push(
                 function(settings, data, dataIndex) {
-                    var arr_m = ['0', 'January', 'February', 'March', 'April', 'May', 'June', 'July ', 'August', 'September',
-                        'October', 'November', 'December'
+                    var arr_months = ['', 'January', 'February', 'March', 'April', 'May', 'June',
+                        'July ', 'August', 'September', 'October', 'November', 'December'
                     ];
-                    var min = arr_m.indexOf($('#minMonth').val());
-                    var max = arr_m.indexOf($('#maxMonth').val());
-                    var month = arr_m.indexOf(data[1]) || 0;
-                    if ((min==-1 && max==-1) ||
-                        (min==-1 && month <= max) ||
-                        (min <= month && max==-1) ||
-                        (min <= month && month <= max)) {
+                    var arrmin = $('#rangepickermin').val().split("/");
+                    var arrmax = $('#rangepickermax').val().split("/");
+                    var min = parseInt(arrmin[0], 10);
+                    var max = parseInt(arrmax[0], 10);
+                    var month = arr_months.indexOf(data[1]) || 0;
+                    if ((isNaN(min) && isNaN(max)) || (isNaN(min) && month <= max) || (min <= month && isNaN(max)) || (
+                            min <= month && month <= max)) {
                         return true;
                     }
                     return false;
                 }
             );
-            $('#filter-dropdown-max,#filter-dropdown-min').on('change', function() {
+
+            $('#filter-dropdown,#rangepickermin,#rangepickermax').on('change', function() {
                 table_summary.draw();
             });
 
+
+            var date = new Date();
+            document.getElementById("rangepickermin").value = (date.getMonth() + 1) + '/' + date.getFullYear();
+            document.getElementById("rangepickermax").value = (date.getMonth() + 1) + '/' + date.getFullYear();
+
+            $('#rangepickermin').datepicker({
+                format: 'mm/yyyy',
+                startView: "months",
+                minViewMode: "months",
+                autoclose: true
+            });
+            $('#rangepickermax').datepicker({
+                format: 'mm/yyyy',
+                startView: "months",
+                minViewMode: "months",
+                autoclose: true
+            });
 
             function load_table(page = 1) {
                 $('#table_events').DataTable({

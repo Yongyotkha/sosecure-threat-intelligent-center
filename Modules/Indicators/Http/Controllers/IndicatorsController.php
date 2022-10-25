@@ -1562,7 +1562,7 @@ class IndicatorsController extends Controller
         order by year Desc,month Desc";
         $summary = DB::select($query_summary);
         foreach ($summary as $records) {
-            $records->month = $arr_months[$records->month];
+            // $records->month = $arr_months[$records->month];
             $records->group_sumc = preg_replace_callback("/[0-9]+/", function ($matches) {
                 return number_format($matches[0], 0, ',', ',');
             }, $records->group_sumc);
