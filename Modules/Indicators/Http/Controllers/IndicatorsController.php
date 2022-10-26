@@ -1496,6 +1496,10 @@ class IndicatorsController extends Controller
 
     public function table_summary(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if (!$role_custom['indicators']) {
+            check_permission403();
+        }
         // $summary = DB::table('indicator_summary_year')->select('year', 'month', 'industries_name', DB::raw("SUM(attribute_count) as sumc"))
         //     ->where("status", "1")
         //     ->where("type", "attribute_type")
@@ -1573,6 +1577,10 @@ class IndicatorsController extends Controller
 
     public function table_summary_export(Request $request)
     {
+        $role_custom = @check_role_custom();
+        if (!$role_custom['indicators']) {
+            check_permission403();
+        }
         // $fileName = 'Indicators-Summary Type.csv';
         $summary_raw = DB::table('indicator_summary_year')->select('year', 'month', 'industries_name', DB::raw("SUM(attribute_count) as sumc"))
             ->where("status", "1")

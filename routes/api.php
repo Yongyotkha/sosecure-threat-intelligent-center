@@ -55,6 +55,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('indicator/show_detail_adversary', 'Api\ApiIndicatorController@show_detail_adversary');
     Route::post('indicator/load_adversary_tb', 'Api\ApiIndicatorController@load_adversary_tb');
     Route::post('indicator/load_malware_tb', 'Api\ApiIndicatorController@load_malware_tb');
+    Route::post('indicator/table_summary', 'Api\ApiIndicatorController@table_summary');
     
     Route::post('dashboard/count_asset', 'Api\ApiDashboardController@count_asset');
     Route::post('dashboard/count_vulnerability', 'Api\ApiDashboardController@count_vulnerability');
