@@ -1573,37 +1573,47 @@ class IndicatorsController extends Controller
 
     public function table_summary_export(Request $request)
     {
-        $fileName = 'Indicators-Summary Type.csv';
-        $summary = DB::table('indicator_summary_year')->select('year', 'month', 'industries_name', DB::raw("SUM(attribute_count) as sumc"))
+        // $fileName = 'Indicators-Summary Type.csv';
+        $summary_raw = DB::table('indicator_summary_year')->select('year', 'month', 'industries_name', DB::raw("SUM(attribute_count) as sumc"))
             ->where("status", "1")
             ->where("type", "attribute_type")
             ->groupBy("year", "month", "industries_name")
             ->orderBy("month", "desc")
             ->orderBy("sumc", "desc")
             ->get();
-        $headers = array(
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        );
-        $columns = array('year', 'month', 'industries_name', 'sumc');
-        $callback = function() use($summary, $columns) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
+        $data_query = $summary_raw;
+        if (!empty($data_query)) {
+            $data_query = $summary_raw->where("year", ">=", $request->minyear)
+                ->where("year", "<=", $request->maxyear)
+                ->where("month", ">=", $request->minmonth)
+                ->where("month", "<=", $request->maxmonth);
+        }
 
-            foreach ($summary as $task) {
-                $row['year']  = $task->year;
-                $row['month']    = $task->month;
-                $row['industries_name']    = $task->industries_name;
-                $row['sumc']  = $task->sumc;
-                fputcsv($file, array($row['year'], $row['month'], $row['industries_name'], $row['sumc']));
-            }
+        // $headers = array(
+        //     "Content-type"        => "text/csv",
+        //     "Content-Disposition" => "attachment; filename=$fileName",
+        //     "Pragma"              => "no-cache",
+        //     "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+        //     "Expires"             => "0"
+        // );
+        // $columns = array('year', 'month', 'industries_name', 'sumc');
+        // $callback = function () use ($data_query, $columns) {
+        //     $file = fopen('php://output', 'w');
+        //     fputcsv($file, $columns);
 
-            fclose($file);
-        };
-        return  response()->stream($callback, 200, $headers);
+        //     foreach ($data_query as $task) {
+        //         $row['year']  = $task->year;
+        //         $row['month']    = $task->month;
+        //         $row['industries_name']    = $task->industries_name;
+        //         $row['sumc']  = $task->sumc;
+        //         fputcsv($file, array($row['year'], $row['month'], $row['industries_name'], $row['sumc']));
+        //     }
+
+        //     fclose($file);
+        // };
+        // return  response()->stream($callback, 200, $headers);
+
+        return response()->json($data_query);
     }
 
     public function load_attributes_tb(Request $request)

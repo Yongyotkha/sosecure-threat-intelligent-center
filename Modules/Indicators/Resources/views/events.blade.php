@@ -71,23 +71,10 @@
                                         placeholder="Search">
                                 </div>
                                 <!--<div class="col-md-4">
-                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="form-group">
-                                                                                                                                                                                                                                                                                                                                                                                                                                            <label for="" class="">Group</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                            {{-- <select name="group[]" id="type" class="select2-option form-control"
-                                        multiple="multiple">
-
-                                    </select> --}}
-                                                                                                                                                                                                                                                                                                                                                                                                                                            <input type="text" class="form-control" name="group" id="group" placeholder="Search">
-                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="col-md-4">
-                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="form-group">
-                                                                                                                                                                                                                                                                                                                                                                                                                                            <label for="" class="">Tag</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                            {{-- <select name="tag[]" id="tag" class="select2-option form-control" multiple="multiple"> --}}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                <input type="text" class="form-control" name="tag" id="tag" placeholder="Search">
-                                                                                                                                                                                                                                                                                                                                                                                                                                            </select>
-                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>-->
+                                            <div class="form-group">
+                                            <label for="" class="">Group</label>                                                                                                                                                                                                                                                                                                                                                                                                                                                               {{-- <select name="group[]" id="type" class="select2-option form-control"
+                                    multiple="multiple">
+                                 </select> --}}                                                                                                                                                                                                                                                                                                                                                                                                                               </div>-->
                                 <div class="col-lg-4 mb-1">
                                     <h5 class="font-weight-bold">Date</h5>
                                     <div id="event_date" class="text-center form-control"
@@ -184,11 +171,6 @@
                         </div>
                     </div>
                 </div>
-
-
-
-
-
 
                 <div class="tabbable">
                     <ul class="nav nav-tabs nav-tabs-highlight">
@@ -294,18 +276,14 @@
                                         </div>
                                     </div>
                                 </header>
-
-
                                 <div class="panel-body">
-                                    
                                     <div class="table-responsive">
-
                                         <table class="table table-striped vt-top" id="table_summary" style="width: 100%">
-                                            <div id="filter-dropdown" class="filter-dropdown" style="text-align: right;">
-                                                <label for="">Select Range</label>
-                                                <input id="rangepickermin" name="rangepickermin" style="width:57px">
-                                                <label for="">-</label>
-                                                <input id="rangepickermax" name="rangepickermax" style="width:57px">
+                                            <div id="filter-dropdown" class="filter-dropdown">
+                                                <label for="" class="fdd">Select Range</label>
+                                                <input id="rangepickermin" class="fdd" name="rangepickermin" style="width:60px">
+                                                <label for="" class="fdd">-</label>
+                                                <input id="rangepickermax" class="fdd" name="rangepickermax" style="width:60px">
                                             </div>
                                             <thead>
                                                 <tr>
@@ -321,12 +299,6 @@
                                     </div>
                                 </div>
                             </section>
-
-
-
-
-
-
                         </div>
                     </div>
                 </div>
@@ -370,7 +342,6 @@
                     thousandsSep: ','
                 }
             });
-
 
             $(".sl_group").select2({
                 placeholder: "Select",
@@ -523,6 +494,16 @@
 
             });
 
+            function convertToCSV(arr) {
+                var array = [Object.keys(arr[0])].concat(arr);
+
+                return array.map(it => {
+                    return Object.values(it).toString()
+                }).join('\n');
+            }
+
+
+
             var table_summary = $("#table_summary").DataTable({
                 dom: '<"button_summary_export"B>rtip',
                 pageLength: 25,
@@ -533,7 +514,43 @@
                     extend: 'excelHtml5',
                     text: 'Excel',
                     action: function(e, dt, node, config) {
-                        window.location = window.location.href.replace("events", 'table_summary_export');
+                        var arrmin = $('#rangepickermin').val().split("/");
+                        var arrmax = $('#rangepickermax').val().split("/");
+                        var a = document.querySelector('td');
+
+                        if (!a.classList.contains("dataTables_empty")) {
+                            $.ajax({
+                                type: "POST",
+                                url: "{{ route('indicators.table_summary_export') }}",
+                                data: {
+                                    minmonth: arrmin[0],
+                                    maxmonth: arrmax[0],
+                                    minyear: arrmin[1],
+                                    maxyear: arrmax[1]
+                                },
+                                success: function(res) {
+                                    if (res.length != 0) {
+                                        var csv = convertToCSV(res);
+                                        var csvContent = "data:text/csv;charset=utf-8," + csv;
+                                        var encodedUri = encodeURI(csvContent);
+                                        var link = document.createElement("a");
+                                        link.setAttribute("href", encodedUri);
+                                        link.setAttribute("download",
+                                            "Indicators-Summary Type.csv");
+                                        document.body.appendChild(link);
+                                        link.click();
+                                    }
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'เเจ้งเตือน',
+                                text: 'ไม่มีข้อมูล',
+                            })
+                        }
+
+
                     }
                 }],
                 ajax: {
