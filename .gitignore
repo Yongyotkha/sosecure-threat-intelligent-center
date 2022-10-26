@@ -16,4 +16,4 @@ mysql/data/ibtmp1
 vendor/*
 .env
 .env.example
-vendor/laravel/framework/src/Illuminate/Cache/FileStore.php
+/vendor/laravel/framework/src/Illuminate/Cache/FileStore.php

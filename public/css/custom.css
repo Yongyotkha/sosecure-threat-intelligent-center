@@ -6335,7 +6335,7 @@ input.form-policy[type=password] {
 }
 .button_summary_export .dt-buttons {
     float: right;
-    margin: 5px;
+    margin: 10px;
 }
 .button_summary_export .dt-buttons .btn {
     background-color: #4CAF50;

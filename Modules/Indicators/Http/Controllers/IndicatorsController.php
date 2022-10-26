@@ -1906,7 +1906,6 @@ class IndicatorsController extends Controller
                 8 => 'indicator_count',
                 9 => 'pulse_id',
             );
-            dd($columns);
             $draw = $_POST['draw'];
             $row = (int)$_POST['start'];
             $rowperpage = (int)$_POST['length'];
