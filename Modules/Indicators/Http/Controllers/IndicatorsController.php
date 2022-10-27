@@ -1500,29 +1500,6 @@ class IndicatorsController extends Controller
         if (!$role_custom['indicators']) {
             check_permission403();
         }
-        // $summary = DB::table('indicator_summary_year')->select('year', 'month', 'industries_name', DB::raw("SUM(attribute_count) as sumc"))
-        //     ->where("status", "1")
-        //     ->where("type", "attribute_type")
-        //     ->groupBy("year", "month", "industries_name")
-        //     ->orderBy("month", "desc")
-        //     ->orderBy("sumc", "desc")
-        //     ->get()
-        //     ->toArray();
-        $arr_months = array(
-            '',
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-            'July ',
-            'August',
-            'September',
-            'October',
-            'November',
-            'December',
-        );
         $query_summary = "select t1.year,t1.month,group_industries_name,group_sumc from 
         (
             (
@@ -1571,7 +1548,7 @@ class IndicatorsController extends Controller
                 return number_format($matches[0], 0, ',', ',');
             }, $records->group_sumc);
         }
-
+        
         return DataTables::of($summary)->make(true);
     }
 

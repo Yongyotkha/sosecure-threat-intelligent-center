@@ -71,8 +71,8 @@
                                         placeholder="Search">
                                 </div>
                                 <!--<div class="col-md-4">
-                                            <div class="form-group">
-                                            <label for="" class="">Group</label>                                                                                                                                                                                                                                                                                                                                                                                                                                                               {{-- <select name="group[]" id="type" class="select2-option form-control"
+                                                <div class="form-group">
+                                                <label for="" class="">Group</label>                                                                                                                                                                                                                                                                                                                                                                                                                                                               {{-- <select name="group[]" id="type" class="select2-option form-control"
                                     multiple="multiple">
                                  </select> --}}                                                                                                                                                                                                                                                                                                                                                                                                                               </div>-->
                                 <div class="col-lg-4 mb-1">
@@ -281,9 +281,11 @@
                                         <table class="table table-striped vt-top" id="table_summary" style="width: 100%">
                                             <div id="filter-dropdown" class="filter-dropdown">
                                                 <label for="" class="fdd">Select Range</label>
-                                                <input id="rangepickermin" class="fdd" name="rangepickermin" style="width:60px">
+                                                <input id="rangepickermin" class="fdd" name="rangepickermin"
+                                                    style="width:60px">
                                                 <label for="" class="fdd">-</label>
-                                                <input id="rangepickermax" class="fdd" name="rangepickermax" style="width:60px">
+                                                <input id="rangepickermax" class="fdd" name="rangepickermax"
+                                                    style="width:60px">
                                             </div>
                                             <thead>
                                                 <tr>
@@ -539,6 +541,12 @@
                                             "Indicators-Summary Type.csv");
                                         document.body.appendChild(link);
                                         link.click();
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'เเจ้งเตือน',
+                                            text: 'ไม่มีข้อมูล',
+                                        })
                                     }
                                 }
                             });
@@ -549,8 +557,6 @@
                                 text: 'ไม่มีข้อมูล',
                             })
                         }
-
-
                     }
                 }],
                 ajax: {
@@ -582,35 +588,6 @@
                         }
                     },
                 ],
-                {{--
-                initComplete: function() {
-                    this.api().columns([1, 0]).every(function(d) {
-                        var column = this;
-                        var tname = $("#table_summary th").eq([d]).text();
-                        
-                        var selectmin = $('<select id="min' + tname + '"><option value="">' + tname +
-                                '</option></select>')
-                            .appendTo(
-                                $('#filter-dropdown-min'))//.on('change', function() {
-                                    console.log("0000");
-                                var val = $.fn.dataTable.util.escapeRegex($(this).val());
-                                column.search(val ? '^' + val + '$' : '', true, false).draw();
-                            })//;
-                        var selectmax = $('<select id="max' + tname + '"><option value="">' + tname +
-                                '</option></select>')
-                            .appendTo(
-                                $('#filter-dropdown-max'))//.on('change', function() {
-                                    console.log("1111");
-                                var val = $.fn.dataTable.util.escapeRegex($(this).val());
-                                column.search(val ? '^' + val + '$' : '', true, false).draw();
-                            })//;
-                        column.data().unique().sort().each(function(d, j) {
-                            selectmin.append('<option value="' + d + '">' + d + '</option>');
-                            selectmax.append('<option value="' + d + '">' + d + '</option>');
-                        });
-                    });
-                },
-                --}}
             });
             $.fn.dataTable.ext.search.push(
                 function(settings, data, dataIndex) {
