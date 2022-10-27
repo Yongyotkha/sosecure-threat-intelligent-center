@@ -840,10 +840,61 @@ class ApiIndicatorController extends ApiController
             $mode = $request->mode;
             $data_request = $request->data;
             $data = $this->dataFalse($header, $mode, $data_request);
+            $query_summary = "select t1.year,t1.month,group_industries_name,group_sumc from 
+              (
+            (
+            SELECT year,month,group_concat(industries_name order by sumc DESC SEPARATOR '\n') as group_industries_name
+            FROM 
+            (
+                SELECT year,month,industries_name, sum(attribute_count) as sumc
+                FROM 
+                (
+                    SELECT year,month,industries_name,attribute_count 
+                    FROM sosecure_threatintelligent_dev.fx_indicator_summary_year
+                    where type='attribute_type' and status=1
+                    order by attribute_count DESC
+                ) as a1
+                group by year,month,industries_name
+                order by sumc desc
+            ) as tab
+            group by year,month
+            
+            ) as t1
+        inner join 
+            (
+            SELECT year,month,group_concat(sumc order by sumc DESC SEPARATOR '\n') as group_sumc 
+            FROM 
+            (
+                SELECT year,month,industries_name,sum(attribute_count) as sumc
+                FROM 
+                (
+                    SELECT year,month,industries_name,attribute_count 
+                    FROM sosecure_threatintelligent_dev.fx_indicator_summary_year
+                    where type='attribute_type' and status=1
+                    order by attribute_count DESC
+                ) as a2
+                group by year,month,industries_name
+                order by sumc desc
+            ) as tab
+            group by year,month
+            ) as t2
+        ON (t1.year = t2.year and t1.month = t2.month)
+        )
+        order by year Desc,month Desc";
+            $summary = DB::select($query_summary);
+            foreach ($summary as $records) {
+                // $records->month = $arr_months[$records->month];
+                $records->group_sumc = preg_replace_callback("/[0-9]+/", function ($matches) {
+                    return number_format($matches[0], 0, ',', ',');
+                }, $records->group_sumc);
+            }
+            $data_transcation = json_encode($summary, JSON_FORCE_OBJECT);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+
             if ($data === false) {
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             } else {
-                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => '00000']);
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
             }
         } catch (\Exception $e) {
             $response = array(
@@ -861,6 +912,54 @@ class ApiIndicatorController extends ApiController
         }
     }
 
+
+    public function table_summary_export(Request $request)
+    {
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            
+            $summary = DB::table('indicator_summary_year')->select('year', 'month', 'industries_name', DB::raw("SUM(attribute_count) as sumc"))
+            ->where("status", "1")
+            ->where("type", "attribute_type")
+            ->groupBy("year", "month", "industries_name")
+            ->orderBy("month", "desc")
+            ->orderBy("sumc", "desc")
+            ->get();
+            $data_query = $summary;
+
+            if (!empty($data_query)) {
+                $data_query = $summary->where("year", ">=",$data['data']['minyear'])
+                    ->where("year", "<=", $data['data']['maxyear'])
+                    ->where("month", ">=", $data['data']['minmonth'])
+                    ->where("month", "<=", $data['data']['maxmonth']);
+            }
+
+            $data_transcation = json_encode($data_query, JSON_FORCE_OBJECT);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+
+            if ($data === false) {
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            } else {
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e->getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
     public function show_detail_adversary(Request $request)
     {
         try {
