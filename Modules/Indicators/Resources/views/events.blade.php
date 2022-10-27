@@ -531,6 +531,7 @@
                                     maxyear: arrmax[1]
                                 },
                                 success: function(res) {
+                                    console.log(res);
                                     if (res.length != 0) {
                                         var csv = convertToCSV(res);
                                         var csvContent = "data:text/csv;charset=utf-8," + csv;

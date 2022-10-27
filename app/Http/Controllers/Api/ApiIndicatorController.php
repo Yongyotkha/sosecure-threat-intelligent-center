@@ -888,7 +888,7 @@ class ApiIndicatorController extends ApiController
                     return number_format($matches[0], 0, ',', ',');
                 }, $records->group_sumc);
             }
-            $data_transcation = json_encode($summary, JSON_FORCE_OBJECT);
+            $data_transcation = json_encode($summary);
             $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
 
             if ($data === false) {
@@ -924,20 +924,17 @@ class ApiIndicatorController extends ApiController
             $summary = DB::table('indicator_summary_year')->select('year', 'month', 'industries_name', DB::raw("SUM(attribute_count) as sumc"))
             ->where("status", "1")
             ->where("type", "attribute_type")
+            ->where("year", ">=", $data['data']['minyear'])
+            ->where("year", "<=", $data['data']['maxyear'])
+            ->where("month", ">=", $data['data']['minmonth'])
+            ->where("month", "<=", $data['data']['maxmonth'])
             ->groupBy("year", "month", "industries_name")
+            ->orderBy("year", "desc")
             ->orderBy("month", "desc")
             ->orderBy("sumc", "desc")
             ->get();
-            $data_query = $summary;
 
-            if (!empty($data_query)) {
-                $data_query = $summary->where("year", ">=",$data['data']['minyear'])
-                    ->where("year", "<=", $data['data']['maxyear'])
-                    ->where("month", ">=", $data['data']['minmonth'])
-                    ->where("month", "<=", $data['data']['maxmonth']);
-            }
-
-            $data_transcation = json_encode($data_query, JSON_FORCE_OBJECT);
+            $data_transcation = json_encode($summary->toArray());
             $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
 
             if ($data === false) {
