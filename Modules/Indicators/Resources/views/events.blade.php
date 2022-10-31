@@ -71,8 +71,8 @@
                                         placeholder="Search">
                                 </div>
                                 <!--<div class="col-md-4">
-                                                <div class="form-group">
-                                                <label for="" class="">Group</label>                                                                                                                                                                                                                                                                                                                                                                                                                                                               {{-- <select name="group[]" id="type" class="select2-option form-control"
+                                                    <div class="form-group">
+                                                    <label for="" class="">Group</label>                                                                                                                                                                                                                                                                                                                                                                                                                                                               {{-- <select name="group[]" id="type" class="select2-option form-control"
                                     multiple="multiple">
                                  </select> --}}                                                                                                                                                                                                                                                                                                                                                                                                                               </div>-->
                                 <div class="col-lg-4 mb-1">
@@ -279,14 +279,7 @@
                                 <div class="panel-body">
                                     <div class="table-responsive">
                                         <table class="table table-striped vt-top" id="table_summary" style="width: 100%">
-                                            <div id="filter-dropdown" class="filter-dropdown">
-                                                <label for="" class="fdd">Select Range</label>
-                                                <input id="rangepickermin" class="fdd" name="rangepickermin"
-                                                    style="width:60px">
-                                                <label for="" class="fdd">-</label>
-                                                <input id="rangepickermax" class="fdd" name="rangepickermax"
-                                                    style="width:60px">
-                                            </div>
+                                            <div style="text-align: right">Latest updated</div>
                                             <thead>
                                                 <tr>
                                                     <th>Year</th>
@@ -507,14 +500,14 @@
 
 
             var table_summary = $("#table_summary").DataTable({
-                dom: '<"button_summary_export"B>rtip',
+                dom: '<"#bse.button_summary_export"B>rtip',
                 pageLength: 25,
                 order: [
                     [0, 'desc']
                 ],
                 buttons: [{
-                    extend: 'excelHtml5',
-                    text: 'Excel',
+                    extend: 'csv',
+                    text: '<i class="fas fa-download"></i> CSV',
                     action: function(e, dt, node, config) {
                         var arrmin = $('#rangepickermin').val().split("/");
                         var arrmax = $('#rangepickermax').val().split("/");
@@ -623,11 +616,17 @@
                 }
             );
 
-            $('#filter-dropdown,#rangepickermin,#rangepickermax').on('change', function() {
+            $('#bse,#rangepickermin,#rangepickermax').on('change', function() {
                 table_summary.draw();
             });
 
-
+            var a = '<div class="dt-buttons btn-group flex-wrap" style="bottom:-3px">' +
+                '<label for="" class="fdd">Select Range</label>' +
+                '<input id="rangepickermin" class="fdd" name="rangepickermin" style="width:60px">' +
+                '<label for="" class="fdd">-</label>' +
+                '<input id="rangepickermax" class="fdd" name="rangepickermax" style="width:60px"></div>' +
+                '</div>';
+            document.getElementById('bse').insertAdjacentHTML('beforeend', a);
             var date = new Date();
             document.getElementById("rangepickermin").value = (date.getMonth() + 1) + '/' + date.getFullYear();
             document.getElementById("rangepickermax").value = (date.getMonth() + 1) + '/' + date.getFullYear();
