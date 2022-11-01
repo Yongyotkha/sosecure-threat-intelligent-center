@@ -6326,13 +6326,6 @@ input.form-policy[type=password] {
 .table td {
     vertical-align: top !important;
 }
-.filter-dropdown{
-    text-align: right;
-}
-
-.filter-dropdown .fdd{
-    margin: auto;
-}
 .button_summary_export .dt-buttons {
     float: right;
     margin: 10px;

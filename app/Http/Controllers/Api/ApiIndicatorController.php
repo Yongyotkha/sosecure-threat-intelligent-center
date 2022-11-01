@@ -174,8 +174,7 @@ class ApiIndicatorController extends ApiController
                         $nestedData['attrCount'] = $document["indicator_count"];
                         $nestedData['public'] = ($document["public"]);
                         $nestedData['is_modified'] = ($document["is_modified"]);
-                        // $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
-                        $nestedData['modified'] = change_date_thai_tummai($document['modified']);
+                        $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
                         $nestedData['count_view'] = @$document["count_view"];
                         $nestedData['pulse_id'] = $document["pulse_id"];
 
@@ -260,6 +259,214 @@ class ApiIndicatorController extends ApiController
             $data_request = $request->data;
             $data = $this->dataFalse($header, $mode, $data_request);
             $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function events_table_test(Request $request)
+    {
+        try {
+            $header = $request->bearerToken();
+            // $mode = $request->mode;
+            // $data_request = $request -> data;
+            // $data = $this -> dataFalse($header, $mode, $data_request);
+            if ($header !== 'VzR6S25ldm5kdmtlMEdTYS9nUmhZTDlHNzNKOEFNTkN2WW5UTzFQd2lxcE92WjN3VTIwd3FFZVMrR0VDazY4c1ZSSGJoUUVRbFBGNXg2SHZYNnQwNkQ0TUtHY0VSSVpMYUs4RTFjZnhiTEE9') {
+                return response()->json(['error' => ' Authentication failed', 'status_code' => '401']);
+            } else {
+                $draw = $request->draw;
+                $row = (int)$request->start;
+                $rowperpage = (int)$request->length;
+
+                $order = $request->order;
+                $dir = $request->dir;
+                $url = $request->url;
+                $industries = $request->industries;
+                $groups = $request->groups;
+
+                $start =  $row;
+
+                $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+                $clientMD = new MongoClient($DB_MONGO_KEY);
+                $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+
+
+                $options = [
+                    'projection' => [
+                        '_id' => 0,
+                        'industries' => 1,
+                        'name' => 1,
+                        'groups' => 1,
+                        'tags' => 1,
+                        'public' => 1,
+                        'is_modified' => 1,
+                        'modified' => 1,
+                        'count_view' => 1,
+                        'indicator_count' => 1,
+                        'pulse_id' => 1,
+
+                    ],
+                    'sort' => [
+                        'modified' => -1
+                    ],
+                    // 'sort' => [
+                    //     $order => $dir
+                    // ],
+                    'skip' => $start,
+                    'limit' => $rowperpage,
+                ];
+
+                $query = array(
+                    'status' => 1,
+                    'deleted_at' => null,
+                );
+
+                if ($request->count_page == -1) {
+                    $cursor_count = $col_fx_otx_events->count($query);
+                    $count_filter = $cursor_count;
+                } else {
+                    $cursor_count = $request->count_page;
+                    $count_filter = $cursor_count;
+                }
+
+
+                if ($request->keywords || $request->isDateSearch || $request->start_date || $request->end_date || $request->check_published || $industries || $groups) {
+
+                    if ($request->keywords) {
+                        $query['name'] = ['$regex' => $request->keywords, '$options' => 'i'];
+                        // $_search =  array_merge($_search, array('indicator' => ['$regex'=>$request->keywords, '$options' => 'i']));
+                    }
+                    if ($industries) {
+                        $query['industries'] = ['$regex' => $industries, '$options' => 'i'];
+                    }
+                    if ($groups) {
+                        $query['groups'] = ['$regex' => $groups, '$options' => 'i'];
+                    }
+
+                    $isDateSearch = filter_var($request->isDateSearch, FILTER_VALIDATE_BOOLEAN);
+
+                    if ($isDateSearch) {
+                        if ($request->startDate && $request->endDate) {
+                            $query['modified'] = ['$gt' =>  new UTCDateTime(strtotime($request->startDate) * 1000), '$lte' => new UTCDateTime(strtotime($request->endDate) * 1000)];
+                            // $_search =  array_merge( $_search, array('updated_at' => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000), '$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)] ) );
+                        } else if ($request->startDate) {
+                            $query['modified'] = ['$gt' =>  new UTCDateTime(strtotime($request->startDate) * 1000)];
+                            // $_search =  array_merge( $_search, array('updated_at' => ['$gt' =>  new UTCDateTime(strtotime($date_start_datetime_format)*1000)] ) );
+                        } else if ($request->endDate) {
+                            $query['modified'] = ['$lte' => new UTCDateTime(strtotime($request->endDate) * 1000)];
+                            // $_search =  array_merge( $_search, array('updated_at' => ['$lte' => new UTCDateTime(strtotime($date_end_datetime_format)*1000)] ) );
+                        }
+                    }
+
+                    if ($request->check_published) {
+                        if ($request->check_published == 1) {
+                            $query['public'] = 1;
+                        } else if ($request->check_published == 2) {
+                            $query['public'] = 0;
+                        }
+                    }
+                    $cursor = $col_fx_otx_events->find($query, $options);
+                    $count_filter = $col_fx_otx_events->count($query);
+                } else {
+                    $cursor = $col_fx_otx_events->find($query, $options);
+                }
+
+                $query['indicator_count'] = ['$ne' => 0];
+                $cursor = $col_fx_otx_events->find($query, $options);
+                $cursor = $cursor->toArray();
+
+                $data_nestedData = array();
+                $order_number = $start;
+                if (!empty($cursor)) {
+                    foreach ($cursor as $document) {
+                        $order_number++;
+                        $nestedData['No'] = $order_number;
+                        $nestedData['name'] = $document["name"];
+                        $nestedData['groups'] = $document["groups"] ? $this->explode_val($document["groups"], 'groups', $url) : '';
+                        $nestedData['tags'] = $this->explode_val($document["tags"], 'tags', $url);
+                        $nestedData['industries'] = $document["industries"] ? $this->explode_val($document["industries"], 'industries', $url) : '';
+                        $nestedData['attr'] = '';
+                        $nestedData['attrCount'] = $document["indicator_count"];
+                        $nestedData['public'] = ($document["public"]);
+                        $nestedData['is_modified'] = ($document["is_modified"]);
+                        // $nestedData['modified'] = change_date_utc_to_thai($document['modified']);
+                        $nestedData['modified'] = change_date_thai_tummai($document['modified']);
+                        $nestedData['count_view'] = @$document["count_view"];
+                        $nestedData['pulse_id'] = $document["pulse_id"];
+
+                        // <a href="'.rou   te('indicators.events_detail_select',['id' => $document['pulse_id']]).'" 
+                        // class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>
+
+                        //------------------------------------------------------
+                        $DB_MONGO_KEY = env("DB_MONGO_DEV");
+                        $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+                        if (app()->environment('local')) {
+                            $collection = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
+                            $collection_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+                        } else {
+                            $collection = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
+                            $collection_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+                        }
+
+                        $query_actor = [
+                            'pulse_id' => $document['pulse_id'],
+                            'mode' => 'indicator',
+                            'join' => 'actor',
+                            'delete_at' => null
+                        ];
+                        $option_actor = [];
+
+                        $result_actor = $collection_related->find($query_actor, $option_actor);
+                        $final_actor = $result_actor->toArray();
+                        $count_actor = count($final_actor);
+
+                        $nestedData['actor'] = $final_actor;
+                        $nestedData['count_actor'] = $count_actor;
+
+                        foreach (@$final_actor as $sel_data_act) {
+                            $query_sel_act = [
+                                'adversary_uuid' => $sel_data_act['adversary_uuid']
+                            ];
+                            $option_sel_act = [];
+                            $result_sel_act = $collection->findOne($query_sel_act, $option_sel_act);
+                            if (@$result_sel_act['logo']) {
+                                $nestedData['logo'][] = $result_sel_act['logo'];
+                            } else {
+                                $nestedData['logo'][] = '/asset_salepage/images/AgentBasedDetection.png';
+                            }
+                        }
+
+                        $query_camp = [
+                            'pulse_id' => $document['pulse_id'],
+                            'mode' => 'indicator',
+                            'join' => 'campainge',
+                            'delete_at' => null
+                        ];
+                        $option_camp = [];
+
+                        $result_camp = $collection_related->find($query_camp, $option_camp);
+                        $final_camp = $result_camp->toArray();
+                        $count_camp = count($final_camp);
+
+                        $nestedData['camp'] = $final_camp;
+                        $nestedData['count_camp'] = $count_camp;
+
+                        $data_nestedData[] = $nestedData;
+                    }
+                }
+                $dataOut["draw"] = $draw;
+                $dataOut["recordsTotal"] = $cursor_count;
+                $dataOut["recordsFiltered"] = $count_filter;
+                $dataOut["data"] = $data_nestedData;
+                $dataOut["cursor"] = $cursor;
+
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $dataOut]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e->getMessage(),
+            );
 
             return response()->json($response);
         }
@@ -833,130 +1040,8 @@ class ApiIndicatorController extends ApiController
         }
     }
 
-    public function table_summary(Request $request)
-    {
-        try {
-            $header = $request->bearerToken();
-            $mode = $request->mode;
-            $data_request = $request->data;
-            $data = $this->dataFalse($header, $mode, $data_request);
-            $query_summary = "select t1.year,t1.month,group_industries_name,group_sumc from 
-              (
-            (
-            SELECT year,month,group_concat(industries_name order by sumc DESC SEPARATOR '\n') as group_industries_name
-            FROM 
-            (
-                SELECT year,month,industries_name, sum(attribute_count) as sumc
-                FROM 
-                (
-                    SELECT year,month,industries_name,attribute_count 
-                    FROM sosecure_threatintelligent_dev.fx_indicator_summary_year
-                    where type='attribute_type' and status=1
-                    order by attribute_count DESC
-                ) as a1
-                group by year,month,industries_name
-                order by sumc desc
-            ) as tab
-            group by year,month
-            
-            ) as t1
-        inner join 
-            (
-            SELECT year,month,group_concat(sumc order by sumc DESC SEPARATOR '\n') as group_sumc 
-            FROM 
-            (
-                SELECT year,month,industries_name,sum(attribute_count) as sumc
-                FROM 
-                (
-                    SELECT year,month,industries_name,attribute_count 
-                    FROM sosecure_threatintelligent_dev.fx_indicator_summary_year
-                    where type='attribute_type' and status=1
-                    order by attribute_count DESC
-                ) as a2
-                group by year,month,industries_name
-                order by sumc desc
-            ) as tab
-            group by year,month
-            ) as t2
-        ON (t1.year = t2.year and t1.month = t2.month)
-        )
-        order by year Desc,month Desc";
-            $summary = DB::select($query_summary);
-            foreach ($summary as $records) {
-                // $records->month = $arr_months[$records->month];
-                $records->group_sumc = preg_replace_callback("/[0-9]+/", function ($matches) {
-                    return number_format($matches[0], 0, ',', ',');
-                }, $records->group_sumc);
-            }
-            $data_transcation = json_encode($summary);
-            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
-
-            if ($data === false) {
-                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
-            } else {
-                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
-            }
-        } catch (\Exception $e) {
-            $response = array(
-                'status_code' => 500,
-                'message' => $e->getMessage(),
-            );
-
-            $header = $request->bearerToken();
-            $mode = $request->mode;
-            $data_request = $request->data;
-            $data = $this->dataFalse($header, $mode, $data_request);
-            $this->saveLog($data['site']['data']['id'], json_encode($response));
-
-            return response()->json($response);
-        }
-    }
 
 
-    public function table_summary_export(Request $request)
-    {
-        try {
-            $header = $request->bearerToken();
-            $mode = $request->mode;
-            $data_request = $request->data;
-            $data = $this->dataFalse($header, $mode, $data_request);
-            
-            $summary = DB::table('indicator_summary_year')->select('year', 'month', 'industries_name', DB::raw("SUM(attribute_count) as sumc"))
-            ->where("status", "1")
-            ->where("type", "attribute_type")
-            ->where("year", ">=", $data['data']['minyear'])
-            ->where("year", "<=", $data['data']['maxyear'])
-            ->where("month", ">=", $data['data']['minmonth'])
-            ->where("month", "<=", $data['data']['maxmonth'])
-            ->groupBy("year", "month", "industries_name")
-            ->orderBy("year", "desc")
-            ->orderBy("month", "desc")
-            ->orderBy("sumc", "desc")
-            ->get();
-
-            $data_transcation = json_encode($summary->toArray());
-            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
-
-            if ($data === false) {
-                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
-            } else {
-                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
-            }
-        } catch (\Exception $e) {
-            $response = array(
-                'status_code' => 500,
-                'message' => $e->getMessage(),
-            );
-
-            $header = $request->bearerToken();
-            $mode = $request->mode;
-            $data_request = $request->data;
-            $data = $this->dataFalse($header, $mode, $data_request);
-            $this->saveLog($data['site']['data']['id'], json_encode($response));
-
-            return response()->json($response);
-        }
-    }
     public function show_detail_adversary(Request $request)
     {
         try {
@@ -1743,6 +1828,130 @@ class ApiIndicatorController extends ApiController
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
                 }
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e->getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function table_summary(Request $request)
+    {
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            $query_summary = "select t1.year,t1.month,group_industries_name,group_sumc from 
+              (
+            (
+            SELECT year,month,group_concat(industries_name order by sumc DESC SEPARATOR '\n') as group_industries_name
+            FROM 
+            (
+                SELECT year,month,industries_name, sum(attribute_count) as sumc
+                FROM 
+                (
+                    SELECT year,month,industries_name,attribute_count 
+                    FROM fx_indicator_summary_year
+                    where type='attribute_type' and status=1
+                    order by attribute_count DESC
+                ) as a1
+                group by year,month,industries_name
+                order by sumc desc
+            ) as tab
+            group by year,month
+            
+            ) as t1
+        inner join 
+            (
+            SELECT year,month,group_concat(sumc order by sumc DESC SEPARATOR '\n') as group_sumc 
+            FROM 
+            (
+                SELECT year,month,industries_name,sum(attribute_count) as sumc
+                FROM 
+                (
+                    SELECT year,month,industries_name,attribute_count 
+                    FROM fx_indicator_summary_year
+                    where type='attribute_type' and status=1
+                    order by attribute_count DESC
+                ) as a2
+                group by year,month,industries_name
+                order by sumc desc
+            ) as tab
+            group by year,month
+            ) as t2
+        ON (t1.year = t2.year and t1.month = t2.month)
+        )
+        order by year Desc,month Desc";
+            $summary = DB::select($query_summary);
+            foreach ($summary as $records) {
+                // $records->month = $arr_months[$records->month];
+                $records->group_sumc = preg_replace_callback("/[0-9]+/", function ($matches) {
+                    return number_format($matches[0], 0, ',', ',');
+                }, $records->group_sumc);
+            }
+            $data_transcation = json_encode($summary);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+
+            if ($data === false) {
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            } else {
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'message' => $e->getMessage(),
+            );
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    public function table_summary_export(Request $request)
+    {
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+
+            $summary = DB::table('indicator_summary_year')->select('year', 'month', 'industries_name', DB::raw("SUM(attribute_count) as sumc"))
+                ->where("status", "1")
+                ->where("type", "attribute_type")
+                ->where("year", ">=", $data['data']['minyear'])
+                ->where("year", "<=", $data['data']['maxyear'])
+                ->where("month", ">=", $data['data']['minmonth'])
+                ->where("month", "<=", $data['data']['maxmonth'])
+                ->groupBy("year", "month", "industries_name")
+                ->orderBy("year", "desc")
+                ->orderBy("month", "desc")
+                ->orderBy("sumc", "desc")
+                ->get();
+
+            $data_transcation = json_encode($summary->toArray());
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+
+            if ($data === false) {
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            } else {
+                return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
             }
         } catch (\Exception $e) {
             $response = array(

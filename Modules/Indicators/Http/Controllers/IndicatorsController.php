@@ -22,6 +22,7 @@ use Modules\Users\Entities\UserSite;
 use Illuminate\Support\Facades\DB;
 use Nette\Utils\Strings;
 use App\Entities\TransactionBatchjob;
+use \Carbon\Carbon;
 
 class IndicatorsController extends Controller
 {
@@ -1511,7 +1512,7 @@ class IndicatorsController extends Controller
                 FROM 
                 (
                     SELECT year,month,industries_name,attribute_count 
-                    FROM sosecure_threatintelligent_dev.fx_indicator_summary_year
+                    FROM fx_indicator_summary_year
                     where type='attribute_type' and status=1
                     order by attribute_count DESC
                 ) as a1
@@ -1530,7 +1531,7 @@ class IndicatorsController extends Controller
                 FROM 
                 (
                     SELECT year,month,industries_name,attribute_count 
-                    FROM sosecure_threatintelligent_dev.fx_indicator_summary_year
+                    FROM fx_indicator_summary_year
                     where type='attribute_type' and status=1
                     order by attribute_count DESC
                 ) as a2
@@ -1543,15 +1544,20 @@ class IndicatorsController extends Controller
         )
         order by year Desc,month Desc";
         $summary = DB::select($query_summary);
-        foreach ($summary as $records) {
-            // $records->month = $arr_months[$records->month];
-            $records->group_sumc = preg_replace_callback("/[0-9]+/", function ($matches) {
-                return number_format($matches[0], 0, ',', ',');
-            }, $records->group_sumc);
+        if(!empty($summary)){
+            foreach ($summary as $records) {
+                // $records->month = $arr_months[$records->month];
+                $records->group_sumc = preg_replace_callback("/[0-9]+/", function ($matches) {
+                    return number_format($matches[0], 0, ',', ',');
+                }, $records->group_sumc);
+            }
         }
-        
         $Transaction = TransactionBatchjob::where('mode', 'indicator_summary_type')->first();
-
+        
+        if(empty($Transaction)){
+            $Transaction = date("Y-m-d H:i:s");
+            return DataTables::of($summary)->with('dateday',$Transaction)->make(true);
+        }
         return DataTables::of($summary)->with('dateday',$Transaction->transcation_date)->make(true);
     }
 
