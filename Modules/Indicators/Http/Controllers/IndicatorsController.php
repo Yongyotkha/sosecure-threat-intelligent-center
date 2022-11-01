@@ -21,6 +21,7 @@ use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
 use Illuminate\Support\Facades\DB;
 use Nette\Utils\Strings;
+use App\Entities\TransactionBatchjob;
 
 class IndicatorsController extends Controller
 {
@@ -1549,7 +1550,9 @@ class IndicatorsController extends Controller
             }, $records->group_sumc);
         }
         
-        return DataTables::of($summary)->make(true);
+        $Transaction = TransactionBatchjob::where('mode', 'indicator_summary_type')->first();
+
+        return DataTables::of($summary)->with('dateday',$Transaction->transcation_date)->make(true);
     }
 
     public function table_summary_export(Request $request)

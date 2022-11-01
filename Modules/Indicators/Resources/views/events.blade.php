@@ -71,8 +71,8 @@
                                         placeholder="Search">
                                 </div>
                                 <!--<div class="col-md-4">
-                                                    <div class="form-group">
-                                                    <label for="" class="">Group</label>                                                                                                                                                                                                                                                                                                                                                                                                                                                               {{-- <select name="group[]" id="type" class="select2-option form-control"
+                                                            <div class="form-group">
+                                                            <label for="" class="">Group</label>                                                                                                                                                                                                                                                                                                                                                                                                                                                               {{-- <select name="group[]" id="type" class="select2-option form-control"
                                     multiple="multiple">
                                  </select> --}}                                                                                                                                                                                                                                                                                                                                                                                                                               </div>-->
                                 <div class="col-lg-4 mb-1">
@@ -279,7 +279,7 @@
                                 <div class="panel-body">
                                     <div class="table-responsive">
                                         <table class="table table-striped vt-top" id="table_summary" style="width: 100%">
-                                            <div style="text-align: right">Latest updated</div>
+                                            <div style="text-align: right" id='lastdate'></div>
                                             <thead>
                                                 <tr>
                                                     <th>Year</th>
@@ -498,10 +498,8 @@
             }
 
 
-
             var table_summary = $("#table_summary").DataTable({
                 dom: '<"#bse.button_summary_export"B>rtip',
-                pageLength: 25,
                 order: [
                     [0, 'desc']
                 ],
@@ -582,6 +580,12 @@
                         }
                     },
                 ],
+                infoCallback: function(settings, start, end, max, total, pre) {
+                    if(settings.json){
+                        document.getElementById('lastdate').innerHTML="";
+                        document.getElementById('lastdate').insertAdjacentText('beforeend',"Latest updated : "+settings.json.dateday);
+                    }
+                },
             });
             $.fn.dataTable.ext.search.push(
                 function(settings, data, dataIndex) {
