@@ -40,6 +40,7 @@ use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
 use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Symfony\Polyfill\Intl\Idn\Resources\unidata\Regex;
+use App\Entities\TransactionBatchjob;
 
 use App\FXTechniques;
 use App\Entities\OtxIndicatiorData;
@@ -1894,13 +1895,22 @@ class ApiIndicatorController extends ApiController
         )
         order by year Desc,month Desc";
             $summary = DB::select($query_summary);
-            foreach ($summary as $records) {
-                // $records->month = $arr_months[$records->month];
-                $records->group_sumc = preg_replace_callback("/[0-9]+/", function ($matches) {
-                    return number_format($matches[0], 0, ',', ',');
-                }, $records->group_sumc);
+            if (!empty($summary)) {
+                foreach ($summary as $records) {
+                    // $records->month = $arr_months[$records->month];
+                    $records->group_sumc = preg_replace_callback("/[0-9]+/", function ($matches) {
+                        return number_format($matches[0], 0, ',', ',');
+                    }, $records->group_sumc);
+                }
             }
-            $data_transcation = json_encode($summary);
+            $Transaction = TransactionBatchjob::where('mode', 'indicator_summary_type')->first();
+            if (empty($Transaction)) {
+                $Transaction = date("Y-m-d H:i:s");
+            }
+            else{
+                $Transaction = $Transaction->transcation_date;
+            }
+            $data_transcation = json_encode(['summary'=>$summary,'dateday'=>$Transaction]);
             $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
 
             if ($data === false) {
