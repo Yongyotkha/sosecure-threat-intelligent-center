@@ -6326,7 +6326,18 @@ input.form-policy[type=password] {
 .table td {
     vertical-align: top !important;
 }
+
 .button_summary_export .dt-buttons {
     float: right;
     margin: 10px;
+}
+
+.fdd {
+    width: 100px;
+    border-radius: 3px;
+    padding: 0 6px;
+    font-size: 1.3rem;
+    min-height: 30px;
+    box-shadow: none;
+    font-weight: 400;
 }

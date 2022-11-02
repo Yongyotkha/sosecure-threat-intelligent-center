@@ -271,15 +271,16 @@
                             <section class="panel panel-default">
                                 <header class="panel-heading font-bold panel-header-blue">
                                     <div class="row">
-                                        <div class="col-xs-12">
+                                        <div class="col-xs-8">
                                             <i class="fas fa-table"></i> Table Summary Type
+                                        </div>
+                                        <div class="col-xs-4" id='lastdate' style="text-align: right">
                                         </div>
                                     </div>
                                 </header>
                                 <div class="panel-body">
                                     <div class="table-responsive">
                                         <table class="table table-striped vt-top" id="table_summary" style="width: 100%">
-                                            <div style="text-align: right" id='lastdate'></div>
                                             <thead>
                                                 <tr>
                                                     <th>Year</th>
@@ -624,11 +625,11 @@
                 table_summary.draw();
             });
 
-            var a = '<div class="dt-buttons btn-group flex-wrap" style="bottom:-3px">' +
+            var a = '<div class="dt-buttons btn-group flex-wrap">' +
                 '<label for="" class="fdd">Select Range</label>' +
-                '<input id="rangepickermin" class="fdd" name="rangepickermin" style="width:60px">' +
-                '<label for="" class="fdd">-</label>' +
-                '<input id="rangepickermax" class="fdd" name="rangepickermax" style="width:60px"></div>' +
+                '<input id="rangepickermin" class="fdd" name="rangepickermin">' +
+                '  -  ' +
+                '<input id="rangepickermax" class="fdd" name="rangepickermax">' +
                 '</div>';
             document.getElementById('bse').insertAdjacentHTML('beforeend', a);
             var date = new Date();
