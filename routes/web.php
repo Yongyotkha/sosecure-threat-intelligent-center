@@ -27,6 +27,7 @@ Route::get('/redirect/{provider}', 'SocialAuthController@redirectToProvider');
 Route::get('/callback/{provider}', 'SocialAuthController@handleProviderCallback');
 
 Route::get('/logout', 'Auth\LoginController@logout');
+Route::get('/backlogin', 'Auth\LoginController@backlogin')->name('backlogin');
 
 Route::get('error/403', 'ErrorController@fourZeroThree')->name('error.403');
 

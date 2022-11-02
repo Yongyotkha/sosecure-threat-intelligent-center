@@ -15,7 +15,6 @@ use Modules\Users\Entities\model_has_roles;
 use Session;
 use App\Menu;
 use App\Menu_sub;
-use Carbon\Carbon;
 use Modules\Users\Entities\role_menu_permission;
 
 class LoginController extends Controller
@@ -48,7 +47,7 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-        $this->middleware(['installed', 'guest'])->except('logout');
+        $this->middleware(['installed', 'guest'])->except('logout','backlogin');
     }
 
     /**
@@ -77,20 +76,16 @@ class LoginController extends Controller
         $User = User::where('email',$request->email)->where('email_verified_at','!=',null)->where('banned',0)->where('deleted_at',null)->where('active',1)->first();
         $model_has_roles = model_has_roles::where('role_id',@$User->get_model_has_roles->role_id)->first();
         if($model_has_roles) {
-            if($model_has_roles->role_id == 1 || $model_has_roles->role_id == 2 || $model_has_roles->role_id == 4) {
+            if($model_has_roles->role_id == 1 || $model_has_roles->role_id == 2) {
                 $role_status = 1;
             } else {
                 $role_status = 0;
             }
         }
-       
+
+
         // if ((Auth::attempt(['email' => $request->email, 'password' => $request->password, 'active' => 1, 'site_role_id' => 1]) ) || ($this->oldLogin($request))) {
-        if ($this->attemptLogin($request)) {
-            if($User){
-                if(Carbon::parse($User->password_start_reset)->addDays($User->password_days_expire) <= Carbon::now()){
-                    return redirect('policypassword');
-                }
-            }
+        if ( ($this->oldLogin($request))) {//custom login
             // The user is active, not suspended, and exists.
 
             // $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
@@ -98,7 +93,12 @@ class LoginController extends Controller
             // $_SESSION["menu"] = $menu;
             // session('menu', $menu);
             // dd($menu);
-            // return $this->sendLoginResponse($request);
+            // dd(55);
+
+
+            
+            return $this->sendLoginResponse($request);
+
         }
 
 
@@ -220,9 +220,13 @@ class LoginController extends Controller
     public function logout()
     {
         auth()->logout();
-        return redirect('/');
+        return redirect('/login');
     }
-
+    public function backlogin()
+    {
+        auth()->logout();
+        return redirect('/login');
+    }
     /*
     |--------------------------------------------------------------------------
     | Api เข้าสู่ระบบ
