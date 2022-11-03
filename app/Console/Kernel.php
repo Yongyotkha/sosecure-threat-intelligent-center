@@ -79,6 +79,7 @@ class Kernel extends ConsoleKernel
       $schedule->command('app:RSS_Feed')->cron('0 */1 * * *')->withoutOverlapping(5);
       $schedule->command('app:news_permission')->cron('0 */6 * * *')->withoutOverlapping(5);
 
+      $schedule->command('app:indicator_summary_type')->dailyAt('03:00')->withoutOverlapping(5);
       $schedule->command('app:MDCVEDataYear')->dailyAt('03:00')->name('lang.progress')->withoutOverlapping(5);
       $schedule->command('app:MDCVEBatchJob')->dailyAt('0 */8 * * *')->name('lang.progress')->withoutOverlapping(5);
 

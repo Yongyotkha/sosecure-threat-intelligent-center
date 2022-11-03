@@ -62,6 +62,7 @@ class indicator_summary_type extends Command
             $Transaction = TransactionBatchjob::where('mode', 'indicator_summary_type')->first();
             print_r("Insert Transaction Log\n");
         }
+        
         if ($Transaction->progress == 1) {
             $Transaction->progress = 2;
             $Transaction->transcation_date_start = date("Y-m-d H:i:s");
