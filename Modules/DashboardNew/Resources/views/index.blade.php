@@ -232,7 +232,7 @@
                 </div>
             </div>
             <hr>
-            <section class="panel panel-default" style="margin-top: 5rem">
+            <section class="panel panel-default" style="margin-top: 2rem">
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
                         <div class="col-md-4 col-lg-6 col-xs-12 m-b-xs-5">
@@ -627,7 +627,7 @@ Highcharts.setOptions({
             ordering: true,
             pagination: true,
             pageLength: 25,
-            processing: true,
+            processing: false,
             serverSide: false,
             destroy: true,
             "dom": '<"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
@@ -673,7 +673,7 @@ Highcharts.setOptions({
                     targets: 0,
                     searchable: false,
                     orderable: false,
-                    width: '10px',
+                    width: '5%',
                     render: function (data, type, row, meta) {
                         return meta.row + meta.settings._iDisplayStart + 1;
                     }
@@ -681,7 +681,7 @@ Highcharts.setOptions({
                 },
                 {
                     targets: 1,
-                    width: '10px',
+                    width: '7%',
                     className:'nowrap',
                     render: function (data, type, full, meta) {
                         
@@ -691,7 +691,7 @@ Highcharts.setOptions({
                 },
                 {
                     targets: 2,
-                    width: '10px',
+                    width: '7%',
                     className:'nowrap',
                     render: function (data, type, full, meta) {
                         
@@ -700,7 +700,7 @@ Highcharts.setOptions({
                     },
                 },
                 {
-                    width:'400px',
+                    width:'60%',
                     targets: 3,
                     render: function (data, type, full, meta) {    
                         let html = '';
@@ -749,7 +749,7 @@ Highcharts.setOptions({
                 {
                     targets: 4,
                     className:'nowrap',
-                    width: '10px',
+                    width: '13%',
                     render: function (data, type, full, meta) {
                         
                         return full.datetime;
@@ -758,7 +758,7 @@ Highcharts.setOptions({
                 },
                 {
                     targets: 5,
-                    width: '10px',
+                    width: '8%',
                     render: function (data, type, full, meta) {
                         return '<a href="'+full.link+'" class="btn btn-info btn-xs"><i class="fas fa-eye"></i> View</a>';
                     },
@@ -783,9 +783,10 @@ Highcharts.setOptions({
                 f_loading_stop(null, '.number_asset');
                 if(result.status_code == 200){
                     if(result.data.assetLimit){
-                        $('.number_asset').text(result.data.countAssets + '/' + result.data.assetLimit);
+                        $('.number_asset').text(result.data.countAssets.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '/' + result.data.assetLimit);
                     }else{
-                        $('.number_asset').text(result.data.countAssets);
+                        console.log(result.data.countAssets);
+                        $('.number_asset').text(result.data.countAssets.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
                     }
                 }
             }
@@ -806,7 +807,7 @@ Highcharts.setOptions({
             success: function(result){
                 f_loading_stop(null, '.number_vulnerability');
                 if(result.status_code == 200){
-                    $('.number_vulnerability').text(result.data);
+                    $('.number_vulnerability').text(result.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
                 }
             }
         });
@@ -825,7 +826,7 @@ Highcharts.setOptions({
             },
             success: function(result){
                 if(result.status_code == 200){
-                    $('.number_compromised').text(result.data);
+                    $('.number_compromised').text(result.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
                 }
             }
         });
@@ -844,7 +845,7 @@ Highcharts.setOptions({
             },
             success: function(result){
                 if(result.status_code == 200){
-                    $('.number_data_leak').text(result.data);
+                    $('.number_data_leak').text(result.data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
                 }
             }
         });
