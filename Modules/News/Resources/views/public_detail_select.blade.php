@@ -1,6 +1,7 @@
 @extends('layouts.public')
 @section('image','{{@$RSSNews->logo}}')
 @section('title',"$RSSNews_name")
+@section('metatitle'," $RSSNews_name")
 @section('description',"$RSSNews_detail")
 @section('content')
 @php 
