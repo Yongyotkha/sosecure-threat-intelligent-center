@@ -587,9 +587,18 @@ class ApiNewsController extends ApiController
 
                         $html_cate_all = '';
                         if(!empty($item->get_cate)) {
+                            $num = count($item->get_cate);
+                            $i = 0;
                             foreach($item->get_cate as $cate_id_val) {
+                                ++$i;
                                 if(!empty($cate_id_val)) {
-                                    $html_cate_all .= '<span class="badge badge-primary" style="background-color:#007bff; margin-bottom: 5px;">'.@$cate_id_val->get_cate_name->name.'</span> &nbsp;';
+                                    if($i === $num){
+                                        $html_cate_all .= @$cate_id_val->get_cate_name->name;
+                                    }
+                                    else{
+                                        $html_cate_all .= @$cate_id_val->get_cate_name->name.",";
+                                    }
+                                    
                                 }
                             }
                         }
@@ -602,7 +611,7 @@ class ApiNewsController extends ApiController
                         if(!empty($html_source_all)) {
                             $html_source_all_full = '<b>Source: </b>'.$html_source_all;
                         } else {
-                            $html_source_all_full = 'Source: <span class="badge badge-info" style="background-color:#17a2b8;">None</span> &nbsp;';
+                            $html_source_all_full = '<b>Source: </b><span class="badge badge-info" style="background-color:#17a2b8;">None</span> &nbsp;';
                         }
 
 
@@ -639,13 +648,12 @@ class ApiNewsController extends ApiController
             
                         $html .= '
                                 </span> &nbsp; 
-                                <span class="entry-cate"> <b>Categories: </b>'.$html_cate_all.'</span>'.@$html_source_all_full.'
+                                <span class="entry-cate"> <b>Categories: </b>'.'<span style="word-break: break-all;display: inline;" class="showmore">'.$html_cate_all.'<button style="padding:0;padding-left:1px;padding-right:1px;" onclick="showMore(this)">Show More</button></span>&nbsp;</span>&nbsp;'.@$html_source_all_full.'
                         ';
                         if($n_detail)
                         {
-                            $html .= '
-                                    <span><p class="details-news-elip">&nbsp;'.strip_tags($n_detail).'</p></span>
-                            ';
+                            $html .= '<span><p class="details-news-elip">&nbsp;</p></span>';
+                            // $html .= '<span><p class="details-news-elip">&nbsp;'.strip_tags($n_detail).'</p></span>';
                         }
 
                                 // if($item->count_campainge > 0)
