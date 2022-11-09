@@ -464,8 +464,8 @@ class RSSFeedSettingsController extends Controller
             // ->where('status', 1)
             // ->where('public_date', '<=', Carbon::now())
             // ---------------------------------------------------
-            
-            -> orderBy('public_date', 'desc');
+
+            ->orderBy('public_date', 'desc');
         // $model = $model -> get();
 
         // dd(count($model));
@@ -641,10 +641,21 @@ class RSSFeedSettingsController extends Controller
 
 
                 $html .= '<span class="text-trucate-ovf"> <span class="m-r-5 m-l-xs"><b>Category : </b>';
-                $html .= '<span style="word-break: break-all;">';
+                $html .= '<span style="word-break: break-all;display: inline;" class="showmore">';
                 if($model->get_cate=="[]"){
                     $html .= 'None';
                 }else{
+                    $catagory_name = "";
+                    $num = count($model->get_cate);
+                    $i = 0;
+                    foreach($model->get_cate as $record){             
+                        if(++$i === $num){
+                            $catagory_name .= $record->get_cate_name->name;
+                        }   
+                        else{
+                            $catagory_name .= $record->get_cate_name->name.",";
+                        }
+                    }
                     $htmls = '';
                    // foreach($model->get_cate as $cate_val) {
                       //  if($cate_val->get_cate_name_news){
@@ -655,16 +666,15 @@ class RSSFeedSettingsController extends Controller
                      //   }
                         
                  //   }
-                    $htmls .= 'All';
+                    $htmls .= $catagory_name;
                     if($htmls =='None-delete0'){
                         $html .= str_replace('-delete0','', $htmls);
                     }else{
                         $html .= str_replace('None-delete0','', $htmls);
                     }
                     
-                    // $html .= rtrim($html,", ");
                 }
-                $html .= '</span>';
+                $html .= '<button style="padding:0;padding-left:1px;padding-right:1px;" onclick="showMore(this)">Show More</button></span>';
         
 
                 $html .= '</span>';
@@ -1445,7 +1455,7 @@ class RSSFeedSettingsController extends Controller
         {
             $data['master_campainge'] = null;
         }
-
+        $data['mode'] = true;
         return view('rssfeedsettings::modal.edit_news')->with($data);
     }
 
