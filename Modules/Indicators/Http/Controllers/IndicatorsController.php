@@ -1568,17 +1568,17 @@ class IndicatorsController extends Controller
             check_permission403();
         }
         // $fileName = 'Indicators-Summary Type.csv';
-        $data_query = DB::table('indicator_summary_year')->select('year', 'month', 'industries_name', DB::raw("SUM(attribute_count) as sumc"))
+        $data_query = DB::table('indicator_summary_year')->select('year', 'month', 'industries_name as attribute_type', DB::raw("SUM(attribute_count) as count"))
         ->where("status", "1")
         ->where("type", "attribute_type")
         ->where("year", ">=", $request->minyear)
         ->where("year", "<=", $request->maxyear)
         ->where("month", ">=", $request->minmonth)
         ->where("month", "<=", $request->maxmonth)
-        ->groupBy("year", "month", "industries_name")
+        ->groupBy("year", "month", "attribute_type")
         ->orderBy("year", "desc")
         ->orderBy("month", "desc")
-        ->orderBy("sumc", "desc")
+        ->orderBy("count", "desc")
         ->get();  
         // $headers = array(
         //     "Content-type"        => "text/csv",
