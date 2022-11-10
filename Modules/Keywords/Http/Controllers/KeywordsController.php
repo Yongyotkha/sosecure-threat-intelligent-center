@@ -14,6 +14,8 @@ use Illuminate\Routing\Controller;
 use MongoDB\Client as MongoClient;
 use Modules\SiteSettings\Entities\Activity;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Concerns\ToArray;
+
 class KeywordsController extends Controller
 {
     /**
@@ -365,9 +367,8 @@ class KeywordsController extends Controller
             $site = SiteSettings::select('id')->where('code', $code_site)->where('active','1')->first();
             array_push($site_id_list,$site->id);
         }
-    
-
-        $site_keywords_main = site_keywords_main::whereIn('site_id', $site_id_list)->where('status',1)->whereNull('deleted_at')->orderBy('order','asc')->get();
+        
+        $site_keywords_main = site_keywords_main::whereIn('site_id', $site_id_list)->where('status',1)->whereNull('deleted_at')->orderBy('order','asc')->select('id','name')->get();
         if(!$site_keywords_main) {
 
             $message = langapp('changes_saved_successful');
@@ -397,7 +398,7 @@ class KeywordsController extends Controller
     {
         $message = '';
         $status = 0;
-
+        
         $type = $request->type;
         $code_site = $request->code_site;
         $site_id_list =array();
@@ -411,9 +412,11 @@ class KeywordsController extends Controller
             $site = SiteSettings::select('id')->where('code', $code_site)->where('active','1')->first();
             array_push($site_id_list,$site->id);
         }
-
-        $Site_keywords = Site_keywords::whereIn('site_id', $site_id_list)->where('status',1)->whereNull('deleted_at')->where('type',$type)->orderBy('order','asc')->get();
-        if(!$Site_keywords) {
+        $data = array();
+        foreach($type as $value){
+            array_push($data,Site_keywords::whereIn('site_id', $site_id_list)->where('status',1)->whereNull('deleted_at')->where('type',$value)->orderBy('order','asc')->select('id','keywords_main_id','name')->get()->toArray());
+        }
+        if(!$data) {
 
             $message = langapp('changes_saved_successful');
             $status = 1;
@@ -428,7 +431,7 @@ class KeywordsController extends Controller
 
         return ajaxResponse(
             [
-                'data'       => @$Site_keywords,
+                'data'       => @$data,
                 'message'  => $message,
                 'status'   => $status,
                 'redirect' => route('keyword.index',['id' => $code_site]),
