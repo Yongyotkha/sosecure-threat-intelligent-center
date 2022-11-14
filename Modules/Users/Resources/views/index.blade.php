@@ -262,9 +262,11 @@ var id_select_site = 'site';
                     "role" :role,
                 }
             },
-            order: [[ 8, "desc" ]],
+            order: [[ 9, "desc" ]],
             columns: [
-                { data: 'chk', name: 'chk', orderable: false, searchable: false, sortable: false },
+                { 
+                    data: 'chk', name: 'chk', orderable: false, searchable: false, sortable: false 
+                },
                 {
                     data: 'no',
                     className: "w-15",
@@ -272,35 +274,49 @@ var id_select_site = 'site';
                         return meta.row + meta.settings._iDisplayStart + 1;
                     },
                 },
-                { data: 'name', name: 'name' },
-                { data: 'rolename', name: 'model_role_id' },
-                { data: 'email', name: 'email' },
-                { data: 'job_title', name: 'profile.job_title',
+                { 
+                    data: 'name', name: 'name' 
+                },
+                { 
+                    data: 'rolename', name: 'model_role_id' 
+                },
+                { 
+                    data: 'email', name: 'email' 
+                },
+                { 
+                    data: 'job_title', name: 'profile.job_title',
                     visible:false,
                     searchable: false,
                     orderable: false
                 },
-                { data: 'site_name', 
-                    name: 'site_id' ,
+                { 
+                    data: 'site_name', name: 'site_id' ,
                     searchable: false,
                     orderable: false
                 },
-                { data: 'mobile', name: 'profile.mobile',
+                { 
+                    data: 'mobile', name: 'profile.mobile',
                     visible:false,
                     searchable: false,
                     orderable: false
                 },
-                { data: 'city', name: 'profile.city',
+                { 
+                    data: 'city', name: 'profile.city',
                     visible:false,
                     searchable: false,
                     orderable: false
                 },
-                { data: 'created_at', name: 'created_at' },
+                { 
+                    data: 'created_at', 
+                    name: 'created_at', 
+                    type: "date"
+                },
                 { data: 'action', name: 'action',
                     searchable: false,
                     orderable: false,
                     className: 'text-center no-wrap'}
-            ]
+            ],
+
         });
     }
 
