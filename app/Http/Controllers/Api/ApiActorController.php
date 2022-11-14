@@ -48,7 +48,7 @@ class ApiActorController extends ApiController
                 // $data_key = $data['data'];
 
                 $data['page'] = "Actor";
-                $data['page_chk'] = @$data['data']['page_chk'] ? $data['page_chk'] : 'actor';
+                $data['page_chk'] = @$data['data']['page_chk'] ? $data['data']['page_chk'] : 'actor';
 
                 $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
                 $client = new MongoClient($DB_MONGO_KEY);
@@ -286,7 +286,7 @@ class ApiActorController extends ApiController
             );
             $data_transcation = json_encode($response);
             $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
-            return response()->json(['error' => '', 'status_code' => 500, 'data' => $datas]);
+            return response()->json(['error' => '', 'status_code' => 500, 'data' => $datas,]);
         }
     }
 
