@@ -733,18 +733,17 @@
                     "fnDrawCallback": function(oSettings) {
                         var numofChar = 100;
                         var showmores = document.querySelectorAll(".showmore");
+               
                         showmores.forEach(showmore => {
-                            var text = showmore.textContent.replace("Show More",'');
+                            var text = showmore.textContent.replace("ดูเพิ่มเติม",'');
                             if (text.length < numofChar) {
                                 showmore.lastChild.style.display = "none";
                             } else {
                                 var displaytext = text.slice(0, numofChar);
                                 var moretext = text.slice(numofChar);
                                 var button = showmore.lastChild;
-                                showmore.innerHTML = displaytext +
-                                    '<span class="dots"> ... </span><span class="hidemore" style="display:none;">' +
-                                    moretext +
-                                    '</span>';
+                                console.log(button);
+                                showmore.innerHTML = displaytext + '<span class="dots"> ... </span><span class="hidemore" style="display:none;">' + moretext + '</span>';
                                 showmore.appendChild(button);
                             }
                         });
@@ -1059,6 +1058,8 @@
                 var post = btn.parentElement;
                 post.querySelector(".dots").style.display = post.querySelector(".dots").style.display === "none" ? '' : 'none';
                 post.querySelector(".hidemore").style.display = post.querySelector(".hidemore").style.display=== "none" ? '' : 'none';
+                post.querySelector(".btn-showmore").textContent = post.querySelector(".btn-showmore").textContent === "ดูเพิ่มเติม" ? "ย่อ" : 'ดูเพิ่มเติม';
+
             }
 
             function copy_link(value) {
