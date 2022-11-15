@@ -648,7 +648,7 @@ class ApiNewsController extends ApiController
             
                         $html .= '
                                 </span> &nbsp; 
-                                <span class="entry-cate"> <b>Categories: </b>'.'<span style="word-break: break-all;display: inline;" class="showmore">'.$html_cate_all.'<button style="padding:0;padding-left:1px;padding-right:1px;" onclick="showMore(this)">Show More</button></span>&nbsp;</span>&nbsp;'.@$html_source_all_full.'
+                                <span class="entry-cate"> <b>Categories: </b>'.'<span style="word-break: break-all;display: inline;" class="showmore">'.$html_cate_all.'<button class="btn-showmore btn-link text-primary" style="padding:0;padding-left:1px;padding-right:1px;" onclick="showMore(this)">ดูเพิ่มเติม</button></span>&nbsp;</span>&nbsp;'.@$html_source_all_full.'
                         ';
                         if($n_detail)
                         {
