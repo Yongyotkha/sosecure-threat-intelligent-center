@@ -315,69 +315,69 @@ class ApiActorController extends ApiController
                     $filter_name = @$data['data']['filter_name'];
                     $status_actor = @$data['data']['status_actor'];
 
-                    // $input = $request->all();
+                    $input = $request->all();
 
-                    // $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
-                    // $client = new MongoClient($DB_MONGO_KEY);
-                    // if(app()->environment('local'))
-                    // {
-                    //     $collection = $client->sosecure_threatintelligent->fx_otx_adversaries;
-                    // }
-                    // else
-                    // {
-                    //     $collection = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
-                    // }
-                    // // $db_name = 'sosecure_threatintelligent_test';
-                    // // $db = $client->$db_name;
-                    // // $collection = $db->fx_otx_adversaries;
+                    $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+                    $client = new MongoClient($DB_MONGO_KEY);
+                    if(app()->environment('local'))
+                    {
+                        $collection = $client->sosecure_threatintelligent->fx_otx_adversaries;
+                    }
+                    else
+                    {
+                        $collection = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
+                    }
+                    // $db_name = 'sosecure_threatintelligent_test';
+                    // $db = $client->$db_name;
+                    // $collection = $db->fx_otx_adversaries;
 
-                    // $query = [
-                    //     'delete_at' => null
-                    // ];
+                    $query = [
+                        'delete_at' => null
+                    ];
 
-                    // if($filter_name != null)
-                    // {
-                    //     $query['name'] = new \MongoDB\BSON\Regex($filter_name);          
-                    // }
+                    if($filter_name != null)
+                    {
+                        $query['name'] = new \MongoDB\BSON\Regex($filter_name);          
+                    }
 
-                    // if($status_actor != null)
-                    // {
-                    //     if($status_actor == "0") 
-                    //     {
-                    //         $query['status'] = "0";
+                    if($status_actor != null)
+                    {
+                        if($status_actor == "0") 
+                        {
+                            $query['status'] = "0";
                             
-                    //     } 
-                    //     else if ($status_actor == "1") 
-                    //     {
-                    //         $query['status'] = "1";
-                    //     }
-                    // }
+                        } 
+                        else if ($status_actor == "1") 
+                        {
+                            $query['status'] = "1";
+                        }
+                    }
 
-                    // // dd($query);
+                    // dd($query);
 
-                    // $option = [];
+                    $option = [];
 
-                    // $final = $collection->find($query,$option);
+                    $final = $collection->find($query,$option);
 
-                    // $result = $final->toArray();
+                    $result = $final->toArray();
 
-                    // // return DataTables::of($result)
-                    // //     ->make(true);
-                    //     // ->toJson();
+                    // return DataTables::of($result)
+                    //     ->make(true);
+                        // ->toJson();
 
-                    // $data_count = count($result);
-
-                    // $response = [
-                    //     "recordsFiltered_count"=> $data_count,
-                    //     "recordsTotal_count" => $data_count,
-                    //     // "data" => DataTables::of($result->skip(@$data['data']['start'])->take(@$data['data']['length'])->get())->toJson(),
-                    //     // ->rawColumns(['feedcontent','get_brand_abuse_feed_one.feedcontent'])
-                    //     "data" => DataTables::of($result)->toJson(),
-                    // ];
+                    $data_count = count($result);
 
                     $response = [
-                        "filter_name"=> @$filter_name,
+                        "recordsFiltered_count"=> $data_count,
+                        "recordsTotal_count" => $data_count,
+                        // "data" => DataTables::of($result->skip(@$data['data']['start'])->take(@$data['data']['length'])->get())->toJson(),
+                        // ->rawColumns(['feedcontent','get_brand_abuse_feed_one.feedcontent'])
+                        "data" => DataTables::of($result)->toJson(),
                     ];
+
+                    // $response = [
+                    //     "filter_name"=> @$filter_name,
+                    // ];
 
                     $data_transcation = json_encode($response);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
@@ -581,7 +581,7 @@ class ApiActorController extends ApiController
                     //     ->make(true);
                     //     // ->toJson();
 
-                    $data_count = count($query_tech);
+                    $data_count = $query_tech->count();
 
                     $response = [
                         "recordsFiltered_count"=> $data_count,
