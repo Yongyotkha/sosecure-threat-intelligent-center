@@ -53,7 +53,7 @@ class TestSendMail extends Command
      */
     public function handle()
     {
-        \Mail::to('romrun.2k@gamail.com')->send(new TestSend());
+        \Mail::to('romrun.2k@gmail.com')->send(new TestSend());
         $this->info('Daily summary sent successfully');
     }
     
