@@ -413,8 +413,10 @@ class KeywordsController extends Controller
             array_push($site_id_list,$site->id);
         }
         $data = array();
-        foreach($type as $value){
-            array_push($data,Site_keywords::whereIn('site_id', $site_id_list)->where('status',1)->whereNull('deleted_at')->where('type',$value)->orderBy('order','asc')->select('id','keywords_main_id','name')->get()->toArray());
+        // foreach($type as $value){
+        if($type){
+            // array_push($data,);
+            $data = Site_keywords::whereIn('site_id', $site_id_list)->where('status',1)->whereNull('deleted_at')->where('type',$type)->orderBy('order','asc')->select('id','keywords_main_id','name')->get();
         }
         if(!$data) {
 
