@@ -2,6 +2,10 @@
 @section('content')
 
 @php $role_custom = @check_role_custom(); @endphp
+@php 
+    // dd($site_settings);
+    // dd(Auth::user()->site_id);
+@endphp
 <section id="content" class="bg">
     <section class="vbox">
         <header class="header bg-white b-b b-light" style="display: flex;justify-content:space-between;">
@@ -9,25 +13,22 @@
             <div class="max-w-select {{ count($site_settings) == 1 ? 'd-none' : '' }}" style="margin-top: 8px;">
                 <select name="site" id="site" class="select2-option form-control select-site"
                     onchange="changeSite(value)">
+                    
                     @if(count($site_settings) == 1)
-                    @if ($site_settings)
-
-                    @foreach ($site_settings as $site_settings)
-                    <option value="{{$site_settings->code}}" selected data-site_id="{{ $site_settings->code }}">{{$site_settings->name}}
-                    </option>
-                    @endforeach
-
-                    @endif
+                        @if ($site_settings)
+                        @foreach ($site_settings as $key => $site_settings)
+                        <option value="{{$site_settings->code}}" selected data-site_id="{{ $site_settings->code }}">{{$site_settings->name}}
+                        </option>
+                        @endforeach
+                        @endif
                     @else
-                    <option value="0" selected>All Site</option>
-                    @if ($site_settings)
-
-                    @foreach ($site_settings as $site_settings)
-                    <option value="{{$site_settings->code}}">{{$site_settings->name}}
-                    </option>
-                    @endforeach
-
-                    @endif
+                        <option value="0">All Site</option>
+                        @if ($site_settings)
+                        @foreach ($site_settings as $site_settings)
+                        <option value="{{$site_settings->code}}" {{ ($site_settings->id == Auth::user()->site_id ? 'selected' : '') }}>{{$site_settings->name}}
+                        </option>
+                        @endforeach
+                        @endif
                     @endif
                     
                 </select>
@@ -419,16 +420,15 @@
 @include('stacks.js.multitext')
 
 <script>
-active_btn('#filter-chart-btn .btn-chart-fil');
+    active_btn('#filter-chart-btn .btn-chart-fil');
 
-var id_select_site = 'site';
-Highcharts.setOptions({
-    lang: {
-      decimalPoint: '.',
-      thousandsSep: ','
-    }
-});
-
+    var id_select_site = 'site';
+    Highcharts.setOptions({
+        lang: {
+        decimalPoint: '.',
+        thousandsSep: ','
+        }
+    });
 
     $('#fillter_click .btn-selector').on('click',function(){
         $(this).siblings().removeClass('active');
@@ -469,7 +469,6 @@ Highcharts.setOptions({
         timePicker: true,
         startDate: start,
         endDate: end,
-
         locale: {
             format: 'M/DD hh:mm A'
         },
@@ -489,9 +488,7 @@ Highcharts.setOptions({
         }
     }
 
-    
     function changeSite(value) {
-       
         
         site = value;
 
@@ -524,17 +521,12 @@ Highcharts.setOptions({
     }
 
     function clearValue(value) {
-        
-
         start = moment().subtract(2, 'days');
         end = moment();
         cb(start, end);
         pagename = '';
         data_table();
         {{--$('#type').val('').trigger('change');$('#keyword').val('');--}}
-
-
-          
     }
 
     function select_pagename(value) {
@@ -587,13 +579,6 @@ Highcharts.setOptions({
         $('[data-rel="tooltip"]').tooltip(); 
 
 
-        
-
-
-
-        
-
-
         $('#date-rang').on('apply.daterangepicker', function(ev, picker) {
             
             data_table();
@@ -604,10 +589,30 @@ Highcharts.setOptions({
 
         cb(start, end);
 
-        
-
-
+        f_load_step_page_moduls(1);
     });
+
+    {{-- /* Function -> Load Step Page Moduls */ --}}
+    function f_load_step_page_moduls(step) {
+        console.log('Step: ' + step);
+        if (step == 1) {
+            
+        } else if (step == 2) {
+
+        } else if (step == 3) {
+            
+        } else if (step == 4) {
+            
+        } else if (step == 5) {
+            
+        } else if (step == 6) {
+            
+        } else if (step == 7) {
+            
+        } else if (step == 8) {
+            
+        }
+    }
 
     function cb(start, end) {
         $('#date-rang span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
