@@ -19,7 +19,7 @@
 
                     @endif
                     @else
-                    <option value="0" selected>All Site</option>
+                    {{-- <option value="0" selected>All Site</option> --}}
                     @if ($site_settings)
 
                     @foreach ($site_settings as $site_settings)
