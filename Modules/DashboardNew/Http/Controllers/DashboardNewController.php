@@ -794,16 +794,32 @@ public function count_vulnerability_host(Request $request) {
         if(@get_role_custom()['superadmin'] == 1) {
             if(!$request -> site){
                 // @$cve_host_name_summarys_data =  DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM sosecure_insight.fx_cve_host_name_summarys where site_id = 0 group by title');
-                @$cve_host_name_summarys_data =  DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM fx_cve_host_name_summarys where site_id = 0 group by title');
-
-                // $cve_host_name_summarys_data = DB::table('cve_host_name_summarys')
-                // ->where('site_id', '=', '0')
-                // ->select('title')
-                // ->sum('status_critical');
+                $cve_host_name_summarys_data = DB::table('cve_host_name_summarys')
+                ->where('site_id', '=', '0')
+                ->select(
+                    'title',
+                    DB::raw('IFNULL(SUM(status_critical), 0) as status_critical'),
+                    DB::raw('IFNULL(SUM(status_high), 0) as status_high'),
+                    DB::raw('IFNULL(SUM(status_medium), 0) as status_medium'),
+                    DB::raw('IFNULL(SUM(status_low), 0) as status_low'),
+                    DB::raw('IFNULL(SUM(status_infomation), 0) as status_infomation'),
+                )
+                ->get();
                 // dd($cve_host_name_summarys_data);
             }else{
                 $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                $cve_host_name_summarys_data =  DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM sosecure_insight.fx_cve_host_name_summarys where site_id = '.$site_id_m->id.' group by title');
+                // $cve_host_name_summarys_data =  DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM sosecure_insight.fx_cve_host_name_summarys where site_id = '.$site_id_m->id.' group by title');
+                $cve_host_name_summarys_data = DB::table('cve_host_name_summarys')
+                ->where('site_id', '=', $site_id_m->id)
+                ->select(
+                    'title',
+                    DB::raw('IFNULL(SUM(status_critical), 0) as status_critical'),
+                    DB::raw('IFNULL(SUM(status_high), 0) as status_high'),
+                    DB::raw('IFNULL(SUM(status_medium), 0) as status_medium'),
+                    DB::raw('IFNULL(SUM(status_low), 0) as status_low'),
+                    DB::raw('IFNULL(SUM(status_infomation), 0) as status_infomation'),
+                )
+                ->get();
                 // dd($site_id_m, $cve_host_name_summarys_data);
             }
         } else {
@@ -1037,9 +1053,7 @@ public function chart_indicators(Request $request){
 
     public function table_dashboard(Request $request)
     {
-
-
-
+        dd($request->all());
         $model = '';
         $html = '';
 
