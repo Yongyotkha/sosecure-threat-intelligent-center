@@ -1,6 +1,6 @@
  <body>
 
-      <form action="https://insight.sosecure.co.th/Darkweb/search.php" method="post">
+      <form action="https://insights.sosecure.co.th/Darkweb/search.php" method="post">
         Search: <input type="text" name="term" /><br />
         Payload: <input type="text" name="payload" value="q"  /><br />
         Time Stamp From: <input type="text" name="time_stamp_from" value="2020-12-07T10:01:24Z" /><br />
@@ -17,7 +17,7 @@
  $time_stamp_to =  $_REQUEST['time_stamp_to']; 
 
  if($term){
- $t = '/usr/bin/php /var/www/html/insight.sosecure.co.th/threat-intelligent-center/artisan app:MDFeedDarkWeb_Token '.$term.' '. $payload.' '. $time_stamp_from.' '. $time_stamp_to;
+ $t = '/usr/bin/php /var/www/html/insights.sosecure.co.th/threat-intelligent-center/artisan app:MDFeedDarkWeb_Token '.$term.' '. $payload.' '. $time_stamp_from.' '. $time_stamp_to;
  $output = shell_exec($t);
  //echo "<pre>$output</pre>";
  print_r($t);

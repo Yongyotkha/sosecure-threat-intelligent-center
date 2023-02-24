@@ -10,7 +10,7 @@
     <meta property="og:image" content="@yield('image')">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>inSight - @yield('metatitle')</title>
+    <title>inSights - @yield('metatitle')</title>
     <link href="//fonts.googleapis.com/css?family=Roboto:100,300,400,500,300i" rel="stylesheet">
     <link href="//fonts.googleapis.com/css?family=Mr+Dafoe" rel="stylesheet">
     <link rel="stylesheet" href="{{ getAsset('css/theme.css') }}" type="text/css"/>

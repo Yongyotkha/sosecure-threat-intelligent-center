@@ -19,7 +19,7 @@
                 {{ get_option('website_name') }}
                 @endif
                 @endif --}}
-                {{-- <span class="md-text-logo"> SOSECURE <br> <span class="sm-text-logo"> Threat inSight </span> </span> --}}
+                {{-- <span class="md-text-logo"> SOSECURE <br> <span class="sm-text-logo"> Threat inSights </span> </span> --}}
             </a>
             <a class="btn btn-link visible-xs" data-toggle="dropdown" data-target=".nav-user">
                 @icon('solid/cog')

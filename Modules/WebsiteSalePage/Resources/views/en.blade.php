@@ -213,7 +213,7 @@
       <div class="intro-info">
         <h2>Intelligence Detection</h2>
         <h3>
-            Threat inSight System is improved for helping organizations detect threats faster and also working with surveillance at the same time. We have data leak detection technology to protect the data of the organization's internet and dark web.
+            Threat inSights System is improved for helping organizations detect threats faster and also working with surveillance at the same time. We have data leak detection technology to protect the data of the organization's internet and dark web.
         </h3>
       </div>
 
@@ -369,7 +369,7 @@
                     <div class="row">
                         <div class="col-xl-4 order-xl-1 order-2 d-flex flex-column align-items-center justify-content-center">
                             <span class="secondary-text mb-3 text-white text-xl-left text-center">
-                                We use indicators from insight data to detect threats from hackers stealing data or infecting Backdoor on the server.
+                                We use indicators from insights data to detect threats from hackers stealing data or infecting Backdoor on the server.
                             </span>
         
                             <ul class="list-img-ice text-center">
@@ -434,7 +434,7 @@
                 <div>
                     <span class="secondary-text text-xl-left text-center">
                         Threat Hunting is a system that can detect proactive threats. Also, Detection threats on cyber by using
-                        proactive indicators of insight data which come from hacker and be attacked by malware.
+                        proactive indicators of insights data which come from hacker and be attacked by malware.
                     </span>
                 </div>
                 <ul class="list-img-ioc mt-4" style="justify-content: space-evenly;">
@@ -472,7 +472,7 @@
                             Compromised Detection
                         </h1>
                         <span class="secondary-text">
-                            We use indicators from insight data to detect threats from hackers stealing data or infecting Backdoor on the server.
+                            We use indicators from insights data to detect threats from hackers stealing data or infecting Backdoor on the server.
                         </span>
                     </div>
 
@@ -579,7 +579,7 @@
                         Advanced Vulnerability Detection
                     </h1>
                     <span class="secondary-text text-white mb-4">
-                        Threat inSight System is able to detect the gap of the system. This system is based on a database of the Common Vulnerabilities and Exposures (CVE) system.
+                        Threat inSights System is able to detect the gap of the system. This system is based on a database of the Common Vulnerabilities and Exposures (CVE) system.
                     </span>
 
                     <img class="img-fluid" src="{{asset('asset_salepage/images/icon/Group97.png')}}" alt="">
@@ -839,7 +839,7 @@
   <footer id="footer">
     <div class="container">
       <div class="copyright">
-        &copy; Copyright <strong>SOSECURE Threat inSight</strong>. All Rights Reserved
+        &copy; Copyright <strong>SOSECURE Threat inSights</strong>. All Rights Reserved
       </div>
     </div>
   </footer>

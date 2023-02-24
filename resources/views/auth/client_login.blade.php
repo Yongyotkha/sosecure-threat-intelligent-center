@@ -14,7 +14,7 @@
     
                 <!-- Text -->
                 <div class="w-100 text-white text-login" style="z-index: 1">
-                    <h1 class="header-text-login font-weight-bolder mb-4">SOSECURE Threat inSight</h1>
+                    <h1 class="header-text-login font-weight-bolder mb-4">SOSECURE Threat inSights</h1>
                     <div class="secondary-text-login font-weight-light">
                         Lorem ipsum dolor sit, amet consectetur adipisicing elit. Natus expedita officia voluptas ipsam, fugit id velit repudiandae
                         in placeat eum doloremque vel dicta quam provident magni similique ex dolorem nihil.

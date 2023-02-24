@@ -27,7 +27,7 @@
                     <label class="col-lg-12 control-label m-t-10">Logo </label>
                     <div class="col-lg-12 m-t-10 m-b-12">
                         <div id="area_preview_logo">
-                            <img id="preview-image_logo" src="{{ @$RSSNews->logo }}" onerror="this.src='https://insight.sosecure.co.th/images/icon/news_default.png'"
+                            <img id="preview-image_logo" src="{{ @$RSSNews->logo }}" onerror="this.src='https://insights.sosecure.co.th/images/icon/news_default.png'"
                                 alt="...">
                             <input id="input_img_logo_base64" type="hidden" name="input_img_logo_base64"
                                 value="">

@@ -4,13 +4,13 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta property="og:url"                content="https://insight.sosecure.co.th" />
+        <meta property="og:url"                content="https://insights.sosecure.co.th" />
         {{-- <meta property="og:type"               content="article" /> --}}
         {{-- <meta property="og:title"              content="When Great Minds Don’t Think Alike" /> --}}
         {{-- <meta property="og:description"        content="How much does culture influence creative thinking?" /> --}}
-        <meta property="og:image"              content="https://insight.sosecure.co.th/asset_salepage/images/icon/cyber.png" />
+        <meta property="og:image"              content="https://insights.sosecure.co.th/asset_salepage/images/icon/cyber.png" />
 
-        <title>SOSECURE Threat inSight บริการด้าน Threat Intelligence ,บริการตรวจจับข้อมูลรั่วไหล Data Leak ,บริการตรวจจับช่องโหว่ ,ตรวจจับภัยคุกคาม Threat Hunting</title>
+        <title>SOSECURE Threat inSights บริการด้าน Threat Intelligence ,บริการตรวจจับข้อมูลรั่วไหล Data Leak ,บริการตรวจจับช่องโหว่ ,ตรวจจับภัยคุกคาม Threat Hunting</title>
 
         {{-- <link rel="icon" href="{{ asset('favicon.ico')}}"> --}}
 

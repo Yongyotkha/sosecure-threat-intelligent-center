@@ -18,7 +18,7 @@
                 </div>
 
                 <div class="ml-2 text-right">
-                <a href="https://insight.sosecure.co.th/monitoring/darkweb" id="advance-"
+                <a href="https://insights.sosecure.co.th/monitoring/darkweb" id="advance-"
                     class="btn btn-sm btn-{{ get_option('theme_color')  }} m-l-xs">
                     <span data-rel="tooltip" title="Filter" data-placement="bottom"> Search Dark Web</span></span>
                 </a>
@@ -214,7 +214,7 @@
                         {{-- <div class="item-wdfm mdasbord-inner">
                             <div class="wdfm-card">
                                 <center > 
-                                    <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/images/logo_site/1611069788.png" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
+                                    <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insights.sosecure.co.th/images/logo_site/1611069788.png" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
                                 </center>
 
                                 <div class="wdfm-footer start-top" >

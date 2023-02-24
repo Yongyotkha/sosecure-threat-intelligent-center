@@ -8,7 +8,7 @@
         <div class="modal-body">
 
                 <?php 
-                    $file = 'https://insight.sosecure.co.th/css/log_yara_scan_data_2021-08-05.txt';
+                    $file = 'https://insights.sosecure.co.th/css/log_yara_scan_data_2021-08-05.txt';
                     $orig = file_get_contents($file);
                     $a = nl2br($orig);
                     echo $a;

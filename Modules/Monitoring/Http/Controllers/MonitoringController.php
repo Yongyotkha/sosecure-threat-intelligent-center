@@ -118,7 +118,7 @@ class MonitoringController extends Controller
                     <div class="item-wdfm mdasbord-inner" id="data_main_'.$value['code'].'">
                         <div class="wdfm-card">
                             <center > 
-                                <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insight.sosecure.co.th/'.$value['logo'].'" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
+                                <div style="width:200px; height:200px;"><img id="preview-image_logo" src="https://insights.sosecure.co.th/'.$value['logo'].'" onerror="setDefaultPic(this)" style="width:100%;height:100%; object-fit:contain;" alt="..."></div>
                             </center>
         
                             <div class="wdfm-footer start-top" >
