@@ -176,7 +176,7 @@
     <nav class="navbar navbar-expand-xl navbar-dark bg-dark fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="/websitesalepage">
-                <img src="{{asset('images/logo_threat/logo.png')}}" height="45px" class="d-inline-block align-top" alt="">
+                <img src="{{asset('images/logo_threat/logo.png')}}" height="58px" class="d-inline-block align-top" alt="">
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
