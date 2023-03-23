@@ -614,8 +614,13 @@
 
                         <div class="column">
                             <div class="css-nheav9">
-                                <h3 class="h3 darkblue css-1w5mdtx title">Detection Support System</h3>
-                                <p class="medium darkgrey css-o8e64g subtitle"></p>
+                                <h3 class="h3 darkblue css-1w5mdtx title mt-3">
+                                    Detection OS System
+                                </h3>
+                                <h5 class="h5 darkblue css-1w5mdtx title">
+                                    ระบบสนับสนุนการตรวจจับ
+                                </h5>
+                                {{-- <p class="medium darkgrey css-o8e64g subtitle"></p> --}}
                                <div data-testid="cards_container" id="area_logo_os" class="css-2u2ye4">
                                     <a class="box css-4oj96i zoom1" data-testid="card" url="#" href="javascript:void(0)">
                                         <div class="css-1iww2db">
