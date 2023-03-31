@@ -165,7 +165,6 @@
                     success: function(response) {
                         loading('stop_load');
                         if (response.status == 1) {
-                            {{-- console.log(response); --}}
                             result = 1;
                             if (response && response.data) {
                                 let data = response.data;
@@ -222,14 +221,15 @@
                         if (response.status == 1) {
                             result = 1;
                             if (response && response.data) {
+                                $('ul.social-list').html("");
+                                $('ul.darkweb-list').html("");
+                                $('ul.defacement-list').html("");
+                                $('ul.credit_card-list').html("");
                                 for (i in response.data) {
-                                    $('ul.' + type[i] + '-list').html('');
                                     var newToDo = ``;
-                                    for (j in response.data[i]) {
-                                        newToDo += `<li class="item-list item--keyword" data-id="${response.data[i][j].id}" data-keywords_main_id="${response.data[i][j].keywords_main_id}"><div class="left-side-item">
-                                        <span class="text-keyword">${response.data[i][j].name}</span></div></li>`;
-                                    }
-                                    $('ul.' + type[i] + '-list').append(newToDo);
+                                    newToDo += `<li class="item-list item--keyword" data-id="${response.data[i].id}" data-keywords_main_id="${response.data[i].keywords_main_id}"><div class="left-side-item">
+                                    <span class="text-keyword">${response.data[i].name}</span></div></li>`;
+                                    $('ul.' + response.data[i].type + '-list').append(newToDo);
                                 }
                             }
                         } else {

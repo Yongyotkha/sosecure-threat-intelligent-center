@@ -416,7 +416,7 @@ class KeywordsController extends Controller
         // foreach($type as $value){
         if($type){
             // array_push($data,);
-            $data = Site_keywords::whereIn('site_id', $site_id_list)->where('status',1)->whereNull('deleted_at')->where('type',$type)->orderBy('order','asc')->select('id','keywords_main_id','name')->get();
+            $data = Site_keywords::whereIn('site_id', $site_id_list)->where('status',1)->whereNull('deleted_at')->whereIn('type',$type)->orderBy('order','asc')->select('id','keywords_main_id','name','type')->get();
         }
         if(!$data) {
 
