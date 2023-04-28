@@ -19,6 +19,23 @@ use MongoDB\Client;
 use MongoDB\Client as MongoClient;
 use Yajra\DataTables\DataTables;
 
+use App\Credentials;
+use App\DataLeakFeed;
+use App\DataLeakFeedTemp;
+use App\DataLeakSocial;
+use App\DataLeakSocialRef;
+use App\DataLeakSocialRefTemp;
+use App\Entities\CompromisedServer;
+use App\leak_socail_ref_temp;
+use App\LogEmail;
+use App\Mail\CompromisedMail;
+use App\transaction_client_asset;
+use App\transaction_client_asset_data;
+use App\transaction_client_compromised_server;
+use App\transaction_client_leak_feed;
+use App\transaction_client_leak_social_ref;
+use App\transcation_jobs_clients;
+
 class PhishingController extends Controller
 {
     /**
@@ -45,6 +62,23 @@ class PhishingController extends Controller
      * Display a listing of the resource.
      * @return Response
      */
+
+    public function phishing_web_server($code)
+    {
+        $get_data = $this->siteSettings->get_data($code);
+        $data['siteSettings'] = $get_data;
+        $siteID = siteSettings::where('code', $code)->first();
+
+        $DataLeakSocial = DataLeakSocial::where('deleted_at', null)->where('status', 1)->get();
+        $data['DataLeakSocial'] = $DataLeakSocial;
+        $data['siteID'] = $siteID->id;
+        $data['page'] = 'Phishing Web Server';
+
+        $data['Credentials'] = Credentials::where('site_id', $get_data->id)->get();
+
+        return view('sitesettings::phishing_web_server')->with($data);
+    }
+
     public function phishing_detection($id)
     {
         $get_data = $this->siteSettings->get_data($id);

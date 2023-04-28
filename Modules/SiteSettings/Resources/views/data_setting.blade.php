@@ -204,7 +204,7 @@
                                 </div>
 
                                 <div class="form-group row">
-                                    <label class="col-lg-3 control-label">Agent Allow</label>
+                                    <label class="col-lg-3 control-label">Agent Windows Allow</label>
                                     <div class="col-lg-2">
                                         <div class="checkbox">
                                             <label>
@@ -223,6 +223,25 @@
                                         @else
                                             <button class="btn btn-primary" disabled>Download Agent</button>
                                         @endif
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Agent linux Allow</label>
+                                    <div class="col-lg-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="allow_agent" {{$siteSettings->allow_agent == 'Y' || $siteSettings->allow_agent == null ? 'checked' : '' }} value="TRUE">
+                                                <span class="label-text" data-rel="tooltip" title="">Allow</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <label class="col-lg-1 control-label">Limit : </label>
+                                    <div class="col-lg-3">
+                                        <input type="text" class="form-control touch_spin text-center" name="allow_agent_limit" value="{{$siteSettings->agent_count}}"> 
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <button type="button" class="btn btn-primary" id="agent_linux_allow_copy_url_clone_install" data-clipboard-text='wget "http://10.104.0.7:8083/agent/linux/file/sosecureinsights-1.0.0-py3-none-any.whl.zip"' onclick="copy_url_clone_install()">Copy URL Clone Install</button>
                                     </div>
                                 </div>
 
@@ -614,6 +633,28 @@
      
          
     });
+
+    function copy_url_clone_install() {
+
+        const target = document.getElementById('agent_linux_allow_copy_url_clone_install');
+        clipboard = new ClipboardJS(target);
+
+        clipboard.on('success', function (e) {
+            const currentLabel = target.innerHTML;
+
+            if (target.innerHTML === 'Copied!') {
+                return;
+            }
+
+            target.innerHTML = 'Copied!';
+            toastr.success('Copied successfully.', 'Response');
+
+            setTimeout(function () {
+                target.innerHTML = currentLabel;
+            }, 1000)
+        });
+
+    }
 
 </script>
 

@@ -86,6 +86,15 @@
             </div>
 
             <div class="form-group">
+                <label class="control-label">Keyword </label>
+                <select name="keyword[]" id="keyword" class="select2-option form-control" multiple="multiple">
+                    <option value="1">pantip</option>
+                    <option value="2">facebook</option>
+                    <option value="3">twitter</option>
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label class="control-label">Status</label>
                 <div>
                     <label class="switch">
@@ -107,6 +116,11 @@
 <script>
 
     $('.sl-2').select2();
+    $('#keyword').select2({
+        tags: true,
+        tokenSeparators: [' ']
+    });
+
     $('#score').change(function(){
         let score = $(this).val();
         $('.score-text').text(score)

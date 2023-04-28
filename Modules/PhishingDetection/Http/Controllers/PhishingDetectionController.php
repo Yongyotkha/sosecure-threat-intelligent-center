@@ -155,6 +155,11 @@ class PhishingDetectionController extends Controller
         $logPhishing->orderBy('log_phishing.created_at', 'DESC')->get();
 
         return DataTables::of($logPhishing)
+            ->editColumn('keyword', function ($collection) {
+                $html = '';
+                $html .= 'pantip,facebook,twitter';
+                return $html;
+            })
             ->editColumn('status', function ($collection) {
                 $html = '';
                 $html .= '<label class="switch">
