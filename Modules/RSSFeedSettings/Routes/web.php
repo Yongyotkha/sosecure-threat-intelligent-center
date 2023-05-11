@@ -59,5 +59,11 @@ Route::group(
 
         Route::post('rss_data/load_top_source', 'RSSFeedSettingsController@load_top_source')->name('rssfeedsettings.load_top_source')->middleware('can:menu_items');
         Route::post('rss_data/load_top_category', 'RSSFeedSettingsController@load_top_category')->name('rssfeedsettings.load_top_category')->middleware('can:menu_items');
+    
+        // Certficate
+        Route::get('/certificate', 'CertificateController@index')->name('certificate.index')->middleware('can:menu_items');
+        Route::post('/certificate/create', 'CertificateController@store')->name('certificate.save')->middleware('can:menu_items');
+        Route::post('/certificate/certificate_table', 'CertificateController@tableCertificate')->name('certificate.tableCertificate')->middleware('can:menu_items');
+        
     }
 );
