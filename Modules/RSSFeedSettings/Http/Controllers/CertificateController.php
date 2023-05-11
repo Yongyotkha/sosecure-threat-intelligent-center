@@ -22,6 +22,8 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Modules\RSSFeedSettings\Entities\NewsCategory;
 use Modules\CategorySettings\Entities\CategorySettings;
 use Modules\RSSFeedSettings\Entities\NewsTag;
@@ -35,7 +37,7 @@ use Modules\SiteSettings\Entities\SiteCategory;
 use Modules\RSSFeedSettings\Entities\TransactionRssData;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Yajra\DataTables\DataTables;
-
+use ZipArchive;
 
 class CertificateController extends Controller
 {
@@ -65,32 +67,37 @@ class CertificateController extends Controller
     public function store(Request $request)
     {
         try {
-            // 
+
+            
             // dd($request->all());
-
             // Store
-            // if ($request->hasFile('file')) {
+            if ($request->hasFile('cert_file_ssl')) {
+                
+                $file = $request->file('cert_file_ssl');
+                $name = date('YmdHis') . $file->getClientOriginalName();
+                $filePath = 'upload/certificate/';
+                $filePathDB = 'upload/certificate/' . $name;
 
-            //     $file = $request->file('file');
-            //     $name = time() . $file->getClientOriginalName();
-            //     $filePath = 'readvpn/testS3/' . $name;
+                // $zip = new ZipArchive();
+                // // $zip->addFile($file->move($filePath, $name));
+                // if ($zip->open(public_path($name), ZipArchive::CREATE) === TRUE)
+                // {
+                //     $zip->addFile($filePath, $name);
+                //     $zip->close();
+                // }
 
-            //     // Upload -> S3
-            //     $path = Storage::disk('s3')->put($filePath, file_get_contents($file));
-            //     $url = Storage::disk('s3')->url($filePath);
+                // Move File -> Public
+                $file ->move($filePath, $name);
 
-            //     // Move File -> Public
-            //     $file->move($filePath, $filePath);
+            }
 
-            // }
             $site = implode(",", $request->cert_site);
-            // dd($site);
             $store = DB::table('certificate')
             ->insert([
                 'code' => generator_uuid(),
                 'name' => $request->cert_name ? $request->cert_name : null,
-                'ssl_certificate' => '',
-                'ssl_certificate_key' => '',
+                'ssl_certificate' => $filePathDB,
+                'ssl_certificate_key' => null,
                 'site_id' => $site,
 
                 'status' => $request->cert_status ? true : false,
@@ -122,15 +129,35 @@ class CertificateController extends Controller
         //     check_permission403();
         // }
         // $model = RSSData::where('deleted_at', null)->get();
-        $query = DB::table('certificate')->where('deleted_at', null)->get();
+
+        $query = DB::table('certificate as cert')->where('cert.deleted_at', null)->get();
+
         return DataTables::of($query)
         ->addIndexColumn()
+        ->editColumn('site_name', function ($query) {
+            // Convert -> Array
+            $site = explode(",", $query->site_id);
+
+            $html = '';
+            $html .= '<ul>';
+            foreach ($site as $site_list) {
+                if ($site_list == 'all') {
+                    $html .= '<li><span>ทั้งหมด</span></li>';
+                } else {
+                    $getsite = DB::table('site')->where('id', $site_list)->where('active', '1')->select('id','name')->first();
+                    $html .= '<li><span>'.$getsite->name.'</span></li>';
+                }
+            }
+            $html .= '</ul>';
+
+            return $html;
+        })
         ->editColumn('download', function ($query) {
-            $html = "
-                <a href='#' class='btn btn-sm btn-info pull-right' download>
-                <i class='fas fa-download'></i> Download
+            $html = '
+                <a href="'.asset($query->ssl_certificate).'" class="btn btn-sm btn-info pull-right" download>
+                    <i class="fas fa-download"></i> Download
                 </a>
-            ";
+            ';
 
             return $html;
         })
@@ -169,7 +196,7 @@ class CertificateController extends Controller
         //     </a></div>";
         //     return $html;
         // })
-        ->rawColumns(['status', 'action', 'download'])
+        ->rawColumns(['status', 'action', 'site_name', 'download'])
         ->toJson();
     }
 

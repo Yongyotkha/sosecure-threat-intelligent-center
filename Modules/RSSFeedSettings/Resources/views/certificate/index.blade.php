@@ -34,7 +34,7 @@
                                             <th>Rule Site</th>
                                             <th>Download</th>
                                             <th>Status</th>
-                                            <th>Action</th>
+                                            <th class="text-center" style="width: 100px;">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -74,7 +74,7 @@
                     </div>
 
                     <div class="form-group row">
-                        <label class="col-lg-3 control-label">SSL Certificate
+                        <label class="col-lg-3 control-label">Certificate
                             <span class="text-danger">*</span>
                         </label>
                         <div class="col-lg-9">
@@ -256,18 +256,12 @@
                 },
                 order: [[ 0, "desc" ]],
                 columns: [
-                    { data: 'DT_Row_Index', name: 'DT_Row_Index', className: 'no-wrap w-10' },
-                    { data: 'name', name: 'name', className: 'no-wrap' },
-                    { data: 'site_id', name: 'site_id', className: 'no-wrap' },
-                    { data: 'download', name: 'download', className: 'no-wrap w-10' },
-                    { data: 'status', name: 'status', className: 'no-wrap w-10' },
-                    {
-                        data: 'action',
-                        orderable: false,
-                        searchable: false,
-                        sortable: false,
-                        className: 'no-wrap w-10'
-                    }
+                    { data: 'DT_Row_Index', name: 'DT_Row_Index', className: 'nowrap w-10' },
+                    { data: 'name', name: 'name', className: 'nowrap' },
+                    { data: 'site_name', name: 'site_name', className: 'nowrap' },
+                    { data: 'download', name: 'download', className: 'nowrap w-10' },
+                    { data: 'status', name: 'status', className: 'nowrap w-10' },
+                    { data: 'action', className: 'nowrap w-10' }
                 ]
             });
 
@@ -293,6 +287,7 @@
                             toastr.success(response.data.message, '@langapp('response_status') ');
                             $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
                             {{-- window.location.href = response.redirect; --}}
+                            window.location.href = response.data.redirect;
                 })
                 .catch(function (error) {
                     if(error.response.data.exception){
