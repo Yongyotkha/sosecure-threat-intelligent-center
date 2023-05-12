@@ -60,37 +60,39 @@ class CertificateController extends Controller
         $SiteSettings = @$get_role_custom_first['SiteSettings'];
         $data['page'] = langapp('certificate');
         $site_settings = DB::table('site')->where('active', 1)->select('id','code','name')->get();
+        $site_settings_edit = DB::table('site')->where('active', 1)->select('id','code','name')->get();
 
-        return view('rssfeedsettings::certificate.index', compact('site_settings'))->with($data);
+        return view('rssfeedsettings::certificate.index', compact('site_settings','site_settings_edit'))->with($data);
     }
 
     public function store(Request $request)
     {
         try {
-
             
             // dd($request->all());
-            // Store
             if ($request->hasFile('cert_file_ssl')) {
                 
                 $file = $request->file('cert_file_ssl');
-                $name = date('YmdHis') . $file->getClientOriginalName();
+                $name = date('YmdHis') .'_'. $file->getClientOriginalName();
                 $filePath = 'upload/certificate/';
                 $filePathDB = 'upload/certificate/' . $name;
-
-                // $zip = new ZipArchive();
-                // // $zip->addFile($file->move($filePath, $name));
-                // if ($zip->open(public_path($name), ZipArchive::CREATE) === TRUE)
-                // {
-                //     $zip->addFile($filePath, $name);
-                //     $zip->close();
-                // }
 
                 // Move File -> Public
                 $file ->move($filePath, $name);
 
+                // Zip
+                // $zip = new ZipArchive(); // Load zip library 
+                // $zip_name = date('YmdHis') .'_ca'. '.zip';
+                // if($zip->open($zip_name, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE)
+                // { 
+                //     $zip->addFile($filePathDB, $name);
+                //     $zip->close();
+                // }
+                // dd( $filePathDB, $zip_name );
+
             }
 
+            // Store -> DB
             $site = implode(",", $request->cert_site);
             $store = DB::table('certificate')
             ->insert([
@@ -116,6 +118,161 @@ class CertificateController extends Controller
                 'status' => 404,
                 'message' => "เกิดข้อผิดพลาด",
                 'redirect' => route('certificate.index'),
+            ];
+        }
+
+        return response()->json($data);
+    }
+
+    public function update(Request $request)
+    {
+        try {
+            
+            // dd($request->all());
+            $filePathDB = '';
+            if ($request->hasFile('cert_file_ssl_edit')) {
+                
+                $file = $request->file('cert_file_ssl_edit');
+                $name = date('YmdHis') .'_'. $file->getClientOriginalName();
+                $filePath = 'upload/certificate/';
+                $filePathDB = 'upload/certificate/' . $name;
+
+                // Move File -> Public
+                $file ->move($filePath, $name);
+
+                // Zip
+                // $zip = new ZipArchive(); // Load zip library 
+                // $zip_name = date('YmdHis') .'_ca'. '.zip';
+                // if($zip->open($zip_name, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE)
+                // { 
+                //     $zip->addFile($filePathDB, $name);
+                //     $zip->close();
+                // }
+                // dd( $filePathDB, $zip_name );
+
+            }
+
+            // Store -> DB
+            $site = implode(",", $request->cert_site_edit);
+            $store = DB::table('certificate')
+            ->where('id', $request->cert_id_edit)
+            ->update([
+                'name' => $request->cert_name_edit ? $request->cert_name_edit : null,
+                'ssl_certificate' => $filePathDB,
+                'ssl_certificate_key' => null,
+                'site_id' => $site,
+
+                'status' => $request->cert_status_edit ? true : false,
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updated_by' => Auth::user()->id,
+            ]);
+
+            $data = [
+                'status' => 200,
+                'message' => "บันทึกสำเร็จ",
+                'redirect' => route('certificate.index'),
+            ];
+
+        } catch (\Exception $e) {
+            $data = [
+                'status' => 404,
+                'message' => "เกิดข้อผิดพลาด",
+                'redirect' => route('certificate.index'),
+            ];
+        }
+
+        return response()->json($data);
+    }
+
+    public function view(Request $request)
+    {
+        try {
+
+            // dd($request->all());
+            $id = $request->id;
+            // Select -> DB
+            $site_all = DB::table('site')->where('active', 1)->select('id','name')->get();
+            $query = DB::table('certificate')->where('id', $id)->first();
+            $site = explode(",", $query->site_id);
+            $mysite = [];
+
+            foreach ($site as $site_list) {
+                array_push($mysite, $site_list);
+            }
+            
+            $data = [
+                'status' => 200,
+                'message' => "สำเร็จ",
+                'data' => $query,
+                'mysite' => $mysite,
+                'site_all' => $site_all,
+            ];
+
+        } catch (\Exception $e) {
+            $data = [
+                'status' => 404,
+                'message' => "เกิดข้อผิดพลาด",
+            ];
+        }
+
+        return response()->json($data);
+    }
+
+    public function delete(Request $request)
+    {
+        try {
+
+            // dd($request->all());
+            $id = $request->id;
+            // Delete -> DB
+            $query = DB::table('certificate')
+            ->where('id', $id)
+            ->update([
+                'status' => $request->cert_status_edit ? true : false,
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updated_by' => Auth::user()->id,
+                'deleted_at' => date('Y-m-d H:i:s'),
+            ]);
+
+            $data = [
+                'status' => 200,
+                'message' => "ลบรายการสำเร็จ",
+            ];
+
+        } catch (\Exception $e) {
+            $data = [
+                'status' => 404,
+                'message' => "เกิดข้อผิดพลาด",
+            ];
+        }
+
+        return response()->json($data);
+    }
+
+    public function change_status(Request $request)
+    {
+        try {
+
+            // dd($request->all());
+            $id = $request->id;
+            // Change Status -> DB
+            $query = DB::table('certificate')
+            ->where('id', $id)
+            ->update([
+                'status' => $request->status,
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updated_by' => Auth::user()->id,
+            ]);
+
+            $data = [
+                'status' => 200,
+                'message' => "ปรับสถานะสำเร็จ",
+            ];
+
+        } catch (\Exception $e) {
+            $data = [
+                'status' => 404,
+                'message' => "เกิดข้อผิดพลาด",
             ];
         }
 
@@ -153,11 +310,15 @@ class CertificateController extends Controller
             return $html;
         })
         ->editColumn('download', function ($query) {
-            $html = '
-                <a href="'.asset($query->ssl_certificate).'" class="btn btn-sm btn-info pull-right" download>
-                    <i class="fas fa-download"></i> Download
-                </a>
-            ';
+            if ($query->ssl_certificate) {
+                $html = '
+                    <a href="'.asset($query->ssl_certificate).'" class="btn btn-sm btn-info pull-right" download>
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                ';
+            } else {
+                $html = '-';
+            }
 
             return $html;
         })
@@ -168,34 +329,28 @@ class CertificateController extends Controller
                 $checked_val = '';
             }
             $html = '';
-            $html .= '<label class="switch">
-                        <input type="checkbox" id="rss-active-' . $query->code . '" onchange="change_rss_active(\'' . $query->code . '\')" ' . $checked_val . ' value="1">
-                        <span></span>
-                    </label>';
-            return $html;
-        })
-        ->editColumn('action', function ($query) {
-            $html = "
-                <a href='#' class='btn btn-sm btn-info pull-right'>
-                    <i class='fas fa-edit'></i>
-                </a>
-                <a href='#' class='btn btn-sm btn-danger pull-right'>
-                    <i class='fas fa-trash-alt'></i>
-                </a>
-            ";
+            $html .= '
+            <label class="switch">
+                <input type="checkbox" id="'.$query->id.'" data-id="'.$query->id.'" data-status="'.$query->status.'" value="'.$query->status.'" '.$checked_val.' onchange="f_change_status_cert(this)">
+                <span></span>
+            </label>
+            ';
 
             return $html;
         })
-        // ->addColumn('action', function (RSSData $model) {
-        //     $html = '';
-        //     $html .= "<a href='" . route('rssfeedsettings.edit', ['id' => $model->code]) . "' class='btn btn-" . get_option('theme_color') . " btn-xs' data-toggle='ajaxModal'>
-        //     <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
-        //     </a>
-        //     <a href='" . route('rssfeedsettings.delete', ['id' => $model->code]) . "' class='btn btn-danger btn-xs' data-toggle='ajaxModal'>
-        //     <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path d='M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z'></path></svg>
-        //     </a></div>";
-        //     return $html;
-        // })
+        ->editColumn('action', function ($query) {
+            $html = '
+                <a type="button" class="btn btn-sm btn-info pull-right" 
+                data-toggle="modal" data-target="#cert_modal_update" data-id="'.$query->id.'" onclick="f_edit_cert(this)">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a type="button" class="btn btn-sm btn-danger pull-right" data-id="'.$query->id.'" onclick="f_delete_cert(this)">
+                    <i class="fas fa-trash-alt"></i>
+                </a>
+            ';
+
+            return $html;
+        })
         ->rawColumns(['status', 'action', 'site_name', 'download'])
         ->toJson();
     }
