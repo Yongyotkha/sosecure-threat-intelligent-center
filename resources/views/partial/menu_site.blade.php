@@ -179,12 +179,17 @@
     </li>
 
 
-    <li class="{{ $page === 'Phishing Detection' || $page == 'Phishing URL' || $page == 'Referer Logs' ? 'active' : '' }} main-link">
+    <li class="{{ $page === 'Phishing Web Server' || $page === 'Phishing Detection' || $page == 'Phishing URL' || $page == 'Referer Logs' ? 'active' : '' }} main-link">
         <a href="#">
             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
             Phishing
         </a>
        <ul class="nav nav-pills nav-stacked no-radius ul_submenu">
+            <li style="padding-left:2rem">
+                <a href="{{route('phishing.webserver', ['id' => $siteSettings->code])}}">
+                    Web Server
+                </a>
+            </li>
            <li style="padding-left:2rem">
                 <a href="{{route('phishing.detection', ['id' => $siteSettings->code])}}">
                     Phishing Detection

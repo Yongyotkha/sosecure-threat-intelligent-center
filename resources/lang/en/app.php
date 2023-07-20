@@ -961,6 +961,7 @@ return [
     'category_settings'                          => 'Categories',
     'site_settings'                              => 'Sites',
     'rss_feed_settings'                          => 'RSS Feed Settings',
+    'certificate'                                => 'Certificate',
     'rss_feed'                                   => 'RSS',
     'rss_data'                                   => 'RSS Data',
     'manage_assets'                              => 'Manage Assets',

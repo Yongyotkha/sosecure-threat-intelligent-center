@@ -6,17 +6,4 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'UpdateHelper\\' => array($vendorDir . '/kylekatarnls/update-helper/src'),
-    'Twocheckout' => array($vendorDir . '/2checkout/2checkout-php/lib'),
-    'Sentry\\Laravel\\' => array($vendorDir . '/sentry/sentry-laravel/src'),
-    'Pimple' => array($vendorDir . '/pimple/pimple/src'),
-    'Parsedown' => array($vendorDir . '/erusev/parsedown'),
-    'OAuth\\Unit' => array($vendorDir . '/lusitanian/oauth/tests'),
-    'OAuth' => array($vendorDir . '/lusitanian/oauth/src'),
-    'Mockery' => array($vendorDir . '/mockery/mockery/library'),
-    'HTMLPurifier' => array($vendorDir . '/ezyang/htmlpurifier/library'),
-    'Eluceo\\iCal' => array($vendorDir . '/eluceo/ical/src'),
-    'Braintree' => array($vendorDir . '/braintree/braintree_php/lib'),
-    'BaconQrCode' => array($vendorDir . '/bacon/bacon-qr-code/src'),
-    'Artdarek\\OAuth' => array($vendorDir . '/oriceon/oauth-5-laravel/src'),
 );

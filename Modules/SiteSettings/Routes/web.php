@@ -154,6 +154,7 @@ Route::group(
 Route::group(
     ['middleware' => ['web', 'permission:role_center', 'permission:web_defacement']],
     function () {
+        Route::get('/phishing/webserver/{code}', 'PhishingController@phishing_web_server')->name('phishing.webserver')->middleware('can:menu_items');
         Route::get('/phishing/detection/{id}', 'PhishingController@phishing_detection')->name('phishing.detection')->middleware('can:menu_items');
         Route::get('/phishing/logs/{id}', 'PhishingController@phishing_logs')->name('phishing.logs')->middleware('can:menu_items');
     }

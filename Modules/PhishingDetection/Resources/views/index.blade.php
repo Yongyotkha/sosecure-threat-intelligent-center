@@ -231,6 +231,7 @@
                                     <th>URL Detection</th>
                                     <th>URL</th>
                                     <th>IP Address</th>
+                                    <th>Keyword</th>
                                     <th>Type</th>
                                     <th>Score</th>
                                     <th>Severity</th>
@@ -492,34 +493,37 @@ function datatable(){
         },
         columns: [
             {
-                data: 'site_name',
+                data: 'site_name', className: 'nowrap'
             },
             {
-                data: 'url_detection',
+                data: 'url_detection', className: 'nowrap'
             },
             {
-                data: 'url',
+                data: 'url', className: 'nowrap'
             },
             {
-                data: 'ip',
+                data: 'ip', className: 'nowrap'
             },
             {
-                data: 'type',
+                data: 'keyword', className: 'nowrap'
             },
             {
-                data: 'score',
+                data: 'type', className: 'nowrap'
             },
             {
-                data: 'c_serverity',
+                data: 'score', className: 'nowrap'
             },
             {
-                data: 'updated_at',
+                data: 'c_serverity', className: 'nowrap'
             },
             {
-                data: 'c_status',
+                data: 'updated_at', className: 'nowrap'
             },
             {
-                data: 'action',
+                data: 'c_status', className: 'nowrap'
+            },
+            {
+                data: 'action', className: 'nowrap',
                 "orderable": false,
             }
         ],
