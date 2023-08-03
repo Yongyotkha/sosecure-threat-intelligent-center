@@ -27,6 +27,7 @@
         "fideloper/proxy": "^4.0",
         "firebase/php-jwt": "^5.2",
         "guzzlehttp/guzzle": "^6.3",
+        "hautelook/phpass": "^0.3.6",
         "intervention/image": "^2.5",
         "kwn/number-to-words": "^1.3",
         "laravel/cashier": "^9.0",
@@ -114,7 +115,8 @@
         "sort-packages": true,
         "optimize-autoloader": true,
         "allow-plugins": {
-            "kylekatarnls/update-helper": true
+            "kylekatarnls/update-helper": true,
+            "php-http/discovery": true
         }
     },
     "minimum-stability": "dev",

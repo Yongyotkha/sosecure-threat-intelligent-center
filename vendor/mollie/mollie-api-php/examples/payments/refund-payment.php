@@ -16,7 +16,7 @@ try {
      */
     $protocol = isset($_SERVER['HTTPS']) && strcasecmp('off', $_SERVER['HTTPS']) !== 0 ? "https" : "http";
     $hostname = $_SERVER['HTTP_HOST'];
-    $path = dirname(isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['PHP_SELF']);
+    $path = dirname($_SERVER['REQUEST_URI'] ?? $_SERVER['PHP_SELF']);
 
     if (isset($_GET['payment_id'])) {
         /*
@@ -25,7 +25,7 @@ try {
         $paymentId = $_GET['payment_id'];
         $payment = $mollie->payments->get($paymentId);
 
-        if ($payment->canBeRefunded() && $payment->amountRemaining->currency === 'EUR' && $payment->amountRemaining->value >= '2.00') {
+        if ($payment->canBeRefunded() && $payment->amountRemaining->currency === 'EUR' && $payment->getAmountRemaining() >= 2.00) {
             /*
              * Refund € 2,00 of the payment.
              *

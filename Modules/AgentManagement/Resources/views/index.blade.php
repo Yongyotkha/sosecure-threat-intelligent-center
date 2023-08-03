@@ -1738,66 +1738,12 @@
                 {
                     data: 'site_agents_ip_private',
                 },
+                
                 {
-                    data: 'site_agents_last_online',
+                    data: 'custom_status',
                     className : 'nowrap',
                 },
-                {
-                    targets: 9,
-                    className : 'nowrap',
-                        render: function (data, type, full, meta) {
-
-                        let html = '';
-                        let date1 = new Date(full.site_agents_last_online);
-
-                        let date1_d = date1.getDay();
-                        let date1_m = date1.getMonth();
-                        let date1_y = date1.getFullYear();
-                        let sumdate_1 = date1_d+''+date1_m+''+date1_y;
-
-                        let date2 = new Date();
-                        let date2_d = date2.getDay();
-                        let date2_m = date2.getMonth();
-                        let date2_y = date2.getFullYear();
-
-                        let sumdate_2 = date2_d+''+date2_m+''+date2_y;
-
-                        let onlineTime = date1.getMinutes();
-                        let onlineTimeH = date1.getHours();
-
-                    
-                        let currentTime = date2.getMinutes();
-                        let currentTimeH = date2.getHours();
-
-                        if(sumdate_1 == sumdate_2){
-                            if(onlineTimeH == currentTimeH){
-                                if(onlineTime < currentTime){
-                                    var sumTime = currentTime - onlineTime;
-                                    if(sumTime > 2){
-                                        html = '<div class="status-flex mr-2"><span class="dot critical "></span> Offline</div>';
-                                    }else{
-                                        html = '<div class="status-flex mr-2"><span class="dot low"></span> Online</div>'
-                                    }
-                                }else{
-                                    var sumTime = onlineTime - currentTime;
-                                    if(sumTime > 2){
-                                        html = '<div class="status-flex mr-2"><span class="dot critical"></span> Offline</div>';
-                                    }else{
-                                        html = '<div class="status-flex mr-2"><span class="dot low"></span> Online</div>'
-                                    }
-                                }
-                            }else{
-                                html = '<div class="status-flex mr-2"><span class="dot critical"></span> Offline</div>';
-                            }
-                        }else{
-                            html = '<div class="status-flex mr-2"><span class="dot critical "></span> Offline</div>';
-                        }
-
-
-                        return `${html} `;
-
-                    },
-                },
+                
                 {
                     data: 'chk_status',
                 },
@@ -1805,7 +1751,10 @@
                     data: 'action',
                     "orderable": false,
                 }
-            ]
+            ],
+            "initComplete": function(settings, json) {
+             
+            }
 
         });
         

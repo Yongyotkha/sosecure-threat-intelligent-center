@@ -629,7 +629,8 @@ class AgentManagementController extends Controller
                 'yara_log.ignore_flag',
                 'rule_name.description as agent_alerts_description',
                 'rule_name.severity as severity_status',
-                'os_type.name as os_type_name'
+                'os_type.name as os_type_name',
+                'yara_log.path'
             )
             ->where('yara_log.status', 1)
             ->where(function($query) use ($site_id ){
@@ -714,11 +715,11 @@ class AgentManagementController extends Controller
                 </div>
 
                 <div>
-                    <strong>Path</strong> :'.$query -> device_name.'
-                    <button type="button" onclick="copyToClipboard(\'#valuecopy_'.$query->agent_alerts_id.'\')" id="btn_copy_link_'.$query->agent_alerts_id.'" data-text="'.$query -> device_name.'" class="btn btn-xs btn-secondary">
+                    <strong>Path</strong> :'.$query -> path.'
+                    <button type="button" onclick="copyToClipboard(\'#valuecopy_'.$query->agent_alerts_id.'\')" id="btn_copy_link_'.$query->agent_alerts_id.'" data-text="'.$query -> path.'" class="btn btn-xs btn-secondary">
                         <i class="fas fa-copy"></i>
                     </button>
-                    <input type="hidden" id="valuecopy_'.$query->agent_alerts_id.'" value="'.$query -> device_name.'">
+                    <input type="hidden" id="valuecopy_'.$query->agent_alerts_id.'" value="'.$query -> path.'">
                 </div>  
 
                 <div>
@@ -882,7 +883,8 @@ class AgentManagementController extends Controller
                         'site_agents.created_at as site_agents_created',
                         'site_agents.batchjob_everydate',
                         'site_agents.real_time_protection',
-                        'site_agents.usb_protection'
+                        'site_agents.usb_protection',
+                        'site_agents.login_last_online'
                     )
                     ->where('site_agents.deleted_at', null);
 
@@ -890,7 +892,7 @@ class AgentManagementController extends Controller
         {
             $query->where('site_agents.site_id', $request->site_id);
         }
-
+        
         if($request->keyword_search != null)
         {
             $query->where('site.name', 'like', '%'.$request->keyword_search.'%')
@@ -931,7 +933,7 @@ class AgentManagementController extends Controller
         {
             $query->where('site_agents.os_description', 'like', '%'.$request->filter_agent_os_des.'%');
         }
-
+        // dd($query->get());
         return DataTables::of($query)
         ->addColumn('chk', function($query) {
             $html = '';
@@ -985,7 +987,41 @@ class AgentManagementController extends Controller
             ';
             return $html;
         })
-        ->rawColumns(['chk', 'chk_status', 'action'])
+        ->addColumn('custom_status', function($query) {
+            $html = '';
+            $currentTime = time();
+
+            // Check App status
+            $lastOnlineApp = strtotime($query['site_agents_last_online']);
+            $onlineTimeApp = ($currentTime - $lastOnlineApp) / 60; // Difference in minutes
+
+            if (date('Y-m-d', $lastOnlineApp) === date('Y-m-d', $currentTime)) {
+                if ($onlineTimeApp <= 2) {
+                    $html .= '<div class="status-flex mr-2"><b>App :&nbsp&nbsp&nbsp&nbsp&nbsp</b><span class="dot low"></span> Online</div>';
+                } else {
+                    $html .= '<div class="status-flex mr-2"><b>App :&nbsp&nbsp&nbsp&nbsp&nbsp</b><span class="dot critical"></span> Offline</div>';
+                }
+            } else {
+                $html .= '<div class="status-flex mr-2"><b>App :&nbsp&nbsp&nbsp&nbsp&nbsp</b><span class="dot critical"></span> Offline</div>';
+            }
+
+            // Check Login status
+            $login_last_online = strtotime($query['login_last_online']);
+            $login_onlineTime = ($currentTime - $login_last_online) / 60; // Difference in minutes
+          
+            if (date('Y-m-d', $login_last_online) === date('Y-m-d', $currentTime)) {
+                if ($login_onlineTime <= 2) {
+                    $html .= '<div class="status-flex mr-2"><b>Login :&nbsp&nbsp</b><span class="dot low"></span> Online</div>';
+                } else {
+                    $html .= '<div class="status-flex mr-2"><b>Login :&nbsp&nbsp</b><span class="dot critical"></span> Offline</div>';
+                }
+            } else {
+                $html .= '<div class="status-flex mr-2"><b>Login :&nbsp&nbsp</b><span class="dot critical"></span> Offline</div>';
+            }
+
+            return $html;
+        })
+        ->rawColumns(['chk', 'chk_status', 'action', 'custom_status'])
         ->make(true);
     }
 

@@ -60,6 +60,7 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
+       
         $this->validateLogin($request);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
@@ -199,7 +200,7 @@ class LoginController extends Controller
                     $cookie_name = "check_login_page";
                     $cookie_value = "1";
                     setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/"); // 86400 = 1 day
-
+                
                 // return Auth::login($user, true);
                 // dd(@check_goto_menu(@$menu_goto));
                 $check_goto_menu = @check_goto_menu(@$menu_goto);
