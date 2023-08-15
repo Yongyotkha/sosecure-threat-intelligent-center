@@ -389,6 +389,7 @@ class ApiAgentController extends ApiController
             } else {
                 $data_key = $data['data'];
                 $ip_private = $data_key['ip_private'];
+                $is_login = $data_key['is_login'];
                 $siteAgentsHasData = FXSiteAgents::where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
                 if($siteAgentsHasData){
                     $now = Carbon::now();
@@ -398,7 +399,8 @@ class ApiAgentController extends ApiController
                         'error' => '', 
                         'status_code' => 200,
                         'data' => [
-                            'last_online' => $now->toDateTimeString()
+                            'last_online' => $now->toDateTimeString(),
+                            'is_login' => $is_login
                         ]
                     ];
                 }else{
