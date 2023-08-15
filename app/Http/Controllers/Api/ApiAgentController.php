@@ -81,7 +81,7 @@ class ApiAgentController extends ApiController
                         'data' => []
                     ];
                 }else{
-                    $siteAgentsHasData = FXSiteAgents::where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
+                    $siteAgentsHasData = FXSiteAgents::where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->where('deleted_at', null)->first();
                     if(empty($siteAgentsHasData)){
                         $site = Sites::select('agent_count')->where('id', $data['site']['data']['id'])->first();
                         $siteAgentsRows = FXSiteAgents::where('site_id', $data['site']['data']['id'])->count();
