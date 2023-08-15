@@ -84,7 +84,7 @@ class ApiAgentController extends ApiController
                     $siteAgentsHasData = FXSiteAgents::where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->where('deleted_at', null)->first();
                     if(empty($siteAgentsHasData)){
                         $site = Sites::select('agent_count')->where('id', $data['site']['data']['id'])->first();
-                        $siteAgentsRows = FXSiteAgents::where('site_id', $data['site']['data']['id'])->count();
+                        $siteAgentsRows = FXSiteAgents::where('site_id', $data['site']['data']['id'])->where('deleted_at', null)->count();
                         if(!empty($site)){
                             if($site -> agent_count < $siteAgentsRows){
                                 $siteAgents = new FXSiteAgents();
@@ -230,7 +230,7 @@ class ApiAgentController extends ApiController
             } else {
                 $data_key = $data['data'];
                 $ip_private = $data_key['ip_private'];
-                $siteAgentsHasData = FXSiteAgents::select('id', 'active_date', 'status')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
+                $siteAgentsHasData = FXSiteAgents::select('id', 'active_date', 'status')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->where('deleted_at', null)->first();
                 if($siteAgentsHasData){
                     if($siteAgentsHasData -> status == 1){
                         $ruleSites = RuleSite::where('site_id', $data['site']['data']['id'])
@@ -390,7 +390,8 @@ class ApiAgentController extends ApiController
                 $data_key = $data['data'];
                 $ip_private = $data_key['ip_private'];
                 $is_login = $data_key['is_login'];
-                $siteAgentsHasData = FXSiteAgents::where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
+                $siteAgentsHasData = FXSiteAgents::where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->where('deleted_at', null)->first();
+                
                 if($siteAgentsHasData){
                     $now = Carbon::now();
                     $siteAgentsHasData -> last_online = $now;
@@ -486,6 +487,9 @@ class ApiAgentController extends ApiController
             $mode = $request->mode;
             $data_request = $request->data;
             $data = $this->dataFalse($header, $mode, $data_request);
+
+
+            
             if ($data === false) {
                 $response =[
                     'error' => 'The request parameters are invalid',
@@ -768,6 +772,7 @@ class ApiAgentController extends ApiController
                 $FXSiteAgents = FXSiteAgents::where('site_id', $data['site']['data']['id'])
                 ->where('ip_private', $ip_private)
                 ->where('status', 1)
+                ->where('deleted_at', null)
                 ->first();
 
                 if($FXSiteAgents){
@@ -818,7 +823,7 @@ class ApiAgentController extends ApiController
             } else {
                 $data_key = $data['data'];
                 $ip_private = $data_key['ip_private'];
-                $siteAgentsHasData = FXSiteAgents::select('id', 'batchjob_everydate', 'real_time_protection', 'extention_all_flag','usb_protection')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
+                $siteAgentsHasData = FXSiteAgents::select('id', 'batchjob_everydate', 'real_time_protection', 'extention_all_flag','usb_protection')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->where('deleted_at', null)->first();
                 if($siteAgentsHasData){
                     $ignore = SiteAgentIgnore::select('ref_id')->where('site_id', $data['site']['data']['id'])
                     ->where('agent_id', $siteAgentsHasData->id)
@@ -878,7 +883,7 @@ class ApiAgentController extends ApiController
             } else {
                 $data_key = $data['data'];
                 $ip_private = $data_key['ip_private'];
-                $siteAgentsHasData = FXSiteAgents::select('id', 'batchjob_everydate', 'real_time_protection', 'extention_all_flag')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
+                $siteAgentsHasData = FXSiteAgents::select('id', 'batchjob_everydate', 'real_time_protection', 'extention_all_flag')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->where('deleted_at', null)->first();
                 if($siteAgentsHasData){
                     $ignore = SiteAgentIgnore::select(DB::raw('"N" AS status'), 'rule_name.file_name','rule_name.rule_name','rule_name.description','rule_name.severity')
                     ->join('rule_name', 'rule_name.id', '=', 'site_agent_ignore.ref_id')
@@ -948,7 +953,7 @@ class ApiAgentController extends ApiController
                 $hash_data = $data_key['data'];
                 $dataFound = [];
 
-                $siteAgentsHasData = FXSiteAgents::select('id', 'batchjob_everydate', 'real_time_protection', 'extention_all_flag')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
+                $siteAgentsHasData = FXSiteAgents::select('id', 'batchjob_everydate', 'real_time_protection', 'extention_all_flag')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->where('deleted_at', null)->first();
                 if($siteAgentsHasData){
                     foreach($hash_data as $item){
                         $hash = $item['hash'];
