@@ -24,6 +24,8 @@
     .word-inline {
         white-space: nowrap;
     }
+
+  
 </style>
 @section('content')
 
@@ -1757,6 +1759,7 @@
                 {
                     data: 'action',
                     "orderable": false,
+                    className: 'text-nowrap'
                 }
             ],
             "initComplete": function(settings, json) {

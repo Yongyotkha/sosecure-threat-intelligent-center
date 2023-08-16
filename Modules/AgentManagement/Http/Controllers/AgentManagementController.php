@@ -991,8 +991,8 @@ class AgentManagementController extends Controller
         ->addColumn('custom_last_online', function($query) {
             $html = '';
             
-            $html .= '<div class="status-flex mr-2"><b>App :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>' . ($query['site_agents_last_online'] ? $query['site_agents_last_online'] : '-') . '</div>';
-            $html .= '<div class="status-flex mr-2"><b>Login :&nbsp;&nbsp;</b>' . ($query['login_last_online'] ? $query['login_last_online'] : '-') . '</div>';
+            $html .= '<div class="status-flex mr-2">App :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . ($query['site_agents_last_online'] ? $query['site_agents_last_online'] : '-') . '</div>';
+            $html .= '<div class="status-flex mr-2">Login :&nbsp;&nbsp;' . ($query['login_last_online'] ? $query['login_last_online'] : '-') . '</div>';
         
             return $html;
         })
@@ -1006,12 +1006,12 @@ class AgentManagementController extends Controller
 
             if (date('Y-m-d', $lastOnlineApp) === date('Y-m-d', $currentTime)) {
                 if ($onlineTimeApp <= 2) {
-                    $html .= '<div class="status-flex mr-2"><b>App :&nbsp&nbsp&nbsp&nbsp&nbsp</b><span class="dot low"></span> Online</div>';
+                    $html .= '<div class="status-flex mr-2">App :&nbsp&nbsp&nbsp&nbsp<span class="dot low"></span> Online</div>';
                 } else {
-                    $html .= '<div class="status-flex mr-2"><b>App :&nbsp&nbsp&nbsp&nbsp&nbsp</b><span class="dot critical"></span> Offline</div>';
+                    $html .= '<div class="status-flex mr-2">App :&nbsp&nbsp&nbsp&nbsp<span class="dot critical"></span> Offline</div>';
                 }
             } else {
-                $html .= '<div class="status-flex mr-2"><b>App :&nbsp&nbsp&nbsp&nbsp&nbsp</b><span class="dot critical"></span> Offline</div>';
+                $html .= '<div class="status-flex mr-2">App :&nbsp&nbsp&nbsp&nbsp<span class="dot critical"></span> Offline</div>';
             }
 
             // Check Login status
@@ -1020,12 +1020,12 @@ class AgentManagementController extends Controller
           
             if (date('Y-m-d', $login_last_online) === date('Y-m-d', $currentTime)) {
                 if ($login_onlineTime <= 2) {
-                    $html .= '<div class="status-flex mr-2"><b>Login :&nbsp&nbsp</b><span class="dot low"></span> Online</div>';
+                    $html .= '<div class="status-flex mr-2">Login :&nbsp&nbsp<span class="dot low"></span> Online</div>';
                 } else {
-                    $html .= '<div class="status-flex mr-2"><b>Login :&nbsp&nbsp</b><span class="dot critical"></span> Offline</div>';
+                    $html .= '<div class="status-flex mr-2">Login :&nbsp&nbsp<span class="dot critical"></span> Offline</div>';
                 }
             } else {
-                $html .= '<div class="status-flex mr-2"><b>Login :&nbsp&nbsp</b><span class="dot critical"></span> Offline</div>';
+                $html .= '<div class="status-flex mr-2">Login :&nbsp&nbsp<span class="dot critical"></span> Offline</div>';
             }
 
             return $html;
