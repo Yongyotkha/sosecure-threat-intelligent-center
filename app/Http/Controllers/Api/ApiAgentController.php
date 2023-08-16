@@ -395,6 +395,9 @@ class ApiAgentController extends ApiController
                 if($siteAgentsHasData){
                     $now = Carbon::now();
                     $siteAgentsHasData -> last_online = $now;
+                    if($is_login == 1 || $is_login == true){
+                        $siteAgentsHasData -> login_last_online = $now;
+                    }
                     $siteAgentsHasData -> save();
                     $response = [
                         'error' => '', 
