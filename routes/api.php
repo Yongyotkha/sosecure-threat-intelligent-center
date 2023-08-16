@@ -159,6 +159,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('agentCenter/getConfig', 'Api\ApiAgentController@getConfig');
     Route::post('agentCenter/getRule', 'Api\ApiAgentController@getRule');
     Route::post('agentCenter/sendHash', 'Api\ApiAgentController@sendHash');
+    Route::post('agentCenter/latestVersion', 'Api\ApiAgentController@latestVersion');
 
     //asset
     Route::post('tranferAsset', 'Api\ApiTransferAssetController@tranferAsset');

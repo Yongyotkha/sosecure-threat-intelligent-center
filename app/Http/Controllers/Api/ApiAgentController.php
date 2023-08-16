@@ -395,6 +395,9 @@ class ApiAgentController extends ApiController
                 if($siteAgentsHasData){
                     $now = Carbon::now();
                     $siteAgentsHasData -> last_online = $now;
+                    if($is_login == 1 || $is_login == true){
+                        $siteAgentsHasData -> login_last_online = $now;
+                    }
                     $siteAgentsHasData -> save();
                     $response = [
                         'error' => '', 
@@ -1002,6 +1005,51 @@ class ApiAgentController extends ApiController
                         'status_code' => 200,
                         'data' => $dataFound
                     ];
+                }else{
+                    $response = [
+                        'error' => 'Data not found', 
+                        'status_code' => 200,
+                        'data' => []
+                    ];
+                }
+            }
+
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 200, 'data' => $datas]);
+        } catch (\Exception $e) {
+            $response = array(
+                'status_code' => 500,
+                'error' => $e -> getMessage(),
+            );
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['error' => '', 'status_code' => 500, 'data' => $datas]);
+        }
+    }
+
+    public function latestVersion(Request $request){
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            if ($data === false) {
+                $response =[
+                    'error' => 'The request parameters are invalid',
+                    'status_code' => 400,
+                    'data' => []
+                ];
+            } else {
+                $data_key = $data['data'];
+                $name = $data_key['name'];
+                $version = $data_key['version'];
+                $ip_private = $data_key['ip_private'];
+                $siteAgentsHasData = FXSiteAgents::where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->first();
+                if($siteAgentsHasData){
+                    $siteAgentsHasData -> file_name = $name;
+                    $siteAgentsHasData -> version = $version;
+                    $siteAgentsHasData -> save();
                 }else{
                     $response = [
                         'error' => 'Data not found', 
