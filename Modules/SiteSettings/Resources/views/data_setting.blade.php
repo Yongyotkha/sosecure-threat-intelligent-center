@@ -219,9 +219,53 @@
                                     </div>
                                     <div class="col-lg-3">
                                         @if(@$file_agent_name)
-                                            <a href="../../agent/file_download/{{$file_agent_name}}" target="_black" class="btn btn-primary">Download Agent</a>
+                                            <a href="../../agent/file_download/Windows/{{$file_agent_name}}" target="_black" class="btn btn-primary">Download Agent Windows</a>
                                         @else
-                                            <button class="btn btn-primary" disabled>Download Agent</button>
+                                            <button class="btn btn-primary" disabled>Download Agent Windows</button>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-lg-9"></div>
+                                    <div class="col-lg-3">
+                                        @if(@$file_agent_name)
+                                            <a href="../../agent/file_download/Debian/{{$file_agent_name}}" target="_black" class="btn btn-primary">Download Agent Debian</a>
+                                        @else
+                                            <button class="btn btn-primary" disabled>Download Agent Debian</button>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-lg-9"></div>
+                                    <div class="col-lg-3">
+                                        @if(@$file_agent_name)
+                                            <a href="../../agent/file_download/Ubuntu/{{$file_agent_name}}" target="_black" class="btn btn-primary">Download Agent Ubuntu</a>
+                                        @else
+                                            <button class="btn btn-primary" disabled>Download Agent Ubuntu</button>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-lg-9"></div>
+                                    <div class="col-lg-3">
+                                        @if(@$file_agent_name)
+                                            <a href="../../agent/file_download/CentOS/{{$file_agent_name}}" target="_black" class="btn btn-primary">Download Agent CentOS</a>
+                                        @else
+                                            <button class="btn btn-primary" disabled>Download Agent CentOS</button>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-lg-9"></div>
+                                    <div class="col-lg-3">
+                                        @if(@$file_agent_name)
+                                            <a href="../../agent/file_download/Fedora/{{$file_agent_name}}" target="_black" class="btn btn-primary">Download Agent Fedora</a>
+                                        @else
+                                            <button class="btn btn-primary" disabled>Download Agent Fedora</button>
                                         @endif
                                     </div>
                                 </div>
@@ -245,7 +289,6 @@
                                     </div>
                                 </div>
 
-
                                 <div class="form-group row">
                                     <label class="col-lg-6 control-label">Configure Log Storage Quotas and Expiration Periods</label>
                                     <div class="col-lg-3">
@@ -257,7 +300,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <hr>
 
                                 <div class="form-group row">
