@@ -968,6 +968,7 @@ class AgentManagementController extends Controller
             ';
             return $html;
         })
+    
         ->addColumn('chk_status', function($query) {
             $html = '';
             $html .= '
@@ -985,6 +986,14 @@ class AgentManagementController extends Controller
                     </label>
                 </div>
             ';
+            return $html;
+        })
+        ->addColumn('custom_last_online', function($query) {
+            $html = '';
+            
+            $html .= '<div class="status-flex mr-2"><b>App :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>' . ($query['site_agents_last_online'] ? $query['site_agents_last_online'] : '-') . '</div>';
+            $html .= '<div class="status-flex mr-2"><b>Login :&nbsp;&nbsp;</b>' . ($query['login_last_online'] ? $query['login_last_online'] : '-') . '</div>';
+        
             return $html;
         })
         ->addColumn('custom_status', function($query) {
@@ -1021,7 +1030,7 @@ class AgentManagementController extends Controller
 
             return $html;
         })
-        ->rawColumns(['chk', 'chk_status', 'action', 'custom_status'])
+        ->rawColumns(['chk', 'chk_status', 'action', 'custom_status', 'custom_last_online'])
         ->make(true);
     }
 

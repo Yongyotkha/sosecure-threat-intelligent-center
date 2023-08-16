@@ -20,6 +20,10 @@
     .wrapper-new:hover > .tooltip-new{
         opacity: 0.9;
     }
+
+    .word-inline {
+        white-space: nowrap;
+    }
 </style>
 @section('content')
 
@@ -1738,7 +1742,10 @@
                 {
                     data: 'site_agents_ip_private',
                 },
-                
+                {
+                    data: 'custom_last_online',
+                    className: 'nowrap'
+                },          
                 {
                     data: 'custom_status',
                     className : 'nowrap',
