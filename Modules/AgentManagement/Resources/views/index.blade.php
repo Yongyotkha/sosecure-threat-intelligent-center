@@ -1805,7 +1805,7 @@
                     data: 'site_name',
                 },
                 {
-                    data: 'site_ip_key',
+                    data: 'site_agents_ip_private',
                 },
                 {
                     data: 'mode',

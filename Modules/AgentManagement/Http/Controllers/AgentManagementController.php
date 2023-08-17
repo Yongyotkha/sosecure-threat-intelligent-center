@@ -609,9 +609,9 @@ class AgentManagementController extends Controller
 
         $site_id = $request->site_id;
         $keyword_search = $request->keyword_search;
-        $query = YaraLog::join('site', 'yara_log.site_id', 'site.id')
-            ->join('site_agents', 'yara_log.agent_id', 'site_agents.id')
-            ->join('os_type', 'site_agents.os_type', 'os_type.id')
+        $query = YaraLog::leftjoin('site', 'yara_log.site_id', 'site.id')
+            ->leftjoin('site_agents', 'yara_log.agent_id', 'site_agents.id')
+            ->leftjoin('os_type', 'site_agents.os_type', 'os_type.id')
             ->leftjoin('rule_name', 'yara_log.rule', 'rule_name.rule_name')
             ->select(
                 'site.name as site_name',
@@ -1040,29 +1040,28 @@ class AgentManagementController extends Controller
         // $end_date_input = $request->end_date;
         
         $query_schedule = AgentScanLog::
-                        join('site', 'agent_scan_log.site_id', 'site.id')
-                        // ->join('site_agents', 'yara_log.agent_id', 'site_agents.id')
-                        ->select(
-                            'site.name as site_name',
-                            'site.logo as site_logo',
-                            'site.ip_key as site_ip_key',
-                            // 'site_agents.ip_private as site_agents_ip_private',
-                            'agent_scan_log.mode',
-                            'agent_scan_log.first_scan',
-                            'agent_scan_log.last_scan',
-                            'agent_scan_log.description'
-                        );
+            join('site', 'agent_scan_log.site_id', 'site.id')
+            ->leftjoin('site_agents', 'agent_scan_log.agent_id', 'site_agents.id')
+            ->where('agent_scan_log.deleted_at', null)
+            ->select(
+                'agent_scan_log.id as scan_id',
+                'site.name as site_name',
+                'site.logo as site_logo',
+                'site.ip_key as site_ip_key',
+                'site_agents.ip_private as site_agents_ip_private',
+                'agent_scan_log.mode',
+                'agent_scan_log.first_scan',
+                'agent_scan_log.last_scan',
+                'agent_scan_log.description'
+            );
 
         if($request->site_id != null)
         {
             $query_schedule->where('site_id', $request->site_id);
         }
-
-        // if($start_date_input != null && $end_date_input != null)
-        // {
-        //     $query->whereBetween('agent_schedule.created_at', [$start_date_input, $end_date_input]);
-        // }
-
+        
+        $query_schedule->orderBy('agent_scan_log.updated_at', 'DESC');
+            
         return DataTables::of($query_schedule)
         ->addColumn('chk', function($query_schedule) {
             $html = '';
