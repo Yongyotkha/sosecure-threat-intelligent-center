@@ -826,7 +826,7 @@ class ApiAgentController extends ApiController
             } else {
                 $data_key = $data['data'];
                 $ip_private = $data_key['ip_private'];
-                $siteAgentsHasData = FXSiteAgents::select('id', 'batchjob_everydate', 'real_time_protection', 'extention_all_flag','usb_protection')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->where('deleted_at', null)->first();
+                $siteAgentsHasData = FXSiteAgents::select('id', 'batchjob_everydate', 'real_time_protection', 'extention_all_flag','usb_protection', 'agent_name', 'version', 'is_show_btn')->where('site_id', $data['site']['data']['id'])->where('ip_private', $ip_private)->where('deleted_at', null)->first();
                 if($siteAgentsHasData){
                     //! ตัวที่ Comment ไว้อาจจะได้ใช้งาน
                     // $ignore = SiteAgentIgnore::select('ref_id')->where('site_id', $data['site']['data']['id'])
