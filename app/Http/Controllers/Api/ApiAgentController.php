@@ -1053,6 +1053,15 @@ class ApiAgentController extends ApiController
                     $siteAgentsHasData -> file_name = $name;
                     $siteAgentsHasData -> version = $version;
                     $siteAgentsHasData -> save();
+
+                    $response = [
+                        'error' => '', 
+                        'status_code' => 200,
+                        'data' => [
+                            'name' => 'sosecure_insights-'.$version.'-py3-none-any.whl.zip',
+                            'version' => $version
+                        ]
+                    ];
                 }else{
                     $response = [
                         'error' => 'Data not found', 
