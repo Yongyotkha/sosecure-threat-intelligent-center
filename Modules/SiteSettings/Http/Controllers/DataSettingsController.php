@@ -72,7 +72,7 @@ class DataSettingsController extends Controller
         $data['page'] = 'DataSetting';
         $data['page'] = langapp('data_setting');
 
-        $data['file_agent_name'] = $data['siteSettings']['name'].'_(Agent-'.$data['siteSettings']['id'].').zip';
+        $data['file_agent_name'] = $data['siteSettings']['name'].'_Agent-'.$data['siteSettings']['id'].'.zip';
 
         return view('sitesettings::data_setting')->with($data);
     }
