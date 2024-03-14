@@ -65,7 +65,8 @@
                     <ul class="nav nav-tabs nav-tabs-highlight">
                         <li id="tab-attributes" class="active">
                             <a href="#tab_attributes" data-toggle="tab">
-                                Attributes  ({{@$otx_events[0]['indicator_count']}})
+                                {{-- Attributes  ({{@$otx_events[0]['indicator_count']}}) --}}
+                                Attributes (0)
                             </a>
                         </li>
                         <li id="tab-attributes">
@@ -276,7 +277,7 @@
 
 
                 $(function() {
-                    load_table_attributes();
+                    // load_table_attributes();
                     load_adversaries();
                     load_malware();
                 });
