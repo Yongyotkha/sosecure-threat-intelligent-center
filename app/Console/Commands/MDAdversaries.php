@@ -51,7 +51,7 @@ class MDAdversaries extends Command
 
         ini_set('memory_limit', '-1');
         $otx_API_Key =  env('otx_API_Key', '');
-        $otx_url = "https://otx.alienvault.com/otxapi/adversaries/?limit=20&page=1&sort=value&q=";
+        $otx_url = "https://otx.alienvault.com/otxapi/pulses/?limit=20&page=1&sort=-modified&q=";
 
         $count =1;
         for ($x = 0; $x <= $count; $x++) {
@@ -76,8 +76,9 @@ class MDAdversaries extends Command
                         $response = json_decode($response);
     
                         foreach(@$response->results as $key=>$valus){
+                          print_r($valus);
                             $this->saveAdversaries($valus);
-                                $otx_pulse_url="https://otx.alienvault.com/otxapi/pulses/?page1&limit=20&sort=-modified&q=adversary:".rawurlencode($valus->value);
+                                $otx_pulse_url="https://otx.alienvault.com/otxapi/pulses/?limit=20&page=1&sort=-modified&q=adversary:".rawurlencode($valus->value);
                                 $this->info($otx_pulse_url);
                                 $count_pulse =1;
                                 for ($x_pulse = 0; $x_pulse <= $count_pulse; $x_pulse++) {

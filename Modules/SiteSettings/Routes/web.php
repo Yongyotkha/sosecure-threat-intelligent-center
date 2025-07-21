@@ -15,7 +15,7 @@
     // Route::get('/', 'SiteSettingsController@index');
 
 Route::group(
-    ['middleware' => ['web', 'permission:role_center', 'permission:settings'], 'prefix' => 'sitesettings'],
+    ['middleware' => ['web'], 'prefix' => 'sitesettings'],
     function () {
         Route::get('/', 'SiteSettingsController@index')->name('sitesettings.index')->middleware('can:menu_items');
         Route::get('/test_mongo', 'SiteSettingsController@test_mongo')->name('sitesettings.test_mongo')->middleware('can:menu_items');
@@ -25,10 +25,10 @@ Route::group(
         Route::get('create', 'SiteSettingsController@create')->name('sitesettings.create')->middleware('can:settings');
         Route::post('bulk-delete', 'SiteSettingsController@bulkDelete')->name('sitesettings.bulk.delete')->middleware(['can:sitesettings_delete']);//->middleware(['can:sitesettings_delete', 'demo']);
         Route::post('change_status', 'SiteSettingsController@change_status')->name('sitesettings.change_status')->middleware(['can:sitesettings_update']);
-        Route::get('edit-sitesettings/{id}', 'SiteSettingsController@edit')->name('sitesettings.edit')->middleware('can:sitesettings_update');
-        Route::get('delete-sitesettings/{id}', 'SiteSettingsController@delete')->name('sitesettings.delete')->middleware('can:sitesettings_delete');
-        Route::post('sitesettings', 'SiteSettingsController@store')->name('sitesettings.save')->middleware('can:sitesettings_create');
-        Route::put('sitesettings/{id}', 'SiteSettingsController@update')->name('sitesettings.update.settings')->middleware('can:sitesettings_update');
+        Route::get('edit-sitesettings/{id}', 'SiteSettingsController@edit')->name('sitesettings.edit');
+        Route::get('delete-sitesettings/{id}', 'SiteSettingsController@delete')->name('sitesettings.delete');
+        Route::post('sitesettings', 'SiteSettingsController@store')->name('sitesettings.save');
+        Route::put('sitesettings/{id}', 'SiteSettingsController@update')->name('sitesettings.update.settings');
         Route::post('sitesettings/change_status', 'SiteSettingsController@change_status')->name('sitesettings.change_status.settings')->middleware('can:sitesettings_update');
         Route::post('sitesettings/sitesettings_delete', 'SiteSettingsController@sitesettings_delete')->name('sitesettings.sitesettings_delete');
         // Route::get('/test', 'SiteSettingsController@test')->name('sitesettings.test')->middleware('can:menu_items');
@@ -36,7 +36,7 @@ Route::group(
         Route::get('/systemsetting/{id}', 'SystemSettingsController@systemsetting')->name('systemsetting.index')->middleware('can:menu_items');
 
         Route::get('/data-setting/{id}', 'DataSettingsController@datasetting')->name('datasettings.index')->middleware('can:menu_items');
-        Route::put('data-setting/{id}', 'DataSettingsController@update')->name('datasettings.update.settings')->middleware('can:sitesettings_update');
+        Route::put('data-setting/{id}', 'DataSettingsController@update')->name('datasettings.update.settings');
         Route::get('get/uuid', function(){
             
             return generator_uuid();
@@ -123,7 +123,7 @@ Route::group(
 
 // WebDefacement
 Route::group(
-    ['middleware' => ['web', 'permission:role_center', 'permission:web_defacement']],
+    ['middleware' => ['web']],
     function () {
         Route::get('/WebDefacement-website/{id}', 'WebDefacementController@webdefacement_website')->name('webdefacement_website.index')->middleware('can:menu_items');
         Route::post('/WebDefacement-website/load_card_by_site', 'WebDefacementController@load_card_by_site')->name('webdefacement.load_card_by_site')->middleware('can:menu_items');
@@ -152,7 +152,7 @@ Route::group(
 
 // WebDefacement
 Route::group(
-    ['middleware' => ['web', 'permission:role_center', 'permission:web_defacement']],
+    ['middleware' => ['web', ]],
     function () {
         Route::get('/phishing/webserver/{code}', 'PhishingController@phishing_web_server')->name('phishing.webserver')->middleware('can:menu_items');
         Route::get('/phishing/detection/{id}', 'PhishingController@phishing_detection')->name('phishing.detection')->middleware('can:menu_items');
@@ -163,7 +163,7 @@ Route::group(
 
 // webserver
 Route::group(
-    ['middleware' => ['web', 'permission:role_center', 'permission:web_defacement']],
+    ['middleware' => ['web' ]],
     function () {
         Route::get('/dfm_feed/{code}', 'DefacementController@dfm_feed')->name('dfm_feed.index')->middleware('can:menu_items');
         Route::get('/dfm_data/{code}', 'DefacementController@dfm_data')->name('dfm_data.index')->middleware('can:menu_items');
@@ -192,7 +192,7 @@ Route::group(
 
 // Compromised
 Route::group(
-    ['middleware' => ['web', 'permission:role_center', 'permission:compromised']],
+    ['middleware' => ['web']],
     function () {
         Route::get('/compromised_feed/{code}', 'DataLeakController@compromised_feed')->name('compromised_feed.index')->middleware('can:menu_items');
         Route::get('/compromised_data/{code}', 'DataLeakController@compromised_data')->name('compromised_data.index')->middleware('can:menu_items');
@@ -237,7 +237,7 @@ Route::group(
 
 // dataleak
 Route::group(
-    ['middleware' => ['web', 'permission:role_center', 'permission:data_leak']],
+    ['middleware' => ['web', ]],
     function () {
         Route::get('/datafeedsocial', 'DataLeakController@datafeed')->name('datafeed.index')->middleware(['can:menu_items','permission:data_leak','permission:role_center']);
         Route::post('/datafeedsocial/datatables', 'DataLeakController@datafeedsocial_datatables')->name('socialdatas.datafeedsocial_datatables');
@@ -254,7 +254,7 @@ Route::group(
 );
 // Compromise
 Route::group(
-    ['middleware' => ['web', 'permission:role_center', 'permission:compromised']],
+    ['middleware' => ['web',]],
     function () {
         Route::get('/datafeed_darkweb', 'DataLeakController@datafeed_darkweb')->name('datafeed.darkweb_index')->middleware(['can:menu_items','permission:compromised','permission:role_center']);
         Route::post('/datafeed_darkweb/get_data_feed', 'DataLeakController@get_data_feed')->name('socialdatas.get_data_feed');

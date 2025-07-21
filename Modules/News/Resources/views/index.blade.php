@@ -217,8 +217,8 @@
 
             <div class="tabbable">
                 <ul class="nav nav-tabs nav-tabs-highlight">
-                    <li class="active"><a href="#tab_related_news" id="tb_related_news" data-toggle="tab">News (<span id="count_news"></span>)</a></li>
-                    <li id="tab-bookmark"><a href="#tab_lastest_news" id="tb_related_bookmark" data-toggle="tab">My Bookmarks (<span id="count_news_bookmark"></span>)</a></li>   
+                    <li class="active"><a href="#tab_related_news" data-toggle="tab">News (<span id="count_news"></span>)</a></li>
+                    <li id="tab-bookmark"><a href="#tab_lastest_news" data-toggle="tab">My Bookmarks (<span id="count_news_bookmark"></span>)</a></li>   
                     <li class="pull-right">
                         {{-- <button id="" class="btn btn-sm btn-{{ get_option('theme_color')  }} pull-right">
                             <span>Bookmarks</span>
@@ -337,10 +337,12 @@
     var news_title_search = null;
     var status_serverity = null;
 
+
     $(".check_serverity").click(function() {
         status_serverity = $(this).val();
-
+   
     });
+
 
     $('#scrollable_news').scroll(function(event) {
         let scrolltop = $('#scrollable_news').scrollTop();
@@ -509,7 +511,6 @@
             console.log("No response from server");
         });
     }
-
     function Bookmarks(ele, news_id){
         {{--page_stop = true;--}}
         {{--page = 1;--}}

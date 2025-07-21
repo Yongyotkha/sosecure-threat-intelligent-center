@@ -117,10 +117,10 @@ class AuthController extends ApiController
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
                     // return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $user , 'menu' => $menu , 'menu_sub' => $menu_sub , 'menu_sub_permission_site' => $Menu_sub_permission_site , 'menu_permission_site' => $Menu_permission_site , 'permission_custom' => $permission_custom, 'check_goto_menu' => $check_goto_menu]);
                 } else{
-                    return response()->json(['error' => 'Username or password is incorrect', 'status_code' => '400']);
+                    return response()->json(['error' => 'Username or password is incorrect ', 'status_code' => '400']);
                 }
             } else {
-                return response()->json(['error' => 'Username or password is incorrect ', 'status_code' => '400', 'user' => $user_check]);
+                return response()->json(['error' => 'Username or password is incorrect ' , 'status_code' => '400', 'user' => $user_check]);
             }
 
 

@@ -138,6 +138,11 @@ class SendLog_Indicator extends Command
                             $format_str = $logs_setting_content_data->content;
                             if ($format_str) {
 
+                             //   $format_str    ="[[M]] [[d]] [[H:i:s]] CEF:0|Threat inSights||Threat inSights||1.0|100|[[Event name]]|2|src=[[Value of Attacker IP Address]] cn1Label=[[Tage]] cn1=[[Value of Tage]]";
+
+
+                            
+
                                 $format_str = str_replace("[[M]]",date("M"),$format_str);
                                 $format_str = str_replace("[[m]]",date("m"),$format_str);
                                 $format_str = str_replace("[[Y]]",date("Y"),$format_str);
@@ -147,7 +152,14 @@ class SendLog_Indicator extends Command
                                 $format_str = str_replace("[[h:i:s]]",date("h:i:s"),$format_str);
                                 $format_str = str_replace("[[H:i:s]]",date("H:i:s"),$format_str);
 
+
+
+
                                 $format_str = str_replace("[[Event name]]", $docs_eventvalue->name,$format_str);
+
+                                $format_str = str_replace("[[Event Description]]", $docs_eventvalue->description,$format_str);
+
+
                                 $format_str = str_replace("[[Attribute Type]]", $data -> type,$format_str);
                                 $format_str = str_replace("[[Attribute Name]]", $data -> indicator_name,$format_str);
                                 $format_str = str_replace("[[Tags]]", $docs_eventvalue->tags,$format_str);
@@ -156,9 +168,39 @@ class SendLog_Indicator extends Command
                                 $Logs_sent_transaction_save->site_id = $logs_setting_content_data->site_id;
                                 $Logs_sent_transaction_save->content = $format_str ;
                                 $Logs_sent_transaction_save->type = 'indicator' ;
-                                $Logs_sent_transaction_save->transaction_status = 1;
-                                //$Logs_sent_transaction_save->created_at = date("yyyy-MM-dd H:i:s"); 
-                                $Logs_sent_transaction_save->save(); 
+
+
+                                if($logs_setting_content_data->site_id == 85){
+                                    $Logs_sent_transaction_save->transaction_status = 3;
+                                    //$Logs_sent_transaction_save->created_at = date("yyyy-MM-dd H:i:s"); 
+                                    $Logs_sent_transaction_save->save(); 
+    
+    
+                                    $server_ip   = "172.16.11.147";
+                                    $server_port = "1521";
+                                    sleep(1);
+                                    $message     = $format_str;
+                                    if ($socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) {
+                                        socket_sendto($socket, $message, strlen($message), 0, $server_ip, $server_port);
+                                    }
+            
+                                }else{
+                                    $Logs_sent_transaction_save->transaction_status = 1;
+                                    //$Logs_sent_transaction_save->created_at = date("yyyy-MM-dd H:i:s"); 
+                                    $Logs_sent_transaction_save->save(); 
+    
+    
+                             
+                                    sleep(1);
+                                    $message     = $format_str;
+            
+
+                                }
+                              
+
+                             
+
+
                                 echo $format_str;
                             }
                         }

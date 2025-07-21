@@ -42,7 +42,7 @@ use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Symfony\Polyfill\Intl\Idn\Resources\unidata\Regex;
 
 use Modules\Assets\Entities\Assets_port;
-use App\TransactionScans;
+
 
 class ApiAssetController extends ApiController
 {
@@ -158,7 +158,7 @@ class ApiAssetController extends ApiController
                                 $Assets_port_data =  Assets_port::where('status',1)->where('site_id',$IP_Listvalue->site_id)->where('asset_name',$IP_Listvalue->value)->get();
                                 $port = '';
                                 foreach ($Assets_port_data as $Assets_port_data_key => $Assets_port_data_value) {
-                                $port = $port.'<div> <span class="bg-port">'.$Assets_port_data_value->port.'</span>'.'</div>';
+                                $port = $port.'<div style="padding:5px;"> <span class="bg-port">'.$Assets_port_data_value->port.'</span> '.' </div>';
                                 }
                                 $Assets_data_list['port'] = $port ;
                                 $Assets_data_list['status'] = $IP_Listvalue->status;
@@ -201,7 +201,7 @@ class ApiAssetController extends ApiController
                                     $Assets_port_data =  Assets_port::where('status',1)->where('site_id',$IP_Listvalue->site_id)->where('asset_name',$IP_Listvalue->value)->get();
                                     $port = '';
                                     foreach ($Assets_port_data as $Assets_port_data_key => $Assets_port_data_value) {
-                                    $port = $port.'<div style="padding:5px;"> <span class="bg-port">'.$Assets_port_data_value->port.'</span>'.'</div>';
+                                    $port = $port.'<div style="padding:3px;"> <span class="bg-port">'.$Assets_port_data_value->port.'</span> '.' </div>';
                                     }
                                     $Assets_data_list['port'] = $port ;
                                     $Assets_data_list['status'] = $IP_Listvalue->status;
@@ -479,79 +479,4 @@ class ApiAssetController extends ApiController
         }
         return $result;
     }
-
-    public function table_asset_online(Request $request){
-        try{
-            $header = $request->bearerToken();
-            $mode = $request->mode;
-            $data_request = $request -> data;
-            $data = $this -> dataFalse($header, $mode, $data_request);
-            if($data === false){
-                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
-            }else{
-                try {
-                    $sitecode = $data['data']['sitecode'];
-                    $get_role_custom_first = $data['data']['get_role_custom_first'];
-                    $site_id_arr = @$get_role_custom_first['site_id_arr'];
-
-
-                    $TransactionScans = TransactionScans::whereIn('site_id', $site_id_arr)->where('module','!=','sfp_citadel')->orderBy('status', 'desc')->get();
-                    $res =  DataTables::of($TransactionScans)
-                        ->editColumn('chk', function (TransactionScans $data) {
-                            $res = '';
-                            if ($data->status_asset_use == 1) {
-                                $res .= '<label>
-                                <input type="checkbox" checked onclick="return false;"/>
-                                    <span class="label-text"></span>
-                                </label>';
-                            } else {
-                                $res .= '<label>
-                                    <input name="select[]" value="' . $data->raw_data . '" data-domain="' . $data->domain_id . '" data-site="' . $data->site_id . '" class="select-chk" type="checkbox" />
-                                    <span class="label-text"></span>
-                                </label>';
-                            }
-                            return $res;
-                        })
-                        ->addColumn('use', function (TransactionScans $data) {
-                            $res = '';
-                            if ($data->status_asset_use == 1) {
-                                $res .= '<span class="badge badge-success">Used</span>';
-                            } else if ($data->status == 0) {
-                                $res .= '<span class="badge badge-danger">Not Found</span>';
-                            } else if ($data->status == 1) {
-                                $res .= '<span class="badge badge-warning" style="background-color: #ffc107;">Discovered</span>';
-                            } else if ($data->status == 2) {
-                                $res .= '<span class="badge badge-primary" style="background-color: #3869d4;">New</span>';
-                            }
-                            return $res;
-                        })
-                        ->rawColumns(['chk', 'use'])
-                        ->toJson();
-
-
-                    $response = [
-                        "data" => $res,
-                    ];
-
-                    $data_transcation = json_encode($response);
-                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
-                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
-                    
-                } catch (\Exception $e) {
-                    $response = array(
-                        'status_code' => 500,
-                        'message' => $e -> getMessage(),
-                    );
-                    return response()->json($response);
-                }
-            }
-        } catch (\Exception $e) {
-            $response = array(
-                'status_code' => 500,
-                'message' => $e -> getMessage(),
-            );
-            return response()->json($response);
-        }
-    }
-
 }

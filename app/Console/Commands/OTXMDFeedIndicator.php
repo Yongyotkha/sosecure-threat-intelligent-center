@@ -70,6 +70,7 @@ class OTXMDFeedIndicator extends Command
                         'updated_by' => "system",
                         'deleted_at' => null,
                         'source' => "otx.alienvault",
+                           'creator_org' =>"OTX"
                     ]);
                 }
                 $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/indicators/?include_inactive=0&sort=-modified&q=modified:%3C12h&page=1&limit=100', $urlLimit);
@@ -102,6 +103,7 @@ class OTXMDFeedIndicator extends Command
                                         'name' => $value["name"],
                                         'updated_at' => $date_now,
                                         'updated_by' => "system",
+                                           'creator_org' =>"OTX",
                                         'transcation_id' => $insertOneResult->getInsertedId(),
                                     ],
                                     '$setOnInsert' => [
@@ -527,6 +529,7 @@ class OTXMDFeedIndicator extends Command
                         $nameDescription => $description,
                         'updated_at' => $date_now,
                         'updated_by' => "system",
+                           'creator_org' =>"OTX"
                     ],
                     '$setOnInsert' => [
                         'status' => 1,
@@ -593,6 +596,7 @@ class OTXMDFeedIndicator extends Command
                                 'author_username' => isset($value["author"]["username"]) ? $value["author"]["username"] : "",
                                 'updated_at' => $date_now ,
                                 'updated_by' => "system",
+                                   'creator_org' =>"OTX"
                             ],
                             '$setOnInsert' => [
                                 'indicator_type_counts' => array(),

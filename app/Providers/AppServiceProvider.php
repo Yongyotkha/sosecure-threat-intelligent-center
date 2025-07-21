@@ -6,6 +6,7 @@ use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 use Modules\Settings\Entities\Options;
+use App\Services\SSHTunnelService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,6 +40,21 @@ class AppServiceProvider extends ServiceProvider
         if (app()->environment('production')) {
             \DB::disableQueryLog();
         }
+        if (env('SSH_TUNNEL_AUTO', true)) {
+            try {
+                $tunnel = app(SSHTunnelService::class);
+
+                if (!$tunnel->isTunnelRunning()) {
+                    $tunnel->createTunnel();
+                    sleep(2); 
+        
+                } else {
+           
+                }
+            } catch (\Exception $e) {
+                
+            }
+        }
     }
 
     /**
@@ -46,7 +62,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        ini_set('memory_limit', '6000M');
         // if ($this->app->isLocal()) {
         //     $this->app->register(TelescopeServiceProvider::class);
         // }

@@ -10,6 +10,12 @@ use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
 use App\Entities\TransactionBatchjob;
 use App\Entities\Transaction_client_cve_assets;
+use Modules\SiteSettings\Entities\SiteSettings;
+use Modules\MonitoringVulnerabilitys\Entities\CVEAssets;
+use Modules\SiteSettings\Entities\DataCveven;
+use Illuminate\Support\Facades\DB;
+use Modules\MonitoringVulnerabilitys\Entities\CVEMappingAssets;
+use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
 
 class MDCVEBatchJob extends Command
 {
@@ -438,13 +444,13 @@ class MDCVEBatchJob extends Command
         $created_atz = date("Y-m-d H:i:s ");
         $modified = date("Y-m-d", strtotime($created_atz));
 
-        // $modified_start = date('Y-m-d', strtotime(' -1 day'));
+       $modified_start = date('Y-m-d', strtotime(' -30 day'));
         // $sql3 =   "SELECT * FROM fx_data_datacve WHERE modified between '".$modified_start."' AND '".$modified."' and namecve IN ('".implode("','", $namecveList)."') ";
         
         //$modified ='2019-08-08';
         $sql3  = 'SELECT *
         FROM `fx_data_datacve`
-        WHERE  modified >=CURDATE() + INTERVAL -2 DAY and   namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
+        WHERE  modified  >=CURDATE() + INTERVAL -200 DAY and   namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
 
         // $sql3  = 'SELECT *
         // FROM `data_datacve`
@@ -614,11 +620,255 @@ class MDCVEBatchJob extends Command
 }
 
 
+
+//บันทึก summary
+$site_id_m = SiteSettings::select('id','code')->where('active','1')->get();
+$site_id_list = array();
+array_push($site_id_list,0);
+foreach($site_id_m as $site_data){
+    array_push($site_id_list,$site_data->id);
+    $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $site_data->id)->where("active", '=', 1)->groupBy('vendor', 'title')->get();
+    $vendor = [];
+    $title = [];
+    foreach($CVEAssets as $data){
+        $vendor[] = $data -> vendor;
+        $title[] = $data -> title;
+    }
+    $DataCveven = DataCveven::select('namecve', 'title', DB::raw('count(*) as total'))->whereIn('vendor', $vendor)->whereIn('title', $title)->groupBy('namecve')->get();
+    $namecve = [];
+    $check_total_namecve = array();
+    $host_name = [];
+    foreach($DataCveven as $data){
+        $namecve[] = $data -> namecve;
+        $check_total_namecve[] = collect([
+            'total' => $data -> total,
+            'namecve' => $data -> namecve,
+            'title' => $data -> title
+        ]);
+    }
+
+    
+    $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_data->id)->select('namecve')->get();
+    $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $CVEMappingAssets_name)->groupBy('severity','namecve')->get();
+    foreach($CVEMapping as $data){
+        foreach($check_total_namecve as $item){
+            if($data -> namecve == $item['namecve']){
+                $data['total'] = $item['total'];
+                $data['title'] = $item['title'];
+                $host_name[] = $item['title'];
+                //บันทึกข้อมูล 
+                $fx_cve_name_summarys_data = DB::table('cve_name_summarys')
+                ->where('site_id',$site_data->id)->where('namecve',$data -> namecve )
+                ->first();
+                if(!$fx_cve_name_summarys_data){
+                    DB::table('cve_name_summarys')->insert(
+                        ['site_id' => $site_data->id, 'namecve' => $data -> namecve, 'title' => $item['title'], 'updated_at' => date("Y-m-d H:i:s"),'total'=>$item['total']]
+                    );
+
+                }else{
+
+                    DB::table('cve_name_summarys')->where('id',$fx_cve_name_summarys_data->id)->update(array(
+                        'total'=>$item['total'],'updated_at'=>date("Y-m-d H:i:s"),
+                      ));
+
+                }
+
+
+
+            }
+        }
+    }
+    $result = array();
+    foreach ($host_name as $element) {
+        $result[$element] = $element;
+  
+         $total_critical = 0;
+         $total_high = 0;
+         $total_medium = 0;
+         $total_low = 0;
+         $total_infomation = 0;
+         foreach($CVEMapping as $cve){
+            if($element == $cve['title'] && $cve['severity'] == 'HIGH'){
+                $total_high  =$total_high+1;
+            }else if($element == $cve['title'] && $cve['severity'] == 'CRITICAL'){
+                $total_critical =$total_critical+1;
+
+            }else if($element == $cve['title'] && $cve['severity']  == 'MEDIUM'){
+                $total_medium = $total_medium+1;
+
+            }else if($element == $cve['title'] && $cve['severity']  == 'LOW'){
+                $total_low = $total_low+1;
+
+            }else if($element == $cve['title'] && $cve['severity']  == 'INFOMATION'){
+                $total_infomation = $total_infomation+1;
+
+            }
+
+         }
+
+           //บันทึกข้อมูล 
+           $cve_host_name_summarys_data = DB::table('cve_host_name_summarys')
+           ->where('site_id',$site_data->id)->where('title',$element)
+           ->first();
+           if(!$cve_host_name_summarys_data){
+            DB::table('cve_host_name_summarys')->insert(
+                ['site_id' => $site_data->id,'site_code' => $site_data->code, 'title' =>$element
+                , 'status_critical' =>$total_critical 
+                , 'status_high' =>$total_high 
+                , 'status_medium' =>$total_medium 
+                , 'status_low' =>$total_low 
+                , 'status_infomation' =>$total_infomation 
+                , 'updated_at' => date("Y-m-d H:i:s")]
+            );
+
+            }else{
+
+                DB::table('cve_host_name_summarys')->where('id',$cve_host_name_summarys_data->id)->update(array(
+                    'status_critical' =>$total_critical 
+                    , 'status_high' =>$total_high 
+                    , 'status_medium' =>$total_medium 
+                    , 'status_low' =>$total_low 
+                    , 'status_infomation' =>$total_infomation 
+                    , 'updated_at' => date("Y-m-d H:i:s")
+                ));
+
+            }
+
+
+    }
+  
+
+
+    
+    
+
+
+}
+//All Site
+$CVEAssets = CVEAssets::select('vendor', 'title')->whereIn('site_id', $site_id_list)->where("active", '=', 1)->groupBy('vendor', 'title')->get();
+$vendor = [];
+$title = [];
+foreach($CVEAssets as $data){
+    $vendor[] = $data -> vendor;
+    $title[] = $data -> title;
+}
+$DataCveven = DataCveven::select('namecve', 'title', DB::raw('count(*) as total'))->whereIn('vendor', $vendor)->whereIn('title', $title)->groupBy('namecve')->get();
+$namecve = [];
+$check_total_namecve = array();
+$host_name = [];
+foreach($DataCveven as $data){
+    $namecve[] = $data -> namecve;
+    $check_total_namecve[] = collect([
+        'total' => $data -> total,
+        'namecve' => $data -> namecve,
+        'title' => $data -> title
+    ]);
+}
+
+
+$CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_list)->select('namecve')->get();
+$CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $CVEMappingAssets_name)->groupBy('severity','namecve')->get();
+foreach($CVEMapping as $data){
+    foreach($check_total_namecve as $item){
+        if($data -> namecve == $item['namecve']){
+            $data['total'] = $item['total'];
+            $data['title'] = $item['title'];
+            $host_name[] = $item['title'];
+            //บันทึกข้อมูล 
+            $fx_cve_name_summarys_data = DB::table('cve_name_summarys')
+            ->where('site_id',0)->where('namecve',$data -> namecve )
+            ->first();
+            if(!$fx_cve_name_summarys_data){
+                DB::table('cve_name_summarys')->insert(
+                    ['site_id' => 0, 'namecve' => $data -> namecve, 'title' => $item['title'], 'updated_at' => date("Y-m-d H:i:s"),'total'=>$item['total']]
+                );
+
+            }else{
+
+                DB::table('cve_name_summarys')->where('id',$fx_cve_name_summarys_data->id)->update(array(
+                    'total'=>$item['total'],'updated_at'=>date("Y-m-d H:i:s"),
+                  ));
+
+            }
+
+
+
+        }
+    }
+}
+$result = array();
+foreach ($host_name as $element) {
+    $result[$element] = $element;
+
+     $total_critical = 0;
+     $total_high = 0;
+     $total_medium = 0;
+     $total_low = 0;
+     $total_infomation = 0;
+     foreach($CVEMapping as $cve){
+        if($element == $cve['title'] && $cve['severity'] == 'HIGH'){
+            $total_high  =$total_high+1;
+        }else if($element == $cve['title'] && $cve['severity'] == 'CRITICAL'){
+            $total_critical =$total_critical+1;
+
+        }else if($element == $cve['title'] && $cve['severity']  == 'MEDIUM'){
+            $total_medium = $total_medium+1;
+
+        }else if($element == $cve['title'] && $cve['severity']  == 'LOW'){
+            $total_low = $total_low+1;
+
+        }else if($element == $cve['title'] && $cve['severity']  == 'INFOMATION'){
+            $total_infomation = $total_infomation+1;
+
+        }
+
+     }
+
+       //บันทึกข้อมูล 
+       $cve_host_name_summarys_data = DB::table('cve_host_name_summarys')
+       ->where('site_id',0)->where('title',$element)
+       ->first();
+       if(!$cve_host_name_summarys_data){
+        DB::table('cve_host_name_summarys')->insert(
+            ['site_id' => 0,'site_code' => 0, 'title' =>$element
+            , 'status_critical' =>$total_critical 
+            , 'status_high' =>$total_high 
+            , 'status_medium' =>$total_medium 
+            , 'status_low' =>$total_low 
+            , 'status_infomation' =>$total_infomation 
+            , 'updated_at' => date("Y-m-d H:i:s")]
+        );
+
+        }else{
+
+            DB::table('cve_host_name_summarys')->where('id',$cve_host_name_summarys_data->id)->update(array(
+                'status_critical' =>$total_critical 
+                , 'status_high' =>$total_high 
+                , 'status_medium' =>$total_medium 
+                , 'status_low' =>$total_low 
+                , 'status_infomation' =>$total_infomation 
+                , 'updated_at' => date("Y-m-d H:i:s")
+            ));
+
+        }
+
+
+}
+
+
+
 $TransactionBatchjob_Update = TransactionBatchjob::where('mode','MDCVEBatchJob')->first();
 $TransactionBatchjob_Update->progress = 1;
 $TransactionBatchjob_Update->transcation_date_end =date("Y-m-d H:i:s");
 $TransactionBatchjob_Update->transcation_date  =date("Y-m-d H:i:s");
 $TransactionBatchjob_Update->save();
+
+
+
+
+
+
+
 
 }
 
@@ -691,6 +941,7 @@ function update_nvd($conn, $add_name, $add_published, $add_modified, $add_descri
         $st = array('sector' => "UPDATE", 'status' => "Fail");
         //  echo json_encode($st);
     }
+
 
 }
 

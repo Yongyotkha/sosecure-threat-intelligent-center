@@ -5,6 +5,15 @@
 
 @extends('layouts.app')
 @section('content')
+<style type="">
+select.c-tags {
+    min-width: 300px;
+}
+.select2-container--default .select2-selection--multiple {
+    min-width: 300px !important;
+}
+
+</style>
 <section id="content" class="bg">
     <section class="vbox">
 
@@ -66,22 +75,22 @@
                         <li id="tab-attributes" class="active">
                             <a href="#tab_attributes" data-toggle="tab">
                                 {{-- Attributes  ({{@$otx_events[0]['indicator_count']}}) --}}
-                                Attributes (0)
+                                Attributes
                             </a>
                         </li>
                         <li id="tab-attributes">
                             <a href="#tab_malware" data-toggle="tab">
-                                Malware ( <span id="number_malware">0</span> )
+                                Malware
                             </a>
                         </li>
                         <li id="tab-attributes">
                             <a href="#tab_adversaries" data-toggle="tab">
-                            Threat Actor ( <span id="number_adversaries">0</span> )
+                            Threat Actor
                             </a>
                         </li>
                         <li id="tab-event">
                             <a href="#tab_related_event" data-toggle="tab">
-                                Related Event ({{@$count_related_pulse}})
+                                Related Event
                             </a>
                         </li>
                     </ul>
@@ -111,6 +120,7 @@
                                                             </th> --}}
                                                             <th>Type</th>
                                                             <th>Attribute Name</th>
+                                                            <th>Tags</th>
                                                             <th>Role</th>
                                                             <th>Date</th>
                                                             <th>Action</th>
@@ -277,7 +287,7 @@
 
 
                 $(function() {
-                    // load_table_attributes();
+                   load_table_attributes();
                     load_adversaries();
                     load_malware();
                 });
@@ -386,6 +396,29 @@
                         count_page = json.recordsTotal;
                         $('[data-toggle="tooltip"]').tooltip();
                     },
+                    "fnDrawCallback": function(oSettings) {
+
+                            $(".c-tags").select2({
+                            tags: true,
+                             width: 'resolve'
+                            });
+                            $(document).on('change', '.select2-option', function() {
+                                const indicator_id = $(this).data('indicator_id'); 
+                                const pulse_id = $(this).data('pulse_id'); 
+                                
+                                const selectedValues = $(this).val(); 
+
+                                const selectedString = selectedValues ? selectedValues.join(',') : '';
+                                f_change_tags(pulse_id,indicator_id,selectedString);
+
+
+                            });
+
+
+
+
+
+                            },
 
                     columns: [
 
@@ -396,6 +429,28 @@
                         data: 'indicator',
                     },
                     {
+                            data: 'tags',
+                            render: function(data, type, row, meta) {
+                            
+                                const tags_list = row.tags ? row.tags.split(",").map(tag => tag.trim()) : [];
+
+
+                                const options = tags_list.map(tag => {
+                                    if(tag){
+                                        const selected = 'selected';
+                                        return `<option value="${tag}" ${selected}>${tag}</option>`;
+                                    }
+                                
+                                }).join('');
+
+                                return `
+                                    <select data-pulse_id="${row.pulse_id}"  data-indicator_id="${row.indicator_id}" name="tag[]" class="c-tags select2-option form-control" multiple="multiple">
+                                        ${options}
+                                    </select>
+                                `;
+                            }
+                        },
+                    {
                         data: 'role',
                     },
                     {
@@ -403,6 +458,7 @@
                     },
                     {
                         data: 'indicator_id',
+                        "visible": false,
                     },
 
                     ],
@@ -591,6 +647,35 @@ function count_view_event(){
         console.log("No response from server");
     });
 }
+          function f_change_tags(pulse_id,indicator_id, tags) {
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        url: "{{ route('indicators.indicator_detail_update_tags') }}",
+                        type: "POST",
+                        data: {
+                            indicator_id: indicator_id,
+                            pulse_id:pulse_id,
+                            tags: tags
+                        },
+                        beforeSend: function () {
+                     
+                        },
+                        success: function (data) {
+                            if (data.status_code == "00") {
+                           
+                                toastr.success('บันทึกสำเร็จ', 'แจ้งแตือน');
+                            } else {
+                             
+                                toastr.error( 'เกิดข้อผิดพลาด' , 'แจ้งแตือน');
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.log("เกิดข้อผิดพลาดในการเชื่อมต่อกับ server");
+                        }
+                    });
+             }
 
 
 

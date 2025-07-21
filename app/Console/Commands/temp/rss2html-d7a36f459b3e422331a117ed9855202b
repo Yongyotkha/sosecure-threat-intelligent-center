@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:thr="http://purl.org/syndication/thread/1.0" xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xml:lang="en-US" xml:base="https://www.schneier.com/wp-atom.php">
+	<title type="text">Schneier on Security</title>
+	<subtitle type="text"/>
+
+	<updated>2021-01-15T21:02:34Z</updated>
+
+	<link rel="alternate" type="text/html" href="https://www.schneier.com"/>
+	<id>https://www.schneier.com/feed/atom/</id>
+	<link rel="self" type="application/atom+xml" href="https://www.schneier.com/feed/atom/"/>
+
+	
+<icon>https://www.schneier.com/wp-content/uploads/2020/06/cropped-favicon-1-32x32.png</icon>
+	<entry>
+		<author>
+			<name>Bruce Schneier</name>
+					</author>
+
+		<title type="html"><![CDATA[Friday Squid Blogging: China Launches Six New Squid Jigging Vessels]]></title>
+		<link rel="alternate" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/friday-squid-blogging-china-launches-six-new-squid-jigging-vessels.html"/>
+
+		<id>https://www.schneier.com/?p=60666</id>
+		<updated>2021-01-04T16:49:10Z</updated>
+		<published>2021-01-15T22:03:33Z</published>
+		<category scheme="https://www.schneier.com" term="Uncategorized"/><category scheme="https://www.schneier.com" term="squid"/>
+		<summary type="html"><![CDATA[<p>From <a href="https://www.prnewswire.com/news-releases/pingtan-marine-enterprise-announces-chinas-largest-fishery-support-vessel-and-6-squid-jigging-vessels-sailing-to-sea-301197503.html">Pingtan Marine Enterprise</a>:</p>
+<blockquote><p>The 6 large-scale squid jigging vessels are normally operating vessels that returned to China earlier this year from the waters of Southwest Atlantic Ocean for maintenance and repair. These vessels left the port of Mawei on December 17, 2020 and are sailing to the fishing grounds in the international waters of the Southeast Pacific Ocean for operation.</p></blockquote>
+<p>I wonder if the company will include this blog post in its PR roundup.</p>
+<p>As usual, you can also use this squid post to talk about the security stories in the news that I haven’t covered...</p>]]></summary>
+
+					<content type="html" xml:base="https://www.schneier.com/blog/archives/2021/01/friday-squid-blogging-china-launches-six-new-squid-jigging-vessels.html"><![CDATA[<p>From <a href="https://www.prnewswire.com/news-releases/pingtan-marine-enterprise-announces-chinas-largest-fishery-support-vessel-and-6-squid-jigging-vessels-sailing-to-sea-301197503.html">Pingtan Marine Enterprise</a>:</p>
+<blockquote><p>The 6 large-scale squid jigging vessels are normally operating vessels that returned to China earlier this year from the waters of Southwest Atlantic Ocean for maintenance and repair. These vessels left the port of Mawei on December 17, 2020 and are sailing to the fishing grounds in the international waters of the Southeast Pacific Ocean for operation.</p></blockquote>
+<p>I wonder if the company will include this blog post in its PR roundup.</p>
+<p>As usual, you can also use this squid post to talk about the security stories in the news that I haven’t covered.</p>
+<p>Read my blog posting guidelines <a href="https://www.schneier.com/blog/archives/2017/03/commenting_poli.html">here</a>.</p>
+]]></content>
+		
+					<link rel="replies" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/friday-squid-blogging-china-launches-six-new-squid-jigging-vessels.html#comments" thr:count="7"/>
+			<link rel="replies" type="application/atom+xml" href="https://www.schneier.com/blog/archives/2021/01/friday-squid-blogging-china-launches-six-new-squid-jigging-vessels.html/feed/atom/" thr:count="7"/>
+			<thr:total>7</thr:total>
+			</entry>
+		<entry>
+		<author>
+			<name>Bruce Schneier</name>
+					</author>
+
+		<title type="html"><![CDATA[Click Here to Kill Everybody Sale]]></title>
+		<link rel="alternate" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/click-here-to-kill-everybody-sale.html"/>
+
+		<id>https://www.schneier.com/?p=60753</id>
+		<updated>2021-01-15T21:02:34Z</updated>
+		<published>2021-01-15T18:26:50Z</published>
+		<category scheme="https://www.schneier.com" term="Uncategorized"/>
+		<summary type="html"><![CDATA[<p>For a limited time, I am selling signed copies of <a href="https://www.schneier.com/product/click-here-to-kill-everybody-hardcover/"><i>Click Here to Kill Everybody</i></a> in hardcover for just $6, plus shipping.</p>
+<p>Note that I have had occasional problems with international shipping. The book just disappears somewhere in the process. At this price, international orders are at the buyer&#8217;s risk. Also, the USPS keeps reminding us that shipping &#8212; both US and international &#8212; may be delayed during the pandemic.</p>
+<p>I have 500 copies of the book available. When they&#8217;re gone, the sale is over and the price will revert to normal.</p>
+<p>Order <a href="https://www.schneier.com/product/click-here-to-kill-everybody-hardcover/">here</a>.</p>
+<p>EDITED TO ADD: I was able to get another 500 from the publisher, since the first 500 sold out so quickly...</p>]]></summary>
+
+					<content type="html" xml:base="https://www.schneier.com/blog/archives/2021/01/click-here-to-kill-everybody-sale.html"><![CDATA[<p>For a limited time, I am selling signed copies of <a href="https://www.schneier.com/product/click-here-to-kill-everybody-hardcover/"><i>Click Here to Kill Everybody</i></a> in hardcover for just $6, plus shipping.</p>
+<p>Note that I have had occasional problems with international shipping. The book just disappears somewhere in the process. At this price, international orders are at the buyer&#8217;s risk. Also, the USPS keeps reminding us that shipping &#8212; both US and international &#8212; may be delayed during the pandemic.</p>
+<p>I have 500 copies of the book available. When they&#8217;re gone, the sale is over and the price will revert to normal.</p>
+<p>Order <a href="https://www.schneier.com/product/click-here-to-kill-everybody-hardcover/">here</a>.</p>
+<p>EDITED TO ADD: I was able to get another 500 from the publisher, since the first 500 sold out so quickly.</p>
+<p>Please be patient on delivery. There are already 550 orders, and that&#8217;s a lot of work to sign and mail. I&#8217;m going to be doing them a few at a time over the next several weeks. So all of you people reading this paragraph before ordering, understand that there are a lot of people ahead of you in line.</p>
+]]></content>
+		
+					<link rel="replies" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/click-here-to-kill-everybody-sale.html#comments" thr:count="15"/>
+			<link rel="replies" type="application/atom+xml" href="https://www.schneier.com/blog/archives/2021/01/click-here-to-kill-everybody-sale.html/feed/atom/" thr:count="15"/>
+			<thr:total>15</thr:total>
+			</entry>
+		<entry>
+		<author>
+			<name>Bruce Schneier</name>
+					</author>
+
+		<title type="html"><![CDATA[Cell Phone Location Privacy]]></title>
+		<link rel="alternate" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/cell-phone-location-privacy.html"/>
+
+		<id>https://www.schneier.com/?p=60757</id>
+		<updated>2021-01-15T04:44:14Z</updated>
+		<published>2021-01-15T12:36:36Z</published>
+		<category scheme="https://www.schneier.com" term="Uncategorized"/><category scheme="https://www.schneier.com" term="cell phones"/><category scheme="https://www.schneier.com" term="geolocation"/><category scheme="https://www.schneier.com" term="privacy"/><category scheme="https://www.schneier.com" term="surveillance"/>
+		<summary type="html"><![CDATA[<p>We all know that our cell phones constantly give our location away to our mobile network operators; that’s how they work. A group of researchers has figured out a way to fix that. “Pretty Good Phone Privacy” (PGPP) protects both user identity and user location using the existing cellular networks. It protects users from fake cell phone towers (IMSI-catchers) and surveillance by cell providers.</p>
+<p>It’s a clever system. The players are the user, a traditional mobile network operator (MNO) like AT&#38;T or Verizon, and a new mobile virtual network operator (MVNO). MVNOs aren’t new. They&#8217;re intermediaries like Cricket and Boost...</p>]]></summary>
+
+					<content type="html" xml:base="https://www.schneier.com/blog/archives/2021/01/cell-phone-location-privacy.html"><![CDATA[<p>We all know that our cell phones constantly give our location away to our mobile network operators; that’s how they work. A group of researchers has figured out a way to fix that. “Pretty Good Phone Privacy” (PGPP) protects both user identity and user location using the existing cellular networks. It protects users from fake cell phone towers (IMSI-catchers) and surveillance by cell providers.</p>
+<p>It’s a clever system. The players are the user, a traditional mobile network operator (MNO) like AT&amp;T or Verizon, and a new mobile virtual network operator (MVNO). MVNOs aren’t new. They&#8217;re intermediaries like Cricket and Boost.</p>
+<p>Here’s how it works:</p>
+<ol>
+<li>One-time setup: The user’s phone gets a new SIM from the MVNO. All MVNO SIMs are identical.
+<li>Monthly: The user pays their bill to the MVNO (credit card or otherwise) and the phone gets anonymous authentication (using Chaum blind signatures) tokens for each time slice (e.g., hour) in the coming month.
+<li>Ongoing: When the phone talks to a tower (run by the MNO), it sends a token for the current time slice. This is relayed to a MVNO backend server, which checks the Chaum blind signature of the token. If it&#8217;s valid, the MVNO tells the MNO that the user is authenticated, and the user receives a temporary random ID and an IP address. (Again, this is now MVNOs like Boost already work.)
+<li>On demand: The user uses the phone normally.</ol>
+<p>The MNO doesn’t have to modify its system in any way. The PGPP MVNO implementation is in software. The user&#8217;s traffic is sent to the MVNO gateway and then out onto the Internet, potentially even using a VPN.</p>
+<p>All connectivity is data connectivity in cell networks today.  The user can choose to be data-only (e.g., use Signal for voice), or use the MVNO or a third party for VoIP service that will look just like normal telephony.</p>
+<p>The group prototyped and tested everything with real phones in the lab. Their approach adds essentially zero latency, and doesn&#8217;t introduce any new bottlenecks, so it doesn&#8217;t have performance/scalability problems like most anonymity networks. The service could handle tens of millions of users on a single server, because it only has to do infrequent authentication, though for resilience you&#8217;d probably run more.</p>
+<p>The paper is <a href="https://raghavan.usc.edu/papers/pgpp-arxiv20.pdf">here</a>.</p>
+]]></content>
+		
+					<link rel="replies" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/cell-phone-location-privacy.html#comments" thr:count="14"/>
+			<link rel="replies" type="application/atom+xml" href="https://www.schneier.com/blog/archives/2021/01/cell-phone-location-privacy.html/feed/atom/" thr:count="14"/>
+			<thr:total>14</thr:total>
+			</entry>
+		<entry>
+		<author>
+			<name>Schneier.com Webmaster</name>
+							<uri>https://www.schneier.com/</uri>
+						</author>
+
+		<title type="html"><![CDATA[Upcoming Speaking Engagements]]></title>
+		<link rel="alternate" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/upcoming-speaking-engagements-5.html"/>
+
+		<id>https://www.schneier.com/?p=60737</id>
+		<updated>2021-01-15T15:35:02Z</updated>
+		<published>2021-01-14T17:42:31Z</published>
+		<category scheme="https://www.schneier.com" term="Uncategorized"/><category scheme="https://www.schneier.com" term="Schneier news"/>
+		<summary type="html"><![CDATA[<p>This is a current list of where and when I am scheduled to speak:</p>
+<ul>
+<li>I&#8217;m speaking (online) as part of Western Washington University&#8217;s <a href="https://cs.wwu.edu/internet-studies-lecture-series-securing-world-physically-capable-computers">Internet Studies Lecture Series</a> on January 20, 2021.</li>
+<li>I&#8217;m speaking (online) at ITU Denmark on February 2, 2021. Details to come.</li>
+<li>I&#8217;m being interviewed by Keith Cronin as part of The Center for Innovation, Security, and New Technology&#8217;s <a href="https://www.eventbrite.com/e/csint-conversations-data-surveillance-internet-security-bruce-schneier-tickets-136623288935">CSINT Conversations</a> series, February 10, 2021 from 11:00 AM &#8211; 11:30 AM CST.</li>
+<li>I’ll be speaking at an <a href="https://www.informa.com/">Informa</a> event on February 28, 2021. Details to come.</li>
+</ul>
+<p>The list is maintained on ...</p>]]></summary>
+
+					<content type="html" xml:base="https://www.schneier.com/blog/archives/2021/01/upcoming-speaking-engagements-5.html"><![CDATA[<p>This is a current list of where and when I am scheduled to speak:</p>
+<ul>
+<li>I&#8217;m speaking (online) as part of Western Washington University&#8217;s <a href="https://cs.wwu.edu/internet-studies-lecture-series-securing-world-physically-capable-computers">Internet Studies Lecture Series</a> on January 20, 2021.</li>
+<li>I&#8217;m speaking (online) at ITU Denmark on February 2, 2021. Details to come.</li>
+<li>I&#8217;m being interviewed by Keith Cronin as part of The Center for Innovation, Security, and New Technology&#8217;s <a href="https://www.eventbrite.com/e/csint-conversations-data-surveillance-internet-security-bruce-schneier-tickets-136623288935">CSINT Conversations</a> series, February 10, 2021 from 11:00 AM &#8211; 11:30 AM CST.</li>
+<li>I’ll be speaking at an <a href="https://www.informa.com/">Informa</a> event on February 28, 2021. Details to come.</li>
+</ul>
+<p>The list is maintained on <a href="https://www.schneier.com/events/">this page</a>.</p>
+]]></content>
+		
+					<link rel="replies" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/upcoming-speaking-engagements-5.html#comments" thr:count="0"/>
+			<link rel="replies" type="application/atom+xml" href="https://www.schneier.com/blog/archives/2021/01/upcoming-speaking-engagements-5.html/feed/atom/" thr:count="0"/>
+			<thr:total>0</thr:total>
+			</entry>
+		<entry>
+		<author>
+			<name>Bruce Schneier</name>
+					</author>
+
+		<title type="html"><![CDATA[Finding the Location of Telegram Users]]></title>
+		<link rel="alternate" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/finding-the-location-of-telegram-users.html"/>
+
+		<id>https://www.schneier.com/?p=60732</id>
+		<updated>2021-01-11T18:08:40Z</updated>
+		<published>2021-01-14T12:08:27Z</published>
+		<category scheme="https://www.schneier.com" term="Uncategorized"/><category scheme="https://www.schneier.com" term="Android"/><category scheme="https://www.schneier.com" term="geolocation"/><category scheme="https://www.schneier.com" term="spoofing"/><category scheme="https://www.schneier.com" term="Telegram"/>
+		<summary type="html"><![CDATA[<p>Security researcher Ahmed Hassan has shown that spoofing the Android&#8217;s &#8220;People Nearby&#8221; feature allows him to <a href="https://arstechnica.com/information-technology/2021/01/telegram-feature-exposes-your-precise-address-to-hackers/">pinpoint</a> the physical location of Telegram users:</p>
+<blockquote><p>Using readily available software and a rooted Android device, he&#8217;s able to spoof the location his device reports to Telegram servers. By using just three different locations and measuring the corresponding distance reported by People Nearby, he is able to pinpoint a user&#8217;s precise location.</p>
+<p>[&#8230;]</p>
+<p>A proof-of-concept video the researcher sent to Telegram showed how he could discern the address of a People Nearby user when he used a free GPS spoofing app to make his phone report just three different locations. He then drew a circle around each of the three locations with a radius of the distance reported by Telegram. The user&#8217;s precise location was where all three intersected...</p></blockquote>]]></summary>
+
+					<content type="html" xml:base="https://www.schneier.com/blog/archives/2021/01/finding-the-location-of-telegram-users.html"><![CDATA[<p>Security researcher Ahmed Hassan has shown that spoofing the Android&#8217;s &#8220;People Nearby&#8221; feature allows him to <a href="https://arstechnica.com/information-technology/2021/01/telegram-feature-exposes-your-precise-address-to-hackers/">pinpoint</a> the physical location of Telegram users:</p>
+<blockquote><p>Using readily available software and a rooted Android device, he&#8217;s able to spoof the location his device reports to Telegram servers. By using just three different locations and measuring the corresponding distance reported by People Nearby, he is able to pinpoint a user&#8217;s precise location.</p>
+<p>[&#8230;]</p>
+<p>A proof-of-concept video the researcher sent to Telegram showed how he could discern the address of a People Nearby user when he used a free GPS spoofing app to make his phone report just three different locations. He then drew a circle around each of the three locations with a radius of the distance reported by Telegram. The user&#8217;s precise location was where all three intersected.</p>
+<p>[&#8230;]</p>
+<p>Fixing the problem &#8212; or at least making it much harder to exploit it &#8212; wouldn&#8217;t be hard from a technical perspective. Rounding locations to the nearest mile and adding some random bits generally suffices. When the Tinder app had a similar disclosure vulnerability, developers used this kind of technique to fix it.</p></blockquote>
+]]></content>
+		
+					<link rel="replies" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/finding-the-location-of-telegram-users.html#comments" thr:count="17"/>
+			<link rel="replies" type="application/atom+xml" href="https://www.schneier.com/blog/archives/2021/01/finding-the-location-of-telegram-users.html/feed/atom/" thr:count="17"/>
+			<thr:total>17</thr:total>
+			</entry>
+		<entry>
+		<author>
+			<name>Bruce Schneier</name>
+					</author>
+
+		<title type="html"><![CDATA[On US Capitol Security — By Someone Who Manages Arena-Rock-Concert Security]]></title>
+		<link rel="alternate" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/on-us-capitol-security-by-someone-who-manages-arena-rock-concert-security.html"/>
+
+		<id>https://www.schneier.com/?p=60727</id>
+		<updated>2021-01-11T18:08:12Z</updated>
+		<published>2021-01-13T12:06:33Z</published>
+		<category scheme="https://www.schneier.com" term="Uncategorized"/><category scheme="https://www.schneier.com" term="operational security"/><category scheme="https://www.schneier.com" term="physical security"/><category scheme="https://www.schneier.com" term="police"/>
+		<summary type="html"><![CDATA[<p>Smart <a href="https://www.nbcnews.com/think/opinion/capitol-police-were-so-unprepared-week-event-planner-me-could-ncna1253531">commentary</a>:</p>
+<blockquote><p>&#8230;I was floored on Wednesday when, glued to my television, I saw police in some areas of the U.S. Capitol using little more than those same mobile gates I had ­ the ones that look like bike racks that can hook together ­ to try to keep the crowds away from sensitive areas and, later, push back people intent on accessing the grounds. (A <a href="https://www.nbcnews.com/video/fencing-goes-up-around-white-house-complex-one-day-after-capitol-riots-99106885915">new fence that appears to be made of sturdier material</a> was being erected on Thursday.) That’s the same equipment and approximately the same amount of force I was able to use when a group of fans got a little feisty and tried to get backstage at a Vanilla Ice show...</p></blockquote>]]></summary>
+
+					<content type="html" xml:base="https://www.schneier.com/blog/archives/2021/01/on-us-capitol-security-by-someone-who-manages-arena-rock-concert-security.html"><![CDATA[<p>Smart <a href="https://www.nbcnews.com/think/opinion/capitol-police-were-so-unprepared-week-event-planner-me-could-ncna1253531 ">commentary</a>:</p>
+<blockquote><p>&#8230;I was floored on Wednesday when, glued to my television, I saw police in some areas of the U.S. Capitol using little more than those same mobile gates I had ­ the ones that look like bike racks that can hook together ­ to try to keep the crowds away from sensitive areas and, later, push back people intent on accessing the grounds. (A <a href="https://www.nbcnews.com/video/fencing-goes-up-around-white-house-complex-one-day-after-capitol-riots-99106885915">new fence that appears to be made of sturdier material</a> was being erected on Thursday.) That’s the same equipment and approximately the same amount of force I was able to use when a group of fans got a little feisty and tried to get backstage at a Vanilla Ice show.</p>
+<p>[&#8230;]</p>
+<p>There’s not ever going to be enough police or security at any event to stop people if they all act in unison; if enough people want to get to Vanilla Ice at the same time, they’re going to get to Vanilla Ice. Social constructs and basic decency, not lightweight security gates, are what hold everyone except the outliers back in a typical crowd.</p>
+<p>[&#8230;]</p>
+<p>When there are enough outliers in a crowd, it throws the normal dynamics of crowd control off; everyone in my business knows this. Citizens tend to hold each other to certain standards ­ which is why my 40,000-person town does not have 40,000 police officers, and why the 8.3 million people of New York City aren&#8217;t policed by 8.3 million police officers.</p>
+<p>Social norms are the fabric that make an event run smoothly &#8212; and, really, hold society together. There aren’t enough police in your town to handle it if everyone starts acting up at the same time.</p></blockquote>
+<p>I like that she uses the term &#8220;outliers,&#8221; and I make much the same points in <a href="https://www.schneier.com/books/liars-and-outliers/"><i>Liars and Outliers</i></a>.</p>
+]]></content>
+		
+					<link rel="replies" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/on-us-capitol-security-by-someone-who-manages-arena-rock-concert-security.html#comments" thr:count="44"/>
+			<link rel="replies" type="application/atom+xml" href="https://www.schneier.com/blog/archives/2021/01/on-us-capitol-security-by-someone-who-manages-arena-rock-concert-security.html/feed/atom/" thr:count="44"/>
+			<thr:total>44</thr:total>
+			</entry>
+		<entry>
+		<author>
+			<name>Bruce Schneier</name>
+					</author>
+
+		<title type="html"><![CDATA[Cloning Google Titan 2FA keys]]></title>
+		<link rel="alternate" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/cloning-google-titan-2fa-keys.html"/>
+
+		<id>https://www.schneier.com/?p=60729</id>
+		<updated>2021-01-11T18:06:16Z</updated>
+		<published>2021-01-12T12:16:55Z</published>
+		<category scheme="https://www.schneier.com" term="Uncategorized"/><category scheme="https://www.schneier.com" term="cloning"/><category scheme="https://www.schneier.com" term="cryptography"/><category scheme="https://www.schneier.com" term="Google"/><category scheme="https://www.schneier.com" term="hardware"/><category scheme="https://www.schneier.com" term="side-channel attacks"/><category scheme="https://www.schneier.com" term="two-factor authentication"/>
+		<summary type="html"><![CDATA[<p>This is a <a href="https://arstechnica.com/information-technology/2021/01/hackers-can-clone-google-titan-2fa-keys-using-a-side-channel-in-nxp-chips/">clever</a> side-channel attack:</p>
+<blockquote><p>The cloning works by using a hot air gun and a scalpel to remove the plastic key casing and expose the NXP <a href="https://media.digikey.com/pdf/Data%20Sheets/NXP%20PDFs/A700x_Rev3.1.pdf">A700X chip</a>, which acts as a secure element that stores the cryptographic secrets. Next, an attacker connects the chip to hardware and software that take measurements as the key is being used to authenticate on an existing account. Once the measurement-taking is finished, the attacker seals the chip in a new casing and returns it to the victim.</p>
+<p>Extracting and later resealing the chip takes about four hours. It takes another six hours to take measurements for each account the attacker wants to hack. In other words, the process would take 10 hours to clone the key for a single account, 16 hours to clone a key for two accounts, and 22 hours for three accounts...</p></blockquote>]]></summary>
+
+					<content type="html" xml:base="https://www.schneier.com/blog/archives/2021/01/cloning-google-titan-2fa-keys.html"><![CDATA[<p>This is a <a href="https://arstechnica.com/information-technology/2021/01/hackers-can-clone-google-titan-2fa-keys-using-a-side-channel-in-nxp-chips/">clever</a> side-channel attack:</p>
+<blockquote><p>The cloning works by using a hot air gun and a scalpel to remove the plastic key casing and expose the NXP <a href="https://media.digikey.com/pdf/Data%20Sheets/NXP%20PDFs/A700x_Rev3.1.pdf">A700X chip</a>, which acts as a secure element that stores the cryptographic secrets. Next, an attacker connects the chip to hardware and software that take measurements as the key is being used to authenticate on an existing account. Once the measurement-taking is finished, the attacker seals the chip in a new casing and returns it to the victim.</p>
+<p>Extracting and later resealing the chip takes about four hours. It takes another six hours to take measurements for each account the attacker wants to hack. In other words, the process would take 10 hours to clone the key for a single account, 16 hours to clone a key for two accounts, and 22 hours for three accounts.</p>
+<p>By observing the local electromagnetic radiations as the chip generates the digital signatures, the researchers exploit a <a href="https://en.wikipedia.org/wiki/Side-channel_attack">side channel vulnerability</a> in the NXP chip. The exploit allows an attacker to obtain the long-term <a href="https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-messages">elliptic curve digital signal algorithm</a> private key designated for a given account. With the crypto key in hand, the attacker can then create her own key, which will work for each account she targeted.</p></blockquote>
+<p>The attack isn&#8217;t free, but it&#8217;s not expensive either:</p>
+<blockquote><p>A hacker would first have to steal a target’s account password and also gain covert possession of the physical key for as many as 10 hours. The cloning also requires up to $12,000 worth of equipment and custom software, plus an advanced background in electrical engineering and cryptography. That means the key cloning &#8212; ­were it ever to happen in the wild &#8212; ­would likely be done only by a nation-state pursuing its highest-value targets. </p></blockquote>
+<p>That last line about &#8220;nation-state pursuing its highest-value targets&#8221; is just not true. There are many other situations where this attack is feasible.</p>
+<p>Note that the attack isn&#8217;t against the Google system specifically. It exploits a side-channel attack in the NXP chip. Which means that other systems are probably vulnerable:</p>
+<blockquote><p>While the researchers performed their attack on the Google Titan, they believe that other hardware that uses the A700X, or chips based on the A700X, may also be vulnerable. If true, that would include Yubico’s YubiKey NEO and several 2FA keys made by Feitian.</p></blockquote>
+]]></content>
+		
+					<link rel="replies" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/cloning-google-titan-2fa-keys.html#comments" thr:count="32"/>
+			<link rel="replies" type="application/atom+xml" href="https://www.schneier.com/blog/archives/2021/01/cloning-google-titan-2fa-keys.html/feed/atom/" thr:count="32"/>
+			<thr:total>32</thr:total>
+			</entry>
+		<entry>
+		<author>
+			<name>Bruce Schneier</name>
+					</author>
+
+		<title type="html"><![CDATA[Changes in WhatsApp’s Privacy Policy]]></title>
+		<link rel="alternate" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/changes-in-whatsapps-privacy-policy.html"/>
+
+		<id>https://www.schneier.com/?p=60723</id>
+		<updated>2021-01-13T14:34:41Z</updated>
+		<published>2021-01-11T12:17:13Z</published>
+		<category scheme="https://www.schneier.com" term="Uncategorized"/><category scheme="https://www.schneier.com" term="data collection"/><category scheme="https://www.schneier.com" term="Facebook"/><category scheme="https://www.schneier.com" term="privacy"/><category scheme="https://www.schneier.com" term="WhatsApp"/>
+		<summary type="html"><![CDATA[<p>If you&#8217;re a WhatsApp user, pay attention to the <a href="https://arstechnica.com/tech-policy/2021/01/whatsapp-users-must-share-their-data-with-facebook-or-stop-using-the-app/">changes in the privacy policy</a> that you&#8217;re being forced to agree with.</p>
+<blockquote><p>In 2016, WhatsApp gave users a one-time ability to opt out of having account data turned over to Facebook. Now, an <a href="https://www.whatsapp.com/legal/privacy-policy">updated privacy policy</a> is changing that. Come next month, users will no longer have that choice. Some of the data that WhatsApp collects includes:</p>
+<ul>
+<li>User phone numbers</li>
+<li>Other people&#8217;s phone numbers stored in address books</li>
+<li>Profile names</li>
+<li>Profile pictures and</li>
+<li>Status message including when a user was last online</li>
+<li>Diagnostic data collected from app logs...</li></ul></blockquote>]]></summary>
+
+					<content type="html" xml:base="https://www.schneier.com/blog/archives/2021/01/changes-in-whatsapps-privacy-policy.html"><![CDATA[<p>If you&#8217;re a WhatsApp user, pay attention to the <a href="https://arstechnica.com/tech-policy/2021/01/whatsapp-users-must-share-their-data-with-facebook-or-stop-using-the-app/">changes in the privacy policy</a> that you&#8217;re being forced to agree with.</p>
+<blockquote><p>In 2016, WhatsApp gave users a one-time ability to opt out of having account data turned over to Facebook. Now, an <a href="https://www.whatsapp.com/legal/privacy-policy">updated privacy policy</a> is changing that. Come next month, users will no longer have that choice. Some of the data that WhatsApp collects includes:</p>
+<ul>
+<li>User phone numbers</li>
+<li>Other people&#8217;s phone numbers stored in address books</li>
+<li>Profile names</li>
+<li>Profile pictures and</li>
+<li>Status message including when a user was last online</li>
+<li>Diagnostic data collected from app logs</li>
+</ul>
+<p>Under the new terms, Facebook reserves the right to share collected data with its <a href="https://faq.whatsapp.com/general/security-and-privacy/the-facebook-companies">family of companies</a>.</p></blockquote>
+<p>EDITED TO ADD (1/13): WhatsApp <a href="https://www.theverge.com/2021/1/12/22226792/whatsapp-privacy-policy-response-signal-telegram-controversy-clarification">tries to explain</a>.</p>
+]]></content>
+		
+					<link rel="replies" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/changes-in-whatsapps-privacy-policy.html#comments" thr:count="40"/>
+			<link rel="replies" type="application/atom+xml" href="https://www.schneier.com/blog/archives/2021/01/changes-in-whatsapps-privacy-policy.html/feed/atom/" thr:count="40"/>
+			<thr:total>40</thr:total>
+			</entry>
+		<entry>
+		<author>
+			<name>Bruce Schneier</name>
+					</author>
+
+		<title type="html"><![CDATA[Friday Squid Blogging: Searching for Giant Squid by Collecting Environmental DNA]]></title>
+		<link rel="alternate" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/friday-squid-blogging-searching-for-giant-squid-by-collecting-environmental-dna.html"/>
+
+		<id>https://www.schneier.com/?p=60664</id>
+		<updated>2021-01-04T16:48:50Z</updated>
+		<published>2021-01-08T22:02:12Z</published>
+		<category scheme="https://www.schneier.com" term="Uncategorized"/><category scheme="https://www.schneier.com" term="squid"/>
+		<summary type="html"><![CDATA[<p>The <a href="https://www.hakaimagazine.com/news/on-the-trail-of-the-giant-squid/">idea</a> is to collect and analyze random DNA floating around the ocean, and using that to figure out where the giant squid are. No one is sure if this will actually work.</p>
+<p>As usual, you can also use this squid post to talk about the security stories in the news that I haven’t covered.</p>
+<p>Read my blog posting guidelines <a href="https://www.schneier.com/blog/archives/2017/03/commenting_poli.html">here</a>.</p>
+]]></summary>
+
+					<content type="html" xml:base="https://www.schneier.com/blog/archives/2021/01/friday-squid-blogging-searching-for-giant-squid-by-collecting-environmental-dna.html"><![CDATA[<p>The <a href="https://www.hakaimagazine.com/news/on-the-trail-of-the-giant-squid/">idea</a> is to collect and analyze random DNA floating around the ocean, and using that to figure out where the giant squid are. No one is sure if this will actually work.</p>
+<p>As usual, you can also use this squid post to talk about the security stories in the news that I haven’t covered.</p>
+<p>Read my blog posting guidelines <a href="https://www.schneier.com/blog/archives/2017/03/commenting_poli.html">here</a>.</p>
+]]></content>
+		
+					<link rel="replies" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/friday-squid-blogging-searching-for-giant-squid-by-collecting-environmental-dna.html#comments" thr:count="226"/>
+			<link rel="replies" type="application/atom+xml" href="https://www.schneier.com/blog/archives/2021/01/friday-squid-blogging-searching-for-giant-squid-by-collecting-environmental-dna.html/feed/atom/" thr:count="226"/>
+			<thr:total>226</thr:total>
+			</entry>
+		<entry>
+		<author>
+			<name>Bruce Schneier</name>
+					</author>
+
+		<title type="html"><![CDATA[APT Horoscope]]></title>
+		<link rel="alternate" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/apt-horoscope.html"/>
+
+		<id>https://www.schneier.com/?p=60719</id>
+		<updated>2021-01-06T17:21:08Z</updated>
+		<published>2021-01-08T20:19:37Z</published>
+		<category scheme="https://www.schneier.com" term="Uncategorized"/><category scheme="https://www.schneier.com" term="hacking"/><category scheme="https://www.schneier.com" term="humor"/>
+		<summary type="html"><![CDATA[<p>This <a href="https://www.atlanticcouncil.org/blogs/new-atlanticist/which-hacker-group-is-most-like-your-astrological-sign/">delightful essay</a> matches APT hacker groups up with astrological signs. This is me:</p>
+<blockquote><p>Capricorn is renowned for its discipline, skilled navigation, and steadfastness. Just like Capricorn, <a href="https://www.crowdstrike.com/blog/meet-crowdstrikes-adversary-of-the-month-for-november-helix-kitten/">Helix Kitten</a> (also known as APT 35 or OilRig) is a skilled navigator of vast online networks, maneuvering deftly across an array of organizations, including those in aerospace, energy, finance, government, hospitality, and telecommunications. Steadfast in its work and objectives, Helix Kitten has a consistent track record of developing meticulous spear-phishing attacks...</p></blockquote>]]></summary>
+
+					<content type="html" xml:base="https://www.schneier.com/blog/archives/2021/01/apt-horoscope.html"><![CDATA[<p>This <a href="https://www.atlanticcouncil.org/blogs/new-atlanticist/which-hacker-group-is-most-like-your-astrological-sign/">delightful essay</a> matches APT hacker groups up with astrological signs. This is me:</p>
+<blockquote><p>Capricorn is renowned for its discipline, skilled navigation, and steadfastness. Just like Capricorn, <a href="https://www.crowdstrike.com/blog/meet-crowdstrikes-adversary-of-the-month-for-november-helix-kitten/">Helix Kitten</a> (also known as APT 35 or OilRig) is a skilled navigator of vast online networks, maneuvering deftly across an array of organizations, including those in aerospace, energy, finance, government, hospitality, and telecommunications. Steadfast in its work and objectives, Helix Kitten has a consistent track record of developing meticulous spear-phishing attacks.</p></blockquote>
+]]></content>
+		
+					<link rel="replies" type="text/html" href="https://www.schneier.com/blog/archives/2021/01/apt-horoscope.html#comments" thr:count="3"/>
+			<link rel="replies" type="application/atom+xml" href="https://www.schneier.com/blog/archives/2021/01/apt-horoscope.html/feed/atom/" thr:count="3"/>
+			<thr:total>3</thr:total>
+			</entry>
+	</feed>

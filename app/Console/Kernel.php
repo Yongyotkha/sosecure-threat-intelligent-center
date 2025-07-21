@@ -78,8 +78,8 @@ class Kernel extends ConsoleKernel
       
       $schedule->command('app:RSS_Feed')->cron('0 */1 * * *')->withoutOverlapping(5);
       $schedule->command('app:news_permission')->cron('0 */6 * * *')->withoutOverlapping(5);
-
-      $schedule->command('app:indicator_summary_type')->dailyAt('03:00')->withoutOverlapping(5);
+      $schedule->command('app:SendLog_Indicator')->dailyAt('10:22')->withoutOverlapping(5);
+      $schedule->command('app:indicator_summary_type')->dailyAt('10:22')->withoutOverlapping(5);
       $schedule->command('app:MDCVEDataYear')->dailyAt('03:00')->name('lang.progress')->withoutOverlapping(5);
       $schedule->command('app:MDCVEBatchJob')->dailyAt('0 */8 * * *')->name('lang.progress')->withoutOverlapping(5);
 
@@ -88,9 +88,9 @@ class Kernel extends ConsoleKernel
       $schedule->command('app:OTXMDFeedType')->cron('0 0 1 * *')->withoutOverlapping(5);
       $schedule->command('app:OTXFeedType')->cron('0 */1 * * *')->withoutOverlapping(5);
       $schedule->command('app:OTXFeedData')->cron('0 */1 * * *')->withoutOverlapping(5);
-      $schedule->command('app:MDMISPFeedDaily')->cron('0 */12 * * *')->withoutOverlapping(5);
+//      $schedule->command('app:MDMISPFeedDaily')->cron('0 */12 * * *')->withoutOverlapping(5);
       $schedule->command('app:data_leak_social')->hourly()->withoutOverlapping(5);
-      $schedule->command('app:MDMISPFeedDaily')->hourly()->withoutOverlapping(5);
+//      $schedule->command('app:MDMISPFeedDaily')->hourly()->withoutOverlapping(5);
       $schedule->command('app:MDFeedDarkWeb')->dailyAt('03:45')->withoutOverlapping(5);
       $schedule->command('app:RemoveFileLogFromStorage')->cron('0 0 */2 * *')->withoutOverlapping(5);
       //$schedule->command('app:test_indicator_update_ref')->everyMinute()->withoutOverlapping(5);
@@ -99,6 +99,8 @@ class Kernel extends ConsoleKernel
       $schedule->command('app:MDAdversaries')->cron('0 */8 * * *')->withoutOverlapping(5);
       $schedule->command('app:MDMalware')->cron('0 */8 * * *')->withoutOverlapping(5);
       $schedule->command('app:SendLog_Indicator')->dailyAt('18:00')->withoutOverlapping(5);
+      $schedule->command('app:site_setpermission_log_transaction')->everyMinute()->withoutOverlapping(5);
+     $schedule->command('app:MDMISPFeedDaily_Database')->cron('0 */6 * * *')->withoutOverlapping(5);
 
     }
 

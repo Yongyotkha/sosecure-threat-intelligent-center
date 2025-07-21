@@ -350,6 +350,24 @@ $date_public = '';
     @include('stacks.css.datepicker')
     @include('stacks.css.form')
     @include('stacks.css.summernote')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.css">
+    <style>
+    @font-face {
+        font-family: 'TH SarabunPSK';
+        src: url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.eot');
+        src: url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.eot?#iefix') format('embedded-opentype'),
+             url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.woff2') format('woff2'),
+             url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.woff') format('woff'),
+             url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    .note-editable {
+  font-family: 'TH SarabunPSK', sans-serif !important;
+}
+</style>
+
 @endpush
 @push('pagescript')
     @include('stacks.js.form')
@@ -359,6 +377,24 @@ $date_public = '';
     @include('stacks.js.hidesettings')
     @include('stacks.js.defaultpic')
     <script>
+         $('#detail_th').summernote('destroy');
+        $('.htmleditor').summernote({
+            height: 300,
+            fontSizes: ['14' ,'16' ,'18' ,'20' ,'22' ,'24' ,'26' ,'32'], // custom font size
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['fontsize', 'fontname']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['insert', ['link', 'picture']],
+                ['view', ['fullscreen', 'codeview']],
+            ],
+            fontNames: ['TH SarabunPSK'],
+            fontNamesIgnoreCheck: ['TH SarabunPSK']
+        });
+
+
+
         $('form').each(function() {
             if ($(this).data('validator'))
                 $(this).data('validator').settings.ignore = ".note-editor *";

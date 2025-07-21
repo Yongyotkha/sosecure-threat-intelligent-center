@@ -319,6 +319,14 @@
                                 </div>
 
 
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Format </label>
+                                    <div class="col-lg-9">
+                                            <input type="text" name="format" class="form-control" value="@if($log_format_indicator){{$log_format_indicator}}@else  @endif"><!--80-->
+                                    </div>
+                                </div>
+
+
                                 {{-- <div id="sec_agent" style="display: none">
                                     <div class="row m-b-md">
     

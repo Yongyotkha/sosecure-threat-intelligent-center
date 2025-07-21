@@ -164,7 +164,25 @@
 @include('stacks.css.datatables')
 @include('stacks.css.form')
 @include('stacks.css.datepicker')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.css">
+    <style>
+    @font-face {
+        font-family: 'TH SarabunPSK';
+        src: url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.eot');
+        src: url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.eot?#iefix') format('embedded-opentype'),
+             url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.woff2') format('woff2'),
+             url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.woff') format('woff'),
+             url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    .note-editable {
+  font-family: 'TH SarabunPSK', sans-serif !important;
+}
+</style>
 @endpush
+
 
 @push('pagescript')
 @include('stacks.js.datatables')

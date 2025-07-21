@@ -344,12 +344,12 @@
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img" id='updateImage_original'>
-                                                <a href="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_original}}" data-lightbox="name-img-2">
+                                                {{-- <a href="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_original}}" data-lightbox="name-img-2">
                                                     <img src="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_original}}" onerror="setDefaultPic(this)"/>
-                                                </a>
-                                                {{--  <a href="http://10.104.0.7:8082{{@$webdefacement->image_original}}" data-lightbox="name-img-2">
-                                                    <img src="http://10.104.0.7:8082{{@$webdefacement->image_original}}" onerror="setDefaultPic(this)"/>
                                                 </a> --}}
+                                                <a href="https://insights.sosecure.co.th{{@$webdefacement->image_original}}" data-lightbox="name-img-2">
+                                                    <img src="https://insights.sosecure.co.th{{@$webdefacement->image_original}}" onerror="setDefaultPic(this)"/>
+                                                </a>
                                             </div>
                                         </div>
                                         <div class="wdfm-body">
@@ -374,12 +374,11 @@
                                     <div class="wdfm-card">
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
-                                                 <a href="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_last}}" data-lightbox="name-img-2">
+                                                {{-- <a href="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_last}}" data-lightbox="name-img-2">
                                                     <img src="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_last}}" onerror="setDefaultPic(this)"/>
-                                                </a> 
-                                                {{--   <a href="http://10.104.0.7:8082{{@$webdefacement->image_last}}" data-lightbox="name-img-2">
-                                                    <img src="http://10.104.0.7:8082{{@$webdefacement->image_last}}" onerror="setDefaultPic(this)"/>
-                                                    --}}
+                                                </a> --}}
+                                                <a href="https://insights.sosecure.co.th{{@$webdefacement->image_last}}" data-lightbox="name-img-2">
+                                                    <img src="https://insights.sosecure.co.th{{@$webdefacement->image_last}}" onerror="setDefaultPic(this)"/>
                                                 </a>
                                             </div>
                                         </div>

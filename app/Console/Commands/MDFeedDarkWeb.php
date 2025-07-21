@@ -72,7 +72,7 @@ class MDFeedDarkWeb extends Command
 
 
             } catch (Exception $e) {
-                echo "Fail handle : " . $e->getMessage();
+               // echo "Fail handle : " . $e->getMessage();
             }
         }
         //use ($site_id)
@@ -168,6 +168,8 @@ class MDFeedDarkWeb extends Command
             $keywords_list = array();
             foreach ($Site_payload["get_keywords_darkweb"] as $value) {
                // print_r($value["name"]);
+               $this->info('-site : '.$Site_payload["name"]);
+               $this->info('--------keywords_darkwe : '.$value["name"]);
                 array_push($keywords_list, $value["name"]);
             }
 
@@ -228,8 +230,66 @@ class MDFeedDarkWeb extends Command
                 } else {
                     $this->info("app:MDFeedDarkWeb FAIL SOME CONTENT");
                 }
+
+                        //-------------------keyword--------------------
+                        $payload = $this->mapTypeDomain('q', $keywords_string,null);
+
+
+                        //         // $payload = array();
+                        //         // if ($value["name"] == 'email') {
+                        //         //     $payload[] = array('emailDomain' => $Site_payload["get_domains_default"][0]["domain"]);
+                        //         //     $payload[] = array('emailDomain' => '*.' . $Site_payload["get_domains_default"][0]["domain"]);
+                        //         // } else {
+                        //         //     $payload[] = array($value["name"] => $Site_payload["get_domains_default"][0]["domain"]);
+                        //         // }
+                        //         // $payload[] = array('count' => '20');
+                        //         // $payload[] = array('sort' => 'd');
+
+
+                            $time_stamp_from = Carbon::now('UTC')->subDays(30)->format('Y-m-d\\TH:i:s\\Z');
+                        // $time_stamp_from = "2021-01-01T07:52:25Z";
+                            $time_stamp_to = Carbon::now('UTC')->addDays(1)->format('Y-m-d\\TH:i:s\\Z');
+                            $search = $this->querysToString($payload, $time_stamp_from, $time_stamp_to);
+                           // print_r($search);
+                            $_clientHttp = $this->getInitialNumbers($search, 'GET', $reconnectLimit);
+                            $site_Data["site_type_search"] = $value["name"];
+                            $site_Data["site_id"] = $value["site_id"];
+                            $site_Data["site_name"] = $Site_payload["name"];
+                            $site_Data["site_domain"] = $Site_payload["get_domains_default"][0]["domain"];
+                            $site_Data["site_domain_name"] = $Site_payload["get_domains_default"][0]["name"];
+                            $site_Data["site_domain_ip"] = $Site_payload["get_domains_default"][0]["IP"];
+                            $getIDStamp = $this->createStamp($site_Data);
+                            $saveCheck = $_clientHttp["success"];
+                           // echo $_clientHttp["total"] . " : IS All_DATA";
+                            //$this->info(json_encode($site_Data));
+                            if($_clientHttp["total"]>0){
+                                if ($_clientHttp["total"] <= 20) {
+                                        //echo json_encode($_clientHttp["alldata"]);
+                                    $this->saveDarkwebDetail_2($getIDStamp,$site_Data,$_clientHttp["alldata"]);
+                                        // $saveCheck = $this->saveDarkwebDetail($_clientHttp["alldata"],
+                                        // $value["name"], $value["site_id"],$Site_payload["name"], $Site_payload["get_domains_default"][0]["domain"], $Site_payload["get_domains_default"][0]["name"]
+                                        // );
+                                } else {
+                                    $firstCrawlDate  = $_clientHttp["alldata"]["results"][0]["crawlDate"];
+                                    $this->saveDarkwebDetail_2($getIDStamp,$site_Data,$_clientHttp["alldata"]);
+                                    $saveCheck = $this->paginate($site_Data,$getIDStamp,
+                                        $_clientHttp["total"],$payload,$search, 'GET', $reconnectLimit,2,$firstCrawlDate
+                                    );
+                                }
+                            }
+                            if ($saveCheck==true) {
+                                $updateResult2 = $col_fx_transaction_darkweb_stamp->updateOne(
+                                    ['_id' => $getIDStamp],
+                                    ['$set' => ['status' => 2]]
+                                );
+                                $this->info("app:MDFeedDarkWeb SUCCESS");
+                            } else {
+                                $this->info("app:MDFeedDarkWeb FAIL SOME CONTENT");
+                            }
+
+
             } catch (Exception $e) {
-                echo "Fail Perform : " . $e->getMessage();
+               // echo "Fail Perform : " . $e->getMessage();
             }
 
        // }
@@ -251,8 +311,8 @@ class MDFeedDarkWeb extends Command
             $data["alldata"] = $data_clientHttp;
             $data["success"] = $_clientHttp["success"];
         } else {
-            $this->info('Fail getData:' . $search);
-            $this->info($_clientHttp["exception"]);
+          //  $this->info('Fail getData:' . $search);
+          //  $this->info($_clientHttp["exception"]);
             $data["resultCount"] = 0;
             $data["total"] = 0;
             $data["alldata"] = null;

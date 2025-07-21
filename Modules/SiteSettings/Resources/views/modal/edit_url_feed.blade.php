@@ -9,13 +9,13 @@
                     <span id="title_head"> Edit Website</span>
                 </h4>
             </div>
-            <form id="form_update_url_feed" enctype="multipat/form-data">
+            <form id="form_update_url_feed">
             {{-- {!! Form::open(['route' => ['urlfeed.update_url_feed'], 'class' => 'ajaxifyForm_custom', 'method' =>
             'POST']) !!} --}}
             <input type="hidden" name="mode" id="mode" value="create">
             <div class="modal-body">
                 <div class="container-fluid">
-                    {{-- <div id="site_id_show" class="form-group row">
+                    <div id="site_id_show" class="form-group row">
                         <label class="col-lg-3 control-label"> Site <span class="text-danger">*</span> </label>
                         <div class="col-lg-9">
                             <select name="site_id" id="edit_site_id" class="select2-option form-control">
@@ -25,40 +25,19 @@
                                 @endforeach
                             </select>
                         </div>
-                    </div> --}}
-
+                    </div>
                     <div class="form-group row">
                         <label class="col-lg-3 control-label"> Name <span class="text-danger">*</span> </label>
                         <div class="col-lg-9">
                             <input type="text" class="form-control" name="name_web" id="edit_name_web" value="{{ $query->source }}" required>
                         </div>
                     </div>
-
-                    <div class="form-group row">
-                        <label class="col-lg-3 control-label"> Type <span class="text-danger">*</span> </label>
-                        <div class="col-lg-9">
-                            <select name="type_web" id="edit_type_web" class="select2-option form-control">
-                                <option value="Public" {{ $query->type == 'Public' ? 'selected' : '' }}>Public</option>
-                                <option value="DarkWeb" {{ $query->type == 'DarkWeb' ? 'selected' : '' }}>DarkWeb</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group row {{ $query->type == 'DarkWeb' ? '' : 'd-none' }}" id="div_header_edit">
-                        <label class="col-lg-3 control-label">Header/Cookies <span class="text-danger"></span> </label>
-                        <div class="col-lg-9">
-                            <textarea class="form-control htmleditor" id="edit_header" name="header" data-id="1" style="display: none;">{!! $query->header !!}</textarea>
-                            {{-- <textarea name="header" id="header" class="form-control note-codable" cols="30" rows="3"></textarea> --}}
-                        </div>
-                    </div>
-
                     <div class="form-group row">
                         <label class="col-lg-3 control-label">URL <span class="text-danger">*</span> </label>
                         <div class="col-lg-9">
                             <input type="text" class="form-control" name="url_web" id="edit_url_web" value="{{ $query->url }}" required>
                         </div>
                     </div>
-
                     <div class="form-group row">
                         <label class="col-lg-3 control-label"> Port <span class="text-danger">*</span> </label>
                         <div class="col-lg-9">
@@ -72,8 +51,8 @@
                         </div>
                     </div>
 
-                    <div id="edit_area_check_message_row" class="form-group row" style="display: none;">
-                        <label class="col-lg-3 control-label"> </label>
+                    <div id="edit_area_check_message_row" class="form-group row" style="display: none;"><label
+                            class="col-lg-3 control-label"> </label>
                         <div class="col-lg-9">
                             <div id="edit_area_check_message"></div>
                         </div>
@@ -101,43 +80,7 @@
         </div>
     </div>
 
-@push('pagestyle')
-    @include('stacks.css.datatables')
-    @include('stacks.css.datepicker')
-    @include('stacks.css.form')
-    @include('stacks.css.summernote')
-    <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
-@endpush
-
-@push('pagescript')
-@include('stacks.js.markdown')
-@include('scripts.summernote')
-@include('stacks.js.datatables')
-@include('stacks.js.form')
-@include('stacks.js.datepicker')
-@include('stacks.js.daterangpicker')
-@include('stacks.js.menusub')
-@include('stacks.js.site_hidesettings')
-@include('stacks.js.advanced_search')
-@include('stacks.js.fullscreen')
-
 <script>
-
-    $('#edit_type_web').change(function(){
-
-        let type_value = $('#edit_type_web :selected').val();
-
-        if(type_value == 'Public')
-        {
-            $('#div_header_edit').addClass('d-none');
-        }
-        else
-        {
-            $('#div_header_edit').removeClass('d-none');
-        }
-
-    });
-
     function edit_get_check_site()
     {
         let url_web = $("#edit_url_web").val();

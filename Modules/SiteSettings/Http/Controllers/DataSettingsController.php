@@ -13,6 +13,7 @@ use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\site_config_email_alert;
 use Modules\SiteSettings\Entities\site_menu_permission;
 use Modules\SiteSettings\Entities\site_menu_sub_permission;
+use App\Entities\Logs_setting;
 
 class DataSettingsController extends Controller
 {
@@ -73,6 +74,16 @@ class DataSettingsController extends Controller
         $data['page'] = langapp('data_setting');
 
         $data['file_agent_name'] = $data['siteSettings']['name'].'_Agent-'.$data['siteSettings']['id'].'.zip';
+
+
+
+        $Logs_setting_data =  Logs_setting::where('type', 'indicator')
+        ->where('site_id', $get_data->id)->select('content')->first();
+        $data['log_format_indicator'] = '[[M]] [[d]] [[H:i:s]] SOSECURE CEF:0|SOSECURE|Threat inSights|1.0|100|[[Event name]]|[[Attribute Type]]=[[Attribute Name]]|Tags=[[Tags]]|Event Description=[[Event Description]]';
+        if($Logs_setting_data){
+            $data['log_format_indicator'] =$Logs_setting_data->content;
+
+        }
 
         return view('sitesettings::data_setting')->with($data);
     }
@@ -160,6 +171,32 @@ class DataSettingsController extends Controller
             $SiteSettings->server_log_ip = trim($request->ip);
             $SiteSettings->log_storage_quotas = $request -> log_storage_quotas;
             $SiteSettings->save();
+
+            //update log sync
+            $Logs_setting_Check_Count =  Logs_setting::where('site_id',$SiteSettings->id)->where('type','indicator')->count();
+            if($Logs_setting_Check_Count > 0){
+                Logs_setting::where('type', 'indicator')
+                ->where('site_id', $SiteSettings->id)
+                ->update([
+                    'content' => $request -> format, // แทน column_name และ new_value ด้วยค่าที่ต้องการ
+                    // เพิ่มคอลัมน์อื่น ๆ ถ้าต้องการ
+                ]);
+
+            }else{
+                $Logs_setting_Create = new Logs_setting();
+                $Logs_setting_Create->type ="indicator";
+                $Logs_setting_Create->site_id =$SiteSettings->id;
+                $Logs_setting_Create->content = $request -> format;
+                $Logs_setting_Create->save();
+
+
+            }
+       
+            
+
+
+
+
         }
         // $SiteSettings->active = $request->active ? 1 : 0;
         // }else if($request->page_setting == 'system_settings'){

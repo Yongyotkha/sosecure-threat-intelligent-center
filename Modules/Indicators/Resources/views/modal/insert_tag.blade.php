@@ -20,7 +20,7 @@
                                 <label for="">Input Tags :</label>
                                 <textarea class="form-control" name="tags" cols="30" rows="3" id="tags_events">{!! $events[0] -> tags !!}</textarea>
                             </div>
-                            {{-- <div class="form-group">
+                            <div class="form-group">
                                 <label for="">Actor :</label>
                                 <select name="category_actor[]" id="category_actor" class="select2-option form-control" multiple>
                                     @if($actors != null)
@@ -29,19 +29,14 @@
                                         @endforeach
                                     @endif
                                 </select>                            
-                            </div> --}}
+                            </div>
                             <div class="form-group">
                                 <label for="">Campaign :</label>
                                 {{-- <input type="text" name="category_campaign" id="category_campaign" class="form-control"> --}}
                                 <select name="category_campaign[]" id="category_campaign" class="select2-option form-control" multiple>
-                                    {{-- @if(@$campainge != null)
-                                        @foreach(@$campainge as $data_camp)
-                                            <option value="{{@$data_camp->adversary_uuid}}" selected>{{@$data_camp->adversary_name}}</option>
-                                        @endforeach
-                                    @endif --}}
-                                    @if(@$master_campainge)
-                                        @foreach($master_campainge as $data_campainge)
-                                            <option value="{{$data_campainge->campainge_uuid}}" {{ ( $campainge ? ( in_array($data_campainge->campainge_uuid, $campainge) ? 'selected' : '' ) : '' ) }}>{{$data_campainge->name}}</option>
+                                    @if($campainge != null)
+                                        @foreach($campainge as $data_camp)
+                                            <option value="{{$data_camp->adversary_uuid}}" selected>{{$data_camp->adversary_name}}</option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -97,7 +92,7 @@
             var form_save = '.formSaving';
             let tags_events = $('#tags_events').val();
             let pulse_id = $('#pulse_id').val();
-            {{-- let category_actor = $('#category_actor').val(); --}}
+            let category_actor = $('#category_actor').val();
             let category_campaign = $('#category_campaign').val();
             let category_techniques = $('#category_techniques').val();
             $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
@@ -105,7 +100,7 @@
             var data = {
                 'tags_events': tags_events,
                 'pulse_id': pulse_id,
-                {{-- 'category_actor': category_actor, --}}
+                'category_actor': category_actor,
                 'category_campaign': category_campaign,
                 'category_techniques': category_techniques
             };
@@ -154,7 +149,7 @@
             }
         });
 
-        {{-- $('#category_campaign').select2({
+        $('#category_campaign').select2({
             tag: true,
             tokenSeparators: [' '],
             placeholder: 'select campainge',
@@ -177,7 +172,7 @@
                 },
                 cache: true
             }
-        }); --}}
+        });
 
         {{-- $('#category_techniques').select2({
             tag: true,

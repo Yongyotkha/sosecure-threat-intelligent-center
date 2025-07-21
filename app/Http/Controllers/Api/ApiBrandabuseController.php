@@ -105,27 +105,44 @@ class ApiBrandabuseController extends ApiController
                                     ->orWhere('feedcontent', 'LIKE', '%' . $title . '%');
                             });
                         }
+
                         if($check_type) {
                             $model = $model-> where('feel_type', '=' ,$check_type);
                             $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$check_type);
-                        }      
+                        }
+            
+                        
+            
+
+                          
                             if($isDateSearch==1){
                                 // $news = $news -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
                                 // $countGroupBy = $countGroupBy -> whereBetween('feedtimepost',array($date_start_datetime_format,$date_end_datetime_format));
+                            
                                 $countGroupBy = $countGroupBy->whereHas('get_brand_abuse_feed_one', function ($qq) use ($request, $date_start_datetime_format, $date_end_datetime_format) {
                                     $qq->whereBetween('feedtimepost', array($date_start_datetime_format, $date_end_datetime_format));
                                 });
+            
                                 $model = $model->whereHas('get_brand_abuse_feed_one', function ($qq) use ($request, $date_start_datetime_format, $date_end_datetime_format) {
                                     $qq->whereBetween('feedtimepost', array($date_start_datetime_format, $date_end_datetime_format));
                                 });
-                            }    
+                            
+                            }
+
+            
                         $site_id_arr = UserSite::select('site_id')->where('user_id', @$user->id)->get();
                         if(@$user->site_role_id && @$user->site_id) {
-                            if(@$user->site_role_id == 99 || @$user->site_role_id == 4) {
+                            if(@$user->site_role_id == 99 || @$user->site_role_id == 4) {//support and admin
+                                // dd(99);
+        
                                 $model = $model->whereIn('site_id', $site_id_arr);
+                
                                 $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
-                            } else {
+                        
+        
+                            } else {//not support and admin
                                 $model = $model->whereIn('site_id', $site_id_arr);
+                
                                 $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
                             }
                         }
@@ -220,6 +237,8 @@ class ApiBrandabuseController extends ApiController
             
                     }
 
+                    $content = [];
+
                     $count_sub_type["darkweb_public"] = 0;
                     $count_sub_type["social"] = 0;
                     
@@ -232,6 +251,7 @@ class ApiBrandabuseController extends ApiController
                         "count" => $brand_abuse_feed_all,
                         "darkweb" => $count_sub_type["darkweb_public"],
                         "social" => $count_sub_type["social"],
+
                     ];
 
                     $data_transcation = json_encode($response);
@@ -280,68 +300,68 @@ class ApiBrandabuseController extends ApiController
                     if($site_code) {
                         $SiteSettings = SiteSettings::where('code',$site_code)->first();
                     }
-                   
+
                     if(@$get_role_custom_first['superadmin'] == 1) {
                         if(!$site_code) {
-                            $query = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public']);
-                            $icon_mobile = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
-                            $icon_facebook = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
-                            $icon_line = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
-                            $icon_twitter = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
-                            $icon_website = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
-                            $icon_other = $query->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
-                            $number_in_progress = $query->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
-                            $number_reported = $query->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
-                            $number_close = $query->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()                                                                                                                                    ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
-                        } else {
-                            $query = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public']);
-                            $icon_mobile = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
-                            $icon_facebook = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
-                            $icon_line = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
-                            $icon_twitter = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
-                            $icon_website = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
-                            $icon_other = $query->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
+                            $icon_mobile = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
+                            $icon_facebook = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
+                            $icon_line = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
+                            $icon_twitter = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
+                            $icon_website = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
+                            $icon_other = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
-                            $number_in_progress = $query->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
-                            $number_reported = $query->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
-                            $number_close = $query->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()                                                                                                                                  ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
+                            $number_in_progress = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
+                            $number_reported = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
+                            $number_close = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()                                                                                                                                    ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
+                        } else {
+                            $icon_mobile = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
+                            $icon_facebook = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
+                            $icon_line = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
+                            $icon_twitter = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
+                            $icon_website = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
+                            $icon_other = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
+                                                                                                                                                              ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
+                                                                                                                                                              ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
+                                                                                                                                                              ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
+                                                                                                                                                              ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
+                            $number_in_progress = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
+                            $number_reported = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
+                            $number_close = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()                                                                                                                                  ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
                         }
                     } else {
                         if(!$site_code) {
-                            $query = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public']);
-                            $icon_mobile = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
-                            $icon_facebook = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
-                            $icon_line = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
-                            $icon_twitter = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
-                            $icon_website = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
-                            $icon_other = $query->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
+                            $icon_mobile = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
+                            $icon_facebook = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
+                            $icon_line = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
+                            $icon_twitter = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
+                            $icon_website = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
+                            $icon_other = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
                          
-                            $number_in_progress = $query->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
-                            $number_reported = $query->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
-                            $number_close = $query->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()                                                                                                                                   ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
+                            $number_in_progress = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
+                            $number_reported = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
+                            $number_close = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()                                                                                                                                   ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
                         } else {
-                            $query = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public']);
-                            $icon_mobile = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
-                            $icon_facebook = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
-                            $icon_line = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
-                            $icon_twitter = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
-                            $icon_website = $query->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
-                            $icon_other = $query->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
+                            $icon_mobile = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('mobile')).'%'])->count();//->get()
+                            $icon_facebook = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('facebook')).'%'])->count();//->get()
+                            $icon_line = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('line')).'%'])->count();//->get()
+                            $icon_twitter = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('twitter')).'%'])->count();//->get()
+                            $icon_website = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ',[trim(strtolower('website')).'%'])->count();//->get()
+                            $icon_other = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('mobile'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('facebook'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('line'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('twitter'))])
                                                                                                                                                               ->whereRaw('LOWER(`keyword`) != ? ',[trim(strtolower('website'))])->count();
                         
-                            $number_in_progress = $query->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
-                            $number_reported = $query->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
-                            $number_close = $query->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()      
+                            $number_in_progress = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('in_progress')).'%'])->count();//->get()
+                            $number_reported = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('reported')).'%'])->count();//->get()
+                            $number_close = BrandAbuseSocialRef::where('deleted_at', null)->where('status',1)->where('site_id',$SiteSettings->id)->whereIn('site_id',$site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ',[trim(strtolower('close')).'%'])->count();//->get()      
                         }
                     }
 
@@ -443,12 +463,12 @@ class ApiBrandabuseController extends ApiController
                     }
 
                     $SiteSettings = $data['data']['SiteSettings'];
-                    $page = $data['data']['page'];
+                    // $page = $data['data']['page'];
 
                     $response = [];
                     $response['source'] = BrandAbuseSocial::where("status", '=', 1)->get();
                     $response['SiteSettings'] = $SiteSettings;
-                    $response['page'] = $page;
+                    $response['page'] = langapp('brand_abuse');
 
                     $data_transcation = json_encode($response);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
@@ -518,9 +538,7 @@ class ApiBrandabuseController extends ApiController
         
                     $BrandAbuseSocialRef_data = BrandAbuseSocialRef::join('brand_abuse_feed', 'brand_abuse_socail_ref.brand_abuse_feed_id', '=', 'brand_abuse_feed.id')
                     ->whereIn('brand_abuse_feed.feel_type', ['social','darkweb_public'])->join('site','site.id','brand_abuse_socail_ref.site_id')
-                    ->select('brand_abuse_socail_ref.*','brand_abuse_feed.*','site.name as site_name','brand_abuse_socail_ref.code as code_data')
-                    ->where('brand_abuse_socail_ref.status',1)->where('brand_abuse_socail_ref.deleted_at',null)
-                    ;
+                    ->select('brand_abuse_socail_ref.*','brand_abuse_feed.*','site.name as site_name','brand_abuse_socail_ref.code as code_data');
 
                     $date_start_datetime_format = '';
                     $date_end_datetime_format = '';
@@ -820,7 +838,8 @@ class ApiBrandabuseController extends ApiController
                         "recordsTotal_count" => $data_count,
                         // "date_start_datetime_format" => $date_start_datetime_format,
                         // "date_end_datetime_format" => $date_end_datetime_format,
-                        "data" => DataTables::of($BrandAbuseSocialRef_data->skip(@$data['data']['start'])->take(@$data['data']['length'])->get())->rawColumns(['feedcontent','get_brand_abuse_feed_one.feedcontent'])->toJson(),
+                        // "data" => DataTables::of($BrandAbuseSocialRef_data->skip(@$data['data']['start'])->take(@$data['data']['length'])->get())->rawColumns(['feedcontent','get_brand_abuse_feed_one.feedcontent'])->toJson(),
+                        "data" => DataTables::of($BrandAbuseSocialRef_data->get())->rawColumns(['feedcontent','get_brand_abuse_feed_one.feedcontent'])->toJson(),
                     ];
 
                     $data_transcation = json_encode($response);
@@ -2009,7 +2028,7 @@ class ApiBrandabuseController extends ApiController
                     }
 
                     $SiteSettings = $data['data']['SiteSettings'];
-                    $page = $data['data']['page'];
+                    // $page = $data['data']['page'];
                     $user_id = $data['data']['user_id'];
 
                     $BrandAbuseSocial = BrandAbuseSocial::where('deleted_at', null)->where('status', 1)->get();
@@ -2018,7 +2037,7 @@ class ApiBrandabuseController extends ApiController
                     $response  = [
                         'site_settings' => $site_settings,
                         'BrandAbuseSocial' => $BrandAbuseSocial,
-                        'page' => $page,
+                        'page' => langapp('brand_abuse')
                     ];
 
                     $data_transcation = json_encode($response);

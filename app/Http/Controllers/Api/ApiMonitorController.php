@@ -97,13 +97,14 @@ class ApiMonitorController extends ApiController
             $response = array(
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
+                'line' => $e -> getLine()
             );
 
-            $header = $request->bearerToken();
-            $mode = $request->mode;
-            $data_request = $request -> data;
-            $data = $this -> dataFalse($header, $mode, $data_request);
-            $this->saveLog($data['site']['data']['id'], json_encode($response));
+            // $header = $request->bearerToken();
+            // $mode = $request->mode;
+            // $data_request = $request -> data;
+            // $data = $this -> dataFalse($header, $mode, $data_request);
+            // $this->saveLog($data['site']['data']['id'], json_encode($response));
 
             return response()->json($response);
         }

@@ -224,6 +224,23 @@
  @include('stacks.js.form')
 @include('stacks.js.datepicker')
 @include('scripts.summernote')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.css">
+    <style>
+    @font-face {
+        font-family: 'TH SarabunPSK';
+        src: url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.eot');
+        src: url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.eot?#iefix') format('embedded-opentype'),
+             url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.woff2') format('woff2'),
+             url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.woff') format('woff'),
+             url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    .note-editable {
+  font-family: 'TH SarabunPSK', sans-serif !important;
+}
+</style>
 <script>
 
 $('form').each(function () {
@@ -235,7 +252,21 @@ $('#detail_th').summernote('destroy');
 {{--var markupStr = '{{@$RSSNews->detail_th}}';--}}
 {{--$('#detail_th').summernote();--}}
 {{--$('#detail_th').summernote('code', markupStr);--}}
-
+$('#detail_th').summernote('destroy');
+        $('.htmleditor').summernote({
+            height: 300,
+            fontSizes: ['14' ,'16' ,'18' ,'20' ,'22' ,'24' ,'26' ,'32'], // custom font size
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['fontsize', 'fontname']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['insert', ['link', 'picture']],
+                ['view', ['fullscreen', 'codeview']],
+            ],
+            fontNames: ['TH SarabunPSK'],
+            fontNamesIgnoreCheck: ['TH SarabunPSK']
+        });
 
      var form_save = '.formSaving';
     $('.formPreview').click(function() {
@@ -302,19 +333,28 @@ $('#detail_th').summernote('destroy');
             
         }
         axios.post($(this).attr("action"), data)
-            .then(function (response) {
+        .then(function (response) {
+            if (response.data.warning) {
+                // กรณีข่าวซ้ำ แสดง toastr.warning แทน success
+                toastr.warning(response.data.message, 'คำเตือน');
+            } else {
+                toastr.success(response.data.message, '@langapp('response_status') ');
+                
+                 $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
+                 window.location.href = response.data.redirect;
+            }
 
-                    toastr.success(response.data.message, '@langapp('response_status') ');
-                    $(form_save).html('<i class="fas fa-check"></i> @langapp('save') </span>');
-                    window.location.href = response.data.redirect;
-          })
+        })
           .catch(function (error) {
             $('.formSaving').attr('disabled',false);
+            console.log(error);
             if(error.response.data.exception){
                 toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
                 $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
             }else{
+        
                 var errors = error.response.data.errors;
+            
                 var errorsHtml= '';
                 $.each( errors, function( key, value ) {
                     errorsHtml += '<li>' + value[0] + '</li>'; 

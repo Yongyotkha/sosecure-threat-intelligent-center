@@ -59,15 +59,5 @@ Route::group(
 
         Route::post('rss_data/load_top_source', 'RSSFeedSettingsController@load_top_source')->name('rssfeedsettings.load_top_source')->middleware('can:menu_items');
         Route::post('rss_data/load_top_category', 'RSSFeedSettingsController@load_top_category')->name('rssfeedsettings.load_top_category')->middleware('can:menu_items');
-    
-        // Certficate
-        Route::get('/certificate', 'CertificateController@index')->name('certificate.index')->middleware('can:menu_items');
-        Route::post('/certificate/create', 'CertificateController@store')->name('certificate.save')->middleware('can:menu_items');
-        Route::post('/certificate/view', 'CertificateController@view')->name('certificate.view')->middleware('can:menu_items');
-        Route::post('/certificate/update', 'CertificateController@update')->name('certificate.update')->middleware('can:menu_items');
-        Route::post('/certificate/delete', 'CertificateController@delete')->name('certificate.delete')->middleware('can:menu_items');
-        Route::post('/certificate/change_status', 'CertificateController@change_status')->name('certificate.change_status')->middleware('can:menu_items');
-        Route::post('/certificate/certificate_table', 'CertificateController@tableCertificate')->name('certificate.tableCertificate')->middleware('can:menu_items');
-        
     }
 );

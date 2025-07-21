@@ -61,10 +61,9 @@
                                                     </label>
                                                 </th> --}}
                                                 {{-- <th>No.</th> --}}
-                                                {{-- <th>Site</th> --}}
+                                                <th>Site</th>
                                                 <th>URL</th>
                                                 <th>Port</th>
-                                                <th>Mode</th>
                                                 <th>Type</th>
                                                 <th>Last Feed</th>
                                                 {{-- <th>Web Status</th>
@@ -189,7 +188,7 @@
                 <input type="hidden" name="mode" id="mode" value="create">
                 <div class="modal-body">
                     <div class="container-fluid">
-                        {{-- <div id="site_id_show" class="form-group row">
+                        <div id="site_id_show" class="form-group row">
                             <label class="col-lg-3 control-label"> Site <span class="text-danger">*</span> </label>
                             <div class="col-lg-9">
                                 <select name="site_id" id="site_id" class="select2-option form-control">
@@ -199,40 +198,19 @@
                                     @endforeach
                                 </select>
                             </div>
-                        </div> --}}
-
+                        </div>
                         <div class="form-group row">
                             <label class="col-lg-3 control-label"> Name <span class="text-danger">*</span> </label>
                             <div class="col-lg-9">
                                 <input type="text" class="form-control" name="name_web" id="name_web" value="" required>
                             </div>
                         </div>
-                        
-                        <div class="form-group row">
-                            <label class="col-lg-3 control-label"> Type <span class="text-danger">*</span> </label>
-                            <div class="col-lg-9">
-                                <select name="type_web" id="type_web" class="select2-option form-control">
-                                    <option value="Public" selected>Public</option>
-                                    <option value="DarkWeb">DarkWeb</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group row d-none" id="div_header_create">
-                            <label class="col-lg-3 control-label">Header/Cookies <span class="text-danger"></span> </label>
-                            <div class="col-lg-9">
-                                <textarea class="form-control htmleditor" id="header" name="header" data-id="1" style="display: none;"></textarea>
-                                {{-- <textarea name="header" id="header" class="form-control note-codable" cols="30" rows="3"></textarea> --}}
-                            </div>
-                        </div>
-
                         <div class="form-group row">
                             <label class="col-lg-3 control-label">URL <span class="text-danger">*</span> </label>
                             <div class="col-lg-9">
                                 <input type="text" class="form-control" name="url_web" id="url_web" value="" required>
                             </div>
                         </div>
-
                         <div class="form-group row">
                             <label class="col-lg-3 control-label"> Port <span class="text-danger">*</span> </label>
                             <div class="col-lg-9">
@@ -246,13 +224,13 @@
                             </div>
                         </div>
     
-                        <div id="area_check_message_row" class="form-group row" style="display: none;">
-                            <label class="col-lg-3 control-label"> </label>
+                        <div id="area_check_message_row" class="form-group row" style="display: none;"><label
+                                class="col-lg-3 control-label"> </label>
                             <div class="col-lg-9">
                                 <div id="area_check_message"></div>
                             </div>
                         </div>
-
+    
                         <input type="hidden" name="site" id="site">
                     </div>
 
@@ -334,13 +312,10 @@
     @include('stacks.css.datatables')
     @include('stacks.css.datepicker')
     @include('stacks.css.form')
-    @include('stacks.css.summernote')
     <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
 @endpush
 
 @push('pagescript')
-@include('stacks.js.markdown')
-@include('scripts.summernote')
 @include('stacks.js.datatables')
 @include('stacks.js.form')
 @include('stacks.js.datepicker')
@@ -362,10 +337,9 @@
                 type: "POST",
             },
             columns: [
-                {{-- { data: 'c_site' }, --}}
+                { data: 'c_site' },
                 { data: 'url' },
                 { data: 'port' },
-                { data: 'c_mode' },
                 { data: 'c_type' },
                 { data: 'feel_last' },
                 { data: 'status' },
@@ -375,11 +349,11 @@
 
     });
 
-    var site_id = 'All';
+    var site_id = '';
 
-    {{-- $('#site_id').change(function() {
+    $('#site_id').change(function() {
         site_id = $('#site_id :selected').val();
-    }); --}}
+    });
 
     function close_wdfm_website(){
         $('#site_id_show').show();
@@ -406,27 +380,8 @@
         $(".review-image-capture").html("");
         $("#link_edit_image_screenshot").html("");
         $('.review_image_screenshot').css("display","none");
-
-        $('#type_web').val('').trigger('change');
-        $('#div_header_create').addClass('d-none');
-        $('#header').empty();
         loading('stop_load');
     }
-
-    $('#type_web').change(function(){
-
-        let type_value = $('#type_web :selected').val();
-
-        if(type_value == 'Public')
-        {
-            $('#div_header_create').addClass('d-none');
-        }
-        else
-        {
-            $('#div_header_create').removeClass('d-none');
-        }
-
-    });
 
     function get_check_site()
     {
@@ -569,17 +524,13 @@
 
     function update_url_feed()
     {
-        {{-- let header_code = $('form#form_update_url_feed').find('div.note-editable').html(); --}}
-        let header_code = $("#edit_header").summernote('code');
-
         var formData = new FormData(document.getElementById('form_update_url_feed'));
-        formData.append('header_code', header_code);
 
         $.ajax({
             url: "{{ route('urlfeed.update_url_feed') }}",
             type: "POST",
             data: formData,
-            cache: false,
+            cache:false,
             contentType: false,
             processData: false,
             beforeSend: function() {

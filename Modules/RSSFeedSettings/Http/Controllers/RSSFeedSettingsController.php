@@ -1610,12 +1610,12 @@ class RSSFeedSettingsController extends Controller
     {
         $role_custom = @check_role_custom();
         if (!$role_custom['news']) {
-            check_permission403();
+          //  check_permission403();
         }
         $RSS_news = RSSNews::where("code", $id)->first();
         // dd($RSS_news->logo);
         if ($RSS_news->logo != config('app.URL_CENTER_PUBLISH') . '/images/icon/news_default.png') {
-            unlink($RSS_news->logo);
+          //  unlink($RSS_news->logo);
         }
 
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
@@ -1776,11 +1776,12 @@ class RSSFeedSettingsController extends Controller
     public function rss_data_store_news_create(Request $request)
     {
 
-        // dd($request->all());
+    
+   
 
         $role_custom = @check_role_custom();
         if (!$role_custom['news']) {
-            check_permission403();
+          //   check_permission403();
         }
 
         $input = $request->all();
@@ -1802,8 +1803,7 @@ class RSSFeedSettingsController extends Controller
 
 
         $SiteCategory = SiteCategory::whereIn("category_id", $request->category_news)->where('active', 1)->get();
-        // dd($SiteCategory[0]->site_email_alert);
-
+   
         $email_site_a = [];
         $site_news = [];
         if ($SiteCategory) {
@@ -1828,7 +1828,18 @@ class RSSFeedSettingsController extends Controller
             // dd($email_site_alert);
         }
 
-
+  /*      return ajaxResponse(
+            [
+                'cate' => $SiteCategory,
+                'test' => $email_site_alert,
+             
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('rssfeedsettings.news'),
+            ],
+            true,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
+*/
         // $site_config_email_alert = site_config_email_alert::where()
 
         $RSSNews_check = RSSNews::where("code", $request->rss_code)->first();
@@ -1836,8 +1847,7 @@ class RSSFeedSettingsController extends Controller
         $output_mail = [];
         if (@$RSSNews_check) {
 
-            // dd($RSSNews_check -> id);
-            // dd($input);
+       
 
             $RSSNews_check->code = generator_uuid();
             $RSSNews_check->logo = config('app.URL_CENTER_PUBLISH') . $logo;
@@ -1867,8 +1877,20 @@ class RSSFeedSettingsController extends Controller
                         $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                         if (preg_match($reg_exUrl, $data, $url_image)) {
                             $url = $url_image[0];
-                            $image = file_get_contents($url);
+                            $contextOptions = [
+                                "ssl" => [
+                                    "verify_peer" => false,
+                                    "verify_peer_name" => false,
+                                    "allow_self_signed" => true,
+                                ]
+                            ];
+                            $context = stream_context_create($contextOptions);
+
+                            // ดึงภาพ
+                            $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
+
                             if ($image !== false) {
+                                // สร้าง data URI แบบ base64
                                 $data = 'data:image/jpg;base64,' . base64_encode($image);
                             }
                         }
@@ -1920,10 +1942,24 @@ class RSSFeedSettingsController extends Controller
                         $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                         if (preg_match($reg_exUrl, $data, $url_image)) {
                             $url = $url_image[0];
-                            $image = file_get_contents($url);
-                            if ($image !== false) {
-                                $data = 'data:image/jpg;base64,' . base64_encode($image);
-                            }
+                         
+                                // เพิ่ม context เพื่อข้าม SSL verification
+                                $contextOptions = [
+                                    "ssl" => [
+                                        "verify_peer" => false,
+                                        "verify_peer_name" => false,
+                                        "allow_self_signed" => true,
+                                    ]
+                                ];
+                                $context = stream_context_create($contextOptions);
+
+                                // ดึงภาพ
+                                $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
+
+                                if ($image !== false) {
+                                    // สร้าง data URI แบบ base64
+                                    $data = 'data:image/jpg;base64,' . base64_encode($image);
+                                }
                         }
 
                         //base64
@@ -1965,12 +2001,18 @@ class RSSFeedSettingsController extends Controller
 
             if (!empty($request->category_news)) {
                 foreach ($request->category_news as $item) {
-                    $RSSNewsCategory = new RSSNewsCategory();
-                    $RSSNewsCategory->code = generator_uuid();
-                    $RSSNewsCategory->rss_news_id = $RSSNews_check->id;
-                    $RSSNewsCategory->news_category_id = $item;
-                    $RSSNewsCategory->status = 1;
-                    $RSSNewsCategory->save();
+                    //เช็คก่อน หมวดหมู่บันทึกซ้ำกัน
+                    $RSSNewsCategory_check_count = RSSNewsCategory::where("rss_news_id", $RSSNews_check->id)->where('news_category_id',$item)->count();
+                    if( $RSSNewsCategory_check_count == 0){
+                        $RSSNewsCategory = new RSSNewsCategory();
+                        $RSSNewsCategory->code = generator_uuid();
+                        $RSSNewsCategory->rss_news_id = $RSSNews_check->id;
+                        $RSSNewsCategory->news_category_id = $item;
+                        $RSSNewsCategory->status = 1;
+                        $RSSNewsCategory->save();
+
+                    }
+                  
                 }
             }
 
@@ -2173,41 +2215,43 @@ class RSSFeedSettingsController extends Controller
             //         } 
             //     }
             // }
-
+          //  $email_site_alert = ['yongyot.kamma@gmail.com', 'yongyot.kha@mtsc.co.th'];
             if ($request->formsubmit !== 'formDraft') {
                 if ($request->sent_mail == 1) {
-                    if ($email_site_alert) {
-                        foreach ($email_site_alert as $data) {
-                            // var_dump($data);
-                            $news = [
-                                'news' => $RSSNews_check,
-                            ];
-                            $output_mail[] = $data;
-                            // dd($this->news);
-                            $sent = Mail::to($data)->send(new NewsMail($news));
-                            if (count(Mail::failures()) == 0) {
-                                LogEmail::Create([
-                                    'to' => $data,
+                    if (!empty($email_site_alert)) {
+                        $news = [
+                            'news' => $RSSNews_check,
+                        ];
+                    
+                        // ส่งอีเมลแบบกลุ่ม
+                        Mail::to($email_site_alert)->send(new NewsMail($news));
+                    
+                        // ตรวจสอบผลลัพธ์
+                        if (count(Mail::failures()) === 0) {
+                            foreach ($email_site_alert as $email) {
+                                LogEmail::create([
+                                    'to' => $email,
                                     'status' => 'Success',
                                     'subject' => 'News'
                                 ]);
                             }
-                        }
-                        if (count(Mail::failures()) > 0) {
-                            foreach (Mail::failures() as $email_address) {
-                                LogEmail::Create([
-                                    'to' => $email_address,
-                                    'status' => 'Fail',
+                        } else {
+                            foreach ($email_site_alert as $email) {
+                                $status = in_array($email, Mail::failures()) ? 'Fail' : 'Success';
+                                LogEmail::create([
+                                    'to' => $email,
+                                    'status' => $status,
                                     'subject' => 'News'
                                 ]);
                             }
                         }
                     }
+                    
                 }
                 // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
-                $mail = ['oatnunkung@gmail.com', 'oatnunkung88@gmail.com'];
-                // $mail = $email_site_alert;
-                // dd($mail);
+               // $mail = ['yongyot.kamma@gmail.com'];
+                 $mail = $email_site_alert;
+             /*   // dd($mail);
                 foreach ($mail as $data) {
                     // dd($data);
                     // $output_mail[] = $data;
@@ -2220,8 +2264,34 @@ class RSSFeedSettingsController extends Controller
                         $fail_mail[] = $data;
                     }
                 }
+                */
             }
         } else {
+
+                 // dd($RSSNews_check -> id);
+            // dd($input);
+            //check ซ้ำ ถ้ามีชื่อข่าวกับวันที public ซ้ำกัน ไม่ให้สร้างได้ในวันนั้น
+            $today = Carbon::today();
+            $RSSNews_check = RSSNews::where("title_th", $request->title_th)
+                ->where("title_en", $request->title_en)
+                ->whereDate("created_at", $today)
+                ->first();
+            
+            if ($RSSNews_check) {
+                // ห้ามสร้างซ้ำ
+            
+                return ajaxResponse(
+                    array_filter([
+                        'mail'      => $output_mail ?? [],
+                        'fail_mail' => $fail_mail ?? [],
+                        'message'   => 'มีข่าวชื่อเดียวกันสร้างไว้แล้วในวันนี้',
+                        'redirect'  => route('rssfeedsettings.news'),
+                        'warning'   => 'มีข่าวชื่อเดียวกันสร้างไว้แล้วในวันนี้',
+                    ]),
+                    false,
+                    200
+                );
+            }
 
             $RSSNews = new RSSNews();
             $RSSNews->code = generator_uuid();
@@ -2251,8 +2321,21 @@ class RSSFeedSettingsController extends Controller
                         $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                         if (preg_match($reg_exUrl, $data, $url_image)) {
                             $url = $url_image[0];
-                            $image = file_get_contents($url);
+                               // เพิ่ม context เพื่อข้าม SSL verification
+                               $contextOptions = [
+                                "ssl" => [
+                                    "verify_peer" => false,
+                                    "verify_peer_name" => false,
+                                    "allow_self_signed" => true,
+                                ]
+                            ];
+                            $context = stream_context_create($contextOptions);
+
+                            // ดึงภาพ
+                            $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
+
                             if ($image !== false) {
+                                // สร้าง data URI แบบ base64
                                 $data = 'data:image/jpg;base64,' . base64_encode($image);
                             }
                         }
@@ -2303,8 +2386,21 @@ class RSSFeedSettingsController extends Controller
                         $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                         if (preg_match($reg_exUrl, $data, $url_image)) {
                             $url = $url_image[0];
-                            $image = file_get_contents($url);
+                             // เพิ่ม context เพื่อข้าม SSL verification
+                             $contextOptions = [
+                                "ssl" => [
+                                    "verify_peer" => false,
+                                    "verify_peer_name" => false,
+                                    "allow_self_signed" => true,
+                                ]
+                            ];
+                            $context = stream_context_create($contextOptions);
+
+                            // ดึงภาพ
+                            $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
+
                             if ($image !== false) {
+                                // สร้าง data URI แบบ base64
                                 $data = 'data:image/jpg;base64,' . base64_encode($image);
                             }
                         }
@@ -2343,12 +2439,15 @@ class RSSFeedSettingsController extends Controller
             $RSSNews->save();
             if (!empty($request->category_news)) {
                 foreach ($request->category_news as $item) {
-                    $RSSNewsCategory = new RSSNewsCategory();
-                    $RSSNewsCategory->code = generator_uuid();
-                    $RSSNewsCategory->rss_news_id = $RSSNews->id;
-                    $RSSNewsCategory->news_category_id = $item;
-                    $RSSNewsCategory->status = 1;
-                    $RSSNewsCategory->save();
+                    $RSSNewsCategory_check_count = RSSNewsCategory::where("rss_news_id", $RSSNews->id)->where('news_category_id',$item)->count();
+                    if( $RSSNewsCategory_check_count == 0){
+                                $RSSNewsCategory = new RSSNewsCategory();
+                                $RSSNewsCategory->code = generator_uuid();
+                                $RSSNewsCategory->rss_news_id = $RSSNews->id;
+                                $RSSNewsCategory->news_category_id = $item;
+                                $RSSNewsCategory->status = 1;
+                                $RSSNewsCategory->save();
+                    }
                 }
             }
 
@@ -2560,38 +2659,43 @@ class RSSFeedSettingsController extends Controller
             //         } 
             //     }
             // }
+          //  $email_site_alert = ['yongyot.kamma@gmail.com', 'yongyot.kha@mtsc.co.th'];
             if ($request->formsubmit !== 'formDraft') {
                 if ($request->sent_mail == 1) {
-                    if ($email_site_alert) {
-                        foreach ($email_site_alert as $data) {
-                            $news = [
-                                'news' => $RSSNews,
-                            ];
-                            $output_mail[] = $data;
-                            $sent = Mail::to($data)->send(new NewsMail($news));
-                            if (count(Mail::failures()) == 0) {
-                                LogEmail::Create([
-                                    'to' => $data,
+                    if (!empty($email_site_alert)) {
+                        $news = [
+                            'news' => $RSSNews,
+                        ];
+                    
+                        // ส่งอีเมลแบบกลุ่ม
+                        Mail::to($email_site_alert)->send(new NewsMail($news));
+                    
+                        // ตรวจสอบผลลัพธ์
+                        if (count(Mail::failures()) === 0) {
+                            foreach ($email_site_alert as $email) {
+                                LogEmail::create([
+                                    'to' => $email,
                                     'status' => 'Success',
                                     'subject' => 'News'
                                 ]);
                             }
-                        }
-                        if (count(Mail::failures()) > 0) {
-                            foreach (Mail::failures() as $email_address) {
-                                LogEmail::Create([
-                                    'to' => $email_address,
-                                    'status' => 'Fail',
+                        } else {
+                            foreach ($email_site_alert as $email) {
+                                $status = in_array($email, Mail::failures()) ? 'Fail' : 'Success';
+                                LogEmail::create([
+                                    'to' => $email,
+                                    'status' => $status,
                                     'subject' => 'News'
                                 ]);
                             }
                         }
                     }
+                    
                 }
                 // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
-                $mail = ['oatnunkung@gmail.com', 'oatnunkung88@gmail.com'];
-                // $mail = $email_site_alert;
-                // dd($mail);
+              //  $mail = ['yongyot.kamma@gmail.com'];
+                 $mail = $email_site_alert;
+            /*    // dd($mail);
                 foreach ($mail as $data) {
                     // dd($data);
                     // $output_mail[] = $data;
@@ -2604,6 +2708,7 @@ class RSSFeedSettingsController extends Controller
                         $fail_mail[] = $data;
                     }
                 }
+                */
             }
         }
 
@@ -2750,6 +2855,7 @@ class RSSFeedSettingsController extends Controller
                 'fail_mail' => $fail_mail,
                 'message'  => langapp('changes_saved_successful'),
                 'redirect' => route('rssfeedsettings.news'),
+                'warning'=>''
             ],
             true,
             Response::HTTP_OK
@@ -2834,10 +2940,23 @@ class RSSFeedSettingsController extends Controller
                                 $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                                 if (preg_match($reg_exUrl, $data, $url_image)) {
                                     $url = $url_image[0];
-                                    $image = file_get_contents($url);
-                                    if ($image !== false) {
-                                        $data = 'data:image/jpg;base64,' . base64_encode($image);
-                                    }
+                                      // เพิ่ม context เพื่อข้าม SSL verification
+                                $contextOptions = [
+                                    "ssl" => [
+                                        "verify_peer" => false,
+                                        "verify_peer_name" => false,
+                                        "allow_self_signed" => true,
+                                    ]
+                                ];
+                                $context = stream_context_create($contextOptions);
+
+                                // ดึงภาพ
+                                $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
+
+                                if ($image !== false) {
+                                    // สร้าง data URI แบบ base64
+                                    $data = 'data:image/jpg;base64,' . base64_encode($image);
+                                }
                                 }
 
                                 //base64
@@ -2888,10 +3007,23 @@ class RSSFeedSettingsController extends Controller
                                 $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                                 if (preg_match($reg_exUrl, $data, $url_image)) {
                                     $url = $url_image[0];
-                                    $image = file_get_contents($url);
-                                    if ($image !== false) {
-                                        $data = 'data:image/jpg;base64,' . base64_encode($image);
-                                    }
+                                       // เพิ่ม context เพื่อข้าม SSL verification
+                                $contextOptions = [
+                                    "ssl" => [
+                                        "verify_peer" => false,
+                                        "verify_peer_name" => false,
+                                        "allow_self_signed" => true,
+                                    ]
+                                ];
+                                $context = stream_context_create($contextOptions);
+
+                                // ดึงภาพ
+                                $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
+
+                                if ($image !== false) {
+                                    // สร้าง data URI แบบ base64
+                                    $data = 'data:image/jpg;base64,' . base64_encode($image);
+                                }
                                 }
 
                                 //base64
@@ -2945,7 +3077,7 @@ class RSSFeedSettingsController extends Controller
                     }
 
 
-
+                    //$email_site_alert = ['yongyot.kamma@gmail.com', 'yongyot.kha@mtsc.co.th'];
                     if ($request->formsubmit !== 'formDraft') {
                         if ($request->sent_mail == 1) {
                             if ($email_site_alert) {
@@ -2973,8 +3105,8 @@ class RSSFeedSettingsController extends Controller
                         }
                         // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
                         // $mail = ['todeooooo@gmail.com', 'yongyot.kamma@gmail.com'];
-                        $mail = ['oatnunkung@gmail.com', 'oatnunkung88@gmail.com'];
-                        // $mail = $email_site_alert;
+                     //   $mail = ['yongyot.kamma@gmail.com'];
+                    /*     $mail = $email_site_alert;
                         // dd($mail);
                         foreach ($mail as $data) {
                             // dd($data);
@@ -2983,6 +3115,7 @@ class RSSFeedSettingsController extends Controller
                             ];
                             Mail::to($data)->send(new NewsMail($this->news));
                         }
+                        */
                         foreach ($site_news as $data) {
                             $TransactionClientNews = TransactionClientNews::where('site_id', $data)->where('transaction_id', $RSSNews_check->id)->first();
                             if ($TransactionClientNews) {
@@ -3050,10 +3183,23 @@ class RSSFeedSettingsController extends Controller
                                 $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                                 if (preg_match($reg_exUrl, $data, $url_image)) {
                                     $url = $url_image[0];
-                                    $image = file_get_contents($url);
-                                    if ($image !== false) {
-                                        $data = 'data:image/jpg;base64,' . base64_encode($image);
-                                    }
+                                      // เพิ่ม context เพื่อข้าม SSL verification
+                                $contextOptions = [
+                                    "ssl" => [
+                                        "verify_peer" => false,
+                                        "verify_peer_name" => false,
+                                        "allow_self_signed" => true,
+                                    ]
+                                ];
+                                $context = stream_context_create($contextOptions);
+
+                                // ดึงภาพ
+                                $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
+
+                                if ($image !== false) {
+                                    // สร้าง data URI แบบ base64
+                                    $data = 'data:image/jpg;base64,' . base64_encode($image);
+                                }
                                 }
 
                                 //base64
@@ -3102,10 +3248,23 @@ class RSSFeedSettingsController extends Controller
                                 $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                                 if (preg_match($reg_exUrl, $data, $url_image)) {
                                     $url = $url_image[0];
-                                    $image = file_get_contents($url);
-                                    if ($image !== false) {
-                                        $data = 'data:image/jpg;base64,' . base64_encode($image);
-                                    }
+                                       // เพิ่ม context เพื่อข้าม SSL verification
+                                $contextOptions = [
+                                    "ssl" => [
+                                        "verify_peer" => false,
+                                        "verify_peer_name" => false,
+                                        "allow_self_signed" => true,
+                                    ]
+                                ];
+                                $context = stream_context_create($contextOptions);
+
+                                // ดึงภาพ
+                                $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
+
+                                if ($image !== false) {
+                                    // สร้าง data URI แบบ base64
+                                    $data = 'data:image/jpg;base64,' . base64_encode($image);
+                                }
                                 }
 
                                 //base64
@@ -3202,6 +3361,7 @@ class RSSFeedSettingsController extends Controller
                         //     } 
                         // }
                     }
+                    //$email_site_alert = ['yongyot.kamma@gmail.com', 'yongyot.kha@mtsc.co.th'];
                     if ($request->formsubmit !== 'formDraft') {
                         if ($request->sent_mail == 1) {
                             if ($email_site_alert) {
@@ -3228,8 +3388,10 @@ class RSSFeedSettingsController extends Controller
                             }
                         }
                         // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
-                        $mail = ['oatnunkung@gmail.com', 'oatnunkung88@gmail.com'];
+                       // $mail = ['yongyot.kamma@gmail.com'];
                         // dd($mail);
+                        /*
+                        $mail = $email_site_alert;
                         foreach ($mail as $data) {
                             // dd($data);
                             $this->news = [
@@ -3237,6 +3399,7 @@ class RSSFeedSettingsController extends Controller
                             ];
                             Mail::to($data)->send(new NewsMail($this->news));
                         }
+                        */
                         foreach ($site_news as $data) {
                             $TransactionClientNews = TransactionClientNews::where('site_id', $data)->where('transaction_id', $RSSNews->id)->first();
                             if ($TransactionClientNews) {

@@ -1,5 +1,70 @@
 @extends('layouts.app')
 @section('content')
+<style type="">
+select.c-tags {
+    min-width: 300px;
+}
+.select2-container--default .select2-selection--multiple {
+    min-width: 300px !important;
+}
+.btn-published {
+    background-color: #22c55e; /* สีเขียว */
+}
+
+.btn-unpublished {
+    background-color: #ef4444; /* สีแดง */
+}
+
+.tag-container {
+    max-height: 2.5em; /* หรือประมาณ 1 บรรทัด */
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.tag-container.expanded {
+    max-height: 500px; /* แสดง tag ทั้งหมด */
+}
+
+.tag-label {
+    display: inline-block;
+    background-color: #f0f0f0;
+    margin: 2px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+}
+.select2-wrapper.collapsed {
+    max-height: 38px; /* ความสูงพอดี 1 บรรทัด */
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.select2-wrapper.expanded {
+    max-height: 300px; /* หรือ auto ถ้าคุณแน่ใจเรื่องขนาด */
+}
+.resizable-select2 {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23999" xmlns="http://www.w3.org/2000/svg" width="10" height="10"><path d="M0 10 L10 0 M3 10 L10 3 M6 10 L10 6" stroke="%23999"/></svg>');
+  background-repeat: no-repeat;
+  background-position: bottom right;
+  background-size: 12px 12px;
+}
+.select2-selection__rendered {
+  resize: both;
+  overflow: auto;
+  padding: 4px;
+  min-width: 200px;
+  min-height: 40px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 55px;
+}
+
+.select2-container {
+  width: 100% !important;
+}
+
+</style>
     <section id="content" class="bg">
         <section class="vbox">
 
@@ -177,7 +242,7 @@
                         <li class="active">
                             <a href="#tab_event" data-toggle="tab">Event</a>
                         </li>
-                        <li><a href="#tab_summary_type" data-toggle="tab">Summary Type</a>
+                        <li style="display: none;"><a href="#tab_summary_type" data-toggle="tab">Summary Type</a>
                         </li>
                         {{-- <li><a href="#tab_otx" data-toggle="tab">OTX (0)</a></li>   
                 <li><a href="#tab_misp" data-toggle="tab">MISP (0)</a></li>    --}}
@@ -235,11 +300,18 @@
                                         <table class="table table-striped" id="table_events">
                                             <thead>
                                                 <tr>
-                                                    <th>No</th>
+                                                    <th>
+
+                                                    <label>
+                                                        <b>      </b>  
+                                                    </th>
+                                                    
                                                     <th>Industries</th>
                                                     <th>Event Name</th>
-                                                    <th>Group</th>
+                                                    <th>Creator org</th>
+                                            
                                                     <th>Tags</th>
+                                                    <th>Group</th>
                                                     <th style="width: 270px;">Actor / Campainge</th>
                                                     <th>Published</th>
                                                     <th>Last Status</th>
@@ -676,15 +748,67 @@
                         datatable = json.cursor;
                         $('[data-toggle="tooltip"]').tooltip();
                     },
+                    "fnDrawCallback": function(oSettings) {
+
+                        $(".c-tags").select2({
+                        tags: true,
+                                 width: 'resolve',
+                                 
+                        });
+                        $(document).on('change', '.select2-option', function() {
+                            const pulseId = $(this).data('plus'); 
+                            const selectedValues = $(this).val(); 
+
+                            const selectedString = selectedValues ? selectedValues.join(',') : '';
+                            f_change_tags(pulseId,selectedString);
+
+                          
+                        });
+
+                       
+                        $('.rss_new_id').click(function(){
+
+                            const $btn = $(this);
+                            const pulseId = $btn.data('id');
+                            const currentStatus = $btn.data('status'); 
+                            const newStatus = currentStatus === 1 ? 0 : 1;
+                                                    
+                            const pulse_id = pulseId;
+                            const is_checked = newStatus;
+                            $btn.data('status', newStatus)
+                            .toggleClass('btn-published btn-unpublished')
+                            .text(newStatus === 1 ? 'Published' : 'Unpublished');
+
+                            f_change_publice(pulse_id,is_checked);
+
+
+
+                        });
+
+
+
+                    },
+
 
                     columns: [
 
                         {
-                            data: 'No',
+                            data: null,
                             orderable: false,
                             searchable: false,
-                            sortable: false,
-                        },
+                            className: 'text-center',
+                            render: function(data, type, row, meta) {
+                                const isChecked = row.public == 0 ? 'checked' : '';
+                                    return 
+                                       ` <label>
+                                            <input type="checkbox"   style="min-width: 200px;" name="checked" class="check_rss_new_id" value="${row.pulse_id}" >
+                                            <span class="label-text"></span>
+                                        </label>`
+                                    ;
+                            }
+                        }   ,
+
+
                         {
                             data: 'industries',
                             "visible": false,
@@ -693,19 +817,47 @@
                             data: 'name',
                         },
                         {
+                            data: 'creator_org',
+                        },
+                     
+                        {
+                            data: 'tags',
+                            render: function(data, type, row, meta) {
+                            
+                                const tags_list = (row.tags_list || "")
+                                    .split(",")
+                                    .map(tag => tag.trim())
+                                    .filter(tag => tag !== "");
+
+                                const options = tags_list.map(tag => {
+                                    if(tag){
+                                        const selected = 'selected';
+                                        return `<option value="${tag}" ${selected}>${tag}</option>`;
+                                    }
+                                
+                                }).join('');
+
+                                return `
+                                    <select data-plus="${row.pulse_id}" name="tag[]" class="c-tags select2-option form-control" multiple="multiple">
+                                        ${options}
+                                    </select>
+                                `;
+                            }
+                        },
+                        {
                             data: 'groups',
                         },
                         {
-                            data: 'tags',
-                        },
-                        {
-                            data: 'actor_and_campainge'
+                            data: 'actor_and_campainge',
+                            "visible": false,
                         },
                         {
                             data: 'public',
+                            visible: false,
                         },
                         {
                             data: 'is_modified',
+                            "visible": false,
                         },
                         {
                             data: 'modified',
@@ -713,15 +865,26 @@
                         },
                         {
                             data: 'attrCount',
+                            orderable: false,
+                            searchable: false,
+                            sortable: false,
+                            render: function(data, type, row) {
+                                if (typeof data === 'number') {
+                                    return data.toLocaleString(); 
+                                }
+                                return data;
+                            }
                         },
                         {
                             data: 'pulse_id',
                             orderable: false,
                             searchable: false,
                             sortable: false,
+                     
                         },
 
                     ],
+                    
                     columnDefs: [{
                             targets: 2,
                             render: function(data, type, row) {
@@ -734,7 +897,7 @@
 
                         },
                         {
-                            targets: 5,
+                            targets: 6,
                             render: function(data, type, row) {
                                 var inner = ``;
                                 const test = row.actor;
@@ -804,7 +967,7 @@
 
                         },
                         {
-                            targets: 6,
+                            targets: 7,
                             className: 'text-center',
                             render: function(data, type, row) {
                                 var inner = '';
@@ -818,7 +981,7 @@
 
                         },
                         {
-                            targets: 7,
+                            targets: 8,
                             render: function(data, type, row) {
                                 var inner = '';
                                 if (row.is_modified == true) {
@@ -831,7 +994,7 @@
 
                         },
                         {
-                            targets: 8,
+                            targets: 9,
                             render: function(data, type, row) {
                                 var inner = '';
                                 if (row.modified) {
@@ -845,7 +1008,7 @@
                         },
 
                         {
-                            targets: 10,
+                            targets: 11,
                             className: 'nowrap',
                             render: function(data, type, row) {
                                 var inner = '';
@@ -864,6 +1027,20 @@
                                     '/' + row.pulse_id +
                                     '" class="m-t-xs btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
                                 inner += '</div>';
+                                const isPublished = row.public == 1;
+                                const buttonText = isPublished ? 'Published' : 'Unpublished';
+                                const buttonClass = isPublished ? 'btn-published' : 'btn-unpublished';
+
+                                inner +=  `
+                                    <button
+                                        class="m-t-xs m-t-xs btn btn-xs rss_new_id btn-toggle-status ${buttonClass}"
+                                        data-id="${row.pulse_id}"
+                                        data-status="${isPublished ? 1 : 0}"
+                                        style=" cursor: pointer;color: #fff;max-width:83px;width:100%;"
+                                    >
+                                        ${buttonText}
+                                    </button>
+                                `;
                                 return inner;
                             }
 
@@ -913,36 +1090,112 @@
                         datatable = json.cursor;
                         $('[data-rel="tooltip"]').tooltip();
                     },
+                    "fnDrawCallback": function(oSettings) {
+
+                        $(".c-tags").select2({
+                        tags: true,
+                                 width: 'resolve'
+                        });
+                        $(document).on('change', '.select2-option', function() {
+                            const pulseId = $(this).data('plus'); 
+                            const selectedValues = $(this).val(); 
+
+                            const selectedString = selectedValues ? selectedValues.join(',') : '';
+                            f_change_tags(pulseId,selectedString);
+
+                        
+                        });
+
+
+                        $('.rss_new_id').click(function(){
+                            const $btn = $(this);
+                            const pulseId = $btn.data('id');
+                            const currentStatus = $btn.data('status'); 
+                            const newStatus = currentStatus === 1 ? 0 : 1;
+                                                    
+                            const pulse_id = pulseId;
+                            const is_checked = newStatus;
+                            $btn.data('status', newStatus)
+                            .toggleClass('btn-published btn-unpublished')
+                            .text(newStatus === 1 ? 'Published' : 'Unpublished');
+
+                            f_change_publice(pulse_id,is_checked);
+
+
+
+                        });
+
+
+
+                        },
 
                     columns: [
 
                         {
-                            data: 'No',
+                            data: null,
                             orderable: false,
                             searchable: false,
-                            sortable: false,
-                        },
+                            className: 'text-center',
+                            render: function(data, type, row, meta) {
+                                const isChecked = row.public == 0 ? 'checked' : '';
+                                    return 
+                                      `  <label>
+                                            <input type="checkbox"   style="min-width: 200px;" name="checked" class="check_rss_new_id" value="${row.pulse_id}" >
+                                            <span class="label-text"></span>
+                                        </label>`
+                                    ;
+                            }
+                        }   ,
+
                         {
                             data: 'industries',
-                            "visible": true,
+                            "visible": false,
                         },
                         {
                             data: 'name',
                         },
                         {
+                            data: 'creator_org',
+                        },
+                     
+                        {
+                            data: 'tags',
+                            render: function(data, type, row, meta) {
+                            
+                                const tags_list = (row.tags_list || "")
+                                        .split(",")
+                                        .map(tag => tag.trim())
+                                        .filter(tag => tag !== "");
+
+                                const options = tags_list.map(tag => {
+                                    if(tag){
+                                        const selected = 'selected';
+                                        return `<option value="${tag}" ${selected}>${tag}</option>`;
+                                    }
+                                
+                                }).join('');
+
+                                return `
+                                    <select data-plus="${row.pulse_id}" name="tag[]" class="c-tags select2-option form-control" multiple="multiple">
+                                        ${options}
+                                    </select>
+                                `;
+                            }
+                        },
+                        {
                             data: 'groups',
                         },
                         {
-                            data: 'tags',
-                        },
-                        {
-                            data: 'actor_and_campainge'
+                            data: 'actor_and_campainge',
+                            "visible": false,
                         },
                         {
                             data: 'public',
+                            "visible": false,
                         },
                         {
                             data: 'is_modified',
+                            "visible": false,
                         },
                         {
                             data: 'modified',
@@ -950,12 +1203,22 @@
                         },
                         {
                             data: 'attrCount',
+                            orderable: false,
+                            searchable: false,
+                            sortable: false,
+                            render: function(data, type, row) {
+                                if (typeof data === 'number') {
+                                    return data.toLocaleString(); 
+                                }
+                                return data;
+                            }
                         },
                         {
                             data: 'pulse_id',
                             orderable: false,
                             searchable: false,
                             sortable: false,
+                       
                         },
 
                     ],
@@ -971,7 +1234,7 @@
 
                         },
                         {
-                            targets: 5,
+                            targets: 6,
                             render: function(data, type, row) {
                                 var inner = ``;
                                 const test = row.actor;
@@ -1033,7 +1296,7 @@
 
                         },
                         {
-                            targets: 6,
+                            targets: 7,
                             className: 'text-center',
                             render: function(data, type, row) {
                                 var inner = '';
@@ -1047,7 +1310,7 @@
 
                         },
                         {
-                            targets: 7,
+                            targets: 8,
                             render: function(data, type, row) {
                                 var inner = '';
                                 if (row.is_modified == true) {
@@ -1060,7 +1323,7 @@
 
                         },
                         {
-                            targets: 8,
+                            targets: 9,
                             render: function(data, type, row) {
                                 var inner = '';
                                 if (row.modified) {
@@ -1073,7 +1336,7 @@
 
                         },
                         {
-                            targets: 10,
+                            targets: 11,
                             className: 'nowrap',
                             render: function(data, type, row) {
                                 var inner = '';
@@ -1087,6 +1350,24 @@
                                     '/' + row.pulse_id +
                                     '" class="m-t-xs btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
                                 inner += '</div>';
+
+                           
+                                const isPublished = row.public == 1;
+                                const buttonText = isPublished ? 'Published' : 'Unpublished';
+                                const buttonClass = isPublished ? 'btn-published' : 'btn-unpublished';
+
+                              
+                                inner +=  `
+                                    <button
+                                        class="m-t-xs m-t-xs btn btn-xs rss_new_id btn-toggle-status ${buttonClass}"
+                                        data-id="${row.pulse_id}"
+                                        data-status="${isPublished ? 1 : 0}"
+                                        style=" cursor: pointer;color: #fff;max-width:83px;width:100%;"
+                                    >
+                                        ${buttonText}
+                                    </button>
+                                `;
+                            
                                 return inner;
                             }
 
@@ -1193,6 +1474,65 @@
                 group = group_name.trim();
                 search_table(1);
             }
+            function f_change_publice(pulse_id, is_public) {
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        url: "{{ route('indicators.indicator_public') }}",
+                        type: "POST",
+                        data: {
+                            pulse_id: pulse_id,
+                            is_public: is_public
+                        },
+                        beforeSend: function () {
+                     
+                        },
+                        success: function (data) {
+                            toastr.clear();
+                            if (data.status_code == "00") {
+                           
+                                toastr.success('บันทึกสำเร็จ', 'แจ้งแตือน');
+                            } else {
+                             
+                                toastr.error( 'เกิดข้อผิดพลาด' , 'แจ้งแตือน');
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.log("เกิดข้อผิดพลาดในการเชื่อมต่อกับ server");
+                        }
+                    });
+             }
+             function f_change_tags(pulse_id, tags) {
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        url: "{{ route('indicators.indicator_update_tags') }}",
+                        type: "POST",
+                        data: {
+                            pulse_id: pulse_id,
+                            tags: tags
+                        },
+                        beforeSend: function () {
+                     
+                        },
+                        success: function (data) {
+                            toastr.clear();
+                            if (data.status_code == "00") {
+                           
+                                toastr.success('บันทึกสำเร็จ', 'แจ้งแตือน');
+                            } else {
+                             
+                                toastr.error( 'เกิดข้อผิดพลาด' , 'แจ้งแตือน');
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.log("เกิดข้อผิดพลาดในการเชื่อมต่อกับ server");
+                        }
+                    });
+             }
+
         </script>
     @endpush
 @endsection

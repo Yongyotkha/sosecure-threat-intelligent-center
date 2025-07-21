@@ -38,8 +38,5 @@ Route::group(
 	}
 );
 
-
-
-
 Route::get('/news/public/news/detail/{code}/{lang}', 'PublicNewsController@public_detail_select')->name('news.public_detail_select');
 // Route::get('/public/news/detail', 'NewsController@public_detail')->name('news.public_detail');

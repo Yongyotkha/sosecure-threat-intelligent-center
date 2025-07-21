@@ -48,7 +48,7 @@ class indicator_log extends Command
     {
 
 
-        $site_id =73;
+        $site_id =85;
         $Logs_setting_data = Logs_setting::where('site_id',$site_id)->where('type','indicator')->first();
 
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
@@ -61,7 +61,7 @@ class indicator_log extends Command
             'allowDiskUse' => TRUE
         ];
 
-
+         
 
 
         // $start = new \MongoDB\BSON\UTCDateTime(strtotime('2020-01-01 00:00:00'));
@@ -74,7 +74,7 @@ class indicator_log extends Command
         $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($start)*1000);
         $dateEnd = new \MongoDB\BSON\UTCDateTime(strtotime($end)*1000);
 
-        // print_r($dateStart->toDateTime()->format(DATE_RSS));
+         print_r($dateStart->toDateTime()->format(DATE_RSS));
 
 
         $where = array(

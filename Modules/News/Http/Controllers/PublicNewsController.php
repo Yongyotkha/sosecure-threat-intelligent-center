@@ -329,7 +329,7 @@ class PublicNewsController extends Controller
         $data['RSSNews_next'] = $RSSNews_next;
         $data['RSSNews_last10'] = $RSSNews_last10;
         $data['RSSNews_name'] = $RSSNews_name;
-        $data['RSSNews_detail'] = $RSSNews_detail;
+        $data['RSSNews_detail'] =$this->convert_ncr_to_utf8($RSSNews_detail);
         $data['lang'] = $lang;
         $data['RSSNews'] = $RSSNews;
         $data['page'] = langapp('news_detail');
@@ -359,6 +359,17 @@ class PublicNewsController extends Controller
      * Show the form for creating a new resource.
      * @return Response
      */
+
+     function convert_ncr_to_utf8($text) {
+        // ถอดรหัส HTML Entities ก่อน
+        $text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+    
+        // แปลง NCR (&#xxxx;) เป็น Unicode
+        return preg_replace_callback('/&#(\d+);/', function ($matches) {
+            return mb_convert_encoding(pack('n', $matches[1]), 'UTF-8', 'UTF-16BE');
+        }, $text);
+    }
+    
     public function create()
     {
         return view('news::create');

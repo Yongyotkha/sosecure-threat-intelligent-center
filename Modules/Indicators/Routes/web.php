@@ -57,7 +57,9 @@ Route::group(
         Route::post('/select_techniques', 'IndicatorsController@select_techniques')->name('indicators.select_techniques')->middleware('can:menu_items');
         Route::get('/industries', 'IndicatorsController@indicator_industries')->name('indicators.industries')->middleware('can:menu_items');
         Route::get('/group', 'IndicatorsController@indicator_group')->name('indicators.indicator_group')->middleware('can:menu_items');
-
+        Route::post('/public', 'IndicatorsController@indicator_public')->name('indicators.indicator_public')->middleware('can:menu_items');
+        Route::post('/update_tags', 'IndicatorsController@indicator_update_tags')->name('indicators.indicator_update_tags')->middleware('can:menu_items');
+        Route::post('/update_detail_tags', 'IndicatorsController@indicator_detail_update_tags')->name('indicators.indicator_detail_update_tags')->middleware('can:menu_items');
         Route::get('/indicator_insert_tag', 'IndicatorsController@insert_tag')->name('indicators.modal_tag')->middleware('can:menu_items');
 
         Route::get('/adversaries', 'IndicatorsController@adversaries')->name('indicators.adversaries');

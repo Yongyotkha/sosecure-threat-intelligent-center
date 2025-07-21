@@ -67,7 +67,7 @@ class TransactionCenterToClient_v04 extends Command
 
         $data_methed_funciton_list = [];
 
-echo  $this->PATH_CENTER.'<>'.$this->PATH_CLIENT;
+
 
         $data_methed_funciton= array();
         $data_methed_funciton['PATH_CENTER_IP_TF_getTranferData'] = $this->PATH_CENTER.'/api/v1/client-transfer/getTranferData'.'?code='.$this->site_code;

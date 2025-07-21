@@ -4,8 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Redirect;
-use Carbon\Carbon;
-use Modules\Users\Entities\User;
+
 class CheckInstalled
 {
     /**
@@ -33,7 +32,6 @@ class CheckInstalled
         //     return redirect()->to('register');
         // }
 
-        
         $response = $next($request);
 
         return $response;

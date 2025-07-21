@@ -490,7 +490,7 @@ class MDCountIndicator extends Command
 
         if(false){
             //backup code
-            $pulseID = '5ff56a70c101904b55634d56'."";
+            $pulseID = '683e298207d6eb58ecad1897'."";
             $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
             $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
             $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;

@@ -52,7 +52,6 @@ class SendDailyEmail extends Command
      */
     public function handle()
     {
-        
         if (config('system.daily_digest.enabled')) {
             $this->summary = [
                 'payment_received'   => formatCurrency(get_option('default_currency'), $this->paidToday()),

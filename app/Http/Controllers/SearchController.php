@@ -22,6 +22,11 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator as FacadesValidator;
 use Illuminate\Validation\Validator;
 use Modules\SiteSettings\Entities\SiteSettings;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Response as FacadeResponse;
+
 
 class SearchController extends Controller
 {
@@ -32,7 +37,7 @@ class SearchController extends Controller
 
     public function __construct(Request $request)
     {
-        $this->middleware('auth');
+      //  $this->middleware('auth');
         $this->request = $request;
     }
 
@@ -1625,7 +1630,7 @@ class SearchController extends Controller
         $site_code = $request->code;
         $site_id = 0;
         $site = null;
-        
+    
        //format
        $type = $this->check_keyword_type($keyword);
 
@@ -1644,9 +1649,12 @@ class SearchController extends Controller
                 return response()->json($response_data);
 
             }
-        }
-    
+        }else{
+            $site = SiteSettings::first();
 
+        }
+        $site = SiteSettings::first();
+       // return response()->json($site);
        if($type == ''){
         $response_data = array(
             'status_code' => 401,
@@ -1692,7 +1700,7 @@ class SearchController extends Controller
    
         }else{
             if(!empty(Auth::user()->site_id)){
-                $site = SiteSettings::where('id', Auth::user()->site_id)->first();
+               // $site = SiteSettings::where('id', Auth::user()->site_id)->first();
                 $center_search_api_loookup_limit =$site->search_api_loookup_limit;
             }else{
                 $center_search_api_loookup_limit = env('center_search_api_loookup_limit', 1000);
@@ -1740,21 +1748,27 @@ class SearchController extends Controller
         $response = '{}';
         $response2 = "{}";
         $response3 = '{}';
+
         if($source =="ibmcloud"){
             $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
+         
             if($log_search){
                 $url = storage_path() .'/app/public/'.$log_search -> path;
                 if(!File::exists($url)){
                     $response = null;
                 }else{
                     $response3 = file_get_contents($url); 
+             
                     if($response3 == '[]' || $response3 == null || $response3 == '')
                     {
                         if(File::exists($url))
                         {File::delete($url);}
 
-                        $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
-                        $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
+                      //  $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
+                      //  $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
+                
+                      $ibmcloud_API_Key = "b477bcdc-90ed-4b62-ba5a-080efa2564ff";
+                      $ibmcloud_API_Key_Password = "15ee88df-635a-4f47-afc7-c856e4eb4578";
                         if($type == 'IP'){
                             $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/" . $keyword;
                         }else if($type == 'Domain' || $type == 'URL'){
@@ -1794,9 +1808,11 @@ class SearchController extends Controller
                     );
                     return response()->json($response_data);
                 }
-
-                $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
-                $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
+           
+               // $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
+               // $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
+               $ibmcloud_API_Key = "b477bcdc-90ed-4b62-ba5a-080efa2564ff";
+               $ibmcloud_API_Key_Password = "15ee88df-635a-4f47-afc7-c856e4eb4578";
                 if($type == 'IP'){
                     $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/" . $keyword;
                 }else if($type == 'Domain' || $type == 'URL'){
@@ -1804,7 +1820,7 @@ class SearchController extends Controller
                 }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
                     $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/malware/" . $keyword;
                 }
-                
+           
                 $ch = curl_init();
                 header('Content-type: application/json');
                 curl_setopt($ch, CURLOPT_URL,$ibmcloud_url);
@@ -2303,4 +2319,279 @@ class SearchController extends Controller
             && preg_match("/^.{1,253}$/", $domain_name) //overall length check
             && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $domain_name)   );
     }
-}
+
+    public function provideCSVFeed_bkk()
+    {
+        // ตัวอย่างข้อมูลที่ต้องการให้ MISP ดึง
+        $feedData = [
+            [
+                "uuid" => Str::uuid(),
+                "type" => "ip-src",
+                "value" => "192.168.1.1",
+                "category" => "Network activity"
+            ],
+            [
+                "uuid" => Str::uuid(),
+                "type" => "domain",
+                "value" => "malicious-site.com",
+                "category" => "Network activity"
+            ],
+        ];
+
+        // สร้าง Streamed Response สำหรับ CSV
+        $response = new StreamedResponse(function () use ($feedData) {
+            $handle = fopen('php://output', 'w');
+
+            // เพิ่ม Header CSV
+            fputcsv($handle, ['uuid', 'type', 'value', 'category']);
+
+            // เพิ่มข้อมูลลง CSV
+            foreach ($feedData as $row) {
+                fputcsv($handle, $row);
+            }
+
+            fclose($handle);
+        });
+
+        // กำหนด Header ให้เป็น CSV
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="misp-feed.csv"');
+
+        return $response;
+    }
+
+    public function provideCSVFeed_bkkl()
+    {
+        $feedData = [
+            ["2024-03-01", "2024-03-21", "192.168.1.1", "443", "US", "AS15169", "Google LLC"],
+            ["2024-03-02", "2024-03-20", "185.220.101.45", "80", "DE", "AS24940", "Hetzner Online GmbH"],
+            ["2024-03-05", "2024-03-19", "203.0.113.10", "8080", "JP", "AS9605", "NTT Communications Corporation"],
+            ["2024-03-07", "2024-03-18", "45.33.32.156", "22", "FR", "AS12876", "Online SAS"],
+            ["2024-03-10", "2024-03-17", "198.51.100.23", "3306", "UK", "AS16509", "Amazon.com Inc"],
+            ["2024-03-11", "2024-03-16", "162.243.161.79", "8443", "CA", "AS14061", "DigitalOcean LLC"],
+            ["2024-03-12", "2024-03-15", "167.99.27.239", "21", "SG", "AS14061", "DigitalOcean LLC"],
+            ["2024-03-13", "2024-03-14", "176.31.45.3", "25", "RU", "AS12389", "Rostelecom"],
+        ];
+
+        $response = new StreamedResponse(function () use ($feedData) {
+            $handle = fopen('php://output', 'w');
+
+            // เพิ่ม Header CSV
+            fputcsv($handle, ['first_seen', 'last_seen', 'ip', 'port', 'country', 'as_number', 'as_name']);
+
+            // เพิ่มข้อมูลลง CSV
+            foreach ($feedData as $row) {
+                fputcsv($handle, $row);
+            }
+
+            fclose($handle);
+        });
+
+        // กำหนด Header ให้เป็น CSV
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="c2-intel.csv"');
+
+        return $response;
+    }
+    public function ShopprovideCSVFeed()
+    {
+        // ตัวอย่างข้อมูล CSV ที่ต้องการแสดงผล
+        $feedData = [
+            ["ip" => "1.118.34.218", "ioc" => "Possible Cobaltstrike C2 IP"],
+            ["ip" => "1.118.35.212", "ioc" => "Possible Cobaltstrike C2 IP"],
+            ["ip" => "1.118.35.47", "ioc" => "Possible Cobaltstrike C2 IP"],
+            ["ip" => "1.12.233.147", "ioc" => "Possible Cobaltstrike C2 IP"],
+            ["ip" => "1.14.123.213", "ioc" => "Possible Cobaltstrike C2 IP"],
+            ["ip" => "1.75.34.67", "ioc" => "Possible Cobaltstrike C2 IP"],
+            ["ip" => "1.92.100.58", "ioc" => "Possible Cobaltstrike C2 IP"],
+            ["ip" => "1.92.91.192", "ioc" => "Possible Cobaltstrike C2 IP"],
+            ["ip" => "1.94.117.32", "ioc" => "Possible Cobaltstrike C2 IP"],
+            ["ip" => "1.94.126.248", "ioc" => "Possible Cobaltstrike C2 IP"],
+        ];
+
+        return view('misp_feed', compact('feedData'));
+    }
+    public function provideCSVFeed()
+    {
+        $fileName = 'misp_feed.csv';
+
+        $feedData = [
+            ["550e8400-e29b-41d4-a716-446655440000", "ip-src", "192.168.1.1", "Network activity"],
+            ["550e8400-e29b-41d4-a716-446655440001", "ip-src", "10.0.0.2", "Network activity"],
+            ["550e8400-e29b-41d4-a716-446655440002", "domain", "malicious-site.com", "Network activity"],
+            ["550e8400-e29b-41d4-a716-446655440003", "domain", "phishing-attack.net", "Network activity"],
+            ["550e8400-e29b-41d4-a716-446655440004", "url", "http://bad-url.com/malware", "Payload delivery"],
+            ["550e8400-e29b-41d4-a716-446655440005", "url", "http://dangerous-link.org/phish", "Phishing"],
+            ["550e8400-e29b-41d4-a716-446655440006", "ip-src", "203.0.113.10", "Network activity"],
+            ["550e8400-e29b-41d4-a716-446655440007", "ip-src", "185.220.101.45", "Network activity"],
+            ["550e8400-e29b-41d4-a716-446655440008", "domain", "compromised-server.net", "Network activity"],
+            ["550e8400-e29b-41d4-a716-446655440009", "hash", "5d41402abc4b2a76b9719d911017c592", "Malware sample"],
+            ["550e8400-e29b-41d4-a716-446655440010", "hash", "ad0234829205b9033196ba818f7a872b", "Malware sample"],
+            ["550e8400-e29b-41d4-a716-446655440011", "ip-src", "45.33.32.156", "Network activity"],
+            ["550e8400-e29b-41d4-a716-446655440012", "ip-src", "198.51.100.23", "Network activity"],
+            ["550e8400-e29b-41d4-a716-446655440013", "domain", "fakebank-login.com", "Credential phishing"],
+            ["550e8400-e29b-41d4-a716-446655440014", "domain", "hacker-forum.net", "Network activity"],
+            ["550e8400-e29b-41d4-a716-446655440015", "url", "http://darkweb-marketplace.com", "Dark web"],
+            ["550e8400-e29b-41d4-a716-446655440016", "ip-src", "185.100.87.174", "Network activity"],
+            ["550e8400-e29b-41d4-a716-446655440017", "ip-src", "103.194.169.1", "Network activity"],
+            ["550e8400-e29b-41d4-a716-446655440018", "domain", "trojan-downloader.site", "Malware distribution"],
+            ["550e8400-e29b-41d4-a716-446655440019", "url", "http://badware.com/ransomware.exe", "Ransomware"],
+            ["550e8400-e29b-41d4-a716-446655440020", "hash", "e99a18c428cb38d5f260853678922e03", "Malware sample"],
+            ["550e8400-e29b-41d4-a716-446655440021", "ip-src", "51.75.126.21", "Network activity"],
+            ["550e8400-e29b-41d4-a716-446655440022", "ip-src", "8.8.8.8", "DNS traffic"],
+            ["550e8400-e29b-41d4-a716-446655440023", "domain", "stealer-malware.com", "Information theft"],
+            ["550e8400-e29b-41d4-a716-446655440024", "url", "http://infected-download.com/trojan.zip", "Malware distribution"],
+            ["550e8400-e29b-41d4-a716-446655440025", "hash", "aab3238922bcc25a6f606eb525ffdc56", "Malware sample"]
+        ];
+
+        $response = new StreamedResponse(function () use ($feedData) {
+            $handle = fopen('php://output', 'w');
+
+            // เพิ่ม Header CSV
+            fputcsv($handle, ['uuid', 'type', 'value', 'category']);
+
+            // เพิ่มข้อมูลลง CSV
+            foreach ($feedData as $row) {
+                fputcsv($handle, $row);
+            }
+
+            fclose($handle);
+        });
+
+        // กำหนด Header ให้เป็น CSV
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+
+        return $response;
+    }
+  
+
+ 
+
+   
+    
+    public function sslBlacklist(): StreamedResponse
+    {
+        $headers = [
+            'Content-Type' => 'text/plain; charset=utf-8',
+            'Content-Disposition' => 'inline; filename="sslblacklist.csv"',
+        ];
+    
+        $records = [
+            ['2025-04-09 06:31:31','60ece5998a5b54a5ffe75cb4','SSH Brute-Force Honeypot Live','SHA1','2e6f7b26dcf020e658c05ca310a898a1efef2fed','ConnectWise C&C'],
+            ['2025-04-09 06:31:31','60ece5998a5b54a5ffe75cb4','SSH Brute-Force Honeypot Live','SHA1','9f9f074c7a082780693069651261a41f5d7ff0cd','AsyncRAT C&C'],
+            ['2025-04-09 06:31:31','60ece5998a5b54a5ffe75cb4','SSH Brute-Force Honeypot Live','SHA1','ab181aaf043e7d35b85d86142988ca361a33aeb8','AsyncRAT C&C'],
+            ['2025-04-09 06:31:31','60ece5998a5b54a5ffe75cb4','SSH Brute-Force Honeypot Live','SHA1','a975bb92402a83a2c8446082bd4847c2059d0602','LummaStealer C&C'],
+            ['2025-04-09 06:31:31','60ece5998a5b54a5ffe75cb4','SSH Brute-Force Honeypot Live','SHA1','7e013496716615db3a73d287d897a052ad3a71f1','OffLoader C&C'],
+            ['2025-04-09 06:31:31','60ece5998a5b54a5ffe75cb4','SSH Brute-Force Honeypot Live','SHA1','d6201bd843754f27041f47f6e95708318744c15b','OffLoader C&C'],
+            ['2025-04-09 06:31:31','60ece5998a5b54a5ffe75cb4','SSH Brute-Force Honeypot Live','SHA1','e02ddb0e7267f8222cccda5fef72f87420f96e8f','OffLoader C&C'],
+            ['2025-04-09 06:31:31','60ece5998a5b54a5ffe75cb4','SSH Brute-Force Honeypot Live','SHA1','70599f2772f70a3b618d9707b816ba280a458517','AsyncRAT C&C'],
+            ['2025-04-09 06:31:31','60ece5998a5b54a5ffe75cb4','SSH Brute-Force Honeypot Live','SHA1','db995fa4fb9e53bc304da1ff32dc2314664b912b','Rhadamanthys C&C'],
+            ['2025-04-09 06:31:31','60ece5998a5b54a5ffe75cb4','SSH Brute-Force Honeypot Live','SHA1','db0f7247b09b40f3b147c6eca880dd50c5c9e380','LummaStealer C&C'],
+            ['2025-04-09 06:31:31','5a64f74f0e543738c12bc973','Webscanners with Bad Requests - HTTP Status 400 - 1/20/2018 thru current day','SHA1','9fb326529bb9dc40ab387999bbc7750595a89e9f','LummaStealer C&C'],
+            ['2025-04-09 06:31:31','5a64f74f0e543738c12bc973','Webscanners with Bad Requests - HTTP Status 400 - 1/20/2018 thru current day','SHA1','c8fc1416a286522044cb8736f7f6df7aab6004d9','LummaStealer C&C'],
+            ['2025-04-09 06:31:31','5a64f74f0e543738c12bc973','Webscanners with Bad Requests - HTTP Status 400 - 1/20/2018 thru current day','SHA1','8423a49e59d5732f529b45cedf69cad6a7752300','LummaStealer C&C'],
+            ['2025-04-09 06:31:31','5a64f74f0e543738c12bc973','Webscanners with Bad Requests - HTTP Status 400 - 1/20/2018 thru current day','SHA1','d02f637b2f790f8b93e2fabf9b13a104fdb39f38','LummaStealer C&C'],
+     
+        ];
+    
+        return response()->streamDownload(function () use ($records) {
+            echo "################################################################\n";
+            echo "# Sosecure SSL Certificate\n";
+            echo "# Last updated: " . Carbon::now('UTC')->format('Y-m-d H:i:s') . " UTC\n";
+            echo "# Terms Of Use: https://insights.sosecure.co.th/feed/terms\n";
+            echo "# Contact: csoc@sosecure.co.th\n";
+            echo "################################################################\n";
+            echo "\n"; // เว้นบรรทัดตรงนี้เพื่อให้ Excel แสดงหัวตารางได้ถูกต้อง
+            echo "Listingdate,event_id,event_name,type,Listingreason\n";
+    
+            foreach ($records as $row) {
+                echo implode(",", $row) . "\n";
+            }
+        }, 'sslblacklist.csv', $headers);
+    }
+    
+    
+  
+    public function sha256MalwareList(): StreamedResponse
+    {
+        $lines = [];
+    
+        // Header block
+        $lines[] = str_repeat('#', 64) . ' MalwareBazaar recent malware samples (SHA256 hashes)         #';
+        $lines[] = '# Last updated: ' . now()->format('Y-m-d H:i:s') . ' UTC';
+        $lines[] = '#';
+        $lines[] = '# Terms Of Use: https://bazaar.abuse.ch/faq/#tos';
+        $lines[] = '# For questions please contact bazaar [at] abuse.ch';
+        $lines[] = str_repeat('#', 66);
+        $lines[] = '#';
+        $lines[] = '# sha256_hash';
+    
+        $hashes = [
+            'b1e2b8b0806852aa586a0491fc91a832babfff3882eaed12a6b7d2e7b776d4c4',
+            '6ac910e3dfd27cd006972437b090fb3b1e7843e763534db05efe721f1828eca2',
+            'a6f6c881665fd25ab6640b1c922d188d8e93ddb13336c5ba51231c8ff4cfde2e',
+            'ed9eaead2f8c731f8ab49ee52bab2057ae526c1029316cb2b20a5f01eb0697c6',
+            '94723e64a4fe32436b43aef84d14a0cd912cf3b17c881572c2e9d92e9349adc7',
+            'd530c63416f12df760514d0e7f0acfbabe74e66b4dc923d6d8ce060d62aa7a03',
+            'f8bbdb08e1552909a7d505ee85065b1c02a0eca98d2f111b6e18c935ec2524ec',
+            '761766237d7a8d58a5cdf2aa5ccace247b724d033d3196bc441c6a9c31717561',
+            '6bc1aeec3046446ad8f32a9956fd4841799abc5efaa6ee43bdb0021813cc4605',
+            '6603338f6a709aa136eef198311467a868faff29c644bbc33a62dd1ba8eaf640',
+            'e594f00895dd29d763379ee4aa87c6004e811385f71077959674c4ef636f5a2e',
+            '2807f5e1177d1c0ca031fe3dde968177008aa592ba78f23fa43d615367e51aac',
+            'f8984264632a0aba48bcd90967988aa1d2c10f9381d00abc08456431ea46d208',
+            '0cdf00254f1b15e4a8e626995683c60be55ac9231c4fe7c65e4b36356422938b',
+            '3bc5f7b8bb948953daf91d46fbc831ce62dd8f122551372ac7d4dd58b28b4688',
+            'f27ac5e33f10a62651ae955bd3ce123daa0a94e1658f371b75654faf92eab776',
+            'df668ebc65fd0035faed898755e4dd1ee61f76f58b6a49448f6489765e1fbc2a',
+            'b4e3200beb7da880299270c487bcb75e72705cb1c10a65a251f8ccd4579326fe',
+            'a2f41135a41217c45ae6ddad5db193b5454245d08063df1a0393772271639c1c',
+            '91b0b1f842b5380d81ecf3f023a2b8a2a7abb86dc9ef4de58f569752dbe15f52',
+            // ... ใส่ทั้งหมดต่อจากนี้ ...
+        ];
+
+    
+        foreach ($hashes as $hash) {
+            $lines[] = $hash;
+        }
+    
+        $csv = implode("\n", $lines);
+    
+        return response()->stream(function () use ($csv) {
+            echo $csv;
+        }, 200, [
+            'Content-Type' => 'text/plain',
+            'Content-Disposition' => 'inline; filename="malware_sha256.csv"',
+        ]);
+    }
+    
+    public function threatFoxMd5List(): StreamedResponse
+    {
+        $lines = [];
+    
+        // Header block
+        $lines[] = str_repeat('#', 64);
+        $lines[] = '# ThreatFox IOCs: recent MD5 hashes - CSV format               #';
+        $lines[] = '# Last updated: ' . now()->format('Y-m-d H:i:s') . ' UTC';
+        $lines[] = '#';
+        $lines[] = '# Terms Of Use: https://threatfox.abuse.ch/faq/#tos';
+        $lines[] = '# For questions please contact threatfox [at] abuse.ch';
+        $lines[] = str_repeat('#', 64);
+        $lines[] = '#';
+        $lines[] = '# "first_seen_utc","ioc_id","ioc_value","ioc_type","threat_type","fk_malware","malware_alias","malware_printable","last_seen_utc","confidence_level","reference","tags","anonymous","reporter"';
+    
+        $data = json_decode(file_get_contents(storage_path('hashes/threatfox_md5_list.json')));
+        foreach ($data as $row) {
+            $lines[] = '"' . implode('","', $row) . '"';
+        }
+    
+        $csv = implode("\n", $lines);
+        return response()->stream(function () use ($csv) {
+            echo $csv;
+        }, 200, [
+            'Content-Type' => 'text/plain',
+            'Content-Disposition' => 'inline; filename="Md5.csv"',
+        ]);
+    }
+}    

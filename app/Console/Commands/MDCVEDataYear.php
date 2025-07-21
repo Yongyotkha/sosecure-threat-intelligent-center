@@ -57,11 +57,12 @@ class MDCVEDataYear extends Command
         $dbname =env('DB_DATABASE');
         $dbport =env('DB_PORT');
         $conn = mysqli_connect($serversql, $dbuser, $dbpass, $dbname, $dbport);
-
+//  $year = date('Y');
 // download & setting //
 
         try {
             $year = date('Y');
+        //   $year = 2022;
             $output_filename = app_path()."/Console/Commands/temp/nvdcve-1.1-" . $year . ".json.zip";
             $linkurl = 'https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-' . $year . '.json.zip';
             $host = $linkurl;
@@ -77,7 +78,7 @@ class MDCVEDataYear extends Command
             curl_close($ch);
 
     //print_r($result); // prints the contents of the collected file before writing..
-            echo $output_filename;
+//            echo $output_filename;
             $fp = fopen($output_filename, 'w');
             fwrite($fp, $result);
             fclose($fp);
@@ -89,7 +90,7 @@ class MDCVEDataYear extends Command
         }
 
 // extract file //
-        ini_set('memory_limit', '1000M');
+        ini_set('memory_limit', '-1');
 
         $zip = \zip_open(app_path()."/Console/Commands/temp/nvdcve-1.1-" . $year . ".json.zip");
 
@@ -124,11 +125,11 @@ class MDCVEDataYear extends Command
 
 ////////////// real xaml file ///////////////
 
-        ini_set('memory_limit', '100000M');
+        ini_set('memory_limit', '-1');
         $strJsonFileContents = file_get_contents(app_path()."/Console/Commands/temp/nvdcve-1.1-" . $year . ".json") or die("Error: Cannot create object");
         $json_o = json_decode($strJsonFileContents, true);
         foreach ($json_o["CVE_Items"] as $json_data) {
-            if ($json_data['cve']['data_type'] == "CVE" and explode('T', $json_data['publishedDate'])[0] >= date('Y-m-d', strtotime(' -90 day'))) {
+            if ($json_data['cve']['data_type'] == "CVE" and explode('T', $json_data['publishedDate'])[0] >= date('Y-m-d', strtotime(' -60 day'))) {
    // if ($json_data['cve']['data_type'] == "CVE") {
                 $CVE_Code = $json_data['cve']['CVE_data_meta']['ID'];
                 print PHP_EOL . '=================================================================';
@@ -170,8 +171,9 @@ class MDCVEDataYear extends Command
             print PHP_EOL . 'product_version :' . $product_version;
             echo PHP_EOL . 'check...';
 
-            $sql_samename = "SELECT namecve FROM fx_data_cveven WHERE namecve = '" . $CVE_Code . "' and title='" . $vendor_name . "' and vendor='" . $product_name . "' and version='" . $product_version . "'";
-            $num =0;
+         //   $sql_samename = "SELECT namecve FROM fx_data_cveven WHERE namecve = '" . $CVE_Code . "' and title='" . $vendor_name . "' and vendor='" . $product_name . "' and version='" . $product_version . "'";
+         $sql_samename = "SELECT namecve FROM fx_data_cveven WHERE namecve = '" . $CVE_Code . "' and rawtext='" . $vendor_text  . "'"; 
+         $num =0;
             try {
               $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
               $num = mysqli_num_rows($result1);

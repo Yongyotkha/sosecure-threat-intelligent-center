@@ -132,7 +132,7 @@ use Carbon\Carbon;
                                 <div class="card-dash-compro border-ee" style="border-right: none !important">
                                     <div class="left-card">
                                         <div class="img-icon-card ice">
-                                            <img src="{{asset('images/endpoint.png')}}" alt="">
+                                            <img src="{{asset('Darkweb/EDR.png')}}" alt="">
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper ">Endpoint Detection</h3>
                                         <span class="number-card green" id='webserver-count'>{{$webserver}}</span>
@@ -145,7 +145,7 @@ use Carbon\Carbon;
                                     <a href="#" onclick="">
                                         <div class="compromised-new-box">
                                             <div class="img-icon-smm-compro">
-                                                <img src="{{asset('images/Agent.png')}}" alt="">
+                                                <img src="{{asset('Darkweb/Agent.png')}}" alt="">
                                             </div>
                                             <div style="width: 50%" class="text-center">
                                                 <span class="number-card green" id='agent-count'>0</span>
@@ -156,7 +156,7 @@ use Carbon\Carbon;
                                     <a href="">
                                         <div class="compromised-new-box">
                                             <div class="img-icon-smm-compro">
-                                                <img src="{{asset('images/nw.png')}}" alt="">
+                                                <img src="{{asset('Darkweb/Network.png')}}" alt="">
                                             </div>
                                             <div style="width: 50%" class="text-center">
                                                 <span class="number-card green" id='network-count'>0</span>
@@ -637,7 +637,7 @@ use Carbon\Carbon;
                 },
                 "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
                     let new_html = '';
-                    let date_day = '2021-01-01';
+                    let date_day = '2025-01-01';
                     let date = aData.get_data_leak_feed_one.feedtimepost;
                     let date_sp = date.split(" ");
                     if(date_sp.length > 0) {
@@ -676,7 +676,7 @@ use Carbon\Carbon;
 
 
     
-                    html_content+='<div class="nowrap" style="padding-top: 22px;padding-left: 35px;">'+ '<strong>Site </strong>'+aData.get_site.name+'&nbsp;&nbsp;&nbsp;<strong>Modified Date </strong>'+aData.get_data_leak_feed_one.feedtimepost;
+                    html_content+='<div class="nowrap" style="padding-top: 22px;padding-left: 35px;">'+ '<strong>Site </strong>'+ aData.get_site?.name || '-'+'&nbsp;&nbsp;&nbsp;<strong>Modified Date </strong>'+aData.get_data_leak_feed_one.feedtimepost;
                     if(aData.get_data_leak_feed_one.feedlink){
                          html_content+= '&nbsp;&nbsp;&nbsp;<b><strong><i class="fas fa-eye"></i>&nbsp;&nbsp;&nbsp; </strong><a href="'+aData.get_data_leak_feed_one.feedlink+'" target="_blank">'+'View Code'+'</a></b>';
                     }
