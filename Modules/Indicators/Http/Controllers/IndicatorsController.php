@@ -15,7 +15,7 @@ use MongoDB\BSON\Regex;
 use MongoDB\Client;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
-// use DB;
+
 use Auth;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
@@ -23,6 +23,14 @@ use Illuminate\Support\Facades\DB;
 use Nette\Utils\Strings;
 use App\Entities\TransactionBatchjob;
 use \Carbon\Carbon;
+
+use DateTime;
+use DateTimeZone;
+use Illuminate\Support\Str;
+use League\Csv\Reader;
+use League\Csv\Statement;
+
+use function PHPSTORM_META\type;
 
 class IndicatorsController extends Controller
 {
@@ -177,15 +185,15 @@ class IndicatorsController extends Controller
 
     public function events_detail_select(Request $request, $id)
     {
-   
+
         $role_custom = @check_role_custom();
         if (!$role_custom['indicators']) {
             check_permission403();
         }
         if (TYPE_WEB == 'center') {
             $client = new Client(DB_MONGO_01);
-            $collection = $client->sosecure_threatintelligent->fx_otx_events;
-   
+            $collection = $client->sosecure_threatintelligent_dev->fx_otx_events;
+
             $query = [
                 'pulse_id' => $id
             ];
@@ -197,7 +205,7 @@ class IndicatorsController extends Controller
             $cursor = $collection->find($query, $options)->toArray();
 
             $_array = array();
-         
+
             $data['otx_events'] = $cursor;
             $data['page'] = langapp('indicators');
             $data['indicator_type_counts'] = $cursor[0]->indicator_type_counts->count();
@@ -219,7 +227,7 @@ class IndicatorsController extends Controller
 
             $data['pulse_id'] = $id;
 
-          
+
             if ($request->iframe) {
                 return view('indicators::events_detail_search')->withHeaders('X-Frame-Options', 'ALLOWALL')->with($data);
             } else {
@@ -277,7 +285,7 @@ class IndicatorsController extends Controller
     {
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $client = new \MongoDB\Client($DB_MONGO_KEY);
-        $db_name = 'sosecure_threatintelligent';
+        $db_name = 'sosecure_threatintelligent_dev';
         $db = $client->$db_name;
         $collection = $db->fx_otx_adversaries_related;
         $where = array(
@@ -295,7 +303,7 @@ class IndicatorsController extends Controller
     {
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $client = new \MongoDB\Client($DB_MONGO_KEY);
-        $db_name = 'sosecure_threatintelligent';
+        $db_name = 'sosecure_threatintelligent_dev';
         $db = $client->$db_name;
         $collection = $db->fx_otx_malware_related;
         $where = array(
@@ -316,7 +324,7 @@ class IndicatorsController extends Controller
             check_permission403();
         }
         // $client = new Client('mongodb://10.104.0.10:27017');
-        // $collection = $client->sosecure_threatintelligent->fx_otx_type;
+        // $collection = $client->sosecure_threatintelligent_dev->fx_otx_type;
 
         // $query = [
         //     'status' => 1,
@@ -328,7 +336,7 @@ class IndicatorsController extends Controller
         // $docs = $cursor->toArray();
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $client = new \MongoDB\Client($DB_MONGO_KEY);
-        $db_name = 'sosecure_threatintelligent';
+        $db_name = 'sosecure_threatintelligent_dev';
         $db = $client->$db_name;
         $collection = $db->fx_otx_type;
         $where = array(
@@ -370,7 +378,7 @@ class IndicatorsController extends Controller
 
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $client = new \MongoDB\Client($DB_MONGO_KEY);
-        $db_name = 'sosecure_threatintelligent';
+        $db_name = 'sosecure_threatintelligent_dev';
         $db = $client->$db_name;
         $collection = $db->fx_otx_malware;
         $where = array(
@@ -398,7 +406,7 @@ class IndicatorsController extends Controller
 
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $client = new \MongoDB\Client($DB_MONGO_KEY);
-        $db_name = 'sosecure_threatintelligent';
+        $db_name = 'sosecure_threatintelligent_dev';
         $db = $client->$db_name;
         $collection = $db->fx_otx_adversaries;
         $where = array(
@@ -425,7 +433,7 @@ class IndicatorsController extends Controller
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
         $html = '';
-        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
 
         $options = array(
             'typeMap' => array(
@@ -494,7 +502,7 @@ class IndicatorsController extends Controller
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
         $html = '';
-        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
 
 
         $query = [
@@ -524,7 +532,7 @@ class IndicatorsController extends Controller
 
 
 
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
         $options = array(
             'typeMap' => array(
                 'root' => 'array',
@@ -580,7 +588,7 @@ class IndicatorsController extends Controller
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
         $html = '';
-        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
         $options = [
             'allowDiskUse' => TRUE
         ];
@@ -859,7 +867,7 @@ class IndicatorsController extends Controller
 
         // $DB_MONGO_KEY = "mongodb://10.104.0.7:27017";
         $clientMD = new MongoClient($DB_MONGO_KEY);
-        $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
+        $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent_dev->fx_transaction_otx_indicators_data;
 
         $cursor = $col_fx_transaction_otx_indicators_data->find();
         $documentAll = $cursor->toArray();
@@ -1154,7 +1162,7 @@ class IndicatorsController extends Controller
 
         $mongo_url = DB_MONGO_01;
         $client = new \MongoDB\Client($mongo_url);
-        $db_name = 'sosecure_threatintelligent';
+        $db_name = 'sosecure_threatintelligent_dev';
         $db = $client->$db_name;
         $collection = $db->fx_otx_events;
         // $where = array(
@@ -1547,7 +1555,7 @@ class IndicatorsController extends Controller
         )
         order by year Desc,month Desc";
         $summary = DB::select($query_summary);
-        if(!empty($summary)){
+        if (!empty($summary)) {
             foreach ($summary as $records) {
                 // $records->month = $arr_months[$records->month];
                 $records->group_sumc = preg_replace_callback("/[0-9]+/", function ($matches) {
@@ -1556,12 +1564,12 @@ class IndicatorsController extends Controller
             }
         }
         $Transaction = TransactionBatchjob::where('mode', 'indicator_summary_type')->first();
-        
-        if(empty($Transaction)){
+
+        if (empty($Transaction)) {
             $Transaction = date("Y-m-d H:i:s");
-            return DataTables::of($summary)->with('dateday',$Transaction)->make(true);
+            return DataTables::of($summary)->with('dateday', $Transaction)->make(true);
         }
-        return DataTables::of($summary)->with('dateday',$Transaction->transcation_date)->make(true);
+        return DataTables::of($summary)->with('dateday', $Transaction->transcation_date)->make(true);
     }
 
     public function table_summary_export(Request $request)
@@ -1572,17 +1580,17 @@ class IndicatorsController extends Controller
         }
         // $fileName = 'Indicators-Summary Type.csv';
         $data_query = DB::table('indicator_summary_year')->select('year', 'month', 'industries_name as attribute_type', DB::raw("SUM(attribute_count) as count"))
-        ->where("status", "1")
-        ->where("type", "attribute_type")
-        ->where("year", ">=", $request->minyear)
-        ->where("year", "<=", $request->maxyear)
-        ->where("month", ">=", $request->minmonth)
-        ->where("month", "<=", $request->maxmonth)
-        ->groupBy("year", "month", "attribute_type")
-        ->orderBy("year", "desc")
-        ->orderBy("month", "desc")
-        ->orderBy("count", "desc")
-        ->get();  
+            ->where("status", "1")
+            ->where("type", "attribute_type")
+            ->where("year", ">=", $request->minyear)
+            ->where("year", "<=", $request->maxyear)
+            ->where("month", ">=", $request->minmonth)
+            ->where("month", "<=", $request->maxmonth)
+            ->groupBy("year", "month", "attribute_type")
+            ->orderBy("year", "desc")
+            ->orderBy("month", "desc")
+            ->orderBy("count", "desc")
+            ->get();
         // $headers = array(
         //     "Content-type"        => "text/csv",
         //     "Content-Disposition" => "attachment; filename=$fileName",
@@ -1630,7 +1638,7 @@ class IndicatorsController extends Controller
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
             $html = '';
-            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
 
             $query = [
                 'pulse_id' => $reqId,
@@ -1664,7 +1672,9 @@ class IndicatorsController extends Controller
                     'updated_at' => 1,
                     'updated_by' => 1,
                     'is_count_attr' => 1,
-                    'tags' => 1
+                    'tags' => 1,
+                    'attribute_score' => 1,
+                    'attribute_serverity' => 1
                 ],
                 'typeMap' => [  // 👈 เพื่อให้ใช้งาน array_key_exists ได้ใน PHP
                     'root' => 'array',
@@ -1672,9 +1682,9 @@ class IndicatorsController extends Controller
                     'array' => 'array'
                 ]
             ];
-            
-            
-            
+
+
+
 
             if ($request->count_page == -1) {
                 //$cursor_count = $col_fx_otx_events_indicator_ref->count($query);
@@ -1695,17 +1705,17 @@ class IndicatorsController extends Controller
                 }
             }
             unset($item);
-            
-        
-            //foreach ($document_all as &$item) {
-               // $query = ['indicator_id' => $item['indicator_id']];
-              //  $detail = $col_fx_otx_events_indicator_ref->findOne($query);
-            
-           ///     $item['tags'] = isset($detail['tags']) ? $detail['tags'] : '';
-          //  }
-          //  unset($item);
 
-            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+
+            //foreach ($document_all as &$item) {
+            // $query = ['indicator_id' => $item['indicator_id']];
+            //  $detail = $col_fx_otx_events_indicator_ref->findOne($query);
+
+            ///     $item['tags'] = isset($detail['tags']) ? $detail['tags'] : '';
+            //  }
+            //  unset($item);
+
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
             $options = array(
                 'typeMap' => array(
                     'root' => 'array',
@@ -1817,7 +1827,7 @@ class IndicatorsController extends Controller
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
             $html = '';
-            $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
+            $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_event_ref;
 
             $query = [
                 'main_pulse_id' => $reqId,
@@ -1846,7 +1856,7 @@ class IndicatorsController extends Controller
 
             // $count_doc = count($document_all);
 
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
             $options = array(
                 'typeMap' => array(
                     'root' => 'array',
@@ -1958,7 +1968,7 @@ class IndicatorsController extends Controller
             $reqId = $request->pulse_id;
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
 
 
             $options = [
@@ -2103,11 +2113,11 @@ class IndicatorsController extends Controller
                     $DB_MONGO_KEY = env("DB_MONGO_DEV");
                     $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
                     if (app()->environment('local')) {
-                        $collection = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
-                        $collection_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+                        $collection = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
+                        $collection_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
                     } else {
-                        $collection = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
-                        $collection_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+                        $collection = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries;
+                        $collection_related = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries_related;
                     }
 
                     $query_actor = [
@@ -2183,7 +2193,7 @@ class IndicatorsController extends Controller
                 8 => 'indicator_count',
                 9 => 'pulse_id',
                 10 => 'creator_org',
-         
+
             );
             $draw = $request->draw;
             $start = (int)$request->start;
@@ -2233,7 +2243,7 @@ class IndicatorsController extends Controller
         if (TYPE_WEB == 'center') {
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
-            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
             $options = array(
                 'typeMap' => array(
                     'root' => 'array',
@@ -2333,7 +2343,7 @@ class IndicatorsController extends Controller
         $reqId = $request->pulse_id;
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
 
         $query = array(
             'tags' => new Regex('^.*' . $request->tags . '.*$', 'i'),
@@ -2497,7 +2507,7 @@ class IndicatorsController extends Controller
         $reqId = $request->pulse_id;
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
 
         $query = array(
             'groups' => new Regex('^.*' . $request->tags . '.*$', 'i'),
@@ -2673,15 +2683,15 @@ class IndicatorsController extends Controller
         $clientMD = new MongoClient($DB_MONGO_KEY);
 
         if (app()->environment('local')) {
-            $select_actors = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
-            $select_campainge = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
+            $select_actors = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
+            $select_campainge = $clientMD->sosecure_threatintelligent_dev->fx_otx_campaign;
         } else {
-            $select_actors = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
-            $select_campainge = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
+            $select_actors = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries_related;
+            $select_campainge = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_campaign;
         }
         // dd($request -> pulse_id);
 
-        $fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
         $query = [
             'pulse_id' => $request->pulse_id,
         ];
@@ -2767,7 +2777,7 @@ class IndicatorsController extends Controller
         return view('indicators::modal.insert_tag')->with($data);
     }
 
- 
+
     public function save_table_tags(Request $request)
     {
         $input = $request->all();
@@ -2776,7 +2786,7 @@ class IndicatorsController extends Controller
 
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
-        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
         $options = array(
             'typeMap' => array(
                 'root' => 'array',
@@ -2797,11 +2807,11 @@ class IndicatorsController extends Controller
 
         //---------------------------------------------------------------------------------------------------
         if (app()->environment('local')) {
-            $insert_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
-            $collection_campaign = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
+            $insert_adversaries_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
+            $collection_campaign = $clientMD->sosecure_threatintelligent_dev->fx_otx_campaign;
         } else {
-            $insert_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
-            $collection_campaign = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
+            $insert_adversaries_related = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries_related;
+            $collection_campaign = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_campaign;
         }
 
         $query_delete = array(
@@ -2833,9 +2843,9 @@ class IndicatorsController extends Controller
                 $add_actor = $data_actor;
                 // dd($add_actor);
                 if (app()->environment('local')) {
-                    $indicator_actor_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
+                    $indicator_actor_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
                 } else {
-                    $indicator_actor_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
+                    $indicator_actor_related = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries;
                 }
                 $query_actor_related = [
                     'adversary_uuid' => $add_actor
@@ -2928,62 +2938,57 @@ class IndicatorsController extends Controller
     {
 
         try {
-                $input = $request->all();
-                // dd($input);
-                $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
+            $input = $request->all();
+            // dd($input);
+            $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
 
-                $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
-                $clientMD = new MongoClient($DB_MONGO_KEY);
-                $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
-                $options = array(
-                    'typeMap' => array(
-                        'root' => 'array',
-                        'document' => 'array',
-                    ),
-                );
-                $document = $col_fx_otx_indicator_detail->findOne(array('pulse_id' => $request->pulse_id), $options);
-                if ($document) {
-                    $update_fx_otx_events_indicator_ref = $col_fx_otx_indicator_detail->updateOne(
-                        ['_id' => $document['_id']],
-                        [
-                            '$set' => [
-                                'public' => $request->is_public,
-                            ]
+            $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+            $clientMD = new MongoClient($DB_MONGO_KEY);
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+            $options = array(
+                'typeMap' => array(
+                    'root' => 'array',
+                    'document' => 'array',
+                ),
+            );
+            $document = $col_fx_otx_indicator_detail->findOne(array('pulse_id' => $request->pulse_id), $options);
+            if ($document) {
+                $update_fx_otx_events_indicator_ref = $col_fx_otx_indicator_detail->updateOne(
+                    ['_id' => $document['_id']],
+                    [
+                        '$set' => [
+                            'public' => $request->is_public,
                         ]
-                    );
+                    ]
+                );
 
-                      //ส่งค่าไปบันทึกที่ MISP
-                            if($document['source']=="misp"){
-                                        $input = $document['pulse_id'];
-                                        $parts = explode('.', $input);
-                                        $id = $parts[1]; // ได้ค่า '33421'
-                                        DB::connection('mysql_misp')
-                                        ->table('events')
-                                        ->where('id', $id)
-                                        ->update([
-                                            'published' => $request->is_public,
-                                        ]);
-                                
-                            }
-                            if($document['source']=="otx.alienvault"){
-                                 $uuid =    isset($document['mips_uuid']) ? $document['mips_uuid'] : '';
-                                    if($uuid){
-                                        DB::connection('mysql_misp')
-                                        ->table('events')
-                                        ->where('uuid', $uuid)
-                                        ->update([
-                                            'published' => $request->is_public,
-                                        ]);
-
-                                    }
-
-                          
-                        
-                         }
+                //ส่งค่าไปบันทึกที่ MISP
+                if ($document['source'] == "misp") {
+                    $input = $document['pulse_id'];
+                    $parts = explode('.', $input);
+                    $id = $parts[1]; // ได้ค่า '33421'
+                    DB::connection('mysql_misp')
+                        ->table('events')
+                        ->where('id', $id)
+                        ->update([
+                            'published' => $request->is_public,
+                        ]);
                 }
-              
-          
-  
+                if ($document['source'] == "otx.alienvault") {
+                    $uuid =    isset($document['mips_uuid']) ? $document['mips_uuid'] : '';
+                    if ($uuid) {
+                        DB::connection('mysql_misp')
+                            ->table('events')
+                            ->where('uuid', $uuid)
+                            ->update([
+                                'published' => $request->is_public,
+                            ]);
+                    }
+                }
+            }http://127.0.0.1:8000/phishing_detection
+
+
+
 
             $response_data = ['message' => '', 'status_code' => '00', 'data' => ''];
         } catch (Exception $e) {
@@ -2996,202 +3001,182 @@ class IndicatorsController extends Controller
     {
 
         try {
-                $input = $request->all();
-                // dd($input);
-                $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
+            $input = $request->all();
+            // dd($input);
+            $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
 
-                $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
-                $clientMD = new MongoClient($DB_MONGO_KEY);
-                $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
-                $options = array(
-                    'typeMap' => array(
-                        'root' => 'array',
-                        'document' => 'array',
-                    ),
-                );
-                $document = $col_fx_otx_indicator_detail->findOne(array('pulse_id' => $request->pulse_id), $options);
-                if ($document) {
-                    $update_fx_otx_events_indicator_ref = $col_fx_otx_indicator_detail->updateOne(
-                        ['_id' => $document['_id']],
-                        [
-                            '$set' => [
-                                'tags' => $request->tags,
-                            ]
+            $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+            $clientMD = new MongoClient($DB_MONGO_KEY);
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+            $options = array(
+                'typeMap' => array(
+                    'root' => 'array',
+                    'document' => 'array',
+                ),
+            );
+            $document = $col_fx_otx_indicator_detail->findOne(array('pulse_id' => $request->pulse_id), $options);
+            if ($document) {
+                $update_fx_otx_events_indicator_ref = $col_fx_otx_indicator_detail->updateOne(
+                    ['_id' => $document['_id']],
+                    [
+                        '$set' => [
+                            'tags' => $request->tags,
                         ]
-                    );
-                }
-          
-                      //ส่งค่าไปบันทึกที่ MISP
-             if($document['source']=="misp"){
+                    ]
+                );
+            }
+
+            //ส่งค่าไปบันทึกที่ MISP
+            if ($document['source'] == "misp") {
                 $input = $document['pulse_id'];
                 $parts = explode('.', $input);
                 $pulseId = $parts[1]; // ได้ค่า '33421'
-                $color ="#ffffff";
+                $color = "#ffffff";
 
                 //ลบก่อน
                 DB::connection('mysql_misp')->table('event_tags')
-                ->where('event_id', '=', $pulseId)
-                ->delete();
+                    ->where('event_id', '=', $pulseId)
+                    ->delete();
 
-                $tags_string =$request->tags;
+                $tags_string = $request->tags;
                 $array = explode(",", $tags_string);
-                
+
                 foreach ($array as $index => $tag_value) {
-                                        $tag_chk = DB::connection('mysql_misp')->table('tags')
-                                        ->select('id')
-                                        ->where('name', '=', $tag_value)
-                                        ->first();
-                                        if (!empty($tag_chk)) {
-                                        
-                            
-                                            $event_tag_chk = '';
-                                            $event_tag_chk = DB::connection('mysql_misp')->table('event_tags')
-                                                ->select('id')
-                                                ->where('tag_id', '=', $tag_chk->id)
-                                                ->where('event_id', '=', $pulseId)
-                                                ->get();
-                            
-                                            if (count($event_tag_chk)) {
-                                            
-                                            } else {
-                                                DB::connection('mysql_misp')->table('event_tags')->insert([
-                                                    'event_id' => $pulseId,
-                                                    'tag_id' => $tag_chk->id
-                                                ]);
-                                        
-                                            }
-                                        } else {
-                                    
-                                            $insertedId = DB::connection('mysql_misp')->table('tags')->insertGetId([
-                                                'name' => $tag_value,
-                                                'colour' => $color,
-                                                'exportable' => 1,
-                                                'org_id' => 0,
-                                                'user_id' => 0,
-                                                'hide_tag' => 0,
-                                                'numerical_value' => null,
-                                                'is_galaxy' => 0,
-                                                'is_custom_galaxy' => 0,
-                                                'local_only' => 0
-                                            ]);
-                            
-                                            if ($insertedId) {
-                                                $e_chk = DB::connection('mysql_misp')->table('event_tags')
-                                                    ->select('id')
-                                                    ->where('tag_id', '=', $insertedId)
-                                                    ->where('event_id', '=', $pulseId)
-                                                    ->get();
-                            
-                                                if (count($e_chk)) {
-                                                
-                                                } else {
-                                                    DB::connection('mysql_misp')->table('event_tags')->insert([
-                                                        'event_id' => $pulseId,
-                                                        'tag_id' => $insertedId
-                                                    ]);
-                                                }
-                                            }
-                                        }
+                    $tag_chk = DB::connection('mysql_misp')->table('tags')
+                        ->select('id')
+                        ->where('name', '=', $tag_value)
+                        ->first();
+                    if (!empty($tag_chk)) {
 
 
+                        $event_tag_chk = '';
+                        $event_tag_chk = DB::connection('mysql_misp')->table('event_tags')
+                            ->select('id')
+                            ->where('tag_id', '=', $tag_chk->id)
+                            ->where('event_id', '=', $pulseId)
+                            ->get();
 
+                        if (count($event_tag_chk)) {
+                        } else {
+                            DB::connection('mysql_misp')->table('event_tags')->insert([
+                                'event_id' => $pulseId,
+                                'tag_id' => $tag_chk->id
+                            ]);
+                        }
+                    } else {
+
+                        $insertedId = DB::connection('mysql_misp')->table('tags')->insertGetId([
+                            'name' => $tag_value,
+                            'colour' => $color,
+                            'exportable' => 1,
+                            'org_id' => 0,
+                            'user_id' => 0,
+                            'hide_tag' => 0,
+                            'numerical_value' => null,
+                            'is_galaxy' => 0,
+                            'is_custom_galaxy' => 0,
+                            'local_only' => 0
+                        ]);
+
+                        if ($insertedId) {
+                            $e_chk = DB::connection('mysql_misp')->table('event_tags')
+                                ->select('id')
+                                ->where('tag_id', '=', $insertedId)
+                                ->where('event_id', '=', $pulseId)
+                                ->get();
+
+                            if (count($e_chk)) {
+                            } else {
+                                DB::connection('mysql_misp')->table('event_tags')->insert([
+                                    'event_id' => $pulseId,
+                                    'tag_id' => $insertedId
+                                ]);
+                            }
+                        }
+                    }
                 }
-
-
-
-                
             }
-            if($document['source']=="otx.alienvault"){
-                 $uuid =    isset($document['mips_uuid']) ? $document['mips_uuid'] : '';
-                    if($uuid){
-                       $events_data =  DB::connection('mysql_misp')
+            if ($document['source'] == "otx.alienvault") {
+                $uuid =    isset($document['mips_uuid']) ? $document['mips_uuid'] : '';
+                if ($uuid) {
+                    $events_data =  DB::connection('mysql_misp')
                         ->table('events')
                         ->select('id')
                         ->where('uuid', $uuid)
                         ->first();
 
-                        if($events_data){
-
-                                             
-                                                    $pulseId = $events_data->id; // ได้ค่า '33421'
-                                                    $color ="#ffffff";
-
-                                                    //ลบก่อน
-                                                                    DB::connection('mysql_misp')->table('event_tags')
-                                                                    ->where('event_id', '=', $pulseId)
-                                                                    ->delete();
-
-                                                                    $tags_string =$request->tags.',OTX';
-                                                                    $array = explode(",", $tags_string);
-                                                                    
-                                                                    foreach ($array as $index => $tag_value) {
-                                                                                            $tag_chk = DB::connection('mysql_misp')->table('tags')
-                                                                                            ->select('id')
-                                                                                            ->where('name', '=', $tag_value)
-                                                                                            ->first();
-                                                                                            if (!empty($tag_chk)) {
-                                                                                            
-                                                                                
-                                                                                                $event_tag_chk = '';
-                                                                                                $event_tag_chk = DB::connection('mysql_misp')->table('event_tags')
-                                                                                                    ->select('id')
-                                                                                                    ->where('tag_id', '=', $tag_chk->id)
-                                                                                                    ->where('event_id', '=', $pulseId)
-                                                                                                    ->get();
-                                                                                
-                                                                                                if (count($event_tag_chk)) {
-                                                                                                
-                                                                                                } else {
-                                                                                                    DB::connection('mysql_misp')->table('event_tags')->insert([
-                                                                                                        'event_id' => $pulseId,
-                                                                                                        'tag_id' => $tag_chk->id
-                                                                                                    ]);
-                                                                                            
-                                                                                                }
-                                                                                            } else {
-                                                                                        
-                                                                                                $insertedId = DB::connection('mysql_misp')->table('tags')->insertGetId([
-                                                                                                    'name' => $tag_value,
-                                                                                                    'colour' => $color,
-                                                                                                    'exportable' => 1,
-                                                                                                    'org_id' => 0,
-                                                                                                    'user_id' => 0,
-                                                                                                    'hide_tag' => 0,
-                                                                                                    'numerical_value' => null,
-                                                                                                    'is_galaxy' => 0,
-                                                                                                    'is_custom_galaxy' => 0,
-                                                                                                    'local_only' => 0
-                                                                                                ]);
-                                                                                
-                                                                                                if ($insertedId) {
-                                                                                                    $e_chk = DB::connection('mysql_misp')->table('event_tags')
-                                                                                                        ->select('id')
-                                                                                                        ->where('tag_id', '=', $insertedId)
-                                                                                                        ->where('event_id', '=', $pulseId)
-                                                                                                        ->get();
-                                                                                
-                                                                                                    if (count($e_chk)) {
-                                                                                                    
-                                                                                                    } else {
-                                                                                                        DB::connection('mysql_misp')->table('event_tags')->insert([
-                                                                                                            'event_id' => $pulseId,
-                                                                                                            'tag_id' => $insertedId
-                                                                                                        ]);
-                                                                                                    }
-                                                                                                }
-                                                                                            }
+                    if ($events_data) {
 
 
+                        $pulseId = $events_data->id; // ได้ค่า '33421'
+                        $color = "#ffffff";
 
-                                                                    }
-                                                
-                                            
-                                        }
-                          }
+                        //ลบก่อน
+                        DB::connection('mysql_misp')->table('event_tags')
+                            ->where('event_id', '=', $pulseId)
+                            ->delete();
 
-                
-         }
-  
+                        $tags_string = $request->tags . ',OTX';
+                        $array = explode(",", $tags_string);
+
+                        foreach ($array as $index => $tag_value) {
+                            $tag_chk = DB::connection('mysql_misp')->table('tags')
+                                ->select('id')
+                                ->where('name', '=', $tag_value)
+                                ->first();
+                            if (!empty($tag_chk)) {
+
+
+                                $event_tag_chk = '';
+                                $event_tag_chk = DB::connection('mysql_misp')->table('event_tags')
+                                    ->select('id')
+                                    ->where('tag_id', '=', $tag_chk->id)
+                                    ->where('event_id', '=', $pulseId)
+                                    ->get();
+
+                                if (count($event_tag_chk)) {
+                                } else {
+                                    DB::connection('mysql_misp')->table('event_tags')->insert([
+                                        'event_id' => $pulseId,
+                                        'tag_id' => $tag_chk->id
+                                    ]);
+                                }
+                            } else {
+
+                                $insertedId = DB::connection('mysql_misp')->table('tags')->insertGetId([
+                                    'name' => $tag_value,
+                                    'colour' => $color,
+                                    'exportable' => 1,
+                                    'org_id' => 0,
+                                    'user_id' => 0,
+                                    'hide_tag' => 0,
+                                    'numerical_value' => null,
+                                    'is_galaxy' => 0,
+                                    'is_custom_galaxy' => 0,
+                                    'local_only' => 0
+                                ]);
+
+                                if ($insertedId) {
+                                    $e_chk = DB::connection('mysql_misp')->table('event_tags')
+                                        ->select('id')
+                                        ->where('tag_id', '=', $insertedId)
+                                        ->where('event_id', '=', $pulseId)
+                                        ->get();
+
+                                    if (count($e_chk)) {
+                                    } else {
+                                        DB::connection('mysql_misp')->table('event_tags')->insert([
+                                            'event_id' => $pulseId,
+                                            'tag_id' => $insertedId
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
 
             $response_data = ['message' => '', 'status_code' => '00', 'data' => ''];
         } catch (Exception $e) {
@@ -3204,266 +3189,248 @@ class IndicatorsController extends Controller
     {
 
         try {
-                $input = $request->all();
-                // dd($input);
-                $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
+            $input = $request->all();
+            // dd($input);
+            $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
 
-                $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
-                $clientMD = new MongoClient($DB_MONGO_KEY);
-                $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
-                $options = array(
-                    'typeMap' => array(
-                        'root' => 'array',
-                        'document' => 'array',
-                    ),
-                );
-                $document = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $request->indicator_id,'pulse_id' => $request->pulse_id), $options);
-                if ($document) {
-                    $update_fx_otx_events_indicator_ref = $col_fx_otx_indicator_detail->updateOne(
-                        ['_id' => $document['_id']],
-                        [
-                            '$set' => [
-                                'tags' => $request->tags,
-                            ]
+            $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+            $clientMD = new MongoClient($DB_MONGO_KEY);
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
+            $options = array(
+                'typeMap' => array(
+                    'root' => 'array',
+                    'document' => 'array',
+                ),
+            );
+            $document = $col_fx_otx_indicator_detail->findOne(array('indicator_id' => $request->indicator_id, 'pulse_id' => $request->pulse_id), $options);
+            if ($document) {
+                $update_fx_otx_events_indicator_ref = $col_fx_otx_indicator_detail->updateOne(
+                    ['_id' => $document['_id']],
+                    [
+                        '$set' => [
+                            'tags' => $request->tags,
                         ]
-                    );
-                }
-
-                $col_fx_otx_indicator_detail_2 = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
-                $options = array(
-                    'typeMap' => array(
-                        'root' => 'array',
-                        'document' => 'array',
-                    ),
+                    ]
                 );
-                $document = $col_fx_otx_indicator_detail_2->findOne(array('indicator_id' => $request->indicator_id), $options);
-                if ($document) {
-                    $update_fx_otx_events_indicator_detail = $col_fx_otx_indicator_detail_2->updateOne(
-                        ['_id' => $document['_id']],
-                        [
-                            '$set' => [
-                                'tags' => $request->tags,
-                            ]
+            }
+
+            $col_fx_otx_indicator_detail_2 = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
+            $options = array(
+                'typeMap' => array(
+                    'root' => 'array',
+                    'document' => 'array',
+                ),
+            );
+            $document = $col_fx_otx_indicator_detail_2->findOne(array('indicator_id' => $request->indicator_id), $options);
+            if ($document) {
+                $update_fx_otx_events_indicator_detail = $col_fx_otx_indicator_detail_2->updateOne(
+                    ['_id' => $document['_id']],
+                    [
+                        '$set' => [
+                            'tags' => $request->tags,
                         ]
-                    );
-                }
-
-
-                $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-                $options = array(
-                    'typeMap' => array(
-                        'root' => 'array',
-                        'document' => 'array',
-                    ),
+                    ]
                 );
-                $document_fx_otx_events = $col_fx_otx_events->findOne(array('pulse_id' => $request->pulse_id), $options);
-                          //ส่งค่าไปบันทึกที่ MISP
-             if($document_fx_otx_events['source']=="misp"){
+            }
 
-              
+
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+            $options = array(
+                'typeMap' => array(
+                    'root' => 'array',
+                    'document' => 'array',
+                ),
+            );
+            $document_fx_otx_events = $col_fx_otx_events->findOne(array('pulse_id' => $request->pulse_id), $options);
+            //ส่งค่าไปบันทึกที่ MISP
+            if ($document_fx_otx_events['source'] == "misp") {
+
+
 
 
                 $input = $document_fx_otx_events['pulse_id'];
                 $parts = explode('.', $input);
                 $pulseId = $parts[1]; // ได้ค่า '33421'
-                $color ="#ffffff";
+                $color = "#ffffff";
 
                 $attributes_data = DB::connection('mysql_misp')->table('attributes')
-                ->select('id')
-                ->where('event_id', '=',  $pulseId)
-                ->where('value1', '=',  $document['indicator_name'])
-                ->first();
-                 if($attributes_data){                           
-                                            $indicator_id =$attributes_data->id;
+                    ->select('id')
+                    ->where('event_id', '=',  $pulseId)
+                    ->where('value1', '=',  $document['indicator_name'])
+                    ->first();
+                if ($attributes_data) {
+                    $indicator_id = $attributes_data->id;
 
 
 
-                                            //ลบก่อน
-                                            DB::connection('mysql_misp')->table('attribute_tags')
-                                            ->where('event_id', '=', $pulseId)
-                                            ->where('attribute_id', '=',  $indicator_id)
-                                            ->delete();
+                    //ลบก่อน
+                    DB::connection('mysql_misp')->table('attribute_tags')
+                        ->where('event_id', '=', $pulseId)
+                        ->where('attribute_id', '=',  $indicator_id)
+                        ->delete();
 
-                                            $tags_string =$request->tags;
-                                            $array = explode(",", $tags_string);
-                                            
-                                            foreach ($array as $index => $tag_value) {
-                                                                    $tag_chk = DB::connection('mysql_misp')->table('tags')
-                                                                    ->select('id')
-                                                                    ->where('name', '=', $tag_value)
-                                                                    ->first();
-                                                                    if (!empty($tag_chk)) {
-                                                                    
-                                                        
-                                                                        $event_tag_chk = '';
-                                                                        $event_tag_chk = DB::connection('mysql_misp')->table('attribute_tags')
-                                                                            ->select('id')
-                                                                            ->where('tag_id', '=', $tag_chk->id)
-                                                                            ->where('event_id', '=', $pulseId)
-                                                                            ->where('attribute_id', '=',  $indicator_id)
-                                                                            ->get();
-                                                        
-                                                                        if (count($event_tag_chk)) {
-                                                                        
-                                                                        } else {
-                                                                            DB::connection('mysql_misp')->table('attribute_tags')->insert([
-                                                                                'event_id' => $pulseId,
-                                                                                'attribute_id' => $indicator_id,
-                                                                                'tag_id' => $tag_chk->id,
-                                                                                'local' =>0
-                                                                            ]);
-                                                                    
-                                                                        }
-                                                                    } else {
-                                                                
-                                                                        $insertedId = DB::connection('mysql_misp')->table('tags')->insertGetId([
-                                                                            'name' => $tag_value,
-                                                                            'colour' => $color,
-                                                                            'exportable' => 1,
-                                                                            'org_id' => 0,
-                                                                            'user_id' => 0,
-                                                                            'hide_tag' => 0,
-                                                                            'numerical_value' => null,
-                                                                            'is_galaxy' => 0,
-                                                                            'is_custom_galaxy' => 0,
-                                                                            'local_only' => 0
-                                                                        ]);
-                                                        
-                                                                        if ($insertedId) {
-                                                                            $e_chk = DB::connection('mysql_misp')->table('attribute_tags')
-                                                                                ->select('id')
-                                                                                ->where('tag_id', '=', $insertedId)
-                                                                                ->where('event_id', '=', $pulseId)
-                                                                                ->where('attribute_id', '=',  $indicator_id)
-                                                                                ->get();
-                                                        
-                                                                            if (count($e_chk)) {
-                                                                            
-                                                                            } else {
-                                                                                DB::connection('mysql_misp')->table('attribute_tags')->insert([
-                                                                                    'event_id' => $pulseId,
-                                                                                    'attribute_id' => $indicator_id,
-                                                                                    'tag_id' => $insertedId,
-                                                                                    'local' =>0
-                                                                                ]);
-                                                                            }
-                                                                        }
-                                                                    }
+                    $tags_string = $request->tags;
+                    $array = explode(",", $tags_string);
+
+                    foreach ($array as $index => $tag_value) {
+                        $tag_chk = DB::connection('mysql_misp')->table('tags')
+                            ->select('id')
+                            ->where('name', '=', $tag_value)
+                            ->first();
+                        if (!empty($tag_chk)) {
 
 
+                            $event_tag_chk = '';
+                            $event_tag_chk = DB::connection('mysql_misp')->table('attribute_tags')
+                                ->select('id')
+                                ->where('tag_id', '=', $tag_chk->id)
+                                ->where('event_id', '=', $pulseId)
+                                ->where('attribute_id', '=',  $indicator_id)
+                                ->get();
 
-                                            }
+                            if (count($event_tag_chk)) {
+                            } else {
+                                DB::connection('mysql_misp')->table('attribute_tags')->insert([
+                                    'event_id' => $pulseId,
+                                    'attribute_id' => $indicator_id,
+                                    'tag_id' => $tag_chk->id,
+                                    'local' => 0
+                                ]);
+                            }
+                        } else {
 
+                            $insertedId = DB::connection('mysql_misp')->table('tags')->insertGetId([
+                                'name' => $tag_value,
+                                'colour' => $color,
+                                'exportable' => 1,
+                                'org_id' => 0,
+                                'user_id' => 0,
+                                'hide_tag' => 0,
+                                'numerical_value' => null,
+                                'is_galaxy' => 0,
+                                'is_custom_galaxy' => 0,
+                                'local_only' => 0
+                            ]);
 
+                            if ($insertedId) {
+                                $e_chk = DB::connection('mysql_misp')->table('attribute_tags')
+                                    ->select('id')
+                                    ->where('tag_id', '=', $insertedId)
+                                    ->where('event_id', '=', $pulseId)
+                                    ->where('attribute_id', '=',  $indicator_id)
+                                    ->get();
+
+                                if (count($e_chk)) {
+                                } else {
+                                    DB::connection('mysql_misp')->table('attribute_tags')->insert([
+                                        'event_id' => $pulseId,
+                                        'attribute_id' => $indicator_id,
+                                        'tag_id' => $insertedId,
+                                        'local' => 0
+                                    ]);
+                                }
+                            }
+                        }
+                    }
                 }
-                
             }
-            if($document_fx_otx_events['source']=="otx.alienvault"){
-                 $uuid =    isset($document_fx_otx_events['mips_uuid']) ? $document_fx_otx_events['mips_uuid'] : '';
-                    if($uuid){
-                       $events_data =  DB::connection('mysql_misp')
+            if ($document_fx_otx_events['source'] == "otx.alienvault") {
+                $uuid =    isset($document_fx_otx_events['mips_uuid']) ? $document_fx_otx_events['mips_uuid'] : '';
+                if ($uuid) {
+                    $events_data =  DB::connection('mysql_misp')
                         ->table('events')
                         ->select('id')
                         ->where('uuid', $uuid)
                         ->first();
 
-                        if($events_data){
+                    if ($events_data) {
 
-                                             
-                                                    $pulseId = $events_data->id; // ได้ค่า '33421'
-                                                    $color ="#ffffff";
-                                                    $attributes_data = DB::connection('mysql_misp')->table('attributes')
-                                                    ->select('id')
-                                                    ->where('event_id', '=',  $pulseId)
-                                                    ->where('value1', '=',  $document['indicator_name'])
-                                                    ->first();
-                                                     if($attributes_data){    
 
-                                                          $indicator_id =$attributes_data->id;
+                        $pulseId = $events_data->id; // ได้ค่า '33421'
+                        $color = "#ffffff";
+                        $attributes_data = DB::connection('mysql_misp')->table('attributes')
+                            ->select('id')
+                            ->where('event_id', '=',  $pulseId)
+                            ->where('value1', '=',  $document['indicator_name'])
+                            ->first();
+                        if ($attributes_data) {
 
-                                                            //ลบก่อน
-                                                            DB::connection('mysql_misp')->table('attribute_tags')
-                                                            ->where('event_id', '=', $pulseId)
-                                                            ->where('attribute_id', '=',  $indicator_id)
-                                                            ->delete();
+                            $indicator_id = $attributes_data->id;
 
-                                                            $tags_string =$request->tags.',OTX';
-                                                            $array = explode(",", $tags_string);
-                                                            
-                                                            foreach ($array as $index => $tag_value) {
-                                                                                    $tag_chk = DB::connection('mysql_misp')->table('tags')
-                                                                                    ->select('id')
-                                                                                    ->where('name', '=', $tag_value)
-                                                                                    ->first();
-                                                                                    if (!empty($tag_chk)) {
-                                                                                    
-                                                                        
-                                                                                        $event_tag_chk = '';
-                                                                                        $event_tag_chk = DB::connection('mysql_misp')->table('attribute_tags')
-                                                                                            ->select('id')
-                                                                                            ->where('tag_id', '=', $tag_chk->id)
-                                                                                            ->where('event_id', '=', $pulseId)
-                                                                                            ->where('attribute_id', '=',  $indicator_id)
-                                                                                            ->get();
-                                                                        
-                                                                                        if (count($event_tag_chk)) {
-                                                                                        
-                                                                                        } else {
-                                                                                            DB::connection('mysql_misp')->table('attribute_tags')->insert([
-                                                                                                'event_id' => $pulseId,
-                                                                                                'attribute_id' => $indicator_id,
-                                                                                                'tag_id' => $tag_chk->id,
-                                                                                                'local' =>0
-                                                                                            ]);
-                                                                                    
-                                                                                        }
-                                                                                    } else {
-                                                                                
-                                                                                        $insertedId = DB::connection('mysql_misp')->table('tags')->insertGetId([
-                                                                                            'name' => $tag_value,
-                                                                                            'colour' => $color,
-                                                                                            'exportable' => 1,
-                                                                                            'org_id' => 0,
-                                                                                            'user_id' => 0,
-                                                                                            'hide_tag' => 0,
-                                                                                            'numerical_value' => null,
-                                                                                            'is_galaxy' => 0,
-                                                                                            'is_custom_galaxy' => 0,
-                                                                                            'local_only' => 0
-                                                                                        ]);
-                                                                        
-                                                                                        if ($insertedId) {
-                                                                                            $e_chk = DB::connection('mysql_misp')->table('attribute_tags')
-                                                                                                ->select('id')
-                                                                                                ->where('tag_id', '=', $insertedId)
-                                                                                                ->where('event_id', '=', $pulseId)
-                                                                                                ->where('attribute_id', '=',  $indicator_id)
-                                                                                                ->get();
-                                                                        
-                                                                                            if (count($e_chk)) {
-                                                                                            
-                                                                                            } else {
-                                                                                                DB::connection('mysql_misp')->table('attribute_tags')->insert([
-                                                                                                    'event_id' => $pulseId,
-                                                                                                    'attribute_id' => $indicator_id,
-                                                                                                    'tag_id' => $insertedId,
-                                                                                                    'local' =>0
-                                                                                                ]);
-                                                                                            }
-                                                                                        }
-                                                                                    }
+                            //ลบก่อน
+                            DB::connection('mysql_misp')->table('attribute_tags')
+                                ->where('event_id', '=', $pulseId)
+                                ->where('attribute_id', '=',  $indicator_id)
+                                ->delete();
 
-                                                                                }
+                            $tags_string = $request->tags . ',OTX';
+                            $array = explode(",", $tags_string);
 
-                                                            }
-                                                
-                                            
-                             }
-                          }
+                            foreach ($array as $index => $tag_value) {
+                                $tag_chk = DB::connection('mysql_misp')->table('tags')
+                                    ->select('id')
+                                    ->where('name', '=', $tag_value)
+                                    ->first();
+                                if (!empty($tag_chk)) {
 
-                
-         }
-  
+
+                                    $event_tag_chk = '';
+                                    $event_tag_chk = DB::connection('mysql_misp')->table('attribute_tags')
+                                        ->select('id')
+                                        ->where('tag_id', '=', $tag_chk->id)
+                                        ->where('event_id', '=', $pulseId)
+                                        ->where('attribute_id', '=',  $indicator_id)
+                                        ->get();
+
+                                    if (count($event_tag_chk)) {
+                                    } else {
+                                        DB::connection('mysql_misp')->table('attribute_tags')->insert([
+                                            'event_id' => $pulseId,
+                                            'attribute_id' => $indicator_id,
+                                            'tag_id' => $tag_chk->id,
+                                            'local' => 0
+                                        ]);
+                                    }
+                                } else {
+
+                                    $insertedId = DB::connection('mysql_misp')->table('tags')->insertGetId([
+                                        'name' => $tag_value,
+                                        'colour' => $color,
+                                        'exportable' => 1,
+                                        'org_id' => 0,
+                                        'user_id' => 0,
+                                        'hide_tag' => 0,
+                                        'numerical_value' => null,
+                                        'is_galaxy' => 0,
+                                        'is_custom_galaxy' => 0,
+                                        'local_only' => 0
+                                    ]);
+
+                                    if ($insertedId) {
+                                        $e_chk = DB::connection('mysql_misp')->table('attribute_tags')
+                                            ->select('id')
+                                            ->where('tag_id', '=', $insertedId)
+                                            ->where('event_id', '=', $pulseId)
+                                            ->where('attribute_id', '=',  $indicator_id)
+                                            ->get();
+
+                                        if (count($e_chk)) {
+                                        } else {
+                                            DB::connection('mysql_misp')->table('attribute_tags')->insert([
+                                                'event_id' => $pulseId,
+                                                'attribute_id' => $indicator_id,
+                                                'tag_id' => $insertedId,
+                                                'local' => 0
+                                            ]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
 
             $response_data = ['message' => '', 'status_code' => '00', 'data' => ''];
         } catch (Exception $e) {
@@ -3490,7 +3457,7 @@ class IndicatorsController extends Controller
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
             $html = '';
-            $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+            $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
 
             $query = [
                 'adversary_uuid' => $reqId,
@@ -3519,7 +3486,7 @@ class IndicatorsController extends Controller
 
             // $count_doc = count($document_all);
 
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
             $options = array(
                 'typeMap' => array(
                     'root' => 'array',
@@ -3617,7 +3584,7 @@ class IndicatorsController extends Controller
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
             $html = '';
-            $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_malware_related;
+            $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_malware_related;
 
             $query = [
                 'malware_uuid' => $reqId,
@@ -3646,7 +3613,7 @@ class IndicatorsController extends Controller
 
             // $count_doc = count($document_all);
 
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
             $options = array(
                 'typeMap' => array(
                     'root' => 'array',
@@ -3741,5 +3708,740 @@ class IndicatorsController extends Controller
         }
 
         return response()->json($query);
+    }
+
+    public function export_events_indicators(Request $request)
+    {
+        // Validate request
+        $request->validate([
+            'start_date' => 'required|date_format:Y-m-d',
+            'end_date' => 'required|date_format:Y-m-d',
+            'type' => 'required|in:1,2',
+        ]);
+
+        $form_type = (int)$request->type;
+
+        try {
+            $tz = new \DateTimeZone('Asia/Bangkok');
+            $start = new \DateTime($request->start_date . ' 00:00:00', $tz);
+            $end = new \DateTime($request->end_date . ' 23:59:59', $tz);
+
+            $from = new \MongoDB\BSON\UTCDateTime($start->getTimestamp() * 1000);
+            $to = new \MongoDB\BSON\UTCDateTime($end->getTimestamp() * 1000);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Invalid date format.'], 422);
+        }
+
+        // return response()->json(['from' => $from, 'to' => $to]);
+
+
+        $pulseRaw = $request->input('pulse_id', []);
+        if (is_string($pulseRaw) && str_contains($pulseRaw, ',')) {
+            $pulseIds = array_map('trim', explode(',', $pulseRaw));
+        } else {
+            $pulseIds = is_array($pulseRaw) ? $pulseRaw : [$pulseRaw];
+        }
+        $pulseIds = array_filter($pulseIds, fn($id) => is_string($id) && !empty($id));
+
+        // Connect Mongo
+        $mongoUri = config("app.DB_MONGO_DEV");
+        $client = new \MongoDB\Client($mongoUri);
+        $db = $client->sosecure_threatintelligent_dev;
+        $eventsCollection = $db->fx_otx_events;
+        $attributesCollection = $db->fx_otx_events_indicator_ref;
+        $options = ['typeMap' => ['root' => 'array', 'document' => 'array']];
+
+        // Event query
+        $usePulseOnly = !empty($pulseIds) && $request->has('pulse_id_only');
+
+       
+
+        // return response()->json($pulseIds);
+
+        if ($usePulseOnly) {
+            $eventQuery = [
+                'pulse_id' => ['$in' => $pulseIds],
+            ];
+        } else {
+            $eventQuery = [
+                'modified' => ['$gte' => $from, '$lte' => $to],
+                'status' => 1,
+                'deleted_at' => null,
+            ];
+            if (!empty($pulseIds)) {
+                $eventQuery['pulse_id'] = ['$in' => $pulseIds];
+            }
+        }
+
+        $eventName = trim($request->input('event_name'));
+        if (!empty($eventName)) {
+            $eventQuery['name'] = new \MongoDB\BSON\Regex($eventName, 'i');
+        }
+
+        $events = $eventsCollection->find($eventQuery, $options)->toArray();
+
+        
+        if (empty($events)) {
+            return response()->json([
+                'message' => !empty($pulseIds)
+                    ? 'Not found event : ' . implode(', ', $pulseIds) .' in date range'
+                    : 'Not found event in date range',
+            ], 200);
+        }
+         
+
+        $timestamp = date("Y-m-d_H.i.s");
+        $fileName = $form_type === 1
+            ? "Sosecure-Threat-Insight-Events-{$timestamp}.csv"
+            : "Sosecure-Threat-Insight-Events-Indicators-{$timestamp}.csv";
+        $filePath = storage_path("app/exportindicator/{$fileName}");
+
+        if (!file_exists(dirname($filePath))) {
+            mkdir(dirname($filePath), 0777, true);
+        }
+
+        $file = fopen($filePath, 'w');
+
+        if ($form_type === 1) {
+            // Header for Events only
+            fputcsv($file, [
+                'event_id',
+                'event_name',
+                'public',
+                'event_tags',
+                'modified_datetime',
+            ]);
+
+            foreach ($events as $doc) {
+                 $eventModified = isset($doc['updated_at']) && $doc['updated_at'] instanceof UTCDateTime
+                    ? $doc['updated_at']->toDateTime()->format('Y-m-d')
+                    : '';
+                fputcsv($file, [
+                    $doc['pulse_id'] ?? '',
+                    $doc['name'] ?? '',
+                    $doc['public'] ?? '',
+                    isset($doc['tags']) ? implode(',', (array)$doc['tags']) : '',
+                    $eventModified,
+                ]);
+            }
+        } elseif ($form_type === 2) {
+            $eventPulseIds = array_column($events, 'pulse_id');
+
+            $attrQuery = [
+                'pulse_id' => ['$in' => $eventPulseIds],
+                'created_at' => ['$gte' => $from, '$lte' => $to]
+            ];
+            $attributes = $attributesCollection->find($attrQuery, $options)->toArray();
+
+            $attributeMap = [];
+            foreach ($attributes as $attr) {
+                $pid = $attr['pulse_id'] ?? '';
+                $attributeMap[$pid][] = $attr;
+            }
+
+            // Header for Events + Attributes
+            fputcsv($file, [
+                'event_id',
+                'event_name',
+                'public',
+                'event_tags',
+                'modified_datetime',
+                'attribute_id',
+                'attribute_type',
+                'attribute_name',
+                'attribute_tags',
+                'attribute_score',
+                'attribute_serverity',
+                'attribute_datetime'
+            ]);
+
+            foreach ($events as $event) {
+                $pulseId = $event['pulse_id'] ?? '';
+                $eventName = $event['name'] ?? '';
+                $eventPublic = $event['public'] ?? '';
+                $eventTags = isset($event['tags']) ? implode(',', (array)$event['tags']) : '';
+                $eventModified = isset($event['updated_at']) && $event['updated_at'] instanceof UTCDateTime
+                    ? $event['updated_at']->toDateTime()->format('Y-m-d')
+                    : '';
+
+                if (!empty($attributeMap[$pulseId])) {
+                    foreach ($attributeMap[$pulseId] as $attr) {
+                        $attrDatetime = isset($attr['created_at']) && $attr['created_at'] instanceof UTCDateTime
+                            ? $attr['created_at']->toDateTime()->format('Y-m-d H:i:s')
+                            : '';
+
+                        fputcsv($file, [
+                            $pulseId,
+                            $eventName,
+                            $eventPublic,
+                            $eventTags,
+                            $eventModified,
+                            $attr['indicator_id'] ?? '',
+                            $attr['type'] ?? '',
+                            $attr['indicator'] ?? '',
+                            isset($attr['tags']) ? implode(',', (array)$attr['tags']) : '',
+                            $attr['attribute_score'] ?? '',
+                            $attr['attribute_serverity'] ?? '',
+                            $attrDatetime
+                        ]);
+                    }
+                } else {
+                    fputcsv($file, [
+                        $pulseId,
+                        $eventName,
+                        $eventPublic,
+                        $eventTags,
+                        $eventModified,
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        ''
+                    ]);
+                }
+            }
+        }
+
+        fclose($file);
+
+        return response()->download($filePath, $fileName, [
+            'Content-Type' => 'text/csv',
+        ]);
+    }
+
+
+    public function export_event_indicators(Request $request)
+    {
+        // Validate: ต้องมี pulse_id
+        $request->validate([
+            'pulse_id' => 'required|string'
+        ]);
+
+        $pulseId = trim($request->input('pulse_id'));
+
+        $mongoUri = config("app.DB_MONGO_DEV");
+        $client = new Client($mongoUri);
+        $db = $client->sosecure_threatintelligent_dev;
+        $eventsCollection = $db->fx_otx_events;
+        $attributesCollection = $db->fx_otx_events_indicator_ref;
+        $options = ['typeMap' => ['root' => 'array', 'document' => 'array']];
+
+        $event = $eventsCollection->findOne([
+            'pulse_id' => $pulseId,
+            'status' => 1,
+            'deleted_at' => null
+        ], $options);
+
+        if (!$event) {
+            return response()->json([
+                'message' => "Not found event : {$pulseId}"
+            ], 200);
+        }
+
+        $attributes = $attributesCollection->find([
+            'pulse_id' => $pulseId
+        ], $options)->toArray();
+
+        // เตรียม CSV
+        $timestamp = date("Y-m-d H.i.s");
+        $fileName = "Sosecure-Threat-Insight-Indicators-{$timestamp}-{$pulseId}.csv";
+        $filePath = storage_path("app/exportindicator/{$fileName}");
+
+        if (!file_exists(dirname($filePath))) {
+            mkdir(dirname($filePath), 0777, true);
+        }
+
+        $file = fopen($filePath, 'w');
+        fputcsv($file, [
+            'event_id',
+            'event_name',
+            'public',
+            'event_tags',
+            'modified_datetime',
+            'attribute_id',
+            'attribute_type',
+            'attribute_name',
+            'attribute_tags',
+            'attribute_score',
+            'attribute_serverity',
+            'attribute_datetime'
+        ]);
+
+        $eventName = $event['name'] ?? '';
+        $eventPublic = $event['public'] ?? '';
+        $eventTags = isset($event['tags']) ? implode(',', (array)$event['tags']) : '';
+        $eventModified = isset($event['updated_at']) && $event['updated_at'] instanceof UTCDateTime
+            ? $event['updated_at']->toDateTime()->format('Y-m-d')
+            : '';
+
+        if (!empty($attributes)) {
+            foreach ($attributes as $attr) {
+                $attrDatetime = isset($attr['created_at']) && $attr['created_at'] instanceof UTCDateTime
+                    ? $attr['created_at']->toDateTime()->format('Y-m-d H:i:s')
+                    : '';
+
+                fputcsv($file, [
+                    $pulseId,
+                    $eventName,
+                    $eventPublic,
+                    $eventTags,
+                    $eventModified,
+                    $attr['indicator_id'] ?? '',
+                    $attr['type'] ?? '',
+                    $attr['indicator'] ?? '',
+                    isset($attr['tags']) ? implode(',', (array)$attr['tags']) : '',
+                    $attr['attribute_score'] ?? '',
+                    $attr['attribute_serverity'] ?? '',
+                    $attrDatetime
+                ]);
+            }
+        } else {
+            fputcsv($file, [
+                $pulseId,
+                $eventName,
+                $eventPublic,
+                $eventTags,
+                $eventModified,
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                ''
+            ]);
+        }
+
+        fclose($file);
+        return response()->download($filePath, $fileName);
+    }
+
+
+    public function importToInsight(Request $request)
+    {
+
+        // return response()->json(['message' => 'Import to Insight']);
+        set_time_limit(600);
+        if (!$request->hasFile('file')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No file uploaded'
+            ], 400);
+        }
+
+        $file = $request->file('file');
+        $import_type = $request->input('import_type');
+        $path = $file->getRealPath();
+
+        if ($import_type == '0') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please select import type'
+            ]);
+        }
+
+        if ($import_type == 'event') {
+            try {
+                $csv = Reader::createFromPath($path, 'r');
+                $csv->setHeaderOffset(0);
+                $stmt = new Statement();
+                $records = $stmt->process($csv);
+
+                $rows = array_values(iterator_to_array($records));
+                $header = $csv->getHeader();
+                $columnCount = count($header);
+
+                if ($columnCount !== 5) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "CSV column count invalid. Found $columnCount columns, expected 5.",
+                        'columns' => $header
+                    ], 400);
+                }
+
+                if (empty($rows)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'CSV is empty or unreadable.'
+                    ], 400);
+                }
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error reading CSV: ' . $e->getMessage()
+                ], 500);
+            }
+
+            $dataKey = Str::uuid()->toString();
+            $now = now();
+            $mongoUrl = config('app.DB_MONGO_DEV');
+            $client = new Client($mongoUrl);
+            $db = $client->sosecure_threatintelligent_dev;
+
+            $eventCollection = $db->fx_otx_events;
+            $tempCollection = $db->fx_events_temp;
+            $dataKeyCollection = $db->fx_data_key;
+
+            $cleanedRows = [];
+            foreach ($rows as $row) {
+                $row['data_key'] = $dataKey;
+                $row['imported_at'] = $now->format('Y-m-d H:i:s');
+                $cleanedRows[] = $row;
+            }
+
+            // Insert temp rows
+            try {
+                $tempCollection->insertMany($cleanedRows);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to insert temp event data: ' . $e->getMessage()
+                ], 500);
+            }
+
+            // Log data key meta
+            try {
+                $dataKeyCollection->insertOne([
+                    'date' => $now->format('Y-m-d H:i:s'),
+                    'data_key' => $dataKey,
+                    'imported_at' => $now->format('Y-m-d H:i:s'),
+                    'record_count' => count($cleanedRows),
+                    'type' => 'event',
+                    'file_name' => $file->getClientOriginalName(),
+                    'timestamp' => $now->timestamp
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to log data_key: ' . $e->getMessage()
+                ], 500);
+            }
+
+            // เรียกฟังก์ชัน update จริง
+            $syncResult = $this->syncEventTagsByDataKey($dataKey, $db);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Event tags updated.',
+                'data_key' => $dataKey,
+                'records_inserted' => count($cleanedRows),
+                'total_rows' => count($rows),
+                'success_list' => array_slice($syncResult['updated'], 0, 100000),
+                'error_list' => $syncResult['errors']
+            ]);
+        }
+
+        if ($import_type == 'attribute') {
+            try {
+                $csv = Reader::createFromPath($path, 'r');
+                $csv->setHeaderOffset(0);
+                $stmt = new Statement();
+                $records = $stmt->process($csv);
+
+                $rows = array_values(iterator_to_array($records));
+                $header = $csv->getHeader();
+                $columnCount = count($header);
+
+                if ($columnCount !== 12) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "CSV column count invalid. Found $columnCount columns, expected 12.",
+                        'columns' => $header
+                    ], 400);
+                }
+
+                if (empty($rows)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'CSV is empty or unreadable.'
+                    ], 400);
+                }
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error reading CSV: ' . $e->getMessage()
+                ], 500);
+            }
+
+            $targetIndex = 8;
+            $originalColumnName = $header[$targetIndex];
+            $dataKey = Str::uuid()->toString();
+            $mongoUrl = config('app.DB_MONGO_DEV');
+            $client = new Client($mongoUrl);
+            $db = $client->sosecure_threatintelligent_dev;
+
+            $tempCollection = $db->fx_indicators_temp;
+            $dataKeyCollection = $db->fx_data_key;
+
+            $cleanedRows = [];
+            foreach ($rows as $row) {
+                if (isset($row[$originalColumnName])) {
+                    $row['tags'] = $row[$originalColumnName];
+                    unset($row[$originalColumnName]);
+                }
+                $row['data_key'] = $dataKey;
+                $cleanedRows[] = $row;
+            }
+
+            // Insert to temp collection
+            $batchSize = 1000;
+            $totalInserted = 0;
+            $insertedIds = [];
+            $insertErrors = [];
+
+            foreach (array_chunk($cleanedRows, $batchSize) as $chunk) {
+                try {
+                    $tempCollection->insertMany($chunk);
+                    $totalInserted += count($chunk);
+                    foreach ($chunk as $record) {
+                        $insertedIds[] = $record['attribute_id'] ?? '(no attribute_id)';
+                    }
+                } catch (\Exception $e) {
+                    $insertErrors[] = 'Insert batch failed: ' . $e->getMessage();
+                }
+            }
+
+            $now = now();
+            try {
+                $dataKeyCollection->insertOne([
+                    'date' => $now->format('Y-m-d H:i:s'),
+                    'data_key' => $dataKey,
+                    'imported_at' => $now->format('Y-m-d H:i:s'),
+                    'record_count' => $totalInserted,
+                    'type' => 'attribute',
+                    'file_name' => $file->getClientOriginalName(),
+                    'timestamp' => $now->timestamp
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to insert data_key log: ' . $e->getMessage()
+                ], 500);
+            }
+
+            // ดึง temp และ sync ไป ref/detail
+            $syncResult = $this->syncIndicatorUpdatesByDataKey($dataKey, $db);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Import complete.',
+                'data_key' => $dataKey,
+                'records_inserted' => $totalInserted,
+                'total_rows' => count($rows),
+                'success_list' => array_slice($syncResult['updated'], 0, 100000),
+                'error_list' => $syncResult['errors']
+            ]);
+        }
+    }
+
+    private function syncIndicatorUpdatesByDataKey(string $dataKey, $db): array
+    {
+        $tempCollection = $db->fx_indicators_temp;
+        $refCollection = $db->fx_otx_events_indicator_ref;
+        $detailCollection = $db->fx_otx_indicator_detail;
+
+        $cursor = $tempCollection->find(
+            ['data_key' => $dataKey],
+            [
+                'projection' => [
+                    '_id' => 0,
+                    'attribute_id' => 1,
+                    'attribute_name' => 1,
+                    'tags' => 1,
+                    'attribute_score' => 1,
+                    'attribute_serverity' => 1
+                ],
+                'batchSize' => 1000
+            ]
+        );
+
+        $batchSize = 1000;
+        $refOps = [];
+        $detailOps = [];
+        $count = 0;
+
+        $updatedIds = [];
+        $errors = [];
+
+        foreach ($cursor as $doc) {
+            $id = $doc['attribute_id'] ?? null;
+            if (empty($id)) continue;
+
+            $updateFields = [
+                'tags' => $doc['tags'] ?? null,
+                'attribute_score' => $doc['attribute_score'] ?? null,
+                'attribute_serverity' => $doc['attribute_serverity'] ?? null
+            ];
+
+            $refOps[] = [
+                'updateOne' => [
+                    ['indicator_id' => $id],
+                    ['$set' => $updateFields],
+                    ['upsert' => false]
+                ]
+            ];
+
+            $detailOps[] = [
+                'updateOne' => [
+                    ['indicator_id' => $id],
+                    ['$set' => $updateFields],
+                    ['upsert' => false]
+                ]
+            ];
+
+            $updatedIds[] = [
+                'id' => $id,
+                'tag' => $doc['tags'] ?? '-',
+                'name' => $doc['attribute_name'] ?? '-'
+            ];
+
+            $count++;
+
+            if ($count >= $batchSize) {
+                try {
+                    $refResult = $refCollection->bulkWrite($refOps);
+                    $detailResult = $detailCollection->bulkWrite($detailOps);
+
+                    // ตรวจสอบการ match
+                    $matched = $refResult->getMatchedCount();
+                    if ($matched < count($refOps)) {
+                        $errors[] = [
+                            'id' => '(bulk batch)',
+                            'name' => '-',
+                            'reason' => "Warning: Only $matched of " . count($refOps) . " ref documents matched."
+                        ];
+                    }
+
+                    $matchedDetail = $detailResult->getMatchedCount();
+                    if ($matchedDetail < count($detailOps)) {
+                        $errors[] = [
+                            'id' => '(bulk batch)',
+                            'name' => '-',
+                            'reason' => "Warning: Only $matchedDetail of " . count($detailOps) . " detail documents matched."
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    $errors[] = [
+                        'id' => '(bulk batch)',
+                        'name' => '-',
+                        'reason' => 'Bulk update error: ' . $e->getMessage()
+                    ];
+                }
+
+                $refOps = [];
+                $detailOps = [];
+                $count = 0;
+            }
+        }
+
+        // leftover ops
+        if (!empty($refOps)) {
+            try {
+                $refResult = $refCollection->bulkWrite($refOps);
+                $detailResult = $detailCollection->bulkWrite($detailOps);
+
+                $matched = $refResult->getMatchedCount();
+                if ($matched < count($refOps)) {
+                    $errors[] = [
+                        'id' => '(Not detected)',
+                        'name' => 'Not detected',
+                        'success' => $matched,
+                        'reason' => "Warning: Only $matched of " . count($refOps) . " Idicator ref documents matched."
+                    ];
+                }
+
+                $matchedDetail = $detailResult->getMatchedCount();
+                if ($matchedDetail < count($detailOps)) {
+                    $errors[] = [
+                        'id' => '(Not detected)',
+                        'name' => 'Not detected',
+                        'success' => $matched,
+                        'reason' => "Warning: Only $matchedDetail of " . count($detailOps) . " Idicator detail documents matched."
+                    ];
+                }
+            } catch (\Exception $e) {
+                $errors[] = [
+                    'id' => '(final batch)',
+                    'name' => '-',
+                    'reason' => 'Final bulk update error: ' . $e->getMessage()
+                ];
+            }
+        }
+        return [
+            'updated' => $updatedIds,
+            'errors' => $errors
+        ];
+    }
+
+    private function syncEventTagsByDataKey(string $dataKey, $db)
+    {
+        $tempCollection = $db->fx_events_temp;
+        $eventCollection = $db->fx_otx_events;
+
+        $cursor = $tempCollection->find(
+            ['data_key' => $dataKey],
+            [
+                'projection' => [
+                    '_id' => 0,
+                    'event_id' => 1,
+                    'event_tags' => 1,
+                    'event_name' => 1
+                ],
+                'batchSize' => 1000
+            ]
+        );
+
+        $success = [];
+        $errors = [];
+
+        foreach ($cursor as $index => $doc) {
+            $pulseId = $doc['event_id'] ?? null;
+            $tags = $doc['event_tags'] ?? null;
+            $name = $doc['event_name'] ?? '-';
+            $rowNumber = $index + 1;
+
+            if (!$pulseId) {
+                $errors[] = [
+                    'id' => "(row {$rowNumber})",
+                    'name' => $name,
+                    'reason' => 'missing event_id'
+                ];
+                continue;
+            }
+
+            try {
+                $result = $eventCollection->updateOne(
+                    ['pulse_id' => $pulseId],
+                    ['$set' => ['tags' => $tags]],
+                    ['upsert' => false]
+                );
+
+                if ($result->getModifiedCount() > 0) {
+                    $success[] = [
+                        'id' => $pulseId,
+                        'name' => $name
+                    ];
+                } else {
+                    $errors[] = [
+                        'id' => $pulseId,
+                        'name' => $name,
+                        'reason' => 'no update (not found or unchanged)'
+                    ];
+                }
+            } catch (\Exception $e) {
+                $errors[] = [
+                    'id' => $pulseId,
+                    'name' => $name,
+                    'reason' => 'update failed: ' . $e->getMessage()
+                ];
+            }
+        }
+
+        return [
+            'updated' => $success,
+            'errors' => $errors
+        ];
     }
 }

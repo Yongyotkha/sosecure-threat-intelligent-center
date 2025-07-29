@@ -11,14 +11,7 @@
         $.fn.dataTable.ext.errMode = 'none';
         $.extend( true, $.fn.dataTable.defaults, {
         buttons: [
-            {
-                "bom": true,
-                charset: 'UTF-8',
-                extend:    'csvHtml5',
-                text:      '<i class="fas fa-download"></i> CSV',
-                titleAttr: 'CSV'
-            },
-          
+            
         ],
         "processing": true,
         "deferRender": true,

@@ -37,6 +37,7 @@
         "laravel/tinker": "^1.0",
         "laravelcollective/html": "^5.5",
         "laravolt/avatar": "^2.0",
+        "league/csv": "^9.8",
         "league/flysystem-aws-s3-v3": "^1.0",
         "league/html-to-markdown": "^4.4",
         "maatwebsite/excel": "^3.0",

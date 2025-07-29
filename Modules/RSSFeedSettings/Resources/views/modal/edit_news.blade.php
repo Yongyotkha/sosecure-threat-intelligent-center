@@ -1,3 +1,16 @@
+<style>
+ 
+        .btn-published {
+            background-color: #28a745 !important; /* เขียว */
+            color: white;
+        }
+        .btn-unpublished {
+            background-color: #dc3545 !important; /* แดง */
+            color: white;
+        }
+</style>
+
+</style>
 <div id="fullscreen-modal" class="modal-dialog modal-dialog-aside">
     <div class="modal-content">
         <div class="modal-header">
@@ -327,12 +340,23 @@ $date_public = '';
             </div>
         </div>
 
+        
         <div class="modal-footer">
             {!! closeModalButton() !!}
             <button type="submit" class="btn btn-warning formDraft btn-rounded"><i class="fas fa-save"></i>
-                SaveDraft</button>
-            <button type="submit" class="btn btn-info formSaving submit btn-rounded"><i
-                    class="fas fa-paper-plane"></i> Save Public</button>
+                Save</button>
+
+              <button 
+                id="toggle-button"
+                type="button"
+                class="btn btn-info formSaving submit btn-rounded btn-published"
+                data-public="0"
+                onclick="togglePublish(this)">
+                <i class="fas fa-paper-plane"></i> Published
+                </button>
+
+            <!-- <button type="submit" class="btn btn-info formSaving submit btn-rounded"><i
+                    class="fas fa-paper-plane"></i>Public</button> -->
             {{-- {!! renderAjaxButton() !!} --}}
             {!! Form::close() !!}
             {{-- <form action="{{ route('rssfeedsettings.rss_data_preview_news') }}" method="post" target="_blank">
@@ -577,6 +601,49 @@ $date_public = '';
             document.execCommand("copy");
             document.body.removeChild(tempInput);
         }
+
+
+        window.addEventListener('DOMContentLoaded', () => {
+    // ล็อก input ทันทีเมื่อเริ่มถ้าเริ่มที่ Published
+    const button = document.getElementById('toggle-button');
+    if (button.getAttribute('data-public') === '1') {
+        lockModalInputs(true);
+    }
+});
+
+        function togglePublish(button) {
+  const modal = document.getElementById('fullscreen-modal');
+  const fields = modal.querySelectorAll('.modal-body input, .modal-body textarea, .modal-body select');
+
+  let isPublished = button.getAttribute('data-public') === '0';
+
+  if (isPublished) {
+    button.setAttribute('data-public', '1');
+    button.innerHTML = '<i class="fas fa-paper-plane"></i> Unpublished';
+    button.classList.remove('btn-published');
+    button.classList.add('btn-unpublished');
+
+    fields.forEach(el => {
+      el.setAttribute('disabled', true);
+      el.setAttribute('readonly', true);
+    });
+
+  } else {
+    button.setAttribute('data-public', '0');
+    button.innerHTML = '<i class="fas fa-paper-plane"></i> Published';
+    button.classList.remove('btn-unpublished');
+    button.classList.add('btn-published');
+
+    fields.forEach(el => {
+      el.removeAttribute('disabled');
+      el.removeAttribute('readonly');
+    });
+  }
+}
+
+
+
+
     </script>
 @endpush
 

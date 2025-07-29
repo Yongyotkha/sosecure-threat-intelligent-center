@@ -64,6 +64,67 @@ select.c-tags {
   width: 100% !important;
 }
 
+  .dropdown {
+    position: relative;
+    display: inline-block;
+    }
+
+    .dropdown-content {
+     display: none;
+     position: absolute;
+     top: 100%;          /* ให้อยู่ใต้ปุ่ม */
+     right: 0;           /* ชิดขอบขวาของปุ่ม */
+     background-color: #f1f1f1;
+     min-width: 160px;
+     z-index: 1;
+     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+     border-radius: 6px;
+     overflow: hidden;
+    }
+
+    .dropdown-content button {
+     width: 100%;
+     padding: 10px;
+     background: none;
+     border: none;
+     text-align: left;
+     cursor: pointer;
+     margin: 0;                /* เอา margin ที่ดันออกไปทางขวาออก */
+    }
+
+    .dropdown:hover .dropdown-content {
+     display: block;
+     }
+
+    .dropdown-content button:hover {
+    background-color: #ddd;
+    }
+
+    .btn-custom {
+        background-color: #ffffffff; 
+        border: #3869d4 solid 0.7px;
+        color: #3869d4;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition-duration: 0.3s;
+    }
+
+    .btn-custom:hover {
+        background-color: #3869d4; 
+        color: #ffffffff;
+        border: #3869d4 solid 0.7px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        transition-duration: 0.3s;
+    }
+    
+
 </style>
     <section id="content" class="bg">
         <section class="vbox">
@@ -262,39 +323,41 @@ select.c-tags {
 
                                 <div class="panel-body">
 
-                                    <div class="row m-b-12">
-                                        <div class="col-md-2 m-b-12">
-                                            <select name="sl_group" id="sl_group"
-                                                class="form-control sl_group c-dropdown-select2" placeholder="Select">
-                                                <option value="0" disabled="disabled">Selected</option>
-                                                <option></option>
-                                                <option value="1">Industries</option>
-                                                {{-- <option value="2">Group</option> --}}
-                                            </select>
-                                        </div>
-                                        <div class="col-md-10">
-                                            <div id="industries_box" style="display: none;">
-                                                <div id="fillter_click" class="button-group">
-                                                    <span id="btn_industrise"></span>
+                                
+                                        <!-- <input type="file" id="fileInput" accept=".csv" style="display: none;"> -->
+                                        <div class="row" style="text-align: left;">
+                                            <!-- <div id="loader" style="display:none; color: green;">⏳ Computing...</div> -->
+                                            <!-- <div class="dropdown">
+                                                <button class="btn btn-success">Actions <i class="fa fa-chevron-circle-down"></i></button>
+                                                <div class="dropdown-content">
+                                                <button onclick="exportCSV(this)" style="text-align: left;" value="1"><i class="fa fa-download"></i>  Export Event</button>
+                                                <button onclick="exportCSV(this)" style="text-align: left;" value="2"><i class="fa fa-download"></i>  Export Event & Attributes</button>
+                                                <button onclick="openModal()" style="text-align: left;"><i class="fa fa-upload"></i>  Import CSV</button>
                                                 </div>
-                                            </div>
-                                            <div id="group_box" class="row" style="display: none;">
-                                                <div class="col-md-12">
-                                                    <div id="fillter_click_group" class="button-group">
-                                                        <span id="btn_group"></span>
-                                                    </div>
-                                                </div>
+                                            </div> -->
+
+                                               <!-- <select name="action" id="action-event" class="form-control w-100 custom-select">
+                                                <option value="0">Actions</option>
+                                                <option value="1">Export Event</option>
+                                                <option value="2">Event & Attributes</option>
+                                                <option value="3">Import CSV</option>
+                                            </select> -->
+
+                                            
+                                            <div class="col-lg-12" style="text-align: left; overflow: visible;">
+                                                <button onclick="exportCSV(this)" class="btn btn-custom" style="text-align: left;" value="1">
+                                                    <i class="fa fa-arrow-circle-down"></i>  Event
+                                                </button>
+                                                <button onclick="exportCSV(this)" class="btn btn-custom" style="text-align: left;" value="2">
+                                                    <i class="fa fa-arrow-circle-down"></i>  Event & Attributes
+                                                </button>
+                                                <button onclick="openModal()" class="btn btn-custom" style="text-align: left;">
+                                                    <i class="fa fa-arrow-circle-up"></i>  Import CSV
+                                                </button>
                                             </div>
                                         </div>
-                                    </div>
-                                    {{-- <div id="industries_box" class="row" style="display: none;">
-                                <div class="col-md-12">
-                                    <h5 class="font-weight-bold">Industries</h5>
-                                    <div id="fillter_click" class="button-group">
-                                        <span id="btn_industrise"></span>
-                                    </div>
-                                </div>
-                            </div> --}}
+
+                                        
 
                                     <div class="table-responsive">
                                         <table class="table table-striped" id="table_events">
@@ -373,6 +436,101 @@ select.c-tags {
 
             </section>
         </section>
+
+        <div id="progressModal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content text-center p-3">
+            <h5 class="mb-2">Importing...</h5>
+            <div class="progress mb-2" style="height: 20px;">
+                <div id="importProgressBar" class="progress-bar progress-bar-striped progress-bar-animated"
+                    role="progressbar" style="width: 0%">0%</div>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="$('#progressModal').modal('hide')">Hide</button>
+            </div>
+        </div>
+        </div>
+
+
+            <div class="modal" id="import-modal">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                    <div class="modal-header bg-blue">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="text-white">&times;</span>
+                        </button>
+                        <h4 class="modal-title text-white" id="exampleModalLabel">Import File</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                
+                                <div class="radio-group">
+                                    <label><strong>Select Type Of Import</strong></label><br>
+                                    <label>
+                                        <input type="radio" class="ratio-import" name="import_type" value="event" checked> Events
+                                    </label>
+
+                                    <label>
+                                        <input type="radio" class="ratio-import" name="import_type" value="attribute"> Attribute
+                                    </label>
+                                    </div>
+
+                                    <style>
+                                    input[type="radio"] {
+                                    all: unset; 
+                                    appearance: auto;
+                                    -webkit-appearance: radio;
+                                    display: inline-block;
+                                    width: 16px;
+                                    height: 16px;
+                                    margin-right: 6px;
+                                    vertical-align: middle;
+                                }
+
+                                .radio-group label {
+                                    display: inline-flex;
+                                    align-items: center;
+                                    font-size: 16px;
+                                    margin-right: 20px;
+                                    cursor: pointer;
+                                }
+                                    .dropzone {
+                                    border: 2px dashed #ccc;
+                                    border-radius: 5px;
+                                    padding: 30px;
+                                    cursor: pointer;
+                                    height: auto;
+                                    text-align: center;
+                                    }
+
+                                    </style>
+
+                            
+                            </div>
+                            </div> 
+                            <br>
+                            <div id="body_detail" class="mb-3">
+                                <label for="fileInput" class="form-label"><i class="fa fa-file"></i> Choose or Drop file to import :</label>
+                                <input class="form-control dropzone" type="file" id="fileInput" style="border-radius: 7px;" accept=".csv" style="border-radius: 7px; height: 70px; font-size: 16px; padding: 10px;">
+                            </div>
+                           
+                        
+                    </div> 
+
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Close
+                        </button>
+                        <button type="button" class="btn btn-info" onclick="importCSV()">
+                        <i class="fas fa-paper-plane"></i> Import
+                        </button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
 
         <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
     </section>
@@ -1054,6 +1212,7 @@ select.c-tags {
             function search_table(page = 1) {
                 let startDate = $("#event_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
                 let endDate = $("#event_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
+
                 console.log(industries);
                 $('#table_events').DataTable({
                     searching: false,
@@ -1532,7 +1691,20 @@ select.c-tags {
                         }
                     });
              }
+              
 
+             
         </script>
+        <script>
+            const exportBaseUrl = "{{ route('indicators.export_events_indicators') }}";
+            const importBaseUrl = "{{ route('indicators.importToInsight') }}";
+        </script>
+        <script src="{{ asset('js/exportandimport.js') }}"></script>
+        <script>
+            function openModal() {
+                $('#import-modal').modal('show');
+            }
+            </script>
+
     @endpush
 @endsection

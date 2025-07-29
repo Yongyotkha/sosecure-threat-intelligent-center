@@ -13,6 +13,40 @@ select.c-tags {
     min-width: 300px !important;
 }
 
+.btn-custom {
+        background-color: #ffffffff; 
+        border: #3869d4 solid 0.7px;
+        color: #3869d4;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition-duration: 0.3s;
+    }
+
+    .btn-custom:hover {
+        background-color: #3869d4; 
+        color: #ffffffff;
+        border: #3869d4 solid 0.7px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        transition-duration: 0.3s;
+    }
+
+    .badge-medium {
+        color: #ffffffff;
+        background-color: #fff000;
+        }
+
+        .badge-high {
+        color: #ffffffff;
+        background-color: #FF8C00;
+        }
+
 </style>
 <section id="content" class="bg">
     <section class="vbox">
@@ -48,6 +82,7 @@ select.c-tags {
                     <div class="container-fluid" style="padding: 2rem">
                         <div class="row">
                             <div class="col-md-6">
+                                <input type="hidden" id="pulse-name" value="{{@$otx_events[0]['name']}}" data-name="{{@$otx_events[0]['name']}}">
                                 <h1>{{@$otx_events[0]['name']}}</h1>
                                 <p>Last Status : {{check_last_status(@$otx_events[0]['is_modified'])}} | Public :
                                 {!!check_publish(@$otx_events[0]['public'])!!}</p>
@@ -104,6 +139,17 @@ select.c-tags {
                                         </div>
                                     </div>
                                 </header>
+
+                                
+                                    <div class="row">
+                                        <div class="col-lg-3" style="margin-top: 10px;margin-bottom: -10px; margin-left: 10px">
+                                           
+                                            <button class="btn btn-custom" onclick="exportCSV()" style="text-align: center;">
+                                               <i class="fa fa-arrow-circle-down"></i>  Export CSV
+                                            </button>
+                                        </div>
+                                    </div>
+
                                 <div class="panel-body">
                                     <div id="main-list" class="row m-b-md">
                                         <div class="col-md-12">
@@ -121,8 +167,10 @@ select.c-tags {
                                                             <th>Type</th>
                                                             <th>Attribute Name</th>
                                                             <th>Tags</th>
-                                                            <th>Role</th>
+                                                            <th>Attribute Score</th>
+                                                            <th>Attribute Serverity</th>
                                                             <th>Date</th>
+                                                            <th>Role</th>
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
@@ -450,6 +498,14 @@ select.c-tags {
                                 `;
                             }
                         },
+                        {
+                        data: 'attribute_score',
+                        
+                    },
+                    {
+                        data: 'attribute_serverity'
+                    },
+                        
                     {
                         data: 'role',
                     },
@@ -460,6 +516,7 @@ select.c-tags {
                         data: 'indicator_id',
                         "visible": false,
                     },
+                
 
                     ],
                     columnDefs: [
@@ -474,7 +531,7 @@ select.c-tags {
                     },
 
                     {
-                        targets: 4,
+                        targets: 6,
                         render: function (data, type, row) {
                             var inner = '';
 
@@ -484,7 +541,7 @@ select.c-tags {
 
                     },
                     {
-                        targets: 3,
+                        targets: 5,
                         render: function (data, type, row) {
                             var inner = '';
                             var v = parseInt(row.updated_at.$date.$numberLong);
@@ -500,6 +557,26 @@ select.c-tags {
                             return inner;
                         }
 
+                    },
+                    {
+                        targets: 3, 
+                         className: 'text-center',
+                        render: function (data, type, row) {
+                            return `<span class="badge badge-success">${data}</span>`;
+                        }
+                    },
+                    {
+                        targets: 4,
+                         className: 'text-center',
+                        render: function (data, type, row) {
+                            let badgeClass = 'badge-secondary';
+                            if (data === 'High' || data === 'high') badgeClass = 'badge-high';
+                            else if (data === 'Critical' || data === 'critical') badgeClass = 'badge-danger';
+                            else if (data === 'Medium' || data === 'medium') badgeClass = 'badge-medium';
+                            else if (data === 'Low' || data === 'low') badgeClass = 'badge-success';
+                            else if (data === 'Infomation' || data === 'infomation') badgeClass = 'badge-info';
+                            return `<span class="badge ${badgeClass}">${data}</span>`;
+                        }
                     }
 
 
@@ -682,6 +759,10 @@ function count_view_event(){
 
 
 </script>
+<script>
+            const exportBaseUrl = "{{ route('indicators.export_event_indicators') }}";
+        </script>
+        <script src="{{ asset('js/exportindicators.js') }}"></script>
 
 @endpush
 @endsection

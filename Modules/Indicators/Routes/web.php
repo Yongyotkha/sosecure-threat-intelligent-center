@@ -70,5 +70,10 @@ Route::group(
 
         Route::get('/newGroups', 'IndicatorsController@new_link_group')->middleware('can:menu_items');
         Route::get('/newTags', 'IndicatorsController@new_link_tags')->middleware('can:menu_items');
+
+         Route::get('/export_events_indicators', 'IndicatorsController@export_events_indicators')->name('indicators.export_events_indicators');
+        Route::get('/export_event_indicators', 'IndicatorsController@export_event_indicators')->name('indicators.export_event_indicators');
+        Route::post('/import_event', 'IndicatorsController@import_event')->name('indicators.import_event');
+        Route::post('/importToInsight', 'IndicatorsController@importToInsight')->name('indicators.importToInsight');
     }
 );

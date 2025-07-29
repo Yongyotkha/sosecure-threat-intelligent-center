@@ -730,12 +730,22 @@ function getMentions($content)
     return $matches[2];
 }
 
+// function getUserIdExisting($username)
+// {
+//     $select = ['id', 'username'];
+//     return is_null($username) ? \Auth::id()
+//     : User::select($select)->whereUsername($username)->count() > 0
+//     ? User::select($select)->whereUsername($username)->first()->id : \Auth::id();
+// }
+
 function getUserIdExisting($username)
 {
     $select = ['id', 'username'];
-    return is_null($username) ? \Auth::id()
-    : User::select($select)->whereUsername($username)->count() > 0
-    ? User::select($select)->whereUsername($username)->first()->id : \Auth::id();
+    return is_null($username)
+        ? \Auth::id()
+        : (User::select($select)->whereUsername($username)->count() > 0
+            ? User::select($select)->whereUsername($username)->first()->id
+            : \Auth::id());
 }
 
 if (!function_exists('humanize')) {

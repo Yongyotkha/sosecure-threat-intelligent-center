@@ -12,6 +12,32 @@ use Carbon\Carbon;
 // dd(get_role_custom()['site_admin']);
 
 @endphp
+
+<style>
+    .img-icon-card.ice {
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    position: relative;
+    float: left;
+}
+
+.img-icon-card.ices {
+    width: 130px;
+    height: 130px;
+    overflow: hidden;
+    position: relative;
+    float: left;
+}
+
+.img-icon-smm-compro {
+    width: 110px;
+    height: 130px;
+    overflow: hidden;
+    position: relative;
+    margin: auto;
+}
+</style>
     <section class="hbox stretch">
         <aside id="hide-settings" class="aside aside-md b-r" style="display: none">
             <section class="vbox">
@@ -105,7 +131,7 @@ use Carbon\Carbon;
                             <a href="#" onclick="dataType('compromise')">
                                 <div class="card-dash-compro border-ee">
                                     <div class="left-card">
-                                        <div class="img-icon-card ice">
+                                        <div class="img-icon-card ices">
                                             <img src="{{asset('images/icebergline2.png')}}" alt="">
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper ">Public</h3>
@@ -118,7 +144,7 @@ use Carbon\Carbon;
                             <a href="#" onclick="dataType('darkweb')">
                                 <div class="card-dash-compro border-ee">
                                     <div class="left-card">
-                                        <div class="img-icon-card ice">
+                                        <div class="img-icon-card ices">
                                             <img src="{{asset('images/icebergline1.png')}}" alt="">
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper">Dark Web</h3>
@@ -132,7 +158,8 @@ use Carbon\Carbon;
                                 <div class="card-dash-compro border-ee" style="border-right: none !important">
                                     <div class="left-card">
                                         <div class="img-icon-card ice">
-                                            <img src="{{asset('Darkweb/EDR.png')}}" alt="">
+                                            <!-- <img src="{{asset('Darkweb/EDR.png')}}" alt=""> -->
+                                            <img src="https://insights-staging.sosecure.co.th/Darkweb/EDR.png" alt="">
                                         </div>
                                         <h3 class="name-dash-text-compro text-dark text-upper ">Endpoint Detection</h3>
                                         <span class="number-card green" id='webserver-count'>{{$webserver}}</span>
@@ -143,9 +170,10 @@ use Carbon\Carbon;
                         <div class="col-lg-3 col-md-6 nopadding">
                                 <div class="card-dash-compro border-ee" style="border-left: none !important;">
                                     <a href="#" onclick="">
-                                        <div class="compromised-new-box">
-                                            <div class="img-icon-smm-compro">
-                                                <img src="{{asset('Darkweb/Agent.png')}}" alt="">
+                                        <div class="compromised-new-box" >
+                                            <div class="img-icon-smm-compro" style="margin-top: -15px">
+                                                <!-- <img src="{{asset('Darkweb/Agent.png')}}" alt=""> -->
+                                                <img src="https://insights-staging.sosecure.co.th/Darkweb/Agent.png" alt="">
                                             </div>
                                             <div style="width: 50%" class="text-center">
                                                 <span class="number-card green" id='agent-count'>0</span>
@@ -154,9 +182,10 @@ use Carbon\Carbon;
                                         </div>
                                     </a>
                                     <a href="">
-                                        <div class="compromised-new-box">
-                                            <div class="img-icon-smm-compro">
-                                                <img src="{{asset('Darkweb/Network.png')}}" alt="">
+                                        <div class="compromised-new-box" >
+                                            <div class="img-icon-smm-compro" style="margin-top: -15px">
+                                                <!-- <img src="{{asset('Darkweb/Network.png')}}" alt=""> -->
+                                                <img  src="https://insights-staging.sosecure.co.th/Darkweb/Network.png" alt="">
                                             </div>
                                             <div style="width: 50%" class="text-center">
                                                 <span class="number-card green" id='network-count'>0</span>

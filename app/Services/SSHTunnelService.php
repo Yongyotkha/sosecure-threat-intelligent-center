@@ -2,11 +2,14 @@
 
 namespace App\Services;
 
+use phpseclib\Net\SSH2;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
+
 class SSHTunnelService
 {
+    protected $ssh;
     protected $config;
 
     public function __construct()
@@ -16,41 +19,69 @@ class SSHTunnelService
             'port' => env('SSH_PORT', 22),
             'username' => env('SSH_USERNAME', 'sosecure'),
             'password' => env('SSH_PASSWORD'),
-            'localPort' => env('SSH_TUNNEL_LOCAL_PORT', 3307),
-            'remoteHost' => env('SSH_TUNNEL_REMOTE_HOST', '127.0.0.1'),
-            'remotePort' => env('SSH_TUNNEL_REMOTE_PORT', 3306),
         ];
+    }
+
+    public function connect()
+    {
+        // ตรวจสอบ config
+        if (empty($this->config['host']) || empty($this->config['username']) || empty($this->config['password'])) {
+            throw new Exception('SSH configuration is missing. Please check your .env file');
+        }
+
+        try {
+            $this->ssh = new SSH2($this->config['host'], $this->config['port']);
+
+            if (!$this->ssh->login($this->config['username'], $this->config['password'])) {
+                throw new Exception('SSH Authentication failed');
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            throw new Exception('SSH Connection failed: ' . $e->getMessage());
+        }
     }
 
     public function createTunnel()
     {
-        // ตรวจสอบ config
-        foreach (['host', 'username', 'password', 'localPort', 'remoteHost', 'remotePort'] as $key) {
-            if (empty($this->config[$key])) {
-                throw new Exception("Missing SSH config: $key");
-            }
+        // $plinkPath = base_path('vendor/PuTTY/plink.exe');
+        // 'D:/xampp/htdocs/threat-intelligent-center/vendor/PuTTY/plink.exe';
+        
+        $plinkPath = base_path('vendor/PuTTY/plink.exe');
+        $sshUser = env('sshUser');
+        $sshHost = env('sshHost');
+        $localPort = env('localPort');
+        $remoteHost = env('remoteHost');
+        $remotePort = env('remotePort');
+        $sshPassword = env('SSH_PASSWORD');
+
+        $cmd = "start /B \"\" \"{$plinkPath}\" -ssh {$sshUser}@{$sshHost} -pw {$sshPassword} -L {$localPort}:{$remoteHost}:{$remotePort} -N -batch";
+
+        // ✅ สั่งให้ Windows รันคำสั่งนี้จริง
+        pclose(popen($cmd, "r"));
+
+        // ✅ Log เพื่อ debug
+        Log::info("🚀 [SSH TUNNEL] Executing: {$cmd}");
+    }
+
+    public function disconnect()
+    {
+        if ($this->ssh) {
+            $this->ssh->disconnect();
+            $this->ssh = null;
         }
+    }
 
-        $sshUser = $this->config['username'];
-        $sshHost = $this->config['host'];
-        $sshPort = $this->config['port'];
-        $localPort = $this->config['localPort'];
-        $remoteHost = $this->config['remoteHost'];
-        $remotePort = $this->config['remotePort'];
-        $sshPassword = $this->config['password'];
-
-        // ใช้ sshpass สำหรับส่งรหัสผ่านผ่าน SSH แบบไม่ interactive
-        $cmd = "sshpass -p '{$sshPassword}' ssh -o StrictHostKeyChecking=no -N -L {$localPort}:{$remoteHost}:{$remotePort} {$sshUser}@{$sshHost} -p {$sshPort} > /dev/null 2>&1 &";
-
-        exec($cmd);
-
-        Log::info("🚀 [SSH TUNNEL - Linux] Executing: {$cmd}");
+    public function isConnected()
+    {
+        return $this->ssh && $this->ssh->isConnected();
     }
 
     public function isTunnelRunning($port = 3307)
     {
-        // เช็คว่า port นั้นมี process listen อยู่หรือไม่
-        $output = shell_exec("lsof -i :$port | grep LISTEN");
-        return !empty($output);
+        // Windows เท่านั้น
+        $output = shell_exec("netstat -ano | findstr :$port");
+
+        return strpos($output, 'LISTENING') !== false;
     }
 }
