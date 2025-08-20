@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Modules\RSSFeedSettings\Entities\NewsCategory;
 use Modules\CategorySettings\Entities\CategorySettings;
@@ -469,11 +470,11 @@ class RSSFeedSettingsController extends Controller
         //     $client = new MongoClient($DB_MONGO_KEY);
         //     if(app()->environment('local'))
         //     {
-        //         $collection = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
+        //         $collection = $client->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
         //     }
         //     else
         //     {
-        //         $collection = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+        //         $collection = $client->sosecure_threatintelligent_dev_test->fx_otx_adversaries_related;
         //     }
 
         //     $query_actor = [
@@ -514,13 +515,13 @@ class RSSFeedSettingsController extends Controller
         //     $client = new MongoClient($DB_MONGO_KEY);
         //     if(app()->environment('local'))
         //     {
-        //         $collection_actor = $client->sosecure_threatintelligent->fx_otx_adversaries;
-        //         $conn = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
+        //         $collection_actor = $client->sosecure_threatintelligent_dev->fx_otx_adversaries;
+        //         $conn = $client->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
         //     }
         //     else
         //     {
-        //         $collection_actor = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
-        //         $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+        //         $collection_actor = $client->sosecure_threatintelligent_dev_test->fx_otx_adversaries;
+        //         $conn = $client->sosecure_threatintelligent_dev_test->fx_otx_adversaries_related;
         //     }
 
         //     // for($i=0;$i<$count_model;$i++)
@@ -750,11 +751,11 @@ class RSSFeedSettingsController extends Controller
                 $DB_MONGO_KEY = config('app.DB_MONGO_DEV');
                 $client = new MongoClient($DB_MONGO_KEY);
                 if (app()->environment('local')) {
-                    $collection_actor = $client->sosecure_threatintelligent->fx_otx_adversaries;
-                    $conn = $client->sosecure_threatintelligent->fx_otx_adversaries_related;
+                    $collection_actor = $client->sosecure_threatintelligent_dev->fx_otx_adversaries;
+                    $conn = $client->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
                 } else {
-                    $collection_actor = $client->sosecure_threatintelligent_test->fx_otx_adversaries;
-                    $conn = $client->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+                    $collection_actor = $client->sosecure_threatintelligent_dev_test->fx_otx_adversaries;
+                    $conn = $client->sosecure_threatintelligent_dev_test->fx_otx_adversaries_related;
                 }
 
                 $query_camp = [
@@ -1337,7 +1338,7 @@ class RSSFeedSettingsController extends Controller
             $public_date = '';
         }
 
-        // dd($RSSNews);
+        // dd('savedraft', $RSSNews->save_draft);
 
         // dd($data['RSSNews']->source);
         // $data['RSSNews'] = '';
@@ -1353,17 +1354,20 @@ class RSSFeedSettingsController extends Controller
         $data['action'] = 'edit';
         $data['category'] = CategorySettings::where('active', 1)->get();
         $data['public_date'] = $public_date;
+        $data['savedraft'] = $RSSNews->save_draft;
+
+        
 
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
         if (app()->environment('local')) {
-            $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
-            $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
-            $col_fx_otx_campaign = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
+            $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
+            $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
+            $col_fx_otx_campaign = $clientMD->sosecure_threatintelligent_dev->fx_otx_campaign;
         } else {
-            $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
-            $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
-            $col_fx_otx_campaign = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
+            $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries;
+            $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries_related;
+            $col_fx_otx_campaign = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_campaign;
         }
 
         $query_actor = [
@@ -1416,6 +1420,7 @@ class RSSFeedSettingsController extends Controller
             $data['master_campainge'] = null;
         }
         $data['mode'] = true;
+        // dd($data);
         return view('rssfeedsettings::modal.edit_news')->with($data);
     }
 
@@ -1437,13 +1442,14 @@ class RSSFeedSettingsController extends Controller
         // dd($data['get_source']);
         $data['category'] = CategorySettings::where('active', 1)->get();
         $data['public_date'] = $public_date;
+        
 
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
         if (app()->environment('local')) {
-            $col_fx_otx_campaign = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
+            $col_fx_otx_campaign = $clientMD->sosecure_threatintelligent_dev->fx_otx_campaign;
         } else {
-            $col_fx_otx_campaign = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
+            $col_fx_otx_campaign = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_campaign;
         }
 
         $query_master_campainge = [
@@ -1623,9 +1629,9 @@ class RSSFeedSettingsController extends Controller
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
         if (app()->environment('local')) {
-            $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+            $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
         } else {
-            $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+            $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries_related;
         }
 
         $query_delete = array(
@@ -1742,17 +1748,18 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_select_actor_news_create(Request $request)
     {
+
         if ($request->has('q')) {
             $search = $request->q;
 
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $client = new MongoClient($DB_MONGO_KEY);
             if (app()->environment('local')) {
-                $db_name = 'sosecure_threatintelligent';
+                $db_name = 'sosecure_threatintelligent_dev';
                 $db = $client->$db_name;
                 $collection = $db->fx_otx_adversaries;
             } else {
-                $db_name = 'sosecure_threatintelligent_test';
+                $db_name = 'sosecure_threatintelligent_dev_test';
                 $db = $client->$db_name;
                 $collection = $db->fx_otx_adversaries;
             }
@@ -1776,8 +1783,11 @@ class RSSFeedSettingsController extends Controller
     public function rss_data_store_news_create(Request $request)
     {
 
-    
-   
+        // Log::info($request->is_published);
+        // return response()->json([
+        //     'message' => 'Your isPublished is : ' . $request->is_published,    
+        // ]
+        // );
 
         $role_custom = @check_role_custom();
         if (!$role_custom['news']) {
@@ -1856,7 +1866,9 @@ class RSSFeedSettingsController extends Controller
             $RSSNews_check->serverity = $request->serverity;
             $RSSNews_check->source = $request->source;
             $RSSNews_check->public_date = Carbon::parse($request->public_date);
+            // $RSSNews_check->published = $request->is_published;
             $detail_th = @$_POST['detail_th']; //รับค่าจาก messageInput
+
             if ($detail_th) {
                 $dom = new \domdocument();
                 if ($dom->getelementsbytagname('img')) {
@@ -2022,13 +2034,13 @@ class RSSFeedSettingsController extends Controller
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
 
             if (app()->environment('local')) {
-                $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
-                $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
-                $collection_campaign = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
+                $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
+                $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
+                $collection_campaign = $clientMD->sosecure_threatintelligent_dev->fx_otx_campaign;
             } else {
-                $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
-                $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
-                $collection_campaign = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
+                $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries;
+                $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries_related;
+                $collection_campaign = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_campaign;
             }
 
             $query_delete = array(
@@ -2301,6 +2313,7 @@ class RSSFeedSettingsController extends Controller
             $RSSNews->serverity = $request->serverity;
             $RSSNews->source = $request->source;
             $RSSNews->public_date = Carbon::parse($request->public_date);
+            // $RSSNews->published = $request->is_published;
             $detail_th = @$_POST['detail_th']; //รับค่าจาก messageInput
             if ($detail_th) {
                 $dom = new \domdocument();
@@ -2405,7 +2418,6 @@ class RSSFeedSettingsController extends Controller
                             }
                         }
 
-
                         //base64
                         $img_check_src = explode(";", $data);
                         if (@$img_check_src[1]) {
@@ -2466,11 +2478,11 @@ class RSSFeedSettingsController extends Controller
                 $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
                 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
                 if (app()->environment('local')) {
-                    $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
-                    $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+                    $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
+                    $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
                 } else {
-                    $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
-                    $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+                    $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries;
+                    $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries_related;
                 }
 
                 // $query_delete = array(
@@ -2563,13 +2575,13 @@ class RSSFeedSettingsController extends Controller
                 $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
                 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
                 if (app()->environment('local')) {
-                    $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
-                    $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
-                    $collection_campaign = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
+                    $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
+                    $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
+                    $collection_campaign = $clientMD->sosecure_threatintelligent_dev->fx_otx_campaign;
                 } else {
-                    $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
-                    $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
-                    $collection_campaign = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
+                    $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries;
+                    $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries_related;
+                    $collection_campaign = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_campaign;
                 }
 
                 foreach ($request->new_campainge as $data_campainge) {
@@ -3772,13 +3784,13 @@ class RSSFeedSettingsController extends Controller
             $DB_MONGO_KEY = env("DB_MONGO_DEV");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
             if (app()->environment('local')) {
-                $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
-                $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
-                $collection_campaign = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
+                $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
+                $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
+                $collection_campaign = $clientMD->sosecure_threatintelligent_dev->fx_otx_campaign;
             } else {
-                $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
-                $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
-                $collection_campaign = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
+                $col_fx_otx_adversaries = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries;
+                $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_adversaries_related;
+                $collection_campaign = $clientMD->sosecure_threatintelligent_dev_test->fx_otx_campaign;
             }
 
             $query_search = [

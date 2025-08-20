@@ -38,10 +38,10 @@ class compareImages
             return imagecreatefromjpeg($i);
         } else
             if ($mime[2] == 'png') {
-                return imagecreatefrompng($i);
-            } else {
-                return false;
-            }
+            return imagecreatefrompng($i);
+        } else {
+            return false;
+        }
     }
 
     private function resizeImage($source)
@@ -77,7 +77,6 @@ class compareImages
             $bits[] = ($color >= $colorMean[0]) ? 1 : 0;
         }
         return $bits;
-
     }
 
     public function compareWith($tagetImage)
@@ -141,7 +140,7 @@ class compareImages
             $diff = 0;
             $sString = str_split($sString);
             $imageHash = str_split($imageHash);
-            for($a = 0; $a < 64; $a++) {
+            for ($a = 0; $a < 64; $a++) {
                 if ($imageHash[$a] != $sString[$a]) {
                     $diff++;
                 }
@@ -150,4 +149,50 @@ class compareImages
         }
         return 64;
     }
+
+    public function compareBySlices($targetImage, $sliceHeight = 1000)
+    {
+        $mime1 = $this->mimeType($this->source);
+        $mime2 = $this->mimeType($targetImage);
+        if (!$mime1 || !$mime2) return 100;
+
+        list($width1, $height1) = $mime1;
+        list($width2, $height2) = $mime2;
+
+        $slices = min(floor($height1 / $sliceHeight), floor($height2 / $sliceHeight));
+        $differentSlices = 0;
+
+        for ($i = 0; $i < $slices; $i++) {
+            $slice1 = imagecreatetruecolor($width1, $sliceHeight);
+            $slice2 = imagecreatetruecolor($width2, $sliceHeight);
+
+            $img1 = $this->createImage($this->source);
+            $img2 = $this->createImage($targetImage);
+
+            imagecopy($slice1, $img1, 0, 0, 0, $i * $sliceHeight, $width1, $sliceHeight);
+            imagecopy($slice2, $img2, 0, 0, 0, $i * $sliceHeight, $width2, $sliceHeight);
+
+            $temp1 = sys_get_temp_dir() . "/s1_{$i}.jpg";
+            $temp2 = sys_get_temp_dir() . "/s2_{$i}.jpg";
+            imagejpeg($slice1, $temp1);
+            imagejpeg($slice2, $temp2);
+
+            $hash1 = $this->hasString($temp1);
+            $hash2 = $this->hasString($temp2);
+
+            $diff = $this->compareHash($hash2);
+            if ($diff > 10) $differentSlices++;
+
+            imagedestroy($slice1);
+            imagedestroy($slice2);
+            unlink($temp1);
+            unlink($temp2);
+        }
+        Log::info("Different slices: {$differentSlices} / {$slices} = " . round(($differentSlices / $slices) * 100, 2));
+
+        return round(($differentSlices / $slices) * 100, 2);
+    }
+
+
+    
 }

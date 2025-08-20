@@ -14,15 +14,31 @@ namespace Prophecy\Comparator;
 use Prophecy\Prophecy\ProphecyInterface;
 use SebastianBergmann\Comparator\ObjectComparator;
 
+/**
+ * @final
+ */
 class ProphecyComparator extends ObjectComparator
 {
-    public function accepts($expected, $actual)
+    /**
+     * @param mixed $expected
+     * @param mixed $actual
+     */
+    public function accepts($expected, $actual): bool
     {
         return is_object($expected) && is_object($actual) && $actual instanceof ProphecyInterface;
     }
 
-    public function assertEquals($expected, $actual, $delta = 0.0, $canonicalize = false, $ignoreCase = false, array &$processed = array())
+    /**
+     * @param mixed $expected
+     * @param mixed $actual
+     * @param float $delta
+     * @param bool  $canonicalize
+     * @param bool  $ignoreCase
+     * @param mixed[] $processed
+     */
+    public function assertEquals($expected, $actual, $delta = 0.0, $canonicalize = false, $ignoreCase = false, array &$processed = array()): void
     {
+        \assert($actual instanceof ProphecyInterface);
         parent::assertEquals($expected, $actual->reveal(), $delta, $canonicalize, $ignoreCase, $processed);
     }
 }

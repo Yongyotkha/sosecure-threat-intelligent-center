@@ -37,15 +37,31 @@ select.c-tags {
         transition-duration: 0.3s;
     }
 
-    .badge-medium {
+    
+    .badge-critical {
         color: #ffffffff;
-        background-color: #fff000;
+        background-color: #b93624;
+        }
+
+    .badge-medium {
+        color: #000000ff;
+        background-color: #f2ff15;
         }
 
         .badge-high {
-        color: #ffffffff;
-        background-color: #FF8C00;
+        color: #000000ff;
+        background-color: #fcc838;
         }
+
+        .badge-isinfo {
+        color: #ffffffff;
+        background-color: #00dcff;
+        }
+        .badge-low {
+        color: #ffffffff;
+        background-color: #409967;
+        }
+        
 
 </style>
 <section id="content" class="bg">
@@ -559,26 +575,42 @@ select.c-tags {
 
                     },
                     {
-                        targets: 3, 
-                         className: 'text-center',
-                        render: function (data, type, row) {
-                            return `<span class="badge badge-success">${data}</span>`;
+                        targets: 3,
+                        className: 'text-center',
+                        render: function (data, type, row, meta) {
+                            if (type !== 'display') return data;
+
+                            var txt = (data === undefined || data === null) ? '' : String(data).trim();
+                            if (!txt) return '';
+
+                            return '<span class="badge badge-success">' + txt + '</span>';
                         }
                     },
                     {
                         targets: 4,
-                         className: 'text-center',
+                        className: 'text-center',
                         render: function (data, type, row) {
-                            let badgeClass = 'badge-secondary';
-                            if (data === 'High' || data === 'high') badgeClass = 'badge-high';
-                            else if (data === 'Critical' || data === 'critical') badgeClass = 'badge-danger';
-                            else if (data === 'Medium' || data === 'medium') badgeClass = 'badge-medium';
-                            else if (data === 'Low' || data === 'low') badgeClass = 'badge-success';
-                            else if (data === 'Infomation' || data === 'infomation') badgeClass = 'badge-info';
-                            return `<span class="badge ${badgeClass}">${data}</span>`;
+                            if (type !== 'display') return data;
+
+                            const raw = (data ?? '').toString().trim();
+                            if (!raw) return '<span></span>';
+
+                            const val = raw.toLowerCase();
+
+                            const badgeMap = {
+                            critical: 'badge-critical',
+                            high: 'badge-high',
+                            medium: 'badge-medium',
+                            low: 'badge-low',
+                            information: 'badge-isinfo',
+                            info: 'badge-isinfo'
+                            };
+
+                            const cls = badgeMap[val];
+                            if (!cls) return `<span>${raw}</span>`;
+                            return `<span class="badge ${cls}">${raw}</span>`;
                         }
                     }
-
 
                     ]
                 });

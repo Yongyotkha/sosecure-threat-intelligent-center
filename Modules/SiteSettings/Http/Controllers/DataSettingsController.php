@@ -14,6 +14,9 @@ use Modules\SiteSettings\Entities\site_config_email_alert;
 use Modules\SiteSettings\Entities\site_menu_permission;
 use Modules\SiteSettings\Entities\site_menu_sub_permission;
 use App\Entities\Logs_setting;
+use Illuminate\Support\Facades\Log;
+use Modules\SiteSettings\Entities\site_config_email_alert_defacement;
+use Modules\SiteSettings\Entities\site_config_email_alert_defacement_customer;
 
 class DataSettingsController extends Controller
 {
@@ -84,6 +87,7 @@ class DataSettingsController extends Controller
             $data['log_format_indicator'] =$Logs_setting_data->content;
 
         }
+        // dd($data);
 
         return view('sitesettings::data_setting')->with($data);
     }
@@ -135,7 +139,8 @@ class DataSettingsController extends Controller
      */
     public function update($id, Request $request)
     {
-        
+        // log::info($request->all());
+        // dd($request->all());
         $SiteSettings = SiteSettings::where('code', $id)->first();
         if ($request->page_setting == 'site_permission_settings') {
             $SiteSettings->user_allow = $request->site_user_allow ? 'Y' : 'N';
@@ -260,6 +265,30 @@ class DataSettingsController extends Controller
                         $site_config_email_alert->site_id = $SiteSettings->id;
                         $site_config_email_alert->email = $email_alert;
                         $site_config_email_alert->save();
+                    }
+                }
+            }
+
+            site_config_email_alert_defacement::where('site_id', $SiteSettings->id)->delete();
+            if ($request->email_alert_defacement) {
+                if (count($request->email_alert_defacement) > 0) {
+                    foreach ($request->email_alert_defacement as $email_alert_d) {
+                        $site_config_email_alert_d = new site_config_email_alert_defacement;
+                        $site_config_email_alert_d->site_id = $SiteSettings->id;
+                        $site_config_email_alert_d->email = $email_alert_d;
+                        $site_config_email_alert_d->save();
+                    }
+                }
+            }
+
+            site_config_email_alert_defacement_customer::where('site_id', $SiteSettings->id)->delete();
+            if ($request->email_alert_defacement_customer) {
+                if (count($request->email_alert_defacement_customer) > 0) {
+                    foreach ($request->email_alert_defacement_customer as $email_alert_d) {
+                        $site_config_email_alert_d = new site_config_email_alert_defacement_customer;
+                        $site_config_email_alert_d->site_id = $SiteSettings->id;
+                        $site_config_email_alert_d->email = $email_alert_d;
+                        $site_config_email_alert_d->save();
                     }
                 }
             }

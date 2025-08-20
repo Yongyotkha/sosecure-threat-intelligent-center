@@ -40,13 +40,13 @@ abstract class AbstractUriElement
      *
      * @throws \InvalidArgumentException if the node is not a link
      */
-    public function __construct(\DOMElement $node, string $currentUri = null, ?string $method = 'GET')
+    public function __construct(\DOMElement $node, ?string $currentUri = null, ?string $method = 'GET')
     {
         $this->setNode($node);
         $this->method = $method ? strtoupper($method) : null;
         $this->currentUri = $currentUri;
 
-        $elementUriIsRelative = null === parse_url(trim($this->getRawUri()), \PHP_URL_SCHEME);
+        $elementUriIsRelative = !parse_url(trim($this->getRawUri()), \PHP_URL_SCHEME);
         $baseUriIsAbsolute = null !== $this->currentUri && \in_array(strtolower(substr($this->currentUri, 0, 4)), ['http', 'file']);
         if ($elementUriIsRelative && !$baseUriIsAbsolute) {
             throw new \InvalidArgumentException(sprintf('The URL of the element is relative, so you must define its base URI passing an absolute URL to the constructor of the "%s" class ("%s" was passed).', __CLASS__, $this->currentUri));
@@ -56,7 +56,7 @@ abstract class AbstractUriElement
     /**
      * Gets the node associated with this link.
      *
-     * @return \DOMElement A \DOMElement instance
+     * @return \DOMElement
      */
     public function getNode()
     {
@@ -66,7 +66,7 @@ abstract class AbstractUriElement
     /**
      * Gets the method associated with this link.
      *
-     * @return string The method
+     * @return string
      */
     public function getMethod()
     {
@@ -76,50 +76,11 @@ abstract class AbstractUriElement
     /**
      * Gets the URI associated with this link.
      *
-     * @return string The URI
+     * @return string
      */
     public function getUri()
     {
-        $uri = trim($this->getRawUri());
-
-        // absolute URL?
-        if (null !== parse_url($uri, \PHP_URL_SCHEME)) {
-            return $uri;
-        }
-
-        // empty URI
-        if (!$uri) {
-            return $this->currentUri;
-        }
-
-        // an anchor
-        if ('#' === $uri[0]) {
-            return $this->cleanupAnchor($this->currentUri).$uri;
-        }
-
-        $baseUri = $this->cleanupUri($this->currentUri);
-
-        if ('?' === $uri[0]) {
-            return $baseUri.$uri;
-        }
-
-        // absolute URL with relative schema
-        if (str_starts_with($uri, '//')) {
-            return preg_replace('#^([^/]*)//.*$#', '$1', $baseUri).$uri;
-        }
-
-        $baseUri = preg_replace('#^(.*?//[^/]*)(?:\/.*)?$#', '$1', $baseUri);
-
-        // absolute path
-        if ('/' === $uri[0]) {
-            return $baseUri.$uri;
-        }
-
-        // relative path
-        $path = parse_url(substr($this->currentUri, \strlen($baseUri)), \PHP_URL_PATH);
-        $path = $this->canonicalizePath(substr($path, 0, strrpos($path, '/')).'/'.$uri);
-
-        return $baseUri.('' === $path || '/' !== $path[0] ? '/' : '').$path;
+        return UriResolver::resolve($this->getRawUri(), $this->currentUri);
     }
 
     /**
@@ -136,7 +97,7 @@ abstract class AbstractUriElement
      *
      * @return string
      */
-    protected function canonicalizePath($path)
+    protected function canonicalizePath(string $path)
     {
         if ('' === $path || '/' === $path) {
             return $path;
@@ -167,36 +128,4 @@ abstract class AbstractUriElement
      * @throws \LogicException If given node is not an anchor
      */
     abstract protected function setNode(\DOMElement $node);
-
-    /**
-     * Removes the query string and the anchor from the given uri.
-     */
-    private function cleanupUri(string $uri): string
-    {
-        return $this->cleanupQuery($this->cleanupAnchor($uri));
-    }
-
-    /**
-     * Remove the query string from the uri.
-     */
-    private function cleanupQuery(string $uri): string
-    {
-        if (false !== $pos = strpos($uri, '?')) {
-            return substr($uri, 0, $pos);
-        }
-
-        return $uri;
-    }
-
-    /**
-     * Remove the anchor from the uri.
-     */
-    private function cleanupAnchor(string $uri): string
-    {
-        if (false !== $pos = strpos($uri, '#')) {
-            return substr($uri, 0, $pos);
-        }
-
-        return $uri;
-    }
 }

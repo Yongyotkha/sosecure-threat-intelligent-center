@@ -205,8 +205,8 @@ select.c-tags {
                                     <h5 class="font-weight-bold">Date</h5>
                                     <div id="event_date" class="text-center form-control"
                                         style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
-                                        <i class="fa fa-calendar"></i>&nbsp;
-                                        <span></span> <i class="fa fa-caret-down"></i>
+                                        &nbsp;
+                                        <span>Select date range</span> 
                                     </div>
                                 </div>
                                 <div class="col-lg-4 mb-1">
@@ -219,7 +219,7 @@ select.c-tags {
                                             <span>Published</span>
                                         </button>
                                         <button class="btn btn-grey check_published" value="2">
-                                            <span> No Published </span>
+                                            <span> UnPublished </span>
                                         </button>
                                     </div>
                                 </div>
@@ -378,7 +378,7 @@ select.c-tags {
                                                     <th style="width: 270px;">Actor / Campainge</th>
                                                     <th>Published</th>
                                                     <th>Last Status</th>
-                                                    <th class="nowrap">DateTime</th>
+                                                    <th class="nowrap">Modified DateTime</th>
                                                     <th>Attribute</th>
                                                     <th>Action</th>
 
@@ -520,7 +520,7 @@ select.c-tags {
 
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <button type="button" class="btn btn-default" id="btnClose" data-dismiss="modal">
                         <i class="fas fa-times"></i> Close
                         </button>
                         <button type="button" class="btn btn-info" onclick="importCSV()">
@@ -642,13 +642,30 @@ select.c-tags {
                     series: load_graph()
                 });
 
-                var start = moment().startOf('hour');
-                var end = moment().startOf('hour').add(32, 'hour');
+                var start = moment().startOf('day'); 
+                var end = moment().endOf('day');    
+
+
+                let first_load = true;
 
                 function cb(start, end) {
-                    $('#event_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-                    startDate = start;
-                    endDate = end;
+                    if (first_load) {
+                        $('#event_date span').html('Please select date range');
+                        startDate = start;
+                        endDate = end;
+                        first_load = false;
+                        return;
+                    } else {
+                        if (!start) {
+                            $('#event_date span').html('Please select date range');
+                            startDate = '';
+                            endDate = '';
+                        } else {
+                            $('#event_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                        startDate = start;
+                        endDate = end;
+                        }
+                    }
                 }
 
                 $('#event_date').daterangepicker({
@@ -696,12 +713,10 @@ select.c-tags {
                     check_published = null;
                     $(".btn-grey").removeClass("active");
                     $("#all").addClass("active");
-                    start = moment();
-                    end = moment();
+                    start = '';
+                    end = '';
                     cb(start, end);
                     load_table(1);
-
-
                 });
 
 
@@ -1691,7 +1706,18 @@ select.c-tags {
                         }
                     });
              }
-              
+             function clearCsvInput() {
+                const inp = document.getElementById('fileInput');
+                if (!inp) return;
+
+                inp.value = '';
+
+                const label = inp.closest('.custom-file')?.querySelector('.custom-file-label');
+                if (label) label.textContent = 'Choose file';
+            }
+
+            document.getElementById('btnClose')?.addEventListener('click', clearCsvInput);
+
 
              
         </script>

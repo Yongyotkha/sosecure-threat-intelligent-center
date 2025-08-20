@@ -2,6 +2,7 @@
 
 namespace Modules\WebDefacement\Http\Controllers;
 
+// use App\Log;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -13,8 +14,13 @@ use Artisan;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
 use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
-use DB;
+// use DB;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Log;
+use App\Mail\DefacementAlertMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class WebDefacementController extends Controller
 {
@@ -43,7 +49,7 @@ class WebDefacementController extends Controller
     public function index()
     {
         $role_custom = @check_role_custom();
-        if(!$role_custom['web_defacement']) {
+        if (!$role_custom['web_defacement']) {
             check_permission403();
         }
         $data['page'] = langapp('webdefacement');
@@ -70,7 +76,7 @@ class WebDefacementController extends Controller
         //                 $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
         //                 ->whereIn('id', $site_id_arr)
         //                 ->get();
-             
+
 
         //             } else {//not support and admin
         //                 $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
@@ -86,41 +92,41 @@ class WebDefacementController extends Controller
         // }
         $get_role_custom_first = @get_role_custom();
         $site_id_arr = @$get_role_custom_first['site_id_arr'];
-        if(@$get_role_custom_first['superadmin'] == 1) {
-            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
-            $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)->get();
-        }else if(@$get_role_custom_first['client'] == 1) {
-            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-            ->whereIn('id', $site_id_arr)//['49', '56']
-            ->get();
+        if (@$get_role_custom_first['superadmin'] == 1) {
+            $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)->get();
+            $SiteSettings_add = SiteSettings::select('id', 'name')->where("active", 1)->where("deleted_at", null)->get();
+        } else if (@$get_role_custom_first['client'] == 1) {
+            $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
+                ->whereIn('id', $site_id_arr) //['49', '56']
+                ->get();
 
-            $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
-            ->whereIn('id', $site_id_arr)
-            ->get();
-        }else if(@$get_role_custom_first['site_support'] == 1) {
-            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-            ->whereIn('id', $site_id_arr)//['49', '56']
-            ->get();
+            $SiteSettings_add = SiteSettings::select('id', 'name')->where("active", 1)->where("deleted_at", null)
+                ->whereIn('id', $site_id_arr)
+                ->get();
+        } else if (@$get_role_custom_first['site_support'] == 1) {
+            $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
+                ->whereIn('id', $site_id_arr) //['49', '56']
+                ->get();
 
-            $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
-            ->whereIn('id', $site_id_arr)
-            ->get();
-        }else if(@$get_role_custom_first['site_admin'] == 1) {
-            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-            ->whereIn('id', $site_id_arr)//['49', '56']
-            ->get();
+            $SiteSettings_add = SiteSettings::select('id', 'name')->where("active", 1)->where("deleted_at", null)
+                ->whereIn('id', $site_id_arr)
+                ->get();
+        } else if (@$get_role_custom_first['site_admin'] == 1) {
+            $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
+                ->whereIn('id', $site_id_arr) //['49', '56']
+                ->get();
 
-            $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
-            ->whereIn('id', $site_id_arr)
-            ->get();
-        }else if(@$get_role_custom_first['site_client'] == 1) {
-            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-            ->whereIn('id', $site_id_arr)//['49', '56']
-            ->get();
+            $SiteSettings_add = SiteSettings::select('id', 'name')->where("active", 1)->where("deleted_at", null)
+                ->whereIn('id', $site_id_arr)
+                ->get();
+        } else if (@$get_role_custom_first['site_client'] == 1) {
+            $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
+                ->whereIn('id', $site_id_arr) //['49', '56']
+                ->get();
 
-            $SiteSettings_add = SiteSettings::select('id', 'name')->where("active",1)->where("deleted_at",null)
-            ->whereIn('id', $site_id_arr)
-            ->get();
+            $SiteSettings_add = SiteSettings::select('id', 'name')->where("active", 1)->where("deleted_at", null)
+                ->whereIn('id', $site_id_arr)
+                ->get();
         }
 
         $data['SiteSettings'] = $SiteSettings;
@@ -129,8 +135,9 @@ class WebDefacementController extends Controller
         return view('webdefacement::index')->with($data);
     }
 
-    public function tbl_server(Request $request){
-        if($request->ajax()){
+    public function tbl_server(Request $request)
+    {
+        if ($request->ajax()) {
             $query = DB::table('webdefacment_data_detection as data_detection')
                 ->leftjoin('site', 'data_detection.site_id', 'site.id')
                 ->where('data_detection.deleted_at', null)
@@ -138,50 +145,38 @@ class WebDefacementController extends Controller
                 ->get();
 
             return DataTables::of($query)
-                ->editColumn('serverity', function($query){
+                ->editColumn('serverity', function ($query) {
                     $html = '';
                     $serverity = $query->serverity;
                     $html = '';
 
-                    if($serverity == 'Critical')
-                    {
+                    if ($serverity == 'Critical') {
                         $html .= '<span class="badge" style="background-color: #b93624;">Critical</span>';
-                    }
-                    else if($serverity == 'High')
-                    {
+                    } else if ($serverity == 'High') {
                         $html .= '<span class="badge" style="background-color: #fcc838;">High</span>';
-                    }
-                    else if($serverity == 'Medium')
-                    {
+                    } else if ($serverity == 'Medium') {
                         $html .= '<span class="badge" style="background-color: #f2ff15;color: #333;">Medium</span>';
-                    }
-                    else if($serverity == 'Low')
-                    {
+                    } else if ($serverity == 'Low') {
                         $html .= '<span class="badge" style="background-color: #409967;">Low</span>';
-                    }
-                        else if($serverity == 'Information')
-                    {
+                    } else if ($serverity == 'Information') {
                         $html .= '<span class="badge" style="background-color: #00dcff;">Information</span>';
-                    }
-                    else
-                    {
+                    } else {
                         $html .= '<span class="badge"> No Severity </span>';
                     }
-                    
+
                     $html .= '';
 
                     return $html;
                 })
-                ->editColumn('status', function($query){
+                ->editColumn('status', function ($query) {
                     $html = '';
                     $html .= '
                         <label class="switch">
                             <input type="checkbox" id="" onchange="" name="active" value="Y"
                     ';
-                            if($query->status == 'Y')
-                            {
-                    $html .= 'checked';
-                            }
+                    if ($query->status == 'Y') {
+                        $html .= 'checked';
+                    }
                     $html .= '        
                             >
                             <span></span>
@@ -189,9 +184,8 @@ class WebDefacementController extends Controller
                     ';
 
                     return $html;
-
                 })
-                ->addColumn('action', function($query){
+                ->addColumn('action', function ($query) {
                     $html = '';
                     $html .= ' 
                         
@@ -208,20 +202,19 @@ class WebDefacementController extends Controller
                 ->rawColumns(['serverity', 'status', 'action'])
                 ->make(true);
         }
-
     }
 
-    public function detail($code,Request $request)
+    public function detail($code, Request $request)
     {
         $role_custom = @check_role_custom();
-        if(!$role_custom['web_defacement']) {
+        if (!$role_custom['web_defacement']) {
             check_permission403();
         }
-       
-        $WebdefacmentSetting = WebdefacmentSetting::where("code",$code)->where('deleted_at', null)->where('active', 1)->with('get_webdefacment_data_original_detail')->with('get_webdefacment_data_check_detail')->with('get_webdefacment_data_log_detail');
-        
 
-        
+        $WebdefacmentSetting = WebdefacmentSetting::where("code", $code)->where('deleted_at', null)->where('active', 1)->with('get_webdefacment_data_original_detail')->with('get_webdefacment_data_check_detail')->with('get_webdefacment_data_log_detail');
+
+
+
         //<><><>
         // if(Auth::check()) {
 
@@ -239,7 +232,7 @@ class WebDefacementController extends Controller
         //                 $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
         //                 ->whereIn('id', $site_id_arr)//['49', '56']
         //                 ->get();
-             
+
 
         //             } else {//not support and admin
         //                 $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
@@ -252,28 +245,27 @@ class WebDefacementController extends Controller
 
         $get_role_custom_first = @get_role_custom();
         $site_id_arr = @$get_role_custom_first['site_id_arr'];
-        if(@$get_role_custom_first['superadmin'] == 1) {
-            
-        }else if(@$get_role_custom_first['client'] == 1) {
-            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-            ->whereIn('id', $site_id_arr)//['49', '56']
-            ->get();
-        }else if(@$get_role_custom_first['site_support'] == 1) {
-            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-            ->whereIn('id', $site_id_arr)//['49', '56']
-            ->get();
-        }else if(@$get_role_custom_first['site_admin'] == 1) {
-            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-            ->whereIn('id', $site_id_arr)//['49', '56']
-            ->get();
-        }else if(@$get_role_custom_first['site_client'] == 1) {
-            $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)
-            ->whereIn('id', $site_id_arr)//['49', '56']
-            ->get();
+        if (@$get_role_custom_first['superadmin'] == 1) {
+        } else if (@$get_role_custom_first['client'] == 1) {
+            $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
+                ->whereIn('id', $site_id_arr) //['49', '56']
+                ->get();
+        } else if (@$get_role_custom_first['site_support'] == 1) {
+            $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
+                ->whereIn('id', $site_id_arr) //['49', '56']
+                ->get();
+        } else if (@$get_role_custom_first['site_admin'] == 1) {
+            $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
+                ->whereIn('id', $site_id_arr) //['49', '56']
+                ->get();
+        } else if (@$get_role_custom_first['site_client'] == 1) {
+            $SiteSettings = SiteSettings::where("active", 1)->where("deleted_at", null)
+                ->whereIn('id', $site_id_arr) //['49', '56']
+                ->get();
         }
 
-        if(count($site_id_arr) > 0) {
-            $WebdefacmentSetting = $WebdefacmentSetting->whereIn('site_id' , $site_id_arr);
+        if (count($site_id_arr) > 0) {
+            $WebdefacmentSetting = $WebdefacmentSetting->whereIn('site_id', $site_id_arr);
         }
         $WebdefacmentSetting = $WebdefacmentSetting->first();
         // dd($WebdefacmentSetting);
@@ -292,13 +284,13 @@ class WebDefacementController extends Controller
         // ->where("blacklist_keyword",1)
         // ->where("image_check",1)
         // ->first();
-        $data['webdefacment_data_original']=@$data['webdefacement']->get_webdefacment_data_original_detail[0];
-        $data['webdefacment_data_check']=@$data['webdefacement']->get_webdefacment_data_check_detail[0];
-        $data['webdefacment_data_log']=@$data['webdefacement']->get_webdefacment_data_log_detail;
-        $data['site_code']=@$request->site_code;
+        $data['webdefacment_data_original'] = @$data['webdefacement']->get_webdefacment_data_original_detail[0];
+        $data['webdefacment_data_check'] = @$data['webdefacement']->get_webdefacment_data_check_detail[0];
+        $data['webdefacment_data_log'] = @$data['webdefacement']->get_webdefacment_data_log_detail;
+        $data['site_code'] = @$request->site_code;
 
-            // dd( $data['webdefacement']->blacklist_keyword_content);
-        
+        // dd( $data);
+
         return view('webdefacement::detail')->with($data);
     }
 
@@ -362,187 +354,326 @@ class WebDefacementController extends Controller
         //
     }
 
+    // public function load_card(Request $request)
+    // {
+
+
+    //     $role_custom = @check_role_custom();
+    //     if (!$role_custom['web_defacement']) {
+    //         check_permission403();
+    //     }
+    //     $html = '';
+
+    //     $modal = WebdefacmentSetting::where("active", '=', 1)->where("deleted_at", null);
+    //     // Log::info($modal->status);
+
+    //     //<><><>
+    //     // if(Auth::check()) {
+
+    //     //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+    //     //     if(Auth::user()->hasRole('admin')) {//if admin
+    //     //         // dd(777);
+    //     //         // $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
+
+    //     //     } else { //if notAdmin
+    //     //         // dd(888);
+    //     //         if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
+    //     //             if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
+    //     //                 // dd(99);
+    //     //                 $modal = $modal->whereIn('site_id' , $site_id_arr);
+    //     //             } else {//not support and admin
+    //     //                 $modal = $modal->whereIn('site_id', $site_id_arr);
+    //     //             }
+    //     //         }
+    //     //     }
+    //     // }
+    //     $get_role_custom_first = @get_role_custom();
+    //     $site_id_arr = @$get_role_custom_first['site_id_arr'];
+    //     if (@$get_role_custom_first['superadmin'] == 1) {
+    //     } else if (@$get_role_custom_first['client'] == 1) {
+    //         $modal = $modal->whereIn('site_id', $site_id_arr);
+    //     } else if (@$get_role_custom_first['site_support'] == 1) {
+    //         $modal = $modal->whereIn('site_id', $site_id_arr);
+    //     } else if (@$get_role_custom_first['site_admin'] == 1) {
+    //         $modal = $modal->whereIn('site_id', $site_id_arr);
+    //     } else if (@$get_role_custom_first['site_client'] == 1) {
+    //         $modal = $modal->whereIn('site_id', $site_id_arr);
+    //     }
+
+
+    //     if ($request->search_ == 1) {
+
+    //         if ($request->level) {
+    //             if ($request->level == 'High') {
+    //                 $modal = $modal->where('status_val', 'High');
+    //             } else if ($request->level == 'Normal') {
+    //                 $modal = $modal->where('status_val', 'Normal');
+    //             } else if ($request->level == 'Medium') {
+    //                 $modal = $modal->where('status_val', 'Medium');
+    //             }
+    //         }
+
+    //         if ($request->keywords) {
+    //             $modal = $modal->where('name', 'LIKE', '%' . $request->keywords . '%')
+    //                 ->orWhere('url', 'LIKE', '%' . $request->keywords . '%');
+    //         }
+
+    //         if ($request->datatype) {
+    //             // dd($request->datatype);
+
+    //             $modal = $modal->whereIn('status_val', $request->datatype);
+    //             // dd($modal);
+    //         }
+    //     }
+
+    //     if ($request->site) {
+    //         $modal = $modal->where('site_id', '=', $request->site);
+    //     }
+
+
+
+
+    //     $modal = $modal->get();
+    //     $id = [];
+    //     foreach ($modal as $key) {
+    //         $status = strtolower($key->status_val);
+    //         // Log::info($key->id);
+
+
+    //         // if (in_array($status, ['high', 'critical']) && !$key->is_alert_sent && $key->deleted_at == null) {
+
+    //         //     // ดึงอีเมลจาก fx_site_config_email_aler_defacement
+    //         //     $emails = DB::table('site_config_email_alert_defacement')
+    //         //         ->where('site_id', $key->site_id ?? $key->get_site->id ?? null)
+    //         //         ->pluck('email')
+    //         //         ->filter()
+    //         //         ->unique()
+    //         //         ->values()
+    //         //         ->all();
+
+    //         //     Log::info($emails);
+
+    //         //     // ✅ กันส่งซ้ำทันที: ตั้ง flag ก่อนส่ง
+    //         //     $w = WebdefacmentSetting::find($key->id);
+    //         //     if ($w) {
+    //         //         $w->update([
+    //         //             'is_alert_sent' => true,
+    //         //             'alert_sent_at' => now()
+    //         //         ]);
+    //         //     }
+
+    //         //     $sentSuccess = false;
+
+    //         //     if (!empty($emails)) {
+    //         //         try {
+    //         //             Mail::to($emails)->send(new DefacementAlertMail($key));
+    //         //             $sentSuccess = true;
+    //         //         } catch (\Throwable $e) {
+    //         //             Log::error("ส่งอีเมลล้มเหลว: " . $e->getMessage());
+    //         //         }
+    //         //     }
+
+
+    //         //     // ❌ ถ้าส่งไม่สำเร็จเลย: ย้อนสถานะกลับ (เพื่อให้พยายามส่งใหม่รอบหน้า)
+    //         //     if (!$sentSuccess && $w) {
+    //         //         $w->update([
+    //         //             'is_alert_sent' => false,
+    //         //             'alert_sent_at' => null,
+    //         //         ]);
+    //         //     }
+    //         // }
+    //         $html .=
+    //             '<div class="item-wdfm wdfm-inner-3">
+    //             <div class="wdfm-card">
+    //                 <div class="wdfm-header">
+    //                     <div class="wdfm-img">
+    //                         <a href="' . config('app.URL_CENTER_PUBLISH') . @$key->image_last . '" data-lightbox="name-img-2" >
+    //                             <img src="' . config('app.URL_CENTER_PUBLISH') . @$key->image_last . '" onerror="setDefaultPic(this)"/>
+    //                         </a>
+    //                     </div>
+    //                 </div>
+    //                 <div class="wdfm-body">
+    //                     <div class="wdfm-btn">
+    //                         <a href="' . route('webdefacement.detail', ['code' => @$key->code]) . '" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
+    //                             <i class="fas fa-eye"></i>
+    //                         </a>
+    //                     </div>
+    //                     <h4 class="wdfm-elip">' . @$key->name . '</h4>
+    //                     <p class="mdfm-text-muted">' . @$key->url . '</p>
+    //                 </div>
+    //                 <div class="wdfm-footer">
+    //                     <div class="wdfm-ft-left flex" style="width: 50%">
+    //                         <div><strong>Site </strong>: ' . @$key->get_site->name . '</div>
+    //                         <div class="status-flex mr-2"><strong>Status</strong> : &nbsp; ' . @get_webdefacment_status($key->status_val, 'color') . '</div>
+    //                         <div class="text-sm-date">Last Online: ' . @$key->last_online . '</div>
+    //                         <div class="text-sm-date">Last Check: ' . @$key->last_check . '</div>
+    //                     </div>
+
+    //                     <div class="wdfm-ft-left flex" style="width: 50%">
+    //                         <div id="chart_wdfm_' . $key->id . '" style="height: 180px"></div>
+    //                     </div>
+
+    //                 </div>
+    //                 <div class="wdfm-footer-action">
+    //                     <div style="display: flex;justify-content:center;">';
+
+
+
+    //         $html .= '<a href="' . route('webdefacement.detail', ['code' => $key->code]) . '" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> View</a>';
+    //         if (@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1) {
+    //             $html .= '<a href="#" onclick="btn_click_edit_webdefacement(\'' . $key->code . '\')" class="btn btn-info btn-sm"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.94 74.17l-60.11-60.11c-18.75-18.75-49.16-18.75-67.91 0l-56.55 56.55 128.02 128.02 56.55-56.55c18.75-18.75 18.75-49.15 0-67.91zm-246.8-20.53c-15.62-15.62-40.94-15.62-56.56 0L75.8 172.43c-6.25 6.25-6.25 16.38 0 22.62l22.63 22.63c6.25 6.25 16.38 6.25 22.63 0l101.82-101.82 22.63 22.62L93.95 290.03A327.038 327.038 0 0 0 .17 485.11l-.03.23c-1.7 15.28 11.21 28.2 26.49 26.51a327.02 327.02 0 0 0 195.34-93.8l196.79-196.79-82.77-82.77-84.85-84.85z"></path></svg> Edit</a>
+    //                     <a href="#" onclick="btn_click_del_webdefacement(' . $key->id . ')" class="btn btn-danger btn-sm btn_del_webdefacment"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z"></path></svg> Delete</a>
+    //                 ';
+    //         }
+
+
+    //         $html .= '
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         </div>';
+
+    //         $arr = [];
+    //         $arr['id'] = $key->id;
+    //         $arr['detection_score_all'] = $key->detection_score_all;
+    //         $arr['hash'] = $key->hash;
+    //         $arr['filesize'] = $key->filesize;
+    //         $arr['element'] = $key->element;
+
+    //         $id[] = $arr;
+    //     }
+
+    //     if ($request->ajax()) {
+    //         $data = [
+    //             "html" => $html,
+    //             "id" => $id,
+    //         ];
+    //         return response()->json($data);
+    //     }
+    // }
+
+
     public function load_card(Request $request)
     {
+
+        // Log::info('Load card is running....');
         $role_custom = @check_role_custom();
-        if(!$role_custom['web_defacement']) {
+        if (!$role_custom['web_defacement']) {
             check_permission403();
         }
+
         $html = '';
-     
-        $modal = WebdefacmentSetting::where("active", '=', 1)->where("deleted_at",null);
+        $modal = WebdefacmentSetting::where("active", 1)->whereNull("deleted_at");
 
-        //<><><>
-        // if(Auth::check()) {
-
-        //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-        //     if(Auth::user()->hasRole('admin')) {//if admin
-        //         // dd(777);
-        //         // $SiteSettings = SiteSettings::where("active",1)->where("deleted_at",null)->get();
-
-        //     } else { //if notAdmin
-        //         // dd(888);
-        //         if(@Auth::user()->site_role_id && @Auth::user()->site_id) {
-        //             if(@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) {//support and admin
-        //                 // dd(99);
-        //                 $modal = $modal->whereIn('site_id' , $site_id_arr);
-        //             } else {//not support and admin
-        //                 $modal = $modal->whereIn('site_id', $site_id_arr);
-        //             }
-        //         }
-        //     }
-        // }
+        // Filter by role
         $get_role_custom_first = @get_role_custom();
         $site_id_arr = @$get_role_custom_first['site_id_arr'];
-        if(@$get_role_custom_first['superadmin'] == 1) {
-            
-        }else if(@$get_role_custom_first['client'] == 1) {
-            $modal = $modal->whereIn('site_id', $site_id_arr);
-        }else if(@$get_role_custom_first['site_support'] == 1) {
-            $modal = $modal->whereIn('site_id', $site_id_arr);
-        }else if(@$get_role_custom_first['site_admin'] == 1) {
-            $modal = $modal->whereIn('site_id', $site_id_arr);
-        }else if(@$get_role_custom_first['site_client'] == 1) {
+        if (@$get_role_custom_first['superadmin'] != 1) {
             $modal = $modal->whereIn('site_id', $site_id_arr);
         }
 
-
+        // Filter by search
         if ($request->search_ == 1) {
-    
-            if($request->level){
-                if($request->level =='High'){
-                    $modal = $modal->where('status_val', 'High');
-                }
-                else if($request->level =='Normal'){
-                    $modal = $modal->where('status_val', 'Normal');
-                }
-                else if($request->level =='Medium'){
-                    $modal = $modal->where('status_val', 'Medium');
-                }
-                
+            if ($request->level) {
+                $modal = $modal->where('status_val', $request->level);
             }
 
             if ($request->keywords) {
-                $modal = $modal->where('name', 'LIKE', '%' . $request->keywords . '%')
-                ->orWhere('url', 'LIKE', '%' . $request->keywords . '%');
+                $modal = $modal->where(function ($q) use ($request) {
+                    $q->where('name', 'LIKE', '%' . $request->keywords . '%')
+                        ->orWhere('url', 'LIKE', '%' . $request->keywords . '%');
+                });
             }
 
             if ($request->datatype) {
-                // dd($request->datatype);
-                
                 $modal = $modal->whereIn('status_val', $request->datatype);
-                // dd($modal);
             }
-
-
-            
-            
         }
 
         if ($request->site) {
-            $modal = $modal->where('site_id', '=', $request->site);
-            
+            $modal = $modal->where('site_id', $request->site);
         }
 
-
-            
         $modal = $modal->get();
-        $id = []; 
+
+        $id = [];
+        $hash_data = [];
+
         foreach ($modal as $key) {
-            $html .= 
-            '<div class="item-wdfm wdfm-inner-3">
-                <div class="wdfm-card">
-                    <div class="wdfm-header">
-                        <div class="wdfm-img">
-                            <a href="'.config('app.URL_CENTER_PUBLISH').@$key->image_last.'" data-lightbox="name-img-2" >
-                                <img src="'.config('app.URL_CENTER_PUBLISH').@$key->image_last.'" onerror="setDefaultPic(this)"/>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="wdfm-body">
-                        <div class="wdfm-btn">
-                            <a href="'.route('webdefacement.detail',['code'=>@$key->code]).'" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                        </div>
-                        <h4 class="wdfm-elip">'.@$key->name.'</h4>
-                        <p class="mdfm-text-muted">'.@$key->url.'</p>
-                    </div>
-                    <div class="wdfm-footer">
-                        <div class="wdfm-ft-left flex" style="width: 50%">
-                            <div><strong>Site </strong>: '.@$key->get_site->name.'</div>
-                            <div class="status-flex mr-2"><strong>Status</strong> : &nbsp; '.@get_webdefacment_status($key->status_val,'color').'</div>
-                            <div class="text-sm-date">Last Online: '.@$key->last_online.'</div>
-                            <div class="text-sm-date">Last Check: '.@$key->last_check.'</div>
-                        </div>
+            $status = strtolower($key->status_val);
 
-                        <div class="wdfm-ft-left flex" style="width: 50%">
-                            <div id="chart_wdfm_'.$key->id.'" style="height: 180px"></div>
-                        </div>
+            $data_chk = [];
+            try {
+                $data_chk = WebdefacmentDataCheck::getData($key->id);
+            } catch (\Throwable $th) {
+                $data_chk = [];
+            }
 
-                    </div>
-                    <div class="wdfm-footer-action">
-                        <div style="display: flex;justify-content:center;">';
-                
-                
-            
-                $html .= '<a href="'.route('webdefacement.detail',['code' => $key->code]).'" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> View</a>';
-                if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1) {
-                    $html .= '<a href="#" onclick="btn_click_edit_webdefacement(\''.$key->code.'\')" class="btn btn-info btn-sm"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.94 74.17l-60.11-60.11c-18.75-18.75-49.16-18.75-67.91 0l-56.55 56.55 128.02 128.02 56.55-56.55c18.75-18.75 18.75-49.15 0-67.91zm-246.8-20.53c-15.62-15.62-40.94-15.62-56.56 0L75.8 172.43c-6.25 6.25-6.25 16.38 0 22.62l22.63 22.63c6.25 6.25 16.38 6.25 22.63 0l101.82-101.82 22.63 22.62L93.95 290.03A327.038 327.038 0 0 0 .17 485.11l-.03.23c-1.7 15.28 11.21 28.2 26.49 26.51a327.02 327.02 0 0 0 195.34-93.8l196.79-196.79-82.77-82.77-84.85-84.85z"></path></svg> Edit</a>
-                        <a href="#" onclick="btn_click_del_webdefacement('.$key->id.')" class="btn btn-danger btn-sm btn_del_webdefacment"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z"></path></svg> Delete</a>
-                    ';
-                }
-         
+            // 🧩 Generate card HTML
+            $html .= view('webdefacement::components.webdefacement_card', compact('key'))->render();
 
-                $html .= '
-                        </div>
-                    </div>
-                </div>
-            </div>';      
-            
-            $arr = [];
-            $arr['id'] = $key->id;
-            $arr['detection_score_all'] = $key->detection_score_all;
-            $arr['hash'] = $key->hash;
-            $arr['filesize'] = $key->filesize;
-            $arr['element'] = $key->element;
-
-            $id[] = $arr; 
-        }
-
-        if ($request->ajax()) {
-            $data = [
-                "html" => $html,
-                "id" => $id,
+            // ⛳ Data for chart
+            $id[] = [
+                'id' => $key->id,
+                'detection_score_all' => $data_chk->percent_all ?: 0,
+                'hash_percent' => $data_chk->hash_percent ?: 0,
+                'filesize_percent' => $data_chk->filesize_percent ?: 0,
+                'element_percent' => $data_chk->element_percent ?: 0,
+                'image_percent' => $data_chk->image_percent ?? 0,
+                'blacklist_percent' => $data_chk->keyword_percent ?? 0
             ];
-            return response()->json($data);
+
+            // 🔐 Data สำหรับ hash เทียบว่าเปลี่ยนไหม
+            $hash_data[] = [
+                'id' => $key->id,
+                'status' => $key->status_val,
+                'updated_at' => $key->updated_at,
+                'image' => $key->image_last,
+                'last_check' => $key->last_check
+            ];
         }
-       
+
+        // 🔐 hash checksum เพื่อตรวจสอบการเปลี่ยนแปลง
+        $hash = md5(json_encode($hash_data));
+
+        // 🌐 ส่งออก
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => $html,
+                'id' => $id,
+                'hash' => $hash
+            ]);
+        }
+
+        // กรณีไม่ใช่ ajax (fallback)
+        return view('your.view', compact('html', 'id', 'hash'));
     }
+
 
     public function change_status(Request $request)
     {
         $role_custom = @check_role_custom();
-        if(!$role_custom['web_defacement']) {
+        if (!$role_custom['web_defacement']) {
             check_permission403();
         }
 
         $data = WebdefacmentSetting::where('id', $request->id)->first();
         $data->webdeflacement_progress = 1;
         $data->status_val = 'Normal';
-        
+        $data->is_alert_sent = 0;
+
         $data->save();
 
         $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
 
-        $html='';
-        if ($webdefacement->status_val != 'Normal')   {
-            $html= '<a href="#" id="accept_risk"
-            class="btn btn- '.get_option('theme_color').' btn-sm btn-responsive">
+        $html = '';
+        if ($webdefacement->status_val != 'Normal') {
+            $html = '<a href="#" id="accept_risk"
+            class="btn btn- ' . get_option('theme_color') . ' btn-sm btn-responsive">
             Accept Risk
             </a>';
         }
-        
+
         return ajaxResponse(
             [
                 'html'  => $html,
@@ -552,12 +683,12 @@ class WebDefacementController extends Controller
             true,
             Response::HTTP_OK
         );
-    }  
+    }
 
     public function update_original(Request $request)
     {
         $role_custom = @check_role_custom();
-        if(!$role_custom['web_defacement']) {
+        if (!$role_custom['web_defacement']) {
             check_permission403();
         }
 
@@ -568,13 +699,13 @@ class WebDefacementController extends Controller
         $command = 'app:WebDefacementUpdateOriginal';
 
         $params = [
-                'webdefacment_id' => $webdefacment_id,
+            'webdefacment_id' => $webdefacment_id,
         ];
 
-            Artisan::call($command, $params);
-            $result = Artisan::output();
+        Artisan::call($command, $params);
+        $result = Artisan::output();
 
-        
+
         // return ajaxResponse(
         //     [
         //         'html'  => $html,
@@ -584,11 +715,12 @@ class WebDefacementController extends Controller
         //     true,
         //     Response::HTTP_OK
         // );
-    }  
+    }
 
-    public function deface_now(Request $request){
+    public function deface_now(Request $request)
+    {
         $role_custom = @check_role_custom();
-        if(!$role_custom['web_defacement']) {
+        if (!$role_custom['web_defacement']) {
             check_permission403();
         }
         $webdefacment_id = $request->id;
@@ -603,7 +735,7 @@ class WebDefacementController extends Controller
     public function update_original_detail(Request $request)
     {
         $role_custom = @check_role_custom();
-        if(!$role_custom['web_defacement']) {
+        if (!$role_custom['web_defacement']) {
             check_permission403();
         }
         $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
@@ -615,7 +747,7 @@ class WebDefacementController extends Controller
         $html_l = $webdefacement_original->last_update;
 
 
-        
+
         return ajaxResponse(
             [
                 'html_h'  => $html_h,
@@ -629,11 +761,12 @@ class WebDefacementController extends Controller
             true,
             Response::HTTP_OK
         );
-    }  
+    }
 
-    public function deface_now_detail(Request $request){
+    public function deface_now_detail(Request $request)
+    {
         $role_custom = @check_role_custom();
-        if(!$role_custom['web_defacement']) {
+        if (!$role_custom['web_defacement']) {
             check_permission403();
         }
         $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
@@ -645,7 +778,7 @@ class WebDefacementController extends Controller
         $html_l = $webdefacement_check->last_update;
 
 
-        
+
         return ajaxResponse(
             [
                 'html_h'  => $html_h,
@@ -664,42 +797,43 @@ class WebDefacementController extends Controller
     public function update_image(Request $request)
     {
         $role_custom = @check_role_custom();
-        if(!$role_custom['web_defacement']) {
+        if (!$role_custom['web_defacement']) {
             check_permission403();
         }
         $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
 
-        if($webdefacement->get_webdefacment_data_original_detail[0]->url_id){
+        if ($webdefacement->get_webdefacment_data_original_detail[0]->url_id) {
             $url_id = $webdefacement->get_webdefacment_data_original_detail[0]->url_id;
-        }else{
+        } else {
             $url_id = 0;
         }
-      
-        $html = ''; 
+
+        $html = '';
         $site_id = $webdefacement->site_id;
         $url_web = $webdefacement->url;
         $port_web = $webdefacement->port;
         // $url_id = $webdefacement->url_id;
         $delay_screenshot_val = $webdefacement->delay_screen_shot_val;
-   
+
         // dd($port_web);
         $command = 'app:WebDefacementsCreenshotCheck';
 
         $params = [
-                'url' => $url_web,
-                'port' => $port_web,
-                'site_id' => $site_id,
-                'url_id' => $url_id,
-                'delay' => $delay_screenshot_val,
+            'url' => $url_web,
+            'port' => $port_web,
+            'site_id' => $site_id,
+            'url_id' => $url_id,
+            'delay' => $delay_screenshot_val,
         ];
 
-            Artisan::call($command, $params);
-            $result = Artisan::output();
-    }  
+        Artisan::call($command, $params);
+        $result = Artisan::output();
+    }
 
-    function get_code_site(Request $request){
-        
-        $SiteSettings = SiteSettings::where("id",$request->id)->first();
+    function get_code_site(Request $request)
+    {
+
+        $SiteSettings = SiteSettings::where("id", $request->id)->first();
 
         return ajaxResponse(
             [
@@ -709,7 +843,79 @@ class WebDefacementController extends Controller
             true,
             Response::HTTP_OK
         );
+    }
 
+    public function alert_to_customer(Request $request)
+    {
+        $setting = WebdefacmentSetting::find($request->id);
+        if (!$setting) {
+            return response()->json(['success' => false, 'message' => 'Setting not found.'], 404);
+        }
 
+        // ถ้าส่งไปใน 1 ชม. ล่าสุด ไม่ให้ส่งซ้ำ
+        // แนะนำให้ตั้ง casts ในโมเดล: 'alert_sent_customer_at' => 'datetime'
+        $table = (new WebdefacmentSetting)->getTable();
+
+        // 1) จองสิทธิ์ส่งแบบอะตอมมิก (กันกดพร้อมกัน)
+        $updated = DB::table($table)
+            ->where('id', $setting->id)
+            ->where(function ($q) {
+                // อนุญาตอัปเดตเฉพาะกรณีไม่เคยส่ง หรือส่งเกิน 1 ชม.มาแล้ว
+                $q->whereNull('alert_sent_customer_at')
+                    ->orWhere('alert_sent_customer_at', '<=', DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'));
+            })
+            ->update([
+                'alert_sent_customer_at' => now(),
+                'is_alert_sent_customer' => 1,
+                'updated_at' => now(),
+            ]);
+
+        if ($updated === 0) {
+            $retryAt = $setting->alert_sent_customer_at
+                ? Carbon::parse($setting->alert_sent_customer_at)->addHour()->format('d-m-Y H:i:s')
+                : null;
+
+            return response()->json([
+                'success' => false,
+                'message' => $retryAt
+                    ? "This defacement was alerted recently. Try again after"
+                    : "This defacement was alerted recently. Try again later.",
+                'retryAt' => $retryAt
+            ], 429);
+        }
+
+        try {
+            $emails = DB::table('site_config_email_alert_defacement_customer')
+                ->where('site_id', $setting->site_id)
+                ->pluck('email')
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+
+            if (empty($emails)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No recipient email configured.'
+                ], 422);
+            }
+
+            Mail::to($emails)->send(new DefacementAlertMail($setting));
+
+            $setting->is_alert_sent_customer = true;
+            $setting->alert_sent_customer_at = now();
+            $setting->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Alert sent To Customer successfully.'
+            ]);
+        } catch (\Throwable $th) {
+            Log::error('alert_to_customer failed', ['error' => $th->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send alert.'
+            ], 500);
+        }
     }
 }

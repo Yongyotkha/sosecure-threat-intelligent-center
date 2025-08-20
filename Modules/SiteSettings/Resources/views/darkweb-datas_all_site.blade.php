@@ -23,8 +23,8 @@ use Carbon\Carbon;
 }
 
 .img-icon-card.ices {
-    width: 130px;
-    height: 130px;
+    width: 150px;
+    height: 150px;
     overflow: hidden;
     position: relative;
     float: left;
@@ -32,7 +32,7 @@ use Carbon\Carbon;
 
 .img-icon-smm-compro {
     width: 110px;
-    height: 130px;
+    height: 133.5px;
     overflow: hidden;
     position: relative;
     margin: auto;

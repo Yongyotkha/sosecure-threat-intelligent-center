@@ -7,10 +7,15 @@ const exportCSV = (type) => {
     const endDate = dateRange.endDate.format('YYYY-MM-DD');
 
     const publishedBtn = document.querySelector('#groupby-published .btn.active');
-    const published = publishedBtn ? publishedBtn.value : "";
+    const published_ = publishedBtn ? publishedBtn.value : "";
+    const published = published_ == 1 ? 1 : published_ == 2 ? 0 : "";
+
+    // alert(published);
 
     const checkedInputs = document.querySelectorAll('.check_rss_new_id:checked');
     const selectedPulseIds = Array.from(checkedInputs).map(input => input.value);
+
+    // alert(published);
 
     const queryParams = new URLSearchParams();
     if (eventName) queryParams.append('event_name', eventName);
@@ -19,18 +24,39 @@ const exportCSV = (type) => {
     queryParams.append('start_date', startDate);
     queryParams.append('end_date', endDate);
     queryParams.append('type', type_);
+    // queryParams.append('ispublished', published);
 
     const fullUrl = `${exportBaseUrl}?${queryParams.toString()}`;
 
+    $show_status_pubished = '';
+    if (published_ == '1') {
+        $show_status_pubished = 'Published';
+    } else if (published_ == '2') {
+        $show_status_pubished = 'Unpublished';
+    } else {
+        $show_status_pubished = 'All';
+    }
+
+    // alert($show_status_pubished);
+
     if (type_ == 1) {
         Swal.fire({
-            title: 'Do you want to export?',
-            text: 'Do you want to export Event ?',
+            title: 'Do you want to export ?',
+            html: 'Do you want to export Events <br> from '
+                + '<strong>'
+                + moment(startDate, 'YYYY-MM-DD').format('DD-MM-YYYY')
+                + ' to '
+                + moment(endDate, 'YYYY-MM-DD').format('DD-MM-YYYY')
+                + ' ?'
+                + '</strong>'
+                + '<br>'
+                + 'Published Status : <strong>' + $show_status_pubished + '</strong>',
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Export',
             cancelButtonText: 'Cancel',
-            reverseButtons: false
+            reverseButtons: false,
+            width: 400
         }).then((result) => {
             if (!result.isConfirmed) {
                 Swal.fire({
@@ -69,7 +95,7 @@ const exportCSV = (type) => {
 
                     if (!contentType || !contentType.includes("text/csv")) {
                         const text = await response.text();
-                        throw new Error("Server error does not return file :\n" + text.slice(0, 200));
+                        throw new Error(text.slice(0, 200));
                     }
 
                     const disposition = response.headers.get('Content-Disposition');
@@ -90,18 +116,49 @@ const exportCSV = (type) => {
                     Swal.close();
                 })
                 .catch(error => {
-                    Swal.fire('Error', error.message, 'error');
+                    let errMsg = error.message;
+
+                    try {
+                        // ถ้า error.message เป็น JSON ก็ parse แล้วดึง message
+                        const parsed = JSON.parse(error.message);
+                        if (parsed.message) {
+                            errMsg = parsed.message;
+                        }
+                    } catch (e) {
+                        // ถ้าไม่ใช่ JSON ก็ใช้ข้อความเดิม
+                    }
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: `"${errMsg}"`, 
+                        showConfirmButton: true,
+                        confirmButtonText: 'OK',
+                        width: 600,
+                        customClass: {
+                            title: 'swal2-title-lg' // ใช้ class กำหนดฟอนต์ใหญ่
+                        }
+                    });
                 });
+
         });
     } else if (type_ == 2) {
         Swal.fire({
             title: 'Do you want to export?',
-            text: 'Do you want to export Event and Attributes ?',
+            html: 'Do you want to export Event and Attributes <br> from '
+                + '<strong>'
+                + moment(startDate, 'YYYY-MM-DD').format('DD-MM-YYYY')
+                + ' to '
+                + moment(endDate, 'YYYY-MM-DD').format('DD-MM-YYYY')
+                + ' ?'
+                + '</strong>'
+                + '<br>'
+                + 'Published Status : <strong>' + $show_status_pubished + '</strong>',
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Export',
             cancelButtonText: 'Cancel',
-            reverseButtons: false
+            reverseButtons: false,
+            width: 450
         }).then((result) => {
             if (!result.isConfirmed) {
                 Swal.fire({
@@ -140,7 +197,7 @@ const exportCSV = (type) => {
 
                     if (!contentType || !contentType.includes("text/csv")) {
                         const text = await response.text();
-                        throw new Error("Server error does not return file :\n" + text.slice(0, 200));
+                        throw new Error(text.slice(0, 200));
                     }
 
                     const disposition = response.headers.get('Content-Disposition');
@@ -160,8 +217,28 @@ const exportCSV = (type) => {
 
                     Swal.close();
                 })
-                .catch(error => {
-                    Swal.fire('Error', error.message, 'error');
+                 .catch(error => {
+                    let errMsg = error.message;
+
+                    try {
+                        // ถ้า error.message เป็น JSON ก็ parse แล้วดึง message
+                        const parsed = JSON.parse(error.message);
+                        if (parsed.message) {
+                            errMsg = parsed.message;
+                        }
+                    } catch (e) {
+                        // ถ้าไม่ใช่ JSON ก็ใช้ข้อความเดิม
+                    }
+                    Swal.fire({
+                        icon: 'warning',
+                        title: `"${errMsg}"`,
+                        width: 600,
+                        showConfirmButton: true,
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            title: 'swal2-title-lg' // ใช้ class กำหนดฟอนต์ใหญ่
+                        }
+                    });
                 });
         });
     }
@@ -241,6 +318,15 @@ const exportCSV = (type) => {
 //         });
 // };
 
+function clearFileInput() {
+    const fi = document.getElementById('fileInput');
+    if (!fi) return;
+    fi.value = '';
+    fi.dispatchEvent(new Event('change', {  // เผื่อมีโค้ด/ปลั๊กอินฟัง event นี้อยู่
+        bubbles: true
+    }));
+}
+
 const importCSV = () => {
     const fileInput = document.getElementById('fileInput');
     const file = fileInput.files[0];
@@ -306,9 +392,9 @@ const importCSV = () => {
             const contentType = response.headers.get("Content-Type");
             const res = contentType.includes("application/json") ? await response.json() : {};
 
-            console.log("DEBUG: Status", response.status);
-            console.log("DEBUG: Content-Type", contentType);
-            console.log("DEBUG: Response JSON", res);
+            // console.log("DEBUG: Status", response.status);
+            // console.log("DEBUG: Content-Type", contentType);
+            // console.log("DEBUG: Response JSON", res);
 
             if (!response.ok || !res.success) {
                 const msg = res.message || "Import failed";
@@ -335,6 +421,9 @@ const importCSV = () => {
         })
         .catch(error => {
             Swal.fire('Import Failed', error.message, 'error');
+        })
+        .finally(() => {
+            clearFileInput();
         });
 };
 

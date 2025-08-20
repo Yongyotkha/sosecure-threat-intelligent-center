@@ -29,6 +29,9 @@ use DateTimeZone;
 use Illuminate\Support\Str;
 use League\Csv\Reader;
 use League\Csv\Statement;
+use Illuminate\Support\Facades\Log;
+use App\Services\MispTagService;
+
 
 use function PHPSTORM_META\type;
 
@@ -1672,7 +1675,9 @@ class IndicatorsController extends Controller
                     'updated_at' => 1,
                     'updated_by' => 1,
                     'is_count_attr' => 1,
-                    'tags' => 1
+                    'tags' => 1,
+                    'attribute_score' => 1,
+                    'attribute_serverity' => 1
                 ],
                 'typeMap' => [  // 👈 เพื่อให้ใช้งาน array_key_exists ได้ใน PHP
                     'root' => 'array',
@@ -2983,7 +2988,8 @@ class IndicatorsController extends Controller
                             ]);
                     }
                 }
-            }http://127.0.0.1:8000/phishing_detection
+            }
+            http: //127.0.0.1:8000/phishing_detection
 
 
 
@@ -2997,7 +3003,6 @@ class IndicatorsController extends Controller
     }
     public function indicator_update_tags(Request $request)
     {
-
         try {
             $input = $request->all();
             // dd($input);
@@ -3752,7 +3757,7 @@ class IndicatorsController extends Controller
         // Event query
         $usePulseOnly = !empty($pulseIds) && $request->has('pulse_id_only');
 
-       
+
 
         // return response()->json($pulseIds);
 
@@ -3778,15 +3783,15 @@ class IndicatorsController extends Controller
 
         $events = $eventsCollection->find($eventQuery, $options)->toArray();
 
-        
+
         if (empty($events)) {
             return response()->json([
                 'message' => !empty($pulseIds)
-                    ? 'Not found event : ' . implode(', ', $pulseIds) .' in date range'
+                    ? 'Not found event : ' . implode(', ', $pulseIds) . ' in date range'
                     : 'Not found event in date range',
             ], 200);
         }
-         
+
 
         $timestamp = date("Y-m-d_H.i.s");
         $fileName = $form_type === 1
@@ -3811,7 +3816,7 @@ class IndicatorsController extends Controller
             ]);
 
             foreach ($events as $doc) {
-                 $eventModified = isset($doc['updated_at']) && $doc['updated_at'] instanceof UTCDateTime
+                $eventModified = isset($doc['updated_at']) && $doc['updated_at'] instanceof UTCDateTime
                     ? $doc['updated_at']->toDateTime()->format('Y-m-d')
                     : '';
                 fputcsv($file, [
@@ -4078,7 +4083,6 @@ class IndicatorsController extends Controller
             $client = new Client($mongoUrl);
             $db = $client->sosecure_threatintelligent_dev;
 
-            $eventCollection = $db->fx_otx_events;
             $tempCollection = $db->fx_events_temp;
             $dataKeyCollection = $db->fx_data_key;
 
@@ -4089,7 +4093,7 @@ class IndicatorsController extends Controller
                 $cleanedRows[] = $row;
             }
 
-            // Insert temp rows
+            // ➤ Insert temp
             try {
                 $tempCollection->insertMany($cleanedRows);
             } catch (\Exception $e) {
@@ -4099,7 +4103,7 @@ class IndicatorsController extends Controller
                 ], 500);
             }
 
-            // Log data key meta
+            // ➤ Insert data key meta
             try {
                 $dataKeyCollection->insertOne([
                     'date' => $now->format('Y-m-d H:i:s'),
@@ -4117,8 +4121,24 @@ class IndicatorsController extends Controller
                 ], 500);
             }
 
-            // เรียกฟังก์ชัน update จริง
+            // ➤ Sync tag to fx_otx_events + MISP
             $syncResult = $this->syncEventTagsByDataKey($dataKey, $db);
+
+            // ➤ Update tags to MISP (event level)
+            $mispService = app(MispTagService::class);
+            foreach ($cleanedRows as $row) {
+                if (!empty($row['event_id'])) {
+                    try {
+                        $mispService->update($row['event_id'], $row['event_tags'] ?? '');
+                    } catch (\Throwable $e) {
+                        \Log::error('[MISP EVENT] Failed to update tags', [
+                            'event_id' => $row['event_id'],
+                            'tags' => $row['event_tags'] ?? '',
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
+            }
 
             return response()->json([
                 'success' => true,
@@ -4127,9 +4147,10 @@ class IndicatorsController extends Controller
                 'records_inserted' => count($cleanedRows),
                 'total_rows' => count($rows),
                 'success_list' => array_slice($syncResult['updated'], 0, 100000),
-                'error_list' => $syncResult['errors']
+                'error_list' => $syncResult['errors'],
             ]);
         }
+
 
         if ($import_type == 'attribute') {
             try {
@@ -4221,6 +4242,32 @@ class IndicatorsController extends Controller
 
             // ดึง temp และ sync ไป ref/detail
             $syncResult = $this->syncIndicatorUpdatesByDataKey($dataKey, $db);
+            $mispService = new MispTagService();
+            // log:info('MISP ATTRIBUTE', $cleanedRows);
+            // return response()->json([
+            //     'message' => 'Attribute tags updated.',
+            //     'data' => $cleanedRows
+            // ]);
+
+
+            foreach ($cleanedRows as $row) {
+                if (!empty($row['event_id']) && !empty($row['attribute_id'])) {
+                    try {
+                        app(MispTagService::class)->updateFromIndicator(
+                            $row['event_id'],
+                            $row['attribute_id'],
+                            $row['tags'] ?? ''
+                        );
+                    } catch (\Throwable $e) {
+                        Log::error('[MISP ATTRIBUTE] Update failed', [
+                            'event_id' => $row['event_id'],
+                            'attribute_id' => $row['attribute_id'],
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
+            }
+
 
             return response()->json([
                 'success' => true,

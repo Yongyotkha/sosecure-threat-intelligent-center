@@ -289,6 +289,42 @@
                                         <div class="text-muted">Alert (News,Other)</div>
                                     </div>
                                 </div>
+
+
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Defacement E-mail Alert Admins</label>
+
+                                    <div class="col-lg-9">
+                                        <select name="email_alert_defacement[]" id="email_alert_defacement" class="select2-option form-control" multiple="multiple">
+                                            {{-- <option value="1">a</option>
+                                            <option value="2">b</option> --}}
+                                            
+                                                @foreach($siteSettings->get_site_config_email_alert_defacement as $site_config_email_alert)
+                                                    <option value="{{ $site_config_email_alert->email  }}" selected >{{ $site_config_email_alert->email }}</option>
+                                                @endforeach
+                                        </select>
+
+                                        <div class="text-muted">Alert (Defacement to admins)</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Defacement E-mail Alert Customers</label>
+
+                                    <div class="col-lg-9">
+                                        <select name="email_alert_defacement_customer[]" id="email_alert_defacement_customer" class="select2-option form-control" multiple="multiple">
+                                            {{-- <option value="1">a</option>
+                                            <option value="2">b</option> --}}
+                                            
+                                                @foreach($siteSettings->get_site_config_email_alert_defacement_customer as $site_config_email_alert)
+                                                    <option value="{{ $site_config_email_alert->email  }}" selected >{{ $site_config_email_alert->email }}</option>
+                                                @endforeach
+                                        </select>
+
+                                        <div class="text-muted">Alert (Defacement to Customers)</div>
+                                    </div>
+                                </div>
+
                                 <hr>
 
                                 <div class="row">
@@ -474,6 +510,15 @@
         });
 
         $('#email_alert').select2({
+            tags: true,
+            tokenSeparators: [' ']
+        });
+
+        $('#email_alert_defacement').select2({
+            tags: true,
+            tokenSeparators: [' ']
+        });
+        $('#email_alert_defacement_customer').select2({
             tags: true,
             tokenSeparators: [' ']
         });

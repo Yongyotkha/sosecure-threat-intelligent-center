@@ -13,11 +13,13 @@
 
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Http\Controllers\MailProgressController;
 
 // Route::get('/', 'Welcome@index')->middleware(['auth'])->name('index');
 // Route::get('/', 'Welcome@index')->name('index_salepage');
 
 // Route::get('/clientlogin', 'Auth\LoginController@login');
+
 Route::get('/clientlogin', 'Welcome@clientlogin');
 Route::get('/test', 'Welcome@test');
 
@@ -69,17 +71,58 @@ Route::post('stripe/webhook', '\Laravel\Cashier\Http\Controllers\WebhookControll
 
 Route::get('phpinfo', function () {
     $dss = 15;
-    if($dss = 15){
+    if ($dss = 15) {
         print_r($dd);
     }
 });
 
 Route::get('emailtest', 'Welcome@emailtest');
 
-Route::get('phishing_detection/login-1', function(){
+Route::get('phishing_detection/login-1', function () {
     return view('demo_login');
 })->name('phishing_detection_login-1');
 
-Route::get('phishing_detection/login-2', function(){
+Route::get('phishing_detection/login-2', function () {
     return view('demo_login');
 })->name('phishing_detection_login-2');
+
+Route::get('/preview-defacement-alert', function () {
+    $w = (object)[
+        'name' => 'John Doe',
+        'url' => 'example.com',
+        'status_val' => 'High',
+        'datetime' => now()->format('Y-m-d H:i:s'),
+        'image_last' => '',
+        'user_agent' => 'cloudflare',
+        'site_id' => '85',
+        'created_at' => now()->format('Y-m-d H:i:s'),
+        'last_online' => now()->format('Y-m-d H:i:s'),
+        'updated_at' => now()->format('Y-m-d H:i:s'),
+        'hash' => 'Test_hash020202023202012012',
+        'filesize_new' => '162424',
+        'element' => 'Test_element',
+        'code' => 'c96e6741-8915-4c6a-8de2-2eb6a52fa91f',
+        'id' => '186',
+        'image_last' => '/images/webdefacment_mages/77/69/77_69_Defacement_Now.png',
+        'hashper' => '100',
+        'filesizeper' => '20',
+        'elementper' => '60',
+        'imageper' => '30',
+        'blacklistper' => '0',
+        'domain' => 'example.com',
+    ];
+
+    return view('emails.defacement_alert', [
+        'w' => $w,
+    ]);
+});
+
+
+
+
+
+
+
+
+
+

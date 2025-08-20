@@ -78,7 +78,7 @@ class MDAdversaries extends Command
                         foreach(@$response->results as $key=>$valus){
                           print_r($valus);
                             $this->saveAdversaries($valus);
-                                $otx_pulse_url="https://otx.alienvault.com/otxapi/pulses/?limit=20&page=1&sort=-modified&q=adversary:".rawurlencode($valus->value);
+                                $otx_pulse_url="https://otx.alienvault.com/otxapi/pulses/?limit=20&page=1&sort=-modified&q=adversary:".rawurlencode($valus->name);
                                 $this->info($otx_pulse_url);
                                 $count_pulse =1;
                                 for ($x_pulse = 0; $x_pulse <= $count_pulse; $x_pulse++) {
@@ -141,17 +141,17 @@ class MDAdversaries extends Command
 
     public function saveAdversaries($valueEvent)
     {
-        $this->info($valueEvent->value);
+        $this->info($valueEvent->name);
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
         $tlpcolor = null;
         $tags = null;
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
         $synonyms =[];
         $country = "";
-        $uuid = $valueEvent->uuid;
-        $value =$valueEvent->value;
+        $uuid = $valueEvent->id;
+        $value =$valueEvent->name;
         $description =@$valueEvent->description;
         if(!empty($valueEvent->meta)){
             $synonymss = [];
@@ -191,8 +191,8 @@ class MDAdversaries extends Command
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
         $checkSuccess = true;
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-        $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+        $col_fx_otx_adversaries_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
         $update_fx_otx_adversaries_related = $col_fx_otx_adversaries_related->updateOne(
             ['adversary_uuid' => $uuid,'pulse_id' => $value["id"]],
             ['$set' => [

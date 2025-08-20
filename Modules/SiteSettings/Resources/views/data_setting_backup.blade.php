@@ -1,0 +1,709 @@
+@extends('layouts.app')
+
+@section('content')
+{{-- {{dd($site_menu_permission)}} --}}
+
+<section id="content" class="bg">
+    <section class="hbox stretch">
+        
+        <aside id="hide-settings" class="aside aside-md b-r">
+            <section class="vbox">
+                @include('partial.header-select-site')
+                <section class="scrollable">
+                    <section id="setting-nav" class="hidden-xs">
+                        @include('partial.menu_site')
+                    </section>
+                </section>
+            </section>
+        </aside>
+
+            <section class="vbox">
+
+                <header class="header bg-white b-b clearfix">
+                    <a class="show-setting btn btn-icon btn-default btn-sm m-r-xs" style="margin-top: 0;display:none">@icon('solid/bars')</a>
+                    <div class="bc-head">Site Setting &gt; Permission Config</div>
+                </header>
+                <section class="scrollable wrapper">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            {{-- {!! Form::open(['class' => 'bs-example form-horizontal ajaxifyForm validator']) !!} --}}
+                            {!! Form::open(['route' => ['datasettings.update.settings', $siteSettings->code], 'class' => 'bs-example form-horizontal ajaxifyForm_custom', 'method' => 'PUT', 'files' => true]) !!}
+                            <input type="hidden" name="page_setting" value="site_permission_settings">
+                            <section class="panel panel-default">
+                            <header class="panel-heading font-bold panel-header-blue">@icon('solid/cogs') Permission & Config Settings  </header>
+                            <div class="panel-body">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Permission Menu </label>
+                                    <div class="col-lg-9">
+
+                                        <ul class="role-group">
+                                            @php  $i=1;  @endphp
+                                            @foreach($menus AS $menu)
+                                            <li>
+                                                <div class="role-main">
+                                                    <span class="role-click" onclick="openrole(this,'role-{{$i}}')">@if(count($menu->get_menu_sub) > 0)@icon('solid/plus')@else <i class="fas fa-minus icon"></i>  @endif</span>
+                                                    <span class="checkbox chk-inline">
+                                                        <label>
+                                                            @if(in_array($menu->code,$site_menu_permission))
+                                                            @php $checked = 'checked'; @endphp
+                                                            @else
+                                                            @php $checked = ''; @endphp
+                                                            @endif
+                                                            <input type="checkbox" name="menu[]" {{$checked}} {{--checked=""--}} value="{{$menu->code}}">
+                                                            <span class="label-text" data-rel="tooltip" title="">{{$menu->name}}</span>
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                                
+                                                @if(count($menu->get_menu_sub) > 0)
+                                                    <ul id="role-{{$i}}" class="role-group-sub">
+                                                    @foreach($menu->get_menu_sub as $menu_sub) 
+                                                    
+                                                        <li>
+                                                            <div class="role-sub">
+                                                                <span class="checkbox chk-inline">
+                                                                    <label>
+                                                                        @if(in_array($menu_sub->code,$site_menu_sub_permission))
+                                                                        @php $checked = 'checked'; @endphp
+                                                                        @else
+                                                                        @php $checked = ''; @endphp
+                                                                        @endif
+                                                                        <input type="checkbox" name="menu_sub[]" {{$checked}} {{--checked=""--}} value="{{$menu_sub->code}}">
+                                                                        <span class="label-text" data-rel="tooltip" title="">{{$menu_sub->name}}</span>
+                                                                    </label>
+                                                                </span>
+                                                            </div>
+                                                        </li>
+                                                    @endforeach
+                                                    </ul>
+                                                @endif
+                                                
+
+                                            </li>
+                                            @php $i++; @endphp
+                                            @endforeach
+                                            
+                                        </ul>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">User Allow </label>
+                                    <div class="col-lg-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="site_user_allow" {{$siteSettings->user_allow == 'Y' || $siteSettings->user_allow == null ? 'checked' : '' }} value="TRUE">
+                                                <span class="label-text" data-rel="tooltip" title="">Site Add</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <label class="col-lg-1 control-label">Limit : </label>
+                                    <div class="col-lg-3">
+                                        <input type="text" class="form-control touch_spin text-center" name="user_limit" value="@if($siteSettings->user_limit_amount) {{$siteSettings->user_limit_amount}} @else{{$site_user_limit_default->value}}@endif">
+                                    </div>
+                                </div>
+                                <!--
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Role Allow </label>
+                                    <div class="col-lg-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="site_role_allow" {{$siteSettings->role_allow_admin == 'Y' ? 'checked' : '' }} value="TRUE">
+                                                <span class="label-text" data-rel="tooltip" title="">Admin</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        {{-- <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="" checked="" value="TRUE">
+                                                <span class="label-text" data-rel="tooltip" title="">Read Only</span>
+                                            </label>
+                                        </div> --}}
+                                    </div>
+                                    <div class="col-lg-2">
+                                        {{-- <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="" checked="" value="TRUE">
+                                                <span class="label-text" data-rel="tooltip" title="">Customer <a href="#" data-rel="tooltip" title="ติดต่อผู้ดูแลระบบ คลิก"><i class="far fa-question-circle"></i></a></span>
+                                            </label>
+                                        </div> --}}
+                                    </div>
+                                </div>
+                               -->
+
+                                
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Domain Allow </label>
+                                    <div class="col-lg-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="site_domain_allow" {{$siteSettings->domain_allow == 'Y' || $siteSettings->domain_allow == null ? 'checked' : '' }} value="TRUE">
+                                                <span class="label-text" data-rel="tooltip" title="">Site Add</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <label class="col-lg-1 control-label">Limit : </label>
+                                    <div class="col-lg-3">
+                                        <input type="text" class="form-control touch_spin text-center" name="domain_limit" value="@if($siteSettings->domain_limit){{$siteSettings->domain_limit}}@else{{$site_domain_limit_default->value}}@endif">
+                                    </div>
+                                </div>
+
+                                
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Asset Allow </label>
+                                    <div class="col-lg-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                {{-- @php var_dump($siteSettings->name) @endphp --}}
+                                                <input type="checkbox" name="site_asset_allow" {{$siteSettings->asset_allow == 'Y' || $siteSettings->asset_allow == null ? 'checked' : '' }} value="TRUE">
+                                                <span class="label-text" data-rel="tooltip" title="">Site Add</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <label class="col-lg-1 control-label">Limit : </label>
+                                    <div class="col-lg-3">
+                                        <input type="text" class="form-control touch_spin text-center" name="asset_limit" value="@if($siteSettings->asset_limit){{$siteSettings->asset_limit}}@else{{$site_asset_limit_default->value}}@endif">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Web Defacement</label>
+                                    <div class="col-lg-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="site_web_defacement_allow" {{$siteSettings->web_defacement_allow == 'Y' || $siteSettings->web_defacement_allow == null ? 'checked' : '' }} value="TRUE">
+                                                <span class="label-text" data-rel="tooltip" title="">URL Add</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <label class="col-lg-1 control-label">Limit : </label>
+                                    <div class="col-lg-3">
+                                        <input type="text" class="form-control touch_spin text-center" name="web_defacement_limit" value="@if($siteSettings->web_defacement_limit){{$siteSettings->web_defacement_limit}}@else{{$site_web_defacement_limit_default->value}}@endif">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Search Threat Lookup Allow</label>
+                                    <div class="col-lg-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="allow_api_api_loookup" {{$siteSettings->allow_api_api_loookup == 'Y' || $siteSettings->allow_api_api_loookup == null ? 'checked' : '' }} value="TRUE">
+                                                <span class="label-text" data-rel="tooltip" title="">Allow</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <label class="col-lg-1 control-label">Limit : </label>
+                                    <div class="col-lg-3">
+                                        <input type="text" class="form-control touch_spin text-center" name="search_api_loookup_limit" value="{{$siteSettings->search_api_loookup_limit}}"> 
+                                     
+                                    </div>
+                                    <div class="col-lg-3">
+                                      Last Search Use : {{$siteSettings->search_api_loookup_Use}}
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Agent Windows Allow</label>
+                                    <div class="col-lg-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="allow_agent" {{$siteSettings->allow_agent == 'Y' || $siteSettings->allow_agent == null ? 'checked' : '' }} value="TRUE">
+                                                <span class="label-text" data-rel="tooltip" title="">Allow</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <label class="col-lg-1 control-label">Limit : </label>
+                                    <div class="col-lg-3">
+                                        <input type="text" class="form-control touch_spin text-center" name="allow_agent_limit" value="{{$siteSettings->agent_count}}"> 
+                                    </div>
+
+
+                                    <div class="col-lg-3">
+                                        <p>Download Agent: </p>
+                                    </div>
+                                   
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-lg-9 "></div>
+                                    <div class="col-lg-3 px-0">
+                                        @if(@$file_agent_name)
+                                            <a style="margin: 0 2px 2px;" href="../../agent/file_download/Windows/{{$file_agent_name}}" target="_black" class=""><img style="width: 40px;padding: 5px 0;" src="../../images/download/windows.png" alt=""></a>
+                                            <a style="margin: 0 2px 2px;" href="../../agent/file_download/Debian/{{$file_agent_name}}" target="_black" class=""><img style="width: 40px;padding: 5px 0;" src="../../images/download/debian.png" alt=""></a>
+                                            <a style="margin: 0 2px 2px;" href="../../agent/file_download/Ubuntu/{{$file_agent_name}}" target="_black" class=""><img style="width: 40px;padding: 5px 0;" src="../../images/download/ubuntu.png" alt=""></a>
+                                            <a style="margin: 0 2px 2px;" href="../../agent/file_download/CentOS/{{$file_agent_name}}" target="_black" class=""><img style="width: 40px;padding: 5px 0;" src="../../images/download/centos.png" alt=""></a>
+                                            <a style="margin: 0 2px 2px;" href="../../agent/file_download/Fedora/{{$file_agent_name}}" target="_black" class=""><img style="width: 40px;padding: 5px 0;" src="../../images/download/fedora.png" alt=""></a>          
+                                        @endif
+                                        
+                                    </div>
+                                </div>
+
+                               
+
+                               
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Agent linux Allow</label>
+                                    <div class="col-lg-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="allow_agent" {{$siteSettings->allow_agent == 'Y' || $siteSettings->allow_agent == null ? 'checked' : '' }} value="TRUE">
+                                                <span class="label-text" data-rel="tooltip" title="">Allow</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <label class="col-lg-1 control-label">Limit : </label>
+                                    <div class="col-lg-3">
+                                        <input type="text" class="form-control touch_spin text-center" name="allow_agent_limit" value="{{$siteSettings->agent_count}}"> 
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <button type="button" class="btn btn-primary" id="agent_linux_allow_copy_url_clone_install" data-clipboard-text='wget "http://10.104.0.7:8083/agent/linux/file/sosecureinsights-1.0.0-py3-none-any.whl.zip"' onclick="copy_url_clone_install()">Copy URL Clone Install</button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-lg-6 control-label">Configure Log Storage Quotas and Expiration Periods</label>
+                                    <div class="col-lg-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="" name="log_storage_quotas" value="{{$siteSettings->log_storage_quotas}}">
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn btn-info">Day</button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">E-mail Alert </label>
+                                    <div class="col-lg-9">
+                                        <select name="email_alert[]" id="email_alert" class="select2-option form-control" multiple="multiple">
+                                            {{-- <option value="1">a</option>
+                                            <option value="2">b</option> --}}
+                                            
+                                                @foreach($siteSettings->get_site_config_email_alert as $site_config_email_alert)
+                                                    <option value="{{ $site_config_email_alert->email  }}" selected >{{ $site_config_email_alert->email }}</option>
+                                                @endforeach
+                                        </select>
+
+                                        <div class="text-muted">Alert (News,Other)</div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Defacement E-mail Alert </label>
+
+                                    <div class="col-lg-9">
+                                        <select name="email_alert_defacement[]" id="email_alert_defacement" class="select2-option form-control" multiple="multiple">
+                                            {{-- <option value="1">a</option>
+                                            <option value="2">b</option> --}}
+                                            
+                                                @foreach($siteSettings->get_site_config_email_alert_defacement as $site_config_email_alert)
+                                                    <option value="{{ $site_config_email_alert->email  }}" selected >{{ $site_config_email_alert->email }}</option>
+                                                @endforeach
+                                        </select>
+
+                                        <div class="text-muted">Alert (Defacement to admin)</div>
+                                    </div>
+                                </div>
+
+                                <hr>
+
+                                <div class="row">
+                                        <label class="col-lg-3 control-label m-b-12">Syslog Server Log</label>
+                                </div>
+                             
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">IP </label>
+                                    <div class="col-lg-9">
+                                            <input type="text" name="ip" class="form-control" value="@if($siteSettings->server_log_ip){{$siteSettings->server_log_ip}}@else  @endif"><!--192.168.1.1-->
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Protocol </label>
+                                    <div class="col-lg-9">
+                                        <select name="protocol" id="select-protocol" class="form-control">
+                                            <option value="">--Protocal--</option>
+                                            <option value="udp" @if($siteSettings->server_log_protocol == 'udp') selected @else  @endif>udp</option>
+                                            <option value="tcp" @if($siteSettings->server_log_protocol == 'tcp') selected @else  @endif>tcp</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Port </label>
+                                    <div class="col-lg-9">
+                                            <input type="number" name="port" class="form-control" value="@if($siteSettings->server_log_port){{$siteSettings->server_log_port}}@else  @endif"><!--80-->
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Format </label>
+                                    <div class="col-lg-9">
+                                            <input type="text" name="format" class="form-control" value="@if($log_format_indicator){{$log_format_indicator}}@else  @endif"><!--80-->
+                                    </div>
+                                </div>
+
+
+                                {{-- <div id="sec_agent" style="display: none">
+                                    <div class="row m-b-md">
+    
+                                        <div class="col-sm-8">
+                                            <h4 style="margin:0;">Add Agent</h4>
+                                        </div>
+                                        <div class="col-sm-4 text-right">
+                                            <button type="button" class="btn btn-info btn-rounded" data-toggle="modal" data-target="#modal_agent"><i class="fas fa-plus"></i> Add</button>
+                                        </div>
+                             
+                                    </div>
+    
+                             
+                                    <div class="table-responsive">
+                                        <div style="width: 100%">
+                                            <table id="tbl_agent" class="table table-borered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No.</th>
+                                                        <th>OS</th>
+                                                        <th>IP Private</th>
+                                                        <th>Remark</th>
+                                                        <th>Config</th>
+                                                        <th>Agent</th>
+                                                        <th>Date Created</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                                 
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <hr>
+                                        </div>
+                                    </div>
+
+                                </div> --}}
+
+
+
+
+
+
+
+                                
+
+                            </div>
+                            <div class="panel-footer text-right">
+                                {{-- {!! closeModalButton() !!} --}}
+                                <button type="submit" class="btn btn-info formSaving btn-rounded"><i class="fas fa-paper-plane"></i> Save</button>
+                            </div>
+                            {!! Form::close() !!}
+                        </div>
+                    </div>
+                </section>
+            </section>
+    </section>
+
+    <!--
+    <div class="modal" id="modal_agent" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white txt-model">Add Agent</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">OS :</label>
+                                    <div class="col-lg-9">
+                                        <select name="os_agent[]" id="os_agent" class="form-control">
+                                            <option value="Window">
+                                                Window 
+                                            </option>
+                                            <option value="Linux">
+                                                Linux
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">IP Private <span class="text-danger">*</span></label>
+                                    <div class="col-lg-9">
+                                        <input type="text" id="ip_private" name="ip_private" class="form-control" value="">
+                                        <span id="ip_required"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 control-label">Remark : </label>
+                                    <div class="col-lg-9">
+                                        <input type="text" id="agent_remark" name="agent_remark" class="form-control" value="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
+
+                    <button id="add_agent" type="button" class="btn btn-info submit btn-rounded" data-dismiss="modal"><i class="fas fa-paper-plane"></i> OK</button>
+                    
+                    {{-- <button type="button" class="btn btn-info submit btn-rounded" data-dismiss="modal"><i class="fas fa-paper-plane"></i> Update</button> --}}
+                </div>
+            </div>
+        </div>
+    </div>
+    -->
+
+    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen, open" data-target="#nav,html"></a>
+</section>
+
+
+@push('pagestyle')
+@include('stacks.css.form')
+@endpush
+@push('pagescript')
+@include('stacks.js.form')
+@include('stacks.js.touchspin')
+@include('stacks.js.menusub')
+@include('stacks.js.site_hidesettings')
+
+<script>
+    $(document).ready(function () {
+
+      
+
+        $('#select-protocol').select2({
+            minimumResultsForSearch: -1
+        });
+
+        $('#email_alert').select2({
+            tags: true,
+            tokenSeparators: [' ']
+        });
+
+        $('#email_alert_defacement').select2({
+            tags: true,
+            tokenSeparators: [' ']
+        });
+        
+        $(".touch_spin").TouchSpin({
+            min: 0,
+            step: 1,
+            boostat: 5,
+            maxboostedstep: 10,
+            max: 1000000000,
+        });
+
+        if($('input[name="allow_agent"]').prop("checked")){
+            $('#sec_agent').show();
+        }else{
+            $('#sec_agent').hide();
+        }
+        
+       
+    });
+
+    {{-- 
+    var select_os = $('#os_agent');
+    var ip_private = $('#ip_private');
+    var agent_remark = $('#agent_remark');
+
+    $('input[name="allow_agent"]').on('change',function(){
+        if(this.checked) {
+            $('#sec_agent').show();
+        }else{
+            $('#sec_agent').hide();
+        }
+    });
+
+    $('#add_agent').click(function(){
+        let os = select_os.val();
+        let ip = ip_private.val();
+        let remark = agent_remark.val();
+
+        if(os != '' && ip != ''){
+            let html = ``;
+            html += `
+            <tr>
+                <td>1</td>
+                <td>${os}</td>
+                <td>
+                    <a href="">${ip}</a> 
+                </td>
+                <td>
+                    <button type="button" class="btn btn-info btn-xs btn-rounded">Download</button>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-info btn-xs btn-rounded">Download</button>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-info btn-xs btn-rounded">Download</button>
+                </td>
+                <td>03-08-2020</td>
+                <td>
+                    <label class="switch">
+                        <input type="checkbox" id="" onchange="" checked="" name="active" value="1">
+                        <span></span>
+                    </label>
+                </td>
+                <td>
+                    <button type="button"  data-toggle="modal" data-target="#modal_agent" class="btn btn-info btn-xs">
+                        <i class="fas fa-edit"></i>
+                    </button>
+
+                    <button type="button" class="btn btn-danger btn-xs delete_agent">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
+            `;
+            $('#tbl_agent tbody').append(html);
+
+            $('.delete_agent').click(function(){
+                $(this).closest('tr').remove();
+            });
+            $('#ip_required').empty();
+        }else{
+            let html = `<div class="text-danger">Please Enter IP Private</div>`;
+            $('#ip_required').append(html);
+        }
+    });
+
+    $('#os_agent').select2();
+    --}}
+
+    $('ul.role-group-sub').hide();
+    function openrole(onck,id){
+        $('#'+id).slideToggle(150);
+    }
+
+   
+        if($("input[name='site_user_allow']").is(':checked')) {
+            $("input[name='user_limit']").prop("disabled",false);
+        } else {
+            $("input[name='user_limit']").prop("disabled",true);
+        }
+    
+        if($("input[name='site_domain_allow']").is(':checked')) {
+            $("input[name='domain_limit']").prop("disabled",false);
+        } else {
+            $("input[name='domain_limit']").prop("disabled",true);
+        }
+    
+        if($("input[name='site_asset_allow']").is(':checked')) {
+            $("input[name='asset_limit']").prop("disabled",false);
+        } else {
+            $("input[name='asset_limit']").prop("disabled",true);
+        }
+
+
+    $("input[name='site_user_allow']").click(function() {
+        if($(this).is(':checked')) {
+            $("input[name='user_limit']").prop("disabled",false);
+        } else {
+            $("input[name='user_limit']").prop("disabled",true);
+        }
+    });
+    $("input[name='site_domain_allow']").click(function() {
+        if($(this).is(':checked')) {
+            $("input[name='domain_limit']").prop("disabled",false);
+        } else {
+            $("input[name='domain_limit']").prop("disabled",true);
+        }
+    });
+    $("input[name='site_asset_allow']").click(function() {
+        if($(this).is(':checked')) {
+            $("input[name='asset_limit']").prop("disabled",false);
+        } else {
+            $("input[name='asset_limit']").prop("disabled",true);
+        }
+    });
+
+    var form_save = '.formSaving';
+    $('.ajaxifyForm_custom').submit(function (event) {
+        event.preventDefault();
+
+            $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
+            $('.formSaving').attr('disabled',true);
+            
+            var data = new FormData(this);
+            if(form_save == '.formSavingAndRun'){
+                data.append('formsubmit', 'formSavingAndRun');
+            }else if(form_save == '.formPreview'){
+                data.append('formsubmit', 'formPreview');
+            }else if(form_save == '.formDraft'){
+                data.append('formsubmit', 'formDraft');
+            }
+            axios.post($(this).attr("action"), data)
+                .then(function (response) {
+                    
+                    toastr.success(response.data.message, '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
+                    window.location.href = response.data.redirect;
+            })
+            .catch(function (error) {
+                if(error.response.data.exception){
+                    $('.formSaving').attr('disabled',false);
+                    toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }else{
+                    $('.formSaving').attr('disabled',false);
+                    var errors = error.response.data.errors;
+                    var errorsHtml= '';
+                    $.each( errors, function( key, value ) {
+                        errorsHtml += '<li>' + value[0] + '</li>'; 
+                    });
+                    toastr.error( errorsHtml , '@langapp('response_status') ');
+                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
+                }
+                
+                
+            }); 
+       
+     
+         
+    });
+
+    function copy_url_clone_install() {
+
+        const target = document.getElementById('agent_linux_allow_copy_url_clone_install');
+        clipboard = new ClipboardJS(target);
+
+        clipboard.on('success', function (e) {
+            const currentLabel = target.innerHTML;
+
+            if (target.innerHTML === 'Copied!') {
+                return;
+            }
+
+            target.innerHTML = 'Copied!';
+            toastr.success('Copied successfully.', 'Response');
+
+            setTimeout(function () {
+                target.innerHTML = currentLabel;
+            }, 1000)
+        });
+
+    }
+
+</script>
+
+@endpush
+
+@endsection

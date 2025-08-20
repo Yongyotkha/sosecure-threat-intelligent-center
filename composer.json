@@ -57,7 +57,8 @@
         "spatie/laravel-permission": "^2.4",
         "spatie/laravel-translation-loader": "^2.2",
         "srmklive/paypal": "^1.5",
-        "symfony/dom-crawler": "^4.1",
+        "symfony/css-selector": "^5.4",
+        "symfony/dom-crawler": "^5.4",
         "tymon/jwt-auth": "^1.0",
         "wepay/php-sdk": "^0.3.1",
         "yajra/laravel-datatables-oracle": "^8.1"

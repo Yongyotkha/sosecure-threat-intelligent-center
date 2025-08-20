@@ -262,13 +262,13 @@
   ),
   'srmklive/paypal' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Srmklive\\PayPal\\Providers\\PayPalServiceProvider',
-    ),
     'aliases' => 
     array (
       'PayPal' => 'Srmklive\\PayPal\\Facades\\PayPal',
+    ),
+    'providers' => 
+    array (
+      0 => 'Srmklive\\PayPal\\Providers\\PayPalServiceProvider',
     ),
   ),
   'tymon/jwt-auth' => 

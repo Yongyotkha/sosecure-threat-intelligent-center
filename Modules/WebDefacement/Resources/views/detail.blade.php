@@ -1,38 +1,166 @@
 @extends('layouts.app')
 @section('content')
+@php
+function strx($v): string {
+if (is_array($v)) {
+return (string)($v['name'] ?? json_encode($v, JSON_UNESCAPED_UNICODE));
+}
+if (is_object($v)) {
+return method_exists($v, '__toString')
+? (string)$v
+: (string)json_encode($v, JSON_UNESCAPED_UNICODE);
+}
+return (string)$v;
+}
+@endphp
+<style>
+    /* กันไม่ให้คอนเทนต์ท้าย ๆ โดนแถบปุ่มบัง */
+    .scrollable.wrapper {
+        padding-bottom: 0px;
+    }
+
+    .section-bottom-bar {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        display: flex;
+        z-index: 1050;
+    }
+
+    /* .section-bottom-bar .flex-btn {
+        flex: 1;
+        border-radius: 99px;
+        padding: 14px;
+        font-size: 16px;
+    } */
+
+
+    .section-bottom-bar {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        display: flex;
+        z-index: 1050;
+    }
+
+    .section-bottom-bar .flex-btn {
+        flex: 1 1 0;
+        box-sizing: border-box;
+        padding: 14px 16px;
+        font-size: 16px;
+        border-radius: 99px;
+        transition:
+            flex 200ms ease,
+            padding 200ms ease,
+            font-size 200ms ease,
+            transform 200ms ease,
+            background-color 150ms ease,
+            color 150ms ease;
+        transform-origin: center bottom;
+    }
+
+    .section-bottom-bar:hover .flex-btn {
+        flex: 0.8;
+        transform: scale(0.96);
+        opacity: 0.5;
+        height: 15%;
+        
+    }
+
+    .section-bottom-bar:hover .flex-btn:hover {
+        flex: 1.6;
+        padding: 22px 16px;
+        font-size: 18px;
+        opacity: 1;
+        font-weight: bold;
+        animation-duration: 300ms;
+        /* transition-delay: 200ms; */
+    }
+
+    .section-bottom-bar .btn-info:hover {
+        color: #fff !important;
+        background-color: #023f81 !important;
+        border-color: #fff;
+    }
+
+    .section-bottom-bar .btn-danger:hover {
+        color: #fff !important;
+        background-color: #ce0000ff !important;
+        border-color: #fff !important;
+    }
+
+
+    /* (ทางเลือก) ลดอนิเมชันบนจอเล็ก */
+    @media (max-width: 480px) {
+        .section-bottom-bar:hover .flex-btn {
+            flex: 0.9;
+            transform: none;
+        }
+        .section-bottom-bar:hover .flex-btn:hover {
+            flex: 1.2;
+            padding: 18px 14px;
+            font-size: 17px;
+        }
+    }
+    .text-message{
+        font-size: 14px;
+        color: #ff0000ff;
+        font-weight: bold;
+    }
+    .text-message-warning{
+        font-size: 14px;
+        color: #fada5e !important;
+        font-weight: bold;
+    }
+    .text-description{
+        text-align: justify;
+        font-size: 13px;
+        color: #683d3dff;
+        font-weight: bold;
+    }
+
+    .section-bottom-bar:hover .flex-btn:hover{
+          box-shadow:
+    0 6px 12px rgba(0,0,0,.08),
+    inset 0 0 0 2px currentColor;
+    animation: outlinePulse 1s ease-in-out infinite;
+    }
+    @keyframes outlinePulse{
+    0%,100%{ box-shadow: 0 6px 12px rgba(0,0,0,.08), inset 0 0 0 2px currentColor; }
+    50%    { box-shadow: 0 10px 20px rgba(0,0,0,.14), inset 0 0 0 4px rgba(255,255,255,.6); }
+    }
+
+
+
+
+</style>
 <section id="content" class="bg">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <section class="vbox">
         {{-- Head --}}
         <header class="header panel-heading bg-white b-b b-light">
-        <div class="bc-head" style="margin-top: 10px;">
-            <a href="{{@$site_code?route('webdefacement_website.index',['id'=>@$site_code]):route('webdefacement.index')}}"
-                class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
-                @icon('solid/arrow-left')
-            </a>
-            @langapp('webdefacement') > {{@$webdefacement->name}}
-        </div>
-
-        <div class="d-none">
-            <span>Status &nbsp;</span>
-            <span id="status_val_webdefacement">
-            {!!@get_webdefacment_status(@$webdefacement->status_val,'color')!!}
-            </span>
-            &nbsp;
-        </div>
-        <div class="pull-right" style="margin-top: 10px" id='load_status'>
-            <span id="check_status_val_webdefacement">
-            @if (@$webdefacement->status_val != 'Normal')   
-                <a href="#" id="accept_risk" onclick="accept_risk()"
-                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive">
-                    Accept Risk
+            <div class="bc-head" style="margin-top: 10px;">
+                <a href="{{@$site_code?route('webdefacement_website.index',['id'=>@$site_code]):route('webdefacement.index')}}"
+                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
+                    @icon('solid/arrow-left')
                 </a>
-            </span>    
-            @endif
-        </div>
+                @langapp('webdefacement') > {{@$webdefacement->name}}
+            </div>
 
-        &nbsp;
+            <div class="d-none">
+                <span>Status &nbsp;</span>
+                <span id="status_val_webdefacement">
+                    {!!@get_webdefacment_status(@$webdefacement->status_val,'color')!!}
+                </span>
+                &nbsp;
+            </div>
+            
 
-    </header>
+            &nbsp;
+
+        </header>
 
         <section class="scrollable wrapper">
 
@@ -51,58 +179,89 @@
                 </header>
                 <div class="panel-body" id="wdfm-analytics">
                     <h3 class="text-center">Last Update : {{@$webdefacement->last_check}}</h3>
+
+                    <!-- Circle -->
+
+                    @php
+          $chk = '';
+          $data['all'] = [];
+          try {
+          $chk = $webdefacment_data_check;
+          if(!empty($chk)){
+          if ($chk->hash_percent > -1) {
+          $data['all']['hash'] = [
+          'name' => 'Hash',
+          'value' => (float) $chk->hash_percent,
+          ];
+          }
+          if ($chk->filesize_percent > -1) {
+          $data['all']['filesize'] = [
+          'name' => 'Filesize',
+          'value' => (float) $chk->filesize_percent,
+          ];
+          }
+          if ($chk->element_percent > -1) {
+          $data['all']['element'] = [
+          'name' => 'Element',
+          'value' => (float) $chk->element_percent,
+          ];
+          }
+          if ($chk->image_percent > -1) {
+          $data['all']['image'] = [
+          'name' => 'Image',
+          'value' => (float) $chk->image_percent,
+          ];
+          }
+          if ($chk->keyword_percent > -1) {
+          $data['all']['blacklist'] = [
+          'name' => 'Blacklist',
+          'value' => (float) $chk->keyword_percent,
+          ];
+          }
+
+          }
+          } catch (\Throwable $th) {
+          $chk = [];
+          }
+ 
+          @endphp
+
                     <div class="wrapper-circle">
+                        @if(!empty($data['all']))
+                        @foreach($data['all'] as $key => $item)
+                        @php
+                        if (is_array($item)) {
+                        $value = (int)($item['value'] ?? 0);
+                        $name = strx($item['name'] ?? $key);
+                        } elseif (is_object($item)) {
+                        $value = (int)($item->value ?? 0);
+                        $name = strx($item->name ?? $key);
+                        } else {
+                        $value = (int)$item;
+                        $name = strx($key);
+                        }
+
+                        if ($value >= 80) {
+                        $color = 'danger';
+                        } elseif ($value >= 50) {
+                        $color = 'warning';
+                        } else {
+                        $color = 'green';
+                        }
+                        @endphp                                                                   
                         <div>
-                            <div class="c100 p{{@$webdefacment_data_check->hash_percent}} green">
-                                <span>{{@$webdefacment_data_check->hash_percent}}%</span>
+                            <div class="c100 p{{$value}} {{$color}}">
+                                <span>{{$value}}%</span>
                                 <div class="slice">
-                                  <div class="bar"></div>
-                                  <div class="fill"></div>
+                                    <div class="bar"></div>
+                                    <div class="fill"></div>
                                 </div>
                             </div>
-                            <h3 class="text-center text-dark font-weight-bold">HASH</h3>
+                            <h3 class="text-center text-dark font-weight-bold">{{$name}}</h3>
                         </div>
-                      
-                        <div>
-                            <div class="c100 p{{@$webdefacment_data_check->filesize_percent}} green">
-                                <span>{{@$webdefacment_data_check->filesize_percent}}%</span>
-                                <div class="slice">
-                                  <div class="bar"></div>
-                                  <div class="fill"></div>
-                                </div>
-                            </div>
-                            <h3 class="text-center text-dark font-weight-bold">Filesize</h3>
-                        </div>
-                        <div>
-                            <div class="c100 p{{@$webdefacment_data_check->element_percent}} danger">
-                                <span>{{@$webdefacment_data_check->element_percent}}%</span>
-                                <div class="slice">
-                                  <div class="bar"></div>
-                                  <div class="fill"></div>
-                                </div>
-                            </div>
-                            <h3 class="text-center text-dark font-weight-bold">Element</h3>
-                        </div>
-                        <div>
-                            <div class="c100 p60 warning">
-                                <span>60%</span>
-                                <div class="slice">
-                                  <div class="bar"></div>
-                                  <div class="fill"></div>
-                                </div>
-                            </div>
-                            <h3 class="text-center text-dark font-weight-bold">Image</h3>
-                        </div>
-                        <div>
-                            <div class="c100 p90 danger">
-                                <span>90%</span>
-                                <div class="slice">
-                                  <div class="bar"></div>
-                                  <div class="fill"></div>
-                                </div>
-                            </div>
-                            <h3 class="text-center text-dark font-weight-bold">Blacklist</h3>
-                        </div>
+                    @endforeach
+                    @endif
+                        
                     </div>
                 </div>
             </section>
@@ -128,32 +287,32 @@
                                 <th>Description</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Datetime</th>
-                                
+
                             </tr>
-    
-                            @if ($webdefacment_data_log)            
-                                @foreach ($webdefacment_data_log as $webdefacment_data_log)
-                                    <tr>
-                                        <td class="text-center">{!! @$loop->iteration !!}</td>
-                                        <td class="nowrap">
-                                            @if ($webdefacment_data_log->message) 
-                                            {!!@$webdefacment_data_log->message!!}
-                                            @else
-                                                -
-                                            @endif 
-                                        </td>
-                                        <td class="text-center">
-                                            @if ($webdefacment_data_log->status_val) 
-                                                {!!@get_webdefacment_status(@$webdefacment_data_log->status_val,'color')!!}
-                                            @else
-                                                -
-                                            @endif    
-                                        </td>
-                                        <td class="no-wrap">{{@$webdefacment_data_log->updated_at}}</td>
-                                    </tr>
-                                @endforeach
+
+                            @if ($webdefacment_data_log)
+                            @foreach ($webdefacment_data_log as $webdefacment_data_log)
+                            <tr>
+                                <td class="text-center">{!! @$loop->iteration !!}</td>
+                                <td class="nowrap">
+                                    @if ($webdefacment_data_log->message)
+                                    {!!@$webdefacment_data_log->message!!}
+                                    @else
+                                    -
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    @if ($webdefacment_data_log->status_val)
+                                    {!!@get_webdefacment_status(@$webdefacment_data_log->status_val,'color')!!}
+                                    @else
+                                    -
+                                    @endif
+                                </td>
+                                <td class="no-wrap">{{@$webdefacment_data_log->updated_at}}</td>
+                            </tr>
+                            @endforeach
                             @endif
-    
+
                             <!-- ตัวอย่าง Log เอาที่อยู่ใน td >  <div class="main-card-log"> 
                             <tr>
                                 <td class="text-center">1</td>
@@ -194,13 +353,13 @@
                                 <td class="no-wrap">2021-01-17 09:47:38</td>
                             </tr>
                             -->
-    
-    
+
+
                         </table>
                     </div>
                 </div>
             </section>
-            
+
             <section class="panel panel-default">
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row d-flex-center">
@@ -227,17 +386,17 @@
                                     {{@$webdefacement->url}}
                                     <a href="{{@$webdefacement->url}}" target="_blank" class="btn btn-info btn-xs"><i class="fas fa-link"></i> Link</a>
                                 </td>
-                                
+
                             </tr>
                             <tr>
                                 <th>Domain</th>
-                                <td >{{@$webdefacement->domain}}</td>
+                                <td>{{@$webdefacement->domain}}</td>
                             </tr>
                             <tr>
                                 <th>User Agent</th>
                                 <td>
                                     {{@$webdefacement->user_agent}}
-                                   
+
                                 </td>
                             </tr>
                             <tr>
@@ -271,7 +430,7 @@
                                     <th>Current</th>
                                 </tr>
                             </thead>
-                            <tbody> 
+                            <tbody>
                                 @if(@$webdefacement->hash == 1)
                                 <tr>
                                     <th>Hash</th>
@@ -317,7 +476,7 @@
                                     </td>
                                 </tr>
                             </tfoot>
-                        </table>       
+                        </table>
                     </div>
                 </div>
             </section>
@@ -345,10 +504,10 @@
                                         <div class="wdfm-header">
                                             <div class="wdfm-img" id='updateImage_original'>
                                                 {{-- <a href="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_original}}" data-lightbox="name-img-2">
-                                                    <img src="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_original}}" onerror="setDefaultPic(this)"/>
+                                                <img src="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_original}}" onerror="setDefaultPic(this)" />
                                                 </a> --}}
                                                 <a href="https://insights.sosecure.co.th{{@$webdefacement->image_original}}" data-lightbox="name-img-2">
-                                                    <img src="https://insights.sosecure.co.th{{@$webdefacement->image_original}}" onerror="setDefaultPic(this)"/>
+                                                    <img src="https://insights.sosecure.co.th{{@$webdefacement->image_original}}" onerror="setDefaultPic(this)" />
                                                 </a>
                                             </div>
                                         </div>
@@ -375,28 +534,27 @@
                                         <div class="wdfm-header">
                                             <div class="wdfm-img">
                                                 {{-- <a href="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_last}}" data-lightbox="name-img-2">
-                                                    <img src="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_last}}" onerror="setDefaultPic(this)"/>
+                                                <img src="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_last}}" onerror="setDefaultPic(this)" />
                                                 </a> --}}
                                                 <a href="https://insights.sosecure.co.th{{@$webdefacement->image_last}}" data-lightbox="name-img-2">
-                                                    <img src="https://insights.sosecure.co.th{{@$webdefacement->image_last}}" onerror="setDefaultPic(this)"/>
+                                                    <img src="https://insights.sosecure.co.th{{@$webdefacement->image_last}}" onerror="setDefaultPic(this)" />
                                                 </a>
                                             </div>
                                         </div>
                                         <div class="wdfm-body">
                                             {{-- <div class="wdfm-btn">
                                                 <a href="{{route('webdefacement.detail',['code'=>$code])}}" class="btn btn-icon btn-default btn-sm" data-rel="tooltip" title="View" data-placement="bottom">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                            </div> --}}
-                                            <h4>{{@$webdefacement->name}}</h4>
-                                            <p class="mdfm-text-muted">{{@$webdefacement->url}}</p>
-                                        </div>
-                                        <div class="wdfm-footer">
-                                            <div class="wdfm-ft-left flex rw">
-                                                <div><strong>Current</strong></div>
-                                                <div><strong>Last Update </strong>: {{@$webdefacment_data_check->last_update}}</div>
-                                                <div class="status-flex"><strong>Status </strong>: &nbsp;{{@$webdefacment_data_check->status_code}}</div>
-                                            </div>
+                                            <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div> --}}
+                                        <h4>{{@$webdefacement->name}}</h4>
+                                        <p class="mdfm-text-muted">{{@$webdefacement->url}}</p>
+                                    </div>
+                                    <div class="wdfm-footer">
+                                        <div class="wdfm-ft-left flex rw">
+                                            <div><strong>Current</strong></div>
+                                            <div><strong>Last Update </strong>: {{@$webdefacment_data_check->last_update}}</div>
+                                            <div class="status-flex"><strong>Status </strong>: &nbsp;{{@$webdefacment_data_check->status_code}}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -404,26 +562,52 @@
                         </div>
                     </div>
                 </div>
+                </div>
             </section>
             @endif
 
 
+            <!-- <div id="load_status"></div> -->
+            @if (@$webdefacement->status_val != 'Normal') 
+                <div id="float-btns" class="section-bottom-bar">
+                    <button class="btn btn-danger flex-btn" onclick="alert_to_customer(@json($webdefacement->id))">Alert To Customer</button>
+                    <button class="btn btn-info flex-btn" id="btn-accept_risk" onclick="accept_risk()">Accept Risk </button>
+                </div>
+            @endif
+            
 
 
-          </section>
+            <!-- Old Code -->
+             <!-- <div class="pull-right" style="margin-top: 10px" id='load_status'> -->
+                <!-- <span id="check_status_val_webdefacement">
+                    @if (@$webdefacement->status_val != 'Normal')
+                    <a href="#" id="accept_risk" onclick="accept_risk()"
+                        class="btn btn-{{ get_option('theme_color') }}  btn-responsive">
+                        Accept Risk
+                    </a>
+                </span>
+                @endif -->
+            <!-- </div> -->
+
+            <!-- End Old Code -->
+
+        </section>
     </section>
-    <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
+
 </section>
 
+
+
+
 @push('pagestyle')
-    @include('stacks.css.datatables')
-    @include('stacks.css.form')
-    @include('stacks.css.lightbox')
-    @include('stacks.css.c3')
-    @include('stacks.css.datepicker')
-    @include('stacks.css.form')
-    @include('stacks.css.circle_chart')
-    <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css"/>
+@include('stacks.css.datatables')
+@include('stacks.css.form')
+@include('stacks.css.lightbox')
+@include('stacks.css.c3')
+@include('stacks.css.datepicker')
+@include('stacks.css.form')
+@include('stacks.css.circle_chart')
+<link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 @endpush
 
 @push('pagescript')
@@ -500,7 +684,22 @@
             heightAuto: false,
             confirmButtonText: 'Yes'
         }).then((result) => {
-            if (result.isConfirmed) {
+            if (!result.isConfirmed) return;
+
+                const openLoader = () => Swal.fire({
+                    title: 'Status Changing...',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    heightAuto: false,
+                    didOpen: () => Swal.showLoading()
+                });
+                const stopLoader = () => {
+                    if (Swal.isLoading()) Swal.hideLoading();
+                    if (Swal.isVisible()) Swal.close();
+                };
+
+                 openLoader();
                 $.ajax({
                     type:"POST",
                     url:"{{ route('webdefacement.change_status') }}",
@@ -518,6 +717,7 @@
                
                         $('#load_status').loading('stop');
                         toastr.success(response.message, '@langapp('response_status')');
+                        stopLoader();
                         {{--window.location.href = response.redirect;--}}
                     },
                     error: function (error){
@@ -527,12 +727,12 @@
                         $.each(errors, function (key, value) {
                             errorsHtml += '<li>' + value[0] + '</li>';
                         });
+                        stopLoader();
                         toastr.error(errorsHtml, '@langapp('response_status') ');
                     }
       
                 });
-
-            }   
+                     
         })
     };
 
@@ -689,59 +889,227 @@
 
 
 
-    function update_image() { 
-     
-     Swal.fire({
-         title: 'Are you sure?',
-         text: "You won't be able to revert this!",
-         icon: 'warning',
-         showCancelButton: true,
-         confirmButtonColor: '#3085d6',
-         cancelButtonColor: '#d33',
-         heightAuto: false,
-         confirmButtonText: 'Yes'
-     }).then((result) => {
-         if (result.isConfirmed) {
-             $.ajax({
-                 type:"POST",
-                 url:"{{ route('webdefacement.update_image') }}",
-                 data:{id: {!!json_encode(@$webdefacement->id)!!}},
-                 beforeSend: function(){
-                    $('#Defacement').loading('start');
-                 },
-                 success:function(response) {
+        function update_image() { 
+        
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            heightAuto: false,
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type:"POST",
+                    url:"{{ route('webdefacement.update_image') }}",
+                    data:{id: {!!json_encode(@$webdefacement->id)!!}},
+                    beforeSend: function(){
+                        $('#Defacement').loading('start');
+                    },
+                    success:function(response) {
 
-                    let data = JSON.parse(response);
+                        let data = JSON.parse(response);
 
-                    $('#updateImage_original').html(`<a href="${base_url}/${data.image_url}" data-lightbox="name-img-2"><img src="${base_url}/${data.image_url}" onerror="setDefaultPic(this)"/>a>`);
-             
-                        $('#Defacement').loading('stop');
+                        $('#updateImage_original').html(`<a href="${base_url}/${data.image_url}" data-lightbox="name-img-2"><img src="${base_url}/${data.image_url}" onerror="setDefaultPic(this)"/>a>`);
+                
+                            $('#Defacement').loading('stop');
 
+                        
                     
-                   
-             
-                    if(data.Result==1){
-                        toastr.success('Update Success', '@langapp('response_status')');
-                    } else {
-                        toastr.error(data.message, '@langapp('response_status')');
+                
+                        if(data.Result==1){
+                            toastr.success('Update Success', '@langapp('response_status')');
+                        } else {
+                            toastr.error(data.message, '@langapp('response_status')');
+                        }
+                        {{--window.location.href = response.redirect;--}}
+                    },
+                    error: function (error){
+                        ('#updateImage_original').loading('stop');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
                     }
-                     {{--window.location.href = response.redirect;--}}
-                 },
-                 error: function (error){
-                    ('#updateImage_original').loading('stop');
-                     var errors = error.response.data.errors;
-                     var errorsHtml = '';
-                     $.each(errors, function (key, value) {
-                         errorsHtml += '<li>' + value[0] + '</li>';
-                     });
-                     toastr.error(errorsHtml, '@langapp('response_status') ');
-                 }
- 
-             });
+    
+                });
 
-         }   
-     })
- };
+            }   
+        })
+    };
+
+
+        $.ajaxSetup({
+        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+        });
+
+        function alert_to_customer(id) {
+            let domain = '{{@$webdefacement->domain}}';
+            let namepage = '{{@$webdefacement->name}}';
+            let site = '{{@$webdefacement->get_site->name}}';
+        Swal.fire({
+            title: 'Are you sure To send this Alert?',
+            html: `
+                    <table class="table table-bordered table-striped" style="border: none">
+                    <tr>
+                        <td colspan="2">
+                            <p class="text-message-warning">Infomation</p> 
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p class="text-description">Domain: </p>
+                        </td>
+                        <td>
+                            <p style="text-align: left">${domain}</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p class="text-description">Namepage:</p>
+                        </td>
+                        <td>
+                            <p style="text-align: left"> ${namepage}</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p class="text-description">Site:</p>
+                        </td>
+                        <td>
+                            <p style="text-align: left"> ${site}</p>
+                        </td>
+                    </tr>
+                    </table>
+                     <p class="text-message-warning">Alert will be sent to the customer.</p>
+                    `,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            heightAuto: false,
+            confirmButtonText: 'Yes',
+            width: '500px',
+            
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+
+            Swal.fire({
+                title: 'Alert is Sending...',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                heightAuto: false,
+                didOpen: () => {
+                Swal.showLoading();
+                }
+            });
+
+            const $btn = $('#btn-alert-customer');
+            $btn.prop('disabled', true).addClass('disabled');
+
+            $.ajax({
+            type: 'POST',
+            url: "{{ route('webdefacement.alert_to_customer') }}",
+            data: { id: id },          
+            dataType: 'json',
+            beforeSend: function() {
+
+            },
+            success: function(res) {
+                if (res && res.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Alert sent',
+                    text: res.message || 'Customer has been notified.',
+                    heightAuto: false
+                });
+                } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: (res && res.message) ? res.message : 'Cannot alert customer.',
+                    heightAuto: false
+                });
+                }
+            },
+            error: function(xhr) {
+                const msg =
+                (xhr.responseJSON && (xhr.responseJSON.message || xhr.responseJSON.error)) ||
+                xhr.statusText || 'Unexpected error';
+                const errs = (xhr.responseJSON && xhr.responseJSON.errors)
+                ? Object.values(xhr.responseJSON.errors).flat().join('\n')
+                : '';
+                const time = xhr.responseJSON && xhr.responseJSON.retryAt ? xhr.responseJSON.retryAt : '';
+                Swal.fire({
+                icon: 'error',
+                title: 'Already sent to customer',
+                html: `
+                        <p class="text-message">${msg}</p>
+                        ${errs ? `<p>${errs}</p>` : ''}
+                        ${time ? `<p style="font-size: 14px;font-weight: bold;font-color: #ff0000df">${time}</p>` : ''}
+                    `,
+                heightAuto: false,
+                width: 600,
+
+                color: '#e2e8f0',              
+                iconColor: '#ef4444',          
+                backdrop: 'rgba(0,0,0,.4)',    
+
+                cancelButtonText: 'Close',
+                });
+            },
+            complete: function() {
+                $btn.prop('disabled', false).removeClass('disabled');
+                Swal.hideLoading();
+
+            }
+            });
+        });
+        }
+
+
+
+
+
+</script>
+
+<script>    
+
+    (function() {
+        const bar = document.getElementById('float-btns');
+        const section = document.getElementById('content');
+        const sentinel = document.getElementById('end-sentinel');
+        if (!bar || !section || !sentinel) return;
+
+        function layoutBar() {
+
+            const srect = section.getBoundingClientRect();
+            bar.style.left = srect.left + 'px';
+            bar.style.width = srect.width + 'px';
+
+            const r = sentinel.getBoundingClientRect();
+            const overlap = Math.max(0, window.innerHeight - r.top);
+            bar.style.transform = `translateY(-${overlap}px)`;
+        }
+
+        window.addEventListener('scroll', layoutBar, {
+            passive: true
+        });
+        window.addEventListener('resize', layoutBar);
+
+        if ('ResizeObserver' in window) {
+            const ro = new ResizeObserver(layoutBar);
+            ro.observe(section);
+        }
+
+        layoutBar();
+    })();
 </script>
 @endpush
 @endsection

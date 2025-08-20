@@ -8,6 +8,13 @@
             background-color: #dc3545 !important; /* แดง */
             color: white;
         }
+        .modal-disabled {
+            pointer-events: none;      
+            user-select: none;        
+            filter: grayscale(50%) brightness(90%);
+            opacity: 1;             
+            touch-action: none; 
+        }
 </style>
 
 </style>
@@ -23,7 +30,16 @@
             'method' => 'POST',
             'files' => true,
         ]) !!}
-        <div class="modal-body">
+
+        @php
+            $isCreateMode = @$mode ? false : true;
+            $isDraft = $isCreateMode ? true : (@$savedraft == 1); // ถ้า create หรือ savedraft = 1 ถือว่ายังไม่ published
+            $isPublished = $isDraft ? 0 : 1;
+            $buttonClass = $isDraft ? 'btn-published btn-success' : 'btn-unpublished btn-danger';
+            $buttonLabel = $isDraft ? 'Published' : 'Unpublished';
+            $modalBodyLockClass = $isPublished ? 'modal-disabled' : ''; // ถ้า published แล้ว ล็อก modal-body
+        @endphp
+        <div class="modal-body {{ $modalBodyLockClass }} ">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12 m-b-12">
@@ -295,7 +311,7 @@ $date_public = '';
                                             if(@$RSSNews -> public_date) {
                                                 $date_public = timePickerFormat($RSSNews -> public_date);
                                             } else {
-                                                $date_public = timePickerFormat(date("Y-m-d"));
+                                                $date_public = timePickerFormat(date("Y-m-d H:i:s"));
                                             } @endphp
                                         value="{{ @$date_public }}" name="public_date"
                                         data-date-format="DD-MM-YYYY HH:mm:ss" data-date-start-date="moment()">
@@ -340,20 +356,34 @@ $date_public = '';
             </div>
         </div>
 
+        @php
+        if (!isset($mode)) {
+            $isPublished = 0;
+        } else {
+            $isPublished = @$savedraft == 0 ? 1 : 0;
+        }
+
+        $buttonClass = $isPublished ? 'btn-unpublished btn-danger' : 'btn-published btn-success';
+        $buttonLabel = $isPublished ? 'Unpublished / Edit' : 'Published';
+        $iconClass = $isPublished ? 'fas fa-undo' : 'fas fa-paper-plane';
+        $saveDisabled = $isPublished && isset($mode) ? 'disabled' : '';
+    @endphp
         
         <div class="modal-footer">
             {!! closeModalButton() !!}
-            <button type="submit" class="btn btn-warning formDraft btn-rounded"><i class="fas fa-save"></i>
-                Save</button>
+            <button type="submit" class="btn btn-warning formDraft btn-rounded" {{ $saveDisabled }}>
+                <i class="fas fa-save"></i> Save
+            </button>
 
-              <button 
+            <button 
                 id="toggle-button"
                 type="button"
-                class="btn btn-info formSaving submit btn-rounded btn-published"
-                data-public="0"
+                class="btn formSaving submit btn-rounded {{ $buttonClass }}"
+                data-public="{{ $isPublished }}"
                 onclick="togglePublish(this)">
-                <i class="fas fa-paper-plane"></i> Published
-                </button>
+                <i class="{{ $iconClass }}"></i> {{ $buttonLabel }}
+            </button>
+
 
             <!-- <button type="submit" class="btn btn-info formSaving submit btn-rounded"><i
                     class="fas fa-paper-plane"></i>Public</button> -->
@@ -525,6 +555,8 @@ $date_public = '';
                 data.append('formsubmit', 'formPreview');
             } else if (form_save == '.formDraft') {
                 data.append('formsubmit', 'formDraft');
+            } else if (form_save == '.formSaving') {
+                data.append('formsubmit', 'formSaving');
             }
             axios.post($(this).attr("action"), data).then(function(response) {
                 toastr.success(response.data.message, '@langapp('response_status') ');
@@ -603,45 +635,133 @@ $date_public = '';
         }
 
 
-        window.addEventListener('DOMContentLoaded', () => {
-    // ล็อก input ทันทีเมื่อเริ่มถ้าเริ่มที่ Published
-    const button = document.getElementById('toggle-button');
-    if (button.getAttribute('data-public') === '1') {
-        lockModalInputs(true);
+        // window.addEventListener('DOMContentLoaded', () => {
+        //     const button = document.getElementById('toggle-button');
+        //     if (button.getAttribute('data-public') === '1') {
+        //         lockModalInputs(true);
+        //     }
+        // });
+
+       function lockModal(isLock = true) {
+        const modal = document.getElementById('fullscreen-modal');
+        const modalBody = modal.querySelector('.modal-body');
+
+        if (isLock) {
+            modalBody.classList.add('modal-disabled');
+            $(modalBody).find('.htmleditor').each(function () {
+            $(this).summernote('disable');
+            });
+        } else {
+            modalBody.classList.remove('modal-disabled');
+            $(modalBody).find('.htmleditor').each(function () {
+            $(this).summernote('enable');
+            });
+        }
+        }
+
+
+        $('#fullscreen-modal').on('shown.bs.modal', function () {
+        const button = document.getElementById('toggle-button');
+        if (button && button.getAttribute('data-public') === '1') {
+            lockModal(true);
+        } else {
+            lockModal(false); 
+        }
+        });
+
+       function togglePublish(button) {
+        const isPublished = button.getAttribute('data-public') === '0';
+        const modal = document.getElementById('fullscreen-modal');
+        const modalBody = modal.querySelector('.modal-body');
+        const form = modal.querySelector('.ajaxifyFormCreate');
+        const saveBtn = modal.querySelector('.formDraft');
+
+        if (isPublished) {
+                const val = document.getElementById('title_th')?.value.trim();
+                const category = document.getElementById('category');
+                const selectedCategories = category?.selectedOptions?.length || 0;
+
+                if (!val || selectedCategories === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Please complete the required fields',
+                        html: `
+                            <ul style="text-align: left">
+                                ${selectedCategories === 0 ? '<li>Please select at least 1 <strong>Category</strong></li>' : ''}
+                                ${!val ? '<li>Please enter <strong>Title Text</strong></li>' : ''}
+                            </ul>
+                        `,
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            confirmButton: 'btn btn-info'
+                        },
+                        buttonsStyling: false
+                    });
+                    return;
+                }
+
+
+
+            const title = document.getElementById('title_th')?.value || '( No found title ! )';
+            Swal.fire({
+                title: 'Comfirmation Required',
+                html: `
+                <p style="font-size: 14px;padding: 1rem"><strong>Title:</strong> ${title}</p>
+                <p style="color: red">If you publish this news, it will be public immediately.</p>
+                `,
+                width: 'auto',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Publish',
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    confirmButton: 'btn btn-success',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    button.setAttribute('data-public', '1');
+                    button.innerHTML = '<i class="fas fa-undo"></i> Unpublished';
+                    button.classList.remove('btn-published', 'btn-success');
+                    button.classList.add('btn-unpublished', 'btn-danger');
+
+                    modalBody.classList.add('modal-disabled');
+                    $(modalBody).find('.htmleditor').each(function () {
+                        $(this).summernote('disable');
+                    });
+
+                    if (saveBtn) saveBtn.disabled = true;
+
+                    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                }
+            });
+        } else {
+            button.setAttribute('data-public', '0');
+            button.innerHTML = '<i class="fas fa-paper-plane"></i> Published';
+            button.classList.remove('btn-unpublished', 'btn-danger');
+            button.classList.add('btn-published', 'btn-success');
+
+            modalBody.classList.remove('modal-disabled');
+            $(modalBody).find('.htmleditor').each(function () {
+                $(this).summernote('enable');
+            });
+
+            if (saveBtn) saveBtn.disabled = false;
+        }
     }
-});
 
-        function togglePublish(button) {
-  const modal = document.getElementById('fullscreen-modal');
-  const fields = modal.querySelectorAll('.modal-body input, .modal-body textarea, .modal-body select');
-
-  let isPublished = button.getAttribute('data-public') === '0';
-
-  if (isPublished) {
-    button.setAttribute('data-public', '1');
-    button.innerHTML = '<i class="fas fa-paper-plane"></i> Unpublished';
-    button.classList.remove('btn-published');
-    button.classList.add('btn-unpublished');
-
-    fields.forEach(el => {
-      el.setAttribute('disabled', true);
-      el.setAttribute('readonly', true);
+    $(document).ready(function () {
+        const isLocked = $('#toggle-button').attr('data-public') === '1';
+        if (isLocked) {
+            $('.modal-body').addClass('modal-disabled');
+            $('.htmleditor').each(function () {
+                if ($(this).next('.note-editor').length) {
+                    $(this).summernote('disable');
+                }
+            });
+        }
     });
-
-  } else {
-    button.setAttribute('data-public', '0');
-    button.innerHTML = '<i class="fas fa-paper-plane"></i> Published';
-    button.classList.remove('btn-unpublished');
-    button.classList.add('btn-published');
-
-    fields.forEach(el => {
-      el.removeAttribute('disabled');
-      el.removeAttribute('readonly');
-    });
-  }
-}
-
-
 
 
     </script>

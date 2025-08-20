@@ -14,7 +14,18 @@ class WebdefacmentSetting extends Model
 {
     use SoftDeletes;
     protected $table = 'webdefacment_setting';
-    protected $fillable = [];
+    protected $casts = [
+        'is_alert_sent' => 'boolean',
+        'alert_sent_at' => 'datetime',
+    ];
+
+    protected $fillable = [
+        'status_val',
+        'is_alert_sent',
+        'alert_sent_at',
+    ];
+
+
 
     public function get_site()
     {
@@ -28,7 +39,7 @@ class WebdefacmentSetting extends Model
 
     public function get_webdefacment_data_original_detail()
     {
-        return $this->hasMany(WebdefacmentDataOriginal::class, 'webdefacment_setting_id', 'id')->orderBy('last_update','desc');
+        return $this->hasMany(WebdefacmentDataOriginal::class, 'webdefacment_setting_id', 'id')->orderBy('last_update', 'desc');
     }
 
     public function get_webdefacment_data_check()
@@ -38,7 +49,7 @@ class WebdefacmentSetting extends Model
 
     public function get_webdefacment_data_check_detail()
     {
-        return $this->hasMany(WebdefacmentDataCheck::class, 'webdefacment_setting_id', 'id')->orderBy('last_update','desc');
+        return $this->hasMany(WebdefacmentDataCheck::class, 'webdefacment_setting_id', 'id')->orderBy('last_update', 'desc');
     }
 
     public function get_webdefacment_data_log()
@@ -48,20 +59,19 @@ class WebdefacmentSetting extends Model
 
     public function get_webdefacment_data_log_detail()
     {
-        return $this->hasMany(WebdefacmentDataLog::class, 'webdefacment_setting_id', 'id')->orderBy('updated_date','desc');
+        return $this->hasMany(WebdefacmentDataLog::class, 'webdefacment_setting_id', 'id')->orderBy('updated_date', 'desc');
     }
 
-    
+
 
     public function webdefacment_data_original_last($webdefacment_setting_id)
     {
         $val = '';
         // return $this->hasOne(SiteSettings::class, 'id', 'site_id');
-        $w = WebdefacmentDataOriginal::where('webdefacment_setting_id',$webdefacment_setting_id)->orderBy('last_update','desc')->first();
-        if($w) {
+        $w = WebdefacmentDataOriginal::where('webdefacment_setting_id', $webdefacment_setting_id)->orderBy('last_update', 'desc')->first();
+        if ($w) {
             $val = $w;
         }
         return $val;
     }
-
 }

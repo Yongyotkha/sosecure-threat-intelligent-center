@@ -1,5 +1,14 @@
 @extends('layouts.app')
 @section('content')
+<style>
+
+.c3-chart-arcs-title{
+  font-size: 14px !important;  
+  font-weight: 600;            
+  line-height: 1;
+}
+
+</style>
 <section id="content" class="bg">
     <section class="vbox">
         {{-- Head --}}
@@ -168,7 +177,7 @@
             </section>
 
 
-            <section class="panel panel-default">
+            <!-- <section class="panel panel-default">
                 <header class="panel-heading font-bold panel-header-blue">
                     <div class="row">
                         <div class="col-xs-12">
@@ -274,7 +283,7 @@
                     </div>
 
                 </div>
-            </section>
+            </section> -->
 
         </section>
     </section>
@@ -494,7 +503,10 @@
 
 <script>
 
+    let lastCardDataHash = null;
+
     $(document).ready(function () {
+
         var tbl_server = $('#tbl_server').dataTable({
             cache: false,
             processData: false,
@@ -518,13 +530,15 @@
                 { data: 'action' },
             ]
         });
-       
-        setInterval(() => {   
+
+        load_card();
+
+        setInterval(() => {
             $('#tbl_server').DataTable().ajax.reload();
             load_card();
         }, 10000);
-        
     });
+
 
     active_btn('#btngroup_status .btn');
     var id_select_site = 'site';
@@ -613,57 +627,78 @@
     
 
     
-    function load_card(search_){
+    function load_card(search_ = 0) {
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             url: '{!! route('webdefacement.load_card') !!}',
             type: "post",
-            data: ({
-
+            data: {
                 search_: search_,
                 keywords: keywords,
                 datatype: datatype,
                 site: site,
                 level: level,
-                              
-            }),
-            datatype: "html",
-            beforeSend: function(){
-                f_loading(null, '#data_card');
-                $("#data_card").html('');  
             },
-        }).done(function(result){
-            f_loading_stop(null, '#data_card');
-                $("#data_card").html(result.html);  
+            success: function (result) {
+                if (result.hash !== lastCardDataHash) {
+                    $("#data_card").html(result.html);
+                    lastCardDataHash = result.hash;
 
-                $('.wdfm-card').hover(function(){
-                    $(this).find('.wdfm-header').addClass('wdfm-header-upper');
-                }); 
-                $('.wdfm-card').mouseleave(function(){
-                    $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
-                }); 
+                    $('.wdfm-card').hover(function () {
+                        $(this).find('.wdfm-header').addClass('wdfm-header-upper');
+                    }).mouseleave(function () {
+                        $(this).find('.wdfm-header').removeClass('wdfm-header-upper');
+                    });
 
-                for(let i in result.id){
-                    const data_id = result.id[i];
+                    for (const item of result.id) {
+
+                    const target = `#chart_wdfm_${item.id}`;
+                    if (!document.querySelector(target)) continue;
+                    const hashPct = Math.max(0, Math.min(100, parseFloat(item.hash) || 0));
+                    const sizePct = Math.max(0, Math.min(100, parseFloat(item.filesize) || 0));
+                    const elemPct = Math.max(0, Math.min(100, parseFloat(item.element) || 0));
+
+                    let score = parseFloat(item.detection_score_all) || 0;
+                    if (score >= 0 && score <= 1) score = score * 100;
+                    score = Math.max(0, Math.min(100, score));
+
                     chart_c3(
-                        '#chart_wdfm_'+data_id.id,
+                        target,
                         [
-                            ['Hash', data_id.hash],
-                            ['Filesize', data_id.filesize],
-                            ['Element', data_id.element],
-                        ]
-                        ,data_id.detection_score_all
+                        ['Hash', parseFloat(item.hash_percent) || 0],
+                        ['Filesize', parseFloat(item.filesize_percent) || 0],
+                        ['Element', parseFloat(item.element_percent) || 0],
+                        ['Blacklist', parseFloat(item.blacklist_percent) || 0],
+                        ['Image', parseFloat(item.image_percent) || 0], 
+                        ],
+                        score,
+                        {
+                            colors: {                 
+                            Hash: '#2D7BD8',        
+                            Filesize: '#10B981',    
+                            Element: '#d3e207ff',
+                            Blacklist: '#ff0202ff',
+                            Image: '#f18f17ff'      
+                            },
+                            titleSize: 15,              
+                        }
                     );
+                    }
+
+
+                } else {
+                    console.log("📌 ไม่มีการเปลี่ยนแปลง ไม่อัปเดต DOM");
                 }
-          
-             
-        }).fail(function(jqXHR, ajaxOptions, thrownError){
-            $('.ajax-loading').hide();
-            console.log("No response from server");
+            },
+            error: function (xhr) {
+                console.error("โหลดข้อมูลไม่สำเร็จ", xhr);
+            }
         });
     }
+    
+
 
     $("#site").change(function() {
         set_cookie_site($(`#${id_select_site}`).val());
@@ -1191,34 +1226,109 @@
         });
 
     }
+
+
+
+const __wdfmCharts = window.__wdfmCharts || (window.__wdfmCharts = new Map());
+
+function chart_c3(bindTo, columns, scoreRaw, opts = {}) {
+  const el = document.querySelector(bindTo);
+  if (!el) return;
+
+  let select_tt_color = '#111827';
+  if (scoreRaw){
+    if (scoreRaw <80 ) {
+      select_tt_color = '#847070ff';
+      }
+    else if (scoreRaw >= 80 && scoreRaw <=100) {
+      select_tt_color = '#ff0000ff';
+    }
+  }
+
+  const defaultOpts = {
+    colors: {
+      Hash: '#2D7BD8',     
+      Filesize: '#10B981', 
+      Element: '#F59E0B'   
+    },
+
+    colorPattern: ['#2D7BD8', '#10B981', '#F59E0B'],
+
+    titleSize: 14,        
+    titleColor: select_tt_color,
+    donutWidth: 18,       
+    normalize: true,     
+    clamp01To100: true    
+  };
+  const cfg = Object.assign({}, defaultOpts, opts);
+
+  if (__wdfmCharts.has(bindTo)) {
+    try { __wdfmCharts.get(bindTo).destroy(); } catch (e) {}
+    __wdfmCharts.delete(bindTo);
+  }
+
+  const toPct = (v) => {
+    let n = Number(v);
+    if (!isFinite(n)) n = 0;
+    if (cfg.clamp01To100 && n >= 0 && n <= 1) n *= 100;
+    n = Math.max(0, Math.min(100, n));
+    return n;
+  };
+
+  let clean = (columns || []).map(([name, val]) => [name, toPct(val)]);
+
+  if (cfg.normalize) {
+    const sum = clean.reduce((s, [, v]) => s + v, 0);
+    if (sum > 0) clean = clean.map(([k, v]) => [k, (v / sum) * 100]);
+  }
+
+  let centerPct = toPct(scoreRaw);
+
+  const chartId = bindTo.replace('#', '');
+  const styleId = `style_${chartId}_title`;
+  if (!document.getElementById(styleId)) {
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      #${chartId} .c3-chart-arcs-title {
+        font-size: ${cfg.titleSize}px !important;
+        line-height: 1;
+        font-weight: 600;
+        fill: ${cfg.titleColor} !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  const chart = c3.generate({
+    bindto: bindTo,
+    data: {
+      columns: clean,
+      type: 'donut',
+      colors: cfg.colors || null
+    },
+    color: cfg.colors ? {} : { pattern: cfg.colorPattern },
+    donut: {
+      title: Math.round(centerPct) + '%',
+      width: cfg.donutWidth
+    },
+    tooltip: {
+      format: { value: v => Math.round(v) + '%' }
+    },
+    transition: { duration: 300 }
+  });
+
+  __wdfmCharts.set(bindTo, chart);
+}
+
+
+
+
+
   
 
 
-    function chart_c3(id,value,score_mid) {
-        const myc3 = c3.generate({
-            bindto: id,
-            data: {
-                columns: value,
-                type : 'donut',
-            },
-            donut: {
-                title: score_mid,
-                label: {
-                format: function(value, ratio, id) {
-                    return value;
-                    }
-                }
-            },
-            legend: {
-                position: 'top'
-            },
-
-            color: {
-                pattern: ['#4398d4', '#40cd8f','#f4d757','#fcc838','#b93624']
-            }
-        });
-    }
-
+    
 
 </script>
 @endpush

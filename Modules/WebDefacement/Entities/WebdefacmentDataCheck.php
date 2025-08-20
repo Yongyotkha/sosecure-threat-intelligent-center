@@ -12,5 +12,12 @@ class WebdefacmentDataCheck extends Model
 	protected $fillable = [];
 
 
+	public static function getData($id)
+	{
+		$res = WebdefacmentDataCheck::where('webdefacment_setting_id', $id)
+			->latest() 
+			->first();  
 
+		return $res ?? '-';
+	}
 }

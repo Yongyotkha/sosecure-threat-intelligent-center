@@ -18,6 +18,10 @@ class WebdefacmentDataOriginal extends Model
         return $this->belongsTo(WebdefacmentSetting::class, 'webdefacment_setting_id', 'id');
     }
 
+    public static function GetDataOriginal($webdefacment_setting_id) {
+        return WebdefacmentDataOriginal::where('webdefacment_setting_id', $webdefacment_setting_id)->get();
+    }
+
 
 
 }

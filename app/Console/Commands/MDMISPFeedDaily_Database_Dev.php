@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-require 'vendor/autoload.php';
+// require 'vendor/autoload.php';
 
 use Carbon\Carbon;
 use Exception;

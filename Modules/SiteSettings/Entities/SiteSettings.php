@@ -11,6 +11,8 @@ use Modules\SiteSettings\Entities\Domain;
 use Modules\Users\Entities\UserSite;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\transcation_jobs_clients;
+use Modules\SiteSettings\Entities\site_config_email_alert_defacement;
+use Modules\SiteSettings\Entities\site_config_email_alert_defacement_customer;
 
 class SiteSettings extends Model{
     use SoftDeletes;
@@ -64,6 +66,14 @@ class SiteSettings extends Model{
 
     public function get_site_config_email_alert(){
         return $this->hasMany(site_config_email_alert::class, 'site_id', 'id');
+    }
+
+     public function get_site_config_email_alert_defacement(){
+        return $this->hasMany(site_config_email_alert_defacement::class, 'site_id', 'id');
+    }
+    
+    public function get_site_config_email_alert_defacement_customer(){
+        return $this->hasMany(site_config_email_alert_defacement_customer::class, 'site_id', 'id');
     }
 
     public function get_user_site($id){

@@ -1,0 +1,212 @@
+               /* เริ่มต้น: โชว์ desktop-only, ซ่อน mobile-only */
+               .desktop-only {
+                   display: block;
+               }
+
+               .mobile-only {
+                   display: none;
+               }
+
+               /* มือถือ: ซ่อน desktop-only, โชว์ mobile-only */
+               @media only screen and (max-width:700px) {
+                   .desktop-only {
+                       display: none !important;
+                   }
+
+                   .pc-only {
+                       display: none !important;
+                   }
+
+                   .mobile-only {
+                       display: table !important;
+                       width: 100% !important;
+                   }
+
+                   .mobile-only .circle-cell {
+                       width: 100% !important;
+                       display: inline-block !important;
+                       vertical-align: top !important;
+                       box-sizing: border-box !important;
+                   }
+
+                   .mobile-only .input-feed {
+                       background: #d5ecff;
+                       border-radius: 99px;
+                       padding: 8px 10px;
+                       font-size: 12px;
+                       color: #2a4a8bff;
+                       height: 15px;
+                       width: 90%;
+                   }
+
+                   .mobile-only .name-show {
+                       font-size: 14px;
+                       color: #2758c3ff;
+                       width: 25%;
+                       font-weight: 600;
+                       text-align: left;
+                   }
+
+                   .m-w100 {
+                       width: 100% !important;
+                       display: table-row !important;
+                   }
+
+                   .m-pad {
+                       padding: 10px 0 !important;
+                   }
+
+                   .m-label {
+                       width: 35% !important;
+                       /* กำหนดสัดส่วน label */
+                       text-align: left !important;
+                       padding-right: 8px !important;
+                       white-space: nowrap;
+                   }
+
+                   .m-value {
+                       width: 100% !important;
+                       /* ที่เหลือเป็นของ value */
+                       text-align: left !important;
+
+                   }
+
+                   .m-value span {
+                       display: block !important;
+                       width: 100% !important;
+                       /* pill ยาวเต็ม cell */
+                       text-align: left;
+                   }
+
+                   .value-badge {
+                       display: inline-block;
+                       min-width: 150px;
+                       /* หรือ width:150px; ถ้าต้องการเท่ากันเป๊ะ */
+                       text-align: center;
+                       background: #e6f3ff;
+                       border-radius: 999px;
+                       padding: 8px 14px;
+                       font-weight: 700;
+                       font-size: 14px;
+                       color: #0b2a66;
+                   }
+
+
+               }
+
+               .info-grid {
+                   display: grid;
+                   grid-template-columns: 1fr 1fr;
+                   /* ซ้าย-ขวา 2 คอลัมน์ */
+                   column-gap: 32px;
+                   row-gap: 14px;
+                   align-items: start;
+               }
+
+               .field {
+                   display: grid;
+                   grid-template-columns: auto 1fr;
+                   /* label | value */
+                   align-items: center;
+                   column-gap: 10px;
+               }
+
+               .label {
+                   white-space: nowrap;
+                   font-weight: 600;
+               }
+
+               .value {
+                   min-width: 0;
+                   /* สำคัญ! ให้กล่องหดได้ ไม่ดัน layout */
+               }
+
+               .pill {
+                   display: flex;
+                   align-items: center;
+                   padding: 10px 14px;
+                   border-radius: 999px;
+                   background: #e7f2ff;
+                   /* สีเดียวกับช่องอื่น */
+                   font-weight: 700;
+                   line-height: 1.2;
+                   min-height: 38px;
+                   /* ความสูงขั้นต่ำให้ดูนิ่ง */
+                   width: 100%;
+                   box-sizing: border-box;
+                   /* ให้จัดการข้อความสวยเวลาแคบลง */
+                   overflow: hidden;
+                   text-overflow: ellipsis;
+                   white-space: nowrap;
+                   /* ปกติไม่ตัดบรรทัด */
+                   font-size: clamp(14px, 1.6vw, 18px);
+                   /* ฟอนต์ยืดหดตามจอ */
+               }
+
+               @media (min-width:700px) and (max-width:900px) {
+                   span {
+                       font-size: 10px !important;
+                   }
+
+                   .do-status {
+                       font-size: 16px !important;
+                   }
+
+                   .pc-only .input-feed {
+                       font-size: 12px !important;
+                   }
+               }
+
+               @media (max-width:680px) {
+                   .m-w100 .m-label {
+                       padding-bottom: 4px !important;
+                   }
+
+                   .m-w100 .m-value {
+                       display: block !important;
+                       /* ไม่บีบเป็นแถวเดียว */
+                       text-align: left !important;
+                   }
+
+                   .m-w100 .m-value span {
+                       display: block !important;
+                       width: 95% !important;
+                       white-space: normal !important;
+                       /* อนุญาตตัดบรรทัด */
+                       word-break: break-word !important;
+                       /* กันค่าที่ยาว (วันที่/URL) */
+                   }
+               }
+
+               .pc-only .input-feed {
+                   background: #d5ecff;
+                   border-radius: 99px;
+                   padding: 8px 10px;
+                   font-size: 15px;
+                   color: #2a4a8bff;
+                   height: 15px;
+                   display: flex;
+               }
+
+               .name-show {
+                   padding: 8px 14px;
+                   font-size: 14px;
+                   color: #2758c3ff;
+                   width: 25%;
+                   font-weight: 600;
+               }
+
+               .input-feed-align {
+                   display: flex;
+                   justify-content: center;
+                   align-items: center;
+               }
+
+               .pc-only tr:last-child td {
+                   padding-bottom: 15px;
+                   /* ปรับตามต้องการ */
+               }
+               .td-mobile tr:last-child td {
+                   padding-bottom: 15px;
+                   /* ปรับตามต้องการ */
+               }
