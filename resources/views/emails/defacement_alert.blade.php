@@ -362,7 +362,7 @@ return (string)$v;
                     <br>
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                       <tr>
-                        <td class="label-head" style="font-size:14px; color:#1b1f2a; white-space:nowrap; text-align:left; padding:0 12px 12px 0;width: 100px">Domain:</td>
+                        <td class="label-head" style="font-size:14px; color:#1b1f2a; white-space:nowrap; text-align:left; padding:0 12px 12px 0;width: 120px">Domain:</td>
                         <td style="padding:0 0 12px 0; width:100%;" width="100%">
                           <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;">
                             <tr>
