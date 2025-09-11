@@ -658,8 +658,8 @@ select.c-tags {
                     } else {
                         if (!start) {
                             $('#event_date span').html('Please select date range');
-                            startDate = '';
-                            endDate = '';
+                            startDate = moment().startOf('day');
+                            endDate = moment().endOf('day');
                         } else {
                             $('#event_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
                         startDate = start;
@@ -713,11 +713,26 @@ select.c-tags {
                     check_published = null;
                     $(".btn-grey").removeClass("active");
                     $("#all").addClass("active");
-                    start = '';
-                    end = '';
-                    cb(start, end);
+                     clearDateToEmpty();
                     load_table(1);
                 });
+                
+                function clearDateToEmpty() {
+                    const $el = $('#event_date');
+                    const picker = $el.data('daterangepicker');
+
+                    $el.find('span').text('Please select date range');
+                    if ($el.is('input')) { $el.val(''); }    
+                    startDate = null;
+                    endDate   = null;
+                    const s = moment().startOf('day');
+                    const e = moment().endOf('day');
+                    picker.setStartDate(s);
+                    picker.setEndDate(e);
+                    picker.chosenLabel = undefined;    
+                    picker.updateView();
+                    picker.updateCalendars();
+                    }
 
 
 
@@ -1031,6 +1046,7 @@ select.c-tags {
                         {
                             data: 'is_modified',
                             "visible": false,
+                            orderable: false,
                         },
                         {
                             data: 'modified',
@@ -1678,6 +1694,12 @@ select.c-tags {
                     });
              }
              function f_change_tags(pulse_id, tags) {
+                toastr.options = {
+                    preventDuplicates: true,
+                    newestOnTop: true,
+                    timeOut: 2000,
+                    closeButton: true
+                };
                     $.ajax({
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1691,6 +1713,7 @@ select.c-tags {
                         beforeSend: function () {
                      
                         },
+                        
                         success: function (data) {
                             toastr.clear();
                             if (data.status_code == "00") {

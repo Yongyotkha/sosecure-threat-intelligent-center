@@ -1151,7 +1151,6 @@ class IndicatorsController extends Controller
 
             $dateStart = new \MongoDB\BSON\UTCDateTime(strtotime($date_start_datetime_format) * 1000);
             $dateEnd = new \MongoDB\BSON\UTCDateTime(strtotime($date_end_datetime_format) * 1000);
-            // dd($dateStart);
         }
 
         $perpage = 25;
@@ -1959,8 +1958,17 @@ class IndicatorsController extends Controller
             $row = (int)$_POST['start'];
             $rowperpage = (int)$_POST['length'];
 
-            $order = $columns[$request->input('order.0.column')];
-            $dir = $request->input('order.0.dir') == 'asc' ? 1 : -1;
+            // $order = $columns[$request->input('order.0.column')];
+            // $dir = $request->input('order.0.dir') == 'asc' ? 1 : -1;
+
+
+            // try {
+            //     if ($order == 'is_modified') {
+            //         $order = 'modified';
+            //     }
+            // } catch (\Throwable $th) {
+            // }
+
 
 
 
@@ -1974,10 +1982,29 @@ class IndicatorsController extends Controller
             $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
 
 
+            // direction
+            $dirStr = strtolower($request->input('order.0.dir', 'desc'));
+            $dir    = $dirStr === 'asc' ? 1 : -1;
+
+            // index ของคอลัมน์
+            $idx    = (int) $request->input('order.0.column', 9); // fallback index = 9 (modified)
+
+            // เอาชื่อ field มาตรงจาก payload
+            $order  = $request->input("columns.$idx.data");
+
+            // whitelist เฉพาะ field ที่อนุญาต
+            $sortable = ['modified', 'name', 'creator_org', 'groups', 'tags', 'attrCount', 'pulse_id'];
+
+            // fallback ถ้าไม่มีหรือไม่อยู่ใน whitelist
+            if (!$order || !in_array($order, $sortable, true)) {
+                $order = 'modified';
+                $dir   = -1;
+            }
+
+            // options ตัวสุดท้าย
             $options = [
                 'projection' => [
                     '_id' => 0,
-
                     'name' => 1,
                     'groups' => 1,
                     'tags' => 1,
@@ -1989,14 +2016,67 @@ class IndicatorsController extends Controller
                     'indicator_count' => 1,
                     'pulse_id' => 1,
                     'creator_org' => 1,
-
                 ],
-                'sort' => [
-                    $order => $dir
-                ],
-                'skip' => $start,
+                'sort'  => [$order => $dir, '_id' => -1], // เพิ่ม _id tie-breaker กันผลลัพธ์แกว่ง
+                'skip'  => $start,
                 'limit' => $rowperpage,
             ];
+
+
+            // dd($options);
+
+            // if ($order) {
+            //     $options = [
+            //         'projection' => [
+            //             '_id' => 0,
+
+            //             'name' => 1,
+            //             'groups' => 1,
+            //             'tags' => 1,
+            //             'industries' => 1,
+            //             'public' => 1,
+            //             'is_modified' => 1,
+            //             'modified' => 1,
+            //             'count_view' => 1,
+            //             'indicator_count' => 1,
+            //             'pulse_id' => 1,
+            //             'creator_org' => 1,
+            //         ],
+            //         'sort' => [
+            //             // 'modified' => -1,
+            //             $order => $dir
+            //         ],
+            //         'skip' => $start,
+            //         'limit' => $rowperpage,
+            //     ];
+            // } else {
+            //     $options = [
+            //         'projection' => [
+            //             '_id' => 0,
+
+            //             'name' => 1,
+            //             'groups' => 1,
+            //             'tags' => 1,
+            //             'industries' => 1,
+            //             'public' => 1,
+            //             'is_modified' => 1,
+            //             'modified' => 1,
+            //             'count_view' => 1,
+            //             'indicator_count' => 1,
+            //             'pulse_id' => 1,
+            //             'creator_org' => 1,
+            //         ],
+            //         'sort' => [
+            //             'modified' => -1
+            //         ],
+            //         'skip' => $start,
+            //         'limit' => $rowperpage,
+            //     ];
+            // }
+
+
+
+
 
             $query = array(
                 'status' => 1,
@@ -2011,6 +2091,8 @@ class IndicatorsController extends Controller
                 $cursor_count = $request->count_page;
                 $count_filter = $cursor_count;
             }
+
+            // dd($query);
 
 
 
@@ -2071,11 +2153,13 @@ class IndicatorsController extends Controller
                     }
                 }
 
+                // dd($query);
+
                 if ($request->check_published) {
                     if ($request->check_published == 1) {
-                        $query['public'] = [ '$in' => [1, "1"] ];
+                        $query['public'] = ['$in' => [1, "1"]];
                     } else if ($request->check_published == 2) {
-                        $query['public'] = [ '$in' => [0, "0"] ];
+                        $query['public'] = ['$in' => [0, "0"]];
                     }
                 }
                 $cursor = $col_fx_otx_events->find($query, $options);
@@ -2950,6 +3034,8 @@ class IndicatorsController extends Controller
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
             $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
+
+
             $options = array(
                 'typeMap' => array(
                     'root' => 'array',
@@ -2963,6 +3049,7 @@ class IndicatorsController extends Controller
                     [
                         '$set' => [
                             'public' => $request->is_public,
+                            'modified' => $date_now
                         ]
                     ]
                 );
@@ -3724,9 +3811,11 @@ class IndicatorsController extends Controller
             'type' => 'required|in:1,2',
         ]);
 
-        // dd($request->all());
+
 
         $form_type = (int)$request->type;
+
+        // dd($request->all());
 
         try {
             $tz = new \DateTimeZone('Asia/Bangkok');
@@ -3738,6 +3827,25 @@ class IndicatorsController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Invalid date format.'], 422);
         }
+        // dd($from, $to ,$from->todatetime()->format('Y-m-d'));
+
+        // try {
+        //     $tz = 'Asia/Bangkok';
+
+        //     // parse วันที่ในรูปแบบ Y-m-d
+        //     $startBkk = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_date . ' 00:00:00', $tz);
+        //     $endBkk   = Carbon::createFromFormat('Y-m-d H:i:s', $request->end_date   . ' 23:59:59', $tz);
+
+        //     $from = new UTCDateTime($startBkk->getTimestampMs());
+        //     $to   = new UTCDateTime($endBkk->getTimestampMs());
+
+        //     // ถ้าอยากตรวจสอบผลลัพธ์
+        //     dump($from->toDateTime()->setTimezone(new DateTimeZone($tz))->format('Y-m-d H:i:s'));
+        //     dump($to->toDateTime()->setTimezone(new DateTimeZone($tz))->format('Y-m-d H:i:s'));
+        // } catch (\Exception $e) {
+        //     return response()->json(['error' => 'Invalid date format.'], 422);
+        // }
+
 
         // return response()->json(['from' => $from, 'to' => $to]);
 
@@ -3816,6 +3924,7 @@ class IndicatorsController extends Controller
                     : 'Not found event in date range',
             ], 200);
         }
+        // dd($events);
 
 
         $timestamp = date("Y-m-d_H.i.s");
@@ -3841,8 +3950,8 @@ class IndicatorsController extends Controller
             ]);
 
             foreach ($events as $doc) {
-                $eventModified = isset($doc['updated_at']) && $doc['updated_at'] instanceof UTCDateTime
-                    ? $doc['updated_at']->toDateTime()->format('Y-m-d')
+                $eventModified = isset($doc['modified']) && $doc['modified'] instanceof UTCDateTime
+                    ? $doc['modified']->toDateTime()->settimezone(new DateTimeZone('Asia/Bangkok'))->format('Y-m-d')
                     : '';
                 fputcsv($file, [
                     $doc['pulse_id'] ?? '',
@@ -3857,7 +3966,7 @@ class IndicatorsController extends Controller
 
             $attrQuery = [
                 'pulse_id' => ['$in' => $eventPulseIds],
-                'created_at' => ['$gte' => $from, '$lte' => $to]
+                'updated_at' => ['$gte' => $from, '$lte' => $to]
             ];
             $attributes = $attributesCollection->find($attrQuery, $options)->toArray();
 
@@ -3883,19 +3992,21 @@ class IndicatorsController extends Controller
                 'attribute_datetime'
             ]);
 
+            // dd($attributeMap);
+
             foreach ($events as $event) {
                 $pulseId = $event['pulse_id'] ?? '';
                 $eventName = $event['name'] ?? '';
                 $eventPublic = $event['public'] ?? '';
                 $eventTags = isset($event['tags']) ? implode(',', (array)$event['tags']) : '';
-                $eventModified = isset($event['updated_at']) && $event['updated_at'] instanceof UTCDateTime
-                    ? $event['updated_at']->toDateTime()->format('Y-m-d')
+                $eventModified = isset($event['modified']) && $event['modified'] instanceof UTCDateTime
+                    ? $event['modified']->toDateTime()->settimezone(new DateTimeZone('Asia/Bangkok'))->format('Y-m-d')
                     : '';
 
                 if (!empty($attributeMap[$pulseId])) {
                     foreach ($attributeMap[$pulseId] as $attr) {
-                        $attrDatetime = isset($attr['created_at']) && $attr['created_at'] instanceof UTCDateTime
-                            ? $attr['created_at']->toDateTime()->format('Y-m-d H:i:s')
+                        $attrDatetime = isset($attr['updated_at']) && $attr['updated_at'] instanceof UTCDateTime
+                            ? $attr['updated_at']->toDateTime()->settimezone(new DateTimeZone('Asia/Bangkok'))->format('Y-m-d H:i:s')
                             : '';
 
                         fputcsv($file, [
@@ -4000,14 +4111,14 @@ class IndicatorsController extends Controller
         $eventName = $event['name'] ?? '';
         $eventPublic = $event['public'] ?? '';
         $eventTags = isset($event['tags']) ? implode(',', (array)$event['tags']) : '';
-        $eventModified = isset($event['updated_at']) && $event['updated_at'] instanceof UTCDateTime
-            ? $event['updated_at']->toDateTime()->format('Y-m-d')
+        $eventModified = isset($event['modified']) && $event['modified'] instanceof UTCDateTime
+            ? $event['modified']->toDateTime()->settimezone(new DateTimeZone('Asia/Bangkok'))->format('Y-m-d')
             : '';
 
         if (!empty($attributes)) {
             foreach ($attributes as $attr) {
-                $attrDatetime = isset($attr['created_at']) && $attr['created_at'] instanceof UTCDateTime
-                    ? $attr['created_at']->toDateTime()->format('Y-m-d H:i:s')
+                $attrDatetime = isset($attr['updated_at']) && $attr['updated_at'] instanceof UTCDateTime
+                    ? $attr['updated_at']->toDateTime()->settimezone(new DateTimeZone('Asia/Bangkok'))->format('Y-m-d H:i:s')
                     : '';
 
                 fputcsv($file, [
@@ -4050,7 +4161,7 @@ class IndicatorsController extends Controller
     public function importToInsight(Request $request)
     {
         // return response()->json(['message' => 'Import to Insight']);
-        set_time_limit(600);
+        set_time_limit(2000);
         if (!$request->hasFile('file')) {
             return response()->json([
                 'success' => false,
@@ -4149,20 +4260,20 @@ class IndicatorsController extends Controller
             $syncResult = $this->syncEventTagsByDataKey($dataKey, $db);
 
             // ➤ Update tags to MISP (event level)
-            $mispService = app(MispTagService::class);
-            foreach ($cleanedRows as $row) {
-                if (!empty($row['event_id'])) {
-                    try {
-                        $mispService->update($row['event_id'], $row['event_tags'] ?? '');
-                    } catch (\Throwable $e) {
-                        \Log::error('[MISP EVENT] Failed to update tags', [
-                            'event_id' => $row['event_id'],
-                            'tags' => $row['event_tags'] ?? '',
-                            'error' => $e->getMessage()
-                        ]);
-                    }
-                }
-            }
+            // $mispService = app(MispTagService::class);
+            // foreach ($cleanedRows as $row) {
+            //     if (!empty($row['event_id'])) {
+            //         try {
+            //             $mispService->update($row['event_id'], $row['event_tags'] ?? '');
+            //         } catch (\Throwable $e) {
+            //             \Log::error('[MISP EVENT] Failed to update tags', [
+            //                 'event_id' => $row['event_id'],
+            //                 'tags' => $row['event_tags'] ?? '',
+            //                 'error' => $e->getMessage()
+            //             ]);
+            //         }
+            //     }
+            // }
 
             return response()->json([
                 'success' => true,
@@ -4217,16 +4328,21 @@ class IndicatorsController extends Controller
 
             $tempCollection = $db->fx_indicators_temp;
             $dataKeyCollection = $db->fx_data_key;
+            array_walk($rows, static function (&$r) use ($dataKey) {
+                $r['data_key'] = $dataKey;
+                $r['imported_at'] = date('Y-m-d H:i:s');
+                $r['status']      = 'pending';
+            });
 
-            $cleanedRows = [];
-            foreach ($rows as $row) {
-                if (isset($row[$originalColumnName])) {
-                    $row['tags'] = $row[$originalColumnName];
-                    unset($row[$originalColumnName]);
-                }
-                $row['data_key'] = $dataKey;
-                $cleanedRows[] = $row;
-            }
+            // $cleanedRows = [];
+            // foreach ($rows as $row) {
+            //     if (isset($row[$originalColumnName])) {
+            //         $row['tags'] = $row[$originalColumnName];
+            //         unset($row[$originalColumnName]);
+            //     }
+            //     $row['data_key'] = $dataKey;
+            //     $cleanedRows[] = $row;
+            // }
 
             // Insert to temp collection
             $batchSize = 1000;
@@ -4234,7 +4350,7 @@ class IndicatorsController extends Controller
             $insertedIds = [];
             $insertErrors = [];
 
-            foreach (array_chunk($cleanedRows, $batchSize) as $chunk) {
+            foreach (array_chunk($rows, $batchSize) as $chunk) {
                 try {
                     $tempCollection->insertMany($chunk);
                     $totalInserted += count($chunk);
@@ -4266,7 +4382,7 @@ class IndicatorsController extends Controller
 
             // ดึง temp และ sync ไป ref/detail
             $syncResult = $this->syncIndicatorUpdatesByDataKey($dataKey, $db);
-            $mispService = new MispTagService();
+            // $mispService = new MispTagService();
             // log:info('MISP ATTRIBUTE', $cleanedRows);
             // return response()->json([
             //     'message' => 'Attribute tags updated.',
@@ -4274,175 +4390,279 @@ class IndicatorsController extends Controller
             // ]);
 
 
-            foreach ($cleanedRows as $row) {
-                if (!empty($row['event_id']) && !empty($row['attribute_id'])) {
-                    try {
-                        app(MispTagService::class)->updateFromIndicator(
-                            $row['event_id'],
-                            $row['attribute_id'],
-                            $row['tags'] ?? ''
-                        );
-                    } catch (\Throwable $e) {
-                        Log::error('[MISP ATTRIBUTE] Update failed', [
-                            'event_id' => $row['event_id'],
-                            'attribute_id' => $row['attribute_id'],
-                            'error' => $e->getMessage(),
-                        ]);
-                    }
-                }
-            }
+            // foreach ($cleanedRows as $row) {
+            //     if (!empty($row['event_id']) && !empty($row['attribute_id'])) {
+            //         try {
+            //             app(MispTagService::class)->updateFromIndicator(
+            //                 $row['event_id'],
+            //                 $row['attribute_id'],
+            //                 $row['tags'] ?? ''
+            //             );
+            //         } catch (\Throwable $e) {
+            //             Log::error('[MISP ATTRIBUTE] Update failed', [
+            //                 'event_id' => $row['event_id'],
+            //                 'attribute_id' => $row['attribute_id'],
+            //                 'error' => $e->getMessage(),
+            //             ]);
+            //         }
+            //     }
+            // }
+
+            Log::info($syncResult['updated_count']);
 
 
             return response()->json([
+                // 'success' => true,
+                // 'message' => 'Import complete.',
+                // 'data_key' => $dataKey,
+                // 'records_inserted' => $totalInserted,
+                // 'total_rows' => count($rows),
+                // 'success_list' => array_slice($syncResult['updated'], 0, 100000),
+                // 'error_list' => $syncResult['errors']
                 'success' => true,
-                'message' => 'Import complete.',
+                'message' => $syncResult['message'],
                 'data_key' => $dataKey,
                 'records_inserted' => $totalInserted,
                 'total_rows' => count($rows),
-                'success_list' => array_slice($syncResult['updated'], 0, 100000),
-                'error_list' => $syncResult['errors']
+                'success_list'     => $syncResult['updated_count'] ?? 0,
+                'error_list' => []
             ]);
         }
     }
 
-    private function syncIndicatorUpdatesByDataKey(string $dataKey, $db): array
+    private function syncIndicatorUpdatesByDataKey(string $dataKey, \MongoDB\Database $db): array
     {
-        $tempCollection = $db->fx_indicators_temp;
-        $refCollection = $db->fx_otx_events_indicator_ref;
-        $detailCollection = $db->fx_otx_indicator_detail;
+        $temp   = $db->fx_indicators_temp;
+        $refCol = $db->fx_otx_events_indicator_ref;
+        $detCol = $db->fx_otx_indicator_detail;
 
-        $cursor = $tempCollection->find(
-            ['data_key' => $dataKey],
-            [
-                'projection' => [
-                    '_id' => 0,
-                    'attribute_id' => 1,
-                    'attribute_name' => 1,
-                    'tags' => 1,
-                    'attribute_score' => 1,
-                    'attribute_serverity' => 1
-                ],
-                'batchSize' => 1000
-            ]
-        );
+        $opts = ['allowDiskUse' => true];
 
-        $batchSize = 1000;
-        $refOps = [];
-        $detailOps = [];
-        $count = 0;
+        // 1) ดึงข้อมูลจาก temp ให้เหลือ unique key
+        $docs = $temp->aggregate([
+            ['$match' => [
+                'data_key'     => $dataKey,
+                'event_id'     => ['$ne' => null],
+                'attribute_id' => ['$ne' => null],
+            ]],
+            ['$addFields' => [
+                'indicator_id' => ['$toString' => '$attribute_id'],
+                'pulse_id'     => ['$toString' => '$event_id'],
+            ]],
+            ['$sort' => ['indicator_id' => 1, 'pulse_id' => 1, 'updated_at' => -1, '_id' => -1]],
+            ['$group' => [
+                '_id' => ['i' => '$indicator_id', 'p' => '$pulse_id'],
+                'tags'                 => ['$first' => '$attribute_tags'],
+                'attribute_score'     => ['$first' => '$attribute_score'],
+                'attribute_serverity' => ['$first' => '$attribute_serverity'],
+            ]],
+            ['$project' => [
+                '_id'                 => 0,
+                'indicator_id'        => '$_id.i',
+                'pulse_id'            => '$_id.p',
+                'tags'                => 1,
+                'attribute_score'     => 1,
+                'attribute_serverity' => 1,
+            ]],
+        ], $opts)->toArray();
 
-        $updatedIds = [];
-        $errors = [];
+        $updated = 0;
+        $bulkOpsRef = [];
+        $bulkOpsDet = [];
 
-        foreach ($cursor as $doc) {
-            $id = $doc['attribute_id'] ?? null;
-            if (empty($id)) continue;
+        foreach ($docs as $doc) {
+            $filterRef = ['indicator_id' => $doc['indicator_id'], 'pulse_id' => $doc['pulse_id']];
+            $filterDet = ['indicator_id' => $doc['indicator_id']];
 
-            $updateFields = [
-                'tags' => $doc['tags'] ?? null,
-                'attribute_score' => $doc['attribute_score'] ?? null,
-                'attribute_serverity' => $doc['attribute_serverity'] ?? null
-            ];
+            $update = ['$set' => [
+                'tags'                => $doc['tags'],
+                'attribute_score'     => $doc['attribute_score'],
+                'attribute_serverity' => $doc['attribute_serverity'],
+                'imported_at'         => date('Y-m-d H:i:s'),
+            ]];
 
-            $refOps[] = [
-                'updateOne' => [
-                    ['indicator_id' => $id],
-                    ['$set' => $updateFields],
-                    ['upsert' => false]
-                ]
-            ];
-
-            $detailOps[] = [
-                'updateOne' => [
-                    ['indicator_id' => $id],
-                    ['$set' => $updateFields],
-                    ['upsert' => false]
-                ]
-            ];
-
-            $updatedIds[] = [
-                'id' => $id,
-                'tag' => $doc['tags'] ?? '-',
-                'name' => $doc['attribute_name'] ?? '-'
-            ];
-
-            $count++;
-
-            if ($count >= $batchSize) {
-                try {
-                    $refResult = $refCollection->bulkWrite($refOps);
-                    $detailResult = $detailCollection->bulkWrite($detailOps);
-
-                    // ตรวจสอบการ match
-                    $matched = $refResult->getMatchedCount();
-                    if ($matched < count($refOps)) {
-                        $errors[] = [
-                            'id' => '(bulk batch)',
-                            'name' => '-',
-                            'reason' => "Warning: Only $matched of " . count($refOps) . " ref documents matched."
-                        ];
-                    }
-
-                    $matchedDetail = $detailResult->getMatchedCount();
-                    if ($matchedDetail < count($detailOps)) {
-                        $errors[] = [
-                            'id' => '(bulk batch)',
-                            'name' => '-',
-                            'reason' => "Warning: Only $matchedDetail of " . count($detailOps) . " detail documents matched."
-                        ];
-                    }
-                } catch (\Exception $e) {
-                    $errors[] = [
-                        'id' => '(bulk batch)',
-                        'name' => '-',
-                        'reason' => 'Bulk update error: ' . $e->getMessage()
-                    ];
-                }
-
-                $refOps = [];
-                $detailOps = [];
-                $count = 0;
-            }
+            $bulkOpsRef[] = ['updateMany' => [$filterRef, $update, ['upsert' => true]]];
+            $bulkOpsDet[] = ['updateMany' => [$filterDet, $update, ['upsert' => true]]];
         }
 
-        // leftover ops
-        if (!empty($refOps)) {
-            try {
-                $refResult = $refCollection->bulkWrite($refOps);
-                $detailResult = $detailCollection->bulkWrite($detailOps);
 
-                $matched = $refResult->getMatchedCount();
-                if ($matched < count($refOps)) {
-                    $errors[] = [
-                        'id' => '(Not detected)',
-                        'name' => 'Not detected',
-                        'success' => $matched,
-                        'reason' => "Warning: Only $matched of " . count($refOps) . " Idicator ref documents matched."
-                    ];
-                }
-
-                $matchedDetail = $detailResult->getMatchedCount();
-                if ($matchedDetail < count($detailOps)) {
-                    $errors[] = [
-                        'id' => '(Not detected)',
-                        'name' => 'Not detected',
-                        'success' => $matched,
-                        'reason' => "Warning: Only $matchedDetail of " . count($detailOps) . " Idicator detail documents matched."
-                    ];
-                }
-            } catch (\Exception $e) {
-                $errors[] = [
-                    'id' => '(final batch)',
-                    'name' => '-',
-                    'reason' => 'Final bulk update error: ' . $e->getMessage()
-                ];
-            }
+        if ($bulkOpsRef) {
+            $resultRef = $refCol->bulkWrite($bulkOpsRef);
+            \Log::info("Ref => matched=" . $resultRef->getMatchedCount() . " modified=" . $resultRef->getModifiedCount());
+            $updated += $resultRef->getModifiedCount(); // ✅ ใช้ matchedCount
         }
-        return [
-            'updated' => $updatedIds,
-            'errors' => $errors
-        ];
+
+
+        // if ($bulkOpsDet) {
+        //     $resultDet = $detCol->bulkWrite($bulkOpsDet);
+        //     // $updated += $resultDet->getModifiedCount();
+        // }
+        Log::info($updated);
+
+        if ($updated == 0) {
+            return [
+                'ok'            => true,
+                'updated_count' => $updated,
+                'message'       => 'No updates found.',
+            ];
+        } else {
+            return [
+                'ok'            => true,
+                'updated_count' => $updated,
+                'message'       => 'Updates applied.',
+            ];
+        }
     }
+
+
+
+
+
+
+
+
+    // private function syncIndicatorUpdatesByDataKey(string $dataKey, $db): array
+    // {
+    //     $tempCollection = $db->fx_indicators_temp;
+    //     $detailCollection = $db->fx_otx_indicator_detail;
+
+    //     $cursor = $tempCollection->find(
+    //         ['data_key' => $dataKey],
+    //         [
+    //             'projection' => [
+    //                 '_id' => 0,
+    //                 'event_id' => 1,
+    //                 'attribute_id' => 1,
+    //                 'attribute_name' => 1,
+    //                 'tags' => 1,
+    //                 'attribute_score' => 1,
+    //                 'attribute_serverity' => 1
+    //             ],
+    //             'batchSize' => 1000
+    //         ]
+    //     );
+    //     $refCollection = $db->fx_otx_events_indicator_ref;
+
+    //     $batchSize = 1000;
+    //     $refOps = [];
+    //     $detailOps = [];
+    //     $count = 0;
+
+    //     $updatedIds = [];
+    //     $errors = [];
+
+    //     foreach ($cursor as $doc) {
+    //         $id = $doc['attribute_id'] ?? null;
+    //         $eventId     = $doc['event_id']     ?? null;
+    //         if (empty($id) || empty($eventId)) continue;
+
+
+    //         $updateFields = [
+    //             'tags' => $doc['tags'] ?? null,
+    //             'attribute_score' => $doc['attribute_score'] ?? null,
+    //             'attribute_serverity' => $doc['attribute_serverity'] ?? null
+    //         ];
+
+
+    //         $refOps[] = [
+    //             'updateOne' => [
+    //                 ['indicator_id' => $id, 'pulse_id' => $eventId],
+    //                 ['$set' => $updateFields],
+    //                 ['upsert' => false]
+    //             ]
+    //         ];
+
+    //         $detailOps[] = [
+    //             'updateOne' => [
+    //                 ['indicator_id' => $id],
+    //                 ['$set' => $updateFields],
+    //                 ['upsert' => false]
+    //             ]
+    //         ];
+
+    //         $updatedIds[] = [
+    //             'id' => $id,
+    //             'tag' => $doc['tags'] ?? '-',
+    //             'name' => $doc['attribute_name'] ?? '-'
+    //         ];
+
+    //         $count++;
+
+    //         if ($count >= $batchSize) {
+    //             try {
+    //                 $refResult = $refCollection->bulkWrite($refOps);
+    //                 $detailResult = $detailCollection->bulkWrite($detailOps);
+
+    //                 // ตรวจสอบการ match
+    //                 $matched = $refResult->getMatchedCount();
+    //                 if ($matched < count($refOps)) {
+    //                     $errors[] = [
+    //                         'id' => '(bulk batch)',
+    //                         'name' => '-',
+    //                         'reason' => "Warning: Only $matched of " . count($refOps) . " ref documents matched."
+    //                     ];
+    //                 }
+
+    //                 $matchedDetail = $detailResult->getMatchedCount();
+    //                 if ($matchedDetail < count($detailOps)) {
+    //                     $errors[] = [
+    //                         'id' => '(bulk batch)',
+    //                         'name' => '-',
+    //                         'reason' => "Warning: Only $matchedDetail of " . count($detailOps) . " detail documents matched."
+    //                     ];
+    //                 }
+    //             } catch (\Exception $e) {
+    //                 $errors[] = [
+    //                     'id' => '(bulk batch)',
+    //                     'name' => '-',
+    //                     'reason' => 'Bulk update error: ' . $e->getMessage()
+    //                 ];
+    //             }
+
+    //             $refOps = [];
+    //             $detailOps = [];
+    //             $count = 0;
+    //         }
+    //     }
+
+    //     // leftover ops
+    //     if (!empty($refOps)) {
+    //         try {
+    //             $refResult = $refCollection->bulkWrite($refOps);
+    //             $detailResult = $detailCollection->bulkWrite($detailOps);
+
+    //             $matched = $refResult->getMatchedCount();
+    //             if ($matched < count($refOps)) {
+    //                 $errors[] = [
+    //                     'id' => '(Not detected)',
+    //                     'name' => 'Not detected',
+    //                     'success' => $matched,
+    //                     'reason' => "Warning: Only $matched of " . count($refOps) . " Idicator ref documents matched."
+    //                 ];
+    //             }
+
+    //             $matchedDetail = $detailResult->getMatchedCount();
+    //             if ($matchedDetail < count($detailOps)) {
+    //                 $errors[] = [
+    //                     'id' => '(Not detected)',
+    //                     'name' => 'Not detected',
+    //                     'success' => $matched,
+    //                     'reason' => "Warning: Only $matchedDetail of " . count($detailOps) . " Idicator detail documents matched."
+    //                 ];
+    //             }
+    //         } catch (\Exception $e) {
+    //             $errors[] = [
+    //                 'id' => '(final batch)',
+    //                 'name' => '-',
+    //                 'reason' => 'Final bulk update error: ' . $e->getMessage()
+    //             ];
+    //         }
+    //     }
+    //     return [
+    //         'updated' => $updatedIds,
+    //         'errors' => $errors
+    //     ];
+    // }
 
     private function syncEventTagsByDataKey(string $dataKey, $db)
     {

@@ -40,26 +40,30 @@ select.c-tags {
     
     .badge-critical {
         color: #ffffffff;
-        background-color: #b93624;
+        background-color: #fe0000;
         }
 
     .badge-medium {
         color: #000000ff;
-        background-color: #f2ff15;
+        background-color: #ffff00;
         }
 
         .badge-high {
         color: #000000ff;
-        background-color: #fcc838;
+        background-color: #ffc000;
         }
 
-        .badge-isinfo {
+        .badge-verylow {
         color: #ffffffff;
-        background-color: #00dcff;
+        background-color: #98fb98;
         }
         .badge-low {
         color: #ffffffff;
-        background-color: #409967;
+        background-color: #00649f;
+        }
+        .badge-infomation {
+        color: #ffffffff;
+        background-color: #00649f;
         }
         
 
@@ -582,8 +586,18 @@ select.c-tags {
 
                             var txt = (data === undefined || data === null) ? '' : String(data).trim();
                             if (!txt) return '';
+                            if (txt === '0') return '<span class="badge badge-infomation">0</span>';
+                            if (txt === '1') return '<span class="badge badge-verylow">1</span>';
+                            if (txt === '2') return '<span class="badge badge-success">2</span>';
+                            if (txt === '3') return '<span class="badge badge-success">3</span>';
+                            if (txt === '4') return '<span class="badge badge-medium">4</span>';
+                            if (txt === '5') return '<span class="badge badge-medium">5</span>';
+                            if (txt === '6') return '<span class="badge badge-medium">6</span>';
+                            if (txt === '7') return '<span class="badge badge-high">7</span>';
+                            if (txt === '8') return '<span class="badge badge-high">8</span>';
+                            if (txt === '9') return '<span class="badge badge-critical">9</span>';
+                            if (txt === '10') return '<span class="badge badge-critical">10</span>';
 
-                            return '<span class="badge badge-success">' + txt + '</span>';
                         }
                     },
                     {
@@ -601,9 +615,11 @@ select.c-tags {
                             critical: 'badge-critical',
                             high: 'badge-high',
                             medium: 'badge-medium',
-                            low: 'badge-low',
-                            information: 'badge-isinfo',
-                            info: 'badge-isinfo'
+                            low: 'badge-success',
+                            information: 'badge-infomation',
+                            informational: 'badge-infomation',
+                            info: 'badge-isinfo',
+                            "very low": 'badge-verylow',
                             };
 
                             const cls = badgeMap[val];
@@ -615,9 +631,6 @@ select.c-tags {
                     ]
                 });
                 }
-
-
-
 
 
                 function load_table_pulse(){

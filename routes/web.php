@@ -14,6 +14,7 @@
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Http\Controllers\MailProgressController;
+use App\Http\Controllers\MISPFeedController;
 
 // Route::get('/', 'Welcome@index')->middleware(['auth'])->name('index');
 // Route::get('/', 'Welcome@index')->name('index_salepage');
@@ -69,6 +70,7 @@ Route::get('support', 'SupportController@ticket')->name('support.ticket')->middl
 Route::post('stripe/webhook', '\Laravel\Cashier\Http\Controllers\WebhookController@handleWebhook');
 
 
+
 Route::get('phpinfo', function () {
     $dss = 15;
     if ($dss = 15) {
@@ -85,6 +87,26 @@ Route::get('phishing_detection/login-1', function () {
 Route::get('phishing_detection/login-2', function () {
     return view('demo_login');
 })->name('phishing_detection_login-2');
+
+Route::get('/feed/indicators.csv', 'SearchController@sslBlacklist')->name('search.sslBlacklist');
+
+Route::get('/feeds/manifest.json', [MISPFeedController::class, 'generateDirectoryManifest']);
+Route::get('/feeds/{uuid}.json', [MISPFeedController::class, 'generateJsonFeed']);
+Route::get('/feeds/{uuid}/manifest.json', [MISPFeedController::class, 'generateManifest']);
+// // Route::get('/feeds/list', [MISPFeedController::class, 'listFeeds']);
+// Route::get('/feeds/list', [MISPFeedController::class, 'listFeeds'])
+//     ->middleware(['api.token']);
+
+Route::prefix('feeds')
+    ->middleware(['throttle:300,1', 'api.token']) 
+    ->group(function () {
+        // Route::get('manifest.json',           [MISPFeedController::class, 'generateDirectoryManifest'])->name('feeds.manifest');
+        // Route::get('{uuid}.json',             [MISPFeedController::class, 'generateJsonFeed'])->name('feeds.event');
+        // Route::get('{uuid}/manifest.json',    [MISPFeedController::class, 'generateManifest'])->name('feeds.event.manifest');
+        Route::get('list',                    [MISPFeedController::class, 'listFeeds'])->name('feeds.list');
+    });
+
+
 
 Route::get('/preview-defacement-alert', function () {
     $w = (object)[
@@ -117,12 +139,44 @@ Route::get('/preview-defacement-alert', function () {
     ]);
 });
 
+Route::get('/preview-news', function () {
+    $news = [
+        'public_date' => now()->format('Y-m-d H:i:s'),
+        'title_th'    => 'Test_title_th',
+        'detail_th'   => '    BitLockMove มี 2 โหมดหลักคือโหมด Enumeration ที่ใช้ API ที่ไม่เป็นทางการจาก winsta.dll เพื่อสำรวจ Session ผู้ใช้งานจากระยะไกลโดยไม่ต้องเปิด Remote Desktop และโหมด Attack ที่เริ่มจากการเปิดใช้ Remote Registry บนเครื่องเป้าหมาย แล้วสร้างคีย์ CLSID ภายใต้ InProcServer32 เพื่อบังคับให้ผู้ใช้งานเรียกใช้ BDEUILauncher เมื่อกระบวนการของ BitLocker ถูกเรียกจะทำการโหลด DLL ของผู้ไม่ประสงค์ดีแทน Component จากนั้นรันโค้ด ซึ่งยากต่อการถูกตรวจจับ
 
+    เทคนิคดังกล่าวถึงจะมีความซับซ้อน แต่องค์กรสามารถตรวจจับได้ในหลายจุด ตัวอย่างเช่น การเปิดใช้ Remote Registry (Event ID 7040), การเปลี่ยนแปลง Registry (Event ID 4657, 4660, 4663), และการโหลด DLL หรือรัน Process ที่ผิดปกติ ตัวอย่างเช่น BaaUpdate.exe หรือ BdeUISrv.exe จาก svchost.exe นอกจากนี้ยังควรตรวจสอบการเรียกใช้ API ที่ไม่เป็นทางการ
 
+จาก winsta.dll และตั้งกฎ SIGMA เพื่อแจ้งเตือนพฤติกรรมที่น่าสงสัย
 
+ความเสี่ยงและผลกระทบจากเหตุการณ์นี้ <br>
 
+- Privilege Escalation: หากผู้ใช้งานที่ถูกเจาะระบบมีสิทธิ์สูง ตัวอย่างเช่น Domain Admin โค้ดอันตรายจะถูกรันภายใต้สิทธิ์นั้น <br>
 
+- Lateral Movement: ผู้ไม่ประสงค์ดีสามารถขยายการเข้าถึงไปยังเครื่องอื่นในเครือข่ายได้<br>
 
+- การหลีกเลี่ยงระบบตรวจจับ: ใช้ส่วนประกอบของ Windows ที่ถูกต้อง ทำให้หลบเลี่ยง EDR/AV ได้ง่าย<br>
 
+พฤติกรรมที่ควรเฝ้าระวัง (Indicators of Compromise / Anomalies)<br>
+- Step one',
+        'get_cate'    => ['get_cate_name' => ['name' => 'Cybernews']],
+        'code' => '167',
+    ];
 
+    $newsObj = (object) $news;
+    // หรือ: $newsObj = new \Illuminate\Support\Fluent($news);
 
+    return view('emails.template_email_new_news', [
+        'news' => ['news' => $newsObj],
+    ]);
+});
+
+Route::get('/preview-hash', function () {
+    $id = [
+        'id'=> '167',
+    ];
+
+    return view('components.hash-display', [
+        'id' => ['id' => $id],
+    ]);
+});
