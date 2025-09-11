@@ -122,15 +122,15 @@ class MispTagService
         $mongo = new \MongoDB\Client(config('app.DB_MONGO_DEV'));
 
         // 1. อัปเดต MongoDB (ทั้ง 2 คอลเลกชัน)
-        $mongo->sosecure_threatintelligent->fx_otx_events_indicator_ref->updateOne(
-            ['pulse_id' => $pulseId, 'indicator_id' => $indicatorId],
-            ['$set' => ['tags' => $tags]]
-        );
+        // $mongo->sosecure_threatintelligent->fx_otx_events_indicator_ref->updateOne(
+        //     ['pulse_id' => $pulseId, 'indicator_id' => $indicatorId],
+        //     ['$set' => ['tags' => $tags]]
+        // );
 
-        $mongo->sosecure_threatintelligent->fx_otx_indicator_detail->updateOne(
-            ['indicator_id' => $indicatorId],
-            ['$set' => ['tags' => $tags]]
-        );
+        // $mongo->sosecure_threatintelligent->fx_otx_indicator_detail->updateOne(
+        //     ['indicator_id' => $indicatorId],
+        //     ['$set' => ['tags' => $tags]]
+        // );
 
         // 2. ดึง event
         $fxDoc = $mongo->sosecure_threatintelligent->fx_otx_events->findOne(['pulse_id' => $pulseId]);

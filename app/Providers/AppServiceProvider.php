@@ -40,19 +40,48 @@ class AppServiceProvider extends ServiceProvider
         if (app()->environment('production')) {
             \DB::disableQueryLog();
         }
-        if (env('SSH_TUNNEL_AUTO', true)) {
-            try {
-                $tunnel = app(SSHTunnelService::class);
+        // if (env('SSH_TUNNEL_AUTO', true)) {
+        //     try {
+        //         $tunnel = app(SSHTunnelService::class);
 
-                if (!$tunnel->isTunnelRunning()) {
-                    $tunnel->createTunnel();
-                    sleep(2); 
+        //         if (!$tunnel->isTunnelRunning()) {
+        //             $tunnel->createTunnel();
+        //             sleep(2); 
         
-                } else {
+        //         } else {
            
-                }
-            } catch (\Exception $e) {
+        //         }
+        //     } catch (\Exception $e) {
                 
+        //     }
+        // }
+        if (env('SSH_TUNNEL_AUTO', true)) {
+            if (!app()->runningUnitTests()) {
+                $interval = (int) env('SSH_TUNNEL_CHECK_INTERVAL', 15);
+                $cacheKey = 'ssh:tunnel:last-check';
+
+                if (!Cache::has($cacheKey)) {
+                    Cache::put($cacheKey, 1, $interval);
+
+                    $lockKey = 'ssh:tunnel:create';
+                    $lockTtl = max(5, (int) env('SSH_TUNNEL_LOCK_SEC', 20));
+
+                    // ใช้ Cache::add() เป็น soft lock
+                    if (Cache::add($lockKey, 1, $lockTtl)) {
+                        try {
+                            $tunnel = app(\App\Services\SSHTunnelService::class);
+                            if (!$tunnel->isTunnelRunning()) {
+                                $tunnel->createTunnel();
+                            }
+                        } catch (\Throwable $e) {
+                            \Log::error('SSH TUNNEL error: ' . $e->getMessage());
+                        } finally {
+                            Cache::forget($lockKey);
+                        }
+                    } else {
+                        \Log::warning('SSH TUNNEL: another create is in progress; skip');
+                    }
+                }
             }
         }
     }
