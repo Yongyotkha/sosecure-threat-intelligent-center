@@ -13,15 +13,22 @@ class DataLeakSocialRef extends Model
     protected $table = 'data_leak_socail_ref';
     protected $dates = ['deleted_at'];
 
-    public function get_data_leak_feed(){
+    public function get_data_leak_feed()
+    {
         return $this->belongsTo(DataLeakFeed::class, 'data_leak_feed_id', 'id');
     }
 
-    public function get_site(){
+    public function get_site()
+    {
         return $this->belongsTo(SiteSettings::class, 'site_id', 'id');
     }
 
-    public function get_data_leak_feed_one(){
-        return $this->hasOne(DataLeakFeed::class, 'id', 'data_leak_feed_id')->where('deleted_at',null)->where('status',1);
+    public function get_data_leak_feed_one()
+    {
+        return $this->hasOne(DataLeakFeed::class, 'id', 'data_leak_feed_id')->where('deleted_at', null)->where('status', 1);
+    }
+    public function feed()
+    {
+        return $this->belongsTo(DataLeakFeed::class, 'data_leak_feed_id');
     }
 }

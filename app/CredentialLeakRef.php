@@ -36,5 +36,9 @@ class CredentialLeakRef extends Model
     {
         return $this->belongsTo(Site::class, 'site_id', 'id');
     }
+    public function feed()
+    {
+        return $this->belongsTo(DataLeakFeed::class, 'data_leak_feed_id');
+    }
 }
  
