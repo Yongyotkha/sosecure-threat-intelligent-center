@@ -15,6 +15,10 @@ use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Http\Controllers\MailProgressController;
 use App\Http\Controllers\MISPFeedController;
+use App\Mail\CompromisedMail;
+use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade as PDF;
+
 
 // Route::get('/', 'Welcome@index')->middleware(['auth'])->name('index');
 // Route::get('/', 'Welcome@index')->name('index_salepage');
@@ -98,7 +102,7 @@ Route::get('/feeds/{uuid}/manifest.json', [MISPFeedController::class, 'generateM
 //     ->middleware(['api.token']);
 
 Route::prefix('feeds')
-    ->middleware(['throttle:300,1', 'api.token']) 
+    ->middleware(['throttle:300,1', 'api.token'])
     ->group(function () {
         // Route::get('manifest.json',           [MISPFeedController::class, 'generateDirectoryManifest'])->name('feeds.manifest');
         // Route::get('{uuid}.json',             [MISPFeedController::class, 'generateJsonFeed'])->name('feeds.event');
@@ -124,7 +128,7 @@ Route::get('/preview-defacement-alert', function () {
         'filesize_new' => '162424',
         'element' => 'Test_element',
         'code' => 'c96e6741-8915-4c6a-8de2-2eb6a52fa91f',
-        'id' => '186',
+        'id' => '167',
         'image_last' => '/images/webdefacment_mages/77/69/77_69_Defacement_Now.png',
         'hashper' => '100',
         'filesizeper' => '20',
@@ -132,10 +136,30 @@ Route::get('/preview-defacement-alert', function () {
         'imageper' => '30',
         'blacklistper' => '0',
         'domain' => 'example.com',
+        'baseline_merkle' => '451220c72121201212001200212101021210',
+    ];
+    $diff = [
+        'success'       => true,
+        'merkle_old'    => 'OLD_MERKLE_HASH_EXAMPLE',
+        'merkle_new'    => 'NEW_MERKLE_HASH_EXAMPLE',
+        'section_diffs' => [
+            ["section" => "header",  "old" => "ceea0c7...", "new" => "02e493c...", "changed" => true],
+            ["section" => "#header", "old" => "e3b0c4...", "new" => "e3b0c4...", "changed" => false],
+            ["section" => "nav",     "old" => "4649fa...", "new" => "71ab0a...", "changed" => true],
+            ["section" => "#content", "old" => "e3b0c4...", "new" => "9c0024...", "changed" => true],
+            ["section" => "footer",  "old" => "a5ce77...", "new" => "0a1b26...", "changed" => true],
+        ],
+        'assets_add'   => ['https://cdn.example.com/new.js', '/assets/new.css'],
+        'assets_del'   => ['/assets/old.css'],
+        'outbound_new' => ['https://tracker.example.org/pixel'],
+        'score'        => 64,
     ];
 
     return view('emails.defacement_alert', [
-        'w' => $w,
+        'w'       => $w,
+        'diff'    => $diff,
+        'limit'   => 20,
+        'viewUrl' => null, // ตอนนี้ยังไม่ทำปุ่ม "ดูเพิ่มเติม"
     ]);
 });
 
@@ -173,10 +197,251 @@ Route::get('/preview-news', function () {
 
 Route::get('/preview-hash', function () {
     $id = [
-        'id'=> '167',
+        'id' => '167',
     ];
 
     return view('components.hash-display', [
         'id' => ['id' => $id],
     ]);
 });
+
+Route::get('/preview-down', function () {
+
+    $setting = (object)[
+        'name' => 'Rice Thailand',
+        'url' => 'example.com',
+        'status_val' => 'High',
+        'datetime' => now()->format('Y-m-d H:i:s'),
+        'image_last' => '',
+        'user_agent' => 'cloudflare',
+        'site_id' => '85',
+        'created_at' => now()->format('Y-m-d H:i:s'),
+        'last_online' => now()->format('Y-m-d H:i:s'),
+        'updated_at' => now()->format('Y-m-d H:i:s'),
+        'hash' => 'Test_hash020202023202012012',
+        'filesize_new' => '162424',
+        'element' => 'Test_element',
+        'code' => 'c96e6741-8915-4c6a-8de2-2eb6a52fa91f',
+        'id' => '167',
+        'image_last' => '/images/webdefacment_mages/77/69/77_69_Defacement_Now.png',
+        'hashper' => '100',
+        'filesizeper' => '20',
+        'elementper' => '60',
+        'imageper' => '30',
+        'blacklistper' => '0',
+        'domain' => 'example.com',
+        'baseline_merkle' => '451220c72121201212001200212101021210',
+    ];
+
+    return view('emails.defacement_alert_web_down',[
+        'setting'   => $setting,
+    ]);
+});
+
+
+Route::get('/preview-dataleak', function () {
+    // mock รายการทดสอบหลายตัว (array of objects)
+    $compromised = [
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password1 leak',
+            'feedcontent' => '<p>Email: user1@example.com<br>Password: L********4</p>',
+            'source_name' => 'Darkweb Forum',
+            'created_at'  => now()->toDateTimeString(),
+            // ถ้าอยากแสดง site_name โดยไม่คิวรี DB ก็ใส่มาเองเลยได้
+            'site_name'   => 'Insight-Demo',
+        ],
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password2 leak',
+            'feedcontent' => '<p>Email: user.two@example.com<br>Password: ****PGMG</p>',
+            'source_name' => 'Paste Site',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password3 leak',
+            'feedcontent' => '<p>Email: u3@example.com<br>Password: ****SNMb</p>',
+            'source_name' => 'Leak Market',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password4 leak',
+            'feedcontent' => '<p>Email: user4@example.com<br>Password: ****LBuq</p>',
+            'source_name' => 'Darkweb Forum',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password5 leak',
+            'feedcontent' => '<p>Email: user5@example.com<br>Password: ****e86c</p>',
+            'source_name' => 'Darkweb Forum',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        // เกิน 5 แถวจะใช้ +N more…
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password6 leak',
+            'feedcontent' => '<p>Email: user6@example.com<br>Password: ****abcd</p>',
+            'source_name' => 'Darkweb Forum',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password3 leak',
+            'feedcontent' => '<p>Email: u3@example.com<br>Password: ****SNMb</p>',
+            'source_name' => 'Leak Market',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password4 leak',
+            'feedcontent' => '<p>Email: user4@example.com<br>Password: ****LBuq</p>',
+            'source_name' => 'Darkweb Forum',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password5 leak',
+            'feedcontent' => '<p>Email: user5@example.com<br>Password: ****e86c</p>',
+            'source_name' => 'Darkweb Forum',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        // เกิน 5 แถวจะใช้ +N more…
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password6 leak',
+            'feedcontent' => '<p>Email: user6@example.com<br>Password: ****abcd</p>',
+            'source_name' => 'Darkweb Forum',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password3 leak',
+            'feedcontent' => '<p>Email: u3@example.com<br>Password: ****SNMb</p>',
+            'source_name' => 'Leak Market',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password4 leak',
+            'feedcontent' => '<p>Email: user4@example.com<br>Password: ****LBuq</p>',
+            'source_name' => 'Darkweb Forum',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password5 leak',
+            'feedcontent' => '<p>Email: user5@example.com<br>Password: ****e86c</p>',
+            'source_name' => 'Darkweb Forum',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        // เกิน 5 แถวจะใช้ +N more…
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password6 leak',
+            'feedcontent' => '<p>Email: user6@example.com<br>Password: ****abcd</p>',
+            'source_name' => 'Darkweb Forum',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password3 leak',
+            'feedcontent' => '<p>Email: u3@example.com<br>Password: ****SNMb</p>',
+            'source_name' => 'Leak Market',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password4 leak',
+            'feedcontent' => '<p>Email: user4@example.com<br>Password: ****LBuq</p>',
+            'source_name' => 'Darkweb Forum',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password5 leak',
+            'feedcontent' => '<p>Email: user5@example.com<br>Password: ****e86c</p>',
+            'source_name' => 'Darkweb Forum',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        // เกิน 5 แถวจะใช้ +N more…
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password6 leak',
+            'feedcontent' => '<p>Email: user6@example.com<br>Password: ****abcd</p>',
+            'source_name' => 'Darkweb Forum',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password5 leak',
+            'feedcontent' => '<p>Email: user5@example.com<br>Password: ****e86c</p>',
+            'source_name' => 'Darkweb Forum',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+        // เกิน 5 แถวจะใช้ +N more…
+        (object)[
+            'id'          => 473,
+            'feel_type'   => 'credential',
+            'keyword'     => 'password6 leak',
+            'feedcontent' => '<p>Email: user6@example.com<br>Password: ****abcd</p>',
+            'source_name' => 'Darkweb Forum',
+            'created_at'  => now()->toDateTimeString(),
+            'site_name'   => 'Insight-Demo',
+        ],
+    ];
+
+    // preview mail ใน browser
+    return (new CompromisedMail($compromised, 'credential_leak'))->render();
+});
+
+Route::get('/download-pdf', function () {
+    $path = storage_path('app/public/test.pdf');
+    return response()->download($path, 'test.pdf', [
+        'Content-Type' => 'application/pdf',
+    ]);
+});
+
+
+
+
+

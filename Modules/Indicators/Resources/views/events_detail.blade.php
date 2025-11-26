@@ -530,7 +530,7 @@ select.c-tags {
                         data: 'role',
                     },
                     {
-                        data: 'transaction_date',
+                        data: 'created',
                     },
                     {
                         data: 'indicator_id',
@@ -564,7 +564,7 @@ select.c-tags {
                         targets: 5,
                         render: function (data, type, row) {
                             var inner = '';
-                            var v = parseInt(row.updated_at.$date.$numberLong);
+                            var v = parseInt(row.created.$date.$numberLong);
                             var created_date =  new Date(v);
                             var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
                             var year = created_date.getFullYear();

@@ -16,6 +16,49 @@ return method_exists($v, '__toString')
 }
 return (string)$v;
 }
+
+$siteName = $w->name ?? 'Unknown Site';
+
+$secRaw = $diff['section_diffs'] ?? [];
+$assetsAddRaw = $diff['assets_add'] ?? [];
+$assetsDelRaw = $diff['assets_del'] ?? [];
+$outNewRaw = $diff['outbound_new'] ?? [];
+$score = $diff['score'] ?? 0;
+
+$section = is_string($secRaw) ? (json_decode($secRaw, true) ?: []) : (is_array($secRaw) ? $secRaw : []);
+$assetsAdd = is_string($assetsAddRaw) ? (json_decode($assetsAddRaw, true) ?: []) : (is_array($assetsAddRaw) ? $assetsAddRaw : []);
+$assetsDel = is_string($assetsDelRaw) ? (json_decode($assetsDelRaw, true) ?: []) : (is_array($assetsDelRaw) ? $assetsDelRaw : []);
+$outNew = is_string($outNewRaw) ? (json_decode($outNewRaw, true) ?: []) : (is_array($outNewRaw) ? $outNewRaw : []);
+
+// บางระบบมี key แตกต่าง/สะกดไม่ตรง แก้ mapping เบื้องต้น
+// เช่น { part: 'head', old_hash: '...', new_hash: '...', changed: '1' }
+$section = array_map(function($row){
+// map key ชื่อแปลกๆ ให้เป็น section/old/new ให้หมด
+if (!isset($row['section']) && isset($row['part'])) $row['section'] = $row['part'];
+if (!isset($row['old']) && isset($row['old_hash'])) $row['old'] = $row['old_hash'];
+if (!isset($row['new']) && isset($row['new_hash'])) $row['new'] = $row['new_hash'];
+return $row;
+}, $section);
+
+// เปลี่ยน changed ให้เป็น boolean จริง (รองรับ 'true','1',1,'yes','changed')
+$isChanged = function($v){
+return $v === true || $v === 1 || $v === '1' || $v === 'true' || $v === 'TRUE' || $v === 'yes' || $v === 'changed';
+};
+
+$changed = array_values(array_filter($section, function($row) use ($isChanged){
+return $isChanged($row['changed'] ?? null);
+}));
+
+// จำกัดจำนวนแถว
+$limit = $limit ?? 20;
+$secShow = array_slice($changed, 0, $limit);
+$addShow = array_slice($assetsAdd, 0, $limit);
+$delShow = array_slice($assetsDel, 0, $limit);
+$outShow = array_slice($outNew, 0, $limit);
+
+// Merkle
+$mo = (string) ($diff['merkle_old'] ?? '');
+$mn = (string) ($diff['merkle_new'] ?? '');
 @endphp
 
 <!doctype html>
@@ -39,7 +82,7 @@ return (string)$v;
     }
 
     /* มือถือ: ซ่อน desktop-only, โชว์ mobile-only */
-    @media only screen and (max-width:700px) {
+    @media only screen and (max-width:875px) {
       .desktop-only {
         display: none !important;
       }
@@ -186,7 +229,7 @@ return (string)$v;
 
     @media (min-width:700px) and (max-width:900px) {
       span {
-        font-size: 10px !important;
+        font-size: 15px !important;
       }
 
       .do-status {
@@ -197,6 +240,7 @@ return (string)$v;
         font-size: 12px !important;
         align-items: center !important;
       }
+
       .label-head {
         font-size: 12px !important;
       }
@@ -252,6 +296,16 @@ return (string)$v;
       display: flex;
     }
 
+    .new-status {
+      background: #d5ecff;
+      border-radius: 99px;
+      padding: 8px 10px;
+      font-size: 15px;
+      color: #ff0000ff;
+      height: 15px;
+      text-align: center;
+    }
+
     .input-feed-align {
       display: flex;
       justify-content: center;
@@ -271,11 +325,14 @@ return (string)$v;
 
 </head>
 
+
+
 <body style="margin:0; padding:0; background:#f2f5f9;">
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f2f5f9;">
     <tr>
       <td align="center" style="padding:24px 12px;">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%; background:#ffffff; border-radius:10px; overflow:hidden;">
+
           <!-- Header bar -->
           <tr>
             <td style="padding:0;">
@@ -294,71 +351,48 @@ return (string)$v;
             <td style="padding:0;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td align="center" valign="middle" height="70" bgcolor="#376ad4"
-                    style="font-family:Arial,Helvetica,sans-serif; color:#ffffff;
-                      font-size:18px; font-weight:700; line-height:70px; mso-line-height-rule:exactly;
-                      background:linear-gradient(90deg,#376ad4 0%,#00C3FF 100%);">
+                  <td align="center" valign="middle" height="70"
+                      style="font-family:Arial,Helvetica,sans-serif; color:#050038; font-size:18px; font-weight:700; line-height:40px; mso-line-height-rule:exactly;">
                     Notification Web Defacement
                   </td>
-
                 </tr>
               </table>
             </td>
           </tr>
+          
 
-
-
-          <!-- Status pill -->
-          <!-- Top info 2x3 grid (tables for email safety) -->
+          <!-- Top info 2x3 grid (desktop) -->
           <tr>
             <td style="padding:0 16px 3px; font-family:Arial,Helvetica,sans-serif;">
-
-
               <br>
 
-              <!--[if mso]><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><![endif]-->
+              <!-- Desktop 3 columns -->
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="desktop-only" style="border-collapse:collapse; table-layout:fixed;">
                 <tr>
                   <!-- COL 1 -->
                   <td width="33.33%" valign="top" style="width:33.33%; padding:8px 12px;">
                     <br>
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-
                       <tr>
                         <td style="padding:4px 24px 18px; vertical-align:middle;">
-
                           <div class="do-status" style="
-                                  display:flex;
-                                  align-items:center;
-                                  justify-content:center;
-                                  background:#e53935;
-                                  color:#fff;
-                                  font-family:Arial,Helvetica,sans-serif;
-                                  font-weight:700;
-                                  border-radius:20px;
-                                  width:100%;
-                                  min-height:115px;
-                                  box-sizing:border-box;
-                                  font-size:25px;
-                              ">
+                            display:flex; align-items:center; justify-content:center;
+                            background:#e53935; color:#fff; font-family:Arial,Helvetica,sans-serif;
+                            font-weight:700; border-radius:20px; width:100%; min-height:115px;
+                            box-sizing:border-box; font-size:25px;">
                             High
                           </div>
                         </td>
                       </tr>
-
-
-
-
                     </table>
                   </td>
 
                   <!-- divider -->
                   <td width="1" style="width:1px; background:#e7e7ed;"></td>
+                  
 
                   <!-- COL 2 -->
-
-
-                  <td width="33.33%" valign="top" valign="top" style="width:33.33%; padding:8px 12px;">
+                  <td width="33.33%" valign="top" style="width:33.33%; padding:8px 12px;">
                     <br>
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                       <tr>
@@ -367,7 +401,7 @@ return (string)$v;
                           <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;">
                             <tr>
                               <td align="left" style="padding:0; mso-line-height-rule:exactly;">
-                                <span style="display:block; background:#e6f3ff; border-radius:999px; padding:8px 14px; font-weight:700; font-size:12px; color:#0b2a66; white-space:nowrap;">
+                                <span style="display:block; background:#e6f3ff; border-radius:999px; padding:8px 14px; font-weight:700; font-size:14px; color:#0b2a66; white-space:nowrap;">
                                   {{ $w->domain ?? '-' }}
                                 </span>
                               </td>
@@ -376,12 +410,12 @@ return (string)$v;
                         </td>
                       </tr>
                       <tr>
-                        <td class="label-head"  style="font-size:14px; color:#1b1f2a; white-space:nowrap; text-align:left; padding:0 12px 12px 0;width: 100px">Name Page:</td>
+                        <td class="label-head" style="font-size:14px; color:#1b1f2a; white-space:nowrap; text-align:left; padding:0 12px 12px 0;width: 100px">Name Page:</td>
                         <td style="padding:0 0 12px 0; width:100%;" width="100%">
                           <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;">
                             <tr>
                               <td align="left" style="padding:0; mso-line-height-rule:exactly;">
-                                <span style="display:block; background:#e6f3ff; border-radius:999px; padding:8px 14px; font-weight:700; font-size:12px; color:#0b2a66; white-space:nowrap;">
+                                <span style="display:block; background:#e6f3ff; border-radius:999px; padding:8px 14px; font-weight:700; font-size:14px; color:#0b2a66; white-space:nowrap;">
                                   {{ $w->name ?? '-' }}
                                 </span>
                               </td>
@@ -395,7 +429,7 @@ return (string)$v;
                           <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;">
                             <tr>
                               <td align="left" style="padding:0; mso-line-height-rule:exactly;">
-                                <span style="display:block; background:#e6f3ff; border-radius:999px; padding:8px 14px; font-weight:700; font-size:12px; color:#0b2a66; white-space:nowrap;">
+                                <span style="display:block; background:#e6f3ff; border-radius:999px; padding:8px 14px; font-weight:700; font-size:14px; color:#0b2a66; white-space:nowrap;">
                                   {{ $w->created_at ?? '-' }}
                                 </span>
                               </td>
@@ -405,7 +439,6 @@ return (string)$v;
                       </tr>
                     </table>
                   </td>
-
 
                   <!-- divider -->
                   <td width="1" style="width:1px; background:#e7e7ed;"></td>
@@ -417,13 +450,13 @@ return (string)$v;
                       <tr>
                         <td class="label-head" style="font-size:14px; color:#1b1f2a; white-space:nowrap; text-align:left; padding:0 12px 12px 0;width: 100px">Site:</td>
                         <td style="padding:0 0 12px 0; text-align:left;width: 100%">
-                          <span style="display:block; background:#e6f3ff; border-radius:999px; padding:8px 14px; font-weight:700; font-size:12px; color:#0b2a66;">{{ Site::getSite($w->site_id) ?? '-' }}</span>
+                          <span style="display:block; background:#e6f3ff; border-radius:999px; padding:8px 14px; font-weight:700; font-size:14px; color:#0b2a66;">{{ Site::getSite($w->site_id) ?? '-' }}</span>
                         </td>
                       </tr>
                       <tr>
                         <td class="label-head" style="font-size:14px; color:#1b1f2a; white-space:nowrap; text-align:left; padding:0 12px 12px 0;width: 100px;">User Agent:</td>
                         <td style="padding:0 0 12px 0; text-align:left;width: 100%">
-                          <span style="display:block; background:#e6f3ff; border-radius:999px; padding:8px 14px; font-weight:700; font-size:12px; color:#0b2a66;">{{ $w->user_agent ?? '-' }}</span>
+                          <span style="display:block; background:#e6f3ff; border-radius:999px; padding:8px 14px; font-weight:700; font-size:14px; color:#0b2a66;">{{ $w->user_agent ?? '-' }}</span>
                         </td>
                       </tr>
                       <tr>
@@ -432,7 +465,7 @@ return (string)$v;
                           <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="200" style="width:100%;">
                             <tr>
                               <td align="left" style="padding:0; mso-line-height-rule:exactly;">
-                                <span style="display:block; background:#e6f3ff; border-radius:999px; padding:8px 14px; font-weight:700; font-size:12px; color:#0b2a66; white-space:nowrap;">
+                                <span style="display:block; background:#e6f3ff; border-radius:999px; padding:8px 14px; font-weight:700; font-size:14px; color:#0b2a66; white-space:nowrap;">
                                   {{ $w->last_online ?? '-' }}
                                 </span>
                               </td>
@@ -444,35 +477,23 @@ return (string)$v;
                   </td>
                 </tr>
               </table>
-              <!--[if mso]></tr></table><![endif]-->
 
+              <!-- Mobile: status -->
               <table class="mobile-only" role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="vertical-align:middle;">
                     <div style="
-                                  display:flex;
-                                  align-items:center;
-                                  justify-content:center;
-                                  background:#e53935;
-                                  color:#fff;
-                                  font-family:Arial,Helvetica,sans-serif;
-                                  font-size:20px;
-                                  font-weight:700;
-                                  border-radius:20px;
-                                  width:100%;
-                                  min-height:115px;
-                                  box-sizing:border-box;
-                              ">
+                      display:flex; align-items:center; justify-content:center; background:#e53935;
+                      color:#fff; font-family:Arial,Helvetica,sans-serif; font-size:20px; font-weight:700;
+                      border-radius:20px; width:100%; min-height:115px; box-sizing:border-box;">
                       High
                     </div>
                   </td>
                 </tr>
               </table>
 
-
-
+              <!-- Mobile: fields -->
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="mobile-only" style="border-collapse:collapse; table-layout:fixed;">
-                <!-- 1) Name Page -->
                 <tr class="m-w100">
                   <td class="m-label m-pad" style="font-size:14px; color:#1b1f2a; white-space:nowrap; padding:6px 0;">Domain:</td>
                   <td class="m-value m-pad" style="padding:6px 0; display:flex; justify-content:flex-end;">
@@ -480,20 +501,15 @@ return (string)$v;
                       {{ $w->domain ?? '-' }}
                     </span>
                   </td>
-
                 </tr>
-                <!-- 2) Domain -->
                 <tr class="m-w100">
                   <td class="m-label m-pad" style="font-size:14px; color:#1b1f2a; white-space:nowrap; padding:6px 0;">Name Page:</td>
-
                   <td class="m-value m-pad" style="padding:6px 0; display:flex; justify-content:flex-end;">
                     <span style="background:#e6f3ff; border-radius:999px; padding:8px 14px; font-weight:700; font-size:14px; color:#0b2a66;">
                       {{ $w->name ?? '-' }}
                     </span>
                   </td>
-
                 </tr>
-                <!-- 3) User Agent -->
                 <tr class="m-w100">
                   <td class="m-label m-pad" style="font-size:14px; color:#1b1f2a; white-space:nowrap; padding:6px 0;">User Agent:</td>
                   <td class="m-value m-pad" style="padding:6px 0; display:flex; justify-content:flex-end;">
@@ -502,7 +518,6 @@ return (string)$v;
                     </span>
                   </td>
                 </tr>
-                <!-- 4) Site -->
                 <tr class="m-w100">
                   <td class="m-label m-pad" style="font-size:14px; color:#1b1f2a; white-space:nowrap; padding:6px 0;">Site:</td>
                   <td class="m-value m-pad" style="padding:6px 0; display:flex; justify-content:flex-end;">
@@ -511,7 +526,6 @@ return (string)$v;
                     </span>
                   </td>
                 </tr>
-                <!-- 5) Create Date -->
                 <tr class="m-w100">
                   <td class="m-label m-pad" style="font-size:14px; color:#1b1f2a; white-space:nowrap; padding:6px 0;">Create Date:</td>
                   <td class="m-value m-pad" style="padding:6px 0; display:flex; justify-content:flex-end;">
@@ -520,30 +534,27 @@ return (string)$v;
                     </span>
                   </td>
                 </tr>
-                <!-- 6) Last Online -->
                 <tr class="m-w100">
                   <td class="m-label m-pad" style="font-size:14px; color:#1b1f2a; white-space:nowrap; padding:6px 0;">Last Online:</td>
                   <td class="m-value m-pad" style="padding:6px 0; display:flex; justify-content:flex-end;">
-                    <span style="background:#e6f3ff; border-radius:999px; padding:8px 14px; font-weight:700; font-size:14px; color:#0b2a66;margin-right: 7;">
+                    <span style="background:#e6f3ff; border-radius:999px; padding:8px 14px; font-weight:700; font-size:14px; color:#0b2a66; margin-right: 7;">
                       {{ $w->last_online ?? '' }}
                     </span>
                   </td>
                 </tr>
-
               </table>
 
             </td>
           </tr>
 
-          <!-- Section title -->
-
+          <!-- Section title: Analytics -->
           <tr>
             <td>
               <br>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td align="center" valign="middle" height="40"
-                    style="font-family:Arial,Helvetica,sans-serif;background-color: #efefef;font-size:14px;font-weight:700;color:#0b2a66;">
+                      style="font-family:Arial,Helvetica,sans-serif;background-color: #efefef;font-size:14px;font-weight:700;color:#0b2a66;">
                     Analytics
                   </td>
                 </tr>
@@ -551,223 +562,175 @@ return (string)$v;
             </td>
           </tr>
 
-          <!-- Analytics -->
+          <!-- Analytics: PHP + circles -->
           <!-- {{ $w->filesizeper}} -->
           @php
           function circleBase64UltraHD(
-          int $pct,
-          string $label = '',
-          int $size = 86,
-          int $thickness = 8,
-          int $retina = 4 // ใช้ 4x เพื่อความคม
+            int $pct,
+            string $label = '',
+            int $size = 86,
+            int $thickness = 8,
+            int $retina = 4
           ): string {
-          $pct = max(0, min(100, $pct));
-          $retina = max(1, $retina);
+            $pct = max(0, min(100, $pct));
+            $retina = max(1, $retina);
 
-          $S = $size * $retina;
-          $T = max(2, $thickness * $retina);
+            $S = $size * $retina;
+            $T = max(2, $thickness * $retina);
 
-          // Canvas โปร่งใส truecolor
-          $im = imagecreatetruecolor($S, $S);
-          imagesavealpha($im, true);
-          $trans = imagecolorallocatealpha($im, 0, 0, 0, 127);
-          imagefill($im, 0, 0, $trans);
+            $im = imagecreatetruecolor($S, $S);
+            imagesavealpha($im, true);
+            $trans = imagecolorallocatealpha($im, 0, 0, 0, 127);
+            imagefill($im, 0, 0, $trans);
 
-          if (function_exists('imageantialias')) {
-          imageantialias($im, true);
+            if (function_exists('imageantialias')) {
+              imageantialias($im, true);
+            }
+
+            $gray = imagecolorallocate($im, 229, 231, 235);
+            $fg = ($pct >= 80) ? imagecolorallocate($im, 220, 38, 38)
+                 : (($pct >= 50) ? imagecolorallocate($im, 217, 119, 6)
+                 : imagecolorallocate($im, 22, 163, 74));
+            $white = imagecolorallocate($im, 255, 255, 255);
+            $textC = imagecolorallocate($im, 11, 42, 102);
+
+            $outer = $S - 2 * $retina;
+            $inner = $outer - 2 * $T;
+            imagefilledellipse($im, $S / 2, $S / 2, $outer, $outer, $gray);
+
+            if ($pct > 0) {
+              $start = -90;
+              $end = -90 + (360 * $pct / 100.0);
+              imagefilledarc($im, $S / 2, $S / 2, $outer, $outer, $start, $end, $fg, IMG_ARC_PIE);
+            }
+
+            imagefilledellipse($im, $S / 2, $S / 2, $inner, $inner, $white);
+
+            $percentText = $pct . '%';
+            $fontPath = base_path('resources/fonts/Montserrat-Regular.ttf');
+            if (is_file($fontPath) && function_exists('imagettftext')) {
+              $fontSize = (int) round($S * 0.2);
+              $bbox = imagettfbbox($fontSize, 0, $fontPath, $percentText);
+              $textW = $bbox[2] - $bbox[0];
+              $textH = $bbox[1] - $bbox[7];
+              $x = (int) (($S - $textW) / 2);
+              $y = (int) (($S + $textH) / 2);
+              imagettftext($im, $fontSize, 0, $x, $y, $textC, $fontPath, $percentText);
+            } else {
+              $font = 12;
+              $textW = imagefontwidth($font) * strlen($percentText);
+              $textH = imagefontheight($font);
+              $x = (int) (($S - $textW) / 2);
+              $y = (int) (($S - $textH) / 2);
+              imagestring($im, $font, $x, $y, $percentText, $textC);
+            }
+
+            ob_start();
+            imagepng($im);
+            $raw = ob_get_clean();
+            imagedestroy($im);
+
+            return 'data:image/png;base64,' . base64_encode($raw);
           }
-
-          // สีพื้นหลังวง
-          $gray = imagecolorallocate($im, 229, 231, 235);
-          $fg = ($pct >= 80) ? imagecolorallocate($im, 220, 38, 38) // เขียว
-          : (($pct >= 50) ? imagecolorallocate($im, 217, 119, 6) // ส้ม
-          : imagecolorallocate($im, 22, 163, 74)); // แดง
-          $white = imagecolorallocate($im, 255, 255, 255);
-          $textC = imagecolorallocate($im, 11, 42, 102);
-
-          // วาดวงเทา
-          $outer = $S - 2 * $retina;
-          $inner = $outer - 2 * $T;
-          imagefilledellipse($im, $S / 2, $S / 2, $outer, $outer, $gray);
-
-          // sector สี
-          if ($pct > 0) {
-          $start = -90;
-          $end = -90 + (360 * $pct / 100.0);
-          imagefilledarc($im, $S / 2, $S / 2, $outer, $outer, $start, $end, $fg, IMG_ARC_PIE);
-          }
-
-          // เจาะไส้ขาว
-          imagefilledellipse($im, $S / 2, $S / 2, $inner, $inner, $white);
-
-
-
-          // ตัวเลข %
-          $percentText = $pct . '%';
-          $fontPath = base_path('resources/fonts/Montserrat-Regular.ttf'); // แนะนำฟอนต์คมๆ
-          if (is_file($fontPath) && function_exists('imagettftext')) {
-          $fontSize = (int) round($S * 0.2); // ใหญ่ขึ้นสำหรับ Retina
-          $bbox = imagettfbbox($fontSize, 0, $fontPath, $percentText);
-          $textW = $bbox[2] - $bbox[0];
-          $textH = $bbox[1] - $bbox[7];
-          $x = (int) (($S - $textW) / 2);
-          $y = (int) (($S + $textH) / 2);
-          imagettftext($im, $fontSize, 0, $x, $y, $textC, $fontPath, $percentText);
-          } else {
-          $font = 12;
-          $textW = imagefontwidth($font) * strlen($percentText);
-          $textH = imagefontheight($font);
-          $x = (int) (($S - $textW) / 2);
-          $y = (int) (($S - $textH) / 2);
-          imagestring($im, $font, $x, $y, $percentText, $textC);
-          }
-
-          ob_start();
-          imagepng($im);
-          $raw = ob_get_clean();
-          imagedestroy($im);
-
-          return 'data:image/png;base64,' . base64_encode($raw);
-          }
-
           @endphp
-
-
-
 
           @php
           $chk = '';
           $data['all'] = [];
           try {
-          $chk = WebdefacmentDataCheck::getData($w->id);
-          if(!empty($chk)){
-          if ($chk->hash_percent != 0) {
-          $data['all']['hash'] = [
-          'name' => 'Hash',
-          'value' => (float) $chk->hash_percent,
-          ];
-          }
-          if ($chk->filesize_percent != 0) {
-          $data['all']['filesize'] = [
-          'name' => 'Filesize',
-          'value' => (float) $chk->filesize_percent,
-          ];
-          }
-          if ($chk->element_percent != 0) {
-          $data['all']['element'] = [
-          'name' => 'Element',
-          'value' => (float) $chk->element_percent,
-          ];
-          }
-          if ($chk->image_percent != 0) {
-          $data['all']['image'] = [
-          'name' => 'Image',
-          'value' => (float) $chk->image_percent,
-          ];
-          }
-          if ($chk->keyword_percent != 0) {
-          $data['all']['blacklist'] = [
-          'name' => 'Blacklist',
-          'value' => (float) $chk->keyword_percent,
-          ];
-          }
-
-          }
+            $chk = WebdefacmentDataCheck::getData($w->id);
+            if(!empty($chk)){
+              if ($chk->score * 100 != 0) {
+                $data['all']['hash'] = ['name' => 'Hash','value' => (float) $chk->score*100];
+              }
+              if ($chk->filesize_percent != 0) {
+                $data['all']['filesize'] = ['name' => 'Filesize','value' => (float) $chk->filesize_percent];
+              }
+              if ($chk->element_percent != 0) {
+                $data['all']['element'] = ['name' => 'Element','value' => (float) $chk->element_percent];
+              }
+              if ($chk->image_percent != 0) {
+                $data['all']['image'] = ['name' => 'Image','value' => (float) $chk->image_percent];
+              }
+              if ($chk->keyword_percent != 0) {
+                $data['all']['blacklist'] = ['name' => 'Blacklist','value' => (float) $chk->keyword_percent];
+              }
+            }
           } catch (\Throwable $th) {
-          $chk = [];
+            $chk = [];
           }
-
-
-
           @endphp
 
+          <!-- Analytics circles (mobile & desktop) -->
           <tr>
             <td style="padding:4px 6px 16px;">
+              <!-- mobile-only row -->
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="mobile-only circle-table">
                 <tr>
                   @if(!empty($data['all']))
-                  @foreach($data['all'] as $key => $item)
-                  @php
-                  if (is_array($item)) {
-                  $value = (int)($item['value'] ?? 0);
-                  $name = strx($item['name'] ?? $key);
-                  } elseif (is_object($item)) {
-                  $value = (int)($item->value ?? 0);
-                  $name = strx($item->name ?? $key);
-                  } else {
-                  $value = (int)$item;
-                  $name = strx($key);
-                  }
-                  $src = circleBase64UltraHD($value, $name, 86, 8, 4);
-                  @endphp
-
-                  <td class="circle-cell" align="center" style="padding:8px 0;">
-                    <img
-                      src="{{ $src }}"
-                      width="120"
-                      height="120"
-                      alt="{{ $value ?? 0 }}%"
-                      style="display:block;border:0;outline:none;text-decoration:none;">
-                    <div style="font:13px Arial,Helvetica,sans-serif;color:#6b7a90;margin-top:8px;">
-                      <p style="margin:0;"><b>{{ $name }}</b></p>
-                    </div>
-                  </td>
-                  @endforeach
+                    @foreach($data['all'] as $key => $item)
+                      @php
+                        if (is_array($item)) {
+                          $value = (int)($item['value'] ?? 0);
+                          $name  = strx($item['name'] ?? $key);
+                        } elseif (is_object($item)) {
+                          $value = (int)($item->value ?? 0);
+                          $name  = strx($item->name ?? $key);
+                        } else {
+                          $value = (int)$item;
+                          $name  = strx($key);
+                        }
+                        $src = circleBase64UltraHD($value, $name, 86, 8, 4);
+                      @endphp
+                      <td class="circle-cell" align="center" style="padding:8px 0;">
+                        <img src="{{ $src }}" width="120" height="120" alt="{{ $value ?? 0 }}%" style="display:block;border:0;outline:none;text-decoration:none;">
+                        <div style="font:13px Arial,Helvetica,sans-serif;color:#6b7a90;margin-top:8px;">
+                          <p style="margin:0;"><b>{{ $name }}</b></p>
+                        </div>
+                      </td>
+                    @endforeach
                   @endif
                 </tr>
               </table>
 
-
+              <!-- desktop row -->
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="pc-only">
                 <tr>
-
                   @if(!empty($data['all']))
-                  @foreach($data['all'] as $key => $item)
-                  @php
-                  // ปลอดภัย: บังคับ value/name ให้เป็นชนิดที่ถูกต้อง
-                  if (is_array($item)) {
-                  $value = (int)($item['value'] ?? 0);
-                  $name = strx($item['name'] ?? $key);
-                  } elseif (is_object($item)) {
-                  $value = (int)($item->value ?? 0);
-                  $name = strx($item->name ?? $key);
-                  } else {
-                  $value = (int)$item;
-                  $name = strx($key);
-                  }
-                  @endphp
-                  @php
-                  $src = circleBase64UltraHD($value, $name, 86, 8, 4);
-                  @endphp
-
-                  <td align="center" style="padding:8px 0;">
-                    <img
-                      src="{{ $src }}"
-                      width="120"
-                      height="120"
-                      alt="{{ $value ?? 0 }}%"
-                      style="display:block;border:0;outline:none;text-decoration:none;">
-                    <div style="font:14px Arial,Helvetica,sans-serif;color:#6b7a90;margin-top:8px;">
-                      <p style="margin:0;"><b>{{ $name  }}</b></p>
-                    </div>
-                  </td>
-                  @endforeach
+                    @foreach($data['all'] as $key => $item)
+                      @php
+                        if (is_array($item)) {
+                          $value = (int)($item['value'] ?? 0);
+                          $name  = strx($item['name'] ?? $key);
+                        } elseif (is_object($item)) {
+                          $value = (int)($item->value ?? 0);
+                          $name  = strx($item->name ?? $key);
+                        } else {
+                          $value = (int)$item;
+                          $name  = strx($key);
+                        }
+                        $src = circleBase64UltraHD($value, $name, 86, 8, 4);
+                      @endphp
+                      <td align="center" style="padding:8px 0;">
+                        <img src="{{ $src }}" width="120" height="120" alt="{{ $value ?? 0 }}%" style="display:block;border:0;outline:none;text-decoration:none;">
+                        <div style="font:14px Arial,Helvetica,sans-serif;color:#6b7a90;margin-top:8px;">
+                          <p style="margin:0;"><b>{{ $name  }}</b></p>
+                        </div>
+                      </td>
+                    @endforeach
                   @endif
                 </tr>
               </table>
             </td>
           </tr>
 
-
-
-
-          <!-- Divider -->
+          <!-- Divider: Values Comparison -->
           <tr>
             <td style="padding:0;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td align="center" valign="middle" height="40"
-                    style="font-family:Arial,Helvetica,sans-serif;background-color: #efefef;font-size:14px;font-weight:700;color:#0b2a66;">
+                      style="font-family:Arial,Helvetica,sans-serif;background-color: #efefef;font-size:14px;font-weight:700;color:#0b2a66;">
                     Values Comparison
                   </td>
                 </tr>
@@ -775,55 +738,53 @@ return (string)$v;
             </td>
           </tr>
 
-          <!-- Compare tables -->
-
-
+          <!-- Compare tables (PC) -->
           @php
           $original_ = '';
+          $original_hash = '';
           try{
-          $original_ = WebdefacmentDataOriginal::GetDataOriginal($w->id);
+            $original_ = WebdefacmentDataOriginal::GetDataOriginal($w->id);
           }catch(\Throwable $th){
-          $original_ = [];
+            $original_ = [];
           }
           @endphp
 
           @php
           function getKB($filesize){
-          $res_kb = 0;
-          if (!empty($filesize)){
-          $res_kb = ceil($filesize / 1024 * 100) / 100;
-          }
-          return $res_kb .' KB';
+            $res_kb = 0;
+            if (!empty($filesize)){
+              $res_kb = ceil($filesize / 1024 * 100) / 100;
+            }
+            return $res_kb .' KB';
           }
           @endphp
 
           <tr>
-            <td style="padding:0 16px 24px;" class="pc-only">
-
-              <!-- <table role="presentation" width="100%" class="desktop-only" cellpadding="0" cellspacing="0"> -->
+            <td style="padding:0 16px 5px;" class="pc-only">
               <table class="pc-only" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; table-layout:fixed;margin-bottom: 20px;">
                 <tr>
                   <!-- Original -->
                   <td width="50%" valign="top" style="padding:8px;">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-                      style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif;">
+                           style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif;">
                       <tr>
                         <td colspan="2"
-                          style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center; 
-                          padding:8px; border-top-left-radius:10px; border-top-right-radius:10px;border-radius:99px;
-                          font-size:14px">
+                            style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center; 
+                                   padding:8px; border-top-left-radius:10px; border-top-right-radius:10px;border-radius:99px;
+                                   font-size:14px">
                           Original
                         </td>
                       </tr>
 
-                      @if($chk->hash_percent)
+                      @if($chk->score)
                       <tr>
                         <td class="name-show">Hash</td>
                         <td>
-                          <div style="margin-top:5px;"
-                            class="input-feed">
-                            {{ $original_['0']['hash'] ?? '' }}
-                          </div>
+                          <div style="margin-top:5px; max-width:250px; word-wrap:break-word; overflow-wrap:break-word; line-height:1.4;" class="input-feed">
+                          <span title="{{ $diff['merkle_old'] ?? '' }}">
+                            {{ Str::limit($diff['merkle_old'] ?? '', 20, '...') }}
+                          </span>
+                        </div>
                         </td>
                       </tr>
                       @endif
@@ -870,30 +831,30 @@ return (string)$v;
                         </td>
                       </tr>
                     </table>
-
                   </td>
 
                   <!-- Current -->
-                  <td width="50%" valign="top" style="padding:8px; ">
+                  <td width="50%" valign="top" style="padding:8px;">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-                      style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif;">
+                           style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif;">
                       <tr>
                         <td colspan="2"
-                          style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center; 
-                          padding:8px; border-top-left-radius:10px; border-top-right-radius:10px;border-radius:99px;
-                          font-size:14px">
+                            style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center; 
+                                   padding:8px; border-top-left-radius:10px; border-top-right-radius:10px;border-radius:99px;
+                                   font-size:14px">
                           Current
                         </td>
                       </tr>
 
-                      @if($chk->hash_percent)
+                      @if($chk->score)
                       <tr>
                         <td class="name-show">Hash</td>
                         <td>
-                          <div style="margin-top:5px;"
-                            class="new">
-                            {{ $chk->hash_new ?? '' }}
-                          </div>
+                          <div style="margin-top:5px; max-width:250px; word-wrap:break-word; overflow-wrap:break-word; line-height:1.4; color:red;" class="input-feed">
+                          <span title="{{ $diff['merkle_new'] ?? '' }}">
+                            {{ Str::limit($diff['merkle_new'] ?? '', 20, '...') }}
+                          </span>
+                        </div>
                         </td>
                       </tr>
                       @endif
@@ -908,7 +869,6 @@ return (string)$v;
                         </td>
                       </tr>
                       @endif
-
 
                       @if($chk->element_percent)
                       <tr>
@@ -941,31 +901,31 @@ return (string)$v;
                         </td>
                       </tr>
                     </table>
-
                   </td>
                 </tr>
               </table>
             </td>
-            <td class="mobile-only">
+          </tr>
+
+          <!-- Compare tables (Mobile stacked) -->
+          <tr class="mobile-only">
+            <td style="padding:0 16px 10px;">
               <table role="presentation" width="100%" class="mobile-only" cellpadding="0" cellspacing="0">
                 <tr>
-                  <!-- Original -->
-                  <td width="50%" valign="top" style="padding:8px;">
+                  <td width="100%" valign="top" style="padding:8px;">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="td-mobile"
-                      style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif;">
+                           style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif;">
                       <tr>
                         <td colspan="2"
-                          style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center; 
-                          padding:8px; border-top-left-radius:10px; border-top-right-radius:10px;border-radius:99px;
-                          font-size:14px">
+                            style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center; 
+                                   padding:8px; border-top-left-radius:10px; border-top-right-radius:10px;border-radius:99px;
+                                   font-size:14px">
                           Original
                         </td>
                       </tr>
 
                       @if($chk->hash_percent)
-                      <tr>
-                        <td colspan="2" class="name-show">Hash</td>
-                      </tr>
+                      <tr><td colspan="2" class="name-show">Hash</td></tr>
                       <tr>
                         <td colspan="2" class="input-feed-align">
                           <div class="input-feed" style="display:block;">
@@ -976,9 +936,7 @@ return (string)$v;
                       @endif
 
                       @if($chk->filesize_percent)
-                      <tr>
-                        <td colspan="2" class="name-show">Filesize</td>
-                      </tr>
+                      <tr><td colspan="2" class="name-show">Filesize</td></tr>
                       <tr>
                         <td colspan="2" class="input-feed-align">
                           <div class="input-feed" style="display:block;">
@@ -989,9 +947,7 @@ return (string)$v;
                       @endif
 
                       @if($chk->element_percent)
-                      <tr>
-                        <td colspan="2" class="name-show">Element</td>
-                      </tr>
+                      <tr><td colspan="2" class="name-show">Element</td></tr>
                       <tr>
                         <td colspan="2" class="input-feed-align">
                           <div class="input-feed" style="display:block;">
@@ -1002,9 +958,7 @@ return (string)$v;
                       @endif
 
                       @if($chk->keyword_percent)
-                      <tr>
-                        <td colspan="2" class="name-show">Blacklist</td>
-                      </tr>
+                      <tr><td colspan="2" class="name-show">Blacklist</td></tr>
                       <tr>
                         <td colspan="2" class="input-feed-align">
                           <div class="input-feed" style="display:block;">
@@ -1014,9 +968,7 @@ return (string)$v;
                       </tr>
                       @endif
 
-                      <tr>
-                        <td colspan="2" class="name-show">Last Update</td>
-                      </tr>
+                      <tr><td colspan="2" class="name-show">Last Update</td></tr>
                       <tr>
                         <td colspan="2" class="input-feed-align">
                           <div class="input-feed" style="display:block;">
@@ -1027,25 +979,22 @@ return (string)$v;
                     </table>
                   </td>
                 </tr>
+
                 <tr>
-                  <!-- Current -->
-                  <td width="50%" valign="top" style="padding:8px; ">
+                  <td width="100%" valign="top" style="padding:8px;">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="td-mobile"
-                      style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif;">
+                           style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif;">
                       <tr>
                         <td colspan="2"
-                          style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center; 
-                          padding:8px; border-top-left-radius:10px; border-top-right-radius:10px;border-radius:99px;
-                          font-size:14px">
+                            style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center; 
+                                   padding:8px; border-top-left-radius:10px; border-top-right-radius:10px;border-radius:99px;
+                                   font-size:14px">
                           Current
                         </td>
                       </tr>
 
-
                       @if($chk->hash_percent)
-                      <tr>
-                        <td colspan="2" class="name-show">Hash</td>
-                      </tr>
+                      <tr><td colspan="2" class="name-show">Hash</td></tr>
                       <tr>
                         <td colspan="2" class="input-feed-align">
                           <div class="new" style="display:block;">
@@ -1056,9 +1005,7 @@ return (string)$v;
                       @endif
 
                       @if($chk->filesize_percent)
-                      <tr>
-                        <td colspan="2" class="name-show">Filesize</td>
-                      </tr>
+                      <tr><td colspan="2" class="name-show">Filesize</td></tr>
                       <tr>
                         <td colspan="2" class="input-feed-align">
                           <div class="new" style="display:block;">
@@ -1069,9 +1016,7 @@ return (string)$v;
                       @endif
 
                       @if($chk->element_percent)
-                      <tr>
-                        <td colspan="2" class="name-show">Element</td>
-                      </tr>
+                      <tr><td colspan="2" class="name-show">Element</td></tr>
                       <tr>
                         <td colspan="2" class="input-feed-align">
                           <div class="new" style="display:block;">
@@ -1080,12 +1025,9 @@ return (string)$v;
                         </td>
                       </tr>
                       @endif
-                      
 
                       @if($chk->keyword_percent)
-                      <tr>
-                        <td colspan="2" class="name-show">Blacklist</td>
-                      </tr>
+                      <tr><td colspan="2" class="name-show">Blacklist</td></tr>
                       <tr>
                         <td colspan="2" class="input-feed-align">
                           <div class="new" style="display:block;">
@@ -1095,9 +1037,7 @@ return (string)$v;
                       </tr>
                       @endif
 
-                      <tr>
-                        <td colspan="2" class="name-show">Last Update</td>
-                      </tr>
+                      <tr><td colspan="2" class="name-show">Last Update</td></tr>
                       <tr>
                         <td colspan="2" class="input-feed-align">
                           <div class="new" style="display:block;">
@@ -1106,7 +1046,364 @@ return (string)$v;
                         </td>
                       </tr>
                     </table>
+                  </td>
+                </tr>
 
+              </table>
+            </td>
+          </tr>
+
+          <!-- Content Detection (mobile+pc common) -->
+          <tr class="mobile-only">
+            <td style="padding:0 16px 10px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; table-layout:fixed; margin:7px 0;">
+                <tr>
+                  <td align="center" valign="middle" height="40"
+                      style="font-family:Arial,Helvetica,sans-serif;background-color:#efefef;font-size:14px;font-weight:700;color:#0b2a66;">
+                    Content Detection
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:0 10px 5px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; table-layout:fixed;">
+                      <tr>
+                        <td>
+                          <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                              style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif; margin-top:7px;">
+
+                          <tr>
+                            <td colspan="4" align="center"
+                                style="padding:14px 8px; font-weight:bold; font-size:14px; background-color:#3869d4; color:#fff; border-radius:99px; line-height:7px;">
+                              Sections (
+                                  {{ is_array($section)
+                                      ? collect($section)->where('changed', true)->count()
+                                      : 'NA'
+                                  }}
+                                )
+                            </td>
+                          </tr>
+
+                          <tr style="color:#2758c3;">
+                            <th style="padding:10px; text-align:center;">Section</th>
+                            <th style="padding:10px; text-align:center;">Status</th>
+                          </tr>
+
+                          @foreach($section as $sec)
+                            @if($sec['changed'] == true)
+                              <tr>
+                                <td style="padding:10px; text-align:center;">{{ $sec['section'] ?? '' }}</td>
+                                </td>
+                                <td style="padding:5px; text-align:center; color:red;">
+                                  {{ $sec['changed'] ? 'Changed' : '' }}
+                                </td>
+                              </tr>
+                            @endif
+                          @endforeach
+                        </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Assets blocks (stacked for mobile, grid for pc) -->
+                <tr>
+                  <td>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; table-layout:fixed; margin-bottom: 20px;">
+                      @php
+                      $blocks = [];
+                      if(count($assetsAdd) > 0){ $blocks[] = 'add'; }
+                      if(count($assetsDel) > 0){ $blocks[] = 'del'; }
+                      if(count($outNew) > 0){ $blocks[] = 'out'; }
+                      if(isset($assetsOther) && count($assetsOther) > 0){ $blocks[] = 'other'; }
+                      @endphp
+
+                      @foreach($blocks as $block)
+                        <tr>
+                          <td valign="top" style="padding: 8px;">
+                            @if($block === 'add')
+                              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                                     style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif; margin-bottom:5px;">
+                                <tr>
+                                  <td colspan="2"
+                                      style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center;
+                                             padding:8px; border-radius:99px;
+                                             font-size:14px">
+                                    Assets Add ({{ count($assetsAdd) }})
+                                  </td>
+                                </tr>
+                                @foreach ($assetsAdd as $asset)
+                                  <tr>
+                                    <td style="padding:5px 8px; text-align:center; vertical-align:middle;">{{ $loop->iteration }}</td>
+                                    <td style="padding:5px 8px;">{{ $asset ?? '' }}</td>
+                                  </tr>
+                                @endforeach
+                              </table>
+                            @endif
+
+                            @if($block === 'del')
+                              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                                  style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif; margin-bottom:5px;">
+
+                              <tr>
+                                <td colspan="2"
+                                    style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center;
+                                          padding:8px; border-radius:99px;
+                                          font-size:14px">
+                                  Assets Deleted ({{ count($assetsDel) }})
+                                </td>
+                              </tr>
+
+                              @foreach ($assetsDel as $asset)
+                                <tr>
+                                  <td style="padding:5px 8px; text-align:center; vertical-align:middle;">{{ $loop->iteration }}</td>
+
+                                  <td style="padding:5px 8px;">
+                                    <div style="max-width:300px; word-wrap:break-word; overflow-wrap:break-word; line-height:1.4;">
+                                      <span title="{{ $asset ?? '' }}">
+                                        {{ Str::limit($asset ?? '', 30, '...') }}
+                                      </span>
+                                    </div>
+                                  </td>
+                                </tr>
+                              @endforeach
+                            </table>
+                            @endif
+
+                            @if($block === 'out')
+                              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                                     style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif; margin-bottom:15px;">
+                                <tr>
+                                  <td colspan="2"
+                                      style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center;
+                                             padding:8px; border-top-left-radius:10px; border-top-right-radius:10px;
+                                             font-size:14px">
+                                    Domaina ({{ count($outNew) }})
+                                  </td>
+                                </tr>
+                                @foreach ($outNew as $outNews)
+                                  <tr>
+                                    <td style="padding:5px 8px; text-align:center; vertical-align:middle;">{{ $loop->iteration }}</td>
+                                    <td style="padding:5px 8px;">{{ $outNews ?? '' }}</td>
+                                  </tr>
+                                @endforeach
+                              </table>
+                            @endif
+
+                            @if($block === 'other')
+                              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                                     style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif; margin-bottom:15px;">
+                                <tr>
+                                  <td colspan="2"
+                                      style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center;
+                                             padding:8px; border-top-left-radius:10px; border-top-right-radius:10px;
+                                             font-size:14px">
+                                    Other ({{ count($assetsOther) }})
+                                  </td>
+                                </tr>
+                                @foreach ($assetsOther as $item)
+                                  <tr>
+                                    <td style="padding:5px 8px; text-align:center; vertical-align:middle;">{{ $loop->iteration }}</td>
+                                    <td style="padding:5px 8px;">{{ $item ?? '' }}</td>
+                                  </tr>
+                                @endforeach
+                              </table>
+                            @endif
+                          </td>
+                        </tr>
+                      @endforeach
+
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Content Detection (PC duplicate block for layout parity) -->
+          <tr>
+            <td style="padding:0 16px 10px;" class="pc-only">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; table-layout:fixed; margin:7px 0;">
+                <tr>
+                  <td align="center" valign="middle" height="40"
+                      style="font-family:Arial,Helvetica,sans-serif;background-color:#efefef;font-size:14px;font-weight:700;color:#0b2a66;">
+                    Content Detection
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:0 10px 5px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; table-layout:fixed;">
+                      <tr>
+                        <td>
+                          <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                              style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif; margin-top:7px;">
+
+                          <tr>
+                            <td colspan="4" align="center"
+                                style="padding:14px 8px; font-weight:bold; font-size:14px; background-color:#3869d4; color:#fff; border-radius:99px; line-height:7px;">
+                              Sections (
+                                  {{ is_array($section)
+                                      ? collect($section)->where('changed', true)->count()
+                                      : 'NA'
+                                  }}
+                                )
+                            </td>
+                          </tr>
+
+                          <tr style="color:#2758c3;">
+                            <th style="padding:10px; text-align:center;">Section</th>
+                            <th style="padding:10px; text-align:center;">Original</th>
+                            <th style="padding:10px; text-align:center;">Current</th>
+                            <th style="padding:10px; text-align:center;">Status</th>
+                          </tr>
+
+                          @foreach($section as $sec)
+                            @if($sec['changed'] == true)
+                              <tr>
+                                <td style="padding:10px; text-align:center;">{{ $sec['section'] ?? '' }}</td>
+
+                                <td style="padding:5px; text-align:center;">
+                                  {{ Str::limit($sec['old'] ?? '', 15, '...') }}
+                                </td>
+                                <td style="padding:5px; text-align:center;">
+                                  {{ Str::limit($sec['new'] ?? '', 15, '...') }}
+                                </td>
+                                <td style="padding:5px; text-align:center; color:red;">
+                                  {{ $sec['changed'] ? 'Changed' : '' }}
+                                </td>
+                              </tr>
+                            @endif
+                          @endforeach
+                        </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- PC: 2–4 columns assets (depending on blocks) -->
+                <tr>
+                  <td>
+                    <table class="pc-only" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; table-layout:fixed;margin-bottom: 20px;">
+                      <tr>
+                        @php
+                        $blocks = [];
+                        if(count($assetsAdd) > 0){ $blocks[] = 'add'; }
+                        if(count($assetsDel) > 0){ $blocks[] = 'del'; }
+                        if(count($outNew) > 0){ $blocks[] = 'out'; }
+                        if(isset($assetsOther) && count($assetsOther) > 0){ $blocks[] = 'other'; }
+                        $colWidth = count($blocks) > 0 ? 100 / count($blocks) : 100;
+                        @endphp
+
+                        @foreach($blocks as $block)
+                          @if($block === 'add')
+                          <td width="{{ $colWidth }}%" valign="top" style="padding: 8px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                                   style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif;">
+                              <tr>
+                                <td colspan="2"
+                                    style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center; 
+                                           padding:8px; border-top-left-radius:10px; border-top-right-radius:10px;border-radius:99px;
+                                           font-size:14px">
+                                  Assets Add ( {{ count($assetsAdd) }} )
+                                </td>
+                              </tr>
+                              @foreach ($assetsAdd as $asset)
+                                <tr>
+                                  <td style="padding:5px 8px; text-align:center; vertical-align:middle;">
+                                    {{ $loop->iteration }}
+                                  </td>
+                                  <td style="padding:5px 8px;">
+                                    <div class="new">{{ $asset ?? '' }}</div>
+                                  </td>
+                                </tr>
+                              @endforeach
+                            </table>
+                          </td>
+                          @endif
+
+                          @if($block === 'del')
+                          <td width="{{ $colWidth }}%" valign="top" style="padding: 8px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                                   style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif;">
+                              <tr>
+                                <td colspan="2"
+                                    style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center; 
+                                           padding:8px; border-top-left-radius:10px; border-top-right-radius:10px;border-radius:99px;
+                                           font-size:14px">
+                                  Assets Deleted ( {{ count($assetsDel) }} )
+                                </td>
+                              </tr>
+                              @foreach ($assetsDel as $asset)
+                                <tr>
+                                  <td style="padding:5px 8px; text-align:center; vertical-align:middle;">
+                                    {{ $loop->iteration }}
+                                  </td>
+                                  <td style="padding:5px 8px;">
+                                    <div class="new">{{ $asset ?? '' }}</div>
+                                  </td>
+                                </tr>
+                              @endforeach
+                            </table>
+                          </td>
+                          @endif
+
+                          @if($block === 'out')
+                          <td width="{{ $colWidth }}%" valign="top" style="padding: 8px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                                   style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif;">
+                              <tr>
+                                <td colspan="2"
+                                    style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center; 
+                                           padding:8px; border-top-left-radius:10px; border-top-right-radius:10px;border-radius:99px;
+                                           font-size:14px">
+                                  Domaina ( {{ count($outNew) }} )
+                                </td>
+                              </tr>
+                              @foreach ($outNew as $outNews)
+                                <tr>
+                                  <td style="padding:5px 8px; text-align:center; vertical-align:middle;">
+                                    {{ $loop->iteration }}
+                                  </td>
+                                  <td style="padding:5px 8px;">
+                                    <div class="new">{{ $outNews ?? '' }}</div>
+                                  </td>
+                                </tr>
+                              @endforeach
+                            </table>
+                          </td>
+                          @endif
+
+                          @if($block === 'other')
+                          <td width="{{ $colWidth }}%" valign="top" style="padding: 8px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                                   style="border-radius:18px; background:#f1f1f1; font-family:Arial,Helvetica,sans-serif;">
+                              <tr>
+                                <td colspan="2"
+                                    style="background:#3869d4; color:#ffffff; font-weight:bold; text-align:center; 
+                                           padding:8px; border-top-left-radius:10px; border-top-right-radius:10px;border-radius:99px;
+                                           font-size:14px">
+                                  Other ( {{ count($assetsOther) }} )
+                                </td>
+                              </tr>
+                              @foreach ($assetsOther as $item)
+                                <tr>
+                                  <td style="padding:5px 8px; text-align:center; vertical-align:middle;">
+                                    {{ $loop->iteration }}
+                                  </td>
+                                  <td style="padding:5px 8px;">
+                                    <div class="new">{{ $item ?? '' }}</div>
+                                  </td>
+                                </tr>
+                              @endforeach
+                            </table>
+                          </td>
+                          @endif
+                        @endforeach
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
@@ -1125,5 +1422,6 @@ return (string)$v;
     </tr>
   </table>
 </body>
+
 
 </html>

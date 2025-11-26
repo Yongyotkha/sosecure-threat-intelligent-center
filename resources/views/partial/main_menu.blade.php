@@ -3,19 +3,45 @@ use App\Menu;
 use Modules\Users\Entities\role_menu_permission;
 use Modules\Users\Entities\role_menu_sub_permission;
 use Modules\Users\Entities\model_has_roles;
-$menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
-// dd(123);
-if(@Auth::check()) {
-    $user_id = @Auth::user()->id;
-}
-$model_has_roles = model_has_roles::where('model_id',@$user_id)->first();
-$role_menu_permission_arr = '';
-$role_menu_sub_permission_arr = '';
-if($model_has_roles) {
+
+$menu = Menu::whereNull('deleted_at')->where('active',1)->orderBy('order','asc')->get();
+
+$current_site_id = Auth::user()->site_id ?? null;
+$user_id = Auth::id();
+$model_has_roles = model_has_roles::where('model_id',$user_id)->first();
+
+$role_menu_permission_arr = [];
+$role_menu_sub_permission_arr = [];
+
+if ($model_has_roles) {
     $role_id = $model_has_roles->role_id;
-    $role_menu_permission_arr = role_menu_permission::select('menu_id')->where('role_id',$model_has_roles->role_id)->where('deleted_at',null)->get()->pluck('menu_id')->toArray();
-    $role_menu_sub_permission_arr = role_menu_sub_permission::select('menu_sub_id')->where('role_id',$model_has_roles->role_id)->where('deleted_at',null)->get()->pluck('menu_sub_id')->toArray();
-    // dd($role_menu_permission_arr);
+
+    // ✅ ตรวจว่ามี site-specific permission ไหม
+    $site_permission = DB::table('site_menu_permission')
+        ->where('site_id', $current_site_id)
+        ->pluck('menu_id')
+        ->toArray();
+
+      //dd(Auth::user());
+
+    if (!empty($site_permission)) {
+        // ใช้สิทธิ์เฉพาะ site
+        $role_menu_permission_arr = $site_permission;
+    } else {
+        // fallback: ใช้สิทธิ์ global
+        $role_menu_permission_arr = role_menu_permission::select('menu_id')
+            ->where('role_id', $role_id)
+            ->whereNull('deleted_at')
+            ->pluck('menu_id')
+            ->toArray();
+    }
+
+    // sub menu เหมือนกัน (ถ้ามี table site_menu_sub_permission)
+    $role_menu_sub_permission_arr = role_menu_sub_permission::select('menu_sub_id')
+        ->where('role_id', $role_id)
+        ->whereNull('deleted_at')
+        ->pluck('menu_sub_id')
+        ->toArray();
 }
 
 // dd($menu);
@@ -120,8 +146,9 @@ if($model_has_roles) {
                         @endforeach
                     </ul> --}}
 
-                    <ul class="nav">
 
+                    <ul class="nav">
+                        
                         @php
                             // $menu = [];
                             $menu_html = '';
@@ -135,8 +162,7 @@ if($model_has_roles) {
                                 foreach($menu as $menu_val) {
 
                            
-                                    if(!empty($role_menu_permission_arr) || @$role_id == 1 && @$menu_val['id'] != 16) {
-                                        if (in_array($menu_val['id'], $role_menu_permission_arr) || @$role_id == 1) {
+                                    if (@$role_id == 1 || in_array($menu_val['id'], $role_menu_permission_arr)) {
 
                                                 $active = '';
                                                 $url = '#';
@@ -359,7 +385,7 @@ if($model_has_roles) {
                                                 $menu_html .=    '<li class="'. $active .'">
                                                                     '.$is_have_sub.'
                                                                 </li>';
-                                        }
+                                        
                                     }
                                 }
 
