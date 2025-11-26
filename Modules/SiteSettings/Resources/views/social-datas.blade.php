@@ -559,6 +559,7 @@ function table_social_data(search_val){
                 className: 'nowrap',
                 render: function (data, type, full, meta) {
 
+                    
                     if(full.status_monitoring=='in_progress'){
                         return '<span class="badge" style="background-color: #FFC107;">Progress</span>';
                     }else if(full.status_monitoring=='reported'){
@@ -578,7 +579,7 @@ function table_social_data(search_val){
                 width: '10px',
                 className: 'nowrap',
                 render: function (data, type, full, meta) {
-        
+                    
                     if(full.serverity=='critical'){
                         return '<span class="badge" style="background-color: #b93624;">Critical</span>';
                     }else if(full.serverity=='high'){

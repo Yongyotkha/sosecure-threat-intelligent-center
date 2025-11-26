@@ -16,6 +16,7 @@
                     <select name="type" id="type" class="select2-option form-control" required>
                         <option value="social">Public</option>
                         <option value="darkweb_public">Dark Web</option>
+                        <option value="credential">Credential</option>
                     </select>
                 </div>
             </div>
@@ -28,6 +29,7 @@
                         <option value="Facebook" {{@$DataLeakFeed->keyword == 'Facebook'?'selected':''}}>Fanpage</option>
                         <option value="Twitter" {{@$DataLeakFeed->keyword == 'Twitter'?'selected':''}}>Twitter</option>
                         <option value="Website" {{@$DataLeakFeed->keyword == 'Website'?'selected':''}}>Website</option>
+                        <option value="Credential" {{@$DataLeakFeed->keyword == 'Credential'?'selected':''}}>Credential</option>
                         <option value="Other" {{@$DataLeakFeed->keyword == 'Mobile'||@$DataLeakFeed->keyword == 'Facebook'||
                         @$DataLeakFeed->keyword == 'Twitter'||@$DataLeakFeed->keyword == 'Website'
                         ?'':'selected'}}>Other</option>

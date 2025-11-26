@@ -28,6 +28,8 @@ use App\transaction_client_site_category;
 use App\transaction_client_user_site;
 use App\transaction_client_users;
 use App\transcation_jobs_clients;
+use App\ApiToken;
+use Cartalyst\Stripe\Api\Api;
 
 class SiteSettingsController extends Controller
 {
@@ -432,6 +434,21 @@ class SiteSettingsController extends Controller
             $SiteSettings->system_key = $this->encrypt_decrypt('encrypt', $id . '&' . $request->ip_key . '&' . $request->mac_address_key, $request->ip_key, $request->mac_address_key);
         }
         $SiteSettings->save();
+
+        try{
+            $chk_token = ApiToken::where('site_id', $SiteSettings->id)
+                     ->latest('id')
+                     ->first();
+            if($chk_token) {
+                if($chk_token->expires_at != $SiteSettings->end_active) {
+                    $chk_token->expires_at = $SiteSettings->end_active;
+                    $chk_token->updated_at = Carbon::now();
+                    $chk_token->save();
+                } 
+            }
+        }catch (\Exception $e) {
+            
+        }
 
         $transaction_client_site = transaction_client_site::where('site_id', $SiteSettings->id)->where('transaction_id', $SiteSettings->id)->first();
         if($transaction_client_site){

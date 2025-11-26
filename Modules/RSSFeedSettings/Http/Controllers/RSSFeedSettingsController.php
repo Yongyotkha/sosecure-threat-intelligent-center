@@ -1783,7 +1783,8 @@ class RSSFeedSettingsController extends Controller
     public function rss_data_store_news_create(Request $request)
     {
 
-        // Log::info($request->is_published);
+        // dd($request->all());
+        // Log::info($request->all());
         // return response()->json([
         //     'message' => 'Your isPublished is : ' . $request->is_published,    
         // ]
@@ -1834,8 +1835,8 @@ class RSSFeedSettingsController extends Controller
             $site_news = array_unique($site_news);
             $email_site_alert = array_unique($email_site_a);
 
+            // Log::info($email_site_alert);
             // $email_site_alert_implode = implode(",",$email_site_alert);
-            // dd($email_site_alert);
         }
 
   /*      return ajaxResponse(
@@ -2228,6 +2229,7 @@ class RSSFeedSettingsController extends Controller
             //     }
             // }
           //  $email_site_alert = ['yongyot.kamma@gmail.com', 'yongyot.kha@mtsc.co.th'];
+          
             if ($request->formsubmit !== 'formDraft') {
                 if ($request->sent_mail == 1) {
                     if (!empty($email_site_alert)) {
@@ -2899,9 +2901,9 @@ class RSSFeedSettingsController extends Controller
                 }
             }
             // $email_site_alert_implode = implode(",",$email_site_alert);
-            // dd($email_site_alert);
             // $email_site_a = ['oatnunkung@gmail.com','oatnunkung88@gmail.com'];
             $email_site_alert = array_unique($email_site_a);
+            
         }
 
         if ($request->formsubmit == 'formSavingAndRun') {
@@ -3090,6 +3092,7 @@ class RSSFeedSettingsController extends Controller
 
 
                     //$email_site_alert = ['yongyot.kamma@gmail.com', 'yongyot.kha@mtsc.co.th'];
+                    
                     if ($request->formsubmit !== 'formDraft') {
                         if ($request->sent_mail == 1) {
                             if ($email_site_alert) {

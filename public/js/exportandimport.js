@@ -357,7 +357,7 @@ const importCSV = () => {
         toast: true,
         position: 'top-end',
         icon: 'info',
-        title: 'Imporing...',
+        title: 'Importing...',
         showConfirmButton: false,
         showCloseButton: false,
         didOpen: () => {
@@ -400,6 +400,7 @@ const importCSV = () => {
                 const msg = res.message || "Import failed";
                 throw new Error(msg);
             }
+            // alert(res.message);
 
             const html = renderResultTable(res.success_list, res.error_list, res.total_rows);
 
@@ -413,9 +414,7 @@ const importCSV = () => {
                 allowOutsideClick: false,
                 allowEscapeKey: false
             }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.reload();
-                }
+                
             });
 
         })
@@ -427,21 +426,21 @@ const importCSV = () => {
         });
 };
 
-const renderResultTable = (successList = [], errorList = [], total_rows = []) => {
+const renderResultTable = (successList , errorList = [], total_rows = []) => {
 
 
-
+// alert(message);
     let html = `
       <div style="max-height:300px; overflow-y:auto; text-align:center;">
         <p>
-          <span style="color:green;"><i class="fas fa-check-circle"></i> Success (${successList.length})</span> &nbsp; 
+          <span style="color:green;"><i class="fas fa-check-circle"></i> Success (${successList})</span> &nbsp; 
           <span style="color:red;"><i class="fas fa-times-circle"></i> Failed (${errorList.length})</span> &nbsp;
           <span style="color:blue;"><i class="fa fa-bars"></i> Total from file (${total_rows})</span>
         </p>
         
     `;
 
-    if (successList.length != 0 && errorList.length === 0) {
+    if (successList != 0 && errorList.length === 0) {
         html += `
         <br>
         <tr>
@@ -455,6 +454,9 @@ const renderResultTable = (successList = [], errorList = [], total_rows = []) =>
         `;
         return html;
     }
+    
+
+    
 
 
 

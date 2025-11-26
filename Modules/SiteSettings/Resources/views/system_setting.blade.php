@@ -2,6 +2,7 @@
 
 @section('content')
 
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <section id="content" class="bg">
     <section class="hbox stretch">
 
@@ -38,6 +39,10 @@
                                     </div>
                                 </header>
                                 <input type="hidden" name="page_setting" value="system_settings">
+                                <input type="hidden" name="tok_name" id="tok-name" value="{{ $siteSettings->name  ?? '' }}">
+                                <input type="hidden" name="tok_days" id="tok-days" value="{{ $siteSettings -> end_active  ?? NULL }}">
+                                <input type="hidden" name="tok_site" id="tok-site" value="{{ $siteSettings -> id  ?? NULL }}">
+                                <!-- {{ $siteSettings}} -->
                                 <div class="panel-body">
                                     <div class="form-group row">
                                         <label class="col-lg-3 control-label">System Online </label>
@@ -313,6 +318,36 @@
                                             </div>
                                         </div>
                                     </div>
+
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-3 control-label">Feed Insight Token<span data-rel="tooltip"
+                                                title="Copy Token Key for feed insight"><i
+                                                    class="far fa-question-circle"></i></span> <span
+                                                class="text-danger">*</span> </label>
+                                        <div class="col-lg-6">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="input-group">
+                                                        <input type="input" class="form-control"
+                                                            id="token"
+                                                            value="{{ $token ?? ''}}" readonly>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-info" onclick="copy_token('token')">Copy</button>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3" style="padding: 0; align-self: center" >
+                                            <span>
+                                                <button id="btn-gen" type="button" class="btn btn-info" style="height: 30px;" onclick="generate_token()">Generate</button>
+                                            </span>
+                                            
+                                        </div>
+                                    </div>
+
+
                                     {{-- <div class="form-group row">
                                      <div class="col-lg-3 control-label">API Key</div>
                                      <div class="col-lg-6">
@@ -499,6 +534,8 @@
                                         <div class="line"></div> --}}
                                     </div>
                                 </div>
+
+                                <!-- {{ $siteSettings }} -->
 
                         </div>
                         <div class="panel-footer text-right">
@@ -945,6 +982,55 @@
             return v.toString(16);
         });
     }
+
+    async function generate_token() {
+    const btn   = document.getElementById('btn-gen');
+    const name  = (document.getElementById('tok-name')?.value || 'Feed Token').trim();
+    const days  = document.getElementById('tok-days')?.value;
+    const csrf  = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const site  = document.getElementById('tok-site').value;
+
+
+    btn && (btn.disabled = true);
+
+    try {
+      const res = await fetch('/admin/api-tokens/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': csrf
+        },
+        body: JSON.stringify({ name, days, site })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || res.statusText);
+      }
+
+      const data = await res.json(); 
+      document.getElementById('token').value = data.token;
+    } catch (e) {
+
+    } finally {
+      btn && (btn.disabled = false);
+    }
+  }
+
+  function copy_token() {
+    const text = document.getElementById('token').value;
+    navigator.clipboard.writeText(text).then(() => {
+        const label = document.querySelector('label[for="token"]')?.textContent.trim() || 'Token';
+
+        toastr.success(`Copied ${label}`, '@langapp("response_status")');
+    }).catch(() => {
+        toastr.error("Copy failed", '@langapp("response_status")');
+    });
+}
+
+
+
 </script>
 @if($siteSettings -> no_expiration_active === 1)
 <script>

@@ -10,6 +10,11 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+// use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
+
+
 Route::group(
     ['middleware' => ['web', 'permission:web_defacement'], 'prefix' => 'webdefacement'],
     function () {
@@ -27,7 +32,11 @@ Route::group(
 
         Route::post('webdefacement.get_code_site', 'WebDefacementController@get_code_site')->name('webdefacement.get_code_site')->middleware('can:menu_items');
         Route::post('webdefacement.alert_to_customer', 'WebDefacementController@alert_to_customer')->name('webdefacement.alert_to_customer')->middleware('can:menu_items');
-    }
-    
-);
+        Route::post('webdefacement.show_diff_hash', 'WebDefacementController@show_diff_hash')->name('webdefacement.show_diff_hash')->middleware('can:menu_items');
 
+        Route::post('webdefacement.check_status', 'WebDefacementController@checkStatus')
+            ->name('webdefacement.check_status')
+            ->middleware('can:menu_items');
+    }
+
+);

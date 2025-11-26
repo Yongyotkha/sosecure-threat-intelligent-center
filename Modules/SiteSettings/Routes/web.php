@@ -10,6 +10,7 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+use App\Http\Controllers\MISPFeedController;
 
 // Route::prefix('sitesettings')->group(function() {
     // Route::get('/', 'SiteSettingsController@index');
@@ -321,3 +322,7 @@ Route::get('/url_feed/modal_delete_url_feed', 'UrlFeedController@modal_delete_ur
 Route::get('/url_feed/delete_url_feed', 'UrlFeedController@delete_url_feed')->name('urlfeed.delete_url_feed')->middleware('can:menu_items');
 Route::post('/url_feed/delete_url_feed', 'UrlFeedController@delete_url_feed')->name('urlfeed.delete_url_feed')->middleware('can:menu_items');
 Route::get('/url_feed/modal_view_url_feed', 'UrlFeedController@modal_view_url_feed')->name('urlfeed.modal_view_url_feed')->middleware('can:menu_items');
+
+//feed
+Route::post('/admin/api-tokens/generate', [MISPFeedController::class, 'generateToken'])
+    ->middleware('can:menu_items');

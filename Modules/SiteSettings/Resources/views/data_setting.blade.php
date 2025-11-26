@@ -292,7 +292,7 @@
 
 
                                 <div class="form-group row">
-                                    <label class="col-lg-3 control-label">Defacement E-mail Alert Admins</label>
+                                    <label class="col-lg-3 control-label">E-mail Alert Admins</label>
 
                                     <div class="col-lg-9">
                                         <select name="email_alert_defacement[]" id="email_alert_defacement" class="select2-option form-control" multiple="multiple">
@@ -302,9 +302,10 @@
                                                 @foreach($siteSettings->get_site_config_email_alert_defacement as $site_config_email_alert)
                                                     <option value="{{ $site_config_email_alert->email  }}" selected >{{ $site_config_email_alert->email }}</option>
                                                 @endforeach
+
                                         </select>
 
-                                        <div class="text-muted">Alert (Defacement to admins)</div>
+                                        <div class="text-muted">Alert (To admins)</div>
                                     </div>
                                 </div>
 

@@ -426,6 +426,9 @@
                                             <button class="btn btn-grey check_type" value="darkweb_public">
                                                 <span> Darkweb </span>
                                             </button>
+                                            <button class="btn btn-grey check_type" value="credential">
+                                                <span> Credential </span>
+                                            </button>
                                         </div>
                                     </div>
                                     <div class="col-lg-4 hide-social" style="display: none">
@@ -581,7 +584,7 @@
                                             <th>Keyword</th>
                                             <th>Content</th>
                                             <th>Severity</th>
-                                            <th>Status Monitoring</th>
+                                            <th>Monitoring</th>
                                             <th>Data Feed</th>
                                             {{-- <th>View</th> --}}
                                             @if (!empty(get_role_custom()))
@@ -952,6 +955,8 @@
                 $('.btn-selector').removeClass('active');
 
                 table_social_data();
+                count_icon();
+                get_count();
                 {{-- get_count(); --}}
             }
 
@@ -1026,7 +1031,6 @@
                             width: '60px',
                             className: 'nowrap',
                             render: function(data, type, full, meta) {
-
                                 if (full.feel_type) {
                                     return get_word_leak_compromise(full.feel_type, 'data_leak');
                                 }
@@ -1069,7 +1073,7 @@
                         },
                         {
                             targets: 5,
-                            width: '10px',
+                            width: '100%',
                             className: 'truncatecontent',
                             render: function(data, type, full, meta) {
 
@@ -1117,11 +1121,11 @@
                             className: 'nowrap',
                             render: function(data, type, full, meta) {
 
-                                if (full.status_monitoring == 'in_progress') {
+                                if (full.ref_status_monitoring == 'in_progress') {
                                     return '<span class="badge" style="background-color: #FFC107;">Progress</span>';
-                                } else if (full.status_monitoring == 'reported') {
+                                } else if (full.ref_status_monitoring == 'reported') {
                                     return '<span class="badge" style="background-color: #28A745;">Reported</span>';
-                                } else if (full.status_monitoring == 'close') {
+                                } else if (full.ref_status_monitoring == 'close') {
                                     return '<span class="badge" style="background-color: #DC3545;">Close</span>';
                                 } else {
                                     return '-';
@@ -1134,15 +1138,15 @@
                             width: '8px',
                             className: 'nowrap',
                             render: function(data, type, full, meta) {
-                                if (full.serverity == 'critical') {
+                                if (full.ref_serverity == 'critical') {
                                     return '<span class="badge" style="background-color: #b93624;">Critical</span>';
-                                } else if (full.serverity == 'high') {
+                                } else if (full.ref_serverity == 'high') {
                                     return '<span class="badge" style="background-color: #fcc838;">High</span>';
-                                } else if (full.serverity == 'medium') {
+                                } else if (full.ref_serverity == 'medium') {
                                     return '<span class="badge" style="background-color: #f2ff15;color:#333;">Medium</span>';
-                                } else if (full.serverity == 'low') {
+                                } else if (full.ref_serverity == 'low') {
                                     return '<span class="badge" style="background-color: #409967;">Low</span>';
-                                } else if (full.serverity == 'information') {
+                                } else if (full.ref_serverity == 'information') {
                                     return '<span class="badge" style="background-color: #00dcff;">Information</span>';
                                 } else {
                                     return '-';
@@ -1173,14 +1177,14 @@
                                     render: function(data, type, full, meta) {
 
                                         var checked_val = null;
-                                        if (full.status_data == 1) {
+                                        if (full.ref_status == 1) {
                                             checked_val = 'checked';
                                         } else {
                                             checked_val = '';
                                         }
 
                                         return '<label class="switch"><input type="checkbox" id="social_active_' +
-                                            full.id_data + '" onchange="social_active( ' + full.id_data +
+                                            full.ref_id + '" onchange="social_active( ' + full.ref_id +
                                             ')" ' + checked_val +
                                             ' name="active" value="1"><span class="slider round"></span></label>';
 
@@ -1489,6 +1493,9 @@
                     url: '{!! site_url('social/count_icon') !!}',
                     data: ({
                         site_id: site_code,
+                        startDate: startDate,
+                        endDate: endDate,
+                        isDateSearch: isDateSearch,
                     }),
                     beforeSend: function() {
                         {{-- loading('load'); --}}

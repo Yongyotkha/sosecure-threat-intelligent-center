@@ -74,4 +74,15 @@ class WebdefacmentSetting extends Model
         }
         return $val;
     }
+
+    public function webdefacement_setting_data($webdefacment_setting_id)
+    {
+        $val = '';
+        // return $this->hasOne(SiteSettings::class, 'id', 'site_id');
+        $w = WebdefacmentSetting::where('id', $webdefacment_setting_id)->first();
+        if ($w) {
+            $val = $w;
+        }
+        return $val;
+    }
 }

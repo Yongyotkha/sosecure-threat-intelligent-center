@@ -21,6 +21,7 @@ use App\Mail\DefacementAlertMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use NumberToWords\Legacy\Numbers\Words\Locale\Id;
 
 class WebDefacementController extends Controller
 {
@@ -603,25 +604,30 @@ class WebDefacementController extends Controller
             $status = strtolower($key->status_val);
 
             $data_chk = [];
-            try {
-                $data_chk = WebdefacmentDataCheck::getData($key->id);
-            } catch (\Throwable $th) {
-                $data_chk = [];
-            }
+
+            $data_chk = WebdefacmentDataCheck::getData($key->id);
+
 
             // 🧩 Generate card HTML
-            $html .= view('webdefacement::components.webdefacement_card', compact('key'))->render();
+            try {
+                $html .= view('webdefacement::components.webdefacement_card', compact('key'))->render();
+            } catch (\Throwable $th) {
+            }
+
 
             // ⛳ Data for chart
+
             $id[] = [
                 'id' => $key->id,
-                'detection_score_all' => $data_chk->percent_all ?: 0,
-                'hash_percent' => $data_chk->hash_percent ?: 0,
-                'filesize_percent' => $data_chk->filesize_percent ?: 0,
-                'element_percent' => $data_chk->element_percent ?: 0,
-                'image_percent' => $data_chk->image_percent ?? 0,
-                'blacklist_percent' => $data_chk->keyword_percent ?? 0
+                'detection_score_all' => $data_chk->percent_all ?? 0,
+                'hash_percent'        => $data_chk->hash_percent ?? 0,
+                'filesize_percent'    => $data_chk->filesize_percent ?? 0,
+                'element_percent'     => $data_chk->element_percent ?? 0,
+                'image_percent'       => $data_chk->image_percent ?? 0,
+                'blacklist_percent'   => $data_chk->keyword_percent ?? 0,
+                'score'               => ($data_chk->score ?? 0) * 100
             ];
+
 
             // 🔐 Data สำหรับ hash เทียบว่าเปลี่ยนไหม
             $hash_data[] = [
@@ -663,6 +669,15 @@ class WebDefacementController extends Controller
         $data->is_alert_sent = 0;
 
         $data->save();
+
+        $data_update = WebdefacmentDataCheck::where('webdefacment_setting_id', $request->id)->first();
+        // $data_update->detection_score_all = 0;
+        $data_update->hash_percent = 0;
+        $data_update->filesize_percent = 0;
+        $data_update->element_percent = 0;
+        $data_update->image_percent = 0;
+        $data_update->keyword_percent = 0;
+        $data_update->save();
 
         $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
 
@@ -746,6 +761,8 @@ class WebDefacementController extends Controller
         $html_b = $webdefacement->blacklist_keyword_content;
         $html_l = $webdefacement_original->last_update;
 
+        $html_h2 = $webdefacement->baseline_merkle;
+
 
 
         return ajaxResponse(
@@ -755,6 +772,7 @@ class WebDefacementController extends Controller
                 'html_e'  => $html_e,
                 'html_b'  => $html_b,
                 'html_l'  => $html_l,
+                'html_h2'  => $html_h2,
                 'message'  => langapp('changes_saved_successful'),
                 // 'redirect' => route('webdefacement.detail',['code' => $webdefacement->code]),
             ],
@@ -770,12 +788,14 @@ class WebDefacementController extends Controller
             check_permission403();
         }
         $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
-        $webdefacement_check = WebdefacmentDataCheck::where('webdefacment_setting_id', $request->id)->first();
+        $webdefacement_check = WebdefacmentDataCheck::where('webdefacment_setting_id', $request->id)->latest()->first();
         $html_h = $webdefacement_check->hash_new;
         $html_f = formatSizeUnits($webdefacement_check->filesize_new) . ' (Difference ' . $webdefacement_check->filesize_percent . '%)';
         $html_e = $webdefacement_check->element_new;
         $html_b = $webdefacement->blacklist_keyword_current;
         $html_l = $webdefacement_check->last_update;
+
+        $html_h2 = $webdefacement_check->merkle_new;
 
 
 
@@ -786,6 +806,7 @@ class WebDefacementController extends Controller
                 'html_e'  => $html_e,
                 'html_b'  => $html_b,
                 'html_l'  => $html_l,
+                'html_h2'  => $html_h2,
                 'message'  => langapp('changes_saved_successful'),
                 // 'redirect' => route('webdefacement.detail',['code' => $webdefacement->code]),
             ],
@@ -917,5 +938,150 @@ class WebDefacementController extends Controller
                 'message' => 'Failed to send alert.'
             ], 500);
         }
+    }
+
+    public static function show_diff_hash(Request $request)
+    {
+        $w_id = $request->id;
+
+        $chk_data = [];
+
+        try {
+            $chk_data = WebdefacmentDataCheck::where('webdefacment_setting_id', $w_id)
+                ->latest()
+                ->first();;
+            $data = response()->json([
+                'success' => true,
+                'merkle_old' => $chk_data->merkle_old,
+                'merkle_new' => $chk_data->merkle_new,
+                'simhash_bits' => $chk_data->simhash_bits,
+                'section_diffs' => $chk_data->section_diffs,
+                'assets_add' => $chk_data->assets_add ? $chk_data->assets_add : [],
+                'assets_del' => $chk_data->assets_del ? $chk_data->assets_del : [],
+                'outbound_new' => $chk_data->outbound_new_not_whitelisted ? $chk_data->outbound_new_not_whitelisted : [],
+            ]);
+            // dd($data);
+            return $data;
+        } catch (\Throwable $th) {
+            Log::error('show_diff_hash failed', ['error' => $th->getMessage()]);
+        }
+
+
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to send alert.'
+        ], 500);
+    }
+
+    public function checkStatus(Request $request)
+    {
+        $url = trim($request->input('url'));
+        $id = $request->input('id');
+
+        if (empty($url)) {
+            return response()->json([
+                'status_code' => 0,
+                'status_text' => 'URL is empty',
+            ], 400);
+        }
+
+        // ถ้าไม่มี http:// หรือ https:// ให้เติมให้อัตโนมัติ
+        if (!preg_match('/^https?:\/\//i', $url)) {
+            $url = 'http://' . $url;
+        }
+
+        // ใช้ cURL ตรวจสอบสถานะเว็บ
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        $web_chk = null;
+
+        try {
+            if ($http_code) {
+                $web_chk = WebdefacmentSetting::where('url', $url)
+                    ->where('id', $id)
+                    ->first();
+
+                // ถ้าไม่เจอ record เลย
+                if (!$web_chk) {
+                    Log::warning('checkStatus: ไม่พบข้อมูลเว็บไซต์', ['url' => $url, 'id' => $id]);
+                    return response()->json([
+                        'status_code' => $http_code,
+                        'status_text' => 'ไม่พบข้อมูลเว็บไซต์ในระบบ',
+                        'url' => $url,
+                        'id' => $id,
+                    ], 404);
+                }
+
+                // ถ้าเจอ record แล้ว ตรวจสถานะ
+                if ($http_code == 200) {
+                    $web_chk->webdeflacement_progress = 1;
+                    $web_chk->web_status = 'up';
+                    $web_chk->is_alert_sent = 0;
+                    $web_chk->updated_at = now();
+                    $web_chk->save();
+                } else {
+                    $web_chk->webdeflacement_progress = 3;
+                    $web_chk->web_status = 'down';
+                    $web_chk->save();
+                }
+
+                Log::info('checkStatus updated successfully', [
+                    'url' => $url,
+                    'id' => $id,
+                    'status' => $web_chk->web_status,
+                    'code' => $http_code,
+                ]);
+
+                return response()->json([
+                    'url' => $url,
+                    'id' => $id,
+                    'status_code' => $http_code,
+                    'web_status' => $web_chk->web_status,
+                ]);
+            }
+        } catch (\Throwable $th) {
+            Log::error('checkStatus failed', ['error' => $th->getMessage(), 'url' => $url, 'id' => $id]);
+            return response()->json([
+                'status_code' => 0,
+                'error' => $th->getMessage(),
+            ], 500);
+        }
+
+
+        // แปลงรหัสสถานะเป็นข้อความอ่านง่าย
+        $status_text = $this->mapStatusCode($http_code);
+
+        return response()->json([
+            'url'          => $url,
+            'status_code'  => $http_code,
+            'status_text'  => $status_text,
+        ]);
+    }
+
+    private function mapStatusCode($code)
+    {
+        $status = [
+            200 => 'OK - เว็บไซต์ทำงานปกติ',
+            301 => 'Moved Permanently',
+            302 => 'Redirected',
+            400 => 'Bad Request',
+            401 => 'Unauthorized',
+            403 => 'Forbidden',
+            404 => 'Not Found',
+            408 => 'Request Timeout',
+            500 => 'Internal Server Error',
+            502 => 'Bad Gateway',
+            503 => 'Service Unavailable',
+            0   => 'Unknown / Timeout',
+        ];
+
+        return isset($status[$code]) ? $status[$code] : 'Unrecognized Status';
     }
 }

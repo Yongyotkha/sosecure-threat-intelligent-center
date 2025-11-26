@@ -30,16 +30,18 @@ class CompromisedMail extends Mailable
      */
     public function build()
     {
-        if($this->title == 'data_leak'){
+        if ($this->title == 'data_leak') {
             return $this->subject('Notification New Data Leak | Threat inSights')->markdown('emails.template_email_compro');
             // return $this->subject('Notification New Data Leak | Threat Intelligent')->markdown('emails.template_email_compro');
-        }else if($this->title == 'brand_abuse'){
+        } else if ($this->title == 'credential_leak') {
+            return $this->subject('Notification New Credential Leak | Threat inSights')
+                ->markdown('emails.template_email_compro_dataleak');
+        } else if ($this->title == 'brand_abuse') {
             return $this->subject('Notification New Brand Abuse | Threat inSights')->markdown('emails.template_email_compro_brandabuse');
             // return $this->subject('Notification New Brand Abuse | Threat Intelligent')->markdown('emails.template_email_compro_brandabuse');
-        }else{
+        } else {
             return $this->subject('Notification New Compromised | Threat inSights')->markdown('emails.template_email_compro');
             // return $this->subject('Notification New Compromised | Threat Intelligent')->markdown('emails.template_email_compro');
         }
-        
     }
 }

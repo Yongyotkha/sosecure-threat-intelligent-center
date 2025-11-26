@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Carbon\Carbon;
+use App\ApiToken;
 
 class SystemSettingsController extends Controller
 {
@@ -38,11 +39,21 @@ class SystemSettingsController extends Controller
      */
     public function systemsetting($id)
     {
+
         $get_data = $this->siteSettings->get_data($id);
+        $token = '';
+
+        $token = ApiToken::getToken($get_data->id);
+        if ($token != '' && $token != null) {
+            $data['token'] = $token;
+        } else {
+            $data['token'] = '';
+        }
         $data['siteSettings'] = $get_data;
         $data['page'] = 'SystemSettings';
         $data['last_version'] = DeployCode::where('status', 1)->orderBy('version', 'desc')->where('deleted_at', null)->first()->version;
-        $data['code_version'] = @DeployHistory::where('site_id', $get_data -> id)->where('status', 1)->orderBy('version', 'desc')->where('deleted_at', null)->first()->version;
+        $data['code_version'] = @DeployHistory::where('site_id', $get_data->id)->where('status', 1)->orderBy('version', 'desc')->where('deleted_at', null)->first()->version;
+        // dd($data);
         return view('sitesettings::system_setting')->with($data);
     }
 
@@ -109,33 +120,33 @@ class SystemSettingsController extends Controller
     public function check_cookie_site(Request $request)
     {
         $firstCurrentVal = $request->firstCurrentVal;
-        $currentVal = $request->currentVal;//secondVal
+        $currentVal = $request->currentVal; //secondVal
         $cookieVal = $request->cookieVal;
-        
-        if(!empty($cookieVal)){
-            if(!empty($currentVal)){
-                if(preg_match("/[a-z]/i", $cookieVal)){
+
+        if (!empty($cookieVal)) {
+            if (!empty($currentVal)) {
+                if (preg_match("/[a-z]/i", $cookieVal)) {
                     $SiteSettingsfor = SiteSettings::where('code', $cookieVal)->first();
-                }else{
+                } else {
                     $SiteSettingsfor = SiteSettings::where('id', $cookieVal)->first();
                 }
-                if(preg_match("/[a-z]/i", $currentVal)){
+                if (preg_match("/[a-z]/i", $currentVal)) {
                     //use code
                     $data["siteValue"] = $SiteSettingsfor->code;
-                }else{
+                } else {
                     //use id
                     $data["siteValue"] = $SiteSettingsfor->id;
                 }
-            }else{
+            } else {
                 $data["siteValue"] = $firstCurrentVal;
             }
-        }else{
+        } else {
             $data["siteValue"] = $firstCurrentVal;
         }
-        
+
         if ($request->ajax()) {
             return response()->json($data);
-        }else{
+        } else {
             return false;
         }
     }

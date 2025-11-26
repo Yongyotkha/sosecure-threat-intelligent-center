@@ -13,6 +13,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\WebDefacement\Entities\WebdefacmentImageMark;
+use Illuminate\Support\Facades\Log;
 
 class WebDefacementController extends Controller
 {
@@ -222,6 +223,7 @@ class WebDefacementController extends Controller
         $url_web = $request->url_web;
         $port_web = $request->port_web;
         $url_id = $request->url_id;
+        // dd($url_id);
         $delay_screenshot_val = $request->delay_screenshot_val;
         $webdefacment_setting_id = $request->webdefacment_setting_id;
 
@@ -252,7 +254,9 @@ class WebDefacementController extends Controller
         $webdefacment_setting_id = $request->webdefacment_setting_id;
         $image = $request->image;
         $part_image = $request->part_image;
+        $url_id = $request->url_id;
 
+        log::info($url_id);
 
         // dd($port_web);
 
@@ -265,6 +269,7 @@ class WebDefacementController extends Controller
                     $webdefacment_data_original->webdefacment_setting_id = $webdefacment_setting_id;
                     $webdefacment_data_original->image = $image;
                     $webdefacment_data_original->part_image = $part_image;
+                    $webdefacment_data_original->url_id = $url_id;
                     $webdefacment_data_original->save();
         
                 } else {
@@ -272,6 +277,7 @@ class WebDefacementController extends Controller
                     $webdefacment_data_original->webdefacment_setting_id = $webdefacment_setting_id;
                     $webdefacment_data_original->image = $image;
                     $webdefacment_data_original->part_image = $part_image;
+                    $webdefacment_data_original->url_id = $url_id;
                     $webdefacment_data_original->save();
                 }
                 if($webdefacment_data_original) {
@@ -300,6 +306,9 @@ class WebDefacementController extends Controller
         }else{
             $site_id = $request->site;
         }
+        // dd($request->all());
+
+       Log::info($request->all());
         
         $name_web = $request->name_web;
         $url_web = $request->url_web;
@@ -359,6 +368,16 @@ class WebDefacementController extends Controller
                         $WebdefacmentSetting->status_add = 1;
                     }
                     $WebdefacmentSetting->save();
+
+                    
+                    try {
+                        $WebDataOriginal = WebdefacmentDataOriginal::where('webdefacment_setting_id', $webdefacment_setting_id)->get();
+                        if($WebDataOriginal){
+                            
+                        }
+                    } catch (\Throwable $th) {
+                        
+                    }
 
                     $Transaction_client_webdefacment_setting = Transaction_client_webdefacment_setting::where('transaction_id', $WebdefacmentSetting -> id)->where('site_id', $site_id)->first();
                     if($Transaction_client_webdefacment_setting){

@@ -50,7 +50,7 @@ return [
         ],
         'mysql_misp'  => [
             'driver'         => 'mysql',
-            'host'           => '127.0.0.1',
+            'host'           => env('DB_MISP_HOST', '127.0.0.1'),
             'port'           => env('DB_MISP_PORT', '3307'),
             'database'       => env('DB_MISP_DATABASE', 'forge'),
             'username'       => env('DB_MISP_USERNAME', 'misp'),

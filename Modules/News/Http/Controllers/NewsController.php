@@ -3,6 +3,7 @@
 namespace Modules\News\Http\Controllers;
 
 use App\Bookmark;
+use App\Log;
 use App\ReadNews;
 use App\ReadTopic;
 use App\ReadCategories;
@@ -23,6 +24,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PgSql\Lob;
 
 class NewsController extends Controller
 {
@@ -598,7 +600,6 @@ class NewsController extends Controller
 
         $RSSNews->view = $RSSNews->view+1;
         $RSSNews->save();
-
 
     //    $data['page'] = langapp('news_detail');
        return view('news::public_detail_select')->with($data);

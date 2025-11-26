@@ -28,15 +28,12 @@ return (string)$v;
         z-index: 1050;
     }
 
-    /* .section-bottom-bar .flex-btn {
+ .section-bottom-bar .flex-btn {
         flex: 1;
         border-radius: 99px;
         padding: 14px;
         font-size: 16px;
-    } */
-
-
-    .section-bottom-bar {
+    } .section-bottom-bar {
         position: sticky;
         bottom: 0;
         left: 0;
@@ -61,38 +58,65 @@ return (string)$v;
         transform-origin: center bottom;
     }
 
-    .section-bottom-bar:hover .flex-btn {
-        flex: 0.8;
-        transform: scale(0.96);
-        opacity: 0.5;
-        height: 15%;
-        
-    }
+    .c100.yellow .bar,
+    .c100.yellow .fill { border-color: gold !important; }
 
-    .section-bottom-bar:hover .flex-btn:hover {
-        flex: 1.6;
-        padding: 22px 16px;
-        font-size: 18px;
-        opacity: 1;
-        font-weight: bold;
-        animation-duration: 300ms;
-        /* transition-delay: 200ms; */
-    }
+    .c100.orange .bar,
+    .c100.orange .fill { border-color: 	#FF4500 !important; }
+    
 
-    .section-bottom-bar .btn-info:hover {
-        color: #fff !important;
-        background-color: #023f81 !important;
-        border-color: #fff;
-    }
+    /* .section-bottom-bar:hover .flex-btn:hover .fa-bell {
+        font-size: 25px;
+        color: #fada5e !important;
+        animation: ring 1.5s infinite ease-in-out;
+        }
 
-    .section-bottom-bar .btn-danger:hover {
+        @keyframes ring {
+        0% { transform: rotate(0); }
+        10% { transform: rotate(-5deg); }
+        20% { transform: rotate(5deg); }
+        30% { transform: rotate(-15deg); }
+        50% { transform: rotate(15deg); }
+        60% { transform: rotate(-25deg); }
+        75% { transform: rotate(25deg); }
+        100% { transform: rotate(0); }
+        }
+
+        .section-bottom-bar:hover .flex-btn:hover .fa-check {
+            color: #add8e6 !important;
+            animation: pulseCheck 0.6s infinite alternate;
+            font-size: 25px;
+            }
+
+            @keyframes pulseCheck {
+            from { transform: scale(1); }
+            to   { transform: scale(1.3); }
+            } */
+
+
+
+            .section-bottom-bar .btn-danger:hover {
         color: #fff !important;
         background-color: #ce0000ff !important;
         border-color: #fff !important;
     }
 
+    .section-bottom-bar .btn-info:hover {
+        color: #fff !important;
+        background-color: #032e5cff !important;
+        border-color: #fff !important;
+    }
 
-    /* (ทางเลือก) ลดอนิเมชันบนจอเล็ก */
+
+    /* .section-bottom-bar .btn-info:hover {
+        color: #fff !important;
+        background-color: #023f81 !important;
+        border-color: #fff;
+    }
+
+    
+
+
     @media (max-width: 480px) {
         .section-bottom-bar:hover .flex-btn {
             flex: 0.9;
@@ -133,6 +157,12 @@ return (string)$v;
     }
 
 
+    #table-show td{
+        max-width: 250px;        
+  overflow: hidden;        
+  text-overflow: ellipsis; 
+  white-space: nowrap;     
+    } */
 
 
 </style>
@@ -141,25 +171,30 @@ return (string)$v;
     <section class="vbox">
         {{-- Head --}}
         <header class="header panel-heading bg-white b-b b-light">
-            <div class="bc-head" style="margin-top: 10px;">
-                <a href="{{@$site_code?route('webdefacement_website.index',['id'=>@$site_code]):route('webdefacement.index')}}"
-                    class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
-                    @icon('solid/arrow-left')
-                </a>
-                @langapp('webdefacement') > {{@$webdefacement->name}}
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="bc-head">
+                    <a href="{{ @$site_code ? route('webdefacement_website.index', ['id' => @$site_code]) : route('webdefacement.index') }}"
+                        class="btn btn-{{ get_option('theme_color') }} btn-sm btn-responsive m-r-5">
+                        @icon('solid/arrow-left')
+                    </a>
+                    @langapp('webdefacement') > {{ @$webdefacement->name }}
+                </div>
+
+                <!-- ปุ่มด้านขวา -->
+                <div class="header-actions">
+                    <button type="button" class="btn btn-success btn-sm" id="btn-export">
+                         Export Report
+                    </button>
+                </div>
             </div>
 
             <div class="d-none">
                 <span>Status &nbsp;</span>
                 <span id="status_val_webdefacement">
-                    {!!@get_webdefacment_status(@$webdefacement->status_val,'color')!!}
+                    {!! @get_webdefacment_status(@$webdefacement->status_val,'color') !!}
                 </span>
                 &nbsp;
             </div>
-            
-
-            &nbsp;
-
         </header>
 
         <section class="scrollable wrapper">
@@ -178,54 +213,53 @@ return (string)$v;
                     </div>
                 </header>
                 <div class="panel-body" id="wdfm-analytics">
-                    <h3 class="text-center">Last Update : {{@$webdefacement->last_check}}</h3>
+                    <h3 class="text-center">Last Updates : {{@$webdefacement->last_check}}</h3>
 
                     <!-- Circle -->
 
                     @php
-          $chk = '';
-          $data['all'] = [];
-          try {
-          $chk = $webdefacment_data_check;
-          if(!empty($chk)){
-          if ($chk->hash_percent > -1) {
-          $data['all']['hash'] = [
-          'name' => 'Hash',
-          'value' => (float) $chk->hash_percent,
-          ];
-          }
-          if ($chk->filesize_percent > -1) {
-          $data['all']['filesize'] = [
-          'name' => 'Filesize',
-          'value' => (float) $chk->filesize_percent,
-          ];
-          }
-          if ($chk->element_percent > -1) {
-          $data['all']['element'] = [
-          'name' => 'Element',
-          'value' => (float) $chk->element_percent,
-          ];
-          }
-          if ($chk->image_percent > -1) {
-          $data['all']['image'] = [
-          'name' => 'Image',
-          'value' => (float) $chk->image_percent,
-          ];
-          }
-          if ($chk->keyword_percent > -1) {
-          $data['all']['blacklist'] = [
-          'name' => 'Blacklist',
-          'value' => (float) $chk->keyword_percent,
-          ];
-          }
+                $chk = '';
+                $data['all'] = [];
+                try {
+                $chk = $webdefacment_data_check;
+                if(!empty($chk)){
+                if ($chk->score > -1) {
+                $data['all']['hash'] = [
+                'name' => 'Hash',
+                'value' => (float) $chk->score * 100,
+                ];
+                }
+                if ($chk->filesize_percent > -1) {
+                $data['all']['filesize'] = [
+                'name' => 'Filesize',
+                'value' => (float) $chk->filesize_percent,
+                ];
+                }
+                if ($chk->element_percent > -1) {
+                $data['all']['element'] = [
+                'name' => 'Element',
+                'value' => (float) $chk->element_percent,
+                ];
+                }
+                if ($chk->image_percent > -1) {
+                $data['all']['image'] = [
+                'name' => 'Image',
+                'value' => (float) $chk->image_percent,
+                ];
+                }
+                if ($chk->keyword_percent > -1) {
+                $data['all']['blacklist'] = [
+                'name' => 'Blacklist',
+                'value' => (float) $chk->keyword_percent,
+                ];
+                }
 
-          }
-          } catch (\Throwable $th) {
-          $chk = [];
-          }
- 
-          @endphp
-
+                }
+                } catch (\Throwable $th) {
+                $chk = [];
+                }
+        
+                @endphp
                     <div class="wrapper-circle">
                         @if(!empty($data['all']))
                         @foreach($data['all'] as $key => $item)
@@ -244,11 +278,15 @@ return (string)$v;
                         if ($value >= 80) {
                         $color = 'danger';
                         } elseif ($value >= 50) {
-                        $color = 'warning';
+                        $color = 'orange';
+                        } else if ($value > 0) {
+                        $color = 'yellow';
                         } else {
                         $color = 'green';
                         }
-                        @endphp                                                                   
+                        @endphp  
+                        
+                        
                         <div>
                             <div class="c100 p{{$value}} {{$color}}">
                                 <span>{{$value}}%</span>
@@ -259,12 +297,14 @@ return (string)$v;
                             </div>
                             <h3 class="text-center text-dark font-weight-bold">{{$name}}</h3>
                         </div>
+                       
                     @endforeach
                     @endif
                         
                     </div>
                 </div>
             </section>
+            <!-- Circle -->
 
             <section class="panel panel-default d-none">
                 <header class="panel-heading font-bold panel-header-blue">
@@ -416,8 +456,27 @@ return (string)$v;
                                 <td>{{@$webdefacement->last_check}}</td>
                             </tr>
                             <tr>
+                                <th>Web status</th>
+                                <td>
+                                    @if (@$webdefacement->web_status == 'Down')
+                                        <span class="text-danger font-weight-bold">Offline</span>
+                                        &nbsp;
+                                        <button class="btn btn-info btn-xs"
+                                                onclick="check_web('{{ $webdefacement->url }}', '{{ $webdefacement->id }}')">
+                                            <i class="fas fa-sync"></i> Check
+                                        </button>
+                                    @else
+                                        <strong class="text-success font-weight-bold">Online</strong>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
                                 <th>Status</th>
-                                <td id='defacement_status'>{!!@get_webdefacment_status(@$webdefacement->status_val,'color')!!}</td>
+                                <td id="defacement_status" style="text-align: left;">
+                                    <strong>{!! trim(strip_tags(@get_webdefacment_status(@$webdefacement->status_val,'color'))) !!}</strong>
+
+
+                                </td>
                             </tr>
                         </table>
                     </div>
@@ -433,9 +492,13 @@ return (string)$v;
                             <tbody>
                                 @if(@$webdefacement->hash == 1)
                                 <tr>
+                                    @if(@$webdefacment_data_check->score > 0)
+                                    <th>Hash <span><button class="btn btn-info btn-xs" onclick="show_diff_hash({{ $webdefacement->id }})">Detail </button></span></th>
+                                    @else
                                     <th>Hash</th>
-                                    <td id='Hash'>{{@$webdefacment_data_original->hash}}</td>
-                                    <td id='hash_new'><span>{{@$webdefacment_data_check->hash_new}}</span> <span class="pull-right text-info">(Difference {{@$webdefacment_data_check->hash_percent}}%)</span></td>
+                                    @endif
+                                    <td id='Hash'>{{@$webdefacement->baseline_merkle}}</td>
+                                    <td id='hash_new'><span>{{@$webdefacment_data_check->merkle_new}} </span><span class="pull-right text-info">(Difference {{@$webdefacment_data_check->score*100}}%)</span></td>
                                 </tr>
                                 @endif
                                 @if(@$webdefacement->filesize == 1)
@@ -461,7 +524,7 @@ return (string)$v;
                                 @endif
                                 <tr>
                                     <th>Last Update</th>
-                                    <td id='LastUpdate'>{{@$webdefacment_data_original->last_update}}</td>
+                                    <td id='LastUpdate'>{{@$webdefacment_data_original->updated_at}}</td>
                                     <td id='last_update'>{{@$webdefacment_data_check->last_update}}</td>
                                 </tr>
                             </tbody>
@@ -506,6 +569,9 @@ return (string)$v;
                                                 {{-- <a href="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_original}}" data-lightbox="name-img-2">
                                                 <img src="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_original}}" onerror="setDefaultPic(this)" />
                                                 </a> --}}
+                                                <!-- <a href="https://insights.sosecure.co.th{{@$webdefacement->image_original}}" data-lightbox="name-img-2">
+                                                    <img src="https://insights.sosecure.co.th{{@$webdefacement->image_original}}" onerror="setDefaultPic(this)" />
+                                                </a> -->
                                                 <a href="https://insights.sosecure.co.th{{@$webdefacement->image_original}}" data-lightbox="name-img-2">
                                                     <img src="https://insights.sosecure.co.th{{@$webdefacement->image_original}}" onerror="setDefaultPic(this)" />
                                                 </a>
@@ -536,6 +602,9 @@ return (string)$v;
                                                 {{-- <a href="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_last}}" data-lightbox="name-img-2">
                                                 <img src="{{config('app.URL_CENTER_PUBLISH').@$webdefacement->image_last}}" onerror="setDefaultPic(this)" />
                                                 </a> --}}
+                                                <!-- <a href="https://insights.sosecure.co.th{{@$webdefacement->image_last}}" data-lightbox="name-img-2">
+                                                    <img src="https://insights.sosecure.co.th{{@$webdefacement->image_last}}" onerror="setDefaultPic(this)" />
+                                                </a> -->
                                                 <a href="https://insights.sosecure.co.th{{@$webdefacement->image_last}}" data-lightbox="name-img-2">
                                                     <img src="https://insights.sosecure.co.th{{@$webdefacement->image_last}}" onerror="setDefaultPic(this)" />
                                                 </a>
@@ -570,8 +639,8 @@ return (string)$v;
             <!-- <div id="load_status"></div> -->
             @if (@$webdefacement->status_val != 'Normal') 
                 <div id="float-btns" class="section-bottom-bar">
-                    <button class="btn btn-danger flex-btn" onclick="alert_to_customer(@json($webdefacement->id))">Alert To Customer</button>
-                    <button class="btn btn-info flex-btn" id="btn-accept_risk" onclick="accept_risk()">Accept Risk </button>
+                    <button class="btn btn-danger flex-btn" onclick="alert_to_customer(@json($webdefacement->id))"><i class="fas fa-bell"></i> Alert To Customer</button>
+                    <button class="btn btn-info flex-btn" id="btn-accept_risk" onclick="accept_risk()"><i class="fas fa-check"></i> Accept Risk </button>
                 </div>
             @endif
             
@@ -599,6 +668,8 @@ return (string)$v;
 
 
 
+
+
 @push('pagestyle')
 @include('stacks.css.datatables')
 @include('stacks.css.form')
@@ -619,6 +690,63 @@ return (string)$v;
 @include('stacks.js.c3')
 
 <script>
+
+        function check_web(url,id) {
+        if (!url) {
+            alert('No URL provided.');
+            return;
+        }
+
+        if (url.indexOf("http://") !== 0 && url.indexOf("https://") !== 0) {
+            alert('URL must begin with http:// or https://');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Checking website status...',
+            html: '<p>Please wait for a moment...</p>',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        $.ajax({
+            url: "{{ route('webdefacement.check_status') }}",
+            type: 'POST',
+            data: {
+                url: url,
+                id: id,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                Swal.close();
+
+                if (response.status_code === 200) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Website is on and running ',
+                        html: '<p>Status Code: ' + response.status_code + '</p>',
+                        confirmButtonText: 'Confirm'
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Website is Unreachable ❌',
+                        html: '<p>Status Code: ' + response.status_code + '</p>',
+                        confirmButtonText: 'confirm'
+                    }).then(() => location.reload());
+                }
+            },
+            error: function() {
+                Swal.close();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Can\'t connect to the server ❌',
+                    html: '<p>Please check your internet connection</p>'
+                });
+            }
+        });
+    }
+
     function collpase_chart(id,text){
         $(id).slideToggle();
         if($(text).text() == 'Expanded'){
@@ -765,9 +893,18 @@ return (string)$v;
                                 
                             },
                             success:function(response) {
+
+                                function getKB_JS(filesize) {
+                                    let res_kb = 0;
+                                    if (filesize) {
+                                        res_kb = Math.ceil((filesize / 1024) * 100) / 100;
+                                    }
+                                    return res_kb + ' KB';
+                                }
+                                let kbValue = getKB_JS(response.html_f);
                         
-                                $('#hash_new').html(response.html_h);
-                                $('#filesize_new').html(response.html_f);
+                                $('#hash_new').html(response.html_h2);
+                                $('#filesize_new').html(response.kbValue);
                                 $('#element_new').html(response.html_e);
                                 $('#last_update').html(response.html_l);
                                 $('#blacklist_keyword_current').html(response.html_b);
@@ -837,9 +974,18 @@ return (string)$v;
                                 
                             },
                             success:function(response) {
+
+                                function getKB_JS(filesize) {
+                                    let res_kb = 0;
+                                    if (filesize) {
+                                        res_kb = Math.ceil((filesize / 1024) * 100) / 100;
+                                    }
+                                    return res_kb + ' KB';
+                                }
+                                let kbValue = getKB_JS(response.html_f);
                         
-                                $('#Hash').html(response.html_h);
-                                $('#FileSize').html(response.html_f);
+                                $('#Hash').html(response.html_h2);
+                                $('#FileSize').html(kbValue);
                                 $('#Element').html(response.html_e);
                                 $('#BlacklistKeyword').html(response.html_b);
                                 $('#LastUpdate').html(response.html_l);
@@ -886,6 +1032,8 @@ return (string)$v;
             }   
         })
     };
+
+            
 
 
 
@@ -952,130 +1100,130 @@ return (string)$v;
             let domain = '{{@$webdefacement->domain}}';
             let namepage = '{{@$webdefacement->name}}';
             let site = '{{@$webdefacement->get_site->name}}';
-        Swal.fire({
-            title: 'Are you sure To send this Alert?',
-            html: `
-                    <table class="table table-bordered table-striped" style="border: none">
-                    <tr>
-                        <td colspan="2">
-                            <p class="text-message-warning">Infomation</p> 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <p class="text-description">Domain: </p>
-                        </td>
-                        <td>
-                            <p style="text-align: left">${domain}</p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <p class="text-description">Namepage:</p>
-                        </td>
-                        <td>
-                            <p style="text-align: left"> ${namepage}</p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <p class="text-description">Site:</p>
-                        </td>
-                        <td>
-                            <p style="text-align: left"> ${site}</p>
-                        </td>
-                    </tr>
-                    </table>
-                     <p class="text-message-warning">Alert will be sent to the customer.</p>
-                    `,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            heightAuto: false,
-            confirmButtonText: 'Yes',
-            width: '500px',
-            
-        }).then((result) => {
-            if (!result.isConfirmed) return;
-
             Swal.fire({
-                title: 'Alert is Sending...',
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                showConfirmButton: false,
-                heightAuto: false,
-                didOpen: () => {
-                Swal.showLoading();
-                }
-            });
-
-            const $btn = $('#btn-alert-customer');
-            $btn.prop('disabled', true).addClass('disabled');
-
-            $.ajax({
-            type: 'POST',
-            url: "{{ route('webdefacement.alert_to_customer') }}",
-            data: { id: id },          
-            dataType: 'json',
-            beforeSend: function() {
-
-            },
-            success: function(res) {
-                if (res && res.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Alert sent',
-                    text: res.message || 'Customer has been notified.',
-                    heightAuto: false
-                });
-                } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Failed',
-                    text: (res && res.message) ? res.message : 'Cannot alert customer.',
-                    heightAuto: false
-                });
-                }
-            },
-            error: function(xhr) {
-                const msg =
-                (xhr.responseJSON && (xhr.responseJSON.message || xhr.responseJSON.error)) ||
-                xhr.statusText || 'Unexpected error';
-                const errs = (xhr.responseJSON && xhr.responseJSON.errors)
-                ? Object.values(xhr.responseJSON.errors).flat().join('\n')
-                : '';
-                const time = xhr.responseJSON && xhr.responseJSON.retryAt ? xhr.responseJSON.retryAt : '';
-                Swal.fire({
-                icon: 'error',
-                title: 'Already sent to customer',
+                title: 'Are you sure To send this Alert?',
                 html: `
-                        <p class="text-message">${msg}</p>
-                        ${errs ? `<p>${errs}</p>` : ''}
-                        ${time ? `<p style="font-size: 14px;font-weight: bold;font-color: #ff0000df">${time}</p>` : ''}
-                    `,
+                        <table class="table table-bordered table-striped" style="border: none">
+                        <tr>
+                            <td colspan="2">
+                                <p class="text-message-warning">Infomation</p> 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="text-description">Domain: </p>
+                            </td>
+                            <td>
+                                <p style="text-align: left">${domain}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="text-description">Namepage:</p>
+                            </td>
+                            <td>
+                                <p style="text-align: left"> ${namepage}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p class="text-description">Site:</p>
+                            </td>
+                            <td>
+                                <p style="text-align: left"> ${site}</p>
+                            </td>
+                        </tr>
+                        </table>
+                        <p class="text-message-warning">Alert will be sent to the customer.</p>
+                        `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
                 heightAuto: false,
-                width: 600,
+                confirmButtonText: 'Yes',
+                width: '500px',
+                
+            }).then((result) => {
+                if (!result.isConfirmed) return;
 
-                color: '#e2e8f0',              
-                iconColor: '#ef4444',          
-                backdrop: 'rgba(0,0,0,.4)',    
-
-                cancelButtonText: 'Close',
+                Swal.fire({
+                    title: 'Alert is Sending...',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    heightAuto: false,
+                    didOpen: () => {
+                    Swal.showLoading();
+                    }
                 });
-            },
-            complete: function() {
-                $btn.prop('disabled', false).removeClass('disabled');
-                Swal.hideLoading();
 
-            }
+                const $btn = $('#btn-alert-customer');
+                $btn.prop('disabled', true).addClass('disabled');
+
+                $.ajax({
+                type: 'POST',
+                url: "{{ route('webdefacement.alert_to_customer') }}",
+                data: { id: id },          
+                dataType: 'json',
+                beforeSend: function() {
+
+                },
+                success: function(res) {
+                    if (res && res.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Alert sent',
+                        text: res.message || 'Customer has been notified.',
+                        heightAuto: false
+                    });
+                    } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed',
+                        text: (res && res.message) ? res.message : 'Cannot alert customer.',
+                        heightAuto: false
+                    });
+                    }
+                },
+                error: function(xhr) {
+                    const msg =
+                    (xhr.responseJSON && (xhr.responseJSON.message || xhr.responseJSON.error)) ||
+                    xhr.statusText || 'Unexpected error';
+                    const errs = (xhr.responseJSON && xhr.responseJSON.errors)
+                    ? Object.values(xhr.responseJSON.errors).flat().join('\n')
+                    : '';
+                    const time = xhr.responseJSON && xhr.responseJSON.retryAt ? xhr.responseJSON.retryAt : '';
+                    Swal.fire({
+                    icon: 'error',
+                    title: 'Already sent to customer',
+                    html: `
+                            <p class="text-message">${msg}</p>
+                            ${errs ? `<p>${errs}</p>` : ''}
+                            ${time ? `<p style="font-size: 14px;font-weight: bold;font-color: #ff0000df">${time}</p>` : ''}
+                        `,
+                    heightAuto: false,
+                    width: 600,
+
+                    color: '#e2e8f0',              
+                    iconColor: '#ef4444',          
+                    backdrop: 'rgba(0,0,0,.4)',    
+
+                    cancelButtonText: 'Close',
+                    });
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).removeClass('disabled');
+                    Swal.hideLoading();
+
+                }
+                });
             });
-        });
         }
 
 
 
-
+       
 
 </script>
 
@@ -1110,6 +1258,331 @@ return (string)$v;
 
         layoutBar();
     })();
+
+
+     function show_diff_hash(id) {
+    const w_id = id;
+
+    $.ajax({
+        type: 'POST',
+        url: "{{ route('webdefacement.show_diff_hash') }}",
+        data: { id: w_id },
+        dataType: 'json',
+        success: function(res) {
+
+            const ensureArray = (v) => {
+                let data = v;
+                let depth = 0;
+                while (typeof data === 'string' && depth < 3) {
+                    try { data = JSON.parse(data); depth++; }
+                    catch { break; }
+                }
+                if (Array.isArray(data)) return data;
+                if (data && typeof data === 'object') return Object.values(data);
+                return [];
+            };
+
+            const section_diff = ensureArray(res.section_diffs);
+            const assets_add   = ensureArray(res.assets_add);
+            const assets_del   = ensureArray(res.assets_del);
+            const outbound_new = ensureArray(res.outbound_new);
+
+            const changedCount   = section_diff.filter(i => i && i.changed).length;
+            const count_asst     = assets_add.length;
+            const count_asst_del = assets_del.length;
+            const count_out      = outbound_new.length;
+
+            const esc = s => String(s).replace(/[&<>"'`=\/]/g, c => ({
+                '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',
+                "'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'
+            }[c]));
+
+            const openViewport = (count) => count > 10 ? '<div class="table-viewport" tabindex="0">' : '<div>';
+            const closeViewport = '</div>';
+
+            let html = `
+            <div class="swal-header-bar"
+                style="text-align:left; display:flex; align-items:center; gap:10px;
+                        background:linear-gradient(to right,#0d2b5a,#1a3a6d);
+                        color:#fff; font-weight:700;
+                        font-size:20px; padding:12px 16px;
+                        border-top-left-radius:4px; border-top-right-radius:4px;">
+                <i class="fa fa-bars" style="font-size:22px;"></i>
+                <span>Information</span>
+            </div>
+
+            <br>
+
+            <div class="accordion" id="diffAccordion">
+
+            <div class="card mb-2">
+                <div class="card-header p-2 text-white bg-darkblue d-flex justify-content-between align-items-center"
+                data-toggle="collapse" data-target="#collapseSection" aria-expanded="true" style="cursor:pointer;">
+                <b>Section (${changedCount})</b>
+                <i class="fa fa-chevron-circle-down"></i>
+                </div>
+                <div id="collapseSection" class="collapse show" data-parent="#diffAccordion">
+                <div class="card-body p-2">
+                    ${openViewport(section_diff.filter(i => i.changed).length)}
+                    <table class="table table-bordered table-sm mb-0">
+                        <thead class="thead-light">
+                        <tr>
+                            <th>Section</th>
+                            <th>Old Hash</th>
+                            <th>New Hash</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        ${
+                            section_diff.filter(i => i.changed).map(i => `
+                            <tr>
+                                <td>${esc(i.section)}</td>
+                                <td title="${esc(i.old)}">${esc(i.old)}</td>
+                                <td title="${esc(i.new)}">${esc(i.new)}</td>
+                                <td><span class="text-danger font-weight-bold">Changed</span></td>
+                            </tr>`).join('') ||
+                            `<tr><td colspan="4" class="text-center">No changes found</td></tr>`
+                        }
+                        </tbody>
+                    </table>
+                    ${closeViewport}
+                </div>
+                </div>
+            </div>
+            `;
+
+
+            if (res.merkle_old !== res.merkle_new) {
+            html += `
+            <div class="card mb-2">
+                <div class="card-header p-2 text-white bg-darkblue d-flex justify-content-between align-items-center"
+                data-toggle="collapse" data-target="#collapseMerkle" style="cursor:pointer;">
+                <b>Merkle Diff</b>
+                <i class="fa fa-chevron-circle-down"></i>
+                </div>
+                <div id="collapseMerkle" class="collapse" data-parent="#diffAccordion">
+                <div class="card-body p-2">
+                    ${openViewport(2)} <!-- แถวคงไม่เกิน แต่เผื่อ style ใช้เหมือนกัน -->
+                    <table class="table table-bordered table-sm mb-0">
+                        <thead class="thead-light">
+                        <tr><th>Old Merkle</th><th>New Merkle</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td title="${esc(res.merkle_old)}">${esc(res.merkle_old)}</td>
+                            <td title="${esc(res.merkle_new)}">${esc(res.merkle_new)}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    ${closeViewport}
+                </div>
+                </div>
+            </div>`;
+            }
+
+            if (assets_add.length > 0) {
+            html += `
+            <div class="card mb-2">
+                <div class="card-header p-2 text-white bg-darkblue d-flex justify-content-between align-items-center"
+                data-toggle="collapse" data-target="#collapseAdd" style="cursor:pointer;">
+                <b>Assets Add (${count_asst})</b>
+                <i class="fa fa-chevron-circle-down"></i>
+                </div>
+                <div id="collapseAdd" class="collapse" data-parent="#diffAccordion">
+                <div class="card-body p-2">
+                    ${openViewport(assets_add.length)}
+                    <table class="table table-bordered table-sm mb-0">
+                        <tbody>
+                        ${assets_add.map(a => `<tr><td title="${esc(a)}">${esc(a)}</td></tr>`).join('')}
+                        </tbody>
+                    </table>
+                    ${closeViewport}
+                </div>
+                </div>
+            </div>`;
+            }
+
+            if (assets_del.length > 0) {
+            html += `
+            <div class="card mb-2">
+                <div class="card-header p-2 text-white bg-darkblue d-flex justify-content-between align-items-center"
+                data-toggle="collapse" data-target="#collapseDel" style="cursor:pointer;">
+                <b>Assets Delete (${count_asst_del})</b>
+                <i class="fa fa-chevron-circle-down"></i>
+                </div>
+                <div id="collapseDel" class="collapse" data-parent="#diffAccordion">
+                <div class="card-body p-2">
+                    ${openViewport(assets_del.length)}
+                    <table class="table table-bordered table-sm mb-0">
+                        <tbody>
+                        ${assets_del.map(a => `<tr><td title="${esc(a)}">${esc(a)}</td></tr>`).join('')}
+                        </tbody>
+                    </table>
+                    ${closeViewport}
+                </div>
+                </div>
+            </div>`;
+            }
+
+            if (outbound_new.length > 0) {
+            html += `
+            <div class="card mb-2">
+                <div class="card-header p-2 text-white bg-darkblue d-flex justify-content-between align-items-center"
+                data-toggle="collapse" data-target="#collapseOutbound" style="cursor:pointer;">
+                <b>Outbound New (${count_out})</b>
+                <i class="fa fa-chevron-circle-down"></i>
+                </div>
+                <div id="collapseOutbound" class="collapse" data-parent="#diffAccordion">
+                <div class="card-body p-2">
+                    ${openViewport(outbound_new.length)}
+                    <table class="table table-bordered table-sm mb-0">
+                        <tbody>
+                        ${outbound_new.map(a => `<tr><td title="${esc(a)}">${esc(a)}</td></tr>`).join('')}
+                        </tbody>
+                    </table>
+                    ${closeViewport}
+                </div>
+                </div>
+            </div>`;
+            }
+
+            html += `</div>`;
+
+
+
+
+            const style = document.createElement('style');
+            style.textContent = `
+                #diffAccordion {
+                overflow: hidden !important;
+                border-radius: 4px;
+                }
+
+                #diffAccordion .card {
+                margin: 0 !important;
+                border: none !important;
+                border-radius: 0 !important;
+                }
+
+                #diffAccordion .card-header {
+                background-color: #1a3a6d !important;
+                color: #fff !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 10px 14px !important;
+                font-weight: 600 !important;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 14px !important;
+                }
+
+                #diffAccordion .card-header b {
+                color: #fff !important;
+                }
+
+                #diffAccordion .card-body {
+                background-color: #f8f9fa !important;
+                padding: 8px 12px !important;
+                margin: 0 !important;
+                border-top: 1px solid #ddd !important;
+                }
+
+                #diffAccordion .collapse.show {
+                border-bottom: none !important;
+                }
+
+                #diffAccordion table {
+                border-collapse: collapse !important;
+                width: 100% !important;
+                table-layout: fixed;
+                }
+
+                #diffAccordion td, 
+                #diffAccordion th {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                vertical-align: middle !important;
+                padding: 5px 8px !important;
+                border: 1px solid #ccc !important;
+                }
+
+                #diffAccordion .collapse,
+                #diffAccordion .card-body {
+                overflow: hidden !important;
+                }
+
+                #diffAccordion::before,
+                #diffAccordion::after,
+                #diffAccordion .card::before,
+                #diffAccordion .card::after {
+                content: none !important;
+                display: none !important;
+                background: none !important;
+                }
+
+                #diffAccordion .card + .card {
+                border-top: 1px solid #fff !important;
+                }
+
+                .fa-chevron-down {
+                font-size: 13px;
+                color: #fff;
+                }
+            .table-viewport {
+            max-height: 300px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            overscroll-behavior: contain; 
+            -webkit-overflow-scrolling: touch;
+            }
+
+            .table-viewport:focus { outline: none; }
+
+            .table-viewport table td,
+            .table-viewport table th {
+            word-break: break-all;
+            white-space: normal;
+            }
+
+            .table-viewport::-webkit-scrollbar { width: 8px; }
+            .table-viewport::-webkit-scrollbar-thumb { background: rgba(0,0,0,.3); border-radius: 4px; }
+
+                `;
+            document.head.appendChild(style);
+
+            Swal.fire({
+                title: '',
+                html: html,
+                width: 1000,
+                showConfirmButton: false,
+                showCancelButton: true,
+                cancelButtonText: 'Close',
+                heightAuto: false,
+                customClass: {
+                    popup: 'swal-no-scroll',
+                    htmlContainer: 'swal-scroll'
+                },
+                didOpen: () => {
+                    const popup = Swal.getPopup();
+                    const body = popup.querySelector('.swal2-html-container');
+                    if (body) {
+                        body.style.maxHeight = '70vh';
+                        body.style.overflowY = 'auto';
+                    }
+                }
+            });
+        }
+    });
+    
+}
+
+
+    
+
+    
 </script>
 @endpush
 @endsection

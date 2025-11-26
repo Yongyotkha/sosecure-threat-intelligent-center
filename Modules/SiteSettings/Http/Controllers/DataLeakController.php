@@ -36,6 +36,9 @@ use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Modules\SiteSettings\Entities\Activity;
+use App\CredentialLeakRef;
+use Illuminate\Support\Facades\Schema;
+
 
 class DataLeakController extends Controller
 {
@@ -71,6 +74,15 @@ class DataLeakController extends Controller
         $data['page'] = 'Keyword Setting';
         return view('sitesettings::keyword_setting')->with($data);
     }
+
+    protected function resolveTable(array $candidates): string
+    {
+        foreach ($candidates as $t) {
+            if (Schema::hasTable($t)) return $t;
+        }
+        throw new \RuntimeException('Table not found. Tried: ' . implode(', ', $candidates));
+    }
+
 
     public function datafeed()
     {
@@ -677,6 +689,8 @@ class DataLeakController extends Controller
             // dd($model->get());
 
         }
+        \Log::debug('[TI] socialdatas_all_site_tb USING ALIAS = u.feedtimepost');
+
         $model->orderBy('created_at', 'desc');
 
         return DataTables::of($model)
@@ -808,360 +822,799 @@ class DataLeakController extends Controller
         );
     }
 
+    // public function socialdatas_all_site_tb(Request $request)
+    // {
+
+    //     $model = DataLeakSocialRef::where('deleted_at', null)
+    //         ->whereHas('get_data_leak_feed_one', function ($query) {
+    //             $query->whereIn('feel_type', ['social', 'darkweb_public']);
+    //         })
+    //         ->with('get_site')
+    //         ->with('get_data_leak_feed_one');
+
+    //     $DataLeakSocialRef_data = DataLeakSocialRef::join('data_leak_feed', 'data_leak_socail_ref.data_leak_feed_id', '=', 'data_leak_feed.id')
+    //         ->whereIn('data_leak_feed.feel_type', ['social', 'darkweb_public'])->join('site', 'site.id', 'data_leak_socail_ref.site_id')
+    //         ->select('data_leak_socail_ref.*', 'data_leak_feed.*', 'site.name as site_name', 'data_leak_socail_ref.code as code_data', 'data_leak_socail_ref.id as id_data', 'data_leak_socail_ref.status as status_data');
+    //     if ($request->search_val == 1) {
+    //         $DataLeakFeed_Data =   DataLeakFeed::where('deleted_at', null)->where('data_leak_feed.status', '1')->whereIn('data_leak_feed.feel_type', ['social', 'darkweb_public']);
+    //         $get_role_custom_first = @get_role_custom();
+    //         $site_id_arr = @$get_role_custom_first['site_id_arr'];
+    //         if (@$get_role_custom_first['superadmin'] == 1) {
+    //         } else if (@$get_role_custom_first['client'] == 1) {
+    //             $model = $model->whereIn('site_id', $site_id_arr);
+    //             $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('data_leak_socail_ref.status', 1);
+    //             $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
+    //         } else if (@$get_role_custom_first['site_support'] == 1) {
+    //             $model = $model->whereIn('site_id', $site_id_arr);
+    //             $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
+    //             $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
+    //         } else if (@$get_role_custom_first['site_admin'] == 1) {
+    //             $model = $model->whereIn('site_id', $site_id_arr);
+    //             $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
+    //             $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
+    //         } else if (@$get_role_custom_first['site_client'] == 1) {
+    //             $model = $model->whereIn('site_id', $site_id_arr)->where('data_leak_feed.status', 1);
+    //             $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('fx_data_leak_feed.status', 1);
+    //             $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
+    //         }
+
+
+
+
+    //         if ($request->keywords) {
+    //             $keywords = $request->keywords;
+    //             //  $DataLeakFeed_data  = $DataLeakFeed_Data->get();
+    //             /*    foreach ($DataLeakFeed_data as $value_data) {
+    //                   $value_data->feedcontent_decode = html_entity_decode($value_data->feedcontent);
+    //             }
+    //             $DataLeakFeed_data_id = array();
+    //             array_push($DataLeakFeed_data_id, 0);
+    //             foreach($DataLeakFeed_data as $a) {
+    //                 if(strpos(strtoupper($a->feedcontent_decode), strtoupper($keywords)) !== false) {
+    //                     array_push($DataLeakFeed_data_id, $a->id);
+    //                 } 
+    //             }
+    //            */
+    //             // dd(count($DataLeakFeed_data_id));
+    //             $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+    //                 $query->where('keyword', 'LIKE', '%' . $keywords . '%');
+    //                 // $query->orwhere('feedcontent', 'LIKE', '%' . $keywords . '%');
+    //                 //   $query->orWhereIn('id', $DataLeakFeed_data_id);
+    //             });
+
+    //             $DataLeakSocialRef_data->whereRaw('(LOWER(fx_data_leak_feed.keyword) LIKE ? or LOWER(fnStripTags(entity_decode(fx_data_leak_feed.feedcontent))) LIKE ? )', array([trim(strtolower('%' . $request->keywords . '%'))], [trim(strtolower('%' . $request->keywords . '%'))]));
+    //             //$DataLeakSocialRef_data->orWhereIn('data_leak_feed.id', $DataLeakFeed_data_id);
+    //         }
+
+    //         if ($request->site) {
+    //             $SiteSettings = SiteSettings::where('code', @$request->site)->first();
+    //             // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
+    //             $model = $model->where('site_id', $SiteSettings->id);
+    //             $DataLeakSocialRef_data->where('data_leak_socail_ref.site_id', $SiteSettings->id);
+    //         }
+
+    //         if ($request->type) {
+
+    //             $type = $request->type;
+    //             $model->whereHas('get_data_leak_feed_one', function ($query) use ($type) {
+    //                 $query->where('feel_type', 'LIKE', '%' . $type . '%');
+    //             });
+    //             $DataLeakSocialRef_data->where('data_leak_feed.feel_type', 'LIKE', '%' . $type . '%');
+    //         }
+
+    //         if ($request->check_type) {
+
+    //             $type = $request->check_type;
+    //             $model->whereHas('get_data_leak_feed_one', function ($query) use ($type) {
+    //                 $query->where('feel_type', 'LIKE', '%' . $type . '%');
+    //             });
+    //             $DataLeakSocialRef_data->where('data_leak_feed.feel_type', 'LIKE', '%' . $type . '%');
+    //         }
+    //         //   dd($request->check_type);
+    //         if ($request->check_social && $request->check_type == "social") {
+
+    //             $check_social = $request->check_social;
+    //             $model->whereHas('get_data_leak_feed_one', function ($query) use ($check_social) {
+    //                 if ($check_social == "other") {
+    //                     $query->whereNotIn('keyword', ['Mobile', 'Facebook', 'Line', 'Twitter', 'Website']);
+    //                 } else {
+    //                     $query->where('keyword', $check_social);
+    //                 }
+    //             });
+    //             if ($check_social == "other") {
+    //                 $DataLeakSocialRef_data->whereNotIn('data_leak_feed.keyword', ['Mobile', 'Facebook', 'Line', 'Twitter', 'Website']);
+    //             } else {
+    //                 $DataLeakSocialRef_data->where('data_leak_feed.keyword', $check_social);
+    //             }
+    //         }
+
+
+
+    //         if ($request->source) {
+
+    //             $source = $request->source;
+    //             $model->whereHas('get_data_leak_feed_one', function ($query) use ($source) {
+    //                 $query->where('sourceid', 'LIKE', '%' . $source . '%');
+    //             });
+
+    //             $DataLeakSocialRef_data->where('data_leak_feed.sourceid', 'LIKE', '%' . $source . '%');
+    //         }
+
+    //         if ($request->check_serverity) {
+    //             $model = $model->where('serverity', $request->check_serverity);
+    //             $DataLeakSocialRef_data->where('data_leak_socail_ref.serverity', 'LIKE', '%' . $request->check_serverity . '%');
+    //         }
+
+    //         if ($request->check_monitoring) {
+    //             $model = $model->where('status_monitoring', $request->check_monitoring);
+    //             $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $request->check_monitoring . '%');
+    //         }
+
+    //         if ($request->isDateSearch == 1) {
+    //             $date_start = $request->startDate;
+    //             $date_end = $request->endDate;
+
+    //             $date_start_explode = explode(" ", $date_start);
+    //             $date_start_date = @$date_start_explode[0];
+    //             $date_start_time = @$date_start_explode[1] . ' ' . @$date_start_explode[2];
+
+    //             $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+
+    //             $date_start_time_time = date("H:i", strtotime($date_start_time));
+    //             // $date_start_datetime_format = $date_start_date_format . ' ' . $date_start_time_time . ':00';
+    //             $date_start_datetime_format = $date_start_date_format . ' '  . '00:00:01';
+
+    //             $date_end_explode = explode(" ", $date_end);
+    //             $date_end_date = @$date_end_explode[0];
+    //             $date_end_time = @$date_end_explode[1] . ' ' . @$date_end_explode[2];
+    //             // dd($date_end_time);
+    //             $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+    //             $date_end_time_time = date("H:i", strtotime($date_end_time));
+    //             // $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
+    //             $date_end_datetime_format = $date_end_date_format . ' '  . '23:59:59';
+
+    //             $source = $request->source;
+    //             $model->whereHas('get_data_leak_feed_one', function ($query) use ($date_start_date_format, $date_end_date_format) {
+    //                 $query->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
+    //             });
+
+    //             $DataLeakSocialRef_data->whereBetween('data_leak_feed.feedtimepost', array($date_start_datetime_format, $date_end_datetime_format));
+    //         }
+
+    //         // $model->get();
+    //     } else {
+    //         if ($request->site) {
+    //             $SiteSettings = SiteSettings::where('code', @$request->site)->first();
+    //             // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
+    //             $model = $model->where('site_id', $SiteSettings->id);
+    //             // remove ->where('status', 1)
+    //             $DataLeakSocialRef_data->where('data_leak_feed.status', 1)->where('data_leak_socail_ref.site_id', $SiteSettings->id);
+    //             // remove ->where('data_leak_socail_ref.status', 1)
+    //         }
+
+    //         if ($request->click_key) {
+    //             $model = $model->where('keyword', $request->click_key);
+    //             $DataLeakSocialRef_data->where('LOWER(`data_leak_feed.keyword`)', 'LIKE', [trim(strtolower($request->click_key))]);
+    //         }
+
+
+    //         if ($request->click_type) {
+
+    //             $model = $model->where('feel_type', '=', $request->click_type);
+    //             $DataLeakSocialRef_data->where('data_leak_socail_ref.feel_type', $request->click_type);
+    //         }
+
+    //         if ($request->click_type2) {
+    //             $keywords = $request->click_type2;
+    //             $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
+    //                 if ($keywords == 'other') {
+    //                     $query->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('mobile'))])
+    //                         ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('facebook'))])
+    //                         ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('line'))])
+    //                         ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('twitter'))])
+    //                         ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('website'))]);
+    //                 } else {
+    //                     if ($keywords == 'in_progress') {
+    //                         $query->where('status_monitoring', 'LIKE', '%' . $keywords . '%');
+    //                     } else if ($keywords == 'reported') {
+    //                         $query->where('status_monitoring', 'LIKE', '%' . $keywords . '%');
+    //                     } else if ($keywords == 'close') {
+    //                         $query->where('status_monitoring', 'LIKE', '%' . $keywords . '%');
+    //                     } else {
+    //                         $query->where('keyword', 'LIKE', '%' . $keywords . '%');
+    //                     }
+    //                 }
+    //             });
+
+    //             if ($keywords == 'other') {
+    //                 $DataLeakSocialRef_data->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ', [trim(strtolower('mobile'))])
+    //                     ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ', [trim(strtolower('facebook'))])
+    //                     ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ', [trim(strtolower('line'))])
+    //                     ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ', [trim(strtolower('twitter'))])
+    //                     ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ', [trim(strtolower('website'))]);
+    //             } else {
+    //                 if ($keywords == 'in_progress') {
+    //                     $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $keywords . '%');
+    //                 } else if ($keywords == 'reported') {
+    //                     $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $keywords . '%');
+    //                 } else if ($keywords == 'close') {
+    //                     $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $keywords . '%');
+    //                 } else {
+    //                     $DataLeakSocialRef_data->where('data_leak_feed.keyword', 'LIKE', '%' . $keywords . '%');
+    //                 }
+    //             }
+    //         }
+
+    //         //<><><>
+    //         // if (Auth::check()) {
+
+    //         //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
+    //         //     if (Auth::user()->hasRole('admin')) { //if admin
+    //         //         // dd(777);
+
+    //         //     } else { //if notAdmin
+    //         //         // dd(888);
+    //         //         if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
+    //         //             if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
+    //         //                 // dd(99);
+
+    //         //                 $model = $model->whereIn('site_id', $site_id_arr);
+
+    //         //                 // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+
+    //         //             } else { //not support and admin
+    //         //                 $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
+
+    //         //                 // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
+    //         //             }
+    //         //         }
+    //         //     }
+    //         // }
+
+    //         $get_role_custom_first = @get_role_custom();
+    //         $site_id_arr = @$get_role_custom_first['site_id_arr'];
+    //         if (@$get_role_custom_first['superadmin'] == 1) {
+    //         } else if (@$get_role_custom_first['client'] == 1) {
+    //             $model = $model->whereIn('site_id', $site_id_arr)->where('data_leak_feed.status', 1);
+    //             $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('data_leak_feed.status', 1);
+    //         } else if (@$get_role_custom_first['site_support'] == 1) {
+    //             $model = $model->whereIn('site_id', $site_id_arr);
+    //             $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
+    //         } else if (@$get_role_custom_first['site_admin'] == 1) {
+    //             $model = $model->whereIn('site_id', $site_id_arr);
+    //             $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
+    //         } else if (@$get_role_custom_first['site_client'] == 1) {
+    //             $model = $model->whereIn('site_id', $site_id_arr)->where('data_leak_feed.status', 1);
+    //             $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('fx_data_leak_feed.status', 1);
+    //         }
+    //     }
+
+
+
+    //     if (@$request->order) {
+    //         $column_order = @$request->order[0]['column'];
+    //         $column_dir = @$request->order[0]['dir'];
+    //         if ($column_order == "9") {
+    //             $model->orderBy('data_leak_feed.status', $column_dir);
+    //             $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.site_id', $column_dir);
+    //         } else if ($column_order == "8") {
+    //             $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
+    //                 $query->orderBy('feedtimepost', $column_dir);
+    //             });
+    //             $DataLeakSocialRef_data->orderBy('data_leak_feed.feedtimepost', $column_dir);
+    //         } else if ($column_order == "7") {
+
+    //             $model->orderBy('status_monitoring', $column_dir);
+    //             $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.status_monitoring', $column_dir);
+    //         } else if ($column_order == "6") {
+
+    //             $model->orderBy('serverity', $column_dir);
+    //             $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.serverity', $column_dir);
+    //         } else if ($column_order == "5") {
+
+    //             $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
+    //                 $query->orderBy('feedcontent', $column_dir);
+    //             });
+    //             $DataLeakSocialRef_data->orderBy('data_leak_feed.feedcontent', $column_dir);
+    //         } else if ($column_order == "4") {
+
+    //             $model->orderBy('keyword', $column_dir);
+    //             $DataLeakSocialRef_data->orderBy('data_leak_feed.keyword', $column_dir);
+    //         } else if ($column_order == "3") {
+
+    //             $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
+    //                 $query->orderBy('source_name', $column_dir);
+    //             });
+    //             $DataLeakSocialRef_data->orderBy('data_leak_feed.source_name', $column_dir);
+    //         } else if ($column_order == "2") {
+
+    //             $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
+    //                 $query->orderBy('feel_type', $column_dir);
+    //             });
+    //             $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.feel_type', $column_dir);
+    //         } else if ($column_order == "1") {
+
+    //             $model->whereHas('get_site', function ($query) use ($column_dir) {
+    //                 $query->orderBy('name', $column_dir);
+    //             });
+    //             $DataLeakSocialRef_data->orderBy('site.name', $column_dir);
+    //         } else {
+    //             $model->orderBy('created_at', 'desc');
+    //             $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.created_at', $column_dir);
+    //         }
+    //     } else {
+    //         $model->orderBy('created_at', 'desc');
+    //         $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.created_at', $column_dir);
+    //     }
+
+    //     //  dd($DataLeakSocialRef_data->toSql());
+    //     // $datas = $DataLeakSocialRef_data->get();
+    //     //   foreach ($datas as $value) {
+
+    //     //  $value['source_name'] = $value->get_data_leak_feed_one->source_name;
+
+    //     //  }
+    //     // $this->aasort($datas,'source_name');
+    //     //  dd(DB::getQueryLog()); // Show results of log
+    //     // return DataTables::of($DataLeakSocialRef_data->get())->make(true);
+
+
+    //     $response = [
+    //         "recordsFiltered" => $DataLeakSocialRef_data->count(),
+    //         "draw" => $request->draw,
+    //         "recordsTotal" => $DataLeakSocialRef_data->count(),
+    //         "start" => $request->start,
+    //         "length" => $request->length,
+    //         "data" => $DataLeakSocialRef_data->skip($request->start)->take($request->length)->get(),
+    //     ];
+    //     // return DataTables::of($response)->make(true);
+
+    //     return response()->json($response);
+
+    //     // $model = DataLeakSocialRef::where('deleted_at', null)->orderBy('id', 'desc');
+    //     // $model->whereHas('get_data_leak_feed', function ($query){
+    //     //     $query->where('site_id', );
+
+    // }
+
+
+
+    // public function socialdatas_all_site_tb(Request $request)
+    // {
+    //     $feedTable          = $this->resolveTable(['data_leak_feed']);
+    //     $siteTable          = $this->resolveTable(['site']);
+    //     $socialRefTable     = $this->resolveTable(['data_leak_socail_ref', 'data_leak_social_ref']);
+    //     $credentialRefTable = $this->resolveTable(['credential_leak_ref']);
+
+    //     $get_role = @get_role_custom();
+    //     $site_ids = is_array(@$get_role['site_id_arr']) ? @$get_role['site_id_arr'] : [];
+    //     $isClientOrSiteClient = ((int) (@$get_role['client'] ?? 0) === 1) || ((int) (@$get_role['site_client'] ?? 0) === 1);
+    //     $hasRoleSiteLimit = !empty($site_ids);
+
+    //     // ---------- SELECTED SITE ----------
+    //     $selectedSite = null;
+    //     if ($request->site) {
+    //         if ($s = SiteSettings::where('code', $request->site)->first()) {
+    //             $selectedSite = (int) $s->id;
+    //         }
+    //     }
+
+    //     // ---------- SOCIAL ----------
+    //     $qSocial = DB::table($socialRefTable)
+    //         ->join($feedTable, "$socialRefTable.data_leak_feed_id", '=', "$feedTable.id")
+    //         ->join($siteTable, "$siteTable.id", '=', "$socialRefTable.site_id")
+    //         ->whereIn("$feedTable.feel_type", ['social', 'darkweb_public'])
+    //         ->when($hasRoleSiteLimit, fn($q) => $q->whereIn("$socialRefTable.site_id", $site_ids))
+    //         ->when($isClientOrSiteClient, fn($q) => $q->where("$feedTable.status", 1))
+    //         ->when($selectedSite, fn($q) => $q->where("$socialRefTable.site_id", $selectedSite))
+    //         ->select(
+    //             "$socialRefTable.id as ref_id",
+    //             "$socialRefTable.site_id",
+    //             "$socialRefTable.data_leak_feed_id",
+    //             "$socialRefTable.status as ref_status",
+    //             "$socialRefTable.created_at as ref_created_at",
+    //             "$socialRefTable.updated_at as ref_updated_at",
+    //             "$socialRefTable.serverity as ref_serverity",
+    //             "$socialRefTable.status_monitoring as ref_status_monitoring",
+
+    //             "$feedTable.keyword",
+    //             "$feedTable.sourceid",
+    //             "$feedTable.source_name",
+    //             "$feedTable.feel_type",
+    //             "$feedTable.feedcontent",
+    //             "$feedTable.feedtimepost",
+    //             "$feedTable.code as code_data",
+    //             "$feedTable.status as feed_status",
+
+    //             "$siteTable.name as site_name",
+    //             DB::raw("'social_ref' as ref_type")
+    //         );
+
+    //     // ---------- CREDENTIAL ----------
+    //     $qCredential = DB::table($credentialRefTable)
+    //         ->join($feedTable, "$credentialRefTable.data_leak_feed_id", '=', "$feedTable.id")
+    //         ->join($siteTable, "$siteTable.id", '=', "$credentialRefTable.site_id")
+    //         ->where("$feedTable.feel_type", 'credential')
+    //         ->when($hasRoleSiteLimit, fn($q) => $q->whereIn("$credentialRefTable.site_id", $site_ids))
+    //         ->when($isClientOrSiteClient, fn($q) => $q->where("$feedTable.status", 1))
+    //         ->when($selectedSite, fn($q) => $q->where("$credentialRefTable.site_id", $selectedSite))
+    //         ->select(
+    //             "$credentialRefTable.id as ref_id",
+    //             "$credentialRefTable.site_id",
+    //             "$credentialRefTable.data_leak_feed_id",
+    //             "$credentialRefTable.status as ref_status",
+    //             "$credentialRefTable.created_at as ref_created_at",
+    //             "$credentialRefTable.updated_at as ref_updated_at",
+    //             "$credentialRefTable.serverity as ref_serverity",
+    //             "$credentialRefTable.status_monitoring as ref_status_monitoring",
+
+    //             "$feedTable.keyword",
+    //             "$feedTable.sourceid",
+    //             "$feedTable.source_name",
+    //             "$feedTable.feel_type",
+    //             "$feedTable.feedcontent",
+    //             "$feedTable.feedtimepost",
+    //             "$feedTable.code as code_data",
+    //             "$feedTable.status as feed_status",
+
+    //             "$siteTable.name as site_name",
+    //             DB::raw("'credential_ref' as ref_type")
+    //         );
+
+    //     // ---------- PAYLOAD FILTERS ----------
+    //     if (!empty($request->check_serverity)) {
+    //         $qSocial->where("$socialRefTable.serverity", $request->check_serverity);
+    //         $qCredential->where("$credentialRefTable.serverity", $request->check_serverity);
+    //     }
+
+    //     if (!empty($request->check_monitoring)) {
+    //         $qSocial->where("$socialRefTable.status_monitoring", $request->check_monitoring);
+    //         $qCredential->where("$credentialRefTable.status_monitoring", $request->check_monitoring);
+    //     }
+
+    //     if (!empty($request->check_type)) {
+    //         $type = strtolower(trim($request->check_type));
+    //         if (in_array($type, ['social', 'darkweb_public'])) {
+    //             $qSocial->where("$feedTable.feel_type", $type);
+    //             $qCredential = null;
+    //         } elseif ($type === 'credential') {
+    //             $qSocial = null;
+    //         }
+    //     }
+
+    //     if (!empty($request->check_social) && $request->check_type === 'social') {
+    //         $check = strtolower($request->check_social);
+    //         if ($check === 'other') {
+    //             $qSocial->whereNotIn("$feedTable.keyword", ['Mobile', 'Facebook', 'Line', 'Twitter', 'Website']);
+    //         } else {
+    //             $qSocial->where("$feedTable.keyword", $check);
+    //         }
+    //     }
+
+    //     // ---------- EXTRA FILTER: CLICK_TYPE2 ----------
+    //     if (!empty($request->click_type2)) {
+    //         $ct2 = strtolower(trim($request->click_type2));
+    //         $feedAlias = DB::getTablePrefix() . $feedTable;
+
+    //         if (in_array($ct2, ['in_progress', 'reported', 'close'])) {
+    //             $qSocial->where("$socialRefTable.status_monitoring", 'LIKE', "%{$ct2}%");
+    //             $qCredential->where("$credentialRefTable.status_monitoring", 'LIKE', "%{$ct2}%");
+    //         } elseif (in_array($ct2, ['mobile', 'facebook', 'line', 'twitter', 'website'])) {
+    //             $qSocial->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["{$ct2}%"]);
+    //             $qCredential = null;
+    //         } elseif ($ct2 === 'other') {
+    //             $qSocial->whereNotIn(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), [
+    //                 'mobile',
+    //                 'facebook',
+    //                 'line',
+    //                 'twitter',
+    //                 'website'
+    //             ]);
+    //         } else {
+    //             $qSocial->where(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), 'LIKE', "%{$ct2}%");
+    //             $qCredential = null;
+    //         }
+    //     }
+
+
+
+    //     // ---------- UNION ----------
+    //     if ($qSocial && $qCredential) {
+    //         $union = $qSocial->unionAll($qCredential);
+    //     } elseif ($qSocial) {
+    //         $union = $qSocial;
+    //     } else {
+    //         $union = $qCredential;
+    //     }
+
+    //     // ---------- MAIN QUERY ----------
+    //     $q = DB::query()
+    //         ->fromRaw("({$union->toSql()}) as u")
+    //         ->mergeBindings($union);
+
+    //     // ---------- FILTERS ----------
+    //     if ($request->keywords) {
+    //         $kw = strtolower(trim($request->keywords));
+    //         $q->whereRaw(
+    //             "(LOWER(u.keyword) LIKE ? OR LOWER(fnStripTags(entity_decode(u.feedcontent))) LIKE ?)",
+    //             ["%{$kw}%", "%{$kw}%"]
+    //         );
+    //     }
+
+    //     if ($request->source) {
+    //         $q->where("u.sourceid", 'LIKE', "%{$request->source}%");
+    //     }
+
+    //     if ((int) $request->isDateSearch === 1 && $request->startDate && $request->endDate) {
+    //         $start = date("Y-m-d", strtotime(explode(" ", $request->startDate)[0])) . ' 00:00:01';
+    //         $end   = date("Y-m-d", strtotime(explode(" ", $request->endDate)[0])) . ' 23:59:59';
+    //         $q->whereBetween(DB::raw("u.ref_created_at"), [$start, $end]);
+    //     }
+
+    //     // ---------- ORDER ----------
+    //     if (@$request->order) {
+    //         $col = @$request->order[0]['column'];
+    //         $dir = @$request->order[0]['dir'] ?: 'desc';
+
+    //         if ($col == "9") $q->orderByRaw("u.site_id $dir");
+    //         elseif ($col == "8") $q->orderByRaw("u.feedtimepost $dir");
+    //         elseif ($col == "7") $q->orderByRaw("u.ref_status_monitoring $dir");
+    //         elseif ($col == "6") $q->orderByRaw("u.ref_serverity $dir");
+    //         elseif ($col == "5") $q->orderByRaw("u.feedcontent $dir");
+    //         elseif ($col == "4") $q->orderByRaw("u.keyword $dir");
+    //         elseif ($col == "3") $q->orderByRaw("u.source_name $dir");
+    //         elseif ($col == "2") $q->orderByRaw("u.feel_type $dir");
+    //         elseif ($col == "1") $q->orderByRaw("u.site_name $dir");
+    //         else $q->orderByRaw("u.ref_created_at desc");
+    //     } else {
+    //         $q->orderByRaw("u.ref_created_at desc");
+    //     }
+
+    //     // ---------- OUTPUT ----------
+    //     $count  = (clone $q)->count();
+    //     $length = (int) $request->length;
+    //     $data   = $length === -1
+    //         ? $q->skip((int)$request->start)->get()
+    //         : $q->skip((int)$request->start)->take($length)->get();
+
+    //     return response()->json([
+    //         "recordsFiltered" => $count,
+    //         "draw"            => $request->draw,
+    //         "recordsTotal"    => $count,
+    //         "start"           => (int)$request->start,
+    //         "length"          => $length,
+    //         "data"            => $data,
+    //     ]);
+    // }
+
+
     public function socialdatas_all_site_tb(Request $request)
     {
-        
-        $model = DataLeakSocialRef::where('deleted_at', null)
-            ->whereHas('get_data_leak_feed_one', function ($query) {
-                $query->whereIn('feel_type', ['social', 'darkweb_public']);
-            })
-            ->with('get_site')
-            ->with('get_data_leak_feed_one');
-        
-        $DataLeakSocialRef_data = DataLeakSocialRef::join('data_leak_feed', 'data_leak_socail_ref.data_leak_feed_id', '=', 'data_leak_feed.id')
-            ->whereIn('data_leak_feed.feel_type', ['social', 'darkweb_public'])->join('site', 'site.id', 'data_leak_socail_ref.site_id')
-            ->select('data_leak_socail_ref.*', 'data_leak_feed.*', 'site.name as site_name', 'data_leak_socail_ref.code as code_data', 'data_leak_socail_ref.id as id_data', 'data_leak_socail_ref.status as status_data');
-        if ($request->search_val == 1) {
-            $DataLeakFeed_Data =   DataLeakFeed::where('deleted_at', null)->where('data_leak_feed.status', '1')->whereIn('data_leak_feed.feel_type', ['social', 'darkweb_public']);
-            $get_role_custom_first = @get_role_custom();
-            $site_id_arr = @$get_role_custom_first['site_id_arr'];
-            if (@$get_role_custom_first['superadmin'] == 1) {
-            } else if (@$get_role_custom_first['client'] == 1) {
-                $model = $model->whereIn('site_id', $site_id_arr);
-                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('data_leak_socail_ref.status', 1);
-                $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
-            } else if (@$get_role_custom_first['site_support'] == 1) {
-                $model = $model->whereIn('site_id', $site_id_arr);
-                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
-                $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
-            } else if (@$get_role_custom_first['site_admin'] == 1) {
-                $model = $model->whereIn('site_id', $site_id_arr);
-                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
-                $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
-            } else if (@$get_role_custom_first['site_client'] == 1) {
-                $model = $model->whereIn('site_id', $site_id_arr)->where('data_leak_feed.status', 1);
-                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('fx_data_leak_feed.status', 1);
-                $DataLeakFeed_Data->whereIn('site_id', $site_id_arr);
-            }
+        $feedTable          = $this->resolveTable(['data_leak_feed']);
+        $siteTable          = $this->resolveTable(['site']);
+        $socialRefTable     = $this->resolveTable(['data_leak_socail_ref', 'data_leak_social_ref']);
+        $credentialRefTable = $this->resolveTable(['credential_leak_ref']);
 
+        // ---------- ROLE ----------
+        $get_role = @get_role_custom();
 
+        // ✅ แปลง Collection site_id_arr ให้เป็น array ปกติ
+        $site_ids = collect(@$get_role['site_id_arr'])
+            ->pluck('site_id')
+            ->filter()
+            ->values()
+            ->toArray();
 
+        // ✅ กำหนด flag สำหรับ client / site_client
+        $isClientOrSiteClient = (
+            (isset($get_role['client']) && (int)$get_role['client'] == 1) ||
+            (isset($get_role['site_client']) && (int)$get_role['site_client'] == 1)
+        );
 
-            if ($request->keywords) {
-                $keywords = $request->keywords;
-                //  $DataLeakFeed_data  = $DataLeakFeed_Data->get();
-                /*    foreach ($DataLeakFeed_data as $value_data) {
-                      $value_data->feedcontent_decode = html_entity_decode($value_data->feedcontent);
-                }
-                $DataLeakFeed_data_id = array();
-                array_push($DataLeakFeed_data_id, 0);
-                foreach($DataLeakFeed_data as $a) {
-                    if(strpos(strtoupper($a->feedcontent_decode), strtoupper($keywords)) !== false) {
-                        array_push($DataLeakFeed_data_id, $a->id);
-                    } 
-                }
-               */
-                // dd(count($DataLeakFeed_data_id));
-                $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
-                    $query->where('keyword', 'LIKE', '%' . $keywords . '%');
-                    // $query->orwhere('feedcontent', 'LIKE', '%' . $keywords . '%');
-                    //   $query->orWhereIn('id', $DataLeakFeed_data_id);
-                });
+        $hasRoleSiteLimit = !empty($site_ids);
 
-                $DataLeakSocialRef_data->whereRaw('(LOWER(fx_data_leak_feed.keyword) LIKE ? or LOWER(fnStripTags(entity_decode(fx_data_leak_feed.feedcontent))) LIKE ? )', array([trim(strtolower('%' . $request->keywords . '%'))], [trim(strtolower('%' . $request->keywords . '%'))]));
-                //$DataLeakSocialRef_data->orWhereIn('data_leak_feed.id', $DataLeakFeed_data_id);
-            }
-
-            if ($request->site) {
-                $SiteSettings = SiteSettings::where('code', @$request->site)->first();
-                // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
-                $model = $model->where('site_id', $SiteSettings->id);
-                $DataLeakSocialRef_data->where('data_leak_socail_ref.site_id', $SiteSettings->id);
-            }
-
-            if ($request->type) {
-
-                $type = $request->type;
-                $model->whereHas('get_data_leak_feed_one', function ($query) use ($type) {
-                    $query->where('feel_type', 'LIKE', '%' . $type . '%');
-                });
-                $DataLeakSocialRef_data->where('data_leak_feed.feel_type', 'LIKE', '%' . $type . '%');
-            }
-
-            if ($request->check_type) {
-
-                $type = $request->check_type;
-                $model->whereHas('get_data_leak_feed_one', function ($query) use ($type) {
-                    $query->where('feel_type', 'LIKE', '%' . $type . '%');
-                });
-                $DataLeakSocialRef_data->where('data_leak_feed.feel_type', 'LIKE', '%' . $type . '%');
-            }
-            //   dd($request->check_type);
-            if ($request->check_social && $request->check_type == "social") {
-
-                $check_social = $request->check_social;
-                $model->whereHas('get_data_leak_feed_one', function ($query) use ($check_social) {
-                    if ($check_social == "other") {
-                        $query->whereNotIn('keyword', ['Mobile', 'Facebook', 'Line', 'Twitter', 'Website']);
-                    } else {
-                        $query->where('keyword', $check_social);
-                    }
-                });
-                if ($check_social == "other") {
-                    $DataLeakSocialRef_data->whereNotIn('data_leak_feed.keyword', ['Mobile', 'Facebook', 'Line', 'Twitter', 'Website']);
-                } else {
-                    $DataLeakSocialRef_data->where('data_leak_feed.keyword', $check_social);
-                }
-            }
-
-
-
-            if ($request->source) {
-
-                $source = $request->source;
-                $model->whereHas('get_data_leak_feed_one', function ($query) use ($source) {
-                    $query->where('sourceid', 'LIKE', '%' . $source . '%');
-                });
-
-                $DataLeakSocialRef_data->where('data_leak_feed.sourceid', 'LIKE', '%' . $source . '%');
-            }
-
-            if ($request->check_serverity) {
-                $model = $model->where('serverity', $request->check_serverity);
-                $DataLeakSocialRef_data->where('data_leak_socail_ref.serverity', 'LIKE', '%' . $request->check_serverity . '%');
-            }
-
-            if ($request->check_monitoring) {
-                $model = $model->where('status_monitoring', $request->check_monitoring);
-                $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $request->check_monitoring . '%');
-            }
-
-            if ($request->isDateSearch == 1) {
-                $date_start = $request->startDate;
-                $date_end = $request->endDate;
-
-                $date_start_explode = explode(" ", $date_start);
-                $date_start_date = @$date_start_explode[0];
-                $date_start_time = @$date_start_explode[1] . ' ' . @$date_start_explode[2];
-
-                $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
-
-                $date_start_time_time = date("H:i", strtotime($date_start_time));
-                // $date_start_datetime_format = $date_start_date_format . ' ' . $date_start_time_time . ':00';
-                $date_start_datetime_format = $date_start_date_format . ' '  . '00:00:01';
-
-                $date_end_explode = explode(" ", $date_end);
-                $date_end_date = @$date_end_explode[0];
-                $date_end_time = @$date_end_explode[1] . ' ' . @$date_end_explode[2];
-                // dd($date_end_time);
-                $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
-                $date_end_time_time = date("H:i", strtotime($date_end_time));
-                // $date_end_datetime_format = $date_end_date_format . ' ' . $date_end_time_time . ':00';
-                $date_end_datetime_format = $date_end_date_format . ' '  . '23:59:59';
-
-                $source = $request->source;
-                $model->whereHas('get_data_leak_feed_one', function ($query) use ($date_start_date_format, $date_end_date_format) {
-                    $query->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
-                });
-
-                $DataLeakSocialRef_data->whereBetween('data_leak_feed.feedtimepost', array($date_start_datetime_format, $date_end_datetime_format));
-            }
-
-            // $model->get();
-        } else {
-            if ($request->site) {
-                $SiteSettings = SiteSettings::where('code', @$request->site)->first();
-                // $model = $model->whereHas('get_social_ref', function($qq) use ($request) {
-                $model = $model->where('site_id', $SiteSettings->id);
-                // remove ->where('status', 1)
-                $DataLeakSocialRef_data->where('data_leak_feed.status', 1)->where('data_leak_socail_ref.site_id', $SiteSettings->id);
-                // remove ->where('data_leak_socail_ref.status', 1)
-            }
-            
-            if ($request->click_key) {
-                $model = $model->where('keyword', $request->click_key);
-                $DataLeakSocialRef_data->where('LOWER(`data_leak_feed.keyword`)', 'LIKE', [trim(strtolower($request->click_key))]);
-            }
-
-            
-            if ($request->click_type) {
-
-                $model = $model->where('feel_type', '=', $request->click_type);
-                $DataLeakSocialRef_data->where('data_leak_socail_ref.feel_type', $request->click_type);
-            }
-           
-            if ($request->click_type2) {
-                $keywords = $request->click_type2;
-                $model->whereHas('get_data_leak_feed_one', function ($query) use ($keywords) {
-                    if ($keywords == 'other') {
-                        $query->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('mobile'))])
-                            ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('facebook'))])
-                            ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('line'))])
-                            ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('twitter'))])
-                            ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('website'))]);
-                    } else {
-                        if ($keywords == 'in_progress') {
-                            $query->where('status_monitoring', 'LIKE', '%' . $keywords . '%');
-                        } else if ($keywords == 'reported') {
-                            $query->where('status_monitoring', 'LIKE', '%' . $keywords . '%');
-                        } else if ($keywords == 'close') {
-                            $query->where('status_monitoring', 'LIKE', '%' . $keywords . '%');
-                        } else {
-                            $query->where('keyword', 'LIKE', '%' . $keywords . '%');
-                        }
-                    }
-                });
-
-                if ($keywords == 'other') {
-                    $DataLeakSocialRef_data->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ', [trim(strtolower('mobile'))])
-                        ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ', [trim(strtolower('facebook'))])
-                        ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ', [trim(strtolower('line'))])
-                        ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ', [trim(strtolower('twitter'))])
-                        ->whereRaw('LOWER(fx_data_leak_feed.keyword) != ? ', [trim(strtolower('website'))]);
-                } else {
-                    if ($keywords == 'in_progress') {
-                        $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $keywords . '%');
-                    } else if ($keywords == 'reported') {
-                        $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $keywords . '%');
-                    } else if ($keywords == 'close') {
-                        $DataLeakSocialRef_data->where('data_leak_socail_ref.status_monitoring', 'LIKE', '%' . $keywords . '%');
-                    } else {
-                        $DataLeakSocialRef_data->where('data_leak_feed.keyword', 'LIKE', '%' . $keywords . '%');
-                    }
-                }
-            }
-            
-            //<><><>
-            // if (Auth::check()) {
-
-            //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            //     if (Auth::user()->hasRole('admin')) { //if admin
-            //         // dd(777);
-
-            //     } else { //if notAdmin
-            //         // dd(888);
-            //         if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
-            //             if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
-            //                 // dd(99);
-
-            //                 $model = $model->whereIn('site_id', $site_id_arr);
-
-            //                 // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
-
-            //             } else { //not support and admin
-            //                 $model = $model->whereIn('site_id', $site_id_arr)->where('status', 1);
-
-            //                 // $countGroupBy = $countGroupBy->whereIn('site_id', $site_id_arr);
-            //             }
-            //         }
-            //     }
-            // }
-
-            $get_role_custom_first = @get_role_custom();
-            $site_id_arr = @$get_role_custom_first['site_id_arr'];
-            if (@$get_role_custom_first['superadmin'] == 1) {
-            } else if (@$get_role_custom_first['client'] == 1) {
-                $model = $model->whereIn('site_id', $site_id_arr)->where('data_leak_feed.status', 1);
-                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('data_leak_feed.status', 1);
-            } else if (@$get_role_custom_first['site_support'] == 1) {
-                $model = $model->whereIn('site_id', $site_id_arr);
-                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
-            } else if (@$get_role_custom_first['site_admin'] == 1) {
-                $model = $model->whereIn('site_id', $site_id_arr);
-                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr);
-            } else if (@$get_role_custom_first['site_client'] == 1) {
-                $model = $model->whereIn('site_id', $site_id_arr)->where('data_leak_feed.status', 1);
-                $DataLeakSocialRef_data->whereIn('data_leak_socail_ref.site_id', $site_id_arr)->where('fx_data_leak_feed.status', 1);
+        // ---------- SELECTED SITE ----------
+        $selectedSite = null;
+        if ($request->site) {
+            if ($s = SiteSettings::where('code', $request->site)->first()) {
+                $selectedSite = (int) $s->id;
             }
         }
 
+        // ---------- SOCIAL REF ----------
+        $qSocial = DB::table($socialRefTable)
+            ->join($feedTable, "$socialRefTable.data_leak_feed_id", '=', "$feedTable.id")
+            ->join($siteTable, "$siteTable.id", '=', "$socialRefTable.site_id")
+            ->whereIn("$feedTable.feel_type", ['social', 'darkweb_public'])
+            ->whereNull("$socialRefTable.deleted_at")
+            ->when($hasRoleSiteLimit, fn($q) => $q->whereIn("$socialRefTable.site_id", $site_ids))
+            ->when($isClientOrSiteClient, fn($q) => $q->where("$feedTable.status", 1))
+            ->when($selectedSite, fn($q) => $q->where("$socialRefTable.site_id", $selectedSite))
+            ->select(
+                "$socialRefTable.id as ref_id",
+                "$socialRefTable.site_id as site_id",
+                "$socialRefTable.data_leak_feed_id",
+                "$socialRefTable.status as ref_status",
+                "$socialRefTable.created_at as ref_created_at",
+                "$socialRefTable.updated_at as ref_updated_at",
+                "$socialRefTable.serverity as ref_serverity",
+                "$socialRefTable.status_monitoring as ref_status_monitoring",
+                "$feedTable.keyword",
+                "$feedTable.sourceid",
+                "$feedTable.source_name",
+                "$feedTable.feel_type",
+                "$feedTable.feedcontent",
+                "$feedTable.feedtimepost",
+                "$feedTable.code as code_data",
+                "$feedTable.status as feed_status",
+                "$siteTable.name as site_name",
+                DB::raw("'social_ref' as ref_type")
+            );
 
+        // ---------- CREDENTIAL REF ----------
+        $qCredential = DB::table($credentialRefTable)
+            ->join($feedTable, "$credentialRefTable.data_leak_feed_id", '=', "$feedTable.id")
+            ->join($siteTable, "$siteTable.id", '=', "$credentialRefTable.site_id")
+            ->where("$feedTable.feel_type", 'credential')
+            ->whereNull("$credentialRefTable.deleted_at")
+            ->when($hasRoleSiteLimit, fn($q) => $q->whereIn("$credentialRefTable.site_id", $site_ids))
+            ->when($isClientOrSiteClient, fn($q) => $q->where("$feedTable.status", 1))
+            ->when($selectedSite, fn($q) => $q->where("$credentialRefTable.site_id", $selectedSite))
+            ->select(
+                "$credentialRefTable.id as ref_id",
+                "$credentialRefTable.site_id as site_id",
+                "$credentialRefTable.data_leak_feed_id",
+                "$credentialRefTable.status as ref_status",
+                "$credentialRefTable.created_at as ref_created_at",
+                "$credentialRefTable.updated_at as ref_updated_at",
+                "$credentialRefTable.serverity as ref_serverity",
+                "$credentialRefTable.status_monitoring as ref_status_monitoring",
+                "$feedTable.keyword",
+                "$feedTable.sourceid",
+                "$feedTable.source_name",
+                "$feedTable.feel_type",
+                "$feedTable.feedcontent",
+                "$feedTable.feedtimepost",
+                "$feedTable.code as code_data",
+                "$feedTable.status as feed_status",
+                "$siteTable.name as site_name",
+                DB::raw("'credential_ref' as ref_type")
+            );
 
-        if (@$request->order) {
-            $column_order = @$request->order[0]['column'];
-            $column_dir = @$request->order[0]['dir'];
-            if ($column_order == "9") {
-                $model->orderBy('data_leak_feed.status', $column_dir);
-                $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.site_id', $column_dir);
-            } else if ($column_order == "8") {
-                $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
-                    $query->orderBy('feedtimepost', $column_dir);
-                });
-                $DataLeakSocialRef_data->orderBy('data_leak_feed.feedtimepost', $column_dir);
-            } else if ($column_order == "7") {
+        // ---------- FILTERS ----------
+        if (!empty($request->check_serverity)) {
+            $qSocial->where("$socialRefTable.serverity", $request->check_serverity);
+            $qCredential->where("$credentialRefTable.serverity", $request->check_serverity);
+        }
 
-                $model->orderBy('status_monitoring', $column_dir);
-                $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.status_monitoring', $column_dir);
-            } else if ($column_order == "6") {
+        if (!empty($request->check_monitoring)) {
+            $qSocial->where("$socialRefTable.status_monitoring", $request->check_monitoring);
+            $qCredential->where("$credentialRefTable.status_monitoring", $request->check_monitoring);
+        }
 
-                $model->orderBy('serverity', $column_dir);
-                $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.serverity', $column_dir);
-            } else if ($column_order == "5") {
+        if (!empty($request->check_type)) {
+            $type = strtolower(trim($request->check_type));
+            if (in_array($type, ['social', 'darkweb_public'])) {
+                $qSocial->where("$feedTable.feel_type", $type);
+                $qCredential = null;
+            } elseif ($type === 'credential') {
+                $qSocial = null;
+            }
+        }
 
-                $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
-                    $query->orderBy('feedcontent', $column_dir);
-                });
-                $DataLeakSocialRef_data->orderBy('data_leak_feed.feedcontent', $column_dir);
-            } else if ($column_order == "4") {
-
-                $model->orderBy('keyword', $column_dir);
-                $DataLeakSocialRef_data->orderBy('data_leak_feed.keyword', $column_dir);
-            } else if ($column_order == "3") {
-
-                $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
-                    $query->orderBy('source_name', $column_dir);
-                });
-                $DataLeakSocialRef_data->orderBy('data_leak_feed.source_name', $column_dir);
-            } else if ($column_order == "2") {
-
-                $model->whereHas('get_data_leak_feed_one', function ($query) use ($column_dir) {
-                    $query->orderBy('feel_type', $column_dir);
-                });
-                $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.feel_type', $column_dir);
-            } else if ($column_order == "1") {
-
-                $model->whereHas('get_site', function ($query) use ($column_dir) {
-                    $query->orderBy('name', $column_dir);
-                });
-                $DataLeakSocialRef_data->orderBy('site.name', $column_dir);
+        if (!empty($request->check_social) && $request->check_type === 'social') {
+            $check = strtolower($request->check_social);
+            if ($check === 'other') {
+                $qSocial->whereNotIn(DB::raw("LOWER($feedTable.keyword)"), ['mobile', 'facebook', 'line', 'twitter', 'website']);
             } else {
-                $model->orderBy('created_at', 'desc');
-                $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.created_at', $column_dir);
+                $qSocial->where(DB::raw("LOWER($feedTable.keyword)"), '=', $check);
             }
-        } else {
-            $model->orderBy('created_at', 'desc');
-            $DataLeakSocialRef_data->orderBy('data_leak_socail_ref.created_at', $column_dir);
         }
 
-        //  dd($DataLeakSocialRef_data->toSql());
-        // $datas = $DataLeakSocialRef_data->get();
-        //   foreach ($datas as $value) {
+        // ---------- CLICK_TYPE2 ----------
+        if (!empty($request->click_type2)) {
+            $ct2 = strtolower(trim($request->click_type2));
+            $feedAlias = DB::getTablePrefix() . $feedTable;
 
-        //  $value['source_name'] = $value->get_data_leak_feed_one->source_name;
+            if (in_array($ct2, ['in_progress', 'reported', 'close'])) {
+                $qSocial->where("$socialRefTable.status_monitoring", 'LIKE', "%{$ct2}%");
+                $qCredential->where("$credentialRefTable.status_monitoring", 'LIKE', "%{$ct2}%");
+            } elseif (in_array($ct2, ['mobile', 'facebook', 'line', 'twitter', 'website'])) {
+                $qSocial->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["{$ct2}%"]);
+                $qCredential->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["{$ct2}%"]);
+            } elseif ($ct2 === 'other') {
+                $qSocial->whereNotIn(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), ['mobile', 'facebook', 'line', 'twitter', 'website']);
+                $qCredential->whereNotIn(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), ['mobile', 'facebook', 'line', 'twitter', 'website']);
+            } else {
+                $qSocial->where(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), 'LIKE', "%{$ct2}%");
+                $qCredential->where(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), 'LIKE', "%{$ct2}%");
+            }
+        }
 
-        //  }
-        // $this->aasort($datas,'source_name');
-        //  dd(DB::getQueryLog()); // Show results of log
-        // return DataTables::of($DataLeakSocialRef_data->get())->make(true);
+        // ---------- UNION ----------
+        if ($qSocial && $qCredential) {
+            $union = $qSocial->unionAll($qCredential);
+        } elseif ($qSocial) {
+            $union = $qSocial;
+        } else {
+            $union = $qCredential;
+        }
 
+        // ---------- MAIN QUERY ----------
+        $q = DB::query()->fromSub($union, 'u');
 
-        $response = [
-            "recordsFiltered" => $DataLeakSocialRef_data->count(),
-            "draw" => $request->draw,
-            "recordsTotal" => $DataLeakSocialRef_data->count(),
-            "start" => $request->start,
-            "length" => $request->length,
-            "data" => $DataLeakSocialRef_data->skip($request->start)->take($request->length)->get(),
-        ];
-        // return DataTables::of($response)->make(true);
+        // ✅ แก้ปัญหา fx_u.site_id โดยใช้ DB::raw
+        if (empty($selectedSite)) {
+            if (!empty($site_ids)) {
+                $q->whereIn(DB::raw('u.site_id'), $site_ids);
+            } elseif (!empty($get_role['site_id'])) {
+                $q->where(DB::raw('u.site_id'), (int)$get_role['site_id']);
+            }
+        }
 
-        return response()->json($response);
+        // ---------- FILTERS ----------
+        if ($request->keywords) {
+            $kw = strtolower(trim($request->keywords));
+            $q->whereRaw(
+                "(LOWER(u.keyword) LIKE ? OR LOWER(fnStripTags(entity_decode(u.feedcontent))) LIKE ?)",
+                ["%{$kw}%", "%{$kw}%"]
+            );
+        }
 
-        // $model = DataLeakSocialRef::where('deleted_at', null)->orderBy('id', 'desc');
-        // $model->whereHas('get_data_leak_feed', function ($query){
-        //     $query->where('site_id', );
+        if ($request->source) {
+            $q->where("u.sourceid", 'LIKE', "%{$request->source}%");
+        }
 
+        // ---------- DATE FILTER ----------
+        if ((int) $request->isDateSearch === 1 && $request->startDate && $request->endDate) {
+            $start = Carbon::parse($request->startDate)->startOfDay()->toDateTimeString();
+            $end   = Carbon::parse($request->endDate)->endOfDay()->toDateTimeString();
+
+            $q->whereRaw("
+            u.feedtimepost IS NOT NULL
+            AND CAST(u.feedtimepost AS DATETIME) BETWEEN ? AND ?
+        ", [$start, $end]);
+        }
+
+        // ---------- ORDER ----------
+        if (!empty($request->order)) {
+            $col = $request->order[0]['column'];
+            $dir = $request->order[0]['dir'] ?? 'desc';
+
+            if ($col == "9")      $q->orderByRaw("u.site_id $dir");
+            elseif ($col == "8")  $q->orderByRaw("u.feedtimepost $dir");
+            elseif ($col == "7")  $q->orderByRaw("u.ref_status_monitoring $dir");
+            elseif ($col == "6")  $q->orderByRaw("u.ref_serverity $dir");
+            elseif ($col == "5")  $q->orderByRaw("u.feedcontent $dir");
+            elseif ($col == "4")  $q->orderByRaw("u.keyword $dir");
+            elseif ($col == "3")  $q->orderByRaw("u.source_name $dir");
+            elseif ($col == "2")  $q->orderByRaw("u.feel_type $dir");
+            elseif ($col == "1")  $q->orderByRaw("u.site_name $dir");
+            else                  $q->orderByRaw("u.feedtimepost DESC");
+        } else {
+            $q->orderByRaw("u.feedtimepost DESC");
+        }
+
+        // ---------- OUTPUT ----------
+        $count  = (clone $q)->count();
+        $length = (int) $request->length;
+
+        $data = $length === -1
+            ? $q->skip((int)$request->start)->get()
+            : $q->skip((int)$request->start)->take($length)->get();
+
+        return response()->json([
+            "recordsFiltered" => $count,
+            "draw"            => $request->draw,
+            "recordsTotal"    => $count,
+            "start"           => (int)$request->start,
+            "length"          => $length,
+            "data"            => $data,
+        ]);
     }
+
+
+
 
 
     // View Content DataLeak
@@ -1267,55 +1720,217 @@ class DataLeakController extends Controller
         );
     }
 
+    // public function delete_dataleakdata($code)
+    // {
+    //     // dd($code);
+    //     $DataLeakSocialRef = DataLeakSocialRef::where('code', $code)->first();
+    //     $DataLeakFeedTemp = DataLeakFeedTemp::where('id', $DataLeakSocialRef->temp_id)->first();
+    //     if ($DataLeakFeedTemp) {
+    //         $DataLeakFeeds = DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->get();
+    //         if ($DataLeakFeeds) {
+    //             foreach ($DataLeakFeeds as $DataLeakFeed) {
+    //                 $leak_socail_ref_temp = leak_socail_ref_temp::where('data_leak_feed_id', $DataLeakFeedTemp->id)->first();
+    //                 $transaction_client_leak_feed = transaction_client_leak_feed::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $DataLeakFeed->id)->first();
+    //                 if ($transaction_client_leak_feed) {
+    //                     $transaction_client_leak_feed->transaction_mode = 'delete';
+    //                     $transaction_client_leak_feed->transaction_data_status = 1;
+    //                     $transaction_client_leak_feed->status = 1;
+    //                     $transaction_client_leak_feed->save();
+    //                 } else {
+    //                     $transaction_client_leak_feed = new transaction_client_leak_feed();
+    //                     $transaction_client_leak_feed->site_id = $leak_socail_ref_temp->site_id;
+    //                     $transaction_client_leak_feed->transaction_id = $DataLeakFeed->id;
+    //                     $transaction_client_leak_feed->transaction_mode = 'delete';
+    //                     $transaction_client_leak_feed->transaction_data_status = 1;
+    //                     $transaction_client_leak_feed->status = 1;
+    //                     $transaction_client_leak_feed->save();
+    //                 }
+
+    //                 $transaction_client_leak_social_ref = transaction_client_leak_social_ref::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $DataLeakSocialRef->id)->first();
+    //                 if ($transaction_client_leak_social_ref) {
+    //                     $transaction_client_leak_social_ref->transaction_mode = 'delete';
+    //                     $transaction_client_leak_social_ref->transaction_data_status = 1;
+    //                     $transaction_client_leak_social_ref->status = 1;
+    //                     $transaction_client_leak_social_ref->save();
+    //                 } else {
+    //                     $transaction_client_leak_social_ref = new transaction_client_leak_social_ref();
+    //                     $transaction_client_leak_social_ref->site_id = $leak_socail_ref_temp->site_id;
+    //                     $transaction_client_leak_social_ref->transaction_id = $DataLeakSocialRef->id;
+    //                     $transaction_client_leak_social_ref->transaction_mode = 'delete';
+    //                     $transaction_client_leak_social_ref->transaction_data_status = 1;
+    //                     $transaction_client_leak_social_ref->status = 1;
+    //                     $transaction_client_leak_social_ref->save();
+    //                 }
+    //             }
+    //         }
+    //         DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->delete();
+    //         $DataLeakSocialRef->delete();
+    //         $DataLeakFeedTemp->approve = 0;
+    //         $DataLeakFeedTemp->save();
+    //     } else {
+    //         $DataLeakSocialRef->delete();
+    //     }
+
+    //     return ajaxResponse(
+    //         [
+    //             'message' => langapp('changes_saved_successful'),
+    //             'redirect' => route('socialdatas.index_all_site'),
+    //         ],
+    //         true,
+    //         Response::HTTP_OK
+    //     );
+    // }
+
     public function delete_dataleakdata($code)
     {
-        // dd($code);
+        // 1) ลองหาใน Social Ref ก่อน
         $DataLeakSocialRef = DataLeakSocialRef::where('code', $code)->first();
-        $DataLeakFeedTemp = DataLeakFeedTemp::where('id', $DataLeakSocialRef->temp_id)->first();
-        if ($DataLeakFeedTemp) {
-            $DataLeakFeeds = DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->get();
-            if ($DataLeakFeeds) {
-                foreach ($DataLeakFeeds as $DataLeakFeed) {
-                    $leak_socail_ref_temp = leak_socail_ref_temp::where('data_leak_feed_id', $DataLeakFeedTemp->id)->first();
-                    $transaction_client_leak_feed = transaction_client_leak_feed::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $DataLeakFeed->id)->first();
-                    if ($transaction_client_leak_feed) {
-                        $transaction_client_leak_feed->transaction_mode = 'delete';
-                        $transaction_client_leak_feed->transaction_data_status = 1;
-                        $transaction_client_leak_feed->status = 1;
-                        $transaction_client_leak_feed->save();
-                    } else {
-                        $transaction_client_leak_feed = new transaction_client_leak_feed();
-                        $transaction_client_leak_feed->site_id = $leak_socail_ref_temp->site_id;
-                        $transaction_client_leak_feed->transaction_id = $DataLeakFeed->id;
-                        $transaction_client_leak_feed->transaction_mode = 'delete';
-                        $transaction_client_leak_feed->transaction_data_status = 1;
-                        $transaction_client_leak_feed->status = 1;
-                        $transaction_client_leak_feed->save();
-                    }
 
-                    $transaction_client_leak_social_ref = transaction_client_leak_social_ref::where('site_id', $leak_socail_ref_temp->site_id)->where('transaction_id', $DataLeakSocialRef->id)->first();
-                    if ($transaction_client_leak_social_ref) {
-                        $transaction_client_leak_social_ref->transaction_mode = 'delete';
-                        $transaction_client_leak_social_ref->transaction_data_status = 1;
-                        $transaction_client_leak_social_ref->status = 1;
-                        $transaction_client_leak_social_ref->save();
-                    } else {
-                        $transaction_client_leak_social_ref = new transaction_client_leak_social_ref();
-                        $transaction_client_leak_social_ref->site_id = $leak_socail_ref_temp->site_id;
-                        $transaction_client_leak_social_ref->transaction_id = $DataLeakSocialRef->id;
-                        $transaction_client_leak_social_ref->transaction_mode = 'delete';
-                        $transaction_client_leak_social_ref->transaction_data_status = 1;
-                        $transaction_client_leak_social_ref->status = 1;
-                        $transaction_client_leak_social_ref->save();
-                    }
+        if ($DataLeakSocialRef) {
+            $DataLeakFeedTemp = DataLeakFeedTemp::find($DataLeakSocialRef->temp_id);
+
+            if ($DataLeakFeedTemp) {
+                $DataLeakFeeds = DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->get();
+
+                foreach ($DataLeakFeeds as $DataLeakFeed) {
+                    $leak_socail_ref_temp = leak_socail_ref_temp::where('data_leak_feed_id', $DataLeakFeed->id)->first();
+
+                    // ✅ Transaction Log (Feed)
+                    $transaction_client_leak_feed = transaction_client_leak_feed::firstOrNew([
+                        'site_id'        => $leak_socail_ref_temp->site_id,
+                        'transaction_id' => $DataLeakFeed->id,
+                    ]);
+                    $transaction_client_leak_feed->transaction_mode        = 'delete';
+                    $transaction_client_leak_feed->transaction_data_status = 1;
+                    $transaction_client_leak_feed->status                  = 1;
+                    $transaction_client_leak_feed->save();
+
+                    // ✅ Transaction Log (Ref)
+                    $transaction_client_leak_social_ref = transaction_client_leak_social_ref::firstOrNew([
+                        'site_id'        => $leak_socail_ref_temp->site_id,
+                        'transaction_id' => $DataLeakFeed->id, // เก็บเป็น feed id
+                    ]);
+                    $transaction_client_leak_social_ref->transaction_mode        = 'delete';
+                    $transaction_client_leak_social_ref->transaction_data_status = 1;
+                    $transaction_client_leak_social_ref->status                  = 1;
+                    $transaction_client_leak_social_ref->save();
+
+                    $DataLeakFeed->delete();
+                }
+
+                // ✅ หลังจากลบ feed หมด ให้ลบ temp ถ้าไม่มี feed เหลือ
+                if (DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->count() === 0) {
+                    $DataLeakFeedTemp->delete();
+                }
+
+                $DataLeakSocialRef->delete();
+            } else {
+                // ไม่มี temp → ลบ ref + log transaction โดยใช้ feed id
+                $transaction_client_leak_social_ref = transaction_client_leak_social_ref::firstOrNew([
+                    'site_id'        => $DataLeakSocialRef->site_id,
+                    'transaction_id' => $DataLeakSocialRef->id,
+                ]);
+                $transaction_client_leak_social_ref->transaction_mode        = 'delete';
+                $transaction_client_leak_social_ref->transaction_data_status = 1;
+                $transaction_client_leak_social_ref->status                  = 1;
+                $transaction_client_leak_social_ref->save();
+
+                // ✅ พยายามลบ feed หลักที่อ้างถึงด้วย
+                $feed = DataLeakFeed::where('code', $DataLeakSocialRef->code)->first();
+                if ($feed) {
+                    $feed->delete();
+                }
+
+                $DataLeakSocialRef->delete();
+            }
+        } else {
+            // 2) Credential Case
+            $CredentialRef = CredentialLeakRef::where('code', $code)->first();
+
+            if ($CredentialRef) {
+                $feed = DataLeakFeed::find($CredentialRef->data_leak_feed_id);
+
+                if ($feed) {
+                    // ✅ Transaction Log (Feed)
+                    $transaction_client_leak_feed = transaction_client_leak_feed::firstOrNew([
+                        'site_id'        => $CredentialRef->site_id,
+                        'transaction_id' => $feed->id,
+                    ]);
+                    $transaction_client_leak_feed->transaction_mode        = 'delete';
+                    $transaction_client_leak_feed->transaction_data_status = 1;
+                    $transaction_client_leak_feed->status                  = 1;
+                    $transaction_client_leak_feed->save();
+
+                    $feed->delete();
+                }
+
+                // ✅ Transaction Log (Credential Ref → เก็บ feed id)
+                $transaction_client_leak_social_ref = transaction_client_leak_social_ref::firstOrNew([
+                    'site_id'        => $CredentialRef->site_id,
+                    'transaction_id' => $CredentialRef->id,
+                ]);
+                $transaction_client_leak_social_ref->transaction_mode        = 'delete';
+                $transaction_client_leak_social_ref->transaction_data_status = 1;
+                $transaction_client_leak_social_ref->status                  = 1;
+                $transaction_client_leak_social_ref->save();
+
+                $CredentialRef->delete();
+            } else {
+                $DataLeakFeed = DataLeakFeed::where('code', $code)->first();
+                if ($DataLeakFeed) {
+                    // ✅ Transaction Log (Feed)
+                    $transaction_client_leak_feed = transaction_client_leak_feed::firstOrNew([
+                        'site_id'        => $DataLeakFeed->site_id,
+                        'transaction_id' => $DataLeakFeed->id,
+                    ]);
+                    $transaction_client_leak_feed->transaction_mode        = 'delete';
+                    $transaction_client_leak_feed->transaction_data_status = 1;
+                    $transaction_client_leak_feed->status                  = 1;
+                    $transaction_client_leak_feed->save();
+
+                    $DataLeakFeed->delete();
+                } else {
+                    return ajaxResponse(
+                        ['message' => 'ไม่พบข้อมูลที่จะลบ'],
+                        false,
+                        Response::HTTP_NOT_FOUND
+                    );
                 }
             }
-            DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->delete();
-            $DataLeakSocialRef->delete();
-            $DataLeakFeedTemp->approve = 0;
-            $DataLeakFeedTemp->save();
+        }
+
+        return ajaxResponse(
+            [
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => route('socialdatas.index_all_site'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+
+    public function change_status_dataleakdata(Request $request)
+    {
+        // พยายามหาใน social ref ก่อน
+        $DataLeakSocialRef = DataLeakSocialRef::where('id', $request->code)->first();
+
+        if ($DataLeakSocialRef) {
+            $DataLeakSocialRef->status = $request->status;
+            $DataLeakSocialRef->save();
         } else {
-            $DataLeakSocialRef->delete();
+            // ถ้าไม่เจอใน social → ลอง credential
+            $CredentialRef = CredentialLeakRef::where('id', $request->code)->first();
+            if ($CredentialRef) {
+                $CredentialRef->status = $request->status;
+                $CredentialRef->save();
+            } else {
+                return ajaxResponse(
+                    ['message' => 'ไม่พบข้อมูลที่ต้องการอัปเดต'],
+                    false,
+                    Response::HTTP_NOT_FOUND
+                );
+            }
         }
 
         return ajaxResponse(
@@ -1328,22 +1943,6 @@ class DataLeakController extends Controller
         );
     }
 
-    public function change_status_dataleakdata(Request $request)
-    {
-
-        $DataLeakSocialRef = DataLeakSocialRef::where('id', $request->code)->first();
-        $DataLeakSocialRef->status = $request->status;
-        $DataLeakSocialRef->save();
-
-        return ajaxResponse(
-            [
-                'message' => langapp('changes_saved_successful'),
-                'redirect' => route('socialdatas.index_all_site'),
-            ],
-            true,
-            Response::HTTP_OK
-        );
-    }
 
     public function change_delete_dataleakdata(Request $request)
     {
@@ -2423,71 +3022,71 @@ class DataLeakController extends Controller
             $site_id = $request->site_id;
             $model = DataLeakFeedTemp::where(function ($q) use ($site_id, $request) {
 
-                    $q->where('keyword', '!=', null);
-                    $q->where('keyword', '!=', '');
-                    $q->where('feed_type', 'darkweb');
-                    // $q->orwhere($orwhere);
-                    $q->wherehas('get_socail_ref_temp', function ($a) use ($site_id) {
-                        $a->where('site_id', $site_id)->where('deleted_at', null);
-                    });
-
-                    // $q->orwhere($orwhere);
-
-                    if ($request->search) {
-                        $q->where('keyword', 'LIKE', '%' . $request->search . '%');
-                    }
-
-                    if ($request->source_select) {
-                        $q->where('sourceid', $request->source_select);
-                    }
-
-                    if ($request->check_type) {
-                        if ($request->check_type == 1) {
-                            $q->where('approve', '0');
-                        } else if ($request->check_type == 2) {
-                            $q->where('approve', '1');
-                        }
-                    }
-
-                    // if ($request->check_all == 'true') {
-
-                    // } else {
-                    //     if ($request->check_pending == 'true' && $request->check_approved == 'true') {
-
-                    //     } else if ($request->check_pending == 'true') {
-                    //         $q->where('approve', '0');
-                    //     } else if ($request->check_approved == 'true') {
-                    //         $q->where('approve', '1');
-                    //     }
-                    // }
-
-                    if ($request->start_date) {
-                        $date_start = $request->start_date;
-                        $date_end = $request->end_date;
-
-                        $date_start_explode = explode(" ", $date_start);
-                        $date_start_date = @$date_start_explode[0];
-                        // $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
-                        // dd($date_start_time);
-                        $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
-                        // dd($date_start_date_format);
-                        // $date_start_time_time = date("H:i", strtotime($date_start_time));
-                        // $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
-                        // dd($date_start);
-
-                        $date_end_explode = explode(" ", $date_end);
-                        $date_end_date = @$date_end_explode[0];
-                        // $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
-                        // dd($date_end_time);
-                        $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
-                        // $date_end_time_time = date("H:i", strtotime($date_end_time));
-                        // $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
-                        // dd($date_end_time_time);
-
-                        // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
-                        $q->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
-                    }
+                $q->where('keyword', '!=', null);
+                $q->where('keyword', '!=', '');
+                $q->where('feed_type', 'darkweb');
+                // $q->orwhere($orwhere);
+                $q->wherehas('get_socail_ref_temp', function ($a) use ($site_id) {
+                    $a->where('site_id', $site_id)->where('deleted_at', null);
                 });
+
+                // $q->orwhere($orwhere);
+
+                if ($request->search) {
+                    $q->where('keyword', 'LIKE', '%' . $request->search . '%');
+                }
+
+                if ($request->source_select) {
+                    $q->where('sourceid', $request->source_select);
+                }
+
+                if ($request->check_type) {
+                    if ($request->check_type == 1) {
+                        $q->where('approve', '0');
+                    } else if ($request->check_type == 2) {
+                        $q->where('approve', '1');
+                    }
+                }
+
+                // if ($request->check_all == 'true') {
+
+                // } else {
+                //     if ($request->check_pending == 'true' && $request->check_approved == 'true') {
+
+                //     } else if ($request->check_pending == 'true') {
+                //         $q->where('approve', '0');
+                //     } else if ($request->check_approved == 'true') {
+                //         $q->where('approve', '1');
+                //     }
+                // }
+
+                if ($request->start_date) {
+                    $date_start = $request->start_date;
+                    $date_end = $request->end_date;
+
+                    $date_start_explode = explode(" ", $date_start);
+                    $date_start_date = @$date_start_explode[0];
+                    // $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
+                    // dd($date_start_time);
+                    $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
+                    // dd($date_start_date_format);
+                    // $date_start_time_time = date("H:i", strtotime($date_start_time));
+                    // $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
+                    // dd($date_start);
+
+                    $date_end_explode = explode(" ", $date_end);
+                    $date_end_date = @$date_end_explode[0];
+                    // $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
+                    // dd($date_end_time);
+                    $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
+                    // $date_end_time_time = date("H:i", strtotime($date_end_time));
+                    // $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
+                    // dd($date_end_time_time);
+
+                    // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
+                    $q->whereBetween('feedtimepost', array($date_start_date_format, $date_end_date_format));
+                }
+            });
 
             $model = $model->orwhere(function ($q) use ($site_id, $request) /*use ($where1,$orwhere)*/ {
                 $q->where('keyword', '!=', null);
@@ -2560,14 +3159,14 @@ class DataLeakController extends Controller
             $site_id = $request->site_id;
             $model = DataLeakFeedTemp::where(function ($q) use ($site_id) {
 
-                    $q->where('keyword', '!=', null);
-                    $q->where('keyword', '!=', '');
-                    $q->where('feed_type', 'darkweb');
-                    // $q->orwhere($orwhere);
-                    $q->wherehas('get_socail_ref_temp', function ($a) use ($site_id) {
-                        $a->where('site_id', $site_id)->where('deleted_at', null);
-                    });
+                $q->where('keyword', '!=', null);
+                $q->where('keyword', '!=', '');
+                $q->where('feed_type', 'darkweb');
+                // $q->orwhere($orwhere);
+                $q->wherehas('get_socail_ref_temp', function ($a) use ($site_id) {
+                    $a->where('site_id', $site_id)->where('deleted_at', null);
                 });
+            });
 
             $model = $model->orwhere(function ($q) use ($site_id) /*use ($where1,$orwhere)*/ {
                 $q->where('keyword', '!=', null);
@@ -4090,30 +4689,92 @@ class DataLeakController extends Controller
         );
     }
 
+    // public function edit_dataleak_modal($code, Request $request)
+    // {
+    //     $DataLeakSocialRefs = DataLeakSocialRef::where('code', $code)->first();
+    //     $DataLeakFeed = DataLeakFeed::where('id', $DataLeakSocialRefs->data_leak_feed_id)->first();;
+    //     $data['DataLeakFeed'] = $DataLeakFeed;
+    //     $data['DataLeakSocialRefs'] = $DataLeakSocialRefs;
+
+    //     $data['site'] = @$request->site;
+
+
+    //     return view('sitesettings::modal.edit_dataleak')->with($data);
+    // }
+
     public function edit_dataleak_modal($code, Request $request)
     {
-        $DataLeakSocialRefs = DataLeakSocialRef::where('code', $code)->first();
-        $DataLeakFeed = DataLeakFeed::where('id', $DataLeakSocialRefs->data_leak_feed_id)->first();;
+        // dd($code);
+        // ลองหาใน Social Ref ก่อน
+        // $DataLeakSocialRefs = DataLeakSocialRef::where('code', $code)->first();
+        $DataLeakFeed = DataLeakFeed::where('code', $code)->first();
+
+        $DataLeakSocialRefs = DataLeakSocialRef::where('data_leak_feed_id', $DataLeakFeed->id)->first();
+
+        if ($DataLeakSocialRefs) {
+            $DataLeakFeed = DataLeakFeed::find($DataLeakSocialRefs->data_leak_feed_id);
+        } else {
+            // ถ้าไม่เจอ social → ลองหาใน feed
+            $DataLeakFeed = DataLeakFeed::where('code', $code)->firstOrFail();
+            $DataLeakSocialRefs = CredentialLeakRef::where('data_leak_feed_id', $DataLeakFeed->id)->first();
+        }
+
+        if (!$DataLeakSocialRefs) {
+            abort(404, "ไม่พบข้อมูล");
+            $data['DataLeakFeed'] = $DataLeakFeed;
+            $data['DataLeakSocialRefs'] = $DataLeakSocialRefs;
+            $data['site'] = $request->site ?? null;
+        }
+
         $data['DataLeakFeed'] = $DataLeakFeed;
         $data['DataLeakSocialRefs'] = $DataLeakSocialRefs;
-
-        $data['site'] = @$request->site;
+        $data['site'] = $request->site ?? null;
 
 
         return view('sitesettings::modal.edit_dataleak')->with($data);
     }
 
+
+    // public function activity_dataleak_modal($code, Request $request)
+    // {
+    //     $DataLeakSocialRefs = DataLeakSocialRef::where('code', $code)->first();
+    //     $ActivityHistory = Activity::select('activity.*', 'users.name as users_name')->where('activity.data_leak_socail_ref_id', $DataLeakSocialRefs->id)->whereNull('activity.deleted_at')->leftJoin('users', 'activity.user_id', '=', 'users.id')->orderBy('created_at', 'desc')->get();
+    //     // $DataLeakFeed = DataLeakFeed::where('id',$DataLeakSocialRefs->data_leak_feed_id)->first();
+    //     $data['DataLeakSocialRefs'] = $DataLeakSocialRefs;
+    //     $data['site'] = @$request->site;
+    //     $data['ActivityHistory'] = $ActivityHistory;
+
+    //     return view('sitesettings::modal.activity_dataleak_modal')->with($data);
+    // }
+
     public function activity_dataleak_modal($code, Request $request)
     {
-        $DataLeakSocialRefs = DataLeakSocialRef::where('code', $code)->first();
-        $ActivityHistory = Activity::select('activity.*', 'users.name as users_name')->where('activity.data_leak_socail_ref_id', $DataLeakSocialRefs->id)->whereNull('activity.deleted_at')->leftJoin('users', 'activity.user_id', '=', 'users.id')->orderBy('created_at', 'desc')->get();
-        // $DataLeakFeed = DataLeakFeed::where('id',$DataLeakSocialRefs->data_leak_feed_id)->first();
-        $data['DataLeakSocialRefs'] = $DataLeakSocialRefs;
-        $data['site'] = @$request->site;
+        // หา Social Ref ก่อน
+        $feed = DataLeakFeed::where('code', $code)->first();
+        $ref = DataLeakSocialRef::where('data_leak_feed_id', $feed->id)->first();
+        if (!$ref) {
+            $ref = CredentialLeakRef::where('code', $code)->first();
+        }
+
+        if (!$ref) {
+            abort(404, 'ไม่พบข้อมูล');
+        }
+
+        $ActivityHistory = Activity::select('activity.*', 'users.name as users_name')
+            ->where('activity.data_leak_socail_ref_id', $ref->id)
+            ->whereNull('activity.deleted_at')
+            ->leftJoin('users', 'activity.user_id', '=', 'users.id')
+            ->orderBy('activity.created_at', 'desc')
+            ->get();
+
+        $data['DataLeakSocialRefs'] = $ref; // 👈 ส่งชื่อเดิม ให้ blade ไม่พัง
+        $data['site'] = $request->site;
         $data['ActivityHistory'] = $ActivityHistory;
 
         return view('sitesettings::modal.activity_dataleak_modal')->with($data);
     }
+
+
 
     public function activity_get_edit_data(Request $request)
     {
@@ -4201,6 +4862,132 @@ class DataLeakController extends Controller
         }
     }
 
+    // public function activity_save(Request $request)
+    // {
+    //     if (!$request->title && !@$_POST['content']) {
+    //         return response()->json(['message' => 'You have to fill Title', 'errors' => ['missing' => ["You have to fill Title"], 'missing2' => ["You have to fill content"]]], 500);
+    //     } else if (!$request->title) {
+    //         return response()->json(['message' => 'You have to fill Title', 'errors' => ['missing' => ["You have to fill Title"]]], 500);
+    //     } else if (!@$_POST['content']) {
+    //         return response()->json(['message' => 'You have to fill content', 'errors' => ['missing' => ["You have to fill content"]]], 500);
+    //     }
+
+    //     $status_activity = $request->status_activity;
+    //     $content = @$_POST['content']; //รับค่าจาก messageInput
+    //     if ($content) {
+    //         $dom = new \domdocument();
+    //         if ($dom->getelementsbytagname('img')) {
+    //             $dom->loadHtml(
+    //                 '<?xml encoding="UTF-8">' . $content,
+    //                 LIBXML_HTML_NOIMPLIED |
+    //                     LIBXML_HTML_NODEFDTD |
+    //                     LIBXML_NOERROR |
+    //                     LIBXML_NOWARNING
+    //             );
+    //             //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
+    //             $images = $dom->getelementsbytagname('img');
+    //             //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
+    //             foreach ($images as $k => $img) {
+    //                 $data = $img->getattribute('src');
+
+    //                 //Link url
+    //                 $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+    //                 if (preg_match($reg_exUrl, $data, $url_image)) {
+    //                     $url = $url_image[0];
+    //                     $image = file_get_contents($url);
+    //                     if ($image !== false) {
+    //                         $data = 'data:image/jpg;base64,' . base64_encode($image);
+    //                     }
+    //                 }
+
+    //                 $img_check_src = explode(";", $data);
+    //                 if (@$img_check_src[1]) {
+    //                     list($type, $data) = explode(';', $data);
+    //                     list(, $data) = explode(',', $data);
+    //                     $data = base64_decode($data);
+    //                     //ตั้งชื่อรูปภาพใหม่โดยอ้างอิงจากเวลา
+    //                     $image_name = time() . $k . '.png';
+    //                     //อัพโหลดภาพไปยัง public
+    //                     $path = public_path('images/file_editor') . '/' . $image_name;
+    //                     //ทำการอัพโหลดภาพ
+    //                     file_put_contents($path, $data);
+    //                     $img->removeattribute('src');
+    //                     $img->setattribute('src', config('app.URL_CENTER_PUBLISH') . '/images/file_editor/' . $image_name);
+    //                 } else {
+    //                 }
+    //             }
+    //             $content = $dom->savehtml();
+    //         }
+    //     }
+
+    //     if ($request->check_active == "1") {
+    //         $Activity = new Activity;
+    //         $Activity->code = generator_uuid();
+    //         $Activity->data_leak_socail_ref_id = $request->id_DataLeakSocialRefs;
+    //         $Activity->title = $request->title;
+    //         $Activity->content = $content;
+    //         $Activity->user_id = Auth::user()->id;
+    //         if ($status_activity) {
+    //             $Activity->status_activity = $status_activity;
+    //         }
+    //         $Activity->save();
+    //     } else if ($request->check_active == "2") {
+    //         $Activity = Activity::where('id', $request->code_edited_activity)->first();
+    //         $Activity->title = $request->title;
+    //         $Activity->content = $content;
+    //         if ($status_activity) {
+    //             $Activity->status_activity = $status_activity;
+    //         }
+    //         $Activity->save();
+    //     }
+    //     $Activity_check = Activity::where('data_leak_socail_ref_id', $request->id_DataLeakSocialRefs)->where('status_activity', 'close')->first();
+
+    //     $DataLeakSocialRef = DataLeakSocialRef::where('id', $request->id_DataLeakSocialRefs)->first();
+    //     // if($DataLeakSocialRef->status_monitoring != 'close') {
+    //     // if($Activity->status_activity == 'close') {
+    //     //     $DataLeakSocialRef->status_monitoring = 'close';
+    //     //     $DataLeakSocialRef->save();
+    //     // } else if ($Activity->status_activity == 'in_progress') {//reported
+    //     //     if($Activity_check) {
+    //     //         $DataLeakSocialRef->status_monitoring = 'close';
+    //     //         $DataLeakSocialRef->save();
+    //     //     } else {
+    //     //         $DataLeakSocialRef->status_monitoring = 'in_progress';//reported
+    //     //         $DataLeakSocialRef->save();
+    //     //     }
+    //     // } else if ($Activity->status_activity == 'in_progress') {
+    //     //     if($Activity_check) {
+    //     //         $DataLeakSocialRef->status_monitoring = 'close';
+    //     //         $DataLeakSocialRef->save();
+    //     //     } else {
+    //     //         $DataLeakSocialRef->status_monitoring = 'in_progress';
+    //     //         $DataLeakSocialRef->save();
+    //     //     }
+    //     // }   
+    //     // }
+    //     if ($status_activity) {
+    //         $DataLeakSocialRef->status_monitoring = $status_activity;
+    //         $DataLeakSocialRef->save();
+    //     }
+
+
+    //     if ($request->site_code) {
+    //         $site = route('socialdatas.index', ['id' => @$request->site_code]);
+    //     } else {
+    //         $site = route('socialdatas.index_all_site');
+    //     }
+
+    //     return ajaxResponse(
+    //         [
+    //             'message' => langapp('changes_saved_successful'),
+    //             'redirect' => $site,
+    //             'socail_ref_id' => $Activity->data_leak_socail_ref_id,
+    //         ],
+    //         true,
+    //         Response::HTTP_OK
+    //     );
+    // }
+
     public function activity_save(Request $request)
     {
         if (!$request->title && !@$_POST['content']) {
@@ -4212,24 +4999,17 @@ class DataLeakController extends Controller
         }
 
         $status_activity = $request->status_activity;
-        $content = @$_POST['content']; //รับค่าจาก messageInput
+        $content = @$_POST['content'];
+
         if ($content) {
             $dom = new \domdocument();
             if ($dom->getelementsbytagname('img')) {
                 $dom->loadHtml(
                     '<?xml encoding="UTF-8">' . $content,
-                    LIBXML_HTML_NOIMPLIED |
-                        LIBXML_HTML_NODEFDTD |
-                        LIBXML_NOERROR |
-                        LIBXML_NOWARNING
+                    LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOERROR | LIBXML_NOWARNING
                 );
-                //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
-                $images = $dom->getelementsbytagname('img');
-                //ลูปรูปภาพและทำการเข้ารหัสรูปภาพ
-                foreach ($images as $k => $img) {
+                foreach ($dom->getelementsbytagname('img') as $k => $img) {
                     $data = $img->getattribute('src');
-
-                    //Link url
                     $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                     if (preg_match($reg_exUrl, $data, $url_image)) {
                         $url = $url_image[0];
@@ -4238,27 +5018,23 @@ class DataLeakController extends Controller
                             $data = 'data:image/jpg;base64,' . base64_encode($image);
                         }
                     }
-
                     $img_check_src = explode(";", $data);
                     if (@$img_check_src[1]) {
                         list($type, $data) = explode(';', $data);
                         list(, $data) = explode(',', $data);
                         $data = base64_decode($data);
-                        //ตั้งชื่อรูปภาพใหม่โดยอ้างอิงจากเวลา
                         $image_name = time() . $k . '.png';
-                        //อัพโหลดภาพไปยัง public
                         $path = public_path('images/file_editor') . '/' . $image_name;
-                        //ทำการอัพโหลดภาพ
                         file_put_contents($path, $data);
                         $img->removeattribute('src');
                         $img->setattribute('src', config('app.URL_CENTER_PUBLISH') . '/images/file_editor/' . $image_name);
-                    } else {
                     }
                 }
                 $content = $dom->savehtml();
             }
         }
 
+        // ✅ บันทึก Activity
         if ($request->check_active == "1") {
             $Activity = new Activity;
             $Activity->code = generator_uuid();
@@ -4279,36 +5055,17 @@ class DataLeakController extends Controller
             }
             $Activity->save();
         }
-        $Activity_check = Activity::where('data_leak_socail_ref_id', $request->id_DataLeakSocialRefs)->where('status_activity', 'close')->first();
 
-        $DataLeakSocialRef = DataLeakSocialRef::where('id', $request->id_DataLeakSocialRefs)->first();
-        // if($DataLeakSocialRef->status_monitoring != 'close') {
-        // if($Activity->status_activity == 'close') {
-        //     $DataLeakSocialRef->status_monitoring = 'close';
-        //     $DataLeakSocialRef->save();
-        // } else if ($Activity->status_activity == 'in_progress') {//reported
-        //     if($Activity_check) {
-        //         $DataLeakSocialRef->status_monitoring = 'close';
-        //         $DataLeakSocialRef->save();
-        //     } else {
-        //         $DataLeakSocialRef->status_monitoring = 'in_progress';//reported
-        //         $DataLeakSocialRef->save();
-        //     }
-        // } else if ($Activity->status_activity == 'in_progress') {
-        //     if($Activity_check) {
-        //         $DataLeakSocialRef->status_monitoring = 'close';
-        //         $DataLeakSocialRef->save();
-        //     } else {
-        //         $DataLeakSocialRef->status_monitoring = 'in_progress';
-        //         $DataLeakSocialRef->save();
-        //     }
-        // }   
-        // }
-        if ($status_activity) {
-            $DataLeakSocialRef->status_monitoring = $status_activity;
-            $DataLeakSocialRef->save();
+        // ✅ หาว่ามาจาก Social หรือ Credential
+        $DataLeakRef = DataLeakSocialRef::find($request->id_DataLeakSocialRefs);
+        if (!$DataLeakRef) {
+            $DataLeakRef = CredentialLeakRef::find($request->id_DataLeakSocialRefs);
         }
 
+        if ($DataLeakRef && $status_activity) {
+            $DataLeakRef->status_monitoring = $status_activity;
+            $DataLeakRef->save();
+        }
 
         if ($request->site_code) {
             $site = route('socialdatas.index', ['id' => @$request->site_code]);
@@ -4327,6 +5084,52 @@ class DataLeakController extends Controller
         );
     }
 
+
+    // public function activity_delete(Request $request)
+    // {
+    //     if ($request->site_code) {
+    //         $site = route('socialdatas.index', ['id' => @$request->site_code]);
+    //     } else {
+    //         $site = route('socialdatas.index_all_site');
+    //     }
+    //     $Activity = Activity::where('id', $request->code_activity)->first();
+    //     $Activity->delete();
+
+    //     $Activity_check = Activity::where('data_leak_socail_ref_id', $Activity->data_leak_socail_ref_id)->where('status_activity', 'close')->first();
+    //     $Activity_check_last = Activity::where('data_leak_socail_ref_id', $Activity->data_leak_socail_ref_id)->where('deleted_at', null)->orderBy('id', 'desc')->first();
+    //     $status_activity = $Activity_check_last->status_activity;
+
+    //     $DataLeakSocialRef = DataLeakSocialRef::where('id', $Activity->data_leak_socail_ref_id)->first();
+    //     // if($DataLeakSocialRef->status_monitoring != 'close') {
+    //     if ($Activity_check_last) {
+    //         if ($status_activity) {
+    //             $DataLeakSocialRef->status_monitoring = $status_activity;
+    //             $DataLeakSocialRef->save();
+    //         } else {
+    //             $DataLeakSocialRef->status_monitoring = 'in_progress';
+    //             $DataLeakSocialRef->save();
+    //         }
+    //     } else {
+    //         $DataLeakSocialRef->status_monitoring = 'in_progress';
+    //         $DataLeakSocialRef->save();
+    //     }
+    //     // }
+
+
+    //     if ($Activity) {
+    //         return ajaxResponse(
+    //             [
+    //                 'message' => langapp('changes_saved_successful'),
+    //                 'redirect' => $site,
+    //             ],
+    //             true,
+    //             Response::HTTP_OK
+    //         );
+    //     } else {
+    //         return response()->json(['message' => 'Error Delete Activity Please Contact Admin', 'errors' => ['missing' => ["Error Delete Activity Please Contact Admin"]]], 500);
+    //     }
+    // }
+
     public function activity_delete(Request $request)
     {
         if ($request->site_code) {
@@ -4334,43 +5137,53 @@ class DataLeakController extends Controller
         } else {
             $site = route('socialdatas.index_all_site');
         }
+
         $Activity = Activity::where('id', $request->code_activity)->first();
+
+        if (!$Activity) {
+            return response()->json([
+                'message' => 'Activity not found',
+                'errors'  => ['missing' => ["Activity not found"]],
+            ], 404);
+        }
+
+        // เก็บ id ก่อนลบ เพราะเดี๋ยว $Activity จะหายไป
+        $refId = $Activity->data_leak_socail_ref_id;
         $Activity->delete();
 
-        $Activity_check = Activity::where('data_leak_socail_ref_id', $Activity->data_leak_socail_ref_id)->where('status_activity', 'close')->first();
-        $Activity_check_last = Activity::where('data_leak_socail_ref_id', $Activity->data_leak_socail_ref_id)->where('deleted_at', null)->orderBy('id', 'desc')->first();
-        $status_activity = $Activity_check_last->status_activity;
+        // หา Activity ล่าสุดที่ยังไม่ถูกลบ
+        $Activity_check_last = Activity::where('data_leak_socail_ref_id', $refId)
+            ->whereNull('deleted_at')
+            ->orderBy('id', 'desc')
+            ->first();
 
-        $DataLeakSocialRef = DataLeakSocialRef::where('id', $Activity->data_leak_socail_ref_id)->first();
-        // if($DataLeakSocialRef->status_monitoring != 'close') {
-        if ($Activity_check_last) {
+        $status_activity = $Activity_check_last->status_activity ?? null;
+
+        // ✅ หาได้ทั้ง SocialRef และ CredentialRef
+        $DataLeakRef = DataLeakSocialRef::find($refId);
+        if (!$DataLeakRef) {
+            $DataLeakRef = CredentialLeakRef::find($refId);
+        }
+
+        if ($DataLeakRef) {
             if ($status_activity) {
-                $DataLeakSocialRef->status_monitoring = $status_activity;
-                $DataLeakSocialRef->save();
+                $DataLeakRef->status_monitoring = $status_activity;
             } else {
-                $DataLeakSocialRef->status_monitoring = 'in_progress';
-                $DataLeakSocialRef->save();
+                $DataLeakRef->status_monitoring = 'in_progress';
             }
-        } else {
-            $DataLeakSocialRef->status_monitoring = 'in_progress';
-            $DataLeakSocialRef->save();
+            $DataLeakRef->save();
         }
-        // }
 
-
-        if ($Activity) {
-            return ajaxResponse(
-                [
-                    'message' => langapp('changes_saved_successful'),
-                    'redirect' => $site,
-                ],
-                true,
-                Response::HTTP_OK
-            );
-        } else {
-            return response()->json(['message' => 'Error Delete Activity Please Contact Admin', 'errors' => ['missing' => ["Error Delete Activity Please Contact Admin"]]], 500);
-        }
+        return ajaxResponse(
+            [
+                'message'  => langapp('changes_saved_successful'),
+                'redirect' => $site,
+            ],
+            true,
+            Response::HTTP_OK
+        );
     }
+
 
     public function edit_dataleak(Request $request)
     {
@@ -4476,6 +5289,113 @@ class DataLeakController extends Controller
                 }
             }
         }
+
+
+        // $CredentialRefs = \App\CredentialLeakRef::where('data_leak_feed_id', $DataLeakFeed->id)->get();
+        // if ($CredentialRefs->count()) {
+        //     foreach ($CredentialRefs as $ref) {
+        //         $ref->keyword           = $request->keyword ?? $ref->keyword;
+        //         $ref->feel_type         = $request->feel_type ?? $ref->feel_type;
+        //         $ref->status_monitoring = $request->monitoring ?? $ref->status_monitoring;
+        //         $ref->serverity         = $request->serverity ?? $ref->serverity;
+        //         $ref->save();
+
+        //         if ($request->sent_mail == true) {
+        //             $site_email_alert = site_config_email_alert::where("site_id", $ref->site_id)->get();
+        //             if ($site_email_alert->count()) {
+        //                 $email_site_alert = $site_email_alert->pluck('email')->unique()->all();
+        //                 foreach ($email_site_alert as $email) {
+        //                     Mail::to($email)->send(new CompromisedMail([$DataLeakFeed], 'credential_leak'));
+        //                     if (count(Mail::failures()) == 0) {
+        //                         LogEmail::create([
+        //                             'to' => $email,
+        //                             'status' => 'Success',
+        //                             'subject' => 'data_leak'
+        //                         ]);
+        //                     }
+        //                 }
+        //                 if (count(Mail::failures()) > 0) {
+        //                     foreach (Mail::failures() as $email_address) {
+        //                         LogEmail::create([
+        //                             'to' => $email_address,
+        //                             'status' => 'Fail',
+        //                             'subject' => 'data_leak'
+        //                         ]);
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
+        $CredentialRefs = \App\CredentialLeakRef::where('data_leak_feed_id', $DataLeakFeed->id)->get();
+
+        if ($CredentialRefs->count()) {
+            foreach ($CredentialRefs as $ref) {
+                // อัปเดตค่า field ตาม request
+                $ref->keyword           = $request->keyword ?? $ref->keyword;
+                $ref->feel_type         = $request->feel_type ?? $ref->feel_type;
+                $ref->status_monitoring = $request->monitoring ?? $ref->status_monitoring;
+                $ref->serverity         = $request->serverity ?? $ref->serverity;
+                $ref->save();
+            }
+
+            if ($request->sent_mail == true) {
+                // ✅ จัดกลุ่มตาม site_id → ส่งทีละ site
+                $grouped = $CredentialRefs->groupBy('site_id');
+
+                foreach ($grouped as $siteId => $refsOfSite) {
+                    // หาผู้รับอีเมลของ site นี้
+                    $site_email_alert = site_config_email_alert::where("site_id", $siteId)->pluck('email');
+                    $emails = $site_email_alert->filter()->unique()->values()->all();
+                    $emails = array_values(array_filter($emails, fn($e) => filter_var($e, FILTER_VALIDATE_EMAIL)));
+
+                    if (empty($emails)) {
+                        continue; // ไม่มีผู้รับ ข้าม
+                    }
+
+                    // สร้าง items สำหรับอีเมล (รวม domain ของ site นี้)
+                    $siteName = DB::table('site')->where('id', $siteId)->value('name');
+                    $mailItems = $refsOfSite->map(function ($ref) use ($DataLeakFeed, $siteName) {
+                        return (object) [
+                            'id'          => $DataLeakFeed->id,
+                            'feel_type'   => $ref->feel_type ?? 'credential',
+                            'keyword'     => $ref->keyword ?? 'Credential',
+                            'feedcontent' => $DataLeakFeed->feedcontent,
+                            'source_name' => $DataLeakFeed->source_name,
+                            'created_at'  => optional($DataLeakFeed->created_at)->toDateTimeString(),
+                            'site_name'   => $siteName ?: data_get($ref->content, 'target', '-'),
+                        ];
+                    })->all();
+
+                    try {
+                        // ✅ ส่งให้ผู้รับทั้งหมดใน site เดียวกัน
+                        \Mail::to($emails)->send(new \App\Mail\CompromisedMail($mailItems, 'credential_leak'));
+
+                        // log success
+                        foreach ($emails as $email) {
+                            \App\LogEmail::create([
+                                'to'      => $email,
+                                'status'  => 'Success',
+                                'subject' => 'credential_leak',
+                            ]);
+                        }
+                    } catch (\Throwable $e) {
+                        // log fail
+                        foreach ($emails as $email) {
+                            \App\LogEmail::create([
+                                'to'      => $email,
+                                'status'  => 'Fail',
+                                'subject' => 'credential_leak',
+                                'message' => $e->getMessage(),
+                            ]);
+                        }
+                        report($e);
+                    }
+                }
+            }
+        }
+
 
         if ($request->site_code) {
             $site = route('socialdatas.index', ['id' => @$request->site_code]);

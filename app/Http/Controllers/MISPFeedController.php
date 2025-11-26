@@ -563,7 +563,7 @@ class MISPFeedController extends Controller
                     ];
                 }
             } else {
-                $feeds = ['No Data for feed now'];
+                $feeds = ['No Data'];
             }
 
 
@@ -585,7 +585,7 @@ class MISPFeedController extends Controller
     public function generateManifest($uuid)
     {
         if (!isset($this->feeds[$uuid])) {
-            return response()->json(['error' => 'Feed not found'], 404);
+            return response()->json(['error' => 'No Data'], 404);
         }
 
         $feed = $this->feeds[$uuid];

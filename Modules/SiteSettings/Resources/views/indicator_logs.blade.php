@@ -122,6 +122,25 @@
                                                 </div>
                                              </div>
 
+                                             <div class="form-group row">
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="copy_attrscore" name="attrscore" value="[[Attribute Score]]" readonly>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-info" onclick="copy_btn('copy_attrscore')">Copy</button>  
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                 <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="copy_attrseverity" name="attrserverity" value="[[Attribute Serverity]]" readonly>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-info" onclick="copy_btn('copy_attrseverity')">Copy</button>  
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                             </div>
+
                                              <div class="form-group">
                                                 <p class="font-weight-bold text-muted">[[M]] = Feb, [[m]] = 02, [[Y]] = 2021, [[y]] = 21, [[D]] = Thu, [[d]] = 11, H:i:s = 08:12:25</p>
                                                  <textarea name="text_protocal_format" id="text_protocal_format" cols="30" rows="5"  class="form-control">

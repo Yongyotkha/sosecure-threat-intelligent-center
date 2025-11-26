@@ -343,6 +343,53 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="form-group row">
+                            <label class="col-lg-3 control-label"> Check Frequency <span class="text-danger">*</span> </label>
+                            <div class="col-lg-9">
+                                <div class="input-group">
+                                    <select name="" id="check-frequency" class="form-control">
+                                        <option value="">1 min</option>
+                                        <option value="">5 mins</option>
+                                        <option value="">10 mins</option>
+                                        <option value="">15 mins</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-3 control-label"> Monitoring Locations <span class="text-danger">*</span> </label>
+                            <div class="col-lg-9">
+                                <div class="input-group">
+                                    <select name="" id="m-location" class="form-control">
+                                        <option value="">Thailand</option>
+                                        <option value="">Singapore</option>
+                                        <option value="">Shanghai</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-lg-3 control-label"> Connection Timeout <span class="text-danger">*</span> </label>
+                            <div class="col-lg-9 d-flex">
+                                <input type="text" class="form-control me-2">
+                                <select name="" id="secs" class="form-control">
+                                    <option value="">Secs</option>
+                                        <option value="">Mins</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+    <label class="col-lg-3 control-label">Tags <span class="text-danger"></span></label>
+    <div class="col-lg-9">
+        <select id="tags" class="form-control" multiple="multiple">
+            <option value="Thailand">กห</option>
+            <option value="Singapore">กห</option>
+        </select>
+    </div>
+</div>
     
                         <div id="area_check_message_row" class="form-group row" style="display: none;"><label
                                 class="col-lg-3 control-label"> </label>
@@ -427,6 +474,7 @@
                         </div>
     
                         <input type="hidden" name="site" id="site">
+                        
                     </div>
 
                 </div>
@@ -481,6 +529,9 @@
 @include('stacks.css.datepicker')
 @include('stacks.css.form')
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
+<link href="/css/select2.min.css" rel="stylesheet" />
+<script src="/js/select2.min.js"></script>
+
 @include('stacks.css.lightbox')
 
 <style>
@@ -656,9 +707,10 @@
 
                     const target = `#chart_wdfm_${item.id}`;
                     if (!document.querySelector(target)) continue;
-                    const hashPct = Math.max(0, Math.min(100, parseFloat(item.hash) || 0));
+                    const hashPct = Math.max(0, Math.min(100, parseFloat(item.score) || 0));
                     const sizePct = Math.max(0, Math.min(100, parseFloat(item.filesize) || 0));
                     const elemPct = Math.max(0, Math.min(100, parseFloat(item.element) || 0));
+                    
 
                     let score = parseFloat(item.detection_score_all) || 0;
                     if (score >= 0 && score <= 1) score = score * 100;
@@ -667,7 +719,7 @@
                     chart_c3(
                         target,
                         [
-                        ['Hash', parseFloat(item.hash_percent) || 0],
+                        ['Hash', parseFloat(item.score) || 0],
                         ['Filesize', parseFloat(item.filesize_percent) || 0],
                         ['Element', parseFloat(item.element_percent) || 0],
                         ['Blacklist', parseFloat(item.blacklist_percent) || 0],
@@ -861,6 +913,7 @@
         let url_web = $("#url_web").val();
         let port_web = $("#port_web").val();
         let delay_screenshot_val = $("#delay_screenshot_val").val();
+        let site_id = $("#site_id").val();
 
         var url_id = $("#url_id").val();
         if(!url_id) {
@@ -931,7 +984,8 @@
                                     data: ({
                                         webdefacment_setting_id:webdefacment_setting_id,
                                         image:image_screenshot,
-                                        part_image:part_image
+                                        part_image:part_image,
+                                        url_id:url_id_receive
                                     }),
                                     beforeSend: function(){
                                         f_loading(null, '.review_image_screenshot');
@@ -1320,6 +1374,11 @@ function chart_c3(bindTo, columns, scoreRaw, opts = {}) {
 
   __wdfmCharts.set(bindTo, chart);
 }
+
+    $('#tags').select2({
+        tags: true,          
+        tokenSeparators: [',', ' ']
+    });
 
 
 

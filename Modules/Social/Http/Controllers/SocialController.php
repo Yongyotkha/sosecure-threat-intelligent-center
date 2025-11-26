@@ -15,7 +15,10 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
 use App\DataLeakSocialRef;
+use App\CredentialLeakRef;
 use DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 
 class SocialController extends Controller
 {
@@ -139,6 +142,20 @@ class SocialController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    protected function resolveTable(array $candidates)
+    {
+        foreach ($candidates as $table) {
+            $prefixed = DB::getTablePrefix() . $table;
+            if (Schema::hasTable($prefixed)) {
+                return $prefixed;
+            }
+            if (Schema::hasTable($table)) {
+                return $table;
+            }
+        }
+        return $candidates[0];
     }
 
 
@@ -732,7 +749,7 @@ class SocialController extends Controller
             if (Auth::check()) {
                 $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
                 if (Auth::user()->hasRole('admin')) {
-                } else { 
+                } else {
                     if (@Auth::user()->site_role_id && @Auth::user()->site_id) {
                         if (@Auth::user()->site_role_id == 99 || @Auth::user()->site_role_id == 4) { //support and admin
                             $model = $model->whereIn('site_id', $site_id_arr);
@@ -818,98 +835,231 @@ class SocialController extends Controller
         }
     }
 
+    // public function count_icon(Request $request)
+    // {
+    //     $site_code = $request->site_id;
+    //     if ($site_code) {
+    //         $SiteSettings = SiteSettings::where('code', $site_code)->first();
+    //     }
+
+    //     $get_role_custom_first = @get_role_custom();
+    //     $site_id_arr = @$get_role_custom_first['site_id_arr'];
+    //     if (@$get_role_custom_first['superadmin'] == 1) {
+    //         if (!$site_code) {
+    //             $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('mobile')) . '%'])->count(); //->get()
+    //             $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('facebook')) . '%'])->count(); //->get()
+    //             $icon_line = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('line')) . '%'])->count(); //->get()
+    //             $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('twitter')) . '%'])->count(); //->get()
+    //             $icon_website = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('website')) . '%'])->count(); //->get()
+    //             $icon_other = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('mobile'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('facebook'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('line'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('twitter'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('website'))])->count();
+    //             $number_in_progress = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('in_progress')) . '%'])->count(); //->get()
+    //             $number_reported = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('reported')) . '%'])->count(); //->get()
+    //             $number_close = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('close')) . '%'])->count(); //->get()
+    //             //remove all ->where('status', 1)
+    //         } else {
+    //             $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('mobile')) . '%'])->count(); //->get()
+    //             $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('facebook')) . '%'])->count(); //->get()
+    //             $icon_line = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('line')) . '%'])->count(); //->get()
+    //             $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('twitter')) . '%'])->count(); //->get()
+    //             $icon_website = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('website')) . '%'])->count(); //->get()
+    //             $icon_other = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('mobile'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('facebook'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('line'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('twitter'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('website'))])->count();
+    //             $number_in_progress = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('in_progress')) . '%'])->count(); //->get()
+    //             $number_reported = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('reported')) . '%'])->count(); //->get()
+    //             $number_close = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('close')) . '%'])->count(); //->get()
+    //             //remove all ->where('status', 1)
+    //         }
+    //     } else {
+    //         if (!$site_code) {
+    //             $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('mobile')) . '%'])->count(); //->get()
+    //             $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('facebook')) . '%'])->count(); //->get()
+    //             $icon_line = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('line')) . '%'])->count(); //->get()
+    //             $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('twitter')) . '%'])->count(); //->get()
+    //             $icon_website = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('website')) . '%'])->count(); //->get()
+    //             $icon_other = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('mobile'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('facebook'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('line'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('twitter'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('website'))])->count();
+    //             $number_in_progress = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('in_progress')) . '%'])->count(); //->get()
+    //             $number_reported = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('reported')) . '%'])->count(); //->get()
+    //             $number_close = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('close')) . '%'])->count(); //->get()
+    //             //remove all ->where('status', 1)
+    //         } else {
+    //             $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('mobile')) . '%'])->count(); //->get()
+    //             $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('facebook')) . '%'])->count(); //->get()
+    //             $icon_line = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('line')) . '%'])->count(); //->get()
+    //             $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('twitter')) . '%'])->count(); //->get()
+    //             $icon_website = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('website')) . '%'])->count(); //->get()
+    //             $icon_other = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('mobile'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('facebook'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('line'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('twitter'))])
+    //                 ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('website'))])->count();
+    //             $number_in_progress = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('in_progress')) . '%'])->count(); //->get()
+    //             $number_reported = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('reported')) . '%'])->count(); //->get()
+    //             $number_close = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('close')) . '%'])->count(); //->get()
+    //             //remove all ->where('status', 1)
+    //         }
+    //     }
+
+
+    //     // $news = $news->with('get_data_leak_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
+
+
+    //     if ($request->ajax()) {
+    //         $data = [
+    //             "icon_mobile" => @$icon_mobile,
+    //             "icon_facebook" => @$icon_facebook,
+    //             "icon_line" => @$icon_line,
+    //             "icon_twitter" => @$icon_twitter,
+    //             "icon_website" => @$icon_website,
+    //             "icon_other" => @$icon_other,
+    //             "number_in_progress" => @$number_in_progress,
+    //             "number_reported" => @$number_reported,
+    //             "number_close" => @$number_close,
+    //         ];
+    //         return response()->json($data);
+    //     }
+    // }
+
+
     public function count_icon(Request $request)
     {
-        $site_code = $request->site_id;
-        if ($site_code) {
-            $SiteSettings = SiteSettings::where('code', $site_code)->first();
-        }
+        $feedTable = 'data_leak_feed';
+        $socialRefTable = 'data_leak_socail_ref';
+        $credentialRefTable = 'credential_leak_ref';
 
-        $get_role_custom_first = @get_role_custom();
-        $site_id_arr = @$get_role_custom_first['site_id_arr'];
-        if (@$get_role_custom_first['superadmin'] == 1) {
-            if (!$site_code) {
-                $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('mobile')) . '%'])->count(); //->get()
-                $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('facebook')) . '%'])->count(); //->get()
-                $icon_line = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('line')) . '%'])->count(); //->get()
-                $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('twitter')) . '%'])->count(); //->get()
-                $icon_website = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('website')) . '%'])->count(); //->get()
-                $icon_other = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('mobile'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('facebook'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('line'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('twitter'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('website'))])->count();
-                $number_in_progress = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('in_progress')) . '%'])->count(); //->get()
-                $number_reported = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('reported')) . '%'])->count(); //->get()
-                $number_close = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('close')) . '%'])->count(); //->get()
-                //remove all ->where('status', 1)
-            } else {
-                $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('mobile')) . '%'])->count(); //->get()
-                $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('facebook')) . '%'])->count(); //->get()
-                $icon_line = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('line')) . '%'])->count(); //->get()
-                $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('twitter')) . '%'])->count(); //->get()
-                $icon_website = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('website')) . '%'])->count(); //->get()
-                $icon_other = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('mobile'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('facebook'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('line'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('twitter'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('website'))])->count();
-                $number_in_progress = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('in_progress')) . '%'])->count(); //->get()
-                $number_reported = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('reported')) . '%'])->count(); //->get()
-                $number_close = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('close')) . '%'])->count(); //->get()
-                //remove all ->where('status', 1)
-            }
-        } else {
-            if (!$site_code) {
-                $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('mobile')) . '%'])->count(); //->get()
-                $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('facebook')) . '%'])->count(); //->get()
-                $icon_line = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('line')) . '%'])->count(); //->get()
-                $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('twitter')) . '%'])->count(); //->get()
-                $icon_website = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('website')) . '%'])->count(); //->get()
-                $icon_other = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('mobile'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('facebook'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('line'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('twitter'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('website'))])->count();
-                $number_in_progress = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('in_progress')) . '%'])->count(); //->get()
-                $number_reported = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('reported')) . '%'])->count(); //->get()
-                $number_close = DataLeakSocialRef::where('deleted_at', null)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('close')) . '%'])->count(); //->get()
-                //remove all ->where('status', 1)
-            } else {
-                $icon_mobile = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('mobile')) . '%'])->count(); //->get()
-                $icon_facebook = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('facebook')) . '%'])->count(); //->get()
-                $icon_line = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('line')) . '%'])->count(); //->get()
-                $icon_twitter = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('twitter')) . '%'])->count(); //->get()
-                $icon_website = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) LIKE ? ', [trim(strtolower('website')) . '%'])->count(); //->get()
-                $icon_other = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('mobile'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('facebook'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('line'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('twitter'))])
-                    ->whereRaw('LOWER(`keyword`) != ? ', [trim(strtolower('website'))])->count();
-                $number_in_progress = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('in_progress')) . '%'])->count(); //->get()
-                $number_reported = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('reported')) . '%'])->count(); //->get()
-                $number_close = DataLeakSocialRef::where('deleted_at', null)->where('site_id', $SiteSettings->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->whereRaw('LOWER(`status_monitoring`) LIKE ? ', [trim(strtolower('close')) . '%'])->count(); //->get()
-                //remove all ->where('status', 1)
+        // ───── Role & Site Logic ─────
+        $get_role = @get_role_custom();
+        $site_ids = collect(@$get_role['site_id_arr'])
+            ->pluck('site_id')
+            ->filter()
+            ->values()
+            ->toArray();
+
+        $isSuperAdmin = (int) (@$get_role['superadmin'] ?? 0) === 1;
+        $hasRoleSiteLimit = !empty($site_ids);
+
+        $selectedSite = null;
+        if ($request->site_id) {
+            $siteSetting = SiteSettings::where('code', $request->site_id)->first();
+            if ($siteSetting) {
+                $selectedSite = (int) $siteSetting->id;
             }
         }
 
+        // ───── Social Ref ─────
+        $qSocial = DB::table("{$socialRefTable} as r")
+            ->join("{$feedTable} as f", 'r.data_leak_feed_id', '=', 'f.id')
+            ->whereIn('f.feel_type', ['social', 'darkweb_public'])
+            ->whereNull('r.deleted_at')
+            ->select(
+                'r.id as ref_id',
+                'r.site_id',
+                'r.status_monitoring',
+                'r.serverity',
+                'f.keyword',
+                'f.feedtimepost',
+                DB::raw("'social_ref' as ref_type")
+            );
 
-        // $news = $news->with('get_data_leak_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
+        // ───── Credential Ref ─────
+        $qCredential = DB::table("{$credentialRefTable} as r")
+            ->join("{$feedTable} as f", 'r.data_leak_feed_id', '=', 'f.id')
+            ->where('f.feel_type', 'credential')
+            ->whereNull('r.deleted_at')
+            ->select(
+                'r.id as ref_id',
+                'r.site_id',
+                'r.status_monitoring',
+                'r.serverity',
+                'f.keyword',
+                'f.feedtimepost',
+                DB::raw("'credential_ref' as ref_type")
+            );
 
-
-        if ($request->ajax()) {
-            $data = [
-                "icon_mobile" => @$icon_mobile,
-                "icon_facebook" => @$icon_facebook,
-                "icon_line" => @$icon_line,
-                "icon_twitter" => @$icon_twitter,
-                "icon_website" => @$icon_website,
-                "icon_other" => @$icon_other,
-                "number_in_progress" => @$number_in_progress,
-                "number_reported" => @$number_reported,
-                "number_close" => @$number_close,
-            ];
-            return response()->json($data);
+        // ───── Filter by role/site ─────
+        if (!$isSuperAdmin && $hasRoleSiteLimit) {
+            $qSocial->whereIn('r.site_id', $site_ids);
+            $qCredential->whereIn('r.site_id', $site_ids);
         }
+
+        if ($selectedSite) {
+            $qSocial->where('r.site_id', $selectedSite);
+            $qCredential->where('r.site_id', $selectedSite);
+        }
+
+        // ───── รวมสองตาราง ─────
+        $union = $qSocial->unionAll($qCredential);
+        $q = DB::query()->fromSub($union, 'u');
+
+        // ───── Filter by date (NEW) ─────
+        if ((int)$request->isDateSearch === 1 && $request->startDate && $request->endDate) {
+            $start = Carbon::parse($request->startDate)->startOfDay()->toDateTimeString();
+            $end   = Carbon::parse($request->endDate)->endOfDay()->toDateTimeString();
+
+            $q->whereRaw("
+            u.feedtimepost IS NOT NULL
+            AND CAST(u.feedtimepost AS DATETIME) BETWEEN ? AND ?
+        ", [$start, $end]);
+        }
+
+        // ───── ICON COUNTS ─────
+        $base = clone $q;
+
+        $icon_mobile = (clone $base)->whereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['mobile%'])->count();
+        $icon_facebook = (clone $base)->whereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['facebook%'])->count();
+        $icon_line = (clone $base)->whereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['line%'])->count();
+        $icon_twitter = (clone $base)->whereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['twitter%'])->count();
+        $icon_website = (clone $base)->whereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['website%'])->count();
+
+        $icon_other = (clone $base)
+            ->whereRaw('TRIM(LOWER(u.keyword)) NOT IN (?, ?, ?, ?, ?)', [
+                'mobile',
+                'facebook',
+                'line',
+                'twitter',
+                'website'
+            ])
+            ->count();
+
+        // ───── STATUS COUNTS ─────
+        // $number_in_progress = (clone $base)
+        //     ->where(function ($q) {
+        //         $q->whereRaw('LOWER(u.status_monitoring) = ?', ['in_progress'])
+        //             ->orWhereNull(DB::raw('u.status_monitoring'));
+        //     })
+        //     ->count();
+
+        $number_in_progress = (clone $base)
+            ->whereRaw("LOWER(u.status_monitoring) = 'in_progress'")
+            ->count();
+
+
+        $number_reported = (clone $base)->whereRaw('LOWER(u.status_monitoring) = ?', ['reported'])->count();
+        $number_close = (clone $base)->whereRaw('LOWER(u.status_monitoring) = ?', ['close'])->count();
+
+        // ───── Response ─────
+        $data = [
+            "icon_mobile"        => $icon_mobile,
+            "icon_facebook"      => $icon_facebook,
+            "icon_line"          => $icon_line,
+            "icon_twitter"       => $icon_twitter,
+            "icon_website"       => $icon_website,
+            "icon_other"         => $icon_other,
+            "number_in_progress" => $number_in_progress,
+            "number_reported"    => $number_reported,
+            "number_close"       => $number_close,
+        ];
+
+        return $request->ajax() ? response()->json($data) : $data;
     }
 }

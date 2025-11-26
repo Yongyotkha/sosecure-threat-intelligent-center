@@ -41,7 +41,7 @@ select.c-tags {
 
 .select2-wrapper.expanded {
     max-height: 300px; /* หรือ auto ถ้าคุณแน่ใจเรื่องขนาด */
-}
+} 
 .resizable-select2 {
   background-image: url('data:image/svg+xml;utf8,<svg fill="%23999" xmlns="http://www.w3.org/2000/svg" width="10" height="10"><path d="M0 10 L10 0 M3 10 L10 3 M6 10 L10 6" stroke="%23999"/></svg>');
   background-repeat: no-repeat;
@@ -136,7 +136,6 @@ select.c-tags {
                             Events
                         </span>
                     </div>
-
                     <div class="ml-2 text-right">
                         {{-- <a id="to_top" href="#area_search" class="">test</a> --}}
                         {{-- <div class="text-left" style="min-width: 270px;display:inline-block">
@@ -170,6 +169,8 @@ select.c-tags {
                                     class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                         </a>
 
+                        
+
 
                     </div>
                 </div>
@@ -178,10 +179,10 @@ select.c-tags {
             <section class="scrollable wrapper">
                 <section id="hide-advance-search" class="panel panel-default" style="display: none;">
                     {{-- <div class="panel-heading">
-            <a class="text-primary" href="{{ route('indicators.events') }}">Events</a>
-            |
-            <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a>
-        </div> --}}
+                        <a class="text-primary" href="{{ route('indicators.events') }}">Events</a>
+                        |
+                        <a href="{{ route('indicators.attributes') }}" class="text-muted">Attributes</a>
+                    </div> --}}
                     <header class="panel-heading font-bold panel-header-blue">
                         <div class="row">
                             <div class="col-md-12">
@@ -191,9 +192,14 @@ select.c-tags {
                     <div class="panel-body" style="padding: 0 !important">
                         <div class="container-fluid" style="padding: 2rem;">
                             <div class="row">
-                                <div class="col-lg-4 mb-1">
+                                <div class="col-lg-3 mb-1">
                                     <h5 class="font-weight-bold">Event Name</h5>
                                     <input type="text" class="form-control" name="event_name" id="event_name"
+                                        placeholder="Search">
+                                </div>
+                                <div class="col-lg-3 mb-1">
+                                    <h5 class="font-weight-bold">Keyword</h5>
+                                    <input type="text" class="form-control" name="keyword_search" id="keyword_search"
                                         placeholder="Search">
                                 </div>
                                 <!--<div class="col-md-4">
@@ -201,7 +207,7 @@ select.c-tags {
                                                             <label for="" class="">Group</label>                                                                                                                                                                                                                                                                                                                                                                                                                                                               {{-- <select name="group[]" id="type" class="select2-option form-control"
                                     multiple="multiple">
                                  </select> --}}                                                                                                                                                                                                                                                                                                                                                                                                                               </div>-->
-                                <div class="col-lg-4 mb-1">
+                                <div class="col-lg-3 mb-1">
                                     <h5 class="font-weight-bold">Date</h5>
                                     <div id="event_date" class="text-center form-control"
                                         style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; display:block;margin-bottom:0;">
@@ -209,7 +215,7 @@ select.c-tags {
                                         <span>Select date range</span> 
                                     </div>
                                 </div>
-                                <div class="col-lg-4 mb-1">
+                                <div class="col-lg-3 mb-1">
                                     <h5 class="font-weight-bold">Published</h5>
                                     <div id="groupby-published" class="btn-group special">
                                         <button class="btn btn-grey check_published  active" id="all" value="">
@@ -702,6 +708,7 @@ select.c-tags {
                     start_date = startDate;
                     end_date = endDate;
                     event_name = $("#event_name").val();
+                    keyword_search = $("#keyword_search").val();
 
 
                     search_table(1);
@@ -1274,6 +1281,7 @@ select.c-tags {
                             d.check_published = check_published;
                             d.industries = industries;
                             d.groups = group;
+                            d.keyword_search = keyword_search;
                         }
                     },
                     initComplete: function(settings, json) {

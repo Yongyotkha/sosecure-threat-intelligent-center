@@ -211,14 +211,25 @@ class IndicatorsController extends Controller
 
             $data['otx_events'] = $cursor;
             $data['page'] = langapp('indicators');
-            $data['indicator_type_counts'] = $cursor[0]->indicator_type_counts->count();
-            $data['count_related_pulse'] = @$cursor[0]->count_related_pulse;
-            $countKey = array();
-            $countVal = array();
-            foreach ($cursor[0]->indicator_type_counts as $key => $value) {
-                $countKey[] = ucwords($key);
-                $countVal[] = $value;
+
+            $data['indicator_type_counts'] = isset($cursor[0]->indicator_type_counts)
+                ? count((array) $cursor[0]->indicator_type_counts)
+                : 0;
+
+            $data['count_related_pulse'] = isset($cursor[0]->count_related_pulse)
+                ? $cursor[0]->count_related_pulse
+                : 0;
+
+            $countKey = [];
+            $countVal = [];
+
+            if (!empty($cursor[0]->indicator_type_counts)) {
+                foreach ((array)$cursor[0]->indicator_type_counts as $key => $value) {
+                    $countKey[] = ucwords($key);
+                    $countVal[] = $value;
+                }
             }
+
             $data['countKey'] = $countKey;
             $data['countVal'] = $countVal;
 
@@ -2124,7 +2135,7 @@ class IndicatorsController extends Controller
             //         ];
 
 
-            if ($request->keywords || $request->isDateSearch || $request->start_date || $request->end_date || $request->check_published || $request->industries || $request->groups) {
+            if ($request->keywords || $request->isDateSearch || $request->start_date || $request->end_date || $request->check_published || $request->industries || $request->groups || $request->keyword_search) {
 
                 if ($request->keywords) {
                     $query['name'] = ['$regex' => $request->keywords, '$options' => 'i'];
@@ -2137,6 +2148,16 @@ class IndicatorsController extends Controller
                     $query['groups'] = ['$regex' => $request->groups, '$options' => 'i'];
                 }
 
+                if ($request->keyword_search) {
+                    $query['$or'] = [
+                        ['name' => ['$regex' => $request->keyword_search, '$options' => 'i']],
+                        ['groups' => ['$regex' => $request->keyword_search, '$options' => 'i']],
+                        ['description' => ['$regex' => $request->keyword_search, '$options' => 'i']],
+                        ['source' => ['$regex' => $request->keyword_search, '$options' => 'i']],
+                        ['creator_org' => ['$regex' => $request->keyword_search, '$options' => 'i']],
+                        ['tags' => ['$regex' => $request->keyword_search, '$options' => 'i']],
+                    ];
+                }
 
                 $isDateSearch = filter_var($request->isDateSearch, FILTER_VALIDATE_BOOLEAN);
 

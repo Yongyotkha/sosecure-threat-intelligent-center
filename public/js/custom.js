@@ -11,7 +11,9 @@ function get_word_leak_compromise(val, type)
             html = 'PUBLIC';
         } else if(val == 'darkweb_public') {
             html = 'DARK WEB';
-        }
+        }  else if(val == 'credential' || val == 'Credential') {
+            html = 'CREDENTIAL';
+        } 
         
     } else if(type == 'compromise') {
         if(val == 'compromise') {

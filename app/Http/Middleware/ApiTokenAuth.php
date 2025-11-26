@@ -37,7 +37,7 @@ class ApiTokenAuth
 
         if (!$bearer) {
             Log::warning('API.TOKEN missing', ['path' => $request->path(), 'ip' => $request->ip()]);
-            return response()->json(['message' => 'Missing token'], 401);
+            return response()->json(['message' => 'Permission denied'], 401);
         }
 
         // 2) หา token (เก็บ plaintext)
@@ -48,17 +48,17 @@ class ApiTokenAuth
                 'path'   => $request->path(),
                 'ip'     => $request->ip(),
             ]);
-            return response()->json(['message' => 'Token invalid'], 401);
+            return response()->json(['message' => 'Error'], 401);
         }
 
         // 3) เช็คหมดอายุ / revoke
         if ($token->expires_at && $token->expires_at->isPast()) {
             Log::warning('API.TOKEN expired', ['id' => $token->id, 'exp' => $token->expires_at]);
-            return response()->json(['message' => 'Token expired'], 401);
+            return response()->json(['message' => 'Error'], 401);
         }
         if (isset($token->revoked) && $token->revoked) {
             Log::warning('API.TOKEN revoked', ['id' => $token->id]);
-            return response()->json(['message' => 'Token revoked'], 401);
+            return response()->json(['message' => 'Error'], 401);
         }
 
         // 4) ล็อก token ให้ใช้ได้เฉพาะ site ที่กำหนด

@@ -17,7 +17,6 @@
         }
 </style>
 
-</style>
 <div id="fullscreen-modal" class="modal-dialog modal-dialog-aside">
     <div class="modal-content">
         <div class="modal-header">
@@ -402,25 +401,31 @@ $date_public = '';
 @push('pagestyle')
     @include('stacks.css.form')
     @include('stacks.css.datepicker')
-    @include('stacks.css.form')
     @include('stacks.css.summernote')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.css">
     <style>
-    @font-face {
-        font-family: 'TH SarabunPSK';
-        src: url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.eot');
-        src: url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.eot?#iefix') format('embedded-opentype'),
-             url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.woff2') format('woff2'),
-             url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.woff') format('woff'),
-             url('https://cdn.jsdelivr.net/gh/cadcenter-th/fonts/thsarabunnew.ttf') format('truetype');
-        font-weight: normal;
-        font-style: normal;
-    }
+  @font-face{
+    font-family:'TH SarabunPSK';
+    src:url('{{ asset('fonts/THSarabunPSK.ttf') }}') format('truetype');
+    font-weight:normal; font-style:normal;
+    font-display: swap;
+  }
 
-    .note-editable {
+
+.htmleditor + .note-editor .note-editable,
+.htmleditor + .note-editor .note-editable *{
   font-family: 'TH SarabunPSK', sans-serif !important;
+  font-size: 20px !important;
+  line-height: 1.15 !important;
+  white-space: normal;
 }
+.note-editor .note-editable p,ul {
+  margin: 0 !important; 
+}
+
+
+
 </style>
+
 
 @endpush
 @push('pagescript')
@@ -431,21 +436,209 @@ $date_public = '';
     @include('stacks.js.hidesettings')
     @include('stacks.js.defaultpic')
     <script>
-         $('#detail_th').summernote('destroy');
-        $('.htmleditor').summernote({
-            height: 300,
-            fontSizes: ['14' ,'16' ,'18' ,'20' ,'22' ,'24' ,'26' ,'32'], // custom font size
-            toolbar: [
-                ['style', ['bold', 'italic', 'underline', 'clear']],
-                ['font', ['fontsize', 'fontname']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['insert', ['link', 'picture']],
-                ['view', ['fullscreen', 'codeview']],
-            ],
-            fontNames: ['TH SarabunPSK'],
-            fontNamesIgnoreCheck: ['TH SarabunPSK']
+
+// ---- ฟังก์ชันลบ <p> ว่างตัวแรก ----
+function removeEmptyFirstParagraph($editable) {
+  const $first = $editable.children('p').first();
+  if ($first.length) {
+    // ลบ comment node เช่น <!--StartFragment-->
+    $first.contents().filter(function () {
+      return this.nodeType === Node.COMMENT_NODE;
+    }).remove();
+
+    const html = $first.html()
+      .replace(/&nbsp;/gi, '')
+      .replace(/<br\s*\/?>/gi, '')
+      .trim();
+
+    if (html === '') {
+      $first.remove();
+    }
+  }
+}
+
+// ---- ฟังก์ชันแปลง plain text -> <p> ----
+function plainTextToHtmlWithBlocks(text) {
+  const paragraphs = (text || '')
+    .replace(/\r\n/g, '\n')
+    .split(/\n{2,}/)
+    .map(block => block.trim())
+    .filter(block => block.length > 0);
+
+  const html = paragraphs.map(block => {
+    const inner = block.replace(/\n/g, '<br>');
+    return `<p style="font-size:20px;font-family:'TH SarabunPSK',sans-serif;line-height:1.2;margin:0;width:100%;display:block;text-align:justify;">${inner}</p>`;
+  }).join('');
+
+  return html || `<p style="font-size:20px;font-family:'TH SarabunPSK',sans-serif;line-height:1.2;margin:0;width:100%;display:block;text-align:justify;">&nbsp;</p>`;
+}
+
+// ---- Normalize เนื้อหา ----
+function normalizeEditorContent($editable) {
+  $editable.find('*').each(function () {
+    if (this.tagName.toLowerCase() === 'img') return;
+    if (this.tagName.toLowerCase() === 'a') {
+      const href = this.getAttribute('href');
+      this.removeAttribute('class');
+      this.removeAttribute('style');
+      if (href) this.setAttribute('href', href);
+      return;
+    }
+    this.removeAttribute('class');
+    this.removeAttribute('style');
+  });
+
+  $editable.find('p, li, td, th, div, span, a').each(function () {
+    this.style.fontSize = '20px';
+    this.style.fontFamily = "'TH SarabunPSK', sans-serif";
+    this.style.lineHeight = '1.2';
+
+    const tag = this.tagName.toLowerCase();
+    if (['p','div','td','th','li'].includes(tag)) {
+      this.style.margin = '0';
+      this.style.width = '100%';
+      this.style.display = 'block';
+      // ✅ เคารพ alignment เดิม
+      if (!this.getAttribute('align')) {
+        this.style.textAlign = 'justify';
+      } else if (this.getAttribute('align') === 'center') {
+        this.style.textAlign = 'center';
+      }
+    }
+  });
+
+  $editable.find('ul, ol').each(function () {
+    this.style.margin = '0';
+    this.style.paddingLeft = '20px';
+  });
+
+  $editable.find('img').each(function () {
+    if (!this.getAttribute('src')) return;
+    if (!/max-width/i.test(this.style.cssText)) this.style.maxWidth = '100%';
+    if (!/height/i.test(this.style.cssText)) this.style.height = 'auto';
+    // ✅ ถ้า parent มี align="center" ให้รูปแสดงกลาง
+    if (this.parentElement && this.parentElement.getAttribute('align') === 'center') {
+      this.style.display = 'block';
+      this.style.margin = '0 auto';
+    }
+  });
+
+  removeEmptyFirstParagraph($editable);
+
+  if ($editable.text().trim() === '' && $editable.find('img').length === 0) {
+    $editable.html(`<p style="font-size:20px;font-family:'TH SarabunPSK',sans-serif;line-height:1.2;margin:0;width:100%;display:block;text-align:justify;">&nbsp;</p>`);
+  }
+}
+
+
+// ---- Init Summernote ----
+$('#detail_th').summernote('destroy');
+$('.htmleditor').summernote({
+  height: 300,
+  toolbar: [
+    ['style', ['bold', 'italic', 'underline']],
+    ['color', ['color']],
+    ['para', ['ul','paragraph']],
+    ['insert', ['link', 'picture']],
+    ['view', ['fullscreen', 'codeview']],
+  ],
+  fontNames: ['TH SarabunPSK'],
+  fontNamesIgnoreCheck: ['TH SarabunPSK'],
+  prettifyHtml: true,
+
+  callbacks: {
+    onInit: function () {
+      const $editable = $(this).next('.note-editor').find('.note-editable');
+      $editable.css({
+        fontSize: '20px',
+        fontFamily: "'TH SarabunPSK', sans-serif",
+        lineHeight: '1.2',
+        width: '100%',
+        textAlign: 'justify'
+      });
+      normalizeEditorContent($editable);
+    },
+
+    onImageUpload: function (files) {
+      const $sn = $(this);
+      [...files].forEach(file => {
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          $sn.summernote('insertImage', e.target.result, file.name);
+        };
+        reader.readAsDataURL(file);
+      });
+    },
+
+    onPaste: function (e) {
+      const $sn = $(this);
+      const clipboard = (e.originalEvent || e).clipboardData || window.clipboardData;
+      const htmlFromClipboard = clipboard && clipboard.getData ? clipboard.getData('text/html') : '';
+
+      e.preventDefault();
+
+      if (htmlFromClipboard && htmlFromClipboard.trim()) {
+        const dom = new DOMParser().parseFromString(htmlFromClipboard, 'text/html');
+
+        dom.querySelectorAll('img').forEach(img => {
+          let src = img.getAttribute('src') || img.getAttribute('data-src') || img.getAttribute('data-original') || '';
+          if (!src) {
+            const srcset = img.getAttribute('srcset');
+            if (srcset) src = srcset.split(',')[0].trim().split(' ')[0];
+          }
+          if (!src) { img.remove(); return; }
+          img.removeAttribute('class');
+          img.removeAttribute('style');
+          img.style.maxWidth = '100%';
+          img.style.height = 'auto';
         });
+
+        const allowed = new Set(['p','br','ul','ol','li','b','strong','i','em','u','a','img','div','span','table','thead','tbody','tr','td','th']);
+        Array.from(dom.body.querySelectorAll('*')).forEach(el => {
+          const tag = el.tagName.toLowerCase();
+          if (!allowed.has(tag)) {
+            const fragment = document.createDocumentFragment();
+            while (el.firstChild) fragment.appendChild(el.firstChild);
+            el.replaceWith(fragment); // unwrap
+            return;
+          }
+          if (tag !== 'img') {
+            el.removeAttribute('class');
+            el.removeAttribute('style');
+          }
+        });
+
+        dom.querySelectorAll('p').forEach(p => {
+          if (p.innerHTML.replace(/&nbsp;/gi, '').replace(/<br\s*\/?>/gi, '').trim() === '') {
+            p.remove();
+          }
+        });
+
+        $sn.summernote('pasteHTML', dom.body.innerHTML.trim());
+      } else {
+        const text = (clipboard && clipboard.getData('text/plain')) || '';
+        const html = plainTextToHtmlWithBlocks(text);
+        $sn.summernote('pasteHTML', html);
+      }
+
+      const $editable = $sn.next('.note-editor').find('.note-editable');
+      setTimeout(() => {
+        normalizeEditorContent($editable);
+        removeEmptyFirstParagraph($editable); // ลบทันทีหลัง paste
+      }, 0);
+    },
+  }
+});
+
+// ---- ก่อนเซฟลง DB ----
+function getCleanHtml(selector) {
+  const $sn = $(selector);
+  const $editable = $sn.next('.note-editor').find('.note-editable');
+  normalizeEditorContent($editable);
+  removeEmptyFirstParagraph($editable);
+  return `<div style="width:100%;max-width:700px;margin:0 auto;">${$sn.summernote('code')}</div>`;
+}
 
 
 
