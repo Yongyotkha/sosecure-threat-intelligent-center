@@ -4,954 +4,460 @@ namespace App\Console\Commands;
 
 use Exception;
 use Illuminate\Console\Command;
-use Modules\RSSFeedSettings\Entities\RSS;
-use Modules\RSSFeedSettings\Entities\TransactionRssData;
-use MongoDB\Client as MongoClient;
-use MongoDB\BSON\UTCDateTime;
-use App\Entities\TransactionBatchjob;
-use App\Entities\Transaction_client_cve_assets;
+use Illuminate\Support\Facades\DB;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\MonitoringVulnerabilitys\Entities\CVEAssets;
-use Modules\SiteSettings\Entities\DataCveven;
-use Illuminate\Support\Facades\DB;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMappingAssets;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
+use Modules\SiteSettings\Entities\DataCveven;
+use App\Entities\TransactionBatchjob;
+use App\CveAssetsProgress;
 
 class MDCVEBatchJob extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'app:MDCVEBatchJob';
+    protected $description = 'Full CVE Data Feed Processor (NVD v2.0, same flow as legacy)';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'RSS Feed';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
     public function handle()
     {
+        $this->info("=== 🟢 MDCVEBatchJob started ===");
+        date_default_timezone_set("Asia/Bangkok");
+        $jobStartTime = microtime(true);
+        @set_time_limit(0);
+        ini_set('memory_limit', '4096M');
 
-      $TransactionBatchjob_Update = TransactionBatchjob::where('mode','MDCVEBatchJob')->first();
-      $TransactionBatchjob_Update->progress = 2;
-      $TransactionBatchjob_Update->transcation_date_start =date("Y-m-d H:i:s");
-      $TransactionBatchjob_Update->transcation_date  =date("Y-m-d H:i:s");
-      $TransactionBatchjob_Update->save();
+        // อัปเดตสถานะ Batch
+        $TransactionBatchjob = TransactionBatchjob::where('mode', 'MDCVEBatchJob')->first();
+        if ($TransactionBatchjob) {
+            $TransactionBatchjob->progress = 2;
+            $TransactionBatchjob->transcation_date_start = now();
+            $TransactionBatchjob->transcation_date = now();
+            $TransactionBatchjob->save();
+        }
 
+        // เชื่อมต่อฐานข้อมูล
+        $conn = mysqli_connect(env('DB_HOST'), env('DB_USERNAME'), env('DB_PASSWORD'), env('DB_DATABASE'), env('DB_PORT'));
+        if (!$conn) {
+            $this->error("❌ Connection failed: " . mysqli_connect_error());
+            return;
+        }
 
+        // === ดาวน์โหลดและแตกไฟล์ NVD Feed v2.0 ===
+        $path = app_path() . "/Console/Commands/temp/adddatabase/";
+        if (!file_exists($path)) mkdir($path, 0777, true);
+        $zipFile = $path . "nvdcve-2.0-modified.json.zip";
+        $jsonFile = $path . "nvdcve-2.0-modified.json";
+        $url = "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-modified.json.zip";
 
-      date_default_timezone_set("Asia/Bangkok");
-      $serversql = env('DB_HOST');
-      $dbuser =env('DB_USERNAME');
-      $dbpass = env('DB_PASSWORD');
-      $dbname =env('DB_DATABASE');
-      $dbport =env('DB_PORT');
-      $conn = \mysqli_connect($serversql, $dbuser, $dbpass, $dbname, $dbport);
-
-      if (!$conn) {
-        die("Connection failed: " . mysqli_connect_error());
-    } else {
-
-    //GET URL FORM DATABASE
-
-        $urldata = "SELECT * FROM fx_logs_setting WHERE UPPER(type) = 'CVE' ";
-
-        $result_final = mysqli_query($conn, $urldata);
-
-    //echo "Download url form : $linkurl";
-    }
-
-
-
-
-
-
-    try {
-
-
-        while ($row = $result_final->fetch_assoc()) {
-    # code...
-
-
-
-// $updatedata = "UPDATE data_batchjob SET datetime='" . date("Y-m-d H:i:s ") . "' where id =1";//
-    // $update_data_query = mysqli_query($conn, $updatedata);//
-    // if ($update_data_query) {
-    //     echo "Insert Success";
-    //     $st = array('sector' => "UPDATE", 'status' => "Success");
-    //     //  echo json_encode($st);
-    // } else {
-    //     echo "Error" . mysqli_error($conn);
-    //     $st = array('sector' => "UPDATE", 'status' => "Fail");
-    //     //  echo json_encode($st);
-    // }
-
-########################################################################################
-
-// download & setting //
-
-            try {
-                $linkurl = $row["link"];
-                $path =  app_path()."/Console/Commands/temp/adddatabase/";
-                $output_filename = app_path()."/Console/Commands/temp/adddatabase/nvdcve-1.1-modified.json.zip";
-                $output_filename_json = app_path()."/Console/Commands/temp/adddatabase/nvdcve-1.1-modified.json";
-                $host = $linkurl;
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $host);
-                curl_setopt($ch, CURLOPT_VERBOSE, 1);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($ch, CURLOPT_AUTOREFERER, false);
-                curl_setopt($ch, CURLOPT_REFERER, "http://nvd.nist.gov");
-                curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-                curl_setopt($ch, CURLOPT_HEADER, 0);
-                $result = curl_exec($ch);
-                curl_close($ch);
-
-        //print_r($result); // prints the contents of the collected file before writing..
-
-                $fp = fopen($output_filename, 'w');
-                fwrite($fp, $result);
-                fclose($fp);
-            } catch (Exception $e) {
-
-            } finally {
-
+        try {
+            $this->info("⬇️  Downloading NVD Feed (v2.0)...");
+            $downloadStart = microtime(true);
+            $data = @file_get_contents($url);
+            if ($data === false || strlen($data) === 0) {
+                throw new Exception("Failed to download NVD feed");
             }
+            file_put_contents($zipFile, $data);
+            $this->info("✅ Downloaded: ~" . round(strlen($data) / 1024 / 1024, 2) . " MB in " . round((microtime(true) - $downloadStart), 2) . "s");
 
-            ini_set('memory_limit', '1000M');
-            echo $output_filename;
-            $zip = \zip_open($output_filename);
-            if ($zip) {
-                while ($zip_entry = \zip_read($zip)) {
-                    $_zip_entry_name = \zip_entry_name($zip_entry);
-            //echo "<p>";
-            //echo "Found File : " . $_zip_entry_name . "<br />";
-
-                    if ($_zip_entry_name[strlen($_zip_entry_name) - 1] == '/') {
-                        mkdir($_zip_entry_name);
-                        chmod($_zip_entry_name, 0777);
-                    } else if (zip_entry_open($zip, $zip_entry)) {
-                        $fname = zip_entry_name($zip_entry);
-                        if ($fd = fopen($path . $fname, 'w')) {
-                            fwrite($fd, zip_entry_read($zip_entry, zip_entry_filesize($zip_entry)));
-                            fclose($fd);
-                        } else {
-                            echo "fopen($fname) error<br>";
-                        }
-
-                        zip_entry_close($zip_entry);
-                //chmod($fname, 0775);
-                    }
-            //echo "</p>";
-                }
-
-                zip_close($zip);
-
-            }
-
-            ini_set('memory_limit', '100000M');
-            $strJsonFileContents = file_get_contents($output_filename_json) or die("Error: Cannot create object");
-            $json_o = json_decode($strJsonFileContents, true);
-
-    ////////////// real xaml file ///////////////
-
-    //search_revisions
-
-            $site_id_fx_cve_assets = $row["site_id"];
-            $sql = "SELECT * FROM fx_cve_assets WHERE active = 1 AND site_id = " . $site_id_fx_cve_assets . " ";
-            $result = $conn->query($sql);
-            $data_utable_list = [];
-
-            if ($result->num_rows > 0) {
-                while ($row2 = $result->fetch_assoc()) {
-
-                    $data_utable = array();
-                    $data_utable['vendor'] = $row2['vendor'];
-                    $data_utable['title'] = $row2['title'];
-                    array_push($data_utable_list, $data_utable);
-                }
+            $this->info("📦 Extracting zip...");
+            $zip = new \ZipArchive();
+            if ($zip->open($zipFile) === TRUE) {
+                $zip->extractTo($path);
+                $zip->close();
+                $this->info("✅ Extracted to: {$jsonFile}");
             } else {
-                echo "0 results";
+                throw new Exception("Cannot open zip file");
             }
 
-            foreach ($json_o["CVE_Items"] as $json_data) {
+            $this->info("🧩 Parsing JSON (in-memory like original; progress logging enabled)...");
+            $parseStart = microtime(true);
+            $jsonRaw = @file_get_contents($jsonFile);
+            if ($jsonRaw === false) {
+                throw new Exception("Cannot read JSON file after extract");
+            }
+            $json = json_decode($jsonRaw, true, 512, JSON_INVALID_UTF8_IGNORE);
+            unset($jsonRaw); // ลด RAM
+            if (!is_array($json) || !isset($json['vulnerabilities'])) {
+                throw new Exception("Invalid JSON structure or no 'vulnerabilities' key");
+            }
+            $this->info("✅ JSON ready in " . round((microtime(true) - $parseStart), 2) . "s");
 
-               // if ($json_data['cve']['data_type'] == "CVE" and explode('T', $json_data['publishedDate'])[0] >= date('Y-m-d', strtotime(' -90 day'))) {
-                if ($json_data['cve']['data_type'] == "CVE") {
-                    $CVE_Code = $json_data['cve']['CVE_data_meta']['ID'];
+            $today = strtotime('-90 days'); // ดึงเฉพาะ CVE ล่าสุด 90 วัน
+            $count_new = 0;
+            $count_update = 0;
+            $processed = 0;
+            $batchSize = 500; // commit ทุก 500 รายการเพื่อลด I/O
 
-                    foreach ($json_data['configurations']['nodes'] as $vendorkey => $vendor) {
-                        try {
-                            $array_cpe_match = array();
-                            if (isset($vendor['children'])) {
-                                foreach ($vendor['children'] as $children) {
-                                    foreach ($children['cpe_match'] as $cpe_match) {
-                                //if($cpe_match['vulnerable']==true)
-                                        array_push($array_cpe_match, $cpe_match);
+            // เปิด transaction สำหรับการ import
+            mysqli_query($conn, "START TRANSACTION");
+            $chunkStart = microtime(true);
 
-                                    }
-                                }
-                            } 
+            foreach ($json['vulnerabilities'] as $vuln) {
+                $processed++;
 
-                            if (isset($vendor['cpe_match']))  {
-                                foreach ($vendor['cpe_match'] as $cpe_match) {
-                            //if($cpe_match['vulnerable']==true)
-                                    array_push($array_cpe_match, $cpe_match);
-                                }
+                $cve = $vuln['cve'] ?? null;
+                $CVE_Code = $cve['id'] ?? null;
+                if (!$CVE_Code) continue;
+
+                $publishedDate = explode('T', $cve['published'] ?? '')[0];
+                if (!$publishedDate || strtotime($publishedDate) < $today) continue;
+                $lastModifiedDate = explode('T', $cve['lastModified'] ?? '')[0];
+
+                // คำอธิบายภาษาอังกฤษ
+                $description_data = '';
+                foreach ($cve['descriptions'] ?? [] as $desc) {
+                    if (($desc['lang'] ?? '') === 'en') {
+                        // เก็บแบบ escape ป้องกัน quote
+                        $description_data .= htmlspecialchars($desc['value'], ENT_QUOTES);
+                    }
+                }
+
+                // CVSS Metric (v3.1 → v3.0 → v2)
+                $baseScore = "";
+                $baseSeverity = "";
+
+                if (isset($cve['metrics']['cvssMetricV40'][0]['cvssData'])) {
+                    // ✅ CVSS v4.0
+                    $cvss = $cve['metrics']['cvssMetricV40'][0]['cvssData'];
+                    $baseScore = $cvss['baseScore'] ?? "";
+                    $baseSeverity = $cvss['baseSeverity'] ?? "";
+                    // Log::info("{$CVE_Code} [CVSS v4.0] - Score: {$baseScore} - Severity: {$baseSeverity}");
+                } elseif (isset($cve['metrics']['cvssMetricV31'][0]['cvssData'])) {
+                    // ✅ CVSS v3.1
+                    $cvss = $cve['metrics']['cvssMetricV31'][0]['cvssData'];
+                    $baseScore = $cvss['baseScore'] ?? "";
+                    $baseSeverity = $cvss['baseSeverity'] ?? "";
+                    // Log::info("{$CVE_Code} [CVSS v3.1] - Score: {$baseScore} - Severity: {$baseSeverity}");
+                } elseif (isset($cve['metrics']['cvssMetricV30'][0]['cvssData'])) {
+                    // ✅ CVSS v3.0
+                    $cvss = $cve['metrics']['cvssMetricV30'][0]['cvssData'];
+                    $baseScore = $cvss['baseScore'] ?? "";
+                    $baseSeverity = $cvss['baseSeverity'] ?? "";
+                    // Log::info("{$CVE_Code} [CVSS v3.0] - Score: {$baseScore} - Severity: {$baseSeverity}");
+                } elseif (isset($cve['metrics']['cvssMetricV2'][0]['cvssData'])) {
+                    // ✅ CVSS v2.0
+                    $cvss = $cve['metrics']['cvssMetricV2'][0]['cvssData'];
+                    $baseScore = $cvss['baseScore'] ?? "";
+                    $baseSeverity = $cvss['baseSeverity'] ?? "";
+                    // Log::info("{$CVE_Code} [CVSS v2.0] - Score: {$baseScore} - Severity: {$baseSeverity}");
+                }
+
+                // CPE Configurations
+                $cpeMatches = [];
+                foreach ($cve['configurations'] ?? [] as $config) {
+                    foreach ($config['nodes'] ?? [] as $node) {
+                        foreach ($node['cpeMatch'] ?? [] as $cpeMatch) {
+                            if (!empty($cpeMatch['vulnerable']) && isset($cpeMatch['criteria'])) {
+                                $cpeMatches[] = $cpeMatch['criteria'];
                             }
-
-                            if (!empty($array_cpe_match)) {
-                                foreach ($array_cpe_match as $keycpe_match => $valuecpe_match) {
-                                    if ($valuecpe_match['vulnerable'] == true) {
-                                        $cpe23Uri = explode(":", $valuecpe_match['cpe23Uri']);
-                                //print PHP_EOL.$cpe23Uri[3].PHP_EOL;
-
-                                        $data_count = search_revisions($data_utable_list, $cpe23Uri[3], 'vendor', $cpe23Uri[4], 'title');
-
-
-                                        if (count($data_count) > 0) {
-                                            print PHP_EOL . '=================================================================';
-                                            print PHP_EOL . $CVE_Code . PHP_EOL;
-
-                                            $vendor_name = $cpe23Uri[3];
-                                            $product_name = $cpe23Uri[4];
-                                            $versionvalue = $cpe23Uri[5];
-                                            $edition = $cpe23Uri[6];
-                                            if ($edition == "*") {
-                                                $edition = "";
-                                            }
-                                            echo PHP_EOL . 'check...';
-
-                                            $sql_samename = "SELECT namecve FROM fx_data_cveven WHERE namecve = '" . $CVE_Code . "' and title='" . $product_name . "' and vendor='" . $vendor_name . "' and version='" . $versionvalue . "' and edition='" . $edition . "'";
-
-                                            $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
-                                            $num = mysqli_num_rows($result1);
-                                    //echo 'end check';
-                                    //$num  = 0;
-
-                                            if ($num == 0) {
-                                                $created_atz = date("Y-m-d H:i:s");
-                                                $created_at = date("Y-m-d H:i:s", strtotime($created_atz));
-
-                                                try {
-
-                                                    $sql = "INSERT INTO fx_data_cveven(namecve,title,vendor,version,edition,created_at)
-                                                    VALUES ('" . $CVE_Code . "','" . $product_name . "','" . $vendor_name . "','" . $versionvalue . "','" . $edition . "','" . $created_at . "')";
-                                                    $result = mysqli_query($conn, $sql);
-
-                                                } catch (Exception $e) {
-
-                                                } finally {
-
-                                                }
-
-                                            }
-
-                                    //================
-
-                                            $description_data = "";
-                                            if(isset($json_data['cve']['description']['description_data'])){
-                                                foreach ($json_data['cve']['description']['description_data'] as $descriptionkey => $descriptionvalue) {
-                                                    $description_data = $description_data . $descriptionvalue['value'];
-                                                }
-                                            }
-                                    // else{
-                                    //     foreach ($json_data['cve']['description'] as $descriptionkey => $descriptionvalue) {
-                                    //         $description_data = $description_data . $descriptionvalue['value'];
-                                    //     }
-                                    // }
-
-                                            $description_data = htmlspecialchars($description_data, ENT_QUOTES);
-
-                                            $baseScore = $json_data['impact']['baseMetricV3']['cvssV3']['baseScore'];
-                                            $baseSeverity = $json_data['impact']['baseMetricV3']['cvssV3']['baseSeverity'];
-
-                                            if (!$json_data['impact']['baseMetricV3']['cvssV3']['baseScore']) {
-                                                $baseScore = $json_data['impact']['baseMetricV2']['exploitabilityScore'];
-                                                $baseSeverity = $json_data['impact']['baseMetricV2']['cvssV3']['severity'];
-
-                                            }
-
-                                            print PHP_EOL . 'baseScore :' . $baseScore;
-                                            print PHP_EOL . 'baseSeverity :' . $baseSeverity;
-
-                                            $publishedDate = $json_data['publishedDate'];
-                                            $lastModifiedDate = $json_data['lastModifiedDate'];
-                                            print PHP_EOL . 'publishedDate : ' . explode('T', $publishedDate)[0];
-                                            print PHP_EOL . 'lastModifiedDate : ' . explode('T', $lastModifiedDate)[0];
-
-                                    //=================================
-                                            $sql_samename = "SELECT namecve FROM fx_data_datacve WHERE namecve = '" . $CVE_Code . "'";
-                                            $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
-                                            $num = mysqli_num_rows($result1);
-                                    //$num = 0;
-
-                                            if ($num > 0) {
-
-                                                $add_name = $CVE_Code;
-
-                                                $add_published = explode('T', $publishedDate)[0];
-
-                                                $add_modified = explode('T', $lastModifiedDate)[0];
-
-                                                $add_descript = $description_data;
-
-                                                $add_cvsssore = $baseScore;
-
-                                                $add_severity = $baseSeverity;
-
-                                                $add_pub_datez = date("Y-m-d H:i:s ");
-                                                $add_pub_date = date("Y-m-d H:i:s ", strtotime($add_pub_datez));
-
-                                                $created_atz = date("Y-m-d H:i:s ");
-
-                                                $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
-
-                                                try {
-
-                                                    update_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
-
-                                                } catch (Exception $e) {
-
-                                                } finally {
-
-                                                }
-
-                                            } else {
-
-                                                $add_name = $CVE_Code;
-
-                                                $add_published = explode('T', $publishedDate)[0];
-
-                                                $add_modified = explode('T', $lastModifiedDate)[0];
-
-                                                $add_descript = $description_data;
-
-                                                $add_cvsssore = $baseScore;
-
-                                                $add_severity = $baseSeverity;
-
-                                                $add_pub_datez = date("Y-m-d H:i:s ");
-                                                $add_pub_date = date("Y-m-d H:i:s ", strtotime($add_pub_datez));
-
-                                                $created_atz = date("Y-m-d H:i:s ");
-
-                                                $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
-
-                                                try {
-
-                                                    insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at);
-
-                                                } catch (Exception $e) {
-
-                                                } finally {
-
-                                                }
-
-                                            }
-                                    //==========================
-
-                                    //==========
-
-                                        }
-
-                                    }
-                                }
-                            }
-
-                        } catch (Exception $e) {
-
                         }
-
                     }
-
                 }
-        //break;
-            }
-// extract file //
 
+                // === Insert fx_data_cveven === (แบบเดิม แต่ commit เป็นช่วง)
+                foreach ($cpeMatches as $uri) {
+                    $parts = explode(':', $uri);
+                    $vendor_name  = mysqli_real_escape_string($conn, $parts[3] ?? '');
+                    $product_name = mysqli_real_escape_string($conn, $parts[4] ?? '');
+                    $version      = mysqli_real_escape_string($conn, $parts[5] ?? '');
+                    $edition      = mysqli_real_escape_string($conn, ($parts[6] ?? '') === '*' ? '' : ($parts[6] ?? ''));
 
-            $sql = "SELECT * FROM fx_cve_assets";
-            $result2 = mysqli_query($conn, $sql) or die(mysqli_error());
+                    $query_check = "
+                        SELECT 1 FROM fx_data_cveven
+                        WHERE namecve='$CVE_Code' AND vendor='$vendor_name' AND title='$product_name' AND version='$version'
+                    ";
+                    $exists = mysqli_query($conn, $query_check);
+                    if ($exists && mysqli_num_rows($exists) == 0) {
+                        $query_insert = "
+                            INSERT INTO fx_data_cveven(namecve, vendor, title, version, edition, created_at)
+                            VALUES ('$CVE_Code', '$vendor_name', '$product_name', '$version', '$edition', NOW())
+                        ";
+                        mysqli_query($conn, $query_insert);
+                    }
+                }
 
-    //Save Mapping
-            echo "=====================Maping===================//////";
-    /*
-    $urldata2 = "SELECT * FROM fx_logs_setting WHERE id LIKE 1 ";
-
-    $resulturldata2 = mysqli_query($conn, $urldata2);
-    $rowresulturldata2 = $resulturldata2->fetch_assoc();
-
-    $urldata3 = "SELECT mode FROM fx_logs_setting WHERE id LIKE 3 ";
-
-    $resulturldata3 = mysqli_query($conn, $urldata3);
-    $rowresulturldata3 = $resulturldata3->fetch_assoc();
-    */
-
-    while ($row3 = $result2->fetch_array(MYSQLI_ASSOC)) {
-
-        //  echo '<br>'.$row3['title'].'<br>---------------------------------------/r/n';
-          print PHP_EOL .$row3['title'];
-
-         if($row3['version'] =="-" || $row3['version'] =="*" || $row3['version'] ==""){
-                    $sql2 = "SELECT distinct * FROM fx_data_cveven where vendor = '" . $row3['vendor'] . "' and title='" . $row3['title'] . "' and version in ('-','*','')";
-          }else{
-                    $sql2 = "SELECT distinct * FROM fx_data_cveven where vendor = '" . $row3['vendor'] . "' and title='" . $row3['title'] . "' and version='" . $row3['version'] . "'";
-
-          }
-
-          if($row3['edition'] =="-" || $row3['edition'] =="*" || $row3['edition'] ==""){
-                     $sql2 =  $sql2. "  and edition in ('-','*','')";
-            }else{
-                     $sql2 =  $sql2."  and edition ='".$row3['edition']."'";
-
-          }
-
-       // print PHP_EOL . $sql2;
-        $result3 = mysqli_query($conn, $sql2) or die(mysqli_error());
-        $namecveList = array();
-        array_push($namecveList, 'C0000');
-        array_push($namecveList, 'C0001');
-         // print PHP_EOL . $sql2;
-        while ($row4 = $result3->fetch_array(MYSQLI_ASSOC)) {
-            if (!array_key_exists($row4['namecve'], $namecveList)) {
-                array_push($namecveList, $row4['namecve']);
-            }
-            
-        }
-
-       // print_r($namecveList);
-
-        $created_atz = date("Y-m-d H:i:s ");
-        $modified = date("Y-m-d", strtotime($created_atz));
-
-       $modified_start = date('Y-m-d', strtotime(' -30 day'));
-        // $sql3 =   "SELECT * FROM fx_data_datacve WHERE modified between '".$modified_start."' AND '".$modified."' and namecve IN ('".implode("','", $namecveList)."') ";
-        
-        //$modified ='2019-08-08';
-        $sql3  = 'SELECT *
-        FROM `fx_data_datacve`
-        WHERE  modified  >=CURDATE() + INTERVAL -200 DAY and   namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
-
-        // $sql3  = 'SELECT *
-        // FROM `data_datacve`
-        // WHERE  namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
-
-        // $sql3 = 'SELECT *
-        // FROM `data_datacve`
-        // WHERE modified > "2021-01-01" and  namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
-        // echo  $sql3;
-
-        $result4 = mysqli_query($conn, $sql3) or die(mysqli_error());
-        
-        while ($row4 = $result4->fetch_array(MYSQLI_ASSOC) ) {
-
-            $created_atz = date("Y-m-d H:i:s ");
-            $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
-
-
-            $sql_samename = "SELECT namecve FROM fx_data_datacve_mapping WHERE namecve = '" . $row4['namecve'] . "'";
-
-            $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
-            $num = mysqli_num_rows($result1);
-            
-            if ($num == 0) {
-                $insertdata = "INSERT INTO fx_data_datacve_mapping (namecve, published, modified, description, cvss_score, severity,site_id, updated_at, created_at,cveven_id)
-                VALUES  ('" . $row4['namecve'] . "',
-                '" . $row4['published'] . "',
-                '" . $row4['modified'] . "',
-                '" . $row4['description'] . "',
-                '" . $row4['cvss_score'] . "',
-                '" . $row4['severity'] . "',
-                '" . '0' . "',
-                '" . $row4['updated_at'] . "','" . $created_at . "','" . '0' . "')";
-
-
-
-
-                $result = \mysqli_query($conn, $insertdata);
-
-
-
-                // $sql_samename_last = "SELECT id FROM fx_data_datacve_mapping order by id desc";
-                // $result1_last = mysqli_query($conn, $sql_samename_last) or die(mysqli_error());
-                // $num_last = mysqli_fetch_assoc($result1_last);
-                
-                // $insertdata_mapping = "INSERT INTO fx_transaction_client_data_datacve_mapping (site_id, transaction_id, transaction_mode, transaction_data_status, status, created_at)
-                // VALUES  ('" . $row3['site_id'] . "',
-                // '" .  $num_last['id'] . "',
-                // '" . "insert". "',
-                // '" . "1". "','" . "1". "','" .  date("Y-m-d H:i:s ") . "')";
-                // $result = \mysqli_query($conn, $insertdata_mapping);
-
-            }else{
-                $sql_samename_last ="UPDATE `fx_data_datacve_mapping`
-                SET
-                `published` = '". $row4['published']."',
-                `modified` = '". $row4['modified']."',
-                `description` = '". $row4['description']."',
-                `cvss_score` = '". $row4['cvss_score']."',
-                `severity` = '". $row4['severity']."',
-                `updated_at` = '". $row4['updated_at']."',
-                WHERE `id` > 0 and  namecve = '" . $row4['namecve'] . "'";
-                $result = \mysqli_query($conn, $sql_samename_last);
-
-            }
-
-            // Mapping Asset
-           // echo $row3['title'].'-'.$row3['site_id'].'|';
-            $sql_samename_asset = "SELECT namecve FROM fx_data_datacve_mapping_assets WHERE namecve = '" . $row4['namecve'] . "' and site_id='".$row3['site_id']."' and cve_asset_id='".$row3['id']."'";
-
-            $result11 = mysqli_query($conn, $sql_samename_asset) or die(mysqli_error());
-            $num = mysqli_num_rows($result11);
-            if ($num == 0) {
-                $insertdata_asset = "INSERT INTO fx_data_datacve_mapping_assets (namecve,cve_asset_id,site_id,code,updated_at, created_at)
-                VALUES  ('" . $row4['namecve'] . "',
-                '" . $row3['id'] . "',
-                '" . $row3['site_id']. "',
-                '" . $this->GUID(). "',
-                '" . $row4['updated_at'] . "','" . $created_at . "'". ")";
-
-                echo  $insertdata_asset;
-
-
-                $result = \mysqli_query($conn, $insertdata_asset);
-            }else{
-
-            }
-
-
-
-            if (1 == 2) {
-                //send log
-                // usleep(1.5*1000000);
-                $mode = $row["protocal_format"];
-                if ($mode == 1) {
-
-                    $LogString = "CEF:0|SOSecure|CVE|1.0|101|Vulnerability Detection|1| dst=" . $row3['IP'] . " dhost=" . $row3['Hostname'] . " dvchost=" . $row3['Site'] . ' cs1Label=NameCVE cs1=' . $row4['namecve'] . ' cs2Label=Vendor ' . "cs2=" . $row3['vendor'] . " " . 'cs3Label=OS ' . "cs3=" . $row3['title'] . " " . 'cs4Label=OSVersion ' . "cs4=" . $row3['version'] . " " . 'cs5Label=Edition ' . "cs5=" . $row3['edition'] . " " . 'cs6Label=Severity ' . "cs6=" . $row4['cvss_score'] . "-" . $row4['severity'];
-
+                // === Insert/Update fx_data_datacve ===
+                $exists = mysqli_query($conn, "SELECT 1 FROM fx_data_datacve WHERE namecve='" . mysqli_real_escape_string($conn, $CVE_Code) . "'");
+                if ($exists && mysqli_num_rows($exists) == 0) {
+                    $this->insert_nvd($conn, $CVE_Code, $publishedDate, $lastModifiedDate, mysqli_real_escape_string($conn, $description_data), $baseScore, $baseSeverity);
+                    $count_new++;
                 } else {
-
-                    $LogString = date("Y/M/d H:i:s") . " " . $row3['vendor'] . " CVE_ID=" . $row4['namecve'] . ",DESCRIPTION=" . $row4['description'] . ",CVSS=" . $row4['cvss_score'] . ",DEVICE=" . $row3['IP'] . ",VENDOR=" . $row3['vendor'] . ",SITE=" . $row3['Site'] . "";
-
+                    $this->update_nvd($conn, $CVE_Code, $publishedDate, $lastModifiedDate, mysqli_real_escape_string($conn, $description_data), $baseScore, $baseSeverity);
+                    $count_update++;
                 }
 
-                if ($row['protocol'] == "udp") {
-                    //  system("echo '".$LogString."' | nc -w0 -u ".$rowresulturldata2['ip']." ".$rowresulturldata2['port']);
-                    //  echo  "echo '".$LogString."' | nc -w0 -u ".$rowresulturldata2['ip']." ".$rowresulturldata2['port']."<br>";
+                // === Mirror fx_data_datacve -> fx_data_datacve_mapping (no-duplicate version) ===
+                $CVE_Code_esc = mysqli_real_escape_string($conn, $CVE_Code);
+                $published_esc = mysqli_real_escape_string($conn, $publishedDate);
+                $modified_esc  = mysqli_real_escape_string($conn, $lastModifiedDate);
+                $desc_esc      = mysqli_real_escape_string($conn, $description_data);
+                $score_esc     = mysqli_real_escape_string($conn, (string)$baseScore);
+                $sev_esc       = mysqli_real_escape_string($conn, (string)$baseSeverity);
 
-                    $server_ip = $row['ip'];
-                    $server_port = $row['port'];
-                    $beat_period = 1;
-                    $message = $LogString;
-                    if ($socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) {
-                        socket_sendto($socket, $message, strlen($message), 0, $server_ip, $server_port);
+                // 1️⃣ อัปเดตถ้ามีอยู่แล้ว
+                $update_sql = "
+                    UPDATE fx_data_datacve_mapping
+                    SET 
+                        published='{$published_esc}',
+                        modified='{$modified_esc}',
+                        description='{$desc_esc}',
+                        cvss_score='{$score_esc}',
+                        severity='{$sev_esc}',
+                        updated_at=NOW()
+                    WHERE namecve='{$CVE_Code_esc}' AND site_id=0
+                ";
+                mysqli_query($conn, $update_sql);
 
-    //echo '\n'.$LogString.'\n';
-
-                    } else {
-                    }
-
-                } else {
-
-                    $server_ip = $row['ip'];
-                    $server_port = $row['port'];
-                    $beat_period = 1;
-                    $message = $LogString;
-
-                    ini_set('display_errors', true);
-                    error_reporting(E_ALL); // <- for debugging purposes only
-
-                    $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-                    if (!$socket) {
-                        $errno = socket_last_error();
-                        $error = sprintf('%s (%d)', socket_strerror($errno), $errno);
-                        trigger_error($error, E_USER_ERROR);
-                    }
-
-                    if (!socket_connect($socket, $server_ip, $server_port)) {
-                        $errno = socket_last_error($socket);
-                        $error = sprintf('%s (%d)', socket_strerror($errno), $errno);
-                        trigger_error($error, E_USER_ERROR);
-                    }
-
-                    $buff = $message;
-                    $length = strlen($buff);
-                    $sent = socket_write($socket, $buff, $length);
-                    if (false === $sent) {
-                        $errno = socket_last_error($socket);
-                        $error = sprintf('%s (%d)', socket_strerror($errno), $errno);
-                        trigger_error($error, E_USER_ERROR);
-                    } else if ($length !== $sent) {
-                        $msg = sprintf('only %d of %d bytes sent', $length, $sent);
-                        trigger_error($msg, E_USER_NOTICE);
-                    }
-
-                }
-
-            }
-
-        }
-    }
-
-}
-
-} catch (Exception $th) {
-    echo json_encode($th->getMessage());
-}
-
-
-
-//บันทึก summary
-$site_id_m = SiteSettings::select('id','code')->where('active','1')->get();
-$site_id_list = array();
-array_push($site_id_list,0);
-foreach($site_id_m as $site_data){
-    array_push($site_id_list,$site_data->id);
-    $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $site_data->id)->where("active", '=', 1)->groupBy('vendor', 'title')->get();
-    $vendor = [];
-    $title = [];
-    foreach($CVEAssets as $data){
-        $vendor[] = $data -> vendor;
-        $title[] = $data -> title;
-    }
-    $DataCveven = DataCveven::select('namecve', 'title', DB::raw('count(*) as total'))->whereIn('vendor', $vendor)->whereIn('title', $title)->groupBy('namecve')->get();
-    $namecve = [];
-    $check_total_namecve = array();
-    $host_name = [];
-    foreach($DataCveven as $data){
-        $namecve[] = $data -> namecve;
-        $check_total_namecve[] = collect([
-            'total' => $data -> total,
-            'namecve' => $data -> namecve,
-            'title' => $data -> title
-        ]);
-    }
-
-    
-    $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_data->id)->select('namecve')->get();
-    $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $CVEMappingAssets_name)->groupBy('severity','namecve')->get();
-    foreach($CVEMapping as $data){
-        foreach($check_total_namecve as $item){
-            if($data -> namecve == $item['namecve']){
-                $data['total'] = $item['total'];
-                $data['title'] = $item['title'];
-                $host_name[] = $item['title'];
-                //บันทึกข้อมูล 
-                $fx_cve_name_summarys_data = DB::table('cve_name_summarys')
-                ->where('site_id',$site_data->id)->where('namecve',$data -> namecve )
-                ->first();
-                if(!$fx_cve_name_summarys_data){
-                    DB::table('cve_name_summarys')->insert(
-                        ['site_id' => $site_data->id, 'namecve' => $data -> namecve, 'title' => $item['title'], 'updated_at' => date("Y-m-d H:i:s"),'total'=>$item['total']]
-                    );
-
-                }else{
-
-                    DB::table('cve_name_summarys')->where('id',$fx_cve_name_summarys_data->id)->update(array(
-                        'total'=>$item['total'],'updated_at'=>date("Y-m-d H:i:s"),
-                      ));
-
+                // 2️⃣ ถ้าไม่มี record เดิม → insert ใหม่
+                if (mysqli_affected_rows($conn) === 0) {
+                    $insert_sql = "
+                        INSERT INTO fx_data_datacve_mapping
+                            (namecve, published, modified, description, cvss_score, severity, site_id, updated_at, created_at)
+                        VALUES
+                            ('{$CVE_Code_esc}', '{$published_esc}', '{$modified_esc}', '{$desc_esc}', '{$score_esc}', '{$sev_esc}', 0, NOW(), NOW())
+                    ";
+                    mysqli_query($conn, $insert_sql);
                 }
 
 
-
-            }
-        }
-    }
-    $result = array();
-    foreach ($host_name as $element) {
-        $result[$element] = $element;
-  
-         $total_critical = 0;
-         $total_high = 0;
-         $total_medium = 0;
-         $total_low = 0;
-         $total_infomation = 0;
-         foreach($CVEMapping as $cve){
-            if($element == $cve['title'] && $cve['severity'] == 'HIGH'){
-                $total_high  =$total_high+1;
-            }else if($element == $cve['title'] && $cve['severity'] == 'CRITICAL'){
-                $total_critical =$total_critical+1;
-
-            }else if($element == $cve['title'] && $cve['severity']  == 'MEDIUM'){
-                $total_medium = $total_medium+1;
-
-            }else if($element == $cve['title'] && $cve['severity']  == 'LOW'){
-                $total_low = $total_low+1;
-
-            }else if($element == $cve['title'] && $cve['severity']  == 'INFOMATION'){
-                $total_infomation = $total_infomation+1;
-
-            }
-
-         }
-
-           //บันทึกข้อมูล 
-           $cve_host_name_summarys_data = DB::table('cve_host_name_summarys')
-           ->where('site_id',$site_data->id)->where('title',$element)
-           ->first();
-           if(!$cve_host_name_summarys_data){
-            DB::table('cve_host_name_summarys')->insert(
-                ['site_id' => $site_data->id,'site_code' => $site_data->code, 'title' =>$element
-                , 'status_critical' =>$total_critical 
-                , 'status_high' =>$total_high 
-                , 'status_medium' =>$total_medium 
-                , 'status_low' =>$total_low 
-                , 'status_infomation' =>$total_infomation 
-                , 'updated_at' => date("Y-m-d H:i:s")]
-            );
-
-            }else{
-
-                DB::table('cve_host_name_summarys')->where('id',$cve_host_name_summarys_data->id)->update(array(
-                    'status_critical' =>$total_critical 
-                    , 'status_high' =>$total_high 
-                    , 'status_medium' =>$total_medium 
-                    , 'status_low' =>$total_low 
-                    , 'status_infomation' =>$total_infomation 
-                    , 'updated_at' => date("Y-m-d H:i:s")
-                ));
-
-            }
-
-
-    }
-  
-
-
-    
-    
-
-
-}
-//All Site
-$CVEAssets = CVEAssets::select('vendor', 'title')->whereIn('site_id', $site_id_list)->where("active", '=', 1)->groupBy('vendor', 'title')->get();
-$vendor = [];
-$title = [];
-foreach($CVEAssets as $data){
-    $vendor[] = $data -> vendor;
-    $title[] = $data -> title;
-}
-$DataCveven = DataCveven::select('namecve', 'title', DB::raw('count(*) as total'))->whereIn('vendor', $vendor)->whereIn('title', $title)->groupBy('namecve')->get();
-$namecve = [];
-$check_total_namecve = array();
-$host_name = [];
-foreach($DataCveven as $data){
-    $namecve[] = $data -> namecve;
-    $check_total_namecve[] = collect([
-        'total' => $data -> total,
-        'namecve' => $data -> namecve,
-        'title' => $data -> title
-    ]);
-}
-
-
-$CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_list)->select('namecve')->get();
-$CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $CVEMappingAssets_name)->groupBy('severity','namecve')->get();
-foreach($CVEMapping as $data){
-    foreach($check_total_namecve as $item){
-        if($data -> namecve == $item['namecve']){
-            $data['total'] = $item['total'];
-            $data['title'] = $item['title'];
-            $host_name[] = $item['title'];
-            //บันทึกข้อมูล 
-            $fx_cve_name_summarys_data = DB::table('cve_name_summarys')
-            ->where('site_id',0)->where('namecve',$data -> namecve )
-            ->first();
-            if(!$fx_cve_name_summarys_data){
-                DB::table('cve_name_summarys')->insert(
-                    ['site_id' => 0, 'namecve' => $data -> namecve, 'title' => $item['title'], 'updated_at' => date("Y-m-d H:i:s"),'total'=>$item['total']]
-                );
-
-            }else{
-
-                DB::table('cve_name_summarys')->where('id',$fx_cve_name_summarys_data->id)->update(array(
-                    'total'=>$item['total'],'updated_at'=>date("Y-m-d H:i:s"),
-                  ));
-
-            }
-
-
-
-        }
-    }
-}
-$result = array();
-foreach ($host_name as $element) {
-    $result[$element] = $element;
-
-     $total_critical = 0;
-     $total_high = 0;
-     $total_medium = 0;
-     $total_low = 0;
-     $total_infomation = 0;
-     foreach($CVEMapping as $cve){
-        if($element == $cve['title'] && $cve['severity'] == 'HIGH'){
-            $total_high  =$total_high+1;
-        }else if($element == $cve['title'] && $cve['severity'] == 'CRITICAL'){
-            $total_critical =$total_critical+1;
-
-        }else if($element == $cve['title'] && $cve['severity']  == 'MEDIUM'){
-            $total_medium = $total_medium+1;
-
-        }else if($element == $cve['title'] && $cve['severity']  == 'LOW'){
-            $total_low = $total_low+1;
-
-        }else if($element == $cve['title'] && $cve['severity']  == 'INFOMATION'){
-            $total_infomation = $total_infomation+1;
-
-        }
-
-     }
-
-       //บันทึกข้อมูล 
-       $cve_host_name_summarys_data = DB::table('cve_host_name_summarys')
-       ->where('site_id',0)->where('title',$element)
-       ->first();
-       if(!$cve_host_name_summarys_data){
-        DB::table('cve_host_name_summarys')->insert(
-            ['site_id' => 0,'site_code' => 0, 'title' =>$element
-            , 'status_critical' =>$total_critical 
-            , 'status_high' =>$total_high 
-            , 'status_medium' =>$total_medium 
-            , 'status_low' =>$total_low 
-            , 'status_infomation' =>$total_infomation 
-            , 'updated_at' => date("Y-m-d H:i:s")]
-        );
-
-        }else{
-
-            DB::table('cve_host_name_summarys')->where('id',$cve_host_name_summarys_data->id)->update(array(
-                'status_critical' =>$total_critical 
-                , 'status_high' =>$total_high 
-                , 'status_medium' =>$total_medium 
-                , 'status_low' =>$total_low 
-                , 'status_infomation' =>$total_infomation 
-                , 'updated_at' => date("Y-m-d H:i:s")
-            ));
-
-        }
-
-
-}
-
-
-
-$TransactionBatchjob_Update = TransactionBatchjob::where('mode','MDCVEBatchJob')->first();
-$TransactionBatchjob_Update->progress = 1;
-$TransactionBatchjob_Update->transcation_date_end =date("Y-m-d H:i:s");
-$TransactionBatchjob_Update->transcation_date  =date("Y-m-d H:i:s");
-$TransactionBatchjob_Update->save();
-
-
-
-
-
-
-
-
-}
-
-function search_revisions($dataArray, $search_value, $key_to_search, $other_matching_value = null, $other_matching_key = null)
-{
-    // This function will search the revisions for a certain value
-    // related to the associative key you are looking for.
-    $keys = array();
-    foreach ($dataArray as $key => $cur_value) {
-        if ($cur_value[$key_to_search] == $search_value) {
-            if (isset($other_matching_key) && isset($other_matching_value)) {
-                if ($cur_value[$other_matching_key] == $other_matching_value) {
-                    $keys[] = $cur_value;
+                // === Progress / Commit เป็นช่วง ===
+                if ($processed % $batchSize === 0) {
+                    mysqli_query($conn, "COMMIT");
+                    mysqli_query($conn, "START TRANSACTION");
+                    $mins = round((microtime(true) - $chunkStart) / 60, 2);
+                    $this->info("⏳ Processed: {$processed} CVEs | New={$count_new} / Update={$count_update} | Chunk time={$mins} min");
+                    $chunkStart = microtime(true);
+                    gc_collect_cycles();
                 }
-            } else {
-                // I must keep in mind that some searches may have multiple
-                // matches and others would not, so leave it open with no continues.
-                $keys[] = $cur_value;
             }
+
+            // ปิดท้าย import
+            mysqli_query($conn, "COMMIT");
+            $importMins = round((microtime(true) - $parseStart) / 60, 2);
+            $this->info("✅ Inserted new: {$count_new}, Updated: {$count_update} (Import time ~ {$importMins} min)");
+
+            // ขั้นตอน Mapping + Summary (คงโค้ดเดิม เพิ่ม log)
+            $this->processMappingAndSummary($conn);
+
+            // อัปเดตสถานะ Batch เสร็จสมบูรณ์
+            if ($TransactionBatchjob) {
+                $TransactionBatchjob->progress = 1;
+                $TransactionBatchjob->transcation_date_end = now();
+                $TransactionBatchjob->transcation_date = now();
+                $TransactionBatchjob->save();
+            }
+
+            $totalMins = round((microtime(true) - $jobStartTime) / 60, 2);
+            $this->info("🎯 MDCVEBatchJob finished successfully in ~{$totalMins} minutes.");
+        } catch (Exception $e) {
+            $this->error("❌ Error: " . $e->getMessage());
         }
     }
-    return $keys;
-}
 
-function insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at)
-{
-
-    $insertdata = "INSERT INTO fx_data_datacve (namecve, published, modified, description, cvss_score, severity, updated_at, created_at)
-    VALUES  ('" . $add_name . "',
-    '" . $add_published . "',
-    '" . $add_modified . "',
-    '" . $add_descript . "',
-    '" . $add_cvsssore . "',
-    '" . $add_severity . "',
-    '" . $add_pub_date . "','" . $created_at . "')";
-
-    $insert_data_query = mysqli_query($conn, $insertdata);
-
-    if ($insert_data_query) {
-        echo "Insert Success";
-        $st = array('sector' => "INSERT", 'status' => "Success");
-        //  echo json_encode($st);
-    } else {
-        echo "Error" . mysqli_error($conn);
-        $st = array('sector' => "INSERT", 'status' => "Fail");
-        // echo json_encode($st);
-    }
-
-}
-
-function update_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at)
-{
-    $updatedata = "UPDATE fx_data_datacve SET
-    published = '" . $add_published . "' ,
-    modified = '" . $add_modified . "' ,
-    description = '" . $add_descript . "' ,
-    cvss_score = '" . $add_cvsssore . "' ,
-    severity = '" . $add_severity . "' ,
-    updated_at = '" . $add_pub_date . "' ,
-    created_at = '" . $created_at . "'
-    WHERE namecve = '" . $add_name . "' ";
-
-    $update_data_query = mysqli_query($conn, $updatedata);
-    if ($update_data_query) {
-        echo "Insert Success";
-        $st = array('sector' => "UPDATE", 'status' => "Success");
-        //  echo json_encode($st);
-    } else {
-        echo "Error" . mysqli_error($conn);
-        $st = array('sector' => "UPDATE", 'status' => "Fail");
-        //  echo json_encode($st);
-    }
-
-
-}
-
-function GUID()
-{
-    if (function_exists('com_create_guid') === true)
+    // ---------------- ฟังก์ชันย่อย ----------------
+    private function insert_nvd($conn, $name, $pub, $mod, $desc, $score, $sev)
     {
-        return trim(com_create_guid(), '{}');
+        $sql = "INSERT INTO fx_data_datacve (namecve, published, modified, description, cvss_score, severity, updated_at, created_at)
+                VALUES ('$name','$pub','$mod','$desc','$score','$sev',NOW(),NOW())";
+        mysqli_query($conn, $sql);
     }
 
-    return sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
-}
+    private function update_nvd($conn, $name, $pub, $mod, $desc, $score, $sev)
+    {
+        $sql = "UPDATE fx_data_datacve SET 
+                published='$pub', modified='$mod', description='$desc',
+                cvss_score='$score', severity='$sev', updated_at=NOW()
+                WHERE namecve='$name'";
+        mysqli_query($conn, $sql);
+    }
+
+    private function processMappingAndSummary($conn)
+    {
+        $this->info("🔁 Starting CVE Mapping & Summary...");
+        $stepStart = microtime(true);
+
+        // 📦 อ่าน progress ล่าสุด
+        $progress = CveAssetsProgress::first();
+        $lastAssetId = $progress ? $progress->last_asset_id : 0;
+        $lastCveName = $progress ? $progress->last_cve_name : null;
+
+        $this->info("▶️ Resume from asset_id={$lastAssetId}, cve={$lastCveName}");
+
+        // 📂 ดึง assets ที่ยังไม่ได้ทำ หรือค้างไว้
+        $assets = mysqli_query($conn, "SELECT * FROM fx_cve_assets WHERE id >= $lastAssetId ORDER BY id ASC");
+        if (!$assets) {
+            $this->error("❌ Cannot query fx_cve_assets");
+            return;
+        }
+
+        $mapped = 0;
+        $mapBatchSize = 100;
+
+        while ($row = mysqli_fetch_assoc($assets)) {
+            $vendor = mysqli_real_escape_string($conn, $row['vendor']);
+            $title  = mysqli_real_escape_string($conn, $row['title']);
+            $version = mysqli_real_escape_string($conn, $row['version']);
+            $edition = mysqli_real_escape_string($conn, $row['edition']);
+            $site_id = $row['site_id'];
+
+            $this->info("🧩 Asset ID {$row['id']} (site_id: {$site_id})");
+
+            // ✅ สร้าง query ดึง CVE ที่ตรงกับ asset
+            $query = "SELECT * FROM fx_data_cveven WHERE vendor='$vendor' AND title='$title'";
+            if (!in_array($version, ['-', '*', ''])) $query .= " AND version='$version'";
+            if (!in_array($edition, ['-', '*', ''])) $query .= " AND edition='$edition'";
+
+            $cves = mysqli_query($conn, $query);
+            if (!$cves) {
+                $this->error("❌ Error fetching CVEs for asset {$row['id']}");
+                continue;
+            }
+
+            // ⚙️ ตรวจว่าต้อง skip CVE ก่อนหน้าไหม (resume จากจุดค้าง)
+            $skipMode = ($row['id'] == $lastAssetId && $lastCveName) ? true : false;
+
+            while ($cve = mysqli_fetch_assoc($cves)) {
+                $name = $cve['namecve'];
+
+                // ถ้ายังอยู่ในโหมด skip ให้ข้ามไปจนกว่าจะถึง CVE เดิม
+                if ($skipMode) {
+                    if ($name == $lastCveName) {
+                        $skipMode = false;
+                        continue; // ข้าม CVE เดิม แล้วเริ่มจากตัวถัดไป
+                    }
+                    continue;
+                }
+
+                // ตรวจว่ามี mapping แล้วหรือยัง
+                $exists = mysqli_query($conn, "
+                    SELECT 1 FROM fx_data_datacve_mapping_assets
+                    WHERE namecve='$name' AND site_id='$site_id' AND cve_asset_id='{$row['id']}'
+                ");
+                if ($exists && mysqli_num_rows($exists) == 0) {
+                    $insert = "
+                        INSERT IGNORE INTO fx_data_datacve_mapping_assets
+                        (namecve, cve_asset_id, site_id, code, updated_at, created_at)
+                        VALUES ('$name', '{$row['id']}', '$site_id', '" . $this->GUID() . "', NOW(), NOW())
+                    ";
+                    mysqli_query($conn, $insert);
+                }
+
+                // ✅ บันทึก progress ทุกครั้งที่ผ่าน CVE
+                CveAssetsProgress::query()->update([
+                    'last_asset_id' => $row['id'],
+                    'last_cve_name' => $name,
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // 🧹 ล้างค่า CVE หลังทำ asset นี้ครบ
+            CveAssetsProgress::query()->update(['last_cve_name' => null]);
+
+            $mapped++;
+            if ($mapped % $mapBatchSize === 0) {
+                $mins = round((microtime(true) - $stepStart) / 60, 2);
+                $this->info("📈 Mapped {$mapped} assets so far | Elapsed={$mins} min");
+                gc_collect_cycles();
+            }
+        }
+
+        // 🧾 สรุปผลหลังจากประมวลผลครบทั้งหมด
+        $this->info("📊 Generating summaries...");
+
+        $sites = SiteSettings::select('id', 'code')->where('active', 1)->get();
+        foreach ($sites as $site) {
+            $this->generateSummary($conn, $site->id, $site->code);
+        }
+        // site_id = 0 (overall)
+        $this->generateSummary($conn, 0, 0);
+
+        CveAssetsProgress::query()->update([
+            'last_asset_id' => 0,
+            'last_cve_name' => null,
+            'updated_at' => now(),
+        ]);
+        $this->info("🔄 Reset cve_assets_progress for next batch.");
+
+        $mins = round((microtime(true) - $stepStart) / 60, 2);
+        $this->info("✅ CVE Mapping & Summary completed successfully in ~{$mins} minutes!");
+    }
+
+    private function generateSummary($conn, $site_id, $site_code)
+    {
+        $this->info("🔁 generateSummary(site_id={$site_id}, code={$site_code}) ...");
+
+        // ดึง namecve ทั้งหมดของ site (distinct)
+        $mappedCve = DB::table('data_datacve_mapping_assets')
+            ->where('site_id', $site_id)
+            ->distinct()
+            ->pluck('namecve');
+
+        if ($mappedCve->isEmpty()) {
+            $this->info("ℹ️ No CVE mapping for site={$site_code}");
+            return;
+        }
+
+        // ดึง severity ตาม CVE แบบ DISTINCT
+        $severityList = DB::table('data_datacve_mapping')
+            ->whereIn('namecve', $mappedCve)
+            ->select('namecve', 'severity')
+            ->groupBy('namecve', 'severity')
+            ->get();
+
+        // เคลียร์ summary เดิม
+        DB::table('summary')
+            ->where('site', $site_code)
+            ->where('data_key_2', 'Vulnerability')
+            ->delete();
+
+        // นับตาม severity
+        $crit = $high = $med = $low = $info = 0;
+
+        foreach ($severityList as $s) {
+            switch (strtoupper($s->severity)) {
+                case 'CRITICAL':
+                    $crit++;
+                    break;
+                case 'HIGH':
+                    $high++;
+                    break;
+                case 'MEDIUM':
+                    $med++;
+                    break;
+                case 'LOW':
+                    $low++;
+                    break;
+                default:
+                    $info++;
+                    break;
+            }
+        }
+
+        // เขียน summary
+        DB::table('summary')->insert([
+            ['site' => $site_code, 'data_key' => 'dashboardnew', 'data_key_2' => 'Vulnerability', 'data_text' => 'Critical', 'data_value' => $crit, 'created_at' => now(), 'updated_at' => now()],
+            ['site' => $site_code, 'data_key' => 'dashboardnew', 'data_key_2' => 'Vulnerability', 'data_text' => 'High', 'data_value' => $high, 'created_at' => now(), 'updated_at' => now()],
+            ['site' => $site_code, 'data_key' => 'dashboardnew', 'data_key_2' => 'Vulnerability', 'data_text' => 'Medium', 'data_value' => $med, 'created_at' => now(), 'updated_at' => now()],
+            ['site' => $site_code, 'data_key' => 'dashboardnew', 'data_key_2' => 'Vulnerability', 'data_text' => 'Low', 'data_value' => $low, 'created_at' => now(), 'updated_at' => now()],
+            ['site' => $site_code, 'data_key' => 'dashboardnew', 'data_key_2' => 'Vulnerability', 'data_text' => 'Information', 'data_value' => $info, 'created_at' => now(), 'updated_at' => now()],
+        ]);
+
+        $this->info("   ✔ Summary updated for {$site_code} — Total CVEs = " . ($crit + $high + $med + $low + $info));
+    }
+
+
+    private function GUID()
+    {
+        return sprintf(
+            '%04X%04X-%04X-%04X-%04X-%04X%04X%04X',
+            mt_rand(0, 65535),
+            mt_rand(0, 65535),
+            mt_rand(0, 65535),
+            mt_rand(16384, 20479),
+            mt_rand(32768, 49151),
+            mt_rand(0, 65535),
+            mt_rand(0, 65535),
+            mt_rand(0, 65535)
+        );
+    }
 }

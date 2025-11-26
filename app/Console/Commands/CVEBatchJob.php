@@ -28,7 +28,7 @@
 
 
 // try {
- 
+
 
 // while ($row = $result_final->fetch_assoc()) {
 //     # code...
@@ -125,7 +125,7 @@
 
 //     if ($result->num_rows > 0) {
 //         while ($row2 = $result->fetch_assoc()) {
-            
+
 //             $data_utable = array();
 //             $data_utable['vendor'] = $row2['vendor'];
 //             $data_utable['title'] = $row2['title'];
@@ -134,9 +134,9 @@
 //     } else {
 //         echo "0 results";
 //     }
- 
+
 //     foreach ($json_o["CVE_Items"] as $json_data) {
-        
+
 //         if ($json_data['cve']['data_type'] == "CVE" and explode('T', $json_data['publishedDate'])[0] >= date('Y-m-d', strtotime(' -90 day'))) {
 //             $CVE_Code = $json_data['cve']['CVE_data_meta']['ID'];
 
@@ -165,10 +165,10 @@
 //                             if ($valuecpe_match['vulnerable'] == true) {
 //                                 $cpe23Uri = explode(":", $valuecpe_match['cpe23Uri']);
 //                                 //print PHP_EOL.$cpe23Uri[3].PHP_EOL;
-                                
+
 //                                 $data_count = search_revisions($data_utable_list, $cpe23Uri[3], 'vendor', $cpe23Uri[4], 'title');
- 
-                                
+
+
 //                                 if (count($data_count) > 0) {
 //                                     print PHP_EOL . '=================================================================';
 //                                     print PHP_EOL . $CVE_Code . PHP_EOL;
@@ -181,14 +181,14 @@
 //                                         $edition = "";
 //                                     }
 //                                     echo PHP_EOL . 'check...';
-                                    
+
 //                                     $sql_samename = "SELECT namecve FROM fx_data_cveven WHERE namecve = '" . $CVE_Code . "' and title='" . $product_name . "' and vendor='" . $vendor_name . "' and version='" . $versionvalue . "' and edition='" . $edition . "'";
 
 //                                     $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
 //                                     $num = mysqli_num_rows($result1);
 //                                     //echo 'end check';
 //                                     //$num  = 0;
-                                    
+
 //                                     if ($num == 0) {
 //                                         $created_atz = date("Y-m-d H:i:s");
 //                                         $created_at = date("Y-m-d H:i:s", strtotime($created_atz));
@@ -206,7 +206,7 @@
 //                                         }
 
 //                                     }
-                                    
+
 //                                     //================
 
 //                                     $description_data = "";
@@ -220,9 +220,9 @@
 //                                     //         $description_data = $description_data . $descriptionvalue['value'];
 //                                     //     }
 //                                     // }
-                                    
+
 //                                     $description_data = htmlspecialchars($description_data, ENT_QUOTES);
-                                    
+
 //                                     $baseScore = $json_data['impact']['baseMetricV3']['cvssV3']['baseScore'];
 //                                     $baseSeverity = $json_data['impact']['baseMetricV3']['cvssV3']['baseSeverity'];
 
@@ -245,7 +245,7 @@
 //                                     $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
 //                                     $num = mysqli_num_rows($result1);
 //                                     //$num = 0;
-                                    
+
 //                                     if ($num > 0) {
 
 //                                         $add_name = $CVE_Code;
@@ -310,7 +310,7 @@
 
 //                                     }
 //                                     //==========================
-                                    
+
 //                                     //==========
 
 //                                 }
@@ -330,10 +330,10 @@
 //     }
 // // extract file //
 
-   
+
 //     $sql = "SELECT * FROM fx_cve_assets";
 //     $result2 = mysqli_query($conn, $sql) or die(mysqli_error());
-    
+
 //     //Save Mapping
 //     echo "Maping===================";
 //     /*
@@ -349,7 +349,7 @@
 //     */
 
 //     while ($row3 = $result2->fetch_array(MYSQLI_ASSOC)) {
-        
+
 //         //  echo '<br>'.$row['vendor'].'<br>---------------------------------------/r/n';
 
 //         $sql2 = "SELECT distinct * FROM fx_data_cveven where vendor = '" . $row3['vendor'] . "' and title='" . $row3['title'] . "' and version='" . $row3['version'] . "'";
@@ -363,17 +363,17 @@
 //             if (!array_key_exists($row4['namecve'], $namecveList)) {
 //                 array_push($namecveList, $row4['namecve']);
 //             }
-            
+
 //         }
 
-        
+
 
 //         $created_atz = date("Y-m-d H:i:s ");
 //         $modified = date("Y-m-d", strtotime($created_atz));
 
 //         $modified_start = date('Y-m-d', strtotime(' -1 day'));
 //         $sql3 =   "SELECT * FROM fx_data_datacve WHERE modified between '".$modified_start."' AND '".$modified."' and namecve IN ('".implode("','", $namecveList)."') ";
-        
+
 //         //$modified ='2019-08-08';
 //         // $sql3  = 'SELECT *
 //         //FROM `data_datacve`
@@ -388,9 +388,9 @@
 //         //WHERE modified > "2020-01-01" and  namecve IN (' . "'".implode("','", $namecveList)."'" . ')';
 
 //         $result4 = mysqli_query($conn, $sql3) or die(mysqli_error());
-        
+
 //         while ($row4 = $result4->fetch_array(MYSQLI_ASSOC) ) {
-            
+
 //             $created_atz = date("Y-m-d H:i:s ");
 //             $created_at = date("Y-m-d H:i:s ", strtotime($created_atz));
 
@@ -398,7 +398,7 @@
 //             $sql_samename = "SELECT namecve FROM fx_data_datacve_mapping WHERE namecve = '" . $row4['namecve'] . "' AND cveven_id = '" . $row3['id'] . "'";
 //             $result1 = mysqli_query($conn, $sql_samename) or die(mysqli_error());
 //             $num = mysqli_num_rows($result1);
-            
+
 //             if ($num == 0) {
 //                 $insertdata = "INSERT INTO fx_data_datacve_mapping (namecve, published, modified, description, cvss_score, severity, updated_at, created_at,cveven_id)
 //         VALUES  ('" . $row4['namecve'] . "',
@@ -412,7 +412,7 @@
 //                 $result = mysqli_query($conn, $insertdata);
 //             }
 
-            
+
 
 
 
@@ -493,32 +493,34 @@
 // } catch (Exception $th) {
 //     echo json_encode($th->getMessage());
 // }
-
-function search_revisions($dataArray, $search_value, $key_to_search, $other_matching_value = null, $other_matching_key = null)
-{
-    // This function will search the revisions for a certain value
-    // related to the associative key you are looking for.
-    $keys = array();
-    foreach ($dataArray as $key => $cur_value) {
-        if ($cur_value[$key_to_search] == $search_value) {
-            if (isset($other_matching_key) && isset($other_matching_value)) {
-                if ($cur_value[$other_matching_key] == $other_matching_value) {
+if (!function_exists('search_revisions')) {
+    function search_revisions($dataArray, $search_value, $key_to_search, $other_matching_value = null, $other_matching_key = null)
+    {
+        // This function will search the revisions for a certain value
+        // related to the associative key you are looking for.
+        $keys = array();
+        foreach ($dataArray as $key => $cur_value) {
+            if ($cur_value[$key_to_search] == $search_value) {
+                if (isset($other_matching_key) && isset($other_matching_value)) {
+                    if ($cur_value[$other_matching_key] == $other_matching_value) {
+                        $keys[] = $cur_value;
+                    }
+                } else {
+                    // I must keep in mind that some searches may have multiple
+                    // matches and others would not, so leave it open with no continues.
                     $keys[] = $cur_value;
                 }
-            } else {
-                // I must keep in mind that some searches may have multiple
-                // matches and others would not, so leave it open with no continues.
-                $keys[] = $cur_value;
             }
         }
+        return $keys;
     }
-    return $keys;
 }
 
-function insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at)
-{
+if (!function_exists('insert_nvd')) {
+    function insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at)
+    {
 
-    $insertdata = "INSERT INTO fx_data_datacve (namecve, published, modified, description, cvss_score, severity, updated_at, created_at)
+        $insertdata = "INSERT INTO fx_data_datacve (namecve, published, modified, description, cvss_score, severity, updated_at, created_at)
   VALUES  ('" . $add_name . "',
   '" . $add_published . "',
   '" . $add_modified . "',
@@ -527,23 +529,24 @@ function insert_nvd($conn, $add_name, $add_published, $add_modified, $add_descri
   '" . $add_severity . "',
   '" . $add_pub_date . "','" . $created_at . "')";
 
-    $insert_data_query = mysqli_query($conn, $insertdata);
+        $insert_data_query = mysqli_query($conn, $insertdata);
 
-    if ($insert_data_query) {
-        echo "Insert Success";
-        $st = array('sector' => "INSERT", 'status' => "Success");
-        //  echo json_encode($st);
-    } else {
-        echo "Error" . mysqli_error($conn);
-        $st = array('sector' => "INSERT", 'status' => "Fail");
-        // echo json_encode($st);
+        if ($insert_data_query) {
+            echo "Insert Success";
+            $st = array('sector' => "INSERT", 'status' => "Success");
+            //  echo json_encode($st);
+        } else {
+            echo "Error" . mysqli_error($conn);
+            $st = array('sector' => "INSERT", 'status' => "Fail");
+            // echo json_encode($st);
+        }
     }
-
 }
 
-function update_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at)
-{
-    $updatedata = "UPDATE fx_data_datacve SET
+if (!function_exists('update_nvd')) {
+    function update_nvd($conn, $add_name, $add_published, $add_modified, $add_descript, $add_cvsssore, $add_severity, $add_pub_date, $created_at)
+    {
+        $updatedata = "UPDATE fx_data_datacve SET
   published = '" . $add_published . "' ,
   modified = '" . $add_modified . "' ,
   description = '" . $add_descript . "' ,
@@ -553,18 +556,15 @@ function update_nvd($conn, $add_name, $add_published, $add_modified, $add_descri
   created_at = '" . $created_at . "'
   WHERE namecve = '" . $add_name . "' ";
 
-    $update_data_query = mysqli_query($conn, $updatedata);
-    if ($update_data_query) {
-        echo "Insert Success";
-        $st = array('sector' => "UPDATE", 'status' => "Success");
-        //  echo json_encode($st);
-    } else {
-        echo "Error" . mysqli_error($conn);
-        $st = array('sector' => "UPDATE", 'status' => "Fail");
-        //  echo json_encode($st);
+        $update_data_query = mysqli_query($conn, $updatedata);
+        if ($update_data_query) {
+            echo "Insert Success";
+            $st = array('sector' => "UPDATE", 'status' => "Success");
+            //  echo json_encode($st);
+        } else {
+            echo "Error" . mysqli_error($conn);
+            $st = array('sector' => "UPDATE", 'status' => "Fail");
+            //  echo json_encode($st);
+        }
     }
-
 }
-
-
-?>
