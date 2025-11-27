@@ -720,6 +720,7 @@ select.c-tags {
                     check_published = null;
                     $(".btn-grey").removeClass("active");
                     $("#all").addClass("active");
+                    $("#keyword_search").val('');
                      clearDateToEmpty();
                     load_table(1);
                 });

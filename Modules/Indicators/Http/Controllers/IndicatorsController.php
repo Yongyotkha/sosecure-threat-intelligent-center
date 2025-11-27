@@ -2152,12 +2152,61 @@ class IndicatorsController extends Controller
                     $query['$or'] = [
                         ['name' => ['$regex' => $request->keyword_search, '$options' => 'i']],
                         ['groups' => ['$regex' => $request->keyword_search, '$options' => 'i']],
-                        ['description' => ['$regex' => $request->keyword_search, '$options' => 'i']],
                         ['source' => ['$regex' => $request->keyword_search, '$options' => 'i']],
                         ['creator_org' => ['$regex' => $request->keyword_search, '$options' => 'i']],
                         ['tags' => ['$regex' => $request->keyword_search, '$options' => 'i']],
                     ];
                 }
+
+                // if ($request->keyword_search) {
+
+                //     // Escape keyword กัน regex แปลความผิด
+                //     $keyword = preg_quote($request->keyword_search, '/');
+
+                //     // ใช้ \b เพื่อบังคับ match แบบคำเต็ม (ถ้าไม่อยากใช้ตัดออกได้)
+                //     $pattern = "\\b{$keyword}\\b";
+
+                //     $query['$or'] = [
+                //         [
+                //             'name' => [
+                //                 '$regex'   => $pattern,
+                //                 '$options' => 'i'
+                //             ]
+                //         ],
+                //         [
+                //             'groups' => [
+                //                 '$ne'      => "/",         // กันฟิลด์ว่าง fake match
+                //                 '$regex'   => $pattern,
+                //                 '$options' => 'i'
+                //             ]
+                //         ],
+                //         [
+                //             'description' => [
+                //                 '$regex'   => $pattern,
+                //                 '$options' => 'i'
+                //             ]
+                //         ],
+                //         [
+                //             'source' => [
+                //                 '$regex'   => $pattern,
+                //                 '$options' => 'i'
+                //             ]
+                //         ],
+                //         [
+                //             'creator_org' => [
+                //                 '$ne'      => "/",
+                //                 '$regex'   => $pattern,
+                //                 '$options' => 'i'
+                //             ]
+                //         ],
+                //         [
+                //             'tags' => [
+                //                 '$regex'   => $pattern,
+                //                 '$options' => 'i'
+                //             ]
+                //         ],
+                //     ];
+                // }
 
                 $isDateSearch = filter_var($request->isDateSearch, FILTER_VALIDATE_BOOLEAN);
 
