@@ -181,11 +181,11 @@ return (string)$v;
                 </div>
 
                 <!-- ปุ่มด้านขวา -->
-                <div class="header-actions">
+                {{-- <div class="header-actions">
                     <button type="button" class="btn btn-success btn-sm" id="btn-export">
                          Export Report
                     </button>
-                </div>
+                </div> --}}
             </div>
 
             <div class="d-none">
@@ -635,6 +635,7 @@ return (string)$v;
             </section>
             @endif
 
+             <!-- {{ $webdefacement->status_val }}  -->
 
             <!-- <div id="load_status"></div> -->
             @if (@$webdefacement->status_val != 'Normal') 
@@ -847,6 +848,10 @@ return (string)$v;
                         toastr.success(response.message, '@langapp('response_status')');
                         stopLoader();
                         {{--window.location.href = response.redirect;--}}
+
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
                     },
                     error: function (error){
                         $('#load_status').loading('stop');
@@ -1185,6 +1190,9 @@ return (string)$v;
                         heightAuto: false
                     });
                     }
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
                 },
                 error: function(xhr) {
                     const msg =
