@@ -8,12 +8,16 @@ function get_word_leak_compromise(val, type)
     var html = '';
     if(type == 'data_leak') {
         if(val == 'social') {
-            html = 'PUBLIC';
+            html = 'SURFACE WEB';
         } else if(val == 'darkweb_public') {
             html = 'DARK WEB';
-        }  else if(val == 'credential' || val == 'Credential') {
+        } else if(val == 'credential' || val == 'Credential') {
             html = 'CREDENTIAL';
-        } 
+        } else if(val == 'surface_web') {
+            html = 'SURFACE WEB';
+        } else if(val == 'darkweb') {
+            html = 'DARK WEB';
+        }
         
     } else if(type == 'compromise') {
         if(val == 'compromise') {

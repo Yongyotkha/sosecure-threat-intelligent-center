@@ -2,11 +2,7 @@
 
 namespace App\Console\Commands;
 
-// use App\Log;
 use Illuminate\Console\Command;
-use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
-use Exception;
-use Illuminate\Support\Facades\Log;
 
 class WebDefacementsCreenshotCheck extends Command
 {
@@ -49,18 +45,6 @@ class WebDefacementsCreenshotCheck extends Command
           $url_id =rand(10,100);
       }
 
-    //   try {
-    //     if(!empty($url_id)){
-    //         $data_original = WebdefacmentDataOriginal::where('site_id', $site_id)->first();
-    //         if (!$data_original->url_id) {
-    //             $data_original->url_id = $url_id;
-    //             $data_original->save();
-    //         }
-    //     }
-    //   }catch (Exception $e) {
-          
-    //   }
-
       $delay = $this->argument('delay');
       $result = array();
     //   $result=new stdClass();
@@ -79,7 +63,6 @@ class WebDefacementsCreenshotCheck extends Command
             $result["image_path_original_full"] = $Path_image;
             $result["image_path_original"] = "/public/images/webdefacment_mages/".$site_id."/".$url_id."/image_original.png";
             $result["url_id"] = $url_id;
-            // Log::info('url ID :'. $result["url_id"] . $site_id );
 
         }else{
             $result["Result"] = 0;

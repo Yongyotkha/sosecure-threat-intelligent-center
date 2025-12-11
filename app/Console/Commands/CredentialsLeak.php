@@ -249,15 +249,19 @@ class CredentialsLeak extends Command
             $fields
         );
 
+        // Classify feel_type based on source
+        $feelType = $this->isSurfaceWeb(strtolower($src)) ? 'surface_web' : 'darkweb';
+
         $feed = new DataLeakFeed();
         $feed->feedlink       = $feedlink;
         $feed->code           = $this->generateFeedCode();
         $feed->keyword        = 'Credential';
-        $feed->feel_type      = 'credential';
+        $feed->feel_type      = $feelType;
         $feed->sourceid       = 0;
         $feed->source_name    = $src;
         $feed->feedtimepost   = $feedtimepost ?: Carbon::now();
         $feed->feedtimestamp  = Carbon::now();
+        $feed->feel_type      = $feelType;
         $feed->feedcontent    = $feedHtml;
         $feed->status         = 1;
         $feed->save();
@@ -267,7 +271,7 @@ class CredentialsLeak extends Command
             'data_leak_feed_id' => $feed->id,
             'site_id'           => $siteId,
             'keyword'           => 'Credential',
-            'feel_type'         => 'credential',
+            'feel_type'         => 'credential', // Keep as credential per requirement
             'serverity'         => 'critical',
             'content'           => [
                 'target'       => $domain,
@@ -285,7 +289,7 @@ class CredentialsLeak extends Command
 
         return [
             'id'        => $feed->id,
-            'feel_type' => 'credential',
+            'feel_type' => $feelType,
             'keyword'   => 'Credential',
             'email'     => $email,
             'password'  => $password,         // raw เก็บไว้ให้ Blade
@@ -294,6 +298,104 @@ class CredentialsLeak extends Command
             'created_at'  => $feed->created_at->toDateTimeString(),
             'site_name'   => $siteName ?: $domain,
         ];
+    }
+
+    /**
+     * Determine if the source name belongs to Surface Web.
+     * Copied logic from UpdateCredentialFeedType
+     *
+     * @param string $sourceName
+     * @return bool
+     */
+    private function isSurfaceWeb($sourceName)
+    {
+        // 1. If it contains '.onion', it is definitely Dark Web (not Surface).
+        if (strpos($sourceName, '.onion') !== false) {
+            return false; 
+        }
+
+        // 2. Check explicit keywords (Social, Shopping, Etc.)
+        $surfaceKeywords = [
+            'facebook',
+            'twitter',
+            'linkedin',
+            'instagram',
+            'youtube',
+            'gmail',
+            'yahoo',
+            'hotmail',
+            'outlook',
+            'amazon',
+            'ebay',
+            'paypal',
+            'netflix',
+            'uber',
+            'grab',
+            'vk.com',
+            'ok.ru',
+            'weibo',
+            'telegram',
+            'discord',
+            'line',
+            'whatsapp',
+            'pinterest',
+            'tumblr',
+            'reddit',
+            'tiktok',
+            'snapchat',
+            'twitch',
+            'skype',
+            'viber',
+            'wechat',
+            'messenger',
+            // Dev / Work
+            'github',
+            'gitlab',
+            'bitbucket',
+            'stackoverflow',
+            'trello',
+            'slack',
+            'zoom',
+            'microsoft',
+            'apple',
+            'google',
+            'dropbox',
+            'adobe',
+            // Shopping
+            'shopee',
+            'lazada',
+            'alibaba',
+            'aliexpress',
+            // Thai specific
+            'pantip',
+            'sanook',
+            'kapook',
+            'dek-d',
+            'mthai',
+            'wongnai',
+            'kaidee',
+            'blockdit',
+            'trueid',
+        ];
+
+        foreach ($surfaceKeywords as $keyword) {
+            if (strpos($sourceName, $keyword) !== false) {
+                return true;
+            }
+        }
+
+        // 3. Logic: If it looks like a domain (has a dot and typical TLD), it's likely Surface Web.
+        // e.g. "something.com", "shop.co.th"
+        // But exclude simple filenames or versions if possible. 
+        // Simple regex for domain-like string:
+        // At least one dot, no spaces (usually), ends with 2-6 letters.
+        if (preg_match('/^[a-z0-9.-]+\.[a-z]{2,10}$/i', $sourceName)) {
+            return true;
+        }
+
+        // 4. Fallback: If it's just a name like "Collection #1", "AntiPublic", "Exploit.in" (no TLD),
+        // we assume it's a Breach Compilation / Dark Web source.
+        return false;
     }
 
 

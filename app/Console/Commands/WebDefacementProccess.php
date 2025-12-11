@@ -68,8 +68,7 @@ class WebDefacementProccess extends Command
    */
   public function handle()
   {
-    Log:
-    info('Webdefacement process started: ' . date("Y-m-d H:i:s"));
+    Log::info('Webdefacement process started: ' . date("Y-m-d H:i:s"));
     ini_set('memory_limit', '2048M');
     $TransactionBatchjob_Update = TransactionBatchjob::where('mode', 'WebDefacement_scan')->first();
     $TransactionBatchjob_Update->progress = 2;
@@ -103,9 +102,17 @@ class WebDefacementProccess extends Command
 
         $url = $WebdefacmentSetting_update->url;
         $status = $this->checkHttpStatus($url);
-        if ($status === 200) {
+        // if ($status === 200) {
+        //   $WebdefacmentSetting_update->web_status = 'Up';
+        //   Log::info('Web is accessible: ' . $url . ' status: ' . $status);
+        // } else {
+        //   $WebdefacmentSetting_update->web_status = 'Down';
+        //   Log::warning("Web is not accessible: {$url}, status: {$status}");
+        // }
+
+        if ($status === 201) {
           $WebdefacmentSetting_update->web_status = 'Up';
-          // Log::info('Web is accessible: ' . $url . ' status: ' . $status);
+          Log::info('Web is accessible: ' . $url . ' status: ' . $status);
         } else {
           $WebdefacmentSetting_update->web_status = 'Down';
           Log::warning("Web is not accessible: {$url}, status: {$status}");
@@ -175,7 +182,8 @@ class WebDefacementProccess extends Command
         "nav","#nav",".nav",
         "main","#main",".main",
         "#content",".content","content",
-        ".entry-content"
+        ".entry-content",
+        "footer","#footer",".footer"
         ]';
         // $WebdefacmentSetting_update->hash_ignore_selectors = '[
         //   ".time",".date",".timestamp",".counter",".views",
@@ -234,7 +242,7 @@ class WebDefacementProccess extends Command
       if ($WebdefacmentSetting_data) {
         $WebdefacmentDataOriginal_data =    WebdefacmentDataOriginal::where('webdefacment_setting_id', $webdefacment_id)->first();
         if (!$WebdefacmentDataOriginal_data) {
-          // Log::info('Webdefacment_id ' . $webdefacment_id . ' - ' . $value->url);
+          Log::info('Webdefacment_id ' . $webdefacment_id . ' - ' . $value->url);
 
           Artisan::call('app:WebDefacementUpdateOriginal', ['webdefacment_id' => $webdefacment_id]);
           Artisan::call('app:WebDefacementsCreenshotCheck', ['url' => $value->url, 'port' => $value->port, 'site_id' => $value->site_id, 'url_id' => 0, 'delay' => $value->delay_screen_shot_val]);
@@ -287,25 +295,7 @@ class WebDefacementProccess extends Command
 
 
             $image_path_2 = "";
-
-            if ($webdefacment_id == 173 || $webdefacment_id == 174 || $webdefacment_id == 209) {
-              $response = $this->getHtml3($url);
-              
-              // 🟩 ตรวจสอบว่าดึง HTML สำเร็จหรือไม่ ถ้าไม่สำเร็จให้ข้าม diff
-              if (isset($response['success']) && $response['success'] === false) {
-                Log::warning("Skipping diff for {$url} due to network error: " . ($response['error'] ?? 'unknown'));
-                $WebdefacmentSetting_update->webdeflacement_progress = 1;
-                $WebdefacmentSetting_update->last_check = date("Y-m-d H:i:s");
-                $WebdefacmentSetting_update->save();
-                continue; // ข้ามไปเว็บถัดไป
-              }
-              
-              $webContent = $response['content'];
-              // Log::info(strlen($response['content']));
-              // Log::info(strlen($response['content']));
-            } else {
-              $response   = $this->getHtml($url);
-            }
+            $response   = $this->getHtml($url);
 
             if ($response['content'] === FALSE) {
               $webContent = "";
@@ -314,9 +304,14 @@ class WebDefacementProccess extends Command
               Log::info($result["messes "]);
             } else {
 
-
               $webContent = $response['content'];
-              // file_put_contents(storage_path('app/dom_raw.html'), $webContent);
+
+              if ($webdefacment_id == 209) {
+                $response = $this->getHtml3($url);
+                $webContent = $response['content'];
+                // Log::info($response['content']);
+              }
+              file_put_contents(storage_path('app/dom_raw.html'), $webContent);
 
 
               // Debug web content
@@ -336,48 +331,7 @@ class WebDefacementProccess extends Command
               // ===== [SECTION MONITOR] (patched) =====
               try {
                 // 1) config
-
-                if ($WebdefacmentSetting_data->id == 173 || $WebdefacmentSetting_data->id == 174) {
-                  $selectors = json_decode($WebdefacmentSetting_data->hash_selectors ?: '[]', true);
-
-                  if (empty($selectors)) {
-                    $selectors = [
-                      "head",
-                      "#header",
-                      ".header",
-                      "nav",
-                      "#nav",
-                      ".nav",
-                      "main",
-                      "#main",
-                      ".main",
-                      "#content",
-                      ".content",
-                      "content",
-                      ".entry-content"
-                    ];
-                  } else {
-                    $removeItems = ["footer", "#footer", ".footer"];
-                    $selectors = array_values(array_diff($selectors, $removeItems));
-                  }
-                } else {
-                  $selectors = json_decode($WebdefacmentSetting_data->hash_selectors ?: '[]', true) ?: [
-                    "head",
-                    "#header",
-                    ".header",
-                    "nav",
-                    "#nav",
-                    ".nav",
-                    "main",
-                    "#main",
-                    ".main",
-                    "#content",
-                    ".content",
-                    "content",
-                    ".entry-content"
-                  ];
-                }
-
+                $selectors = json_decode($WebdefacmentSetting_data->hash_selectors ?: '[]', true) ?: ["header", "nav", "main", "#content", ".entry-content", "footer"];
                 $ignores   = json_decode($WebdefacmentSetting_data->hash_ignore_selectors ?: '[]', true) ?: [
 
                   "//*[contains(@class,\'time\')]",
@@ -491,15 +445,15 @@ class WebDefacementProccess extends Command
                 // simhash ของ "ทั้งหน้าเว็บ"
                 $simNowHex = $this->simhash64_hex($textFullPage);
 
-                // Log::debug('defacement.simhash.fullpage', [
-                //   'text_length' => strlen($textFullPage),
-                //   'simNowHex'   => $simNowHex,
-                // ]);
+                Log::debug('defacement.simhash.fullpage', [
+                  'text_length' => strlen($textFullPage),
+                  'simNowHex'   => $simNowHex,
+                ]);
 
 
 
                 // 4) !! เปลี่ยนตรงนี้ !!  ดึง assets/outbound จาก “ทั้งหน้าเดิม” ไม่ใช่เฉพาะ sections
-                list($assetsAllFull, $outboundNow) = $this->assetsAndOutboundFromHtml($domNorm, $url);
+                list($assetsAllFull, $outboundNow) = $this->assetsAndOutboundFromHtml($webContent, $url);
                 $assetsNow = [];
                 foreach ($assetsAllFull as $a) {
                   foreach ($allowPat as $pat) {
@@ -710,7 +664,7 @@ class WebDefacementProccess extends Command
                   $sectionsChanged  = 0;
                   $skippedEmptyPair = 0;
 
-                  // Log::info('sectionDiffs: ' . json_encode(($sectionDiffs ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                  Log::info('sectionDiffs: ' . json_encode(($sectionDiffs ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
                   if (is_array($sectionDiffs) && !empty($sectionDiffs)) {
                     foreach ($sectionDiffs as $row) {
@@ -749,12 +703,12 @@ class WebDefacementProccess extends Command
                   }
 
                   // ===== log ตรวจสอบ =====
-                  // Log::debug('defacement.section_diff.stats', [
-                  //   'sections_total'      => $sectionsTotal,
-                  //   'sections_changed'    => $sectionsChanged,
-                  //   'skipped_empty_pairs' => $skippedEmptyPair,
-                  //   'section_ratio'       => round($sectionRatio, 4),
-                  // ]);
+                  Log::debug('defacement.section_diff.stats', [
+                    'sections_total'      => $sectionsTotal,
+                    'sections_changed'    => $sectionsChanged,
+                    'skipped_empty_pairs' => $skippedEmptyPair,
+                    'section_ratio'       => round($sectionRatio, 4),
+                  ]);
 
 
                   // รอบ adopted ไม่คิดสัญญาณจาก section_diff
@@ -771,13 +725,13 @@ class WebDefacementProccess extends Command
                   // รวมคะแนนสุดท้าย (0..1)
                   $score = $component_section + $component_assets + $component_domain + $component_bits;
 
-                  // Log::debug('defacement.score', [
-                  //   'component_section' => round($component_section, 3),
-                  //   'component_assets'  => round($component_assets, 3),
-                  //   'component_domain'  => round($component_domain, 3),
-                  //   'component_bits'    => round($component_bits, 3),
-                  //   'score'             => $score,
-                  // ]);
+                  Log::debug('defacement.score', [
+                    'component_section' => round($component_section, 3),
+                    'component_assets'  => round($component_assets, 3),
+                    'component_domain'  => round($component_domain, 3),
+                    'component_bits'    => round($component_bits, 3),
+                    'score'             => $score,
+                  ]);
 
                   // คํานวณเหตุผล
                   $reason = $adopted ? 'baseline_adopted_new_selectors'
@@ -803,7 +757,7 @@ class WebDefacementProccess extends Command
 
                 $result['_score_percent']          = $score * 100;
 
-                // Log::debug('[SECTION] merkleNow=' . $merkleNow . ' simBits=' . $simBits . ' isFirst=' . ($isFirstBaseline ? '1' : '0') . 'sections_diffs=' . count($sectionDiffs));
+                Log::debug('[SECTION] merkleNow=' . $merkleNow . ' simBits=' . $simBits . ' isFirst=' . ($isFirstBaseline ? '1' : '0') . 'sections_diffs=' . count($sectionDiffs));
               } catch (\Throwable $e) {
                 Log::error('[SECTION MONITOR] ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
               }
@@ -839,7 +793,7 @@ class WebDefacementProccess extends Command
               }
               if ($WebdefacmentSetting_data->filesize == 1) {
                 $totalConfig += 1;
-                $file_size = strlen($domNorm); //filesize
+                $file_size = strlen($webContent); //filesize
                 $result["file_size"] = $file_size;
 
                 if ($WebdefacmentDataOriginal_data->filesize == null || $WebdefacmentDataOriginal_data->filesize == 0) {
@@ -891,7 +845,7 @@ class WebDefacementProccess extends Command
               }
               if ($WebdefacmentSetting_data->element == 1) {
                 $totalConfig += 1;
-                $allElement = preg_match_all('/<([^\/!][a-z1-9]*)/i', $domNorm, $matches);
+                $allElement = preg_match_all('/<([^\/!][a-z1-9]*)/i', $webContent, $matches);
                 $result['all_element'] = (int)$allElement;
 
                 if ($WebdefacmentDataOriginal_data->element == null || $WebdefacmentDataOriginal_data->element == 0) {
@@ -1222,17 +1176,10 @@ class WebDefacementProccess extends Command
                 $WebdefacmentDataLog_save->save();
               }
 
-              // $WebdefacmentSetting_update->image_last = $result['image_url'];
+              $WebdefacmentSetting_update->image_last = $result['image_url'];
               $WebdefacmentSetting_update->last_check = date("Y-m-d H:i:s");
               $WebdefacmentSetting_update->last_online = date("Y-m-d H:i:s");
               $WebdefacmentSetting_update->status_val = $status;
-
-              if (in_array($WebdefacmentSetting_update->id, [173, 174])) {
-                // ไม่เปลี่ยนภาพ
-              } else {
-                $WebdefacmentSetting_update->image_last = $result['image_url'];
-                $WebdefacmentSetting_update->image_original = $result['image_url'];
-              }
 
               // try {
               //   // หากสถานะเป็น High และยังไม่เคยส่งแจ้งเตือน
@@ -1261,122 +1208,79 @@ class WebDefacementProccess extends Command
               //   Log::error("ส่งแจ้งเตือนล้มเหลว: " . $e->getMessage());
               // }
 
+
+              //ส่งเมลล์
               // try {
-              //   $svc  = app(WebDefacementService::class);
-              //   $diff = $svc->getDiffData($WebdefacmentSetting_update->id);
-              //   Log::info($diff);
-              // } catch (\Throwable $ex) {
-              //   Log::channel('single')->error('getDiffData() failed: ' . $ex->getMessage());
-              //   $diff = [];
+              //   // หากสถานะเป็น High และยังไม่เคยส่งแจ้งเตือน
+              //   if ($status === 'High' && !$WebdefacmentSetting_update->is_alert_sent) {
+
+              //     // 1) ดึงอีเมลปลายทาง
+              //     $emails = DB::table('site_config_email_alert_defacement')
+              //       ->where('site_id', $WebdefacmentSetting_update->site_id)
+              //       ->pluck('email')
+              //       ->filter()
+              //       ->unique()
+              //       ->values()
+              //       ->all();
+
+              //     // กรองให้เหลืออีเมลที่ valid เท่านั้น
+              //     $emails = array_values(array_filter($emails, function ($e) {
+              //       return filter_var($e, FILTER_VALIDATE_EMAIL);
+              //     }));
+
+              //     if (!empty($emails)) {
+              //       try {
+              //         // 2) ดึง diff data สำหรับแนบในอีเมล
+              //         $svc  = app(WebDefacementService::class);
+              //         $diff = $svc->getDiffData($WebdefacmentSetting_update->id);
+
+              //         // 3) normalize เผื่อ service คืน string JSON มา
+              //         $toArr = function ($v) {
+              //           return is_string($v) ? (json_decode($v, true) ?: []) : (is_array($v) ? $v : []);
+              //         };
+              //         $diff['section_diffs'] = $toArr(isset($diff['section_diffs']) ? $diff['section_diffs'] : []);
+              //         $diff['assets_add']    = $toArr(isset($diff['assets_add']) ? $diff['assets_add'] : []);
+              //         $diff['assets_del']    = $toArr(isset($diff['assets_del']) ? $diff['assets_del'] : []);
+              //         $diff['outbound_new']  = $toArr(isset($diff['outbound_new']) ? $diff['outbound_new'] : []);
+              //         $diff['score']         = $toArr(isset($diff['score']) ? $diff['score'] : 0);
+
+              //         // (ออปชัน) log สั้น ๆ เพื่อดีบัก
+              //         Log::info('defacement command diff snapshot', [
+              //           'setting_id' => $WebdefacmentSetting_update->id,
+              //           'success'    => isset($diff['success']) ? $diff['success'] : null,
+              //           'sec_count'  => count($diff['section_diffs']),
+              //           'add_count'  => count($diff['assets_add']),
+              //           'del_count'  => count($diff['assets_del']),
+              //           'out_count'  => count($diff['outbound_new']),
+              //           'score'      => $diff['score'],
+              //         ]);
+
+              //         // 4) ส่งอีเมล พร้อม diff (ไม่ต้องมี viewUrl ตอนนี้ → ส่ง null)
+              //         Mail::to($emails)->send(
+              //           new DefacementAlertMail($WebdefacmentSetting_update, $diff, 20, null)
+              //         );
+
+              //         // 5) อัปเดตสถานะหลังส่งสำเร็จ
+              //         $WebdefacmentSetting_update->is_alert_sent = true;
+              //         $WebdefacmentSetting_update->alert_sent_at = now();
+              //       } catch (\Throwable $e) {
+              //         Log::error("แจ้งเตือนล้มเหลว (command): " . $e->getMessage(), [
+              //           'setting_id' => $WebdefacmentSetting_update->id
+              //         ]);
+              //         // ไม่เซ็ต is_alert_sent เพื่อให้ retry รอบหน้า
+              //       }
+              //     } else {
+              //       Log::warning('ไม่พบอีเมลผู้รับ (command)', [
+              //         'site_id' => $WebdefacmentSetting_update->site_id
+              //       ]);
+              //     }
+              //   }
+              // } catch (\Throwable $e) {
+              //   Log::error("บล็อคแจ้งเตือนล้มเหลว (outer): " . $e->getMessage());
               // }
-              // return;
 
 
-              // ส่งเมลล์
-              if ($webdefacment_id  != 173) {
-                try {
-                  // หากสถานะเป็น High และยังไม่เคยส่งแจ้งเตือน
-                  if ($status === 'High' && !$WebdefacmentSetting_update->is_alert_sent) {
-
-                    // Log::info($status); 
-
-                    // 1) ดึงอีเมลปลายทาง
-                    $emails = DB::table('site_config_email_alert_defacement')
-                      ->where('site_id', $WebdefacmentSetting_update->site_id)
-                      ->pluck('email')
-                      ->filter()
-                      ->unique()
-                      ->values()
-                      ->all();
-
-                    // กรองให้เหลืออีเมลที่ valid เท่านั้น
-                    $emails = array_values(array_filter($emails, function ($e) {
-                      return filter_var($e, FILTER_VALIDATE_EMAIL);
-                    }));
-
-                    // Log::info($emails); return;
-
-
-
-                    if (!empty($emails)) {
-                      try {
-                        // 2) ดึง diff data สำหรับแนบในอีเมล
-                        $svc  = app(WebDefacementService::class);
-                        $diff = $svc->getDiffData($WebdefacmentSetting_update->id);
-
-                        // 3) normalize เผื่อ service คืน string JSON มา
-                        $normalize = function ($v) {
-                          // ถ้าเป็น array อยู่แล้ว
-                          if (is_array($v)) {
-                            return $v;
-                          }
-
-                          // ถ้าเป็น string ลอง decode JSON
-                          if (is_string($v)) {
-                            $decoded = json_decode($v, true);
-                            // ถ้า decode แล้วได้ array ให้ใช้เลย
-                            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                              return $decoded;
-                            }
-                            // ถ้าเป็นตัวเลขหรือ string ธรรมดา → คืนค่าดั้งเดิม
-                            return $v;
-                          }
-
-                          // คืนค่าดั้งเดิมสำหรับกรณีอื่น เช่น int, float
-                          return $v;
-                        };
-
-                        $diff['section_diffs'] = $normalize($diff['section_diffs'] ?? []);
-                        $diff['assets_add']    = $normalize($diff['assets_add'] ?? []);
-                        $diff['assets_del']    = $normalize($diff['assets_del'] ?? []);
-                        $diff['outbound_new']  = $normalize($diff['outbound_new'] ?? []);
-                        $diff['score']         = $normalize($diff['score'] ?? 0);
-
-
-                        Log::channel('single')->info('diff after normalize', [
-                          'sec_count' => is_array($diff['section_diffs']) ? count($diff['section_diffs']) : 'not array',
-                          'add_count' => is_array($diff['assets_add']) ? count($diff['assets_add']) : 'not array',
-                          'del_count' => is_array($diff['assets_del']) ? count($diff['assets_del']) : 'not array',
-                          'out_count' => is_array($diff['outbound_new']) ? count($diff['outbound_new']) : 'not array',
-                          'score' => $diff['score'],
-                        ]);
-
-
-
-                        // 4) ส่งอีเมล พร้อม diff (ไม่ต้องมี viewUrl ตอนนี้ → ส่ง null)
-                        Mail::to($emails)->send(
-                          new DefacementAlertMail($WebdefacmentSetting_update, $diff, 20, null)
-                        );
-
-                        // 5) อัปเดตสถานะหลังส่งสำเร็จ
-                        $WebdefacmentSetting_update->is_alert_sent = true;
-                        $WebdefacmentSetting_update->alert_sent_at = now();
-                        try {
-                          $svc  = app(WebDefacementService::class);
-                          $diff = $svc->getDiffData($WebdefacmentSetting_update->id);
-                        } catch (\Throwable $ex) {
-                          Log::channel('single')->error('getDiffData() failed: ' . $ex->getMessage());
-                          $diff = [];
-                        }
-                      } catch (\Throwable $e) {
-                        Log::error("แจ้งเตือนล้มเหลว (command): " . $e->getMessage(), [
-                          'setting_id' => $WebdefacmentSetting_update->id
-                        ]);
-                        // ไม่เซ็ต is_alert_sent เพื่อให้ retry รอบหน้า
-                      }
-                    } else {
-                      Log::warning('ไม่พบอีเมลผู้รับ (command)', [
-                        'site_id' => $WebdefacmentSetting_update->site_id
-                      ]);
-                    }
-                  }
-                } catch (\Throwable $e) {
-                  Log::error("บล็อคแจ้งเตือนล้มเหลว (outer): " . $e->getMessage());
-                }
-              }
-
-
-              // $WebdefacmentSetting_update->image_original = $result['image_url'];
+              $WebdefacmentSetting_update->image_original = $result['image_url'];
               $WebdefacmentSetting_update->blacklist_keyword_current = $WebdefacmentDataCheck_save->keyword;
               $WebdefacmentSetting_update->save();
 
@@ -1396,15 +1300,14 @@ class WebDefacementProccess extends Command
               }
               WebdefacmentDataCheck::whereNotIn('id', $WebdefacmentDataCheck_delete_list)->where('webdefacment_setting_id', $webdefacment_id)->delete();
 
-
               try {
                 DB::table('webdefacement_stat_log')->insert([
                   'site_id' => $WebdefacmentSetting_data->site_id,
                   'webdefacement_setting_id' => $webdefacment_id,
                   'result_id' => $WebdefacmentDataCheck_save->id ?? null,
                   'status' => $status,
-                  'score' => intval($pointAlert ?? 0),
-                  'diff_percent' => intval($pointAlert ?? 0),
+                  'score' => round($result['_score'] ?? 0, 3),
+                  'diff_percent' => round($result['_score'] ?? 0, 3),
                   'hash_changed' => ($result['hash_parcent'] ?? 0) > 0 ? 1 : 0,
                   'image_changed' => ($result['image_parcent'] ?? 0) > 0 ? 1 : 0,
                   'alert_sent' => ($status === 'High') ? 1 : 0,
@@ -1414,10 +1317,11 @@ class WebDefacementProccess extends Command
                   'updated_at' => now(),
                 ]);
 
-                // Log::info("[STAT_LOG] Saved for webdefacement_setting_id={$webdefacment_id}, status={$status}");
+                Log::info("[STAT_LOG] Saved for webdefacement_setting_id={$webdefacment_id}, status={$status}");
               } catch (\Throwable $e) {
                 Log::error("[STAT_LOG] Failed for webdefacement_setting_id={$webdefacment_id}: " . $e->getMessage());
               }
+
 
               print_r($webdefacment_id);
             }
@@ -1506,9 +1410,9 @@ class WebDefacementProccess extends Command
 
     $content = $this->get_dataa($url);
 
-    // \Log::info('Content length: ' . strlen($content));
-    // \Log::info('DIV count: ' . substr_count($content, '<div'));
-    // \Log::info('Preview: ' . mb_substr($content, 0, 500));
+    \Log::info('Content length: ' . strlen($content));
+    \Log::info('DIV count: ' . substr_count($content, '<div'));
+    \Log::info('Preview: ' . mb_substr($content, 0, 500));
 
 
     return array(
@@ -1705,112 +1609,182 @@ class WebDefacementProccess extends Command
   // ===== Helpers for section hashing & diff (PHP 7 compatible) =====
   private function normalizeHtml(string $html, array $ignoreSelectors = []): string
   {
-    libxml_use_internal_errors(true);
+    // --- Fast strip ก่อน ลดงาน DOM ---
+    $html = preg_replace('#<script\b[^>]*>.*?</script>#is', '', $html);
+    $html = preg_replace('#<style\b[^>]*>.*?</style>#is', '', $html);
+    $html = preg_replace('#<!--.*?-->#s', '', $html);
 
-    // --- โหลด DOM ครั้งเดียว ---
+    // --- Encoding safety ---
+    if (!preg_match('//u', $html)) {
+      $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+    }
+
+    // --- โหลด DOM ---
     $doc = new \DOMDocument('1.0', 'UTF-8');
-    @$doc->loadHTML($html, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NONET | LIBXML_COMPACT);
+    $doc->preserveWhiteSpace = false;
+    $doc->formatOutput = false;
+
+    $prevUseInternal = libxml_use_internal_errors(true);
+    if (function_exists('libxml_disable_entity_loader')) {
+      $prevDisable = libxml_disable_entity_loader(true);
+    }
+
+    $loaded = false;
+    if (PHP_VERSION_ID >= 70300) {
+      $loaded = @$doc->loadHTML($html, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NONET | LIBXML_COMPACT);
+    } else {
+      $loaded = @$doc->loadHTML($html);
+    }
+
+    if (function_exists('libxml_disable_entity_loader')) {
+      libxml_disable_entity_loader($prevDisable ?? false);
+    }
     libxml_clear_errors();
-    libxml_use_internal_errors(false);
+    libxml_use_internal_errors($prevUseInternal);
+
+    if (!$loaded) {
+      return trim(preg_replace('/\s+/', ' ', $html));
+    }
+
+    // --- Dump HTML เก็บไว้ debug ---
+    file_put_contents(storage_path('app/dom_dump.html'), $doc->saveHTML());
 
     $xpath = new \DOMXPath($doc);
 
-    // --- ดึง <head> และ <body> แยกไว้ก่อน ---
-    $headNode = $doc->getElementsByTagName('head')->item(0);
-    $bodyNode = $doc->getElementsByTagName('body')->item(0);
-    $headHtml = $headNode ? $doc->saveHTML($headNode) : '<head></head>';
-    if (!$bodyNode) return $html; // กัน fail ถ้าไม่มี body
+    // === 1) จำกัด scope ให้เอาเฉพาะส่วนที่เป็น content หลัก ===
+    $targetNode = null;
+    if ($doc->getElementById('root')) {
+      $targetNode = $doc->getElementById('root'); // ถ้าเว็บมี #root
+    } else {
+      $nodes = $xpath->query("//*[contains(@class,'main-content')]");
+      if ($nodes->length > 0) {
+        $targetNode = $nodes->item(0);
+      }
+    }
 
-    // --- รวม ignore selectors + default dynamic selectors ---
-    $defaultSelectors = [
-      "//*[contains(@class,'time')]",
-      "//*[contains(@class,'date')]",
-      "//*[contains(@class,'timestamp')]",
-      "//*[contains(@class,'counter')]",
-      "//*[contains(@class,'view')]",
-      "//*[contains(@class,'carousel')]",
-      "//*[contains(@class,'slider')]",
-      "//*[contains(@class,'ticker')]",
-      "//*[contains(@class,'marquee')]",
-      "//*[contains(@class,'swiper-container')]",
-      "//*[contains(@class,'ads')]",
-      "//*[contains(@class,'advert')]",
-      "//*[contains(@class,'banner')]",
-      "//*[contains(@class,'toast')]",
-      "//*[contains(@class,'modal')]",
-      "//*[contains(@class,'popup')]",
-      "//*[contains(@class,'live')]",
-      "//*[contains(@class,'countdown')]",
-      "//*[contains(@class,'slick-track')]",
-      "//*[contains(@class,'slick-slide')]",
-      "//*[contains(@class,'swiper-wrapper')]",
-      "//*[contains(@class,'swiper-slide')]",
-      "//*[contains(@class,'fade')]",
+    if ($targetNode) {
+      $html = $doc->saveHTML($targetNode);
+      $doc = new \DOMDocument('1.0', 'UTF-8');
+      libxml_use_internal_errors(true);
+      @$doc->loadHTML($html, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NONET | LIBXML_COMPACT);
+      libxml_clear_errors();
+      libxml_use_internal_errors(false);
+      $xpath = new \DOMXPath($doc);
+    }
+
+    // === 2) เพิ่ม ignore selectors dynamic ที่เจอในเว็บนี้ ===
+    $extraIgnore = [
       "//*[contains(@class,'floating-icon')]",
       "//*[contains(@class,'footer-bottom-bar')]",
       "//*[contains(@class,'cookie')]",
-      "//*[contains(@class,'header-top-bar')]",
-      "//*[@id='fb-root']",
-      "//*[contains(@class,'fb-customerchat')]",
-      "//*[starts-with(@id,'__BVID__')]",
+      "//*[contains(@class,'header-top-bar')]"
     ];
+    $ignoreSelectors = array_merge($ignoreSelectors, $extraIgnore);
 
-    $selectors = array_values(array_unique(array_merge($ignoreSelectors, $defaultSelectors)));
+    // --- ลบ noscript/template ---
+    foreach (['//noscript', '//template'] as $tag) {
+      foreach ($xpath->query($tag) as $n) {
+        if ($n->parentNode) {
+          $n->parentNode->removeChild($n);
+        }
+      }
+    }
 
-    // --- ลบ node ที่ match (เฉพาะใน body) ---
-    foreach ($selectors as $sel) {
+    // --- ลบ ignore selectors ---
+    foreach ($ignoreSelectors as $sel) {
+      if (strpos($sel, '.') === 0) {
+        $sel = "//*[contains(@class,'" . substr($sel, 1) . "')]";
+      } elseif (strpos($sel, '#') === 0) {
+        $sel = "//*[@id='" . substr($sel, 1) . "']";
+      }
       try {
-        $nodeList = $xpath->query($sel);
-        if (!$nodeList || $nodeList->length === 0) continue;
-        $nodes = iterator_to_array($nodeList, false);
-
-        foreach ($nodes as $n) {
-          // skip ถ้า node อยู่ใน head
-          $p = $n->parentNode;
-          $insideHead = false;
-          while ($p) {
-            if (strtolower($p->nodeName) === 'head') {
-              $insideHead = true;
-              break;
+        $nodes = $xpath->query($sel);
+        \Log::debug("Ignore selector: {$sel} found " . ($nodes ? $nodes->length : 0) . " node(s)");
+        if ($nodes) {
+          foreach ($nodes as $n) {
+            if ($n->parentNode) {
+              $n->parentNode->removeChild($n);
             }
-            $p = $p->parentNode;
-          }
-          if (!$insideHead && $n->parentNode) {
-            $n->parentNode->removeChild($n);
           }
         }
       } catch (\Throwable $e) {
-        // ข้าม selector ที่ query ไม่ได้
+        \Log::warning("Invalid selector: {$sel}: " . $e->getMessage());
       }
     }
 
-    // --- ล้าง attribute สุ่มใน body ---
-    foreach ($doc->getElementsByTagName('*') as $el) {
-      if (!$el->hasAttributes()) continue;
-      $remove = [];
-      foreach (iterator_to_array($el->attributes) as $attr) {
-        $name = strtolower($attr->name);
-        if (preg_match('/^(data-|aria-|nonce|integrity|crossorigin)/', $name)) $remove[] = $name;
-        if (strpos($name, 'on') === 0) $remove[] = $name;
+    // --- ลบ token/time/query/attr ที่สุ่ม ---
+    $html2 = $doc->saveHTML() ?: '';
+    $html2 = preg_replace([
+      // token / query random
+      '/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/',
+      '/csrf[_-]?token\s*=\s*[\'"][A-Za-z0-9+\/=]{20,}[\'"]/',
+      '/([?&])(cacheBust|cb|_|\d{1,2})=\d+/',
+      // attr ที่สุ่ม
+      '/\bnonce="[^"]*"/i',
+      '/\bcrossorigin="[^"]*"/i',
+      '/\bintegrity="[^"]*"/i',
+      '/\bdata-[a-z0-9\-]+="[^"]*"/i',
+      '/aria-[a-z\-]+="[^"]*"/i',
+      '/data-v-[a-z0-9\-]+="[^"]*"/i',
+      // id/class random
+      '/\bid="__BVID__\d+"/i',
+      '/\bid="__nuxt[^"]*"/i',
+      '/\bid="v-[^"]*"/i',
+      '/<script[^>]*id="__NEXT_DATA__"[^>]*>.*?<\/script>/is',
+      '/<script[^>]*id="__NUXT_DATA__"[^>]*>.*?<\/script>/is',
+      '/id="fb-root"/i',
+      '/class="[^"]*(fb-customerchat|popup|banner)[^"]*"/i',
+      '/class="[^"]*(swiper|carousel|slide|slick|bvid|nuxt-progress|vuetify|v-application|v-main|v-navigation-drawer|theme--light|floating-icon|header-top-bar|cookie|footer-bottom-bar)[^"]*"/i'
+    ], '', $html2);
+
+    // --- จัดเรียงแอตทริบิวต์ ---
+    $MAX_BYTES_FOR_ATTR_SORT = 2500000;
+    $SORT_TAGS = ['html', 'head', 'body', 'meta', 'link', 'script', 'img', 'a', 'div', 'span', 'header', 'footer', 'main', 'section', 'article', 'nav', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
+    if (strlen($html2) <= $MAX_BYTES_FOR_ATTR_SORT) {
+      $doc2 = new \DOMDocument('1.0', 'UTF-8');
+      $doc2->preserveWhiteSpace = false;
+      $doc2->formatOutput = false;
+
+      $prevUseInternal = libxml_use_internal_errors(true);
+      @$doc2->loadHTML($html2, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NONET | LIBXML_COMPACT);
+      libxml_clear_errors();
+      libxml_use_internal_errors($prevUseInternal);
+
+      $xp2 = new \DOMXPath($doc2);
+      $xpathExpr = '//' . implode(' | //', $SORT_TAGS);
+
+      foreach ($xp2->query($xpathExpr) as $el) {
+        if (!$el->hasAttributes()) continue;
+
+        $attrs = [];
+        foreach (iterator_to_array($el->attributes) as $attr) {
+          $name = $attr->name;
+          if (preg_match('/^(data-|aria-)/', $name)) continue;
+          if ($name === 'nonce' || $name === 'integrity' || $name === 'crossorigin') continue;
+          if ($name === 'onclick' || strpos($name, 'on') === 0) continue;
+          $attrs[$name] = $attr->value ?? '';
+        }
+
+        while ($el->attributes->length) {
+          $el->removeAttribute($el->attributes->item(0)->name);
+        }
+        if ($attrs) {
+          ksort($attrs, SORT_NATURAL);
+          foreach ($attrs as $k => $v) {
+            $el->setAttribute($k, $v);
+          }
+        }
       }
-      foreach ($remove as $r) {
-        $el->removeAttribute($r);
-      }
+
+      $html2 = $doc2->saveHTML() ?: $html2;
     }
 
-    // --- save body ที่เหลือ ---
-    $bodyHtml = $doc->saveHTML($bodyNode);
-
-    // --- ประกอบกลับ (ใช้ head เดิมจาก DOM) ---
-    $finalHtml = "<!DOCTYPE html>\n<html>\n{$headHtml}\n{$bodyHtml}\n</html>";
-
-    // --- ยุบช่องว่าง + save debug ---
-    $finalHtml = preg_replace('/\s+/', ' ', $finalHtml);
-    file_put_contents(storage_path('app/normalized.html'), $finalHtml);
-
-    return trim($finalHtml);
+    // --- ยุบช่องว่างและคืนค่า ---
+    $html2 = preg_replace('/\s+/', ' ', $html2);
+    file_put_contents(storage_path('app/normalized.html'), $html2);
+    return trim($html2);
   }
-
 
 
 
@@ -2106,191 +2080,40 @@ class WebDefacementProccess extends Command
     return $found;
   }
 
-  private function getHtml3($url, $retryCount = 0)
+  private function getHtml3($url)
   {
-    $browser = null;
-    $maxRetries = 3;
-
     try {
-      ini_set('max_execution_time', 300);
-      ini_set('default_socket_timeout', 300);
-      set_time_limit(0);
-
       putenv('NODE_PATH=' . base_path('puphpeteer_env/node_modules'));
       $_ENV['NODE_PATH'] = base_path('puphpeteer_env/node_modules');
 
-      // 🟩 ปิด Chrome ที่ค้างไว้
-      @exec("pkill -f 'chrome --headless' >/dev/null 2>&1");
-
-      $puppeteer = new \Nesk\Puphpeteer\Puppeteer([
-        'read_timeout' => 300,
-        'idle_timeout' => 300,
-      ]);
-
+      $puppeteer = new Puppeteer;
       $browser = $puppeteer->launch([
         'executablePath' => '/usr/bin/google-chrome',
-        'headless' => true,
         'args' => [
           '--no-sandbox',
           '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
           '--disable-gpu',
-          '--single-process',
-          '--no-zygote',
-          '--disable-background-timer-throttling',
-          '--disable-renderer-backgrounding',
-          '--disable-background-networking',
-          '--disable-features=IsolateOrigins,site-per-process',
-          '--window-size=1920,1080',
+          '--headless=new'
         ],
       ]);
 
       $page = $browser->newPage();
-      $page->setDefaultNavigationTimeout(90000); // เพิ่มเป็น 90 วินาที
+      $page->goto($url, ['waitUntil' => 'networkidle2']);
+      sleep(5);
+      $content = $page->content();  // <<<<< จุดนี้เดิมคุณเก็บ HTML แค่ครั้งเดียว
+      $browser->close();
 
-      // 🟩 เปิด JavaScript
-      $page->setJavaScriptEnabled(true);
-
-      $page->goto($url, [
-        'timeout' => 90000,
-        'waitUntil' => ['load', 'domcontentloaded', 'networkidle0'], // รอ network ให้เงียบสนิท
-      ]);
-
-      // 🟩 รอให้หน้าเว็บโหลดเสร็จ
-      sleep(2);
-
-      // 🟩 SCROLL เพื่อ TRIGGER LAZY LOADING
-      $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
-            async () => {
-                // Scroll ลงไปทีละน้อยเพื่อ trigger lazy loading
-                const scrollStep = 300;
-                const scrollDelay = 200;
-                
-                const totalHeight = Math.max(
-                    document.body.scrollHeight,
-                    document.documentElement.scrollHeight
-                );
-                
-                for (let scrolled = 0; scrolled < totalHeight; scrolled += scrollStep) {
-                    window.scrollTo(0, scrolled);
-                    await new Promise(resolve => setTimeout(resolve, scrollDelay));
-                }
-                
-                // Scroll กลับขึ้นบน
-                window.scrollTo(0, 0);
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-        "));
-
-      // 🟩 รอ network requests ที่เกิดจาก scroll
-      sleep(3); // รอให้ lazy loading โหลดเสร็จ
-
-      // 🟩 WAIT UNTIL DOM STABLE (เพิ่มเวลารอ)
-      $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
-            () => {
-                return new Promise(resolve => {
-                    let last = document.body.innerHTML.length;
-                    let stableCount = 0;
-                    let attempts = 0;
-                    const maxAttempts = 60;   // 30 seconds (60 × 500ms) - เพิ่มจาก 20
-
-                    const check = () => {
-                        attempts++;
-                        const now = document.body.innerHTML.length;
-
-                        if (now === last) {
-                            stableCount++;
-                            if (stableCount >= 4) return resolve(true); // stable 2s (เพิ่มจาก 3)
-                        } else {
-                            stableCount = 0;
-                        }
-
-                        last = now;
-
-                        // Fallback → do not wait forever
-                        if (attempts >= maxAttempts) {
-                            console.log('DOM stability timeout, proceeding anyway');
-                            return resolve(true);
-                        }
-
-                        setTimeout(check, 500);
-                    };
-
-                    check();
-                });
-            }
-        "));
-
-      // 🟩 รอเพิ่มอีกนิดเพื่อให้แน่ใจว่า dynamic content โหลดเสร็จ
-      sleep(1);
-
-      // 🟩 Pull final HTML snapshot
-      $content = $page->content();
-
-      // 🟩 ตรวจสอบว่า content ที่ได้มามีความสมบูรณ์หรือไม่
-      if (strlen($content) < 500) {
-        \Log::warning("getHtml3: Content too short ({$url}), length: " . strlen($content));
-        throw new \Exception("Content too short, possible network error");
-      }
-
-      // 🟩 Log เพื่อ debug
-      $elementCount = $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
-            () => document.querySelectorAll('*').length
-        "));
-      \Log::info("getHtml3: Captured {$elementCount} elements from {$url}");
-
-      return ['content' => $content, 'success' => true];
-    } catch (\Throwable $e) {
-      $errorMsg = $e->getMessage();
-      
-      // 🟩 ตรวจสอบว่าเป็น network error หรือไม่
-      $isNetworkError = (
-        stripos($errorMsg, 'ERR_SOCKET_NOT_CONNECTED') !== false ||
-        stripos($errorMsg, 'ERR_CONNECTION') !== false ||
-        stripos($errorMsg, 'ERR_NETWORK') !== false ||
-        stripos($errorMsg, 'ERR_TIMED_OUT') !== false ||
-        stripos($errorMsg, 'Navigation timeout') !== false ||
-        stripos($errorMsg, 'Content too short') !== false
-      );
-
-      \Log::error("Puphpeteer Error (attempt " . ($retryCount + 1) . "/{$maxRetries}): {$errorMsg} at {$url}");
-
-      // 🟩 ถ้าเป็น network error และยังลองไม่ถึง max retries ให้ลองใหม่
-      if ($isNetworkError && $retryCount < $maxRetries) {
-        \Log::info("Retrying {$url} (attempt " . ($retryCount + 2) . "/{$maxRetries})");
-        
-        // ปิด browser ก่อน retry
-        if ($browser) {
-          try {
-            $browser->close();
-          } catch (\Throwable $ex) {
-            // ignore
-          }
-        }
-        
-        // รอสักครู่ก่อน retry
-        sleep(2 + $retryCount); // รอนานขึ้นทุกครั้งที่ retry
-        
-        return $this->getHtml3($url, $retryCount + 1);
-      }
-
-      // 🟩 ถ้า retry หมดแล้วหรือไม่ใช่ network error ให้ใช้ fallback
-      // แต่ return พร้อม error flag เพื่อไม่ให้ diff
-      $fallbackResult = $this->getHtmlFallback($url);
-      $fallbackResult['success'] = false;
-      $fallbackResult['error'] = $errorMsg;
-      
-      return $fallbackResult;
-    } finally {
-      if ($browser) {
-        try {
-          $browser->close();
-        } catch (\Throwable $ex) {
-          \Log::warning("Browser close failed: " . $ex->getMessage());
-        }
-      }
+      return ['content' => $content];
+    } catch (\Exception $e) {
+      error_log("Puphpeteer Error: " . $e->getMessage());
+      return $this->getHtmlFallback($url);
     }
   }
+
+
+
+
 
   // เก็บ function เก่าไว้เป็น fallback
   private function getHtmlFallback($url)

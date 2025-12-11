@@ -930,6 +930,7 @@ return [
     'compromised'                                => 'Compromised',
     'data_setting'                               => 'DataSetting',
     'data_leak'                                  => 'Data Leak',
+    'credential_leak'                            => 'Credential Leak',
     'dataleak_data'                              => 'Data Leak Data',
     'data_leak_feed'                             => 'Data Leak Feed',
     'data_feed_Social'                           => 'Social Feed',

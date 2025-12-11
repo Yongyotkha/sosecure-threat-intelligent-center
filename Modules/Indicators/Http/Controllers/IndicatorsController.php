@@ -20,6 +20,7 @@ use Auth;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Nette\Utils\Strings;
 use App\Entities\TransactionBatchjob;
 use \Carbon\Carbon;
@@ -1636,190 +1637,153 @@ class IndicatorsController extends Controller
         if (!$role_custom['indicators']) {
             check_permission403();
         }
-        // dd( $_POST['order']);
+
         if (TYPE_WEB == 'center') {
-            $draw = $_POST['draw'];
-            $row = (int)$_POST['start'];
-            $rowperpage = (int)$_POST['length'];
-
-
-
-            $start =  $row;
-
-
+            $draw = (int)($_POST['draw'] ?? 0);
+            $start = (int)($_POST['start'] ?? 0);
+            $rowperpage = (int)($_POST['length'] ?? 10);
             $reqId = $request->pulse_id;
-            $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
-            $clientMD = new MongoClient($DB_MONGO_KEY);
-            $html = '';
-            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
 
-            $query = [
-                'pulse_id' => $reqId,
-                'type' => [
-                    '$exists' => true,
-                    '$ne' => null
-                ],
-                // 'type'=> { $exists: true, $ne: null },
-            ];
-            $options = [
-                'skip' => $start,
-                'limit' => $rowperpage,
-                'sort' => ['updated_at' => -1],
-                'projection' => [
-                    '_id' => 1,
-                    'indicator_id' => 1,
-                    'pulse_id' => 1,
-                    'created' => 1,
-                    'created_at' => 1,
-                    'created_by' => 1,
-                    'deleted_at' => 1,
-                    'expiration' => 1,
-                    'indicator' => 1,
-                    'is_active' => 1,
-                    'pulse_modified' => 1,
-                    'role' => 1,
-                    'source' => 1,
-                    'status' => 1,
-                    'transaction_date' => 1,
-                    'type' => 1,
-                    'updated_at' => 1,
-                    'updated_by' => 1,
-                    'is_count_attr' => 1,
-                    'tags' => 1,
-                    'attribute_score' => 1,
-                    'attribute_serverity' => 1
-                ],
-                'typeMap' => [  // 👈 เพื่อให้ใช้งาน array_key_exists ได้ใน PHP
-                    'root' => 'array',
-                    'document' => 'array',
-                    'array' => 'array'
-                ]
-            ];
+            // ✅ จำกัด rowperpage สูงสุดไว้ที่ 100 เพื่อป้องกัน timeout
+            $rowperpage = min($rowperpage, 100);
 
+            // ✅ Cache keys
+            $cacheKeyCount = "indicator_count_{$reqId}";
+            $cacheKeyData = "indicator_data_{$reqId}_{$start}_{$rowperpage}";
 
-
-
-            if ($request->count_page == -1) {
-                //$cursor_count = $col_fx_otx_events_indicator_ref->count($query);
-                $cursor_count = $request->total_record;
-                $count_filter = $cursor_count;
-            } else {
-                $cursor_count = $request->count_page;
-                $count_filter = $cursor_count;
+            // ✅ ลอง cache ข้อมูลทั้งหมดก่อน (เร็วสุด!)
+            $cachedResult = Cache::get($cacheKeyData);
+            if ($cachedResult !== null && $request->count_page != -1) {
+                return response()->json($cachedResult);
             }
 
+            try {
+                $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+                $clientMD = new MongoClient($DB_MONGO_KEY, [
+                    'serverSelectionTimeoutMS' => 5000,
+                    'socketTimeoutMS' => 30000, // 30 วินาที
+                ]);
+                $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
 
+                // ✅ Query แบบ optimized
+                $query = ['pulse_id' => $reqId];
 
-            $cursor = $col_fx_otx_events_indicator_ref->find($query, $options);
-            $document_all = $cursor->toArray();
-            foreach ($document_all as &$item) {
-                if (is_array($item) && !array_key_exists('tags', $item)) {
-                    $item['tags'] = '';
+                // ✅ Options พร้อม projection และ maxTimeMS
+                $options = [
+                    'projection' => [
+                        '_id' => 0,
+                        'indicator_id' => 1,
+                        'indicator_name' => 1,
+                        'type' => 1,
+                        'pulse_id' => 1,
+                        'updated_at' => 1,
+                        'tags' => 1,
+                        // เพิ่มฟิลด์ที่จำเป็น
+                        'name' => 1,
+                        'attribute_serverity' => 1,
+                        'attribute_score' => 1,
+                        'indicator' => 1,
+                        'is_active' => 1,
+                        'role' => 1,
+                        'title' => 1,
+                        'created_at' => 1
+                    ],
+                    'skip' => $start,
+                    'limit' => $rowperpage,
+                    'sort' => ['updated_at' => -1],
+                    'maxTimeMS' => 25000, // ⏱️ Timeout 25 วินาที
+                    // 'hint' => ['pulse_id' => 1], // 👈 เปิดหลังสร้าง index
+                    'typeMap' => [
+                        'root' => 'array',
+                        'document' => 'array',
+                        'array' => 'array'
+                    ]
+                ];
+
+                // ✅ Count แบบ cache (30 นาที) - ถ้า timeout ให้ใช้ค่าประมาณ
+                if ($request->count_page == -1) {
+                    try {
+                        $cursor_count = Cache::remember($cacheKeyCount, 1800, function () use ($col_fx_otx_events_indicator_ref, $query) {
+                            // ใช้ estimatedDocumentCount แทน countDocuments ถ้า query ง่าย
+                            return $col_fx_otx_events_indicator_ref->countDocuments($query, ['maxTimeMS' => 10000]);
+                        });
+                    } catch (\Exception $e) {
+                        // ถ้า count timeout ให้ใช้ค่าประมาณ
+                        \Log::warning("Count timeout for pulse_id: {$reqId}, using estimate");
+                        $cursor_count = 1000; // ค่าประมาณ
+                    }
+                } else {
+                    $cursor_count = $request->count_page;
                 }
+
+                // ✅ Query ข้อมูล
+                $cursor = $col_fx_otx_events_indicator_ref->find($query, $options);
+                $document_all = $cursor->toArray();
+
+                // ✅ ตรวจสอบ tags แบบเร็ว
+                foreach ($document_all as &$item) {
+                    $item['tags'] = $item['tags'] ?? '';
+                }
+                unset($item);
+
+                // ✅ สร้าง response
+                $response = [
+                    "draw" => $draw,
+                    "recordsTotal" => $cursor_count,
+                    "recordsFiltered" => $cursor_count,
+                    "data" => $document_all
+                ];
+
+                // ✅ Cache ผลลัพธ์ไว้ 10 นาที
+                Cache::put($cacheKeyData, $response, 600);
+
+                return response()->json($response);
+
+            } catch (\MongoDB\Driver\Exception\ExecutionTimeoutException $e) {
+                \Log::error("MongoDB timeout for pulse_id: {$reqId}", ['error' => $e->getMessage()]);
+                
+                return response()->json([
+                    "draw" => $draw,
+                    "recordsTotal" => 0,
+                    "recordsFiltered" => 0,
+                    "data" => [],
+                    "error" => "Query timeout - please create MongoDB index or contact administrator"
+                ], 200);
+                
+            } catch (\Exception $e) {
+                \Log::error("MongoDB error in load_attributes_tb", [
+                    'pulse_id' => $reqId,
+                    'error' => $e->getMessage()
+                ]);
+                
+                return response()->json([
+                    "draw" => $draw,
+                    "recordsTotal" => 0,
+                    "recordsFiltered" => 0,
+                    "data" => [],
+                    "error" => "Database error - " . $e->getMessage()
+                ], 200);
             }
-            unset($item);
 
-
-            //foreach ($document_all as &$item) {
-            // $query = ['indicator_id' => $item['indicator_id']];
-            //  $detail = $col_fx_otx_events_indicator_ref->findOne($query);
-
-            ///     $item['tags'] = isset($detail['tags']) ? $detail['tags'] : '';
-            //  }
-            //  unset($item);
-
-            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
-            $options = array(
-                'typeMap' => array(
-                    'root' => 'array',
-                    'document' => 'array',
-                ),
-            );
-            $data = array();
-            // foreach ($document_all as  $value) {
-            //     $query = [
-            //         'indicator_id' => $value->indicator_id
-
-            //     ];
-            //     $cursor_2 = $col_fx_otx_indicator_detail->findOne($query);
-
-            //     //$join_fx_otx_indicator_detail[]=  array("a"=>$value,"b"=>$cursor_2);
-            //     // $view = '<a href="'.route('indicators.detail_indicator').
-            //     //         '?id='.$document['b']['indicator_id'].'&type='.$document['b']['type'].'&indicator='.$document['b']['indicator_name'].'" 
-            //     //         class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>'; 
-            //     $data[] = array( 
-            //         "type"=>@$cursor_2['type'],
-            //         "indicator"=>@$cursor_2['indicator_name'],
-            //         "role"=>@$value['role'],
-            //         "updated_at"=>@$value['updated_at'],
-            //         "indicator_id"=>$value->indicator_id,
-            //         "transaction_date"=>'',
-            //     );
-
-            //  }
-            //     foreach ($document_all as $key => $value) {
-
-            //      $query = [
-            //         'indicator_id' => $value->indicator_id
-
-            //     ];
-            //     $cursor_2 = $col_fx_otx_indicator_detail->findOne($query);
-
-
-            //     $data[] = array( 
-            //         "TYPE"=>@$cursor_2['type'],
-            //         "AttributeName"=>(isset($cursor_2['indicator_name'])?$cursor_2['indicator_name']:""),
-            //         "ROLE"=>@$value['role'],
-            //         "Date"=>(isset($value['created'])?change_date_utc_to_thai($value['created']):""),
-            //         "Action"=>route('indicators.detail_indicator')."?id=".@$value['indicator_id'].
-            //         '&type='.@$cursor_2['type'].'&indicator='.@$cursor_2['indicator_name']
-
-            //     );
-
-
-            $total_record = $cursor_count;
-            $total_count_filter = $count_filter;
-
-
-            $dataOut["draw"] = $_POST['draw'];
-            $dataOut["recordsTotal"] = $cursor_count;
-            $dataOut["recordsFiltered"] = $total_count_filter;
-            $dataOut["data"] = $document_all;
-            //dd($dataOut);
-            return response()->json($dataOut);
-            if ($request->ajax()) {
-                return response()->json($dataOut);
-            }
         } else {
-            $ip = $this->ip;
-            $mac = $this->mac;
-            $authorization_key = $this->header;
-            $url_indicator_load_attributes_tb = $this->url_indicator_load_attributes_tb;
-
-            $draw = $request->draw;
-            $row = (int)$request->start;
-            $rowperpage = (int)$request->length;
-            $reqId = $request->pulse_id;
-            $count_page = $request->count_page;
-
+            // ✅ Remote API call
             $request_body_complete = [
-                'draw' => $draw,
-                'row' => $row,
-                'rowperpage' => $rowperpage,
-                'count_page' => $count_page,
-                'reqId' => $reqId,
+                'draw' => $request->draw,
+                'row' => (int)$request->start,
+                'rowperpage' => (int)$request->length,
+                'count_page' => $request->count_page,
+                'reqId' => $request->pulse_id,
             ];
 
             $body_complete = json_encode($request_body_complete);
-            $form_body_complete = encrypt_decrypt('encrypt', $body_complete, $authorization_key, $ip, $mac);
-            $response_complete = $this->reconnnect($url_indicator_load_attributes_tb, $form_body_complete, $authorization_key);
+            $form_body_complete = encrypt_decrypt('encrypt', $body_complete, $this->header, $this->ip, $this->mac);
+            $response_complete = $this->reconnnect($this->url_indicator_load_attributes_tb, $form_body_complete, $this->header);
 
-            if ($response_complete['status_code'] == "200") {
-                $dataOut = $response_complete['data'];
-                return response()->json($dataOut);
-            } else {
-                return response()->json($response_complete);
-            }
+            return response()->json(
+                $response_complete['status_code'] == "200" 
+                    ? $response_complete['data'] 
+                    : $response_complete
+            );
         }
     }
 

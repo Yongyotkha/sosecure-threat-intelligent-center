@@ -164,6 +164,8 @@ if ($model_has_roles) {
                            
                                     if (@$role_id == 1 || in_array($menu_val['id'], $role_menu_permission_arr)) {
 
+
+
                                                 $active = '';
                                                 $url = '#';
                                                 $check_menu_active = '';
@@ -362,7 +364,7 @@ if ($model_has_roles) {
 
                                                 }
                                                     if($menu_val->is_have_sub == 1) {//ถ้ามี sub menu
-                                                        $is_have_sub = '<a href="'. $url .'" class="'. @$active_sub .'">
+                                                        $is_have_sub = '<a href="#" class="'. @$active_sub .'">
                                                                             <i class="'.@$menu_val->icon.'"><b class="bg-info"></b></i>
                                                                             <span class="pull-right"><i class="fas fa-angle-down text"></i>
                                                                             <i class="fas fa-angle-up text-active"></i></span>
@@ -382,7 +384,12 @@ if ($model_has_roles) {
                                                 
                                     
 
-                                                $menu_html .=    '<li class="'. $active .'">
+                                                $li_class = $active;
+                                                if($menu_val->is_have_sub == 1) {
+                                                    $li_class .= ' nav-w-children';
+                                                }
+
+                                                $menu_html .=    '<li class="'. $li_class .'">
                                                                     '.$is_have_sub.'
                                                                 </li>';
                                         

@@ -28,6 +28,7 @@ use Barryvdh\DomPDF\Facade as PDF;
 Route::get('/clientlogin', 'Welcome@clientlogin');
 Route::get('/test', 'Welcome@test');
 
+
 Auth::routes(['verify' => true, 'register' => settingEnabled('allow_client_registration')]);
 
 Route::get('/redirect/{provider}', 'SocialAuthController@redirectToProvider');

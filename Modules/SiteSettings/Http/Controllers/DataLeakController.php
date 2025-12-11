@@ -1451,11 +1451,159 @@ class DataLeakController extends Controller
                 DB::raw("'social_ref' as ref_type")
             );
 
-        // ---------- CREDENTIAL REF ----------
+
+
+        // ---------- FILTERS ----------
+        if (!empty($request->check_serverity)) {
+            $qSocial->where("$socialRefTable.serverity", $request->check_serverity);
+        }
+
+        if (!empty($request->check_monitoring)) {
+            $qSocial->where("$socialRefTable.status_monitoring", $request->check_monitoring);
+        }
+
+        if (!empty($request->check_type)) {
+            $type = strtolower(trim($request->check_type));
+            if (in_array($type, ['social', 'darkweb_public'])) {
+                $qSocial->where("$feedTable.feel_type", $type);
+            }
+        }
+
+        if (!empty($request->check_social) && $request->check_type === 'social') {
+            $check = strtolower($request->check_social);
+            if ($check === 'other') {
+                $qSocial->whereNotIn(DB::raw("LOWER($feedTable.keyword)"), ['mobile', 'facebook', 'line', 'twitter', 'website']);
+            } else {
+                $qSocial->where(DB::raw("LOWER($feedTable.keyword)"), '=', $check);
+            }
+        }
+
+        // ---------- CLICK_TYPE2 ----------
+        if (!empty($request->click_type2)) {
+            $ct2 = strtolower(trim($request->click_type2));
+            $feedAlias = DB::getTablePrefix() . $feedTable;
+
+            if (in_array($ct2, ['in_progress', 'reported', 'close'])) {
+                $qSocial->where("$socialRefTable.status_monitoring", 'LIKE', "%{$ct2}%");
+            } elseif (in_array($ct2, ['mobile', 'facebook', 'line', 'twitter', 'website'])) {
+                $qSocial->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["{$ct2}%"]);
+            } elseif ($ct2 === 'other') {
+                $qSocial->whereNotIn(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), ['mobile', 'facebook', 'line', 'twitter', 'website']);
+            } else {
+                $qSocial->where(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), 'LIKE', "%{$ct2}%");
+            }
+        }
+
+        // ---------- MAIN QUERY ----------
+        $q = DB::query()->fromSub($qSocial, 'u');
+
+        // ✅ แก้ปัญหา fx_u.site_id โดยใช้ DB::raw
+        if (empty($selectedSite)) {
+            if (!empty($site_ids)) {
+                $q->whereIn(DB::raw('u.site_id'), $site_ids);
+            } elseif (!empty($get_role['site_id'])) {
+                $q->where(DB::raw('u.site_id'), (int)$get_role['site_id']);
+            }
+        }
+
+        // ---------- FILTERS ----------
+        if ($request->keywords) {
+            $kw = strtolower(trim($request->keywords));
+            $q->whereRaw(
+                "(LOWER(u.keyword) LIKE ? OR LOWER(fnStripTags(entity_decode(u.feedcontent))) LIKE ?)",
+                ["%{$kw}%", "%{$kw}%"]
+            );
+        }
+
+        if ($request->source) {
+            $q->where("u.sourceid", 'LIKE', "%{$request->source}%");
+        }
+
+        // ---------- DATE FILTER ----------
+        if ((int) $request->isDateSearch === 1 && $request->startDate && $request->endDate) {
+            $start = Carbon::parse($request->startDate)->startOfDay()->toDateTimeString();
+            $end   = Carbon::parse($request->endDate)->endOfDay()->toDateTimeString();
+
+            $q->whereRaw("
+            u.feedtimepost IS NOT NULL
+            AND CAST(u.feedtimepost AS DATETIME) BETWEEN ? AND ?
+        ", [$start, $end]);
+        }
+
+        // ---------- ORDER ----------
+        if (!empty($request->order)) {
+            $col = $request->order[0]['column'];
+            $dir = $request->order[0]['dir'] ?? 'desc';
+
+            if ($col == "9")      $q->orderByRaw("u.site_id $dir");
+            elseif ($col == "8")  $q->orderByRaw("u.feedtimepost $dir");
+            elseif ($col == "7")  $q->orderByRaw("u.ref_status_monitoring $dir");
+            elseif ($col == "6")  $q->orderByRaw("u.ref_serverity $dir");
+            elseif ($col == "5")  $q->orderByRaw("u.feedcontent $dir");
+            elseif ($col == "4")  $q->orderByRaw("u.keyword $dir");
+            elseif ($col == "3")  $q->orderByRaw("u.source_name $dir");
+            elseif ($col == "2")  $q->orderByRaw("u.feel_type $dir");
+            elseif ($col == "1")  $q->orderByRaw("u.site_name $dir");
+            else                  $q->orderByRaw("u.feedtimepost DESC");
+        } else {
+            $q->orderByRaw("u.feedtimepost DESC");
+        }
+
+        // ---------- OUTPUT ----------
+        $count  = (clone $q)->count();
+        $length = (int) $request->length;
+
+        $data = $length === -1
+            ? $q->skip((int)$request->start)->get()
+            : $q->skip((int)$request->start)->take($length)->get();
+
+        return response()->json([
+            "recordsFiltered" => $count,
+            "draw"            => $request->draw,
+            "recordsTotal"    => $count,
+            "start"           => (int)$request->start,
+            "length"          => $length,
+            "data"            => $data,
+        ]);
+    }
+
+    public function credentialdatas_all_site_tb(Request $request)
+    {
+        $feedTable          = $this->resolveTable(['data_leak_feed']);
+        $siteTable          = $this->resolveTable(['site']);
+        $credentialRefTable = $this->resolveTable(['credential_leak_ref']);
+
+        // ---------- ROLE ----------
+        $get_role = @get_role_custom();
+
+        // ✅ แปลง Collection site_id_arr ให้เป็น array ปกติ
+        $site_ids = collect(@$get_role['site_id_arr'])
+            ->pluck('site_id')
+            ->filter()
+            ->values()
+            ->toArray();
+
+        // ✅ กำหนด flag สำหรับ client / site_client
+        $isClientOrSiteClient = (
+            (isset($get_role['client']) && (int)$get_role['client'] == 1) ||
+            (isset($get_role['site_client']) && (int)$get_role['site_client'] == 1)
+        );
+
+        $hasRoleSiteLimit = !empty($site_ids);
+
+        // ---------- SELECTED SITE ----------
+        $selectedSite = null;
+        if ($request->site) {
+            if ($s = SiteSettings::where('code', $request->site)->first()) {
+                $selectedSite = (int) $s->id;
+            }
+        }
+
         $qCredential = DB::table($credentialRefTable)
             ->join($feedTable, "$credentialRefTable.data_leak_feed_id", '=', "$feedTable.id")
             ->join($siteTable, "$siteTable.id", '=', "$credentialRefTable.site_id")
-            ->where("$feedTable.feel_type", 'credential')
+            // ->where("$feedTable.feel_type", 'credential')
+            ->whereIn("$feedTable.feel_type", ['surface_web', 'darkweb'])
             ->whereNull("$credentialRefTable.deleted_at")
             ->when($hasRoleSiteLimit, fn($q) => $q->whereIn("$credentialRefTable.site_id", $site_ids))
             ->when($isClientOrSiteClient, fn($q) => $q->where("$feedTable.status", 1))
@@ -1483,65 +1631,38 @@ class DataLeakController extends Controller
 
         // ---------- FILTERS ----------
         if (!empty($request->check_serverity)) {
-            $qSocial->where("$socialRefTable.serverity", $request->check_serverity);
             $qCredential->where("$credentialRefTable.serverity", $request->check_serverity);
         }
 
         if (!empty($request->check_monitoring)) {
-            $qSocial->where("$socialRefTable.status_monitoring", $request->check_monitoring);
             $qCredential->where("$credentialRefTable.status_monitoring", $request->check_monitoring);
         }
 
-        if (!empty($request->check_type)) {
-            $type = strtolower(trim($request->check_type));
-            if (in_array($type, ['social', 'darkweb_public'])) {
-                $qSocial->where("$feedTable.feel_type", $type);
-                $qCredential = null;
-            } elseif ($type === 'credential') {
-                $qSocial = null;
-            }
-        }
-
-        if (!empty($request->check_social) && $request->check_type === 'social') {
-            $check = strtolower($request->check_social);
-            if ($check === 'other') {
-                $qSocial->whereNotIn(DB::raw("LOWER($feedTable.keyword)"), ['mobile', 'facebook', 'line', 'twitter', 'website']);
-            } else {
-                $qSocial->where(DB::raw("LOWER($feedTable.keyword)"), '=', $check);
-            }
-        }
-
         // ---------- CLICK_TYPE2 ----------
-        if (!empty($request->click_type2)) {
-            $ct2 = strtolower(trim($request->click_type2));
+        // ---------- CLICK_TYPE / CLICK_TYPE2 ----------
+        $clickType = !empty($request->click_type2) ? $request->click_type2 : $request->click_type;
+
+        if (!empty($clickType)) {
+            $ct = strtolower(trim($clickType));
             $feedAlias = DB::getTablePrefix() . $feedTable;
 
-            if (in_array($ct2, ['in_progress', 'reported', 'close'])) {
-                $qSocial->where("$socialRefTable.status_monitoring", 'LIKE', "%{$ct2}%");
-                $qCredential->where("$credentialRefTable.status_monitoring", 'LIKE', "%{$ct2}%");
-            } elseif (in_array($ct2, ['mobile', 'facebook', 'line', 'twitter', 'website'])) {
-                $qSocial->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["{$ct2}%"]);
-                $qCredential->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["{$ct2}%"]);
-            } elseif ($ct2 === 'other') {
-                $qSocial->whereNotIn(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), ['mobile', 'facebook', 'line', 'twitter', 'website']);
+            if (in_array($ct, ['in_progress', 'reported', 'close'])) {
+                $qCredential->where("$credentialRefTable.status_monitoring", 'LIKE', "%{$ct}%");
+            } elseif ($ct === 'social' || $ct === 'surface_web') {
+                $qCredential->where("$feedTable.feel_type", 'surface_web');
+            } elseif ($ct === 'darkweb_public' || $ct === 'darkweb') { 
+                 $qCredential->where("$feedTable.feel_type", 'darkweb');
+            } elseif (in_array($ct, ['mobile', 'facebook', 'line', 'twitter', 'website'])) {
+                $qCredential->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["{$ct}%"]);
+            } elseif ($ct === 'other') {
                 $qCredential->whereNotIn(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), ['mobile', 'facebook', 'line', 'twitter', 'website']);
             } else {
-                $qSocial->where(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), 'LIKE', "%{$ct2}%");
-                $qCredential->where(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), 'LIKE', "%{$ct2}%");
+                 //$qCredential->where(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), 'LIKE', "%{$ct}%");
             }
-        }
-
-        // ---------- UNION ----------
-        if ($qSocial && $qCredential) {
-            $union = $qSocial->unionAll($qCredential);
-        } elseif ($qSocial) {
-            $union = $qSocial;
-        } else {
-            $union = $qCredential;
         }
 
         // ---------- MAIN QUERY ----------
-        $q = DB::query()->fromSub($union, 'u');
+        $q = DB::query()->fromSub($qCredential, 'u');
 
         // ✅ แก้ปัญหา fx_u.site_id โดยใช้ DB::raw
         if (empty($selectedSite)) {
@@ -1616,6 +1737,170 @@ class DataLeakController extends Controller
 
 
 
+
+
+
+    public function credentialdatas_count_icon(Request $request)
+    {
+        $feedTable          = $this->resolveTable(['data_leak_feed']);
+        $siteTable          = $this->resolveTable(['site']);
+        $credentialRefTable = $this->resolveTable(['credential_leak_ref']);
+
+        // ---------- ROLE ----------
+        $get_role = @get_role_custom();
+        $site_ids = collect(@$get_role['site_id_arr'])
+            ->pluck('site_id')
+            ->filter()
+            ->values()
+            ->toArray();
+
+        $isClientOrSiteClient = (
+            (isset($get_role['client']) && (int)$get_role['client'] == 1) ||
+            (isset($get_role['site_client']) && (int)$get_role['site_client'] == 1)
+        );
+
+        $hasRoleSiteLimit = !empty($site_ids);
+
+        // ---------- SELECTED SITE ----------
+        $selectedSite = null;
+        if ($request->site_id) {
+            if ($s = SiteSettings::where('code', $request->site_id)->first()) {
+                $selectedSite = (int) $s->id;
+            }
+        }
+
+        // ---------- CREDENTIAL REF ----------
+        $qCredential = DB::table($credentialRefTable)
+            ->join($feedTable, "$credentialRefTable.data_leak_feed_id", '=', "$feedTable.id")
+            ->join($siteTable, "$siteTable.id", '=', "$credentialRefTable.site_id")
+            // ->where("$feedTable.feel_type", 'credential')
+            ->whereIn("$feedTable.feel_type", ['surface_web', 'darkweb'])
+            ->whereNull("$credentialRefTable.deleted_at")
+            ->when($hasRoleSiteLimit, fn($q) => $q->whereIn("$credentialRefTable.site_id", $site_ids))
+            ->when($isClientOrSiteClient, fn($q) => $q->where("$feedTable.status", 1))
+            ->when($selectedSite, fn($q) => $q->where("$credentialRefTable.site_id", $selectedSite))
+            ->select(
+                "$credentialRefTable.id as ref_id",
+                "$credentialRefTable.site_id",
+                "$credentialRefTable.status_monitoring",
+                "$feedTable.keyword",
+                "$feedTable.feel_type",
+                "$feedTable.feedtimepost"
+            );
+
+        // ---------- DATE FILTER ----------
+        if ((int) $request->isDateSearch === 1 && $request->startDate && $request->endDate) {
+            $start = Carbon::parse($request->startDate)->startOfDay()->toDateTimeString();
+            $end   = Carbon::parse($request->endDate)->endOfDay()->toDateTimeString();
+
+            $qCredential->whereRaw("
+                $feedTable.feedtimepost IS NOT NULL
+                AND CAST($feedTable.feedtimepost AS DATETIME) BETWEEN ? AND ?
+            ", [$start, $end]);
+        }
+
+        // ---------- QUERY WRAPPER ----------
+        $base = DB::query()->fromSub($qCredential, 'u');
+
+        // ---------- ICON COUNTS ----------
+        // Mapping: 
+        // icon_mobile (Social) -> surface_web
+        // icon_website (Dark Website) -> darkweb
+        
+        $icon_mobile   = (clone $base)->where('feel_type', 'surface_web')->count();
+        $icon_website  = (clone $base)->where('feel_type', 'darkweb')->count();
+        
+        // Zero out unused icons for this view as per new requirement
+        $icon_facebook = 0;
+        $icon_line     = 0;
+        $icon_twitter  = 0;
+        $icon_other    = 0;
+
+        // ---------- STATUS COUNTS ----------
+        $number_in_progress = (clone $base)->where('status_monitoring', 'LIKE', '%in_progress%')->count();
+        $number_reported    = (clone $base)->where('status_monitoring', 'LIKE', '%reported%')->count();
+        $number_close       = (clone $base)->where('status_monitoring', 'LIKE', '%close%')->count();
+
+        return response()->json([
+            "icon_mobile"        => $icon_mobile,
+            "icon_facebook"      => $icon_facebook, // Unused
+            "icon_line"          => $icon_line,     // Unused
+            "icon_twitter"       => $icon_twitter,  // Unused
+            "icon_website"       => $icon_website,
+            "icon_other"         => $icon_other,    // Unused
+            "number_in_progress" => $number_in_progress,
+            "number_reported"    => $number_reported,
+            "number_close"       => $number_close,
+        ]);
+    }
+    public function credentialdatas_count_val(Request $request)
+    {
+        $feedTable          = $this->resolveTable(['data_leak_feed']);
+        $siteTable          = $this->resolveTable(['site']);
+        $credentialRefTable = $this->resolveTable(['credential_leak_ref']);
+
+        // ---------- ROLE ----------
+        $get_role = @get_role_custom();
+        $site_ids = collect(@$get_role['site_id_arr'])
+            ->pluck('site_id')
+            ->filter()
+            ->values()
+            ->toArray();
+
+        $isClientOrSiteClient = (
+            (isset($get_role['client']) && (int)$get_role['client'] == 1) ||
+            (isset($get_role['site_client']) && (int)$get_role['site_client'] == 1)
+        );
+
+        $hasRoleSiteLimit = !empty($site_ids);
+
+        // ---------- SELECTED SITE ----------
+        $selectedSite = null;
+        if ($request->site_id) {
+            if ($s = SiteSettings::where('code', $request->site_id)->first()) {
+                $selectedSite = (int) $s->id;
+            }
+        }
+
+        // ---------- QUERY ----------
+        $q = DB::table($credentialRefTable)
+            ->join($feedTable, "$credentialRefTable.data_leak_feed_id", '=', "$feedTable.id")
+            // ->where("$feedTable.feel_type", 'credential')
+            ->whereIn("$feedTable.feel_type", ['surface_web', 'darkweb'])
+            ->whereNull("$credentialRefTable.deleted_at")
+            ->when($hasRoleSiteLimit, fn($q) => $q->whereIn("$credentialRefTable.site_id", $site_ids))
+            ->when($isClientOrSiteClient, fn($q) => $q->where("$feedTable.status", 1))
+            ->when($selectedSite, fn($q) => $q->where("$credentialRefTable.site_id", $selectedSite));
+
+        // ---------- KEYWORDS ----------
+        if ($request->keywords) {
+            $kw = strtolower(trim($request->keywords));
+            $q->whereRaw("LOWER($feedTable.keyword) LIKE ?", ["%{$kw}%"]);
+        }
+
+        // ---------- DATE FILTER ----------
+        if ((int) $request->isDateSearch === 1 && $request->startDate && $request->endDate) {
+            $start = Carbon::parse($request->startDate)->startOfDay()->toDateTimeString();
+            $end   = Carbon::parse($request->endDate)->endOfDay()->toDateTimeString();
+
+            $q->whereRaw("
+                $feedTable.feedtimepost IS NOT NULL
+                AND CAST($feedTable.feedtimepost AS DATETIME) BETWEEN ? AND ?
+            ", [$start, $end]);
+        }
+
+        // Clone query for counting types
+        $countCredential = (clone $q)->count(); // Total
+        $countSocial     = (clone $q)->where("$feedTable.feel_type", 'surface_web')->count();
+        $countDarkweb    = (clone $q)->where("$feedTable.feel_type", 'darkweb')->count();
+
+        // ---------- RESPONSE ----------
+        return response()->json([
+            "credential" => $countCredential,
+            "social"     => $countSocial,
+            "darkweb"    => $countDarkweb,
+        ]);
+    }
 
     // View Content DataLeak
     public function view_dataleak_modal($code)
@@ -5477,5 +5762,28 @@ class DataLeakController extends Controller
         $data['page'] = 'Phishing Detection';
 
         return view('sitesettings::data_leak_url')->with($data);
+    }
+
+    public function credential_leak()
+    {
+        $SiteSettings = @get_role_custom()['SiteSettings'];
+        $site_id_arr = @get_role_custom()['site_id_arr'];
+        if (@get_role_custom()['superadmin'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        } else if (@get_role_custom()['client'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        } else if (@get_role_custom()['site_support'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        } else if (@get_role_custom()['site_admin'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        } else if (@get_role_custom()['site_client'] == 1) {
+            $SiteSettings = @get_role_custom()['SiteSettings'];
+        }
+
+        $data['SiteSettings'] = $SiteSettings;
+        $data['source'] = DataLeakSocial::where("status", '=', 1)->get();
+
+        $data['page'] = langapp('credential_leak');
+        return view('sitesettings::credential_leak.index')->with($data);
     }
 }

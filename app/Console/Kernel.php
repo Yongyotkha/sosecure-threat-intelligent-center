@@ -109,6 +109,12 @@ class Kernel extends ConsoleKernel
       ->withoutOverlapping(5);
 
     $schedule->command('app:webdefacement_stat_daily')->dailyAt('00:05')->withoutOverlapping();
+    
+    $schedule->command('misp:tags:sync-insight --max-total=20000')
+      ->dailyAt('04:00')
+      ->timezone('Asia/Bangkok')
+      ->withoutOverlapping(120) 
+      ->name('misp.tags.sync');
   }
 
   /**

@@ -2,396 +2,274 @@
 
 namespace App\Console\Commands;
 
-// require 'vendor/autoload.php';
-
+// use App\Log;
 use Carbon\Carbon;
 use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use MongoDB\BSON\UTCDateTime;
-use Artisan;
-
+use MongoDB\Client as MongoClient;
 use Illuminate\Support\Facades\DB;
 use App\Services\SSHTunnelService;
-use Braintree\Result\Successful;
-use DateTime;
-use DateInterval;
-use Sabberworm\CSS\Value\Value;
+use Illuminate\Support\Facades\Log;
 
 class MDMISPFeedDaily_Database_Dev extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'app:MDMISPFeedDaily_Database_Dev';
+    protected $description = 'Pull MISP data 3 months back in 6h chunks with resume';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Attr Feed';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @return mixed===
-     */
     public function handle()
     {
         ini_set('memory_limit', '-1');
-        //  echo app_path() . "5555555555555";
+        $this->info("=== Start pulling ALL MISP data (with resume support) ===");
+        Log::info("=== Start Pulling ALL MISP data  at " . now() . " ===");
 
-
-        //---------------------------------------------------------------
-
-        /*
-$pipeline = [
-    [
-        '$group' => [
-            '_id' => [
-                'month'=>['$month'=>'$created_at'],
-                'year'=>['$year'=>'$created_at'],
-            ],
-            'COUNT(*)' => [
-                '$sum' => 1
-            ]
-        ]
-    ],
-    [
-        '$project' => [
-            'COUNT_Attr' => '$COUNT(*)',
-            'year' => '$_id.year',
-            'month' => '$_id.month',
-            'type' => 'Attr',
-            '_id' => 0
-        ]
-    ],
-    [
-        '$sort' => [
-            'year' =>-1,
-            'month' => -1,
-        ]
-    ]
-];
-
-$options = [
-    'allowDiskUse' => TRUE
-];
-$DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
-$clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-$col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
-$col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-$countAttr = $col_fx_otx_indicator_detail->aggregate($pipeline, $options);
-$countAttr = $countAttr->toArray();
-
-//print_r($countAttr);
-//echo '================================================================';
-//---------------------------------------------------------------
-*/
-
-
-        // Code Test
-        // $events = DB::connection('mysql_misp')->table('events')
-        //     ->select('id', 'info', 'date', 'orgc_id', 'published', 'attribute_count', 'timestamp')
-        //     ->limit(1)
-        //     ->get();
-
-        // $attr = DB::connection('mysql_misp')->table('attributes')->where('event_id', '=', '1836')->limit(5)->get();
-        // print_r($events);
-        // return;
-
-        // Code Test 
-
-        // $id = 33420;
-        // $result = $this->updateEventYes($id);
-        // $this->info('Yes');
-        // return;
-
-        // $id = 33420;
-        // $result = $this->updateEventNo($id);
-        // $this->info('No');
-        // return;
-
-
-        $end = new DateTime();
-        $start = clone $end;
-        $start->sub(new DateInterval('PT6H'));
-
-        $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
-        $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_transaction_otx_event_stamp = $clientMD->sosecure_threatintelligent_dev->fx_transaction_otx_event_stamp;
-        $ins_fx_transaction_otx_event_stamp = $col_fx_transaction_otx_event_stamp->insertOne([
-            'code' => generator_uuid(),
-            'transaction_date' => date("Y-m-d"),
-            'status' => 1,
-            'created_at' => $date_now,
-            'created_by' => "system",
-            'updated_at' => $date_now,
-            'updated_by' => "system",
-            'deleted_at' => null,
-            'source' => "misp",
-            'start_date_job' => $start->format('Y-m-d H:i:s'),
-            'end_date_job' => $end->format('Y-m-d H:i:s'),
-        ]);
-        echo "Inserted ID: " . $ins_fx_transaction_otx_event_stamp->getInsertedId();
+        $clientMD = new MongoClient($DB_MONGO_KEY);
+        $progressCol = $clientMD->sosecure_threatintelligent->job_progress;
 
-        $col_fx_transaction_otx_indicator_stamp = $clientMD->sosecure_threatintelligent_dev->fx_transaction_otx_indicator_stamp;
-        $ins_fx_transaction_otx_indicator_stamp = $col_fx_transaction_otx_indicator_stamp->insertOne([
-            'code' => generator_uuid(),
-            'transaction_date' => date("Y-m-d"),
-            'status' => 1,
-            'created_at' => $date_now,
-            'created_by' => "system",
-            'updated_at' => $date_now,
-            'updated_by' => "system",
-            'deleted_at' => null,
-            'source' => "misp",
-            'start_date_job' => $start->format('Y-m-d H:i:s'),
-            'end_date_job' => $end->format('Y-m-d H:i:s'),
-        ]);
-        echo "Inserted ID: " . $ins_fx_transaction_otx_indicator_stamp->getInsertedId();
+        // 🧠 1️⃣ เช็ค progress ล่าสุดใน Mongo
+        $progress = $progressCol->findOne(['job' => 'pull_misp_data']);
+        if ($progress && isset($progress['last_ts'])) {
+            $startTs = $progress['last_ts'];
+            $this->info("Resuming from last timestamp: " . Carbon::createFromTimestamp($startTs));
+        } else {
+            // 🧠 2️⃣ ถ้าไม่เคยรันมาก่อน → เริ่มจาก event ที่เก่าสุด
+            $startTs = $this->queryWithRetry(function () {
+                return DB::connection('mysql_misp')->table('events')->min('timestamp');
+            });
+            $this->warn("Running FULL mode from oldest timestamp: " . Carbon::createFromTimestamp($startTs));
+        }
 
-        $stamp_event_id = $ins_fx_transaction_otx_event_stamp->getInsertedId();
-        $stamp_indicator_id = $ins_fx_transaction_otx_indicator_stamp->getInsertedId();
+        if (!$startTs) {
+            $this->error("❌ ไม่พบข้อมูล timestamp ในตาราง events");
+            return;
+        }
 
+        $endTs = Carbon::now()->timestamp;
+        $cursor = $startTs;
 
+        while ($cursor < $endTs) {
+            $chunkStart = $cursor;
+            $chunkEnd = min($cursor + 6 * 3600, $endTs);
 
-        $this->saveJson($stamp_event_id, $stamp_indicator_id);
+            $this->info(
+                "Processing chunk "
+                    . Carbon::createFromTimestamp($chunkStart)
+                    . " - "
+                    . Carbon::createFromTimestamp($chunkEnd)
+            );
 
+            try {
+                $this->queryWithRetry(function () use ($chunkStart, $chunkEnd) {
+                    $this->saveJson($chunkStart, $chunkEnd);
+                });
 
-        $commandArtisan = 'app:MDCountIndicator';
-        Artisan::call($commandArtisan);
+                // ✅ บันทึก progress หลังจบแต่ละ chunk
+                $progressCol->updateOne(
+                    ['job' => 'pull_misp_data'],
+                    [
+                        '$set' => [
+                            'last_ts' => $chunkEnd,
+                            'updated_at' => new UTCDateTime(strtotime(now()) * 1000),
+                        ]
+                    ],
+                    ['upsert' => true]
+                );
+            } catch (Exception $e) {
+                \Log::error("Chunk $chunkStart - $chunkEnd failed: " . $e->getMessage());
+                $this->warn("Chunk failed, stopping to avoid skipping data");
+                return;
+            }
+
+            $cursor = $chunkEnd;
+        }
+
+        $this->info("=== Finished pulling ALL MISP data ===");
     }
 
 
-    public function saveJson($stamp_event_id, $stamp_indicator_id, $json_o = null)
+    public function saveJson($startTs, $endTs)
     {
+        $this->info("Preparing data between "
+            . Carbon::createFromTimestamp($startTs)
+            . " - "
+            . Carbon::createFromTimestamp($endTs));
 
-        // PREPARE DATA //
-        $this->info('Prepaing DATA ...');
+        // 🔹 step 1: ดึง tag otx
+        $chk_tag = $this->queryWithRetry(function () {
+            return DB::connection('mysql_misp')->table('tags')
+                ->select('id')
+                ->whereRaw('LOWER(name) LIKE ?', ['%otx%'])
+                ->pluck('id')
+                ->toArray();
+        });
 
-        // $sixHoursAgo = Carbon::now()->subHours(6)->timestamp;
-        // $excludedTagIds = [3293, 7162];
-        // $mysqlEvents = DB::connection('mysql_misp')->table('events')
-        //     ->select('id', 'info', 'date', 'published', 'publish_timestamp', 'timestamp', 'orgc_id', 'org_id')
-        //     // ->where('id', '=',     646)
-        //     ->where('timestamp', '>=', $sixHoursAgo)
-        //     // ->limit(1)
-        //     ->whereNotExists(function ($query) use ($excludedTagIds) {
-        //         $query->select(DB::raw(1))
-        //             ->from('event_tags')
-        //             ->whereColumn('event_tags.event_id', 'events.id')
-        //             ->whereIn('event_tags.tag_id', $excludedTagIds);
-        //     })
-        //     // ->limit(1)
-        //     ->get();
+        // 🔹 step 2: ดึง event ในช่วงเวลา
+        $mysqlEvents = $this->queryWithRetry(function () use ($chk_tag, $startTs, $endTs) {
+            return DB::connection('mysql_misp')->table('events')
+                ->select('id', 'info', 'date', 'published', 'publish_timestamp', 'timestamp', 'orgc_id', 'org_id')
+                ->whereBetween('timestamp', [$startTs, $endTs])
+                ->whereNotExists(function ($query) use ($chk_tag) {
+                    $query->select(DB::raw(1))
+                        ->from('event_tags')
+                        ->whereColumn('event_tags.event_id', 'events.id')
+                        ->whereIn('event_tags.tag_id', $chk_tag);
+                })
+                ->orderBy('id')
+                ->get();
+        });
 
+        // 🔹 step 3: เตรียมเชื่อม MongoDB
+        $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
+        $clientMD = new MongoClient($DB_MONGO_KEY);
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $progressCol = $clientMD->sosecure_threatintelligent->job_progress;
 
-        $chk_tag = DB::connection('mysql_misp')->table('tags')
-            ->select('id')
-            ->whereRaw('LOWER(name) LIKE ?', ['%otx%'])
-            ->pluck('id')
-            ->toArray();
-
-        $sixHoursAgo = Carbon::now()->subHours(6)->timestamp;
-        $mysqlEvents = DB::connection('mysql_misp')->table('events')
-            ->select('id', 'info', 'date', 'published', 'publish_timestamp', 'timestamp', 'orgc_id', 'org_id')
-            ->where('timestamp', '>=', $sixHoursAgo)
-            // ->where('id', '=', 	646)
-            ->whereNotExists(function ($query) use ($chk_tag) {
-                $query->select(DB::raw(1))
-                    ->from('event_tags')
-                    ->whereColumn('event_tags.event_id', 'events.id')
-                    ->whereIn('event_tags.tag_id', $chk_tag);
-            })
-            ->get();
+        // 🔹 step 4: โหลด progress ล่าสุด (resume point)
+        $resume = $progressCol->findOne(['job' => 'pull_misp_data']) ?? [];
+        $lastEventId = $resume['last_event_id'] ?? 0;
+        $lastAttrId = $resume['last_attr_id'] ?? 0;
 
         $insertedCount = 0;
 
-        // ATTRIBUTE START //
-
-
-        $attributes = [];
-
+        // 🔹 step 5: loop events ในช่วงเวลา
         foreach ($mysqlEvents as $event) {
-            $sixHoursAgo = Carbon::now()->subHours(6)->timestamp;
-            // $val_ = 15982;
 
-            $attributes = DB::connection('mysql_misp')->table('attributes')
-                ->leftJoin('attribute_tags', 'attributes.id', '=', 'attribute_tags.attribute_id')
-                ->leftJoin('tags', 'attribute_tags.tag_id', '=', 'tags.id')
-                ->where('attributes.event_id', $event->id)
-                ->where('attributes.timestamp', '>=', $sixHoursAgo)
-                // ->where('attributes.id', $val_)
-                ->select(
-                    'attributes.id',
-                    'attributes.event_id',
-                    'attributes.type',
-                    'attributes.value1',
-                    'attributes.category',
-                    'attributes.timestamp',
-                    'tags.name as tag_name'
-                )
-                ->limit(30000)
-                ->get()
-                ->groupBy('id') // group by attribute id
-                ->map(function ($items) {
-                    $first = $items->first();
-                    return [
-                        'id' => $first->id,
-                        'event_id' => $first->event_id,
-                        'type' => $first->type,
-                        'value' => $first->value1,
-                        'category' => $first->category,
-                        'timestamp' => $first->timestamp,
-                        'tags' => $items->pluck('tag_name')->filter()->unique()->values()->all(),
-                    ];
-                })
-                ->values()
-                ->toArray();
-        
-            if (empty($attributes)) {
+            // ✅ เช็กใน Mongo ก่อน
+            $exists = $col_fx_otx_events->findOne(
+                ['pulse_id' => 'misp.' . $event->id],
+                ['projection' => ['_id' => 1]]
+            );
+
+            if ($exists) {
+                $this->info("⚡ Skip event {$event->id} (already in MongoDB)");
                 continue;
             }
 
-            // ATTRIBUTE END //
+            $this->info("🚀 Processing event {$event->id} (resume attr_id > {$lastAttrId})");
 
-            // Event Tags START //
+            try {
+                // ✅ ดึง attributes ทั้งหมดแบบ chunk
+                DB::connection('mysql_misp')->table('attributes')
+                    ->where('event_id', $event->id)
+                    ->where('id', '>', $lastAttrId)
+                    ->orderBy('id')
+                    ->chunk(1000, function ($rows) use ($event, $col_fx_otx_events, $progressCol, &$insertedCount) {
 
-            $tags = [];
-            $tags_list = [];
-            if ($event) {
-                $tag = DB::connection('mysql_misp')->table('event_tags')
-                    ->where('event_id', '=', $event->id)
-                    ->get();
-            }
+                        $attributes = $rows->map(function ($attr) {
+                            return [
+                                'type' => $attr->type,
+                                'event_id' => $attr->event_id,
+                                'value' => $attr->value1,
+                                'id' => $attr->id,
+                                'category' => $attr->category,
+                                'timestamp' => $attr->timestamp,
+                            ];
+                        })->toArray();
 
-            if (count($tag)) {
-                foreach ($tag as $tags) {
-                    $tagData = DB::connection('mysql_misp')->table('tags')
-                        ->select('name')
-                        ->where('id', '=', $tags->tag_id)
-                        ->first();
+                        // ✅ ดึง tags
+                        $tags = DB::connection('mysql_misp')->table('event_tags')
+                            ->where('event_id', '=', $event->id)->get();
 
-                    if ($tagData && !in_array($tagData->name, array_column($tags_list, 'name'))) {
-                        $tags_list[] = $tagData;
-                    }
-                }
-            }
+                        $tags_list = [];
+                        foreach ($tags as $t) {
+                            $tagData = DB::connection('mysql_misp')->table('tags')
+                                ->select('name')->where('id', '=', $t->tag_id)->first();
+                            if ($tagData && !in_array($tagData->name, array_column($tags_list, 'name'))) {
+                                $tags_list[] = $tagData;
+                            }
+                        }
 
-            // ITEM START //
-            $item = [
-                'id' => $event->id,
-                'info' => $event->info,
-                'date' => $event->date,
-                'published' => $event->published,
-                'publish_timestamp' => $event->publish_timestamp,
-                'timestamp' => $event->timestamp,
-                'orgc_id' => $this->findOrgName($event->orgc_id),
-                'org_id' => $this->findOrgName($event->org_id),
-                'created_at' => $event->date,
-                'updated_at' => $event->timestamp,
-                'attribute_count' => count($attributes),
-                'Tag' => $tags_list,
-                'Attribute' => $attributes,
-            ];
-            // ITEM END //
+                        // ✅ สร้าง item
+                        $item = [
+                            'id' => $event->id,
+                            'pulse_id' => 'misp.' . $event->id,
+                            'info' => $event->info,
+                            'date' => $event->date,
+                            'published' => $event->published,
+                            'publish_timestamp' => $event->publish_timestamp,
+                            'timestamp' => $event->timestamp,
+                            'orgc_id' => $this->findOrgName($event->orgc_id),
+                            'org_id' => $this->findOrgName($event->org_id),
+                            'attribute_count' => count($attributes),
+                            'Tag' => $tags_list,
+                            'Attribute' => $attributes,
+                        ];
 
-            $countEvent = 0;
+                        // ✅ save ลง Mongo
+                        $countAttr = $this->saveRelatedIndicator($item);
+                        $this->saveEvent($item, $countAttr);
 
+                        $insertedCount++;
+                        $lastAttrId = end($attributes)['id'] ?? 0;
 
-            // INSERT TO MONGODB START //
-            $this->info("\n" . "Saving data to Sosecure TreatIntelligent....");
+                        // ✅ บันทึก progress ระหว่าง chunk
+                        $progressCol->updateOne(
+                            ['job' => 'pull_misp_data'],
+                            [
+                                '$set' => [
+                                    'last_event_id' => $event->id,
+                                    'last_attr_id' => $lastAttrId,
+                                    'last_ts' => $event->timestamp,
+                                    'updated_at' => new UTCDateTime(),
+                                ]
+                            ],
+                            ['upsert' => true]
+                        );
 
-            $countAttr = $this->saveRelatedIndicator($item, $stamp_event_id, $stamp_indicator_id);
-            // $countEvent = $this->saveRelatedEvent($item, $stamp_event_id, $stamp_indicator_id);
-            $this->saveEvent($item, $stamp_event_id, $stamp_indicator_id, $countAttr, 0);
+                        $this->info("💾 Saved chunk for event {$event->id}, last_attr_id={$lastAttrId}");
+                    });
 
-            // INSERT TO MONGODB END //
-
-            $insertedCount++;
-            $this->info("Completed " . $insertedCount . " events.");
-            // return;
-        }
-
-
-        $this->info("Saved " . $insertedCount . " events to MongoDB.");
-    }
-
-    public function updateEventYes($id)
-    {
-        $results = DB::connection('mysql_misp')->table('events')
-            ->where('id', '=', $id)
-            ->update([
-                'published' => 1
-            ]);
-    }
-
-    public function updateEventNo($id)
-    {
-        $results = DB::connection('mysql_misp')->table('events')
-            ->where('id', '=', $id)
-            ->update([
-                'published' => 0
-            ]);
-    }
-
-    public function findTags($item)
-    {
-        $data = [];
-        if ($item) {
-            foreach ($item as $value) {
-                $results = DB::connection('mysql_misp')->table('event_tags')
-                    ->where('id', '=', $id)
-                    ->update([
-                        'published' => 0
-                    ]);
+                // ✅ event เสร็จ reset attr id และบันทึก timestamp
+                $progressCol->updateOne(
+                    ['job' => 'pull_misp_data'],
+                    [
+                        '$set' => [
+                            'last_event_id' => $event->id + 1,
+                            'last_attr_id' => 0,
+                            'last_ts' => $event->timestamp,
+                            'updated_at' => new UTCDateTime(),
+                        ]
+                    ]
+                );
+            } catch (\Exception $e) {
+                $this->error("❌ Error processing event {$event->id}: " . $e->getMessage());
+                $this->warn("🕹️ Progress saved. Resume next run from this event.");
+                break;
             }
         }
+
+
+        $this->info("✅ Saved {$insertedCount} events to MongoDB between "
+            . Carbon::createFromTimestamp($startTs)
+            . " - " . Carbon::createFromTimestamp($endTs));
     }
 
 
-
-    public function findOrgName($org_id)
-    {
-        $orgc_name = '';
-        if ($org_id != null) {
-            $orgc_name = DB::connection('mysql_misp')->table('organisations')
-                ->select('name')
-                ->where('id', '=', $org_id)
-                ->get();
-        }
-        return $orgc_name[0]->name;
-    }
-
-    public function saveEvent($valueEvent, $stamp_event_id, $stamp_indicator_id, $countAttr, $countEvent)
+    public function saveEvent($valueEvent, $countAttr)
     {
         try {
 
             $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
-            $no_Indicator = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $no_Indicator = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
             $countPulse = $no_Indicator->countDocuments([
                 'pulse_id' => 'misp.' . $valueEvent["id"]
             ]);
             $tlpcolor = null;
             $tags = null;
             $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
+
+            // $indicatorTypeCounts = isset($countAttr['byType']) ? $countAttr['byType'] : [];
+            // $indicatorCount = isset($countAttr['all']) ? $countAttr['all'] : 0;
+
+
+            // print_r($indicatorTypeCounts);
+            // return;
+
+
 
             $incData = [];
             if (!empty($countAttr['byType'])) {
@@ -423,7 +301,7 @@ $countAttr = $countAttr->toArray();
                         '$set' => [
                             'name' => @$valueEvent["info"],
                             'description' => @$valueEvent["info"],
-                            'modified' => isset($valueEvent["publish_timestamp"]) ? new UTCDateTime($valueEvent["publish_timestamp"] * 1000) : null,
+                            'modified' => isset($valueEvent["timestamp"]) ? new UTCDateTime($valueEvent["timestamp"] * 1000) : null,
                             'created' => isset($valueEvent["date"]) ? new UTCDateTime(strtotime($valueEvent["date"]) * 1000) : null,
                             'public' => ($valueEvent["published"] == true) ? 1 : 0,
                             // 'public' => 0,
@@ -442,7 +320,7 @@ $countAttr = $countAttr->toArray();
                             'malware_families' => null,
                             'industries' => null,
                             'references' => null,
-                            'transcation_id' => $stamp_event_id,
+                            'transcation_id' => '',
                             'status' => 1,
                             'created_at' => $date_now,
                             'created_by' => "system",
@@ -463,7 +341,7 @@ $countAttr = $countAttr->toArray();
                         '$set' => [
                             'name' => @$valueEvent["info"],
                             'description' => @$valueEvent["info"],
-                            'modified' => isset($valueEvent["publish_timestamp"]) ? new UTCDateTime($valueEvent["publish_timestamp"] * 1000) : null,
+                            'modified' => isset($valueEvent["timestamp"]) ? new UTCDateTime($valueEvent["timestamp"] * 1000) : null,
                             'created' => isset($valueEvent["date"]) ? new UTCDateTime(strtotime($valueEvent["date"]) * 1000) : null,
                             'public' => ($valueEvent["published"] == true) ? 1 : 0,
                             // 'public' => 0,
@@ -482,7 +360,7 @@ $countAttr = $countAttr->toArray();
                             'malware_families' => null,
                             'industries' => null,
                             'references' => null,
-                            'transcation_id' => $stamp_event_id,
+                            'transcation_id' => '',
                             'status' => 1,
                             'created_at' => $date_now,
                             'created_by' => "system",
@@ -503,106 +381,16 @@ $countAttr = $countAttr->toArray();
         return 0;
     }
 
-    public function saveRelatedEvent($valueEvent, $stamp_event_id, $stamp_indicator_id)
-    {
-        try {
-            //  echo "111111111111111";
-            $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
-            //  echo $DB_MONGO_KEY;
-            $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-            $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
-            $data["all"] = 0;
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
-            $col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_event_ref;
-
-            if (!empty($valueEvent["RelatedEvent"])) {
-                foreach ($valueEvent["RelatedEvent"] as $key => $value) {
-                    $data["all"]++;
-
-                    // Test Save Related Attr   
-                    // $countAttr = $this->saveRelatedIndicatorOfRelatedEvent($value, $valueEvent['RelatedEventAttr'], $stamp_event_id, $stamp_indicator_id);
-                    // End Test
-
-                    $update_fx_otx_events = $col_fx_otx_events->updateOne(
-                        ['pulse_id' => "misp." . @$value["id"]],
-                        [
-                            '$set' => [
-                                'name' => @$value["info"],
-                                'description' => @$value["info"],
-                                'modified' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : null,
-                                'created' => isset($value["date"]) ? new UTCDateTime(strtotime($value["date"]) * 1000) : null,
-                                'public' => ($value["published"] == true) ? 1 : 0,
-                                'is_modified' => false,
-                                'updated_at' => $date_now,
-                                'updated_by' => "system",
-                                // 'creator_org' => @$value["orgc_id"],
-                                // 'public' => ($value["Event"]["published"] == true) ? 1 : 0,
-                            ],
-                            '$setOnInsert' => [
-                                'references' => null,
-                                'tags' => null,
-                                'industries' => null,
-                                'malware_families' => null,
-                                'author_username' => null,
-                                'indicator_type_counts' => array(),
-                                'TLP' => null,
-                                'indicator_count' => 0,
-                                'groups' => null,
-                                'transcation_id' => null,
-                                'status' => 1,
-                                'created_at' => $date_now,
-                                'created_by' => "system",
-                                'deleted_at' => null,
-                                'transaction_date' => date("Y-m-d"),
-                                'count_view' => 0,
-                                'source' => "misp",
-                                'creator_org' => @$value["orgc_id"],
-                            ],
-                        ],
-                        ['upsert' => true]
-                    );
-
-                    $update_fx_otx_events_event_ref = $col_fx_otx_events_event_ref->updateOne(
-                        [
-                            'main_pulse_id' => "misp." . @$valueEvent["id"],
-                            'pulse_id' => "misp." . @$value["id"]
-                        ],
-                        [
-                            '$set' => [
-                                'sub_pulse_modified' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : null,
-                                'updated_at' => $date_now,
-                                'updated_by' => "system",
-                            ],
-                            '$setOnInsert' => [
-                                'status' => 1,
-                                'created_at' => $date_now,
-                                'created_by' => "system",
-                                'deleted_at' => null,
-                                'transaction_date' => date("Y-m-d"),
-                                'source' => "misp",
-                            ],
-                        ],
-                        ['upsert' => true]
-                    );
-                }
-            }
-        } catch (Exception $e) {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
-        }
-
-        return $data;
-    }
-
-    public function saveRelatedIndicator($valueEvent, $stamp_event_id, $stamp_indicator_id)
+    public function saveRelatedIndicator($valueEvent)
     {
         try {
 
             $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
-            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
-            $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent_dev->fx_transaction_otx_indicators_data;
-            $col_fx_otx_type = $clientMD->sosecure_threatintelligent_dev->fx_otx_type;
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+            $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
+            $col_fx_otx_type = $clientMD->sosecure_threatintelligent->fx_otx_type;
             $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
             $data["all"] = 0;
             $data["byType"] = array();
@@ -633,11 +421,15 @@ $countAttr = $countAttr->toArray();
                         }
                     }
 
-                    $tagsString = "";
-                    if (isset($value["tags"]) && is_array($value["tags"])) {
-                        $cleanedTags = array_map('trim', $value["tags"]); 
-                        $tagsString = implode(",", array_unique($cleanedTags)); 
-                    }
+                    // $document = $col_fx_otx_indicator_detail->findOne(['indicator_id' => "misp_".@$value["id"]],
+                    //     [
+                    //         'projection' => [
+                    //             "_id" => 1,
+                    //         ]
+                    //     ]
+                    // );
+
+
 
                     if (true) {
                         $update_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->updateOne(
@@ -649,19 +441,16 @@ $countAttr = $countAttr->toArray();
                                     'updated_by' => "system",
                                     'updated_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now,
                                     'created_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now, //
-                                    'indicator_tags' => isset($tagsString) ? $tagsString : '',
                                 ],
                                 '$setOnInsert' => [
-                                    'transcation_id' => $stamp_indicator_id,
+                                    'transcation_id' => '',
                                     'allrow' => $allRow,
                                     'status' => 1,
                                     'created_by' => "system",
                                     'deleted_at' => null,
                                     'transaction_date' => date("Y-m-d"),
                                     'source' => "misp",
-                                    'creator_org' => $valueEvent["orgc_id"],
-                                    // 'indicator_tags' => '',
-                                    // 'indicator_tags' => isset($tagsString) ? $tagsString : '',
+                                    'creator_org' => $valueEvent["orgc_id"]
                                 ],
                             ],
                             ['upsert' => true]
@@ -679,10 +468,8 @@ $countAttr = $countAttr->toArray();
                                     'name' => null,
                                     'updated_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now,
                                     'updated_by' => "system",
-                                    'transcation_id' => $stamp_indicator_id,
+                                    'transcation_id' => '',
                                     'created_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now, //
-                                    // 'indicator_tags' => $tagsString,
-                                    'indicator_tags' => isset($tagsString) ? $tagsString : '',
                                 ],
                                 '$setOnInsert' => [
                                     'status' => 1,
@@ -691,8 +478,6 @@ $countAttr = $countAttr->toArray();
                                     'deleted_at' => null,
                                     'transaction_date' => date("Y-m-d"),
                                     'source' => "misp",
-                                    // 'indicator_tags' => '',
-                                    // 'indicator_tags' => isset($tagsString) ? $tagsString : '',
                                 ],
                             ],
                             ['upsert' => true]
@@ -740,8 +525,6 @@ $countAttr = $countAttr->toArray();
                                 'created' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : null,
                                 'expiration' => null,
                                 'is_active' => 1,
-                                // 'tags' => $tagsString,
-                                'indicator_tags' => isset($tagsString) ? $tagsString : '',
                                 // 'indicator' => $value["value"],
                                 //'type' => $value["type"],
                             ],
@@ -776,174 +559,53 @@ $countAttr = $countAttr->toArray();
         return $data;
     }
 
+    public function findOrgName($org_id)
+    {
+        if (!$org_id) return null;
+        $org = DB::connection('mysql_misp')->table('organisations')
+            ->select('name')
+            ->where('id', '=', $org_id)
+            ->first();
+        return $org ? $org->name : null;
+    }
 
-    //     public function saveRelatedIndicatorOfRelatedEvent($valueEvent, $re_value, $stamp_event_id, $stamp_indicator_id)
-    //     {
-    //         try {
+    protected function queryWithRetry(callable $callback, $maxTry = 5, $delay = 30)
+    {
+        $sshService = new SSHTunnelService();
 
-    //             $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
-    //             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-    //             $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
-    //             $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
-    //             $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent_dev->fx_transaction_otx_indicators_data;
-    //             $col_fx_otx_type = $clientMD->sosecure_threatintelligent_dev->fx_otx_type;
-    //             $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
-    //             $data["all"] = 0;
-    //             $data["byType"] = array();
+        for ($i = 1; $i <= $maxTry; $i++) {
+            try {
+                DB::purge('mysql_misp');
+                DB::reconnect('mysql_misp');
+                return $callback();
+            } catch (\Illuminate\Database\QueryException $e) {
+                $msg = $e->getMessage();
+                // \Log::info($msg);
 
+                if (
+                    str_contains($msg, 'server has gone away') ||
+                    str_contains($msg, 'Connection refused') ||
+                    str_contains($msg, 'Lost connection') ||
+                    str_contains($msg, 'actively refused') ||
+                    str_contains($msg, 'No connection could be made')
+                ) {
+                    \Log::warning("mysql_misp lost, retry {$i}/{$maxTry}...");
 
-    //             if (!empty($valueEvent["Attribute"])) {
-    //                 foreach ($valueEvent["Attribute"] as $key => $value) {
+                    // 🔥 ถ้าเจอ connection refused ให้ลอง restart SSH tunnel ใหม่
+                    if (str_contains($msg, 'No connection could be made')) {
+                        \Log::warning("🔄 SSH tunnel lost — restarting...");
+                        $sshService->createTunnel();
+                        sleep(10); // รอให้ tunnel เปิดก่อน
+                    }
 
-    //                     $data["all"]++;
-    //                     if (isset($data["byType"][$value["type"]])) {
-    //                         $data["byType"][$value["type"]] = $data["byType"][$value["type"]] + 1;
-    //                     } else {
-    //                         $data["byType"][$value["type"]] = 1;
-    //                     }
-    //                     $allRow = array();
-    //                     if (isset($value["value"])) {
-    //                         $allRow["detail"] = @$value["value"];
-    //                     }
+                    if ($i < $maxTry) {
+                        sleep($delay);
+                        continue;
+                    }
+                }
 
-    //                     // $document = $col_fx_otx_indicator_detail->findOne(['indicator_id' => "misp_".@$value["id"]],
-    //                     //     [
-    //                     //         'projection' => [
-    //                     //             "_id" => 1,
-    //                     //         ]
-    //                     //     ]
-    //                     // );
-
-
-
-    //                     if (true) {
-    //                         //  print_r('You are Here 1');
-    //                         // return;
-    //                         $update_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->updateOne(
-    //                             ['indicator_id' => "misp." . @$value["id"]],
-    //                             [
-    //                                 '$set' => [
-    //                                     'indicator_name' => @$value["value"],
-    //                                     'type' => @$value["type"],
-    //                                     'updated_by' => "system",
-    //                                     'updated_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now,
-    //                                     'created_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now, //
-    //                                 ],
-    //                                 '$setOnInsert' => [
-    //                                     'transcation_id' => $stamp_indicator_id,
-    //                                     'allrow' => $allRow,
-    //                                     'status' => 1,
-
-    //                                     'created_by' => "system",
-    //                                     'deleted_at' => null,
-    //                                     'transaction_date' => date("Y-m-d"),
-    //                                     'source' => "misp",
-    //                                     'creator_org' => $valueEvent["orgc_id"]
-    //                                 ],
-    //                             ],
-    //                             ['upsert' => true]
-    //                         );
-
-    //                         $update_fx_transaction_otx_indicators_data = $col_fx_transaction_otx_indicators_data->updateOne(
-    //                             ['indicator_id' => "misp." . @$value["id"]],
-    //                             [
-    //                                 '$set' => [
-    //                                     'indicator' => @$value["value"],
-    //                                     'type' => @$value["type"],
-    //                                     'tile' => null,
-    //                                     'desciption' => null,
-    //                                     'slug' => null,
-    //                                     'name' => null,
-    //                                     'updated_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now,
-    //                                     'updated_by' => "system",
-    //                                     'transcation_id' => $stamp_indicator_id,
-    //                                     'created_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now, //
-    //                                 ],
-    //                                 '$setOnInsert' => [
-    //                                     'status' => 1,
-
-    //                                     'created_by' => "system",
-    //                                     'deleted_at' => null,
-    //                                     'transaction_date' => date("Y-m-d"),
-    //                                     'source' => "misp",
-    //                                 ],
-    //                             ],
-    //                             ['upsert' => true]
-    //                         );
-
-    //                         $update_fx_otx_type = $col_fx_otx_type->updateOne(
-    //                             [
-    //                                 'name' => @$value["type"],
-    //                             ],
-    //                             [
-    //                                 '$setOnInsert' => [
-    //                                     'transcation_id' => null,
-    //                                     'updated_at' => $date_now,
-    //                                     'updated_by' => "system",
-    //                                     'slug' => null,
-    //                                     'description' => null,
-    //                                     'code' => generator_uuid(),
-    //                                     'remark' => "system",
-    //                                     'element_count' => 0,
-    //                                     'status' => 1,
-    //                                     'created_at' => $date_now,
-    //                                     'created_by' => "system",
-    //                                     'deleted_at' => null,
-    //                                     'source' => 'misp',
-    //                                 ],
-    //                             ],
-    //                             ['upsert' => true]
-    //                         );
-    //                     }
-    //                     //   print_r($value);
-    //                     echo  'indicator_id:' . "misp." . @$value["id"] . '|' . "misp." . @$valueEvent["id"] . '|indicator:' . @$value["value"];
-    //                     //   break;
-    //                     $pulse_id  = "misp." . $valueEvent["id"];
-    //                     $indicator_id  =  "misp." . $value["id"];
-    //                     $update_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->updateOne(
-    //                         [
-    //                             'indicator_id' => $indicator_id,
-    //                             'pulse_id' =>  $pulse_id,
-
-    //                         ],
-    //                         [
-    //                             '$set' => [
-    //                                 'pulse_modified' => isset($valueEvent["date"]) ? new UTCDateTime($valueEvent["publish_timestamp"] * 1000) : null,
-    //                                 'role' => @$value["category"],
-    //                                 'created' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : null,
-    //                                 'expiration' => null,
-    //                                 'is_active' => 1,
-    //                                 // 'indicator' => $value["value"],
-    //                                 //'type' => $value["type"],
-    //                             ],
-    //                             '$setOnInsert' => [
-    //                                 'status' => 1,
-    //                                 'created_at' => $date_now,
-    //                                 'created_by' => "system",
-    //                                 'deleted_at' => null,
-    //                                 'transaction_date' => date("Y-m-d"),
-    //                                 'updated_at' => $date_now,
-    //                                 'updated_by' => "system",
-    //                                 'source' => "misp",
-    //                                 'indicator' => $value["value"],
-    //                                 'type' => $value["type"],
-    //                                 'is_count_attr' => 1,
-    //                                 'creator_org' => $valueEvent["orgc_id"],
-    //                             ],
-    //                         ],
-    //                         ['upsert' => true]
-    //                     );
-    //                     //  print_r($value);
-    //                     //  echo  'indicator_id:'.@$value["id"].'|'. "misp." . @$valueEvent["id"].'|indicator:'.@$value["value"];
-    //                     //   break;
-
-    //                     $this->info("Saving.....");
-    //                 }
-    //             }
-    //         } catch (Exception $e) {
-    //             echo 'Caught exception: ',  $e->getMessage(), "\n";
-    //         }
-
-    //         return $data;
-    //     }
+                throw $e; // ถ้าครบ maxTry แล้วยัง error ก็โยนออกไป
+            }
+        }
+    }
 }

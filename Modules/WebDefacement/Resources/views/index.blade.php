@@ -710,7 +710,6 @@
                     const hashPct = Math.max(0, Math.min(100, parseFloat(item.score) || 0));
                     const sizePct = Math.max(0, Math.min(100, parseFloat(item.filesize) || 0));
                     const elemPct = Math.max(0, Math.min(100, parseFloat(item.element) || 0));
-                    
 
                     let score = parseFloat(item.detection_score_all) || 0;
                     if (score >= 0 && score <= 1) score = score * 100;
@@ -720,10 +719,10 @@
                         target,
                         [
                         ['Hash', parseFloat(item.score) || 0],
-                        ['Filesize', parseFloat(item.filesize_percent) || 0],
-                        ['Element', parseFloat(item.element_percent) || 0],
-                        ['Blacklist', parseFloat(item.blacklist_percent) || 0],
-                        ['Image', parseFloat(item.image_percent) || 0], 
+                        ['Filesize', (parseFloat(item.filesize_percent) >= 1 ? parseFloat(item.filesize_percent) : 0)],
+                        ['Element', (parseFloat(item.element_percent) >= 1 ? parseFloat(item.element_percent) : 0)],
+                        ['Blacklist', (parseFloat(item.blacklist_percent) >= 1 ? parseFloat(item.blacklist_percent) : 0)],
+                        ['Image', (parseFloat(item.image_percent) >= 1 ? parseFloat(item.image_percent) : 0)],
                         ],
                         score,
                         {
@@ -734,14 +733,16 @@
                             Blacklist: '#ff0202ff',
                             Image: '#f18f17ff'      
                             },
-                            titleSize: 15,              
+                            titleSize: 15,    
+                            clampData: false,
+                            normalize: false
                         }
                     );
                     }
 
 
                 } else {
-                    console.log("📌 ไม่มีการเปลี่ยนแปลง ไม่อัปเดต DOM");
+                    
                 }
             },
             error: function (xhr) {
@@ -1283,97 +1284,109 @@
 
 
 
-const __wdfmCharts = window.__wdfmCharts || (window.__wdfmCharts = new Map());
+    const __wdfmCharts = window.__wdfmCharts || (window.__wdfmCharts = new Map());
 
-function chart_c3(bindTo, columns, scoreRaw, opts = {}) {
-  const el = document.querySelector(bindTo);
-  if (!el) return;
+        function chart_c3(bindTo, columns, scoreRaw, opts = {}) {
+    const el = document.querySelector(bindTo);
+    if (!el) return;
 
-  let select_tt_color = '#111827';
-  if (scoreRaw){
-    if (scoreRaw <80 ) {
-      select_tt_color = '#847070ff';
-      }
-    else if (scoreRaw >= 80 && scoreRaw <=100) {
-      select_tt_color = '#ff0000ff';
+    let select_tt_color = '#111827';
+    if (scoreRaw) {
+        if (scoreRaw < 80) {
+            select_tt_color = '#847070ff';
+        } else if (scoreRaw >= 80 && scoreRaw <= 100) {
+            select_tt_color = '#ff0000ff';
+        }
     }
-  }
 
-  const defaultOpts = {
-    colors: {
-      Hash: '#2D7BD8',     
-      Filesize: '#10B981', 
-      Element: '#F59E0B'   
-    },
+    const defaultOpts = {
+        colors: {
+            Hash: '#2D7BD8',
+            Filesize: '#10B981',
+            Element: '#F59E0B'
+        },
 
-    colorPattern: ['#2D7BD8', '#10B981', '#F59E0B'],
+        colorPattern: ['#2D7BD8', '#10B981', '#F59E0B'],
 
-    titleSize: 14,        
-    titleColor: select_tt_color,
-    donutWidth: 18,       
-    normalize: true,     
-    clamp01To100: true    
-  };
-  const cfg = Object.assign({}, defaultOpts, opts);
+        titleSize: 14,
+        titleColor: select_tt_color,
+        donutWidth: 18,
 
-  if (__wdfmCharts.has(bindTo)) {
-    try { __wdfmCharts.get(bindTo).destroy(); } catch (e) {}
-    __wdfmCharts.delete(bindTo);
-  }
+        normalize: true,      
+        clamp01To100: true,    
+        clampData: true        
+    };
 
-  const toPct = (v) => {
-    let n = Number(v);
-    if (!isFinite(n)) n = 0;
-    if (cfg.clamp01To100 && n >= 0 && n <= 1) n *= 100;
-    n = Math.max(0, Math.min(100, n));
-    return n;
-  };
+    const cfg = Object.assign({}, defaultOpts, opts);
 
-  let clean = (columns || []).map(([name, val]) => [name, toPct(val)]);
 
-  if (cfg.normalize) {
-    const sum = clean.reduce((s, [, v]) => s + v, 0);
-    if (sum > 0) clean = clean.map(([k, v]) => [k, (v / sum) * 100]);
-  }
+    if (__wdfmCharts.has(bindTo)) {
+        try { __wdfmCharts.get(bindTo).destroy(); } catch (e) {}
+        __wdfmCharts.delete(bindTo);
+    }
 
-  let centerPct = toPct(scoreRaw);
+    const toPctData = (v) => {
+        let n = Number(v);
+        if (!isFinite(n)) n = 0;
+        if (cfg.clampData && cfg.clamp01To100 && n >= 0 && n <= 1) n *= 100; 
+        n = Math.max(0, Math.min(100, n));
+        return n;
+    };
 
-  const chartId = bindTo.replace('#', '');
-  const styleId = `style_${chartId}_title`;
-  if (!document.getElementById(styleId)) {
-    const style = document.createElement('style');
-    style.id = styleId;
-    style.textContent = `
-      #${chartId} .c3-chart-arcs-title {
-        font-size: ${cfg.titleSize}px !important;
-        line-height: 1;
-        font-weight: 600;
-        fill: ${cfg.titleColor} !important;
-      }
-    `;
-    document.head.appendChild(style);
-  }
+    const toPctScore = (v) => {
+        let n = Number(v);
+        if (!isFinite(n)) n = 0;
+        if (n >= 0 && n <= 1) n *= 100;  
+        n = Math.max(0, Math.min(100, n));
+        return n;
+    };
 
-  const chart = c3.generate({
-    bindto: bindTo,
-    data: {
-      columns: clean,
-      type: 'donut',
-      colors: cfg.colors || null
-    },
-    color: cfg.colors ? {} : { pattern: cfg.colorPattern },
-    donut: {
-      title: Math.round(centerPct) + '%',
-      width: cfg.donutWidth
-    },
-    tooltip: {
-      format: { value: v => Math.round(v) + '%' }
-    },
-    transition: { duration: 300 }
-  });
+    let clean = (columns || []).map(([name, val]) => [name, toPctData(val)]);
 
-  __wdfmCharts.set(bindTo, chart);
+    if (cfg.normalize) {
+        const sum = clean.reduce((s, [, v]) => s + v, 0);
+        if (sum > 0) clean = clean.map(([k, v]) => [k, (v / sum) * 100]);
+    }
+
+    let centerPct = toPctScore(scoreRaw);
+
+    const chartId = bindTo.replace('#', '');
+    const styleId = `style_${chartId}_title`;
+    if (!document.getElementById(styleId)) {
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = `
+        #${chartId} .c3-chart-arcs-title {
+            font-size: ${cfg.titleSize}px !important;
+            line-height: 1;
+            font-weight: 600;
+            fill: ${cfg.titleColor} !important;
+        }
+        `;
+        document.head.appendChild(style);
+    }
+
+    const chart = c3.generate({
+        bindto: bindTo,
+        data: {
+            columns: clean,
+            type: 'donut',
+            colors: cfg.colors || null
+        },
+        color: cfg.colors ? {} : { pattern: cfg.colorPattern },
+        donut: {
+            title: Math.round(centerPct) + '%',
+            width: cfg.donutWidth
+        },
+        tooltip: {
+            format: { value: v => Math.round(v) + '%' } 
+        },
+        transition: { duration: 300 }
+    });
+
+    __wdfmCharts.set(bindTo, chart);
 }
+
 
     $('#tags').select2({
         tags: true,          

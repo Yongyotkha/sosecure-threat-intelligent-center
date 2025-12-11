@@ -935,7 +935,6 @@ class SocialController extends Controller
     {
         $feedTable = 'data_leak_feed';
         $socialRefTable = 'data_leak_socail_ref';
-        $credentialRefTable = 'credential_leak_ref';
 
         // ───── Role & Site Logic ─────
         $get_role = @get_role_custom();
@@ -971,35 +970,17 @@ class SocialController extends Controller
                 DB::raw("'social_ref' as ref_type")
             );
 
-        // ───── Credential Ref ─────
-        $qCredential = DB::table("{$credentialRefTable} as r")
-            ->join("{$feedTable} as f", 'r.data_leak_feed_id', '=', 'f.id')
-            ->where('f.feel_type', 'credential')
-            ->whereNull('r.deleted_at')
-            ->select(
-                'r.id as ref_id',
-                'r.site_id',
-                'r.status_monitoring',
-                'r.serverity',
-                'f.keyword',
-                'f.feedtimepost',
-                DB::raw("'credential_ref' as ref_type")
-            );
-
         // ───── Filter by role/site ─────
         if (!$isSuperAdmin && $hasRoleSiteLimit) {
             $qSocial->whereIn('r.site_id', $site_ids);
-            $qCredential->whereIn('r.site_id', $site_ids);
         }
 
         if ($selectedSite) {
             $qSocial->where('r.site_id', $selectedSite);
-            $qCredential->where('r.site_id', $selectedSite);
         }
 
-        // ───── รวมสองตาราง ─────
-        $union = $qSocial->unionAll($qCredential);
-        $q = DB::query()->fromSub($union, 'u');
+        // ───── Main Query ─────
+        $q = DB::query()->fromSub($qSocial, 'u');
 
         // ───── Filter by date (NEW) ─────
         if ((int)$request->isDateSearch === 1 && $request->startDate && $request->endDate) {
@@ -1032,13 +1013,6 @@ class SocialController extends Controller
             ->count();
 
         // ───── STATUS COUNTS ─────
-        // $number_in_progress = (clone $base)
-        //     ->where(function ($q) {
-        //         $q->whereRaw('LOWER(u.status_monitoring) = ?', ['in_progress'])
-        //             ->orWhereNull(DB::raw('u.status_monitoring'));
-        //     })
-        //     ->count();
-
         $number_in_progress = (clone $base)
             ->whereRaw("LOWER(u.status_monitoring) = 'in_progress'")
             ->count();
