@@ -36,7 +36,7 @@ class MDCVEFeedOnline extends Command
         $this->info("=== 🟢 Starting MDCVEFeedOnline (Safe Mode) ===");
 
         $startTime = microtime(true);
-        $sitesUpdated = [];   // <-- ใช้ track site ที่มี mapping ใหม่
+        $sitesUpdated = [];  
 
         try {
             $client = new Client([

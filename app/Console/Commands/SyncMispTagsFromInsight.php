@@ -54,6 +54,11 @@ class SyncMispTagsFromInsight extends Command
 
         $this->info("Start (window={$windowH}h, overlap={$overlapMin}m) using imported_at >= {$fromStr}" . ($dry ? ' [DRY]' : ''));
 
+        // Preload tags เพื่อลด query
+        if (!$dry) {
+            $svc->preloadTags();
+        }
+
         $total = 0;
         $capped = false;
 
@@ -88,8 +93,12 @@ class SyncMispTagsFromInsight extends Command
         $cpCol,
         $dry
     ) {
-        $this->info("DEBUG current_time=" . now('Asia/Bangkok')->format('Y-m-d H:i:s'));
-        $this->info("DEBUG using fromStr=" . $fromStr);
+        // เตรียม MongoDB connection สำหรับ fx_otx_events
+        $mongo = new MongoClient(config('app.DB_MONGO_DEV'));
+        $fxEventsCol = $mongo->sosecure_threatintelligent->fx_otx_events;
+        
+        // Cache fx_otx_events documents เพื่อไม่ต้อง query ซ้ำ
+        $fxDocCache = [];
 
         if ($remainCap <= 0) return 0;
 
@@ -114,7 +123,8 @@ class SyncMispTagsFromInsight extends Command
                     ['status' => ['$ne' => 'done']],
                     ['status' => ['$exists' => false]],
                 ]],
-                ['imported_at' => ['$gte' => $fromStr]],
+                // ชั่วคราว: comment เพื่อทดสอบ (ประมวลผลทั้งหมดไม่สนใจเวลา)
+                // ['imported_at' => ['$gte' => $fromStr]],
             ]
         ];
 
@@ -145,7 +155,7 @@ class SyncMispTagsFromInsight extends Command
                     'limit'           => $limitThis,
                     'batchSize'       => $batchSize,
                     'noCursorTimeout' => true,
-                    'hint'            => 'status_importedAt__id',
+                    'sort'            => ['_id' => 1],  // เรียงตาม _id (เก่า → ใหม่)
                     'typeMap'         => ['root' => 'array', 'document' => 'array'],
                 ]
             );
@@ -156,10 +166,14 @@ class SyncMispTagsFromInsight extends Command
                 $processed++;
                 $lastId = (string) $doc['_id'];
 
-                $this->handleOne($col, $scope, $doc, $svc, $dry);
+                $this->handleOne($col, $scope, $doc, $svc, $dry, $fxEventsCol, $fxDocCache);
 
                 if ($sleepMs > 0) usleep($sleepMs * 1000);
-                if ($processed % $this->gcEvery === 0) gc_collect_cycles();
+                if ($processed % $this->gcEvery === 0) {
+                    gc_collect_cycles();
+                    // เคลียร์ cache ทุก 500 records เพื่อไม่ให้ใช้ memory มากเกินไป
+                    $fxDocCache = [];
+                }
                 if ($processed >= $remainCap) break;
             }
 
@@ -171,7 +185,7 @@ class SyncMispTagsFromInsight extends Command
 
 
 
-    private function handleOne($col, $scope, array $doc, MispTagService $svc, $dry)
+    private function handleOne($col, $scope, array $doc, MispTagService $svc, $dry, $fxEventsCol, &$fxDocCache)
     {
         $id      = (string) $doc['_id'];
         $pulseId = isset($doc['event_id']) ? (string) $doc['event_id'] : '';
@@ -187,9 +201,37 @@ class SyncMispTagsFromInsight extends Command
                 $this->line("DRY: event {$id} update('{$pulseId}','{$tags}')");
                 return;
             }
+            
+            // ข้ามถ้าไม่มี tags (ว่างหรือมีแต่ช่องว่าง)
+            if (empty(trim($tags))) {
+                $this->line("⏭️  Skip event {$id}: no tags");
+                $this->markDone($col, $id);
+                return;
+            }
+            
+            $this->info("Processing event {$id}: pulse_id={$pulseId}, tags={$tags}");
+            
             try {
-                $ok = $svc->update($pulseId, $tags);
+                // ใช้ cache หรือ query ถ้ายังไม่มี
+                if (!isset($fxDocCache[$pulseId])) {
+                    $fxDocCache[$pulseId] = $fxEventsCol->findOne(['pulse_id' => $pulseId], ['typeMap' => ['root' => 'array', 'document' => 'array']]);
+                }
+                $fxDoc = $fxDocCache[$pulseId];
+                
+                if (!$fxDoc) {
+                    $this->markFailed($col, $id, 'fx_otx_events not found');
+                    return;
+                }
+                
+                $ok = $svc->update($pulseId, $tags, $fxDoc);
+                
+                if ($ok) {
+                    $this->info("✅ Event {$id} updated successfully");
+                } else {
+                    $this->warn("⚠️ Event {$id} update returned false");
+                }
             } catch (\Exception $e) {
+                $this->error("❌ Event {$id} error: " . $e->getMessage());
                 $this->markFailed($col, $id, $e->getMessage());
                 return;
             }
@@ -204,8 +246,26 @@ class SyncMispTagsFromInsight extends Command
                 $this->line("DRY: ind {$id} updateFromIndicator('{$pulseId}','{$attrId}','{$attrTags}')");
                 return;
             }
+            
+            // ข้ามถ้าไม่มี tags
+            if (empty(trim($attrTags))) {
+                $this->line("⏭️  Skip indicator {$id}: no tags");
+                $this->markDone($col, $id);
+                return;
+            }
+            
             try {
-                $ok = $svc->updateFromIndicator($pulseId, $attrId, $attrTags);
+                // ใช้ cache หรือ query ถ้ายังไม่มี
+                if (!isset($fxDocCache[$pulseId])) {
+                    $fxDocCache[$pulseId] = $fxEventsCol->findOne(['pulse_id' => $pulseId], ['typeMap' => ['root' => 'array', 'document' => 'array']]);
+                }
+                $fxDoc = $fxDocCache[$pulseId];
+                
+                if (!$fxDoc) {
+                    $this->markFailed($col, $id, 'fx_otx_events not found');
+                    return;
+                }
+                $ok = $svc->updateFromIndicator($pulseId, $attrId, $attrTags, $fxDoc);
             } catch (\Exception $e) {
                 $this->markFailed($col, $id, $e->getMessage());
                 return;

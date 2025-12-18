@@ -440,7 +440,7 @@ class MDMISPFeedDaily_Database_Dev extends Command
                                     'type' => @$value["type"],
                                     'updated_by' => "system",
                                     'updated_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now,
-                                    'created_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now, //
+                                    'created_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now, 
                                 ],
                                 '$setOnInsert' => [
                                     'transcation_id' => '',
@@ -469,7 +469,7 @@ class MDMISPFeedDaily_Database_Dev extends Command
                                     'updated_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now,
                                     'updated_by' => "system",
                                     'transcation_id' => '',
-                                    'created_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now, //
+                                    'created_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now, 
                                 ],
                                 '$setOnInsert' => [
                                     'status' => 1,

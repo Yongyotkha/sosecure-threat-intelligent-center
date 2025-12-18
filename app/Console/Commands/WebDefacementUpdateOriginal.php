@@ -3,18 +3,32 @@
 namespace App\Console\Commands;
 
 use Exception;
-use GuzzleHttp\Client;
+// use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use MongoDB\BSON\UTCDateTime;
 use App\Console\Commands\compareImages;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
 use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
-use Modules\WebDefacement\Entities\TestHTMLWeb;
-use Modules\Webdefacement\Entities\WebdefacmentDataCheck;
-use Illuminate\Support\Facades\Log;
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\CssSelector\CssSelectorConverter; // ถ้าใช้ selector ของ DomCrawler ด้วย
 
+use Modules\WebDefacement\Entities\WebdefacmentImageMark;
+use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
+use Modules\WebDefacement\Entities\WebdefacmentDataLog;
+use App\Entities\TransactionBatchjob;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\DefacementAlertMail;
+use Symfony\Component\DomCrawler\Crawler;
+use Modules\WebDefacement\Entities\TestHTMLWeb;
+use PHPUnit\Framework\Test;
+use App\Services\WebDefacementService;
+use Spatie\Browsershot\Browsershot;
+use Symfony\Component\Panther\Client;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
+use Symfony\Component\Panther\ChromeOptions;
+use Nesk\Puphpeteer\Puppeteer;
 
 class WebDefacementUpdateOriginal extends Command
 {
@@ -24,7 +38,7 @@ class WebDefacementUpdateOriginal extends Command
      * @var string
      */
 
-    protected $signature = 'app:WebDefacementUpdateOriginal{webdefacment_id}';
+    protected $signature = 'app:WebDefacementUpdateOriginal {webdefacment_id}';
 
     /**
      * The console command description.
@@ -51,412 +65,299 @@ class WebDefacementUpdateOriginal extends Command
      */
     public function handle()
     {
-        $result = array();
+        Log::info('[UpdateOriginal] start: ' . date("Y-m-d H:i:s"));
+        ini_set('memory_limit', '2048M');
+
+        $result = [
+            "Result" => 0,
+            "message" => "unknown",
+        ];
+
         $webdefacment_id = $this->argument('webdefacment_id');
-        $WebdefacmentSetting_data =    WebdefacmentSetting::find($webdefacment_id);
-        if ($WebdefacmentSetting_data) {
-            $WebdefacmentDataOriginal_data =    WebdefacmentDataOriginal::where('webdefacment_setting_id', $webdefacment_id)->first();
-            if (!$WebdefacmentDataOriginal_data) {
-                $WebdefacmentDataOriginal_save = new WebdefacmentDataOriginal;
-                $WebdefacmentDataOriginal_save->webdefacment_setting_id = $webdefacment_id;
-                $WebdefacmentDataOriginal_save->save();
-                $WebdefacmentDataOriginal_data =    WebdefacmentDataOriginal::where('webdefacment_setting_id', $webdefacment_id)->first();
-            }
-            $url = $WebdefacmentSetting_data->url;
-            $Keyword_check = array();
-
-
-
-
-            if ($this->is_url($url)) {
-                $result["Result"] = 1;
-                $result["message"] = "";
-                $result['hash_code'] = "";
-                $result["file_size"] = 0;
-                $result["all_element"] = 0;
-                $result['image_url'] = "";
-                $result["image_path_original"] = "";
-                $response   = $this->getHtml($url);
-                if ($response['content'] === FALSE) {
-                    $webContent = "";
-                    $result["Result"] = 0;
-                    $result["message"] = "Html not found";
-                } else {
-                    $webContent = $response['content'];
-
-                    // if ($webdefacment_id == 167) {
-                    //     $webContent = TestHTMLWeb::testHTML();
-                    //     // Log::info($webContent);
-                    // } else {
-                    //     $webContent = $response['content'];
-                    // }
-
-                    try {
-                        $selectors = json_decode($WebdefacmentSetting_data->hash_selectors ?: '[]', true) ?: ["header", "nav", "main", "#content", ".entry-content", "footer"];
-                        $ignores   = json_decode($WebdefacmentSetting_data->hash_ignore_selectors ?: '[]', true) ?: [
-                            ".time",
-                            ".date",
-                            ".timestamp",
-                            ".counter",
-                            ".views",
-                            ".carousel",
-                            ".slider",
-                            ".ticker",
-                            ".marquee",
-                            ".ads",
-                            ".advert",
-                            ".banner",
-                            "#cookie-consent",
-                            ".toast",
-                            ".modal",
-                            ".live",
-                            ".countdown"
-                        ];
-                        $whitelist = json_decode($WebdefacmentSetting_data->domain_whitelist ?: '[]', true) ?: [];
-                        $allowPat  = json_decode($WebdefacmentSetting_data->asset_allow_patterns ?: '[]', true) ?: [
-                            '\\.css$',
-                            '\\.js$',
-                            '\\.mjs$',
-                            '\\.(png|jpe?g|gif|webp|svg)$',
-                            '\\.(woff2?|ttf|otf|eot)$',
-                            '^/assets/',
-                            '^/static/',
-                            '^/build/',
-                            '^/dist/'
-                        ];
-                        $domNorm      = $this->normalizeHtml($webContent, $ignores);
-                        $sectionsText = $this->sectionsText($domNorm, $selectors);
-                        $sectionsHtml = $this->sectionsHtml($domNorm, $selectors);
-                        $textAll      = implode("\n", array_values($sectionsText));
-
-                        $c = new \Symfony\Component\DomCrawler\Crawler($domNorm);
-                        $cnt = [
-                            'footer'  => $c->filter('footer')->count(),
-                            '#footer' => $c->filter('#footer')->count(),
-                            '.footer' => $c->filter('.footer')->count(),
-                            '#main'   => $c->filter('#main')->count(),
-                            '.main'   => $c->filter('.main')->count(),
-                            'body'    => $c->filter('body')->count(),
-                            'content' => $c->filter('contents')->count(),
-                            '.entry-content' => $c->filter('.entry-content')->count(),
-                            'nav'     => $c->filter('nav')->count(),
-                            'header'  => $c->filter('header')->count(),
-                            'main'    => $c->filter('main')->count(),
-                            '#content' => $c->filter('#content')->count(),
-                            '.contents' => $c->filter('.contents')->count(),
-                        ];
-                        // \Log::debug('[SELS.footer] '.json_encode($cnt));
-
-
-                        // 2.1 Fallback ถ้า selectors ไม่โดนเลย → เอา body ทั้งก้อนมาใช้
-                        if (trim($textAll) === '') {
-                            $crawler = new \Symfony\Component\DomCrawler\Crawler($domNorm);
-                            if ($crawler->filter('body')->count()) {
-                                $fallbackText   = trim(preg_replace('/\s+/', ' ', $crawler->filter('body')->text(' ')));
-                                $sectionsText   = ['__fallback_body__' => $fallbackText];
-                                $sectionsHtml   = $crawler->filter('body')->html();
-                                $selectors      = ['body']; // จะถูกบันทึกลง snapshot/baseline
-                            } else {
-                                $fallbackText   = trim(preg_replace('/\s+/', ' ', strip_tags($domNorm)));
-                                $sectionsText   = ['__fallback_all__' => $fallbackText];
-                                $sectionsHtml   = $domNorm;
-                                $selectors      = ['__all__'];
-                            }
-                            $textAll = implode("\n", array_values($sectionsText));
-                            $result['_selectors_fallback_used'] = true;
-                        }
-
-                        // 3) digests (per-section + merkle + simhash) — เหมือนเดิม
-                        $secDigNow = [];
-                        foreach ($sectionsText as $sel => $txt) {
-                            $secDigNow[$sel] = $this->sha256($txt);
-                        }
-                        // จัดเรียงตามชื่อ selector ให้คงที่ทุกครั้ง
-                        $secDigSorted = $secDigNow;
-                        ksort($secDigSorted, SORT_NATURAL);
-                        $merkleNow = $this->merkleCanonical($secDigNow);
-                        // $merkleNow = $this->merkleRoot(array_values($secDigSorted));
-
-                        // (แนะนำ) เก็บไว้ debug ด้วย จะเห็นว่าใช้ leaves อะไรและลำดับไหน
-                        $result['_merkle_leaves'] = $secDigSorted;
-
-
-                        // $merkleNow = $this->merkleRoot(array_values($secDigNow));
-                        // $simNowHex = $this->simhash64_hex($textAll);
-
-                        // ===== ใช้ข้อความจากทั้งหน้าเว็บเพื่อทำ simhash =====
-                        $crawler = new \Symfony\Component\DomCrawler\Crawler($domNorm);
-                        if ($crawler->filter('body')->count()) {
-                            // เอาเฉพาะข้อความใน body แล้ว normalize ช่องว่าง
-                            $textFullPage = trim(preg_replace('/\s+/', ' ', $crawler->filter('body')->text(' ')));
-                        } else {
-                            // fallback ถ้าไม่มี <body>
-                            $textFullPage = trim(preg_replace('/\s+/', ' ', strip_tags($domNorm)));
-                        }
-
-                        // simhash ของ "ทั้งหน้าเว็บ"
-                        $simNowHex = $this->simhash64_hex($textFullPage);
-
-                        Log::debug('defacement.simhash.fullpage', [
-                            'text_length' => strlen($textFullPage),
-                            'simNowHex'   => $simNowHex,
-                        ]);
-
-
-
-                        // 4) !! เปลี่ยนตรงนี้ !!  ดึง assets/outbound จาก “ทั้งหน้าเดิม” ไม่ใช่เฉพาะ sections
-                        list($assetsAllFull, $outboundNow) = $this->assetsAndOutboundFromHtml($webContent, $url);
-                        $assetsNow = [];
-                        foreach ($assetsAllFull as $a) {
-                            foreach ($allowPat as $pat) {
-                                if (@preg_match('/' . $pat . '/', $a)) {
-                                    $assetsNow[] = $a;
-                                    break;
-                                }
-                            }
-                        }
-                        sort($assetsNow);
-
-                        // 5) โหลด baseline (กัน null/invalid)
-                        $baselineSec = json_decode($WebdefacmentSetting_data->baseline_section_hashes ?? '{}', true);
-                        if (!is_array($baselineSec)) {
-                            $baselineSec = [];
-                        }
-                        $baselineMerkle = $WebdefacmentSetting_data->baseline_merkle ?: '';
-                        $baselineSimHex = $WebdefacmentSetting_data->baseline_text_fuzzy ?: '0000000000000000';
-                        $assetsBase     = json_decode($WebdefacmentSetting_data->baseline_assets ?? '[]', true);
-                        if (!is_array($assetsBase))  $assetsBase = [];
-                        $outBase        = json_decode($WebdefacmentSetting_data->baseline_outbound ?? '[]', true);
-                        if (!is_array($outBase))     $outBase = [];
-
-                        $isFirstBaseline = true;
-
-                        // 5.1 baseline รอบแรก
-                        if ($isFirstBaseline) {
-                            $setting = \Modules\WebDefacement\Entities\WebdefacmentSetting::find($webdefacment_id);
-                            if ($setting) {
-                                // --- canonical merkle (เรียงคีย์ในฟังก์ชัน merkleCanonical อยู่แล้ว) ---
-                                $baselineMerkleCanonical = $this->merkleCanonical($secDigNow);
-
-                                $setting->hash_scope              = 'sections';
-                                $setting->hash_selectors          = json_encode($selectors, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-                                $setting->hash_ignore_selectors   = json_encode($ignores,   JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-                                $setting->baseline_section_hashes = json_encode($secDigNow, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-                                $setting->baseline_merkle         = $baselineMerkleCanonical;   // ← canonical
-                                $setting->baseline_text_fuzzy     = $simNowHex;                 // ← HEX 16 ตัว
-                                $setting->baseline_assets         = json_encode($assetsNow,   JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-                                $setting->baseline_h_assets       = $this->sha256(implode('', $assetsNow));
-                                $setting->baseline_outbound       = json_encode($outboundNow, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-                                $setting->baseline_h_outbound     = $this->sha256(implode('', $outboundNow));
-                                $setting->save();
-                            }
-
-                            // ใช้ค่าเดียวกับที่เพิ่งเซฟ (หลีกเลี่ยง $merkleNow ที่อาจไม่ canonical)
-                            $baselineSec    = $secDigNow;
-                            $baselineMerkle = isset($baselineMerkleCanonical) ? $baselineMerkleCanonical : $this->merkleCanonical($secDigNow);
-                            $baselineSim    = $simNowHex;
-                            $assetsBase     = $assetsNow;
-                            $outBase        = $outboundNow;
-                        }
-
-
-                        // 6) diff per-section — adopt key ใหม่อัตโนมัติ
-                        $sectionDiffs   = [];
-                        $baselineSecMut = $baselineSec;
-                        $adopted        = false;
-
-                        foreach ($secDigNow as $sel => $h) {
-                            if (!array_key_exists($sel, $baselineSecMut) || $baselineSecMut[$sel] === null || $baselineSecMut[$sel] === '') {
-                                $baselineSecMut[$sel] = $h;
-                                $sectionDiffs[] = ['section' => $sel, 'old' => $h, 'new' => $h, 'changed' => false, 'note' => 'adopted_missing_baseline'];
-                                $adopted = true;
-                            } else {
-                                $old = $baselineSecMut[$sel];
-                                $sectionDiffs[] = ['section' => $sel, 'old' => $old, 'new' => $h, 'changed' => ($old !== $h)];
-                            }
-                        }
-
-                        $changedCount = 0;
-                        foreach ($sectionDiffs as $d) {
-                            if (!empty($d['changed'])) $changedCount++;
-                        }
-
-                        if ($changedCount === 0 && $merkleNow !== $baselineMerkle) {
-                            // ไม่มี section ไหนเปลี่ยน แต่ root ต่าง → ซิงก์ baseline_merkle ให้ตรง canonical
-                            $setting = \Modules\WebDefacement\Entities\WebdefacmentSetting::find($webdefacment_id);
-                            if ($setting) {
-                                $setting->baseline_merkle = $merkleNow;
-                                $setting->save();
-                            }
-                            $baselineMerkle = $merkleNow;
-                            $reason = 'baseline_merkle_recanonicalized'; // เพื่อระบุในรอบนี้ว่าเป็นการซิงก์ ไม่ใช่เหตุผิดปกติ
-                        }
-
-
-                        if ($adopted) {
-                            $setting = \Modules\WebDefacement\Entities\WebdefacmentSetting::find($webdefacment_id);
-                            if ($setting) {
-                                $setting->baseline_section_hashes = json_encode($baselineSecMut, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-                                $setting->baseline_merkle         = $this->merkleCanonical($baselineSecMut); // ← อัปเดต merkle ของ baseline
-                                $setting->save();
-                            }
-                            $baselineSec    = $baselineSecMut;
-                            $baselineMerkle = $setting->baseline_merkle ?? $this->merkleCanonical($baselineSecMut); // ← sync ตัวแปรในหน่วยความจำด้วย
-                        }
-
-
-
-                        // 7) diff assets/outbound
-                        if ($isFirstBaseline) {
-                            $assets_add = [];
-                            $assets_del = [];
-                            $out_add = [];
-                            $outbound_new_not_whitelisted = [];
-                        } else {
-                            $assets_add = array_values(array_diff($assetsNow,  $assetsBase));
-                            $assets_del = array_values(array_diff($assetsBase, $assetsNow));
-                            $out_add    = array_values(array_diff($outboundNow, $outBase));
-                            $outbound_new_not_whitelisted = array_values(array_diff($out_add, $whitelist));
-                        }
-
-                        // 8) คะแนน/เหตุผล
-                        if ($isFirstBaseline) {
-                            $simBits = 0;
-                            $signals_assets = 0.0;
-                            $signals_outbound = 0.0;
-                            $score = 0.0;
-                            $reason = 'update original';
-                        } else {
-                        }
-
-                        $result = [];
-                        $result['_section_scope']          = 'sections';
-                        $result['_section_selectors']      = $selectors;
-                        $result['_merkle_old']             = $baselineMerkle;
-                        $result['_merkle_new']             = $merkleNow;
-                        $result['_simhash_bits']           = $simBits;
-                        $result['_section_diffs']          = $sectionDiffs;
-                        $result['_assets_add']             = $assets_add;
-                        $result['_assets_del']             = $assets_del;
-                        $result['_outbound_new_not_wl']    = $outbound_new_not_whitelisted;
-                        $result['_score']                  = round($score, 3);
-                        $result['_reason']                 = $reason;
-
-                        $WebdefacmentDataCheck_save = new WebdefacmentDataCheck;
-                        $WebdefacmentDataCheck_save->webdefacment_setting_id = $WebdefacmentSetting_data->id;
-
-                        $WebdefacmentDataCheck_save->scope_snapshot       = $result['_section_scope']        ?? 'sections';
-                        $WebdefacmentDataCheck_save->selectors_snapshot   = json_encode($result['_section_selectors'] ?? [], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-                        $WebdefacmentDataCheck_save->merkle_old           = $result['_merkle_old'] ?? '';
-                        $WebdefacmentDataCheck_save->merkle_new           = $result['_merkle_new'] ?? '';
-                        $WebdefacmentDataCheck_save->simhash_bits         = (int)($result['_simhash_bits'] ?? 0);
-
-                        $WebdefacmentDataCheck_save->section_diffs        = json_encode($result['_section_diffs'] ?? [], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-                        $WebdefacmentDataCheck_save->assets_add           = json_encode($result['_assets_add'] ?? [], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-                        $WebdefacmentDataCheck_save->assets_del           = json_encode($result['_assets_del'] ?? [], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-                        $WebdefacmentDataCheck_save->outbound_new_not_whitelisted = json_encode($result['_outbound_new_not_wl'] ?? [], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-
-                        $WebdefacmentDataCheck_save->score  = (float)($result['_score'] ?? 0);
-                        $WebdefacmentDataCheck_save->reason = $result['_reason'] ?? null;
-
-                        if ($WebdefacmentDataCheck_save->save()) {
-                            Log::info("Save Complete " . "Section Difference: " . json_encode($result['_section_diffs'] ?? [], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE));
-                        }
-                    } catch (Exception $e) {
-                        Log::info($e->getMessage());
-                    }
-
-
-
-                    if ($WebdefacmentSetting_data->hash == 1) {
-                        $hashMD5 = hash($this->hashingAlgorithm, $webContent);
-                        $result['hash_code'] = $hashMD5;
-                    }
-                    if ($WebdefacmentSetting_data->filesize == 1) {
-                        $file_size = strlen($webContent); //filesize
-                        $result["file_size"] = $file_size;
-                    }
-                    if ($WebdefacmentSetting_data->element == 1) {
-                        $allElement = preg_match_all('/<([^\/!][a-z1-9]*)/i', $webContent, $matches);
-                        $result['all_element'] = (int)$allElement;
-                    }
-                    if ($WebdefacmentSetting_data->image_check == 1) {
-
-                        $url_id = $WebdefacmentDataOriginal_data->url_id;
-                        $site_id = $WebdefacmentSetting_data->site_id;
-                        $delay = $WebdefacmentSetting_data->delay_screen_shot_val;
-                        if (!$url_id) {
-                            $url_id = rand(10, 100);
-                        }
-
-                        $result["image_url"] = "/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/image_original.png";
-                        $path_include = base_path() . '/public/screenshot/use/DownloadImage.php';
-                        include_once($path_include);
-                        $downloadImg = new \DownloadImage();
-                        $Path_image = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/image_original.png";
-                        $downloadImg->download($url, $Path_image, $delay);
-                        $result["image_path_original_full"] = $Path_image;
-                        $result["image_path_original"] = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/image_original.png";
-                        $result["url_id"] = $url_id;
-
-
-
-                        $compareMachine = new compareImages($result["image_path_original_full"]);
-                        $image1Hash = $compareMachine->getHasString();
-                        $result["imageHash"] = $image1Hash;
-
-
-                        $WebdefacmentDataOriginal_data->url_id = $result["url_id"];
-                        $WebdefacmentDataOriginal_data->imageHash = $result["imageHash"];
-                    }
-
-
-                    $result_checkDomainHeaders =   $this->checkDomainHeaders($url, 1);
-                    $result_URL_404 =   $this->URL_404($url);
-                    $result["DomainHeaders"] = $result_checkDomainHeaders;
-                    $result["Is_URL_404"] = $result_URL_404;
-                    // $blackListFound = $this->trackKeyWords($webContent,$WebdefacmentSetting_data->blacklist_keyword_content,$Keyword_check);//keyword
-
-                    //$result['blacklist'] = $blackListFound;
-
-
-
-                    $WebdefacmentDataOriginal_data->hash = $result['hash_code'];
-                    $WebdefacmentDataOriginal_data->filesize = $result['file_size'];
-                    $WebdefacmentDataOriginal_data->element = $result['all_element'];
-                    $WebdefacmentDataOriginal_data->image = $result['image_url'];
-                    $WebdefacmentDataOriginal_data->part_image = $result['image_path_original'];
-                    $WebdefacmentDataOriginal_data->last_update = date("Y-m-d H:i:s");
-                    $WebdefacmentDataOriginal_data->updated_at = date("Y-m-d H:i:s");
-                    if ($WebdefacmentDataOriginal_data->save()) {
-                    }
-
-                    $parse = \parse_url($url);
-                    $host = $parse['host']; // prints 'google.com'
-
-                    $WebdefacmentSetting_data->DomainHeaders = json_encode($result_checkDomainHeaders);
-                    $WebdefacmentSetting_data->user_agent = $result_checkDomainHeaders['Server'];
-                    $WebdefacmentSetting_data->domain = $host;
-                    $WebdefacmentSetting_data->save();
-                }
-
-
-
-
-
-                $result["Result"] = 1;
-                $result["message"] = "";
-            } else {
-                $result["Result"] = 0;
-                $result["message"] = "The url is not formatted.";
-            }
-        } else {
-            $result["Result"] = 0;
-            $result["message"] = "No data found.";
+        if (!$webdefacment_id) {
+            $result["message"] = "Missing argument: webdefacment_id";
+            echo json_encode($result);
+            return 0;
         }
-        $result_json_e = json_encode($result);
-        echo $result_json_e;
+
+        try {
+            $WebdefacmentSetting = WebdefacmentSetting::find($webdefacment_id);
+            if (!$WebdefacmentSetting) {
+                $result["message"] = "No WebdefacmentSetting found.";
+                echo json_encode($result);
+                return 0;
+            }
+
+            // ensure Original row
+            $Original = WebdefacmentDataOriginal::where('webdefacment_setting_id', $webdefacment_id)->first();
+            if (!$Original) {
+                $Original = new WebdefacmentDataOriginal();
+                $Original->webdefacment_setting_id = $webdefacment_id;
+                $Original->save();
+                $Original = WebdefacmentDataOriginal::where('webdefacment_setting_id', $webdefacment_id)->first();
+            }
+
+            $url = $WebdefacmentSetting->url;
+            if (!$this->is_url($url)) {
+                $result["message"] = "The url is not formatted.";
+                echo json_encode($result);
+                return 0;
+            }
+
+            // --- ตรวจ web status + เตรียมค่า default config ให้คล้ายตัวอย่าง ---
+            try {
+                $status = $this->checkHttpStatus($url);
+                $WebdefacmentSetting->web_status = ($status === 200) ? 'Up' : 'Down';
+                Log::info("[UpdateOriginal] URL status {$status} : {$url}");
+            } catch (\Throwable $e) {
+                Log::warning("[UpdateOriginal] checkHttpStatus error: {$e->getMessage()}");
+            }
+
+            // default scope/selectors/ignores หากยังไม่เคยตั้ง
+            $WebdefacmentSetting->hash_scope = $WebdefacmentSetting->hash_scope ?: 'sections';
+            $defaultSelectors = [
+                "head",
+                "#header",
+                ".header",
+                "nav",
+                "#nav",
+                ".nav",
+                "main",
+                "#main",
+                ".main",
+                "#content",
+                ".content",
+                "content",
+                ".entry-content",
+                "footer",
+                "#footer",
+                ".footer"
+            ];
+            $WebdefacmentSetting->hash_selectors = $WebdefacmentSetting->hash_selectors ?: json_encode($defaultSelectors, JSON_UNESCAPED_UNICODE);
+
+            $ignores = [
+                "//*[contains(@class,'time')]",
+                "//*[contains(@class,'date')]",
+                "//*[contains(@class,'timestamp')]",
+                "//*[contains(@class,'counter')]",
+                "//*[contains(@class,'view')]",
+                "//*[contains(@class,'carousel')]",
+                "//*[contains(@class,'slider')]",
+                "//*[contains(@class,'ticker')]",
+                "//*[contains(@class,'marquee')]",
+                "//*[contains(@class,'swiper-container')]",
+                "//*[contains(@class,'ads')]",
+                "//*[contains(@class,'advert')]",
+                "//*[contains(@class,'banner')]",
+                "//*[@id='cookie-consent']",
+                "//*[contains(@class,'toast')]",
+                "//*[contains(@class,'modal')]",
+                "//*[contains(@class,'live')]",
+                "//*[contains(@class,'countdown')]",
+                "//*[contains(@class,'slick-track')]",
+                "//*[contains(@class,'slick-slide')]",
+                "//*[contains(@class,'swiper-wrapper')]",
+                "//*[contains(@class,'swiper-slide')]",
+                "//*[contains(@class,'fade')]",
+                "//*[starts-with(@id,'__BVID__')]",
+                "//*[contains(@class,'carousel-inner')]",
+                "//*[contains(@class,'carousel-item')]",
+                "//*[@id='fb-root']",
+                "//*[contains(@class,'fb-customerchat')]",
+                "//*[contains(@class,'popup')]",
+                "//*[contains(@class,'banner')]",
+                "//*[contains(@class,'modal')]"
+            ];
+            $WebdefacmentSetting->hash_ignore_selectors = $WebdefacmentSetting->hash_ignore_selectors ?: json_encode($ignores, JSON_UNESCAPED_SLASHES);
+
+            $WebdefacmentSetting->domain_whitelist     = $WebdefacmentSetting->domain_whitelist     ?: '[]';
+            $WebdefacmentSetting->asset_allow_patterns = $WebdefacmentSetting->asset_allow_patterns ?: '[
+            "\\\\.css$","\\\\.js$","\\\\.mjs$","\\\\.json$",
+            "\\\\.(png|jpe?g|gif|webp|svg)$",
+            "\\\\.(woff2?|ttf|otf|eot)$",
+            "^/assets/","^/static/","^/build/","^/dist/"
+        ]';
+            $WebdefacmentSetting->save();
+
+            // --- ดึง HTML ---
+            $resp = $this->getHtml($url);
+            if ($resp['content'] === FALSE) {
+                $webContent = "";
+                $result["Result"]  = 0;
+                $result["message"] = "Html not found";
+                Log::warning("[UpdateOriginal] Html not found: {$url}");
+                echo json_encode($result);
+                return 0;
+            }
+            $webContent = $resp['content'];
+
+            if ($webdefacment_id == 176 || $webdefacment_id == 173 || $webdefacment_id == 174 || $webdefacment_id == 204 || $webdefacment_id == 209) {
+                $options = [];
+                if ($webdefacment_id == 204) {
+                    $options['userAgent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+                }
+                $response = $this->getHtml3($url, 0, $options);
+                $webContent = $response['content'];
+                // Log::info($response['content']);
+            }
+            // file_put_contents(storage_path('app/dom_raw_original.html'), $webContent);
+
+            
+
+            // === [SECTION MONITOR] สร้าง baseline ครั้งแรก (canonical) ===
+            // 1) selectors/ignores/allow/whitelist
+            $selectors = json_decode($WebdefacmentSetting->hash_selectors ?: '[]', true) ?: ["header", "nav", "main", "#content", ".entry-content", "footer"];
+            $ign      = json_decode($WebdefacmentSetting->hash_ignore_selectors ?: '[]', true) ?: [];
+            $allowPat = json_decode($WebdefacmentSetting->asset_allow_patterns ?: '[]', true) ?: [];
+
+            // 2) normalize + extract
+            $domNorm      = $this->normalizeHtml($webContent, $ign);
+            $sectionsText = $this->sectionsText($domNorm, $selectors);
+            $textAll = trim(implode("\n", array_values($sectionsText)));
+            if ($textAll === '') {
+                // fallback: เอา body หรือ all text
+                $crawler = new \Symfony\Component\DomCrawler\Crawler($domNorm);
+                if ($crawler->filter('body')->count()) {
+                    $fallbackText = trim(preg_replace('/\s+/', ' ', $crawler->filter('body')->text(' ')));
+                    $sectionsText = ['__fallback_body__' => $fallbackText];
+                    $selectors    = ['body'];
+                } else {
+                    $fallbackText = trim(preg_replace('/\s+/', ' ', strip_tags($domNorm)));
+                    $sectionsText = ['__fallback_all__' => $fallbackText];
+                    $selectors    = ['__all__'];
+                }
+            }
+
+            // 3) digests
+            $secDigNow = [];
+            foreach ($sectionsText as $sel => $txt) {
+                $secDigNow[$sel] = $this->sha256($txt);
+            }
+            ksort($secDigNow, SORT_NATURAL);
+            $merkleNow = $this->merkleCanonical($secDigNow);
+
+            // 4) simhash (ทั้งหน้า)
+            $crawler = new \Symfony\Component\DomCrawler\Crawler($domNorm);
+            if ($crawler->filter('body')->count()) {
+                $textFull = trim(preg_replace('/\s+/', ' ', $crawler->filter('body')->text(' ')));
+            } else {
+                $textFull = trim(preg_replace('/\s+/', ' ', strip_tags($domNorm)));
+            }
+            $simNowHex = $this->simhash64_hex($textFull);
+
+            // 5) assets/outbound จาก “ทั้งหน้า”
+            [$assetsAll, $outboundNow] = $this->assetsAndOutboundFromHtml($domNorm, $url);
+            $assetsNow = [];
+            foreach ($assetsAll as $a) {
+                foreach ($allowPat as $pat) {
+                    if (@preg_match('/' . $pat . '/', $a)) {
+                        $assetsNow[] = $a;
+                        break;
+                    }
+                }
+            }
+            sort($assetsNow);
+
+            // 6) หากยังไม่มี baseline → เซ็ต baseline (canonical)
+           
+                $WebdefacmentSetting->hash_scope              = 'sections';
+                $WebdefacmentSetting->hash_selectors          = json_encode($selectors, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+                $WebdefacmentSetting->hash_ignore_selectors   = json_encode($ign,      JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+                $WebdefacmentSetting->baseline_section_hashes = json_encode($secDigNow, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+                $WebdefacmentSetting->baseline_merkle         = $merkleNow;     // canonical
+                $WebdefacmentSetting->baseline_text_fuzzy     = $simNowHex;     // HEX 16 ตัว
+                $WebdefacmentSetting->baseline_assets         = json_encode($assetsNow, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+                $WebdefacmentSetting->baseline_h_assets       = $this->sha256(implode('', $assetsNow));
+                $WebdefacmentSetting->baseline_outbound       = json_encode($outboundNow, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+                $WebdefacmentSetting->baseline_h_outbound     = $this->sha256(implode('', $outboundNow));
+                $WebdefacmentSetting->save();
+            
+
+            // === เก็บค่าพื้นฐานตาม flag เดิม (hash/filesize/element) ===
+            $hash_code = "";
+            if ((int)$WebdefacmentSetting->hash === 1) {
+                $hash_code = hash($this->hashingAlgorithm, $domNorm);
+            }
+            $file_size = ((int)$WebdefacmentSetting->filesize === 1) ? strlen($domNorm) : 0;
+            $all_element = 0;
+            if ((int)$WebdefacmentSetting->element === 1) {
+                $all_element = (int)preg_match_all('/<([^\/!][a-z1-9]*)/i', $domNorm, $m);
+            }
+
+            // === ถ่ายภาพ/แฮชภาพ (เก็บ original) ===
+            $image_url = "";
+            $part_image = "";
+            $imageHash = "";
+            if ((int)$WebdefacmentSetting->image_check === 1) {
+                $url_id = $Original->url_id ?: rand(10, 100);
+                $site_id = $WebdefacmentSetting->site_id;
+                $delay   = $WebdefacmentSetting->delay_screen_shot_val;
+
+                $image_url  = "/images/webdefacment_mages/{$site_id}/{$url_id}/image_original.png";
+                $path_full  = base_path() . "/public/images/webdefacment_mages/{$site_id}/{$url_id}/image_original.png";
+                $part_image = "/public/images/webdefacment_mages/{$site_id}/{$url_id}/image_original.png";
+
+                try {
+                    $path_include = base_path() . '/public/screenshot/use/DownloadImage.php';
+                    include_once($path_include);
+                    $downloadImg = new \DownloadImage();
+                    $downloadImg->download($url, $path_full, $delay);
+
+                    $cmp = new compareImages($path_full);
+                    $imageHash = $cmp->getHasString();
+                    $Original->url_id   = $url_id;
+                    $Original->imageHash = $imageHash;
+                } catch (\Throwable $e) {
+                    Log::warning("[UpdateOriginal] screenshot/hash error: {$e->getMessage()}");
+                }
+            }
+
+            // === Domain headers & 404 ===
+            try {
+                $headers = $this->checkDomainHeaders($url, 1);
+                $is404   = $this->URL_404($url);
+                $parse   = parse_url($url);
+                $host    = $parse['host'] ?? '';
+                $WebdefacmentSetting->DomainHeaders = json_encode($headers);
+                $WebdefacmentSetting->user_agent    = $headers['Server'] ?? ($headers['server'] ?? null);
+                $WebdefacmentSetting->domain        = $host;
+                $WebdefacmentSetting->save();
+            } catch (\Throwable $e) {
+                Log::warning("[UpdateOriginal] domain header check error: {$e->getMessage()}");
+            }
+
+            // === บันทึกค่า Original ===
+            $Original->hash        = $hash_code;
+            $Original->filesize    = $file_size;
+            $Original->element     = $all_element;
+            $Original->image       = $image_url;
+            $Original->part_image  = $part_image;
+            $Original->last_update = date("Y-m-d H:i:s");
+            $Original->updated_at  = date("Y-m-d H:i:s");
+            $Original->save();
+
+            $result = [
+                "Result" => 1,
+                "message" => "",
+                "hash_code" => $hash_code,
+                "file_size" => $file_size,
+                "all_element" => $all_element,
+                "image_url" => $image_url,
+                "part_image" => $part_image,
+                "imageHash" => $imageHash,
+                // "baseline_inited" => $isFirstBaseline ? 1 : 0,
+            ];
+        } catch (\Throwable $e) {
+            Log::error("[UpdateOriginal] error: {$e->getMessage()} @ {$e->getFile()}:{$e->getLine()}");
+            $result["Result"] = 0;
+            $result["message"] = $e->getMessage();
+        }
+
+        echo json_encode($result);
+        Log::info('[UpdateOriginal] done: ' . date("Y-m-d H:i:s"));
+        return 0;
     }
+
 
     private function compareImage2($dirPath, $imgSourcePath, $imgComparePath)
     {
@@ -499,56 +400,109 @@ class WebDefacementUpdateOriginal extends Command
 
         $content = $this->get_dataa($url);
 
+        // \Log::info('Content length: ' . strlen($content));
+        // \Log::info('DIV count: ' . substr_count($content, '<div'));
+        // \Log::info('Preview: ' . mb_substr($content, 0, 500));
+
+
         return array(
             'content' => $content
         );
     }
+    // function get_dataa($url)
+    // {
+    //   $ch = curl_init();
+    //   $timeout = 5;
+    //   curl_setopt($ch, CURLOPT_URL, $url);
+    //   curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0)");
+    //   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    //   curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    //   curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    //   curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+    //   curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    //   curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+    //   $data = curl_exec($ch);
+    //   curl_close($ch);
+    //   return $data;
+    // }
+
     function get_dataa($url)
     {
         $ch = curl_init();
-        $timeout = 5;
+        $connectTimeout = 10; // เวลารอการเชื่อมต่อ
+        $timeout = 60;        // เวลารอโหลดข้อมูลทั้งหมด
+
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0)");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+
+        // ปิด verify ssl ถ้าเว็บใช้ https ที่ cert ไม่ถูกต้อง
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+
+        // ตั้งค่า User-Agent และ header ให้เหมือน browser จริง
+        curl_setopt(
+            $ch,
+            CURLOPT_USERAGENT,
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125 Safari/537.36"
+        );
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language: th-TH,th;q=0.9,en;q=0.8'
+        ]);
+
+        // รองรับ response ที่บีบอัด gzip/deflate
+        curl_setopt($ch, CURLOPT_ENCODING, "");
+
+        // เพิ่ม timeout
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $connectTimeout);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+
         $data = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            \Log::error('cURL error: ' . curl_error($ch));
+        }
+
         curl_close($ch);
         return $data;
     }
 
+
     private function trackKeyWords($webContent, $blacklistKeywords, $Keyword_checks)
     {
         $keywordOK = array();
-        $keywords = explode(',', $blacklistKeywords);
-        foreach ($keywords as $keyword) {
-            $trackFound = $this->CheckKeyword($webContent, $keyword);
-            if (count($trackFound) > 0) {
-                if (count($Keyword_checks) > 0) {
-                    $filtereds = array();
-                    $rows = $Keyword_checks;
-                    foreach ($rows as $index => $columns) {
-                        foreach ($columns as $key => $value) {
-                            if ($key == 'key' && $value == $keyword) {
-                                $filtereds[] = $columns;
+        if ($blacklistKeywords) {
+
+
+            $keywords = explode(',', $blacklistKeywords);
+            foreach ($keywords as $keyword) {
+                $trackFound = $this->CheckKeyword($webContent, $keyword);
+                if (count($trackFound) > 0) {
+                    if (count($Keyword_checks) > 0) {
+                        $filtereds = array();
+                        $rows = $Keyword_checks;
+                        foreach ($rows as $index => $columns) {
+                            foreach ($columns as $key => $value) {
+                                if ($key == 'key' && $value == $keyword) {
+                                    $filtereds[] = $columns;
+                                }
                             }
                         }
-                    }
 
-                    foreach ($trackFound as $position) {
-                        //ถ้ามีให้หาตำแหน่ง
+                        foreach ($trackFound as $position) {
+                            //ถ้ามีให้หาตำแหน่ง
 
-                        if (!in_array($position, array_column($filtereds, 'position'))) {
-                            //ไม่มีอยู่ใน ignore
+                            if (!in_array($position, array_column($filtereds, 'position'))) {
+                                //ไม่มีอยู่ใน ignore
+                                array_push($keywordOK, array("key" => $keyword, "position" => $position));
+                            }
+                        }
+                    } else {
+                        foreach ($trackFound as $position) {
                             array_push($keywordOK, array("key" => $keyword, "position" => $position));
                         }
-                    }
-                } else {
-                    foreach ($trackFound as $position) {
-                        array_push($keywordOK, array("key" => $keyword, "position" => $position));
                     }
                 }
             }
@@ -618,346 +572,142 @@ class WebDefacementUpdateOriginal extends Command
         }
     }
 
-    // ===== Helper: SHA-256 =====
-    private function sha256($s)
+    private function isPageHack($trackList, $pageTransaction, &$totalPoint)
     {
-        return hash('sha256', (string)$s);
-    }
+        $pageIsHack = false;
 
-    // ===== Helper: ดึงข้อความใน <body> แบบ normalize =====
-    private function extractBodyText($html)
-    {
-        // พยายามใช้ DOMDocument เพื่อดึงเฉพาะ body
-        $text = '';
-        if (!is_string($html) || $html === '') return $text;
-        // ป้องกัน warning encoding
-        $internalErrors = libxml_use_internal_errors(true);
-        $dom = new \DOMDocument('1.0', 'UTF-8');
-        // กำหนด meta charset กันภาษาตกหล่น
-        @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_NOWARNING | LIBXML_NOERROR);
-        libxml_clear_errors();
-        libxml_use_internal_errors($internalErrors);
+        foreach ($trackList as $key => $value) {
+            $pageTransactionValue = $this->convertValueType($pageTransaction[$key]);
 
-        $xpath = new \DOMXPath($dom);
-        $body = $xpath->query('//body')->item(0);
-        if ($body) {
-            $text = $this->nodeText($body);
-        } else {
-            // fallback: ตัด tag ออกทั้งหมด
-            $text = strip_tags($html);
-        }
-        // normalize ช่องว่าง
-        $text = trim(preg_replace('/\s+/u', ' ', $text));
-        return $text;
-    }
-
-    private function nodeText(\DOMNode $node)
-    {
-        if ($node->nodeType === XML_TEXT_NODE) {
-            return $node->nodeValue;
-        }
-        $out = '';
-        if ($node->hasChildNodes()) {
-            foreach ($node->childNodes as $child) {
-                $out .= $this->nodeText($child) . ' ';
+            if ($pageTransactionValue !== $value) {
+                $pageIsHack = true;
+                $totalPoint = $this->addPoint($totalPoint);
             }
         }
-        return $out;
+        return $pageIsHack;
     }
 
-    // ===== Helper: Merkle canonical จาก map selector => hash =====
-    private function merkleCanonical(array $sectionMap)
+    private function convertValueType($value)
     {
-        if (empty($sectionMap)) return $this->sha256(''); // กรณีว่าง
-        // เรียงคีย์ก่อน
-        ksort($sectionMap, SORT_NATURAL);
-        // ใช้ค่าของแฮชเป็น leaves ตามลำดับคีย์ที่เรียงแล้ว
-        $leaves = array_values($sectionMap);
-        // ถ้า leaf ไม่ใช่ 64 hex ให้ sha256 เพิ่มเติมให้เป็นฐานเดียวกัน
-        foreach ($leaves as &$v) {
-            if (!is_string($v) || !preg_match('/^[0-9a-f]{64}$/i', $v)) {
-                $v = $this->sha256($v);
-            }
+        if (filter_var($value, FILTER_VALIDATE_INT)) {
+            $value = (int)$value;
         }
-        unset($v);
-
-        // โยงขึ้นเป็น merkle: จับคู่ซ้าย-ขวา ถ้าคี่ก็ยกตัวสุดท้ายขึ้นไป
-        while (count($leaves) > 1) {
-            $next = array();
-            for ($i = 0; $i < count($leaves); $i += 2) {
-                if (isset($leaves[$i + 1])) {
-                    $next[] = $this->sha256($leaves[$i] . $leaves[$i + 1]);
-                } else {
-                    // เดี่ยว ๆ ก็แฮชตัวเองซ้ำให้ขึ้นชั้น
-                    $next[] = $this->sha256($leaves[$i]);
-                }
-            }
-            $leaves = $next;
-        }
-        return $leaves[0];
+        return $value;
     }
 
-    // ===== Helper: ดึง assets และ outbound ทั้งหน้า =====
-    private function assetsAndOutboundFromHtml($html, $baseUrl)
-    {
-        $assets = array();   // src/href ของ asset ชนิด img, script, link rel=stylesheet, video, audio
-        $out    = array();   // ลิงก์ออกนอกโดเมน
 
-        if (!is_string($html) || $html === '') return array($assets, $out);
-
-        // เตรียม DOM
-        $internalErrors = libxml_use_internal_errors(true);
-        $dom = new \DOMDocument('1.0', 'UTF-8');
-        @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_NOWARNING | LIBXML_NOERROR);
-        libxml_clear_errors();
-        libxml_use_internal_errors($internalErrors);
-        $xpath = new \DOMXPath($dom);
-
-        // base host
-        $pu = @parse_url($baseUrl);
-        $baseHost = isset($pu['host']) ? strtolower($pu['host']) : '';
-
-        // img[src]
-        foreach ($xpath->query('//img[@src]') as $n) {
-            /** @var \DOMElement $n */
-            $u = trim($n->getAttribute('src'));
-            if ($u !== '') $assets[] = $this->absUrl($u, $baseUrl);
-        }
-        // script[src]
-        foreach ($xpath->query('//script[@src]') as $n) {
-            $u = trim($n->getAttribute('src'));
-            if ($u !== '') $assets[] = $this->absUrl($u, $baseUrl);
-        }
-        // link[rel=stylesheet][href]
-        foreach ($xpath->query('//link[@rel][@href]') as $n) {
-            $rel = strtolower(trim($n->getAttribute('rel')));
-            if ($rel === 'stylesheet') {
-                $u = trim($n->getAttribute('href'));
-                if ($u !== '') $assets[] = $this->absUrl($u, $baseUrl);
-            }
-        }
-        // video[src], source[src], audio[src]
-        foreach ($xpath->query('//video[@src]|//audio[@src]|//source[@src]') as $n) {
-            $u = trim($n->getAttribute('src'));
-            if ($u !== '') $assets[] = $this->absUrl($u, $baseUrl);
-        }
-
-        // a[href] → outbound (โดเมนปลายทางต่างจาก baseHost)
-        foreach ($xpath->query('//a[@href]') as $n) {
-            $u = trim($n->getAttribute('href'));
-            if ($u === '') continue;
-            $abs = $this->absUrl($u, $baseUrl);
-            $ph = @parse_url($abs);
-            $host = isset($ph['host']) ? strtolower($ph['host']) : '';
-            if ($host !== '' && $baseHost !== '' && $host !== $baseHost) {
-                $out[] = $abs;
-            }
-        }
-
-        // clean & uniq
-        $assets = $this->uniqNormalizedUrls($assets);
-        $out    = $this->uniqNormalizedUrls($out);
-
-        return array($assets, $out);
-    }
-
-    private function absUrl($url, $base)
-    {
-        // ง่าย ๆ: ถ้าเป็น protocol-relative // ให้แปลงเป็น http(s) ของ base
-        if (strpos($url, '//') === 0) {
-            $bp = parse_url($base);
-            $scheme = isset($bp['scheme']) ? $bp['scheme'] : 'http';
-            return $scheme . ':' . $url;
-        }
-        // ถ้าเป็น absolute อยู่แล้ว
-        if (preg_match('#^https?://#i', $url)) return $url;
-
-        // รวมกับ base (แบบง่าย)
-        $bp = parse_url($base);
-        if (!$bp || !isset($bp['scheme']) || !isset($bp['host'])) return $url;
-
-        $scheme = $bp['scheme'];
-        $host   = $bp['host'];
-        $port   = isset($bp['port']) ? ':' . $bp['port'] : '';
-        $path   = isset($bp['path']) ? $bp['path'] : '/';
-
-        // ถ้า url เริ่มด้วย / ให้ต่อจาก root
-        if (strpos($url, '/') === 0) {
-            return $scheme . '://' . $host . $port . $url;
-        }
-
-        // ตัดชื่อไฟล์ออก เหลือ directory
-        if (substr($path, -1) !== '/') {
-            $path = preg_replace('#/[^/]*$#', '/', $path);
-        }
-        return $scheme . '://' . $host . $port . $path . $url;
-    }
-
-    private function uniqNormalizedUrls(array $urls)
-    {
-        $out = array();
-        $seen = array();
-        foreach ($urls as $u) {
-            // ตัด fragment/query เพื่อความเสถียรของ hash (ปรับตามนโยบายได้)
-            $p = @parse_url($u);
-            if (!$p || !isset($p['scheme']) || !isset($p['host'])) continue;
-            $norm = strtolower($p['scheme'] . '://' . $p['host'] . (isset($p['path']) ? $p['path'] : '/'));
-            if (!isset($seen[$norm])) {
-                $seen[$norm] = true;
-                $out[] = $norm;
-            }
-        }
-        return $out;
-    }
+    // ===== Helpers for section hashing & diff (PHP 7 compatible) =====
     private function normalizeHtml(string $html, array $ignoreSelectors = []): string
-    {
-        // --- Fast strip ก่อน ลดงาน DOM ---
-        $html = preg_replace('#<script\b[^>]*>.*?</script>#is', '', $html);
-        $html = preg_replace('#<style\b[^>]*>.*?</style>#is',   '', $html);
-        $html = preg_replace('#<!--.*?-->#s',                   '', $html);
+  {
+    libxml_use_internal_errors(true);
 
-        // --- Encoding safety ---
-        if (!preg_match('//u', $html)) {
-            $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        }
+    // --- โหลด DOM ครั้งเดียว ---
+    $doc = new \DOMDocument('1.0', 'UTF-8');
+    @$doc->loadHTML($html, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NONET | LIBXML_COMPACT);
+    libxml_clear_errors();
+    libxml_use_internal_errors(false);
 
-        // --- โหลด DOM แบบ no-network / no-validate ---
-        $doc = new \DOMDocument('1.0', 'UTF-8');
-        $doc->preserveWhiteSpace = false;
-        $doc->formatOutput = false;
+    $xpath = new \DOMXPath($doc);
 
-        $prevUseInternal = libxml_use_internal_errors(true);
-        if (function_exists('libxml_disable_entity_loader')) {
-            $prevDisable = libxml_disable_entity_loader(true); // กัน XXE/โหลดภายนอก (PHP 7.x)
-        }
+    // --- ดึง <head> และ <body> แยกไว้ก่อน ---
+    $headNode = $doc->getElementsByTagName('head')->item(0);
+    $bodyNode = $doc->getElementsByTagName('body')->item(0);
+    $headHtml = $headNode ? $doc->saveHTML($headNode) : '<head></head>';
+    if (!$bodyNode) return $html; // กัน fail ถ้าไม่มี body
 
-        $loaded = false;
-        if (PHP_VERSION_ID >= 70300) {
-            $loaded = @$doc->loadHTML($html, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NONET | LIBXML_COMPACT);
-        } else {
-            $loaded = @$doc->loadHTML($html); // PHP 7.0–7.2 ไม่มี options
-        }
+    // --- รวม ignore selectors + default dynamic selectors ---
+    $defaultSelectors = [
+      "//*[contains(@class,'time')]",
+      "//*[contains(@class,'date')]",
+      "//*[contains(@class,'timestamp')]",
+      "//*[contains(@class,'counter')]",
+      "//*[contains(@class,'view')]",
+      "//*[contains(@class,'carousel')]",
+      "//*[contains(@class,'slider')]",
+      "//*[contains(@class,'ticker')]",
+      "//*[contains(@class,'marquee')]",
+      "//*[contains(@class,'swiper-container')]",
+      "//*[contains(@class,'ads')]",
+      "//*[contains(@class,'advert')]",
+      "//*[contains(@class,'banner')]",
+      "//*[contains(@class,'toast')]",
+      "//*[contains(@class,'modal')]",
+      "//*[contains(@class,'popup')]",
+      "//*[contains(@class,'live')]",
+      "//*[contains(@class,'countdown')]",
+      "//*[contains(@class,'slick-track')]",
+      "//*[contains(@class,'slick-slide')]",
+      "//*[contains(@class,'swiper-wrapper')]",
+      "//*[contains(@class,'swiper-slide')]",
+      "//*[contains(@class,'fade')]",
+      "//*[contains(@class,'floating-icon')]",
+      "//*[contains(@class,'footer-bottom-bar')]",
+      "//*[contains(@class,'cookie')]",
+      "//*[contains(@class,'header-top-bar')]",
+      "//*[@id='fb-root']",
+      "//*[contains(@class,'fb-customerchat')]",
+      "//*[starts-with(@id,'__BVID__')]",
+    ];
 
-        if (function_exists('libxml_disable_entity_loader')) {
-            libxml_disable_entity_loader($prevDisable ?? false);
-        }
-        libxml_clear_errors();
-        libxml_use_internal_errors($prevUseInternal);
+    $selectors = array_values(array_unique(array_merge($ignoreSelectors, $defaultSelectors)));
 
-        if (!$loaded) {
-            // ถ้าโหลด DOM ไม่ขึ้น ให้คืนค่าที่ยุบช่องว่างแล้ว
-            return trim(preg_replace('/\s+/', ' ', $html));
-        }
+    // --- ลบ node ที่ match (เฉพาะใน body) ---
+    foreach ($selectors as $sel) {
+      try {
+        $nodeList = $xpath->query($sel);
+        if (!$nodeList || $nodeList->length === 0) continue;
+        $nodes = iterator_to_array($nodeList, false);
 
-        // --- ตัด noscript/template และ ignore selectors ด้วย Crawler ---
-        $crawler = new Crawler($doc);
-
-        foreach (['noscript', 'template'] as $tag) {
-            foreach ($crawler->filter($tag) as $n) {
-                if ($n->parentNode) {
-                    $n->parentNode->removeChild($n);
-                }
+        foreach ($nodes as $n) {
+          // skip ถ้า node อยู่ใน head
+          $p = $n->parentNode;
+          $insideHead = false;
+          while ($p) {
+            if (strtolower($p->nodeName) === 'head') {
+              $insideHead = true;
+              break;
             }
+            $p = $p->parentNode;
+          }
+          if (!$insideHead && $n->parentNode) {
+            $n->parentNode->removeChild($n);
+          }
         }
-
-        foreach ($ignoreSelectors as $sel) {
-            try {
-                foreach ($crawler->filter($sel) as $n) {
-                    if ($n->parentNode) {
-                        $n->parentNode->removeChild($n);
-                    }
-                }
-            } catch (\Throwable $e) {
-                // selector ไม่ถูกต้อง → ข้าม
-            }
-        }
-
-        // --- ลบ token/time/query สุ่ม ในทั้งเอกสาร ---
-        $html2 = $doc->saveHTML() ?: '';
-        $html2 = preg_replace([
-            '/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/',                 // ISO timestamp
-            '/csrf[_-]?token\s*=\s*[\'"][A-Za-z0-9+\/=]{20,}[\'"]/',  // csrf token
-            '/([?&])(cacheBust|cb|_|\d{1,2})=\d+/',                   // random qs
-        ], '', $html2);
-
-        // --- จัดเรียงแอตทริบิวต์ (จำกัดเพื่อความเร็ว/กันค้าง) ---
-        // เฉพาะเมื่อขนาดไม่เกิน 2.5 MB และเฉพาะแท็กสำคัญ
-        $MAX_BYTES_FOR_ATTR_SORT = 2500000;
-        $SORT_TAGS = [
-            'html',
-            'head',
-            'body',
-            'meta',
-            'link',
-            'script',
-            'img',
-            'a',
-            'div',
-            'span',
-            'header',
-            'footer',
-            'main',
-            'section',
-            'article',
-            'nav',
-            'h1',
-            'h2',
-            'h3',
-            'h4',
-            'h5',
-            'h6'
-        ];
-
-        if (strlen($html2) <= $MAX_BYTES_FOR_ATTR_SORT) {
-            $doc2 = new \DOMDocument('1.0', 'UTF-8');
-            $doc2->preserveWhiteSpace = false;
-            $doc2->formatOutput = false;
-
-            $prevUseInternal = libxml_use_internal_errors(true);
-            if (PHP_VERSION_ID >= 70300) {
-                @$doc2->loadHTML($html2, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NONET | LIBXML_COMPACT);
-            } else {
-                @$doc2->loadHTML($html2);
-            }
-            libxml_clear_errors();
-            libxml_use_internal_errors($prevUseInternal);
-
-            $xp2 = new \DOMXPath($doc2);
-            $xpathExpr = '//' . implode(' | //', $SORT_TAGS);
-
-            foreach ($xp2->query($xpathExpr) as $el) {
-                /** @var \DOMElement $el */
-                if (!$el->hasAttributes()) continue;
-
-                $attrs = [];
-                foreach (iterator_to_array($el->attributes) as $attr) {
-                    $name = $attr->name;
-                    // ตัด attrs ที่สุ่ม/เสียงดัง
-                    if (preg_match('/^(data-|aria-)/', $name)) continue;
-                    if ($name === 'nonce' || $name === 'integrity' || $name === 'crossorigin') continue;
-                    if ($name === 'onclick' || strpos($name, 'on') === 0) continue; // inline js
-                    $attrs[$name] = $attr->value ?? '';
-                }
-
-                // เคลียร์ และใส่คืนแบบเรียงชื่อคงที่
-                while ($el->attributes->length) {
-                    $el->removeAttribute($el->attributes->item(0)->name);
-                }
-                if ($attrs) {
-                    ksort($attrs, SORT_NATURAL);
-                    foreach ($attrs as $k => $v) {
-                        $el->setAttribute($k, $v);
-                    }
-                }
-            }
-
-            $html2 = $doc2->saveHTML() ?: $html2;
-        }
-
-        // --- ยุบช่องว่างและคืนค่า ---
-        $html2 = preg_replace('/\s+/', ' ', $html2);
-        return trim($html2);
+      } catch (\Throwable $e) {
+        // ข้าม selector ที่ query ไม่ได้
+      }
     }
+
+    // --- ล้าง attribute สุ่มใน body ---
+    foreach ($doc->getElementsByTagName('*') as $el) {
+      if (!$el->hasAttributes()) continue;
+      $remove = [];
+      foreach (iterator_to_array($el->attributes) as $attr) {
+        $name = strtolower($attr->name);
+        if (preg_match('/^(data-|aria-|nonce|integrity|crossorigin)/', $name)) $remove[] = $name;
+        if (strpos($name, 'on') === 0) $remove[] = $name;
+      }
+      foreach ($remove as $r) {
+        $el->removeAttribute($r);
+      }
+    }
+
+    // --- save body ที่เหลือ ---
+    $bodyHtml = $doc->saveHTML($bodyNode);
+
+    // --- ประกอบกลับ (ใช้ head เดิมจาก DOM) ---
+    $finalHtml = "<!DOCTYPE html>\n<html>\n{$headHtml}\n{$bodyHtml}\n</html>";
+
+    // --- ยุบช่องว่าง + save debug ---
+    $finalHtml = preg_replace('/\s+/', ' ', $finalHtml);
+    // file_put_contents(storage_path('app/normalized.html'), $finalHtml);
+
+    return trim($finalHtml);
+  }
+
+
+
+
 
     private function sectionsText(string $normalizedHtml, array $selectors): array
     {
@@ -991,6 +741,81 @@ class WebDefacementUpdateOriginal extends Command
         return implode("\n", $chunks);
     }
 
+    private function assetsAndOutboundFromHtml(string $html): array
+    {
+        $crawler = new Crawler($html);
+        $assets = [];
+        $hosts = [];
+
+        foreach ($crawler->filter('link,script,img,iframe') as $n) {
+            $u = $n->getAttribute('href');
+            if (!$u) {
+                $u = $n->getAttribute('src');
+            }
+            if ($u) {
+                $assets[] = $u;
+            }
+            $p = parse_url($u ? $u : '');
+            if (!empty($p['host'])) {
+                $hosts[strtolower($p['host'])] = true;
+            }
+        }
+        foreach ($crawler->filter('a') as $a) {
+            $p = parse_url($a->getAttribute('href') ? $a->getAttribute('href') : '');
+            if (!empty($p['host'])) {
+                $hosts[strtolower($p['host'])] = true;
+            }
+        }
+
+        sort($assets);
+        $outbound = array_keys($hosts);
+        sort($outbound);
+
+        return [$assets, $outbound];
+    }
+
+    private function sha256(string $s): string
+    {
+        return hash('sha256', $s);
+    }
+
+    // ===== SimHash แบบเก็บเป็น HEX 16 ตัวอักษร (อิสระจาก 32/64-bit) =====
+    private function simhash64_hex(string $text): string
+    {
+        // ตัดคำแบบง่าย ๆ
+        $tokens = preg_split('/\W+/u', mb_strtolower($text), -1, PREG_SPLIT_NO_EMPTY);
+        if (!$tokens) {
+            // ค่าคงที่สำหรับข้อความว่าง: all zeros
+            return '0000000000000000';
+        }
+
+        // เวกเตอร์น้ำหนัก 64 มิติ
+        $vec = array_fill(0, 64, 0);
+
+        foreach ($tokens as $tok) {
+            // ใช้ sha256 แล้วเอา 8 ไบต์แรกเป็น fingerprint
+            $hbin = substr(hash('sha256', $tok, true), 0, 8); // 8 bytes
+            $bytes = array_values(unpack('C*', $hbin));       // [b0..b7]
+            // ไล่บิตแบบ big-endian: b0(bit7..0), b1, ...
+            for ($i = 0; $i < 64; $i++) {
+                $byteIdx = intdiv($i, 8);
+                $bitIdx  = 7 - ($i % 8);
+                $bit = ($bytes[$byteIdx] >> $bitIdx) & 1;
+                $vec[$i] += $bit ? 1 : -1;
+            }
+        }
+
+        // สร้าง 8 ไบต์ผลลัพธ์จากสัญลักษณ์ของแต่ละมิติ
+        $outBytes = array_fill(0, 8, 0);
+        for ($i = 0; $i < 64; $i++) {
+            $byteIdx = intdiv($i, 8);
+            $bitIdx  = 7 - ($i % 8);
+            if ($vec[$i] >= 0) {
+                $outBytes[$byteIdx] |= (1 << $bitIdx);
+            }
+        }
+        return bin2hex(call_user_func_array('pack', array_merge(['C*'], $outBytes)));
+    }
 
     private function hamming64_hex(string $hexA, string $hexB): int
     {
@@ -1039,7 +864,21 @@ class WebDefacementUpdateOriginal extends Command
         }
         return bin2hex($level[0]);
     }
+    private function merkleCanonical(array $secDigAssoc): string
+    {
+        if (empty($secDigAssoc)) {
+            return hash('sha256', ''); // กรณีไม่มี section
+        }
+        // เรียงตามชื่อ selector ให้คงที่เสมอ
+        ksort($secDigAssoc, SORT_NATURAL);
 
+        // ต่อเป็น "selector:digest|selector:digest|..."
+        $pieces = [];
+        foreach ($secDigAssoc as $sel => $h) {
+            $pieces[] = $sel . ':' . $h;
+        }
+        return hash('sha256', implode('|', $pieces));
+    }
     function isEmptyHash($v): bool
     {
         if (!is_string($v)) return true;
@@ -1058,40 +897,369 @@ class WebDefacementUpdateOriginal extends Command
 
         return false;
     }
-    private function simhash64_hex(string $text): string
+
+    private function fetchHtmlShell(string $url): string
     {
-        // ตัดคำแบบง่าย ๆ
-        $tokens = preg_split('/\W+/u', mb_strtolower($text), -1, PREG_SPLIT_NO_EMPTY);
-        if (!$tokens) {
-            // ค่าคงที่สำหรับข้อความว่าง: all zeros
-            return '0000000000000000';
-        }
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS      => 10,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT        => 20,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_USERAGENT      => 'Mozilla/5.0',
+            CURLOPT_ENCODING       => '',
+        ]);
+        $body = curl_exec($ch);
+        curl_close($ch);
+        return $body ?: '';
+    }
 
-        // เวกเตอร์น้ำหนัก 64 มิติ
-        $vec = array_fill(0, 64, 0);
+    private function absolutize(string $path, string $base): string
+    {
+        if ($path === '') return $base;
+        if (preg_match('#^https?://#i', $path)) return $path;
+        if (strpos($path, '//') === 0) return (parse_url($base, PHP_URL_SCHEME) ?: 'https') . ':' . $path;
+        $p = parse_url($base);
+        $origin = ($p['scheme'] ?? 'https') . '://' . $p['host'] . (isset($p['port']) ? (':' . $p['port']) : '');
+        if (strpos($path, '/') === 0) return $origin . $path;
+        $dir = isset($p['path']) ? rtrim(dirname($p['path']), '/\\') : '';
+        return $origin . ($dir ? $dir . '/' : '/') . $path;
+    }
 
-        foreach ($tokens as $tok) {
-            // ใช้ sha256 แล้วเอา 8 ไบต์แรกเป็น fingerprint
-            $hbin = substr(hash('sha256', $tok, true), 0, 8); // 8 bytes
-            $bytes = array_values(unpack('C*', $hbin));       // [b0..b7]
-            // ไล่บิตแบบ big-endian: b0(bit7..0), b1, ...
-            for ($i = 0; $i < 64; $i++) {
-                $byteIdx = intdiv($i, 8);
-                $bitIdx  = 7 - ($i % 8);
-                $bit = ($bytes[$byteIdx] >> $bitIdx) & 1;
-                $vec[$i] += $bit ? 1 : -1;
+    private function extractScriptUrls(string $html, string $baseUrl): array
+    {
+        $c = new Crawler($html);
+        $urls = [];
+        $c->filter('script[src]')->each(function ($n) use (&$urls, $baseUrl) {
+            $urls[] = $this->absolutize($n->attr('src'), $baseUrl);
+        });
+        // ให้ main.*.js มาก่อน
+        usort($urls, function ($a, $b) {
+            $score = function ($u) {
+                $s = 0;
+                if (preg_match('#/(?:static/)?js/[^/]*main[^/]*\.js#i', $u)) $s += 100;
+                if (preg_match('#/(?:static/)?js/#i', $u)) $s += 50;
+                if (preg_match('#\.js(\?|$)#i', $u)) $s += 10;
+                return $s;
+            };
+            return $score($b) <=> $score($a);
+        });
+        // กรอง third-party ที่มักไม่มี API ของเว็บ
+        $third = ['google-analytics.com', 'googletagmanager.com', 'googleapis.com', 'gstatic.com', 'unpkg.com', 'jsdelivr.net', 'cloudflare.com', 'cloudfront.net', 'fontawesome.com'];
+        $urls = array_values(array_filter(array_unique($urls), function ($u) use ($third) {
+            $h = parse_url($u, PHP_URL_HOST) ?: '';
+            foreach ($third as $t) if (stripos($h, $t) !== false) return false;
+            return true;
+        }));
+        return array_slice($urls, 0, 12);
+    }
+
+    private function fetchText(string $url): string
+    {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT        => 25,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_USERAGENT      => 'Mozilla/5.0',
+            CURLOPT_ENCODING       => '',
+        ]);
+        $body = curl_exec($ch);
+        curl_close($ch);
+        return $body ?: '';
+    }
+
+    private function extractApiEndpointsFromJs(string $js, string $baseUrl): array
+    {
+        $found = [];
+        preg_match_all('#https?://[^\s"\'`]+/(?:api|graphql)[^\s"\'`]*#i', $js, $mAbs);
+        foreach ($mAbs[0] ?? [] as $u) $found[] = $u;
+
+        preg_match_all('#(?<![a-z0-9_])/(?:api|graphql)[^\s"\'`]*#i', $js, $mRel);
+        foreach ($mRel[0] ?? [] as $p) $found[] = $this->absolutize($p, $baseUrl);
+
+        preg_match_all('#(?:fetch|axios\.(?:get|post|put|delete)|new\s+Request)\(\s*[\'"]([^\'"]+)[\'"]#i', $js, $mCalls);
+        foreach ($mCalls[1] ?? [] as $p) {
+            if (preg_match('#^(?:https?:)?//#', $p)) {
+                $found[] = (strpos($p, '//') === 0) ? (parse_url($baseUrl, PHP_URL_SCHEME) . ':' . $p) : $p;
+            } elseif (preg_match('#^(?:/)?(?:api|graphql)(?:/|$)#i', $p)) {
+                $found[] = $this->absolutize($p, $baseUrl);
             }
         }
+        // unique + ตัดพวกไฟล์ .js/.css
+        $found = array_values(array_unique(array_filter($found, function ($u) {
+            return !preg_match('#\.(?:css|js|map)(\?|$)#i', $u);
+        })));
+        return $found;
+    }
 
-        // สร้าง 8 ไบต์ผลลัพธ์จากสัญลักษณ์ของแต่ละมิติ
-        $outBytes = array_fill(0, 8, 0);
-        for ($i = 0; $i < 64; $i++) {
-            $byteIdx = intdiv($i, 8);
-            $bitIdx  = 7 - ($i % 8);
-            if ($vec[$i] >= 0) {
-                $outBytes[$byteIdx] |= (1 << $bitIdx);
+    private function getHtml3($url, $retryCount = 0, $options = [])
+  {
+    $browser = null;
+    $maxRetries = 3;
+
+    try {
+      ini_set('max_execution_time', 300);
+      ini_set('default_socket_timeout', 300);
+      set_time_limit(0);
+
+      // ✅ บังคับให้ Chrome ใช้ HOME และ user data dir ที่ปลอดภัย
+      $chromeHome = storage_path('app/chrome_home');
+      if (!file_exists($chromeHome)) {
+          mkdir($chromeHome, 0777, true);
+      }
+      putenv('HOME=' . $chromeHome);
+      $_ENV['HOME'] = $chromeHome;
+
+      putenv('NODE_PATH=' . base_path('puphpeteer_env/node_modules'));
+      $_ENV['NODE_PATH'] = base_path('puphpeteer_env/node_modules');
+
+      // 🟩 ปิด Chrome ที่ค้างไว้
+      @exec("pkill -f 'chrome --headless' >/dev/null 2>&1");
+
+      $puppeteer = new \Nesk\Puphpeteer\Puppeteer([
+        'read_timeout' => 300,
+        'idle_timeout' => 300,
+      ]);
+
+      $browser = $puppeteer->launch([
+        'executablePath' => '/usr/bin/google-chrome',
+        'headless' => true,
+        'args' => [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu',
+          '--single-process',
+          '--no-zygote',
+          '--disable-background-timer-throttling',
+          '--disable-renderer-backgrounding',
+          '--disable-background-networking',
+          '--disable-features=IsolateOrigins,site-per-process',
+          '--window-size=1920,1080',
+          "--user-data-dir={$chromeHome}/user_data",
+        ],
+      ]);
+
+      $page = $browser->newPage();
+      $page->setDefaultNavigationTimeout(90000); // เพิ่มเป็น 90 วินาที
+
+      // 🟩 Set User-Agent to bypass basic blocking
+      if (!empty($options['userAgent'])) {
+          $page->setUserAgent($options['userAgent']);
+      } else {
+          $page->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+      }
+
+      // 🟩 เปิด JavaScript
+      $page->setJavaScriptEnabled(true);
+
+      $page->goto($url, [
+        'timeout' => 90000,
+        'waitUntil' => ['load', 'domcontentloaded', 'networkidle0'], // รอ network ให้เงียบสนิท
+      ]);
+
+      // 🟩 รอให้หน้าเว็บโหลดเสร็จ
+      sleep(2);
+
+      // 🟩 SCROLL เพื่อ TRIGGER LAZY LOADING
+      $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
+            async () => {
+                // Scroll ลงไปทีละน้อยเพื่อ trigger lazy loading
+                const scrollStep = 300;
+                const scrollDelay = 200;
+                
+                const totalHeight = Math.max(
+                    document.body.scrollHeight,
+                    document.documentElement.scrollHeight
+                );
+                
+                for (let scrolled = 0; scrolled < totalHeight; scrolled += scrollStep) {
+                    window.scrollTo(0, scrolled);
+                    await new Promise(resolve => setTimeout(resolve, scrollDelay));
+                }
+                
+                // Scroll กลับขึ้นบน
+                window.scrollTo(0, 0);
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
+        "));
+
+      // 🟩 รอ network requests ที่เกิดจาก scroll
+      sleep(3); // รอให้ lazy loading โหลดเสร็จ
+
+      // 🟩 WAIT UNTIL DOM STABLE (เพิ่มเวลารอ)
+      $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
+            () => {
+                return new Promise(resolve => {
+                    let last = document.body.innerHTML.length;
+                    let stableCount = 0;
+                    let attempts = 0;
+                    const maxAttempts = 60;   // 30 seconds (60 × 500ms) - เพิ่มจาก 20
+
+                    const check = () => {
+                        attempts++;
+                        const now = document.body.innerHTML.length;
+
+                        if (now === last) {
+                            stableCount++;
+                            if (stableCount >= 4) return resolve(true); // stable 2s (เพิ่มจาก 3)
+                        } else {
+                            stableCount = 0;
+                        }
+
+                        last = now;
+
+                        // Fallback → do not wait forever
+                        if (attempts >= maxAttempts) {
+                            console.log('DOM stability timeout, proceeding anyway');
+                            return resolve(true);
+                        }
+
+                        setTimeout(check, 500);
+                    };
+
+                    check();
+                });
+            }
+        "));
+
+      // 🟩 รอเพิ่มอีกนิดเพื่อให้แน่ใจว่า dynamic content โหลดเสร็จ
+      sleep(1);
+
+      // 🟩 Pull final HTML snapshot
+      $content = $page->content();
+
+      // 🟩 ตรวจสอบว่า content ที่ได้มามีความสมบูรณ์หรือไม่
+      if (strlen($content) < 500) {
+        \Log::warning("getHtml3: Content too short ({$url}), length: " . strlen($content));
+        throw new \Exception("Content too short, possible network error");
+      }
+
+      // 🟩 Log เพื่อ debug
+      $elementCount = $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
+            () => document.querySelectorAll('*').length
+        "));
+      \Log::info("getHtml3: Captured {$elementCount} elements from {$url}");
+
+      return ['content' => $content, 'success' => true];
+    } catch (\Throwable $e) {
+      $errorMsg = $e->getMessage();
+
+      // 🟩 ตรวจสอบว่าเป็น network error หรือไม่
+      $isNetworkError = (
+        stripos($errorMsg, 'ERR_SOCKET_NOT_CONNECTED') !== false ||
+        stripos($errorMsg, 'ERR_CONNECTION') !== false ||
+        stripos($errorMsg, 'ERR_NETWORK') !== false ||
+        stripos($errorMsg, 'ERR_TIMED_OUT') !== false ||
+        stripos($errorMsg, 'Navigation timeout') !== false ||
+        stripos($errorMsg, 'Content too short') !== false
+      );
+
+      \Log::error("Puphpeteer Error (attempt " . ($retryCount + 1) . "/{$maxRetries}): {$errorMsg} at {$url}");
+
+      // 🟩 ถ้าเป็น network error และยังลองไม่ถึง max retries ให้ลองใหม่
+      if ($isNetworkError && $retryCount < $maxRetries) {
+        \Log::info("Retrying {$url} (attempt " . ($retryCount + 2) . "/{$maxRetries})");
+
+        // ปิด browser ก่อน retry
+        if ($browser) {
+          try {
+            $browser->close();
+          } catch (\Throwable $ex) {
+            // ignore
+          }
         }
-        return bin2hex(call_user_func_array('pack', array_merge(['C*'], $outBytes)));
+
+        // รอสักครู่ก่อน retry
+        sleep(2 + $retryCount); // รอนานขึ้นทุกครั้งที่ retry
+
+        return $this->getHtml3($url, $retryCount + 1, $options);
+      }
+
+      // 🟩 ถ้า retry หมดแล้วหรือไม่ใช่ network error ให้ใช้ fallback
+      // แต่ return พร้อม error flag เพื่อไม่ให้ diff
+      $fallbackResult = $this->getHtmlFallback($url);
+      $fallbackResult['success'] = false;
+      $fallbackResult['error'] = $errorMsg;
+
+      return $fallbackResult;
+    } finally {
+      if ($browser) {
+        try {
+          $browser->close();
+        } catch (\Throwable $ex) {
+          \Log::warning("Browser close failed: " . $ex->getMessage());
+        }
+      }
+    }
+  }
+
+
+
+
+
+    // เก็บ function เก่าไว้เป็น fallback
+    private function getHtmlFallback($url)
+    {
+        $content = $this->get_dataa3($url);
+        return array(
+            'content' => $content
+        );
+    }
+
+    function get_dataa3($url)
+    {
+        $ch = curl_init();
+        $timeout = 5;
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0)");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+        $data = curl_exec($ch);
+        curl_close($ch);
+        return $data;
+    }
+    function checkHttpStatus($url)
+    {
+        // เติม http:// ถ้าไม่มี
+        if (!preg_match('#^https?://#i', $url)) {
+            $url = 'http://' . $url;
+        }
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_NOBODY         => true,   // ใช้ HEAD เพื่อลดข้อมูลโหลด
+            CURLOPT_FOLLOWLOCATION => true,   // ตาม redirect
+            CURLOPT_MAXREDIRS      => 5,
+            CURLOPT_TIMEOUT        => 8,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_USERAGENT      => 'WebDefacementBot/1.0'
+        ]);
+        curl_exec($ch);
+        $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        // ถ้าเว็บไม่รองรับ HEAD (405) → ลอง GET 1 ไบต์แทน
+        if ($code === 405) {
+            curl_setopt_array($ch, [
+                CURLOPT_NOBODY => false,
+                CURLOPT_RANGE  => '0-0'
+            ]);
+            curl_exec($ch);
+            $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        }
+
+        curl_close($ch);
+        return $code;
     }
 }
