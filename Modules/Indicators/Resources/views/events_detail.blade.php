@@ -563,17 +563,38 @@ select.c-tags {
                     {
                         targets: 5,
                         render: function (data, type, row) {
-                            var inner = '';
-                            var v = parseInt(row.created.$date.$numberLong);
-                            var created_date =  new Date(v);
-                            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                            var inner = '-';
+                            
+                            var dateVal = row.created_at || row.created;
+                            if (!dateVal) return inner;
+                            
+                            var v = null;
+                            
+                            if (dateVal.$date && dateVal.$date.$numberLong) {
+                                v = parseInt(dateVal.$date.$numberLong);
+                            }
+                            
+                            else if (dateVal.$date) {
+                                v = new Date(dateVal.$date).getTime();
+                            }
+                            
+                            else if (typeof dateVal === 'number') {
+                                v = dateVal;
+                            }
+                            
+                            else if (typeof dateVal === 'string') {
+                                v = new Date(dateVal).getTime();
+                            }
+                            
+                            if (!v || isNaN(v)) return inner;
+                            
+                            var created_date = new Date(v);
                             var year = created_date.getFullYear();
                             var month = created_date.getMonth();
                             var date = created_date.getDate();
                             var hour = created_date.getHours();
                             var min = created_date.getMinutes();
-                            var sec = created_date.getSeconds();
-                            inner =  year + '-' + (month+1) + '-' + date + ' ' + hour + ':' + min;
+                            inner = year + '-' + (month+1) + '-' + date + ' ' + hour + ':' + (min < 10 ? '0' : '') + min;
                             return inner;
                         }
 

@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Services\IndicatorCheckService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\EachPromise;
+use Illuminate\Support\Facades\Log;
 
 class CheckIndicators extends Command
 {
@@ -14,7 +15,7 @@ class CheckIndicators extends Command
      *
      * @var string
      */
-    protected $signature = 'indicators:check {--file= : Path to CSV file} {--manual : Manual input mode} {--limit=100 : Maximum number of indicators to process} {--resume : Resume from last checkpoint}';
+    protected $signature = 'app:indicatorscheck {--file= : Path to CSV file} {--manual : Manual input mode} {--limit=0 : Maximum number of indicators to process (0 = unlimited)} {--resume : Resume from last checkpoint} {--force : Force start new job (ignore existing progress)} {--event= : Process single event by pulse_id} {--job= : Job ID for tracking progress}';
 
     /**
      * The console command description.
@@ -49,9 +50,16 @@ class CheckIndicators extends Command
     public function handle()
     {
         $this->info("\n=== IOC Threat Checker ===\n");
-        $this->info("Fetching indicators from events...\n");
-
-        $results = $this->processMongoInput();
+        
+        // Check if processing single event
+        $eventId = $this->option('event');
+        if ($eventId) {
+            $this->info("Processing single event: {$eventId}\n");
+            $results = $this->processSingleEvent($eventId);
+        } else {
+            $this->info("Fetching indicators from events...\n");
+            $results = $this->processMongoInput();
+        }
         
         if (empty($results)) {
             $this->error("No IOCs processed. Exiting.");
@@ -139,6 +147,29 @@ class CheckIndicators extends Command
 
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
             
+            // Get or create data_key for this batch
+            $dataKeyCollection = $clientMD->sosecure_threatintelligent_dev->fx_data_key;
+            
+            // Generate file_name with timestamp
+            $timestamp = date('Y-m-d_H.i.s');
+            $fileName = "Sosecure-Threat-Insight-Indicators-{$timestamp}-program";
+            
+            // Create new data_key for this batch
+            $dataKey = md5(date('Y-m-d H:i:s') . uniqid());
+            $dataKeyDoc = [
+                'date' => date('Y-m-d H:i:s'),
+                'data_key' => $dataKey,
+                'imported_at' => date('Y-m-d H:i:s'),
+                'record_count' => 0,
+                'type' => 'attribute',
+                'file_name' => $fileName,
+                'timestamp' => time()
+            ];
+            
+            $dataKeyCollection->insertOne($dataKeyDoc);
+            $this->info("Created new data_key: {$dataKey}");
+            $this->info("File name: {$fileName}");
+            
             // Fetch events within today's date range
             $eventsCollection = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
             
@@ -177,19 +208,55 @@ class CheckIndicators extends Command
             
             $this->info("Found " . count($events) . " events");
             
-            // Get limit from option
+            // Get limit from option (0 = unlimited)
             $limit = (int)$this->option('limit');
-            if ($limit <= 0) $limit = 100;
+            if ($limit < 0) $limit = 0; // Negative values = unlimited
+            $isUnlimited = ($limit === 0);
+            if ($isUnlimited) {
+                $this->info("Processing ALL indicators (unlimited mode)");
+            } else {
+                $this->info("Limit: {$limit} indicators");
+            }
             
             // Job progress tracking
             $jobProgressCollection = $clientMD->sosecure_threatintelligent_dev->job_progress;
             $jobName = 'indicators_check';
             $isResume = $this->option('resume');
+            $isForce = $this->option('force');
             
             // Load or create job progress
             $jobProgress = $jobProgressCollection->findOne(['job_name' => $jobName]);
             $startEventIndex = 0;
             $totalProcessed = 0;
+            $autoResume = false;
+            
+            // Force start new job
+            if ($isForce) {
+                $this->warn("Force mode: Starting new job (ignoring existing progress)");
+                $isResume = false;
+                $autoResume = false;
+            }
+            // Check if we should auto-resume
+            elseif (!$isResume && $jobProgress && $jobProgress['status'] === 'running') {
+                // Check if the job's date range matches current latest events
+                $jobStartDate = $jobProgress['date_range_start']->toDateTime();
+                $jobEndDate = $jobProgress['date_range_end']->toDateTime();
+                
+                // Compare timestamps (within 1 hour tolerance for same batch)
+                $startDiff = abs($jobStartDate->getTimestamp() - $startDate->getTimestamp());
+                $endDiff = abs($jobEndDate->getTimestamp() - $latestDate->getTimestamp());
+                
+                if ($startDiff < 3600 && $endDiff < 3600) {
+                    // Same date range (within 1 hour)
+                    $autoResume = true;
+                    $isResume = true;
+                    $this->info("Auto-resuming: Found incomplete job for the same date range");
+                } else {
+                    $this->warn("Starting new job: Previous job was for a different date range");
+                    $this->line("  Previous: " . $jobStartDate->format('Y-m-d H:i') . " to " . $jobEndDate->format('Y-m-d H:i'));
+                    $this->line("  Current:  " . $startDate->format('Y-m-d H:i') . " to " . $latestDate->format('Y-m-d H:i'));
+                }
+            }
             
             if ($isResume && $jobProgress && $jobProgress['status'] === 'running') {
                 // Resume from previous job
@@ -200,7 +267,11 @@ class CheckIndicators extends Command
                 $startDate = $jobProgress['date_range_start']->toDateTime();
                 $endDate = $jobProgress['date_range_end']->toDateTime();
                 
-                $this->info("Resuming from Event " . ($startEventIndex + 1) . " (Previously processed: {$totalProcessed} indicators)");
+                if (!$autoResume) {
+                    $this->info("Resuming from Event " . ($startEventIndex + 1) . " (Previously processed: {$totalProcessed} indicators)");
+                } else {
+                    $this->info("Continuing from Event " . ($startEventIndex + 1) . " ({$totalProcessed} indicators already processed)");
+                }
                 $this->info("Using original date range: " . $startDate->format('Y-m-d H:i:s') . " to " . $endDate->format('Y-m-d H:i:s'));
                 
                 // Re-fetch events with the same date range
@@ -247,7 +318,7 @@ class CheckIndicators extends Command
                     continue;
                 }
                 
-                if ($totalIndicators >= $limit) {
+                if (!$isUnlimited && $totalIndicators >= $limit) {
                     $this->warn("Reached limit of {$limit} indicators. Stopping...");
                     break;
                 }
@@ -257,6 +328,7 @@ class CheckIndicators extends Command
                 
                 $eventName = $event['name'] ?? 'Unknown Event';
                 $eventTags = $event['tags'] ?? [];
+                $eventPublic = $event['public'] ?? 1; // Default to public
                 
                 $this->info("\nProcessing Event " . ($eventIndex + 1) . "/" . count($events) . ": " . substr($eventName, 0, 50));
                 
@@ -268,7 +340,7 @@ class CheckIndicators extends Command
                 
                 $eventIocs = [];
                 foreach ($indicators as $doc) {
-                    if ($totalIndicators >= $limit) {
+                    if (!$isUnlimited && $totalIndicators >= $limit) {
                         break;
                     }
                     
@@ -297,6 +369,7 @@ class CheckIndicators extends Command
                                 'pulse_id' => $pulseId,
                                 'event_name' => $eventName,
                                 'event_tags' => is_array($eventTags) ? $eventTags : [],
+                                'event_public' => $eventPublic,
                                 'indicator_id' => (string)$doc['_id']
                             ];
                             $totalIndicators++;
@@ -307,7 +380,7 @@ class CheckIndicators extends Command
                 // Process this event's indicators immediately
                 if (!empty($eventIocs)) {
                     $this->info("  Found " . count($eventIocs) . " new indicators (skipped {$skippedCount} already scored)");
-                    $this->processEventIndicators($eventIocs, $iocs);
+                    $this->processEventIndicators($eventIocs, $iocs, $dataKey);
                 }
                 
                 // Save checkpoint after each event
@@ -334,9 +407,17 @@ class CheckIndicators extends Command
                 ]]
             );
             
+            // Update record_count in fx_data_key
+            $dataKeyCollection->updateOne(
+                ['data_key' => $dataKey],
+                ['$set' => ['record_count' => $totalIndicators]]
+            );
+            
             if ($skippedCount > 0) {
                 $this->info("\nTotal skipped (already scored): {$skippedCount}");
             }
+            
+            $this->info("Updated fx_data_key record_count: {$totalIndicators}");
             
             return $iocs;
         } catch (\Exception $e) {
@@ -388,7 +469,229 @@ class CheckIndicators extends Command
         }
     }
     
-    protected function processEventIndicators($eventIocs, &$allIocs)
+    /**
+     * Process a single event by pulse_id
+     * 
+     * @param string $pulseId
+     * @return array
+     */
+    protected function processSingleEvent($pulseId)
+    {
+        $jobId = $this->option('job');
+        $jobsCollection = null;
+        
+        try {
+            $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
+            if (empty($DB_MONGO_KEY)) {
+                $this->error("DB_MONGO_STOREDATAB not found in .env");
+                return [];
+            }
+            
+            $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+            
+            // Setup job tracking if job_id provided
+            if ($jobId) {
+                $jobsCollection = $clientMD->sosecure_threatintelligent_dev->ioc_enrichment_jobs;
+                $jobsCollection->updateOne(
+                    ['job_id' => $jobId],
+                    ['$set' => [
+                        'status' => 'processing',
+                        'started_at' => new \MongoDB\BSON\UTCDateTime()
+                    ]]
+                );
+            }
+            
+            // Fetch the specific event first to get its date
+            $eventsCollection = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+            $event = $eventsCollection->findOne(['pulse_id' => $pulseId]);
+            
+            if (!$event) {
+                $this->error("Event not found with pulse_id: {$pulseId}");
+                if ($jobsCollection && $jobId) {
+                    $jobsCollection->updateOne(
+                        ['job_id' => $jobId],
+                        ['$set' => ['status' => 'failed', 'error' => 'Event not found', 'failed_at' => new \MongoDB\BSON\UTCDateTime()]]
+                    );
+                }
+                return [];
+            }
+            
+            $eventName = $event['name'] ?? 'Unknown Event';
+            $eventTags = $event['tags'] ?? [];
+            $eventPublic = $event['public'] ?? 1;
+            
+            // Get event date (use modified or created date)
+            $eventDate = null;
+            if (isset($event['modified']) && $event['modified'] instanceof \MongoDB\BSON\UTCDateTime) {
+                $eventDate = $event['modified']->toDateTime();
+            } elseif (isset($event['created']) && $event['created'] instanceof \MongoDB\BSON\UTCDateTime) {
+                $eventDate = $event['created']->toDateTime();
+            } else {
+                $eventDate = new \DateTime();
+            }
+            $eventDate->setTimezone(new \DateTimeZone('Asia/Bangkok'));
+            
+            $this->info("Found event: " . substr($eventName, 0, 60));
+            $this->info("Event date: " . $eventDate->format('Y-m-d'));
+            
+            // Get or create data_key for this batch
+            $dataKeyCollection = $clientMD->sosecure_threatintelligent_dev->fx_data_key;
+            
+            // Generate file_name with timestamp
+            $timestamp = date('Y-m-d_H.i.s');
+            $fileName = "Sosecure-Threat-Insight-Indicators-{$timestamp}-single-event";
+            
+            // Create new data_key for this batch
+            $dataKey = md5(date('Y-m-d H:i:s') . uniqid());
+            $dataKeyDoc = [
+                'date' => date('Y-m-d H:i:s'),
+                'data_key' => $dataKey,
+                'imported_at' => date('Y-m-d H:i:s'),
+                'record_count' => 0,
+                'type' => 'attribute',
+                'file_name' => $fileName,
+                'timestamp' => time(),
+                'pulse_id' => $pulseId,
+                'event_date' => $eventDate->format('Y-m-d')
+            ];
+            
+            $dataKeyCollection->insertOne($dataKeyDoc);
+            $this->info("Created new data_key: {$dataKey}");
+            
+            $indicatorRefCollection = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
+            
+            $indicators = $indicatorRefCollection->find([
+                'pulse_id' => $pulseId,
+                'status' => 1
+            ])->toArray();
+            
+            $this->info("Found " . count($indicators) . " indicators for this event");
+            
+            if (empty($indicators)) {
+                $this->warn("No indicators found for this event");
+                if ($jobsCollection && $jobId) {
+                    $jobsCollection->updateOne(
+                        ['job_id' => $jobId],
+                        ['$set' => ['status' => 'completed', 'message' => 'No indicators to process', 'completed_at' => new \MongoDB\BSON\UTCDateTime()]]
+                    );
+                }
+                return [];
+            }
+            
+            $eventIocs = [];
+            $skippedCount = 0;
+            
+            foreach ($indicators as $doc) {
+                if (isset($doc['indicator'])) {
+                    $hasScore = isset($doc['attribute_score']) && $doc['attribute_score'] !== null && $doc['attribute_score'] !== '' && $doc['attribute_score'] !== '0';
+                    $hasSeverity = isset($doc['attribute_serverity']) && $doc['attribute_serverity'] !== null && $doc['attribute_serverity'] !== '' && $doc['attribute_serverity'] !== 'Informational';
+                    
+                    if ($hasScore || $hasSeverity) {
+                        $skippedCount++;
+                        continue;
+                    }
+                    
+                    $val = $doc['indicator'];
+                    $rawType = $doc['type'] ?? 'unknown';
+                    
+                    $indicatorId = $doc['indicator_id'] ?? (string)$doc['_id'];
+                    $mongoId = (string)$doc['_id'];
+                    
+                    $type = 'unknown';
+                    if (strpos($rawType, 'ip') !== false) $type = 'ip';
+                    elseif (strpos($rawType, 'domain') !== false) $type = 'domain';
+                    elseif (strpos($rawType, 'md5') !== false) $type = 'md5';
+                    elseif (strpos($rawType, 'sha') !== false) $type = 'sha256';
+                    elseif (strpos($rawType, 'url') !== false) $type = 'url';
+                    else $type = $this->detectType($val);
+                    
+                    $eventIocs[] = [
+                        'ioc' => $val, 
+                        'type' => $type !== 'unknown' ? $type : $rawType,
+                        'pulse_id' => $pulseId,
+                        'event_name' => $eventName,
+                        'event_tags' => is_array($eventTags) ? $eventTags : [],
+                        'event_public' => $eventPublic,
+                        'indicator_id' => $indicatorId,
+                        'mongo_id' => $mongoId,
+                        'event_date' => $eventDate->format('Y-m-d')
+                    ];
+                }
+            }
+            
+            if ($skippedCount > 0) {
+                $this->info("Skipped {$skippedCount} indicators (already have score/severity)");
+            }
+            
+            $totalToProcess = count($eventIocs);
+            
+            // Update job with total count
+            if ($jobsCollection && $jobId) {
+                $jobsCollection->updateOne(
+                    ['job_id' => $jobId],
+                    ['$set' => [
+                        'total_indicators' => $totalToProcess,
+                        'remaining' => $totalToProcess,
+                        'event_name' => $eventName,
+                        'data_key' => $dataKey
+                    ]]
+                );
+            }
+            
+            if (empty($eventIocs)) {
+                $this->warn("No indicators to process (all already have score/severity)");
+                if ($jobsCollection && $jobId) {
+                    $jobsCollection->updateOne(
+                        ['job_id' => $jobId],
+                        ['$set' => ['status' => 'completed', 'message' => 'All indicators already enriched', 'completed_at' => new \MongoDB\BSON\UTCDateTime()]]
+                    );
+                }
+                return [];
+            }
+            
+            $this->info("Processing " . count($eventIocs) . " indicators...");
+            
+            // Process indicators with progress tracking
+            $allIocs = [];
+            $this->processEventIndicatorsWithProgress($eventIocs, $allIocs, $dataKey, $jobsCollection, $jobId);
+            
+            // Update record_count in fx_data_key
+            $dataKeyCollection->updateOne(
+                ['data_key' => $dataKey],
+                ['$set' => ['record_count' => count($allIocs)]]
+            );
+            
+            $this->info("Updated fx_data_key record_count: " . count($allIocs));
+            
+            // Mark job as completed
+            if ($jobsCollection && $jobId) {
+                $jobsCollection->updateOne(
+                    ['job_id' => $jobId],
+                    ['$set' => [
+                        'status' => 'completed',
+                        'processed_count' => count($allIocs),
+                        'remaining' => 0,
+                        'completed_at' => new \MongoDB\BSON\UTCDateTime(),
+                        'message' => 'Successfully processed ' . count($allIocs) . ' indicators'
+                    ]]
+                );
+            }
+            
+            return $allIocs;
+            
+        } catch (\Exception $e) {
+            $this->error("Error processing single event: " . $e->getMessage());
+            if ($jobsCollection && $jobId) {
+                $jobsCollection->updateOne(
+                    ['job_id' => $jobId],
+                    ['$set' => ['status' => 'failed', 'error' => $e->getMessage(), 'failed_at' => new \MongoDB\BSON\UTCDateTime()]]
+                );
+            }
+            return [];
+        }
+    }
+    
+    protected function processEventIndicators($eventIocs, &$allIocs, $dataKey)
     {
         if (empty($eventIocs)) return;
         
@@ -404,15 +707,19 @@ class CheckIndicators extends Command
         $bar->start();
         
         // Create a generator for promises
-        $promises = (function () use ($client, $eventIocs) {
+        $promises = (function () use ($client, $eventIocs, $dataKey) {
             foreach ($eventIocs as $item) {
                 yield $this->service->checkIocAsync($client, $item['ioc'], $item['type'])
-                    ->then(function ($result) use ($item) {
+                    ->then(function ($result) use ($item, $dataKey) {
                         return array_merge($result, [
                             'event_name' => $item['event_name'] ?? 'N/A',
                             'event_tags' => $item['event_tags'] ?? [],
                             'pulse_id' => $item['pulse_id'] ?? null,
-                            'indicator_id' => $item['indicator_id'] ?? null
+                            'indicator_id' => $item['indicator_id'] ?? null,
+                            'mongo_id' => $item['mongo_id'] ?? $item['indicator_id'] ?? null,
+                            'event_public' => $item['event_public'] ?? 1,
+                            'event_date' => $item['event_date'] ?? null,
+                            'data_key' => $dataKey
                         ]);
                     });
             }
@@ -435,9 +742,203 @@ class CheckIndicators extends Command
         $bar->finish();
         $this->line("");
         
+        // Save results to MongoDB indicator_temp
+        $this->saveResultsToMongo($eventResults);
+        
         // Show summary for this event
         $this->displayEventSummary($eventResults);
     }
+    
+    protected function processEventIndicatorsWithProgress($eventIocs, &$allIocs, $dataKey, $jobsCollection = null, $jobId = null)
+    {
+        if (empty($eventIocs)) return;
+        
+        $this->line("  Processing " . count($eventIocs) . " indicators with progress tracking...");
+        
+        // One client for all requests with shorter timeout
+        $client = new Client(['verify' => false, 'timeout' => 30, 'connect_timeout' => 15, 'headers' => ['Connection' => 'keep-alive']]);
+        $eventResults = [];
+        $batchResults = [];
+        $totalCount = count($eventIocs);
+        $processedCount = 0;
+        
+        // Create progress bar for this event
+        $bar = $this->output->createProgressBar($totalCount);
+        $bar->setFormat('  %current%/%max% [%bar%] %percent:3s%%');
+        $bar->start();
+        
+        // Create a generator for promises
+        $promises = (function () use ($client, $eventIocs, $dataKey) {
+            foreach ($eventIocs as $item) {
+                yield $this->service->checkIocAsync($client, $item['ioc'], $item['type'])
+                    ->then(function ($result) use ($item, $dataKey) {
+                        return array_merge($result, [
+                            'event_name' => $item['event_name'] ?? 'N/A',
+                            'event_tags' => $item['event_tags'] ?? [],
+                            'pulse_id' => $item['pulse_id'] ?? null,
+                            'indicator_id' => $item['indicator_id'] ?? null,
+                            'mongo_id' => $item['mongo_id'] ?? $item['indicator_id'] ?? null,
+                            'event_public' => $item['event_public'] ?? 1,
+                            'event_date' => $item['event_date'] ?? null,
+                            'data_key' => $dataKey
+                        ]);
+                    });
+            }
+        })();
+        
+        // Process with concurrency
+        $each = new EachPromise($promises, [
+            'concurrency' => 10,
+            'fulfilled' => function ($result) use ($bar, &$eventResults, &$batchResults, &$allIocs, &$processedCount, $totalCount, $jobsCollection, $jobId) {
+                $eventResults[] = $result;
+                $batchResults[] = $result;
+                $allIocs[] = $result;
+                $processedCount++;
+                $bar->advance();
+                
+                // Save batch every 50 items
+                if (count($batchResults) >= 50) {
+                     $this->saveAndSyncResults($batchResults);
+                     array_splice($batchResults, 0); // Clear array without breaking reference
+                }
+
+                // Update job progress every 10 items
+                if ($jobsCollection && $jobId && ($processedCount % 10 === 0)) {
+                    $remaining = max(0, $totalCount - $processedCount);
+                    $jobsCollection->updateOne(
+                        ['job_id' => $jobId],
+                        ['$set' => [
+                            'processed_count' => $processedCount,
+                            'remaining' => $remaining,
+                            'last_updated' => new \MongoDB\BSON\UTCDateTime()
+                        ]]
+                    );
+                }
+            },
+            'rejected' => function ($reason) use ($bar, &$processedCount) {
+                $processedCount++;
+                $bar->advance();
+            }
+        ]);
+        
+        $each->promise()->wait();
+        $bar->finish();
+        $this->line("");
+        
+        // Save remaining batch
+        if (!empty($batchResults)) {
+             $this->saveAndSyncResults($batchResults);
+        }
+        
+        // Final update for job progress
+        if ($jobsCollection && $jobId) {
+            $jobsCollection->updateOne(
+                ['job_id' => $jobId],
+                ['$set' => [
+                    'processed_count' => $processedCount,
+                    'remaining' => 0,
+                    'last_updated' => new \MongoDB\BSON\UTCDateTime()
+                ]]
+            );
+        }
+
+        // Show summary for this event
+        $this->displayEventSummary($eventResults);
+    }
+    
+    protected function saveAndSyncResults($results)
+    {
+        if (empty($results)) return;
+        
+        try {
+            $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
+            $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+            $db = $clientMD->sosecure_threatintelligent_dev;
+            $temp = $db->fx_indicators_temp;
+            $ref = $db->fx_otx_events_indicator_ref;
+            
+            $opsTemp = [];
+            $opsRef = [];
+            
+            foreach ($results as $result) {
+                $tags = [];
+                if (!empty($result['event_tags']) && is_array($result['event_tags'])) {
+                    $tags = array_merge($tags, $result['event_tags']);
+                }
+                if (!empty($result['vt']['unique_results'])) {
+                    $tags = array_merge($tags, $result['vt']['unique_results']);
+                }
+                if (!empty($result['rstcloud_threat'])) {
+                    $tags = array_merge($tags, $result['rstcloud_threat']);
+                }
+                if (!empty($result['threatfox']['tags'])) {
+                    $tags = array_merge($tags, $result['threatfox']['tags']);
+                }
+                $tags = array_unique($tags);
+                
+                $importedAt = date('Y-m-d H:i:s');
+                
+                $doc = [
+                    'data_key' => $result['data_key'] ?? null,
+                    'imported_at' => $importedAt,
+                    'event_id' => $result['pulse_id'] ?? null,
+                    'public' => $result['event_public'] ?? 1,
+                    'event_tags' => implode(', ', $result['event_tags'] ?? []),
+                    'attribute_id' => $result['indicator_id'] ?? null,
+                    'attribute_type' => $result['type'] ?? 'unknown',
+                    'attribute_name' => $result['ioc'] ?? '',
+                    'attribute_score' => (string)($result['total_score'] ?? 0),
+                    'attribute_serverity' => $result['risk_level'] ?? 'Informational',
+                    'attribute_datetime' => date('Y-m-d H:i:s'),
+                    'attribute_tags' => implode(', ', $tags),
+                    // All API results in one field
+                    'enrichment_value' => [
+                        'vt' => $result['vt'] ?? [],
+                        'abuse' => $result['abuse'] ?? [],
+                        'otx' => $result['otx'] ?? [],
+                        'threatfox' => $result['threatfox'] ?? [],
+                        'rstcloud' => [
+                            'score' => $result['rstcloud_score'] ?? null,
+                            'threat' => $result['rstcloud_threat'] ?? []
+                        ]
+                    ],
+                    'status' => 'pending',
+                    'last_error' => null,
+                    'processed_at' => null
+                ];
+                
+                $opsTemp[] = ['updateOne' => [
+                    ['attribute_id' => $result['indicator_id']],
+                    ['$set' => $doc],
+                    ['upsert' => true]
+                ]];
+                
+                if (!empty($result['indicator_id']) && !empty($result['pulse_id'])) {
+                    $filterRef = [
+                        'indicator_id' => (string)$result['indicator_id'],
+                        'pulse_id' => (string)$result['pulse_id']
+                    ];
+                    $updateRef = ['$set' => [
+                        'attribute_score' => (string)($result['total_score'] ?? 0),
+                        'attribute_serverity' => $result['risk_level'] ?? 'Informational',
+                        'tags' => implode(', ', $tags),
+                        'imported_at' => date('Y-m-d H:i:s')
+                    ]];
+                    $opsRef[] = ['updateMany' => [$filterRef, $updateRef, ['upsert' => true]]];
+                }
+            }
+            
+            if ($opsTemp) $temp->bulkWrite($opsTemp);
+            if ($opsRef) $ref->bulkWrite($opsRef);
+            
+            $this->info("Saved & Synced batch of " . count($results));
+            
+        } catch (\Exception $e) {
+            $this->error("Save/Sync Error: " . $e->getMessage());
+            Log::error($e);
+        }
+    }
+
     
     protected function displayEventSummary($results)
     {
@@ -554,6 +1055,11 @@ class CheckIndicators extends Command
                  $tags = array_merge($tags, $res['rstcloud_threat']);
             }
             
+            // Add ThreatFox tags
+            if (!empty($res['threatfox']['tags'])) {
+                $tags = array_merge($tags, $res['threatfox']['tags']);
+            }
+            
             $tags = array_unique($tags);
             // Limit tags for display
             $displayTags = implode(', ', array_slice($tags, 0, 5));
@@ -580,4 +1086,5 @@ class CheckIndicators extends Command
         $this->table($headers, $data);
         $this->info("--- Analysis Complete ---");
     }
+
 }

@@ -75,5 +75,7 @@ Route::group(
         Route::get('/export_event_indicators', 'IndicatorsController@export_event_indicators')->name('indicators.export_event_indicators');
         Route::post('/import_event', 'IndicatorsController@import_event')->name('indicators.import_event');
         Route::post('/importToInsight', 'IndicatorsController@importToInsight')->name('indicators.importToInsight');
+        Route::post('/ioc_enrichment', 'IndicatorsController@iocEnrichment')->name('indicators.ioc_enrichment');
+        Route::post('/enrichment_status', 'IndicatorsController@checkEnrichmentStatus')->name('indicators.enrichment_status');
     }
 );

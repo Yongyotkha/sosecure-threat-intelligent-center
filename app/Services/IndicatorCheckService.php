@@ -5,6 +5,7 @@ namespace App\Services;
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise;
 use GuzzleHttp\Promise\Utils;
+use Illuminate\Support\Facades\Log;
 
 class IndicatorCheckService
 {
@@ -92,7 +93,7 @@ class IndicatorCheckService
             $rstResult = $results['rst'];
 
             list($totalScore, $riskLevel, $activeScores, $activeWeights) = $this->calculateRisk(
-                $vtResult, $abuseResult, $tfResult, $otxResult, 
+                $vtResult, $abuseResult, $tfResult, $otxResult,
                 ['score' => $rstResult['score'] ?? null], 
                 $type
             );
@@ -132,7 +133,7 @@ class IndicatorCheckService
             return Promise\Create::promiseFor(["malicious" => 0, "unique_results" => [], "suspicious" => 0]);
         }
 
-        return $client->getAsync($url, ['headers' => $headers])->then(
+        return $client->getAsync($url, ['headers' => $headers, 'timeout' => 30, 'connect_timeout' => 15])->then(
             function ($response) {
                 $data = json_decode($response->getBody(), true);
                 $attributes = $data['data']['attributes'] ?? [];
@@ -149,7 +150,8 @@ class IndicatorCheckService
                     "unique_results" => array_unique($uniqueResults)
                 ];
             },
-            function ($exception) {
+            function ($exception) use ($ioc) {
+                Log::warning("VT API Error for {$ioc}: " . $exception->getMessage());
                 return ["malicious" => 0, "unique_results" => [], "suspicious" => 0];
             }
         );
@@ -160,7 +162,9 @@ class IndicatorCheckService
         $key = $this->getKey('ABUSE');
         return $client->getAsync("https://api.abuseipdb.com/api/v2/check", [
             'query' => ['ipAddress' => $ip, 'maxAgeInDays' => 120],
-            'headers' => ['Key' => $key, 'Accept' => 'application/json']
+            'headers' => ['Key' => $key, 'Accept' => 'application/json'],
+            'timeout' => 30,
+            'connect_timeout' => 15
         ])->then(
             function ($response) {
                 $data = json_decode($response->getBody(), true);
@@ -169,7 +173,8 @@ class IndicatorCheckService
                     "total_reports" => $data['data']['totalReports'] ?? 0
                 ];
             },
-            function ($exception) {
+            function ($exception) use ($ip) {
+                Log::warning("AbuseIPDB Error for {$ip}: " . $exception->getMessage());
                 return ["score" => "-", "total_reports" => 0];
             }
         );
@@ -193,7 +198,7 @@ class IndicatorCheckService
             return Promise\Create::promiseFor(["pulse_count" => 0]);
         }
 
-        return $client->getAsync($url, ['headers' => ['X-OTX-API-KEY' => $key]])->then(
+        return $client->getAsync($url, ['headers' => ['X-OTX-API-KEY' => $key], 'timeout' => 30, 'connect_timeout' => 15])->then(
             function ($response) {
                 $data = json_decode($response->getBody(), true);
                 return ["pulse_count" => $data['pulse_info']['count'] ?? 0];
@@ -211,22 +216,37 @@ class IndicatorCheckService
         
         return $client->postAsync("https://threatfox-api.abuse.ch/api/v1/", [
             'json' => $body,
-            'headers' => ['API-KEY' => $key]
+            'headers' => ['Auth-Key' => $key],
+            'timeout' => 30,
+            'connect_timeout' => 15
         ])->then(
-            function ($response) {
+            function ($response) use ($ioc) {
                 $data = json_decode($response->getBody(), true);
+                
                 if (($data['query_status'] ?? '') === 'ok') {
                     $maxConf = 0;
+                    $tags = [];
                     foreach ($data['data'] as $entry) {
                         if (isset($entry['confidence_level']) && $entry['confidence_level'] > $maxConf) {
                             $maxConf = $entry['confidence_level'];
                         }
+                        
+                        // Collect tags
+                        if (!empty($entry['malware_printable'])) {
+                            $tags[] = $entry['malware_printable'];
+                        }
+                        if (!empty($entry['threat_type'])) {
+                            $tags[] = $entry['threat_type'];
+                        }
                     }
-                    return ["confidence_level" => $maxConf];
+                    return [
+                        "confidence_level" => $maxConf,
+                        "tags" => array_unique($tags)
+                    ];
                 }
                 return ["confidence_level" => 0];
             },
-            function ($exception) {
+            function ($exception) use ($ioc) {
                 return ["confidence_level" => 0];
             }
         );
@@ -243,7 +263,7 @@ class IndicatorCheckService
 
         $url = "https://api.rstcloud.net/v1/{$endpointType}/{$ioc}";
         
-        return $client->getAsync($url, ['headers' => ['x-api-key' => $key]])->then(
+        return $client->getAsync($url, ['headers' => ['x-api-key' => $key], 'timeout' => 30, 'connect_timeout' => 15])->then(
             function ($response) {
                 $data = json_decode($response->getBody(), true);
                 return [
@@ -259,11 +279,18 @@ class IndicatorCheckService
 
     // --- Helper Methods ---
 
+    // Static counters for round-robin rotation
+    protected static $keyCounters = [
+        'VT' => 0, 'OTX' => 0, 'ABUSE' => 0, 'TF' => 0, 'RST' => 0
+    ];
+
     protected function getKey($service)
     {
         $keys = constant("self::{$service}_KEYS");
-        // Simple random rotation
-        return $keys[array_rand($keys)];
+        // Round-robin rotation (much better than random for avoiding rate limits)
+        $index = self::$keyCounters[$service] % count($keys);
+        self::$keyCounters[$service]++;
+        return $keys[$index];
     }
 
     protected function mapScore($val, $thresholds)
@@ -332,21 +359,12 @@ class IndicatorCheckService
         }
 
         // Weight Transfer Logic (Replicating Python Script Behavior/Bug)
-        // Python: if ioc_type != 'ip' and 'abuse' in WEIGHTS and 'vt' in scores
-        // The bug: 'abuse' in active_weights checks string in list of floats -> always False
-        // So Abuse weight is NEVER removed, but VT weight IS increased for non-IP types
         if ($iocType !== 'ip' && isset(self::WEIGHTS['abuse']) && isset($scores['vt'])) {
              if (isset($activeWeights['vt'])) {
                  $activeWeights['vt'] += self::WEIGHTS['abuse'];
              }
-             // INTENTIONALLY SKIPPING removal of Abuse to match Python bug
-             /* 
-             if (isset($activeWeights['abuse'])) {
-                 unset($activeWeights['abuse']);
-                 unset($activeScores['abuse']);
-             }
-             */
         }
+        
         
         $totalWeight = array_sum($activeWeights);
         if ($totalWeight == 0) return [0, "Informational", [], []];
@@ -359,7 +377,7 @@ class IndicatorCheckService
         }
 
         $finalScoreRaw = $weightedSum / $totalWeight;
-        $finalScore = round($finalScoreRaw); 
+        $finalScore = ceil($finalScoreRaw); // Use ceil to be safer (1.25 -> 2)
         
         // 3. Determine risk level
         if ($finalScore >= 9) $level = "Critical";

@@ -1663,7 +1663,7 @@ class IndicatorsController extends Controller
                     'serverSelectionTimeoutMS' => 5000,
                     'socketTimeoutMS' => 30000, // 30 วินาที
                 ]);
-                $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+                $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
 
                 // ✅ Query แบบ optimized
                 $query = ['pulse_id' => $reqId];
@@ -1954,7 +1954,7 @@ class IndicatorsController extends Controller
             $reqId = $request->pulse_id;
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
 
 
             // direction
@@ -2053,11 +2053,12 @@ class IndicatorsController extends Controller
 
 
 
-            $query = array(
-                'status' => 1,
-                'deleted_at' => null,
-                'indicator_count' => ['$gt' => 0],
-            );
+            $query = [
+                '$or' => [
+                    ['deleted_at' => null],
+                    ['deleted_at' => ['$exists' => false]],
+                ],
+            ];
 
             if ($request->count_page == -1) {
                 $cursor_count = $col_fx_otx_events->count($query);
@@ -2203,7 +2204,6 @@ class IndicatorsController extends Controller
             }
 
 
-            $query['indicator_count'] = ['$ne' => 0];
             $cursor = $col_fx_otx_events->find($query, $options);
             $cursor = $cursor->toArray();
 
@@ -2216,11 +2216,11 @@ class IndicatorsController extends Controller
                 foreach ($cursor as $document_2) {
                     $order_number++;
                     $nestedData['No'] = $order_number;
-                    $nestedData['name'] = $document_2["name"];
-                    $nestedData['groups'] = explode_val($document_2["groups"], 'groups');
-                    $nestedData['tags'] = explode_val($document_2["tags"], 'tags');
-                    $nestedData['tags_list'] = $document_2["tags"];
-                    $nestedData['industries'] = explode_val($document_2["industries"]);
+                    $nestedData['name'] = $document_2["name"] ?? '';
+                    $nestedData['groups'] = explode_val($document_2["groups"] ?? [], 'groups');
+                    $nestedData['tags'] = explode_val($document_2["tags"] ?? [], 'tags');
+                    $nestedData['tags_list'] = $document_2["tags"] ?? [];
+                    $nestedData['industries'] = explode_val($document_2["industries"] ?? []);
                     $nestedData['attr'] = '';
                     $nestedData['attrCount'] = $document_2["indicator_count"];
                     $nestedData['public'] = ($document_2["public"]);
@@ -2235,8 +2235,8 @@ class IndicatorsController extends Controller
                     $DB_MONGO_KEY = env("DB_MONGO_DEV");
                     $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
                     if (app()->environment('local')) {
-                        $collection = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
-                        $collection_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+                        $collection = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
+                        $collection_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
                     } else {
                         $collection = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
                         $collection_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
@@ -4766,5 +4766,139 @@ class IndicatorsController extends Controller
             'updated' => $success,
             'errors' => $errors
         ];
+    }
+
+    /**
+     * IOC Enrichment - Queue background job to process event indicators
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function iocEnrichment(Request $request)
+    {
+        set_time_limit(180);
+        
+        $pulseId = $request->input('pulse_id');
+        $batchSize = 50;
+        
+        if (empty($pulseId)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'pulse_id is required'
+            ], 400);
+        }
+        
+
+            
+
+                
+
+            
+        try {
+            $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
+            $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+            $jobsCollection = $clientMD->sosecure_threatintelligent_dev->ioc_enrichment_jobs;
+            
+            // Check for existing running job
+            $existingJob = $jobsCollection->findOne([
+                'pulse_id' => $pulseId,
+                'status' => ['$in' => ['pending', 'processing']],
+                'created_at' => ['$gte' => new \MongoDB\BSON\UTCDateTime((time() - 3600) * 1000)] // Within last hour
+            ]);
+            
+            if ($existingJob) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Enrichment job already running',
+                    'job_id' => $existingJob['job_id'],
+                    'already_running' => true
+                ]);
+            }
+            
+            // Generate Job ID
+            $jobId = (string) \Illuminate\Support\Str::uuid();
+            
+            // Create initial job record
+            $jobsCollection->insertOne([
+                'job_id' => $jobId,
+                'pulse_id' => $pulseId,
+                'status' => 'pending',
+                'created_at' => new \MongoDB\BSON\UTCDateTime(),
+                'processed_count' => 0,
+                'remaining' => 0,
+                'total_indicators' => 0
+            ]);
+            
+            // Run Artisan command in background (Works on Windows & Linux)
+            $artisanPath = base_path('artisan');
+            $phpBinary = PHP_BINARY;
+            // PHP_BINARY inside FPM usually points to php-fpm, which cannot run CLI commands.
+            if (strpos($phpBinary, 'fpm') !== false) {
+                $phpBinary = 'php';
+            }
+            
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                $command = "start /B \"bg_process\" \"{$phpBinary}\" \"{$artisanPath}\" app:indicatorscheck --event=\"{$pulseId}\" --job=\"{$jobId}\" --force > NUL 2>&1";
+                Log::info("[IOC Enrichment] Spawning Windows command: " . $command);
+                pclose(popen($command, 'r'));
+            } else {
+                $command = "\"{$phpBinary}\" \"{$artisanPath}\" app:indicatorscheck --event=\"{$pulseId}\" --job=\"{$jobId}\" --force > /dev/null 2>&1 &";
+                Log::info("[IOC Enrichment] Spawning Linux command: " . $command);
+                exec($command);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Enrichment job started',
+                'job_id' => $jobId
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error("[IOC Enrichment] Failed to start job: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Check IOC Enrichment job status
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkEnrichmentStatus(Request $request)
+    {
+        $jobId = $request->input('job_id');
+        
+        if (empty($jobId)) {
+            return response()->json(['success' => false, 'message' => 'Job ID required'], 400);
+        }
+        
+        try {
+            $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
+            $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+            $jobsCollection = $clientMD->sosecure_threatintelligent_dev->ioc_enrichment_jobs;
+            
+            $job = $jobsCollection->findOne(['job_id' => $jobId]);
+            
+            if (!$job) {
+                return response()->json(['success' => false, 'message' => 'Job not found']);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'status' => $job['status'],
+                'processed_count' => $job['processed_count'] ?? 0,
+                'total_indicators' => $job['total_indicators'] ?? 0,
+                'remaining' => $job['remaining'] ?? 0,
+                'message' => $job['message'] ?? null,
+                'error' => $job['error'] ?? null
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 }

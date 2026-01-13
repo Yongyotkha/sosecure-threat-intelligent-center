@@ -64,6 +64,255 @@ select.c-tags {
   width: 100% !important;
 }
 
+/* Loading Modal Overlay */
+.loading-modal-overlay {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 999999 !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.loading-modal-overlay.show {
+    display: flex !important;
+}
+.loading-modal-content {
+    position: relative !important;
+    background: linear-gradient(145deg, #ffffff, #f5f7fa);
+    padding: 50px 70px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+    max-width: 450px;
+    margin: auto !important;
+    animation: modalPulse 0.3s ease-out;
+}
+@keyframes modalPulse {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+.loading-modal-content .spinner-icon {
+    width: 70px;
+    height: 70px;
+    border: 5px solid #e8e8e8;
+    border-top: 5px solid #22c55e;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 25px auto;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.loading-modal-content h4 {
+    margin: 0 0 12px 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+.loading-modal-content p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 15px;
+    line-height: 1.6;
+}
+.loading-modal-content .record-count {
+    display: inline-block;
+    background: #22c55e;
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 15px;
+}
+.loading-modal-content .result-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px auto;
+    font-size: 36px;
+}
+.loading-modal-content .result-icon.success {
+    background: #dcfce7;
+    color: #22c55e;
+}
+.loading-modal-content .result-icon.error {
+    background: #fee2e2;
+    color: #ef4444;
+}
+.loading-modal-content .close-btn {
+    display: inline-block;
+    background: #22c55e;
+    color: #fff;
+    padding: 12px 40px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 25px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+.loading-modal-content .close-btn:hover {
+    background: #16a34a;
+    transform: translateY(-2px);
+}
+.loading-modal-content .close-btn.error {
+    background: #ef4444;
+}
+.loading-modal-content .close-btn.error:hover {
+    background: #dc2626;
+}
+.loading-modal-content .confirm-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px auto;
+    font-size: 36px;
+    background: #fef3c7;
+    color: #f59e0b;
+}
+.loading-modal-content .btn-group {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 25px;
+}
+.loading-modal-content .confirm-btn {
+    padding: 12px 35px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+.loading-modal-content .confirm-btn.yes {
+    background: #22c55e;
+    color: #fff;
+}
+.loading-modal-content .confirm-btn.yes:hover {
+    background: #16a34a;
+    transform: translateY(-2px);
+}
+.loading-modal-content .confirm-btn.no {
+    background: #e5e7eb;
+    color: #374151;
+}
+.loading-modal-content .confirm-btn.no:hover {
+    background: #d1d5db;
+    transform: translateY(-2px);
+}
+
+.enrichment-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(145deg, #ffffff, #f8fafc);
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    padding: 16px 20px;
+    min-width: 320px;
+    max-width: 400px;
+    z-index: 99999;
+    border-left: 4px solid #22c55e;
+    animation: slideIn 0.3s ease-out;
+}
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+.enrichment-toast.hiding {
+    animation: slideOut 0.3s ease-in forwards;
+}
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+.enrichment-toast .toast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.enrichment-toast .toast-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.enrichment-toast .toast-title i {
+    color: #22c55e;
+}
+.enrichment-toast .toast-close {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+    line-height: 1;
+}
+.enrichment-toast .toast-close:hover {
+    color: #6b7280;
+}
+.enrichment-toast .toast-body {
+    font-size: 13px;
+    color: #4b5563;
+    margin-bottom: 12px;
+}
+.enrichment-toast .toast-event {
+    font-weight: 500;
+    color: #1f2937;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.enrichment-toast .toast-progress-bar {
+    background: #e5e7eb;
+    border-radius: 6px;
+    height: 6px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+.enrichment-toast .toast-progress-fill {
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+    height: 100%;
+    transition: width 0.3s ease;
+}
+.enrichment-toast .toast-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6b7280;
+}
+.enrichment-toast .toast-stats .success { color: #22c55e; }
+.enrichment-toast .toast-stats .fail { color: #ef4444; }
+
   .dropdown {
     position: relative;
     display: inline-block;
@@ -122,6 +371,66 @@ select.c-tags {
         display: inline-block;
         font-size: 14px;
         transition-duration: 0.3s;
+    }
+
+    .btn-custom-green {
+        background-color: #ffffffff; 
+        border: #22c55e solid 0.7px;
+        color: #22c55e;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition-duration: 0.3s;
+    }
+
+    .btn-custom-green:hover {
+        background-color: #22c55e; 
+        color: #ffffffff;
+        border: #22c55e solid 0.7px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        transition-duration: 0.3s;
+    }
+
+    /* Custom card stats - ให้ทั้งสองฝั่งเท่ากัน */
+    .card-ev-body-custom {
+        display: flex;
+        align-items: stretch;
+    }
+
+    .ev-stat-box {
+        flex: 1;
+        padding: 0.5rem 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .ev-stat-box:first-child {
+        border-right: 1px solid #eee;
+    }
+
+    .ev-stat-box .ev-number {
+        font-size: 38px;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .ev-stat-box .ev-number.cl-orange {
+        color: #f59e0b;
+    }
+
+    .ev-stat-box .ev-label {
+        font-size: 18px;
+        font-weight: 600;
+        margin-top: 0.25rem;
     }
     
 
@@ -261,15 +570,14 @@ select.c-tags {
                                         <div class="header-ev">
                                             Events
                                         </div>
-                                        <div class="card-ev-body">
-                                            <div class="ev-left">
-                                                <span>{{ @number_format(TYPE_WEB == 'center' ? $attr_all->event_count : $attr_all['event_count']) }}</span>
-                                                <span class="ev-text-sec">All</span>
+                                        <div class="card-ev-body-custom">
+                                            <div class="ev-stat-box">
+                                                <span class="ev-number cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->event_count : $attr_current['event_count']) }}</span>
+                                                <span class="ev-label">New Event</span>
                                             </div>
-                                            <div class="ev-right">
-                                                <span
-                                                    class="cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->event_count : $attr_current['event_count']) }}</span>
-                                                <span>New Event</span>
+                                            <div class="ev-stat-box">
+                                                <span class="ev-number">{{ @number_format(TYPE_WEB == 'center' ? $attr_all->event_count : $attr_all['event_count']) }}</span>
+                                                <span class="ev-label">All</span>
                                             </div>
                                         </div>
                                     </div>
@@ -279,15 +587,14 @@ select.c-tags {
                                         <div class="header-ev">
                                             Attribute
                                         </div>
-                                        <div class="card-ev-body">
-                                            <div class="ev-left">
-                                                <span>{{ @number_format(TYPE_WEB == 'center' ? $attr_all->attribute_count : $attr_all['attribute_count']) }}</span>
-                                                <span class="ev-text-sec">All</span>
+                                        <div class="card-ev-body-custom">
+                                            <div class="ev-stat-box">
+                                                <span class="ev-number cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->attribute_count : $attr_current['attribute_count']) }}</span>
+                                                <span class="ev-label">New Attribute</span>
                                             </div>
-                                            <div class="ev-right">
-                                                <span
-                                                    class="cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->attribute_count : $attr_current['attribute_count']) }}</span>
-                                                <span>New Attribute</span>
+                                            <div class="ev-stat-box">
+                                                <span class="ev-number">{{ @number_format(TYPE_WEB == 'center' ? $attr_all->attribute_count : $attr_all['attribute_count']) }}</span>
+                                                <span class="ev-label">All</span>
                                             </div>
                                         </div>
                                     </div>
@@ -359,6 +666,9 @@ select.c-tags {
                                                 </button>
                                                 <button onclick="openModal()" class="btn btn-custom" style="text-align: left;">
                                                     <i class="fa fa-arrow-circle-up"></i>  Import CSV
+                                                </button>
+                                                <button onclick="showBulkIocInfo()" class="btn btn-custom-green" style="text-align: left;">
+                                                    <i class="fas fa-sync"></i>  IOC Enrichment
                                                 </button>
                                             </div>
                                         </div>
@@ -1210,12 +1520,27 @@ select.c-tags {
                             render: function(data, type, row) {
                                 var inner = '';
                                 inner += '<div style="display:flex;flex-direction:column;">';
+                                
+                                inner += `
+                                    <button
+                                        class="btn btn-xs btn-ioc-enrichment"
+                                        data-id="${row.pulse_id}"
+                                        data-count="${row.attrCount || 0}"
+                                        onclick="iocEnrichment('${row.pulse_id}', '${(row.name || '').replace(/'/g, "\\'")}', ${row.attrCount || 0})"
+                                        style="cursor: pointer; max-width:83px; width:100%; background-color: #22c55e; border: 1px solid #22c55e; color: #fff;"
+                                        onmouseover="this.style.backgroundColor='#17ae4eff';"
+                                        onmouseout="this.style.backgroundColor='#22c55e';"
+                                    >
+                                        <i class="fas fa-sync"></i> IOC
+                                    </button>
+                                `;
+
                                 @if (!empty(get_role_custom()))
                                     @if (@get_role_custom()['client'] != 1)
                                         inner +=
                                             '<a style="max-width:83px;width:100%;" href="{{ route('indicators.modal_tag') }}' +
                                             '?pulse_id=' + row.pulse_id +
-                                            '" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
+                                            '" data-toggle="ajaxModal" class="m-t-xs btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
                                     @endif
                                 @endif
 
@@ -1761,6 +2086,415 @@ select.c-tags {
         <script>
             function openModal() {
                 $('#import-modal').modal('show');
+            }
+
+            window.iocEnrichment = function(pulseId, eventName, indicatorCount) {
+                var displayName = eventName || pulseId;
+                
+                var tableHtml = '<div style="max-height:200px;overflow-y:auto;margin:15px 0;border:1px solid #e5e7eb;border-radius:8px;">';
+                tableHtml += '<table style="width:100%;border-collapse:collapse;font-size:13px;">';
+                tableHtml += '<thead style="position:sticky;top:0;background:#f3f4f6;"><tr>';
+                tableHtml += '<th style="padding:10px;text-align:left;border-bottom:1px solid #e5e7eb;">#</th>';
+                tableHtml += '<th style="padding:10px;text-align:left;border-bottom:1px solid #e5e7eb;">Event Name</th>';
+                tableHtml += '<th style="padding:10px;text-align:right;border-bottom:1px solid #e5e7eb;">Indicators</th>';
+                tableHtml += '</tr></thead><tbody>';
+                tableHtml += '<tr style="border-bottom:1px solid #f3f4f6;">';
+                tableHtml += '<td style="padding:8px 10px;color:#6b7280;">1</td>';
+                tableHtml += '<td style="padding:8px 10px;text-align:left;">' + displayName + '</td>';
+                tableHtml += '<td style="padding:8px 10px;text-align:right;color:#22c55e;font-weight:600;">' + (indicatorCount || 0) + '</td>';
+                tableHtml += '</tr>';
+                tableHtml += '</tbody></table></div>';
+                tableHtml += '<div style="text-align:center;margin-bottom:10px;">';
+                tableHtml += '<span style="background:#22c55e;color:#fff;padding:5px 15px;border-radius:20px;font-size:13px;">';
+                tableHtml += '<i class="fas fa-database"></i> Total: ' + (indicatorCount || 0) + ' indicators</span></div>';
+                tableHtml += '<small style="color:#f59e0b;">Note: This may take several minutes.</small>';
+                
+                Swal.fire({
+                    title: 'IOC Enrichment',
+                    html: 'Do you want to perform IOC Enrichment for <strong>1 event</strong>?' + tableHtml,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirm',
+                    cancelButtonText: 'Cancel',
+                    width: 650
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        startEnrichment(pulseId, eventName, indicatorCount);
+                    }
+                });
+            };
+            
+            function startEnrichment(pulseId, eventName, indicatorCount) {
+                var displayName = eventName || pulseId;
+                if (displayName.length > 40) displayName = displayName.substring(0, 40) + '...';
+                
+                var btn = $('button[data-id="' + pulseId + '"].btn-ioc-enrichment');
+                var originalText = btn.html();
+                
+                btn.html('<i class="fas fa-spinner fa-spin"></i> Init...').prop('disabled', true);
+                
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('indicators.ioc_enrichment') }}",
+                    data: { 
+                        pulse_id: pulseId,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(res) {
+                        if (res.job_id) {
+                            pollSingleJob(res.job_id, btn, originalText, displayName);
+                        } else {
+                             btn.html(originalText).prop('disabled', false);
+                             Swal.fire({
+                                icon: 'error',
+                                title: 'Failed to start',
+                                text: res.message || 'Unknown error'
+                             });
+                        }
+                    },
+                    error: function(xhr) {
+                         btn.html(originalText).prop('disabled', false);
+                         Swal.fire({
+                            icon: 'error',
+                            title: 'Connection Error',
+                            text: 'Could not contact server to start job'
+                         });
+                    }
+                });
+            }
+
+            function pollSingleJob(jobId, btn, originalText, displayName) {
+                var checkInterval = 2000;
+                
+                var checkStatus = function() {
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ route('indicators.enrichment_status') }}",
+                        data: { 
+                            job_id: jobId, 
+                            _token: '{{ csrf_token() }}' 
+                        },
+                        success: function(res) {
+                            if (res.status === 'completed') {
+                                btn.html('<i class="fas fa-check"></i> Done').removeClass('btn-info').addClass('btn-success');
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Enrichment Completed',
+                                    html: '<b>' + displayName + '</b><br>Processed: ' + (res.processed_count || 0) + ' indicators',
+                                    confirmButtonText: 'Refresh',
+                                    allowOutsideClick: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else if (res.status === 'failed') {
+                                btn.html(originalText).prop('disabled', false);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Job Failed',
+                                    text: res.error || 'Unknown error during processing'
+                                });
+                            } else {
+                                var processed = res.processed_count || 0;
+                                var total = res.total_indicators || '?';
+                                var pct = 0;
+                                if (total > 0 && total !== '?') {
+                                     pct = Math.round((processed / total) * 100);
+                                     btn.html('<i class="fas fa-spinner fa-spin"></i> ' + pct + '%');
+                                } else {
+                                     btn.html('<i class="fas fa-spinner fa-spin"></i> ' + processed);
+                                }
+                                
+                                setTimeout(checkStatus, checkInterval);
+                            }
+                        },
+                        error: function() {
+                            setTimeout(checkStatus, 3000);
+                        }
+                    });
+                };
+                
+                setTimeout(checkStatus, 1000);
+            }
+            
+            window.showBulkIocInfo = function() {
+                var selectedEvents = [];
+                $('.check_rss_new_id:checked').each(function() {
+                    var pulseId = $(this).val();
+                    var row = $('#table_events').DataTable().rows().data().toArray().find(r => r.pulse_id === pulseId);
+                    if (row) {
+                        selectedEvents.push({
+                            pulse_id: pulseId,
+                            name: row.name || pulseId,
+                            indicator_count: row.attrCount || 0
+                        });
+                    }
+                });
+                
+                if (selectedEvents.length === 0) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'No Events Selected',
+                        text: 'Please select at least one event by checking the checkbox in the first column of the table.',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+                
+                var totalIndicators = selectedEvents.reduce((sum, e) => sum + (e.indicator_count || 0), 0);
+                
+                var tableHtml = '<div style="max-height:300px;overflow-y:auto;margin:15px 0;border:1px solid #e5e7eb;border-radius:8px;">';
+                tableHtml += '<table style="width:100%;border-collapse:collapse;font-size:13px;">';
+                tableHtml += '<thead style="position:sticky;top:0;background:#f3f4f6;"><tr>';
+                tableHtml += '<th style="padding:10px;text-align:left;border-bottom:1px solid #e5e7eb;">#</th>';
+                tableHtml += '<th style="padding:10px;text-align:left;border-bottom:1px solid #e5e7eb;">Event Name</th>';
+                tableHtml += '<th style="padding:10px;text-align:right;border-bottom:1px solid #e5e7eb;">Indicators</th>';
+                tableHtml += '</tr></thead><tbody>';
+                
+                selectedEvents.forEach(function(e, i) {
+                    tableHtml += '<tr style="border-bottom:1px solid #f3f4f6;">';
+                    tableHtml += '<td style="padding:8px 10px;color:#6b7280;">' + (i + 1) + '</td>';
+                    tableHtml += '<td style="padding:8px 10px;text-align:left;">' + e.name + '</td>';
+                    tableHtml += '<td style="padding:8px 10px;text-align:right;color:#22c55e;font-weight:600;">' + (e.indicator_count || 0) + '</td>';
+                    tableHtml += '</tr>';
+                });
+                
+                tableHtml += '</tbody></table></div>';
+                tableHtml += '<div style="text-align:center;margin-bottom:10px;">';
+                tableHtml += '<span style="background:#22c55e;color:#fff;padding:5px 15px;border-radius:20px;font-size:13px;">';
+                tableHtml += '<i class="fas fa-database"></i> Total: ' + totalIndicators + ' indicators</span></div>';
+                tableHtml += '<small style="color:#f59e0b;">Note: This may take several minutes.</small>';
+                
+                Swal.fire({
+                    title: 'IOC Enrichment',
+                    html: 'Do you want to perform IOC Enrichment for <strong>' + selectedEvents.length + ' events</strong>?' + tableHtml,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirm',
+                    cancelButtonText: 'Cancel',
+                    width: 650
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        startBulkEnrichment(selectedEvents);
+                    }
+                });
+            };
+            
+            function startBulkEnrichment(events) {
+                var total = events.length;
+                var current = 0;
+                var successCount = 0;
+                var failCount = 0;
+                var results = [];
+                
+                showEnrichmentToast(total);
+                processNext();
+                
+                function showEnrichmentToast(total) {
+                    if ($('#enrichment-toast').length) {
+                        $('#enrichment-toast').remove();
+                    }
+                    var toastHtml = `
+                        <div id="enrichment-toast" class="enrichment-toast">
+                            <div class="toast-header">
+                                <div class="toast-title">
+                                    <i class="fas fa-sync fa-spin"></i>
+                                    <span>IOC Enrichment</span>
+                                </div>
+                            </div>
+                            <div class="toast-body">
+                                <div class="toast-event" id="toast-event-name">Preparing...</div>
+                                <div class="toast-status-text" id="toast-status-text" style="font-size:11px;color:#6b7280;margin-top:2px;">Starting job...</div>
+                            </div>
+                            <div class="toast-progress-bar">
+                                <div class="toast-progress-fill" id="toast-progress-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="toast-stats">
+                                <span id="toast-count">0 / ${total} events</span>
+                                <span><span class="success" id="toast-success">0</span> done</span>
+                            </div>
+                        </div>
+                    `;
+                    $('body').append(toastHtml);
+                }
+                
+                function processNext() {
+                    if (current >= total) {
+                        if (!$('#enrichment-toast').hasClass('showing-result')) {
+                            $('#enrichment-toast').addClass('showing-result');
+                            showBulkResult();
+                        }
+                        return;
+                    }
+                    
+                    var event = events[current];
+                    var percent = Math.round((current / total) * 100);
+                    var displayName = event.name ? event.name.substring(0, 40) : 'Event';
+                    if (event.name && event.name.length > 40) displayName += '...';
+                    
+                    $('#toast-event-name').text(displayName);
+                    $('#toast-status-text').text('Starting background job...');
+                    $('#toast-count').text((current + 1) + ' / ' + total + ' events');
+                    $('#toast-progress-fill').css('width', percent + '%');
+                    $('#toast-success').text(successCount);
+                    
+                    console.log('Bulk: Starting job for pulse_id:', event.pulse_id);
+                    
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ route('indicators.ioc_enrichment') }}",
+                        data: { 
+                            pulse_id: event.pulse_id,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(res) {
+                            if (res.success && res.job_id) {
+                                console.log('Job started:', res.job_id);
+                                if (res.already_running) {
+                                     $('#toast-status-text').text('Job already running, connecting...');
+                                } else {
+                                     $('#toast-status-text').text('Job queued...');
+                                }
+                                pollJobStatus(res.job_id, event, displayName);
+                            } else if (res.complete) {
+                                successCount++;
+                                results.push({
+                                    name: event.name,
+                                    status: 'success',
+                                    processed: res.processed_count || 0,
+                                    message: 'Completed'
+                                });
+                                current++;
+                                processNext();
+                            } else {
+                                handleFail(event, res.message || 'Failed to start job');
+                            }
+                        },
+                        error: function(xhr) {
+                            var msg = 'Request failed';
+                            try {
+                                var resp = JSON.parse(xhr.responseText);
+                                msg = resp.message || msg;
+                            } catch(e) {}
+                            handleFail(event, msg);
+                        }
+                    });
+                }
+                
+                function pollJobStatus(jobId, event, displayName) {
+                    var errorCount = 0;
+                    
+                    var checkStatus = function() {
+                        $.ajax({
+                            type: "POST",
+                            url: "{{ route('indicators.enrichment_status') }}",
+                            data: { 
+                                job_id: jobId,
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(res) {
+                                if (!res.success) {
+                                    handleFail(event, res.message || 'Job status check failed');
+                                    return;
+                                }
+                                
+                                var status = res.status;
+                                var processed = res.processed_count || 0;
+                                var remaining = res.remaining || 0;
+                                
+                                var statusText = `Status: ${status} | Processed: ${processed}`;
+                                if (remaining > 0) statusText += ` | Remaining: ${remaining}`;
+                                $('#toast-status-text').text(statusText);
+                                
+                                if (status === 'completed') {
+                                    successCount++;
+                                    results.push({
+                                        name: event.name,
+                                        status: 'success',
+                                        processed: processed,
+                                        message: 'Completed'
+                                    });
+                                    current++;
+                                    processNext();
+                                } else if (status === 'failed') {
+                                    handleFail(event, res.error || 'Job failed');
+                                } else {
+                                    setTimeout(checkStatus, 2000);
+                                }
+                            },
+                            error: function() {
+                                errorCount++;
+                                if (errorCount > 5) {
+                                    handleFail(event, 'Connection lost to status server');
+                                } else {
+                                    setTimeout(checkStatus, 2000);
+                                }
+                            }
+                        });
+                    };
+                    
+                    setTimeout(checkStatus, 2000);
+                }
+                
+                function handleFail(event, message) {
+                    failCount++;
+                    results.push({
+                        name: event.name,
+                        status: 'error',
+                        processed: 0,
+                        message: message
+                    });
+                    current++;
+                    processNext();
+                }
+                
+                function showBulkResult() {
+                    var isAllSuccess = failCount === 0;
+                    var totalProcessed = results.reduce((sum, r) => sum + (r.processed || 0), 0);
+                    
+                    $('#enrichment-toast .toast-title i').removeClass('fa-spin').addClass(isAllSuccess ? 'fa-check-circle' : 'fa-exclamation-circle');
+                    $('#enrichment-toast').css('border-left-color', isAllSuccess ? '#22c55e' : '#f59e0b');
+                    $('#toast-event-name').text(isAllSuccess ? 'Completed!' : 'Finished with issues');
+                    $('#toast-status-text').text('All tasks finished.');
+                    $('#toast-progress-fill').css('width', '100%');
+                    $('#toast-count').text(total + ' events processed');
+                    $('#toast-success').text(successCount);
+                    
+                    setTimeout(function() {
+                        $('#enrichment-toast').addClass('hiding');
+                        setTimeout(function() {
+                            $('#enrichment-toast').remove();
+                            
+                            var summaryHtml = '<div style="text-align:center;">';
+                            summaryHtml += '<span style="background:#22c55e;color:#fff;padding:5px 12px;border-radius:20px;font-size:12px;margin-right:8px;"><i class="fas fa-check"></i> ' + successCount + ' success</span>';
+                            if (failCount > 0) {
+                                summaryHtml += '<span style="background:#ef4444;color:#fff;padding:5px 12px;border-radius:20px;font-size:12px;"><i class="fas fa-times"></i> ' + failCount + ' failed</span>';
+                            }
+                            summaryHtml += '<br><br><span style="color:#6b7280;font-size:13px;"><i class="fas fa-database"></i> Total: ' + totalProcessed + ' indicators processed</span></div>';
+                            
+                            if (failCount > 0) {
+                                summaryHtml += '<div style="margin-top:15px;max-height:150px;overflow-y:auto;border:1px solid #fecaca;border-radius:8px;background:#fef2f2;padding:10px;">';
+                                summaryHtml += '<div style="font-weight:600;color:#dc2626;font-size:12px;margin-bottom:8px;"><i class="fas fa-exclamation-triangle"></i> Failed Events:</div>';
+                                results.filter(r => r.status === 'error').forEach(function(r) {
+                                    var eventName = r.name ? (r.name.length > 40 ? r.name.substring(0, 40) + '...' : r.name) : 'Unknown';
+                                    summaryHtml += '<div style="font-size:11px;color:#7f1d1d;margin:4px 0;padding:4px 8px;background:#fee2e2;border-radius:4px;">';
+                                    summaryHtml += '<strong>' + eventName + '</strong>: ' + (r.message || 'Unknown error');
+                                    summaryHtml += '</div>';
+                                });
+                                summaryHtml += '</div>';
+                            }
+                            
+                            Swal.fire({
+                                icon: isAllSuccess ? 'success' : 'warning',
+                                title: isAllSuccess ? 'IOC Enrichment Completed!' : 'IOC Enrichment Finished',
+                                html: summaryHtml,
+                                confirmButtonText: 'Close & Refresh',
+                                allowOutsideClick: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }, 300);
+                    }, 1500);
+                }
             }
             </script>
 
