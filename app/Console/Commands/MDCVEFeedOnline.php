@@ -67,7 +67,15 @@ class MDCVEFeedOnline extends Command
                 $edition = trim($row->edition ?: '*');
 
                 $part = $this->detectCPEPart($vendor, $product);
-                $cpeName = "cpe:2.3:{$part}:{$vendor}:{$product}:{$version}:{$edition}";
+                
+                // For virtualMatchString: use shorter CPE format (it allows partial matching)
+                // If version is *, just use part:vendor:product
+                // If version is specific, add it
+                if ($version === '*') {
+                    $cpeName = "cpe:2.3:{$part}:{$vendor}:{$product}";
+                } else {
+                    $cpeName = "cpe:2.3:{$part}:{$vendor}:{$product}:{$version}";
+                }
 
                 $this->info("🔍 Fetching CVE for: {$cpeName}");
 
@@ -100,13 +108,18 @@ class MDCVEFeedOnline extends Command
 
                 do {
 
-                    // NEW: เพิ่ม date filter ลงใน URL
+                    // Use keywordSearch - more flexible than cpeName/virtualMatchString
+                    // This searches for CVEs containing the vendor and product in their descriptions/configurations
+                    $searchKeyword = "{$vendor} {$product}";
+                    
                     $url = "rest/json/cves/2.0?"
-                        . "cpeName=" . urlencode($cpeName)
-                        . "&pubStartDate={$pubStartDate}"
-                        . "&pubEndDate={$pubEndDate}"
+                        . "keywordSearch=" . urlencode($searchKeyword)
+                        . "&pubStartDate=" . urlencode($pubStartDate)
+                        . "&pubEndDate=" . urlencode($pubEndDate)
                         . "&startIndex={$startIndex}"
                         . "&resultsPerPage={$pageSize}";
+                    
+                    $this->info("🔗 URL: " . $url);
 
 
                     $this->info("🌐 Calling NVD API (safe mode)...");
@@ -444,14 +457,27 @@ class MDCVEFeedOnline extends Command
     {
         for ($i = 0; $i < $retry; $i++) {
             try {
+                $apiKey = env('NVD_API_KEY');
+                
+                // Debug: check if API key is set
+                if (empty($apiKey)) {
+                    echo "⚠️  WARNING: NVD_API_KEY is empty!\n";
+                }
+                
                 return $client->get($url, [
                     'headers' => [
-                        'apiKey' => env('NVD_API_KEY')
+                        'apiKey' => $apiKey
                     ]
                 ]);
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 $code = $e->getCode();
-
+                $response = $e->getResponse();
+                $body = $response ? (string) $response->getBody() : 'No response body';
+                
+                // Debug: show actual error details
+                echo "❌ HTTP {$code} Error\n";
+                echo "📄 Response: " . substr($body, 0, 500) . "\n";
+                
                 // 🔥 404 = ไม่มี CVE ของ product นี้ → return null = ให้ loop skip ไป
                 if ($code == 404) {
                     echo "ℹ️  404 Not Found → Skip CPE\n";
@@ -464,11 +490,18 @@ class MDCVEFeedOnline extends Command
                     sleep(15);
                     continue;
                 }
+                
+                // 🔥 403 = Forbidden (API key issue)
+                if ($code == 403) {
+                    echo "🔒 403 Forbidden - Check your NVD_API_KEY\n";
+                    return null;
+                }
 
                 // อื่นๆ → ส่ง error ออกไป
                 throw $e;
             } catch (\GuzzleHttp\Exception\ConnectException $e) {
-                echo "❌ Connection error, retrying...\n";
+                echo "❌ Connection error: " . $e->getMessage() . "\n";
+                echo "Retrying...\n";
                 sleep(3);
                 continue;
             }
