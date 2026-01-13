@@ -36,12 +36,24 @@ if ($model_has_roles) {
             ->toArray();
     }
 
-    // sub menu เหมือนกัน (ถ้ามี table site_menu_sub_permission)
-    $role_menu_sub_permission_arr = role_menu_sub_permission::select('menu_sub_id')
-        ->where('role_id', $role_id)
+    // ✅ sub menu: ตรวจว่ามี site-specific permission ไหม
+    $site_sub_permission = DB::table('site_menu_sub_permission')
+        ->where('site_id', $current_site_id)
         ->whereNull('deleted_at')
         ->pluck('menu_sub_id')
         ->toArray();
+
+    if (!empty($site_sub_permission)) {
+        // ใช้สิทธิ์เฉพาะ site
+        $role_menu_sub_permission_arr = $site_sub_permission;
+    } else {
+        // fallback: ใช้สิทธิ์ global (role-based)
+        $role_menu_sub_permission_arr = role_menu_sub_permission::select('menu_sub_id')
+            ->where('role_id', $role_id)
+            ->whereNull('deleted_at')
+            ->pluck('menu_sub_id')
+            ->toArray();
+    }
 }
 
 // dd($menu);
@@ -251,6 +263,7 @@ if ($model_has_roles) {
 
                                                     
                                                     $menu_sub_html = '';
+                                                    $has_active_sub = false; // Track if any submenu is active
                                                     foreach($menu_val->get_menu_sub as $menu_sub_val) {
                                                         // if($menu_sub_val->name == 'Batch Job') {
                                                         //     // dd($menu_sub_val);
@@ -337,6 +350,7 @@ if ($model_has_roles) {
                                                                             if(@$page == $check_menu_active_sub_val) {
                                                                                 // dd($check_menu_active_sub_val);
                                                                                 $active_sub = 'active';
+                                                                                $has_active_sub = true; // Mark parent as having active submenu
                                                                             }
                                                                         }
                                                                     }
@@ -385,6 +399,10 @@ if ($model_has_roles) {
                                     
 
                                                 $li_class = $active;
+                                                // If any submenu is active, add active class to parent
+                                                if($menu_val->is_have_sub == 1 && !empty($has_active_sub)) {
+                                                    $li_class = 'active';
+                                                }
                                                 if($menu_val->is_have_sub == 1) {
                                                     $li_class .= ' nav-w-children';
                                                 }
