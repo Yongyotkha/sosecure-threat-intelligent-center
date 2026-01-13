@@ -130,252 +130,11 @@
                         </div>
                     </div>
                 </header>
+                
 
 
 
                 <section class="scrollable wrapper">
-
-                    <div class="container-fluid m-b-xs">
-                        <div class="row">
-                            <div class="col-xl-2 col-lg-2 col-md-12 nopadding m-b-12">
-                                <div class="row">
-                                    <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149.5px;">
-                                        <a href="javascript:void(0)" onclick="dataType2('reported')">
-                                            <div class="card-dash" style="height: 149.5px; border: 1px solid #e4e4e4;">
-                                                <div class="left-card">
-                                                    <div class="img-icon-card" style="width: 55px; height: 55px;"><img
-                                                            src="{{ asset('images/icon/Reported.png') }}" alt=""
-                                                            onerror="setDefaultPic(this)"></div>
-                                                    <h3 class="name-dash-text text-dark text-upper ">Reported</h3>
-                                                    <span class="number-card green number_reported">0</span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149.5px;">
-                                        <a href="javascript:void(0)" onclick="dataType2('in_progress')">
-                                            <div class="card-dash" style="height: 149.5px; border: 1px solid #e4e4e4;">
-                                                <div class="left-card">
-                                                    <div class="img-icon-card" style="width: 55px; height: 55px;"><img
-                                                            src="{{ asset('images/icon/In progress.png') }}" alt=""
-                                                            onerror="setDefaultPic(this)"></div>
-                                                    <h3 class="name-dash-text text-dark text-upper ">In Progress</h3>
-                                                    <span class="number-card info number_in_progress">0</span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col-lg-12 col-md-4 col-sm-12 col-xs-12" style="height: 149px;">
-                                        <a href="javascript:void(0)" onclick="dataType2('close')">
-                                            <div class="card-dash" style="height: 150px; border: 1px solid #e4e4e4;">
-                                                <div class="left-card">
-                                                    <div class="img-icon-card" style="width: 55px; height: 55px;"><img
-                                                            src="{{ asset('images/icon/Close .png') }}" alt=""
-                                                            onerror="setDefaultPic(this)"></div>
-                                                    <h3 class="name-dash-text text-dark text-upper ">Close</h3>
-                                                    <span class="number-card warning number_close">0</span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <div class="col-xl-10 col-lg-10 col-md-12">
-                                <div class="row">
-                                    <div class="container-fluid" style="">
-                                        <div class="row">
-                                            <div class="col-md-6 col-sm-12 col-xs-12 nopadding"
-                                                style="border-right: 0px !important;border: 1px solid #e4e4e4;">
-                                                <div class="col-md-12 nopadding"
-                                                    style="
-                                                  /* grid-template-columns: 1fr 1fr; */
-                                                  /* display: grid; */
-                                                  ">
-                                                    <div class="col-md-12 nopadding"
-                                                        style="
-                                                     border-right: solid 0;
-                                                     ">
-                                                        <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6"
-                                                            style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
-                                                            <a href="javascript:void(0)" onclick="dataType2('mobile')">
-                                                                <div class="left-card">
-                                                                    <div id="left1" class="img-icon-card ice"
-                                                                        style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
-                                                                        <img src="{{ asset('images/icon/MOBILE.png') }}"
-                                                                            alt="" onerror="setDefaultPic(this)"
-                                                                            class="border_cicle"
-                                                                            style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%; background: #d8d8d8;"><span
-                                                                            class="number-card_s warning"
-                                                                            style="font-size: 35px !important;padding: 20px; margin-left: 108px; color: #ffcc00;"
-                                                                            id="icon_mobile">0</span>
-                                                                        <p class="text_icon_social">Mobile</p>
-                                                                    </div>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                        <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6"
-                                                            style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
-                                                            <a href="javascript:void(0)" onclick="dataType2('line')">
-                                                                <div class="left-card">
-                                                                    <div id="right1" class="img-icon-card ice right"
-                                                                        style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
-                                                                        <img src="{{ asset('images/icon/line_icon.png') }}"
-                                                                            alt="" onerror="setDefaultPic(this)"
-                                                                            class="border_cicle"
-                                                                            style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%; "><span
-                                                                            class="number-card_s info"
-                                                                            style="font-size: 35px !important;padding: 20px; margin-left: 108px; color: #00dcff;"
-                                                                            id="icon_line">0</span>
-                                                                        <p class="text_icon_social">Line</p>
-                                                                    </div>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                        <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6"
-                                                            style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
-                                                            <a href="javascript:void(0)" onclick="dataType2('website')">
-                                                                <div class="left-card">
-                                                                    <div id="left2" class="img-icon-card ice"
-                                                                        style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
-                                                                        <img src="{{ asset('images/icon/WEBSITE.png') }}"
-                                                                            alt="" onerror="setDefaultPic(this)"
-                                                                            class="border_cicle"
-                                                                            style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;"><span
-                                                                            class="number-card_s "
-                                                                            style="color: #8793db; font-size: 35px !important;padding: 20px; margin-left: 108px; color: #8793db;"
-                                                                            id="icon_website">0</span>
-                                                                        <p class="text_icon_social">Website</p>
-                                                                    </div>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                        <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6"
-                                                            style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
-                                                            <a href="javascript:void(0)" onclick="dataType2('facebook')">
-                                                                <div class="left-card">
-                                                                    <div id="right2" class="img-icon-card ice right"
-                                                                        style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
-                                                                        <img src="{{ asset('images/icon/FACEBOOK.png') }}"
-                                                                            alt="" onerror="setDefaultPic(this)"
-                                                                            class="border_cicle"
-                                                                            style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;"><span
-                                                                            class="number-card_s info"
-                                                                            style="font-size: 35px !important;padding: 20px; margin-left: 108px; color: #00dcff;"
-                                                                            id="icon_facebook">0</span>
-                                                                        <p class="text_icon_social">Fanpage</p>
-                                                                    </div>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                        <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6"
-                                                            style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
-                                                            <a href="javascript:void(0)" onclick="dataType2('twitter')">
-                                                                <div class="left-card">
-                                                                    <div id="left3" class="img-icon-card ice"
-                                                                        style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
-                                                                        <img src="{{ asset('images/icon/TWIITER.png') }}"
-                                                                            alt="" onerror="setDefaultPic(this)"
-                                                                            class="border_cicle"
-                                                                            style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;"><span
-                                                                            class="number-card_s "
-                                                                            style="color: #5bb984; font-size: 35px !important;padding: 20px; margin-left: 108px; color: #5bb984;"
-                                                                            id="icon_twitter">0</span>
-                                                                        <p class="text_icon_social">Twitter</p>
-                                                                    </div>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                        <div class="card-dash-compro none-bg none-shadow col-md-6 col-xs-6"
-                                                            style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
-                                                            <a href="javascript:void(0)" onclick="dataType2('other')">
-                                                                <div class="left-card">
-                                                                    <div id="right3" class="img-icon-card ice right"
-                                                                        style="height: 100px; width: 300px; text-align: left; margin-left: 90px;">
-                                                                        <img src="{{ asset('images/icon/OTHER2.png') }}"
-                                                                            alt="" onerror="setDefaultPic(this)"
-                                                                            class="border_cicle"
-                                                                            style="width: 60px; height: 60px; margin-left: 50px; margin-top: 10px; border-radius: 50%;"><span
-                                                                            class="number-card_s "
-                                                                            style="color: #565656; font-size: 35px !important;padding: 20px; margin-left: 108px; color: #565656;"
-                                                                            id="icon_other">0</span>
-                                                                        <p class="text_icon_social">Other</p>
-                                                                    </div>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3 col-sm-12 col-xs-12 nopadding">
-                                                <div class="col-md-12 nopadding">
-                                                    <div class="card-dash-compro none-bg none-shadow "
-                                                        style="border-top: solid 1px #e4e4e4;min-height: 51px;box-shadow: 0 0px 0px #f5f5f5;">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-12 nopadding">
-                                                    <div class="card-dash-compro none-bg none-shadow "
-                                                        style="min-height: 149px; box-shadow: 0 0px 0px #f5f5f5;">
-                                                        <a href="#" onclick="dataType('social')">
-                                                            <div id="icon_publish" class="left-card"
-                                                                style="margin-left: 0px;">
-                                                                <div class="img-icon-card ice"
-                                                                    style="width: 150px;height: 150px;"><img
-                                                                        src="{{ asset('images/icebergline2.png') }}"
-                                                                        alt="" onerror="setDefaultPic(this)">
-                                                                </div>
-                                                                <h3 class="name-dash-text-compro text-dark text-upper ">
-                                                                    Public</h3>
-                                                                <span class="number-card warning"
-                                                                    id="compromise-count">0</span>
-                                                            </div>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-12 nopadding">
-                                                    <div id="area_pp" class="card-dash-compro none-bg none-shadow"
-                                                        style="min-height: 151px;box-shadow: 0 0px 0px #f5f5f5;"></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3 col-sm-12 col-xs-12 nopadding"
-                                                style=" border: 1px solid #e4e4e4;">
-                                                <div class="col-md-12 nopadding">
-                                                    <div class="card-dash-compro none-bg none-shadow "
-                                                        style="min-height: 51px; box-shadow: 0 1px 1px rgb(0 0 0 / 20%); ">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-12 nopadding">
-                                                    <div class="card-dash-compro none-bg none-shadow"
-                                                        style=" box-shadow: 0 1px 1px rgb(0 0 0 / 20%);">
-                                                        <a href="#" onclick="dataType('darkweb_public')">
-                                                            <div class="left-card">
-                                                                <div class="img-icon-card ice"
-                                                                    style="width: 150px;height: 150px; "><img
-                                                                        src="{{ asset('images/icebergline1.png') }}"
-                                                                        alt="" onerror="setDefaultPic(this)">
-                                                                </div>
-                                                                <h3 class="name-dash-text-compro text-dark text-upper">Dark
-                                                                    Web</h3>
-                                                                <span class="number-card info" id="darkweb-count">0</span>
-                                                            </div>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-12 nopadding">
-                                                    <div class="card-dash-compro none-bg none-shadow "
-                                                        style="min-height: 149px; box-shadow: 0 1px 1px rgb(0 0 0 / 20%); ">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <section class="panel panel-default" id="hide-advance-search" style="display: none">
                         <header class="panel-heading font-bold panel-header-blue">
                             <div class="row">
@@ -420,38 +179,47 @@
                                             <button id="all" class="btn btn-grey check_type active" value="">
                                                 <span> All</span>
                                             </button>
-                                            <button class="btn btn-grey check_type btn-social-click" value="social">
-                                                <span> Public </span>
+                                            <button class="btn btn-grey check_type btn-social-click" value="surface_web">
+                                                <span> Surface Web </span>
                                             </button>
-                                            <button class="btn btn-grey check_type" value="darkweb_public">
+                                            <button class="btn btn-grey check_type btn-darkweb-click" value="darkweb">
                                                 <span> Darkweb </span>
-                                            </button>
-                                            <button class="btn btn-grey check_type" value="credential">
-                                                <span> Credential </span>
                                             </button>
                                         </div>
                                     </div>
                                     <div class="col-lg-4 hide-social" style="display: none">
-                                        <h5 class="font-weight-bold">Social</h5>
+                                        <h5 class="font-weight-bold">Surface Web</h5>
                                         <div id="groupby-social" class="btn-group special">
-                                            <button id="all" class="btn btn-grey active check_social"
-                                                value="Mobile">
-                                                <span> Mobile App</span>
-                                            </button>
-                                            <button class="btn btn-grey check_social" value="Facebook">
-                                                <span> Fanpage </span>
-                                            </button>
-                                            <button class="btn btn-grey check_social" value="Line">
-                                                <span> Line </span>
-                                            </button>
-                                            <button class="btn btn-grey check_social" value="Twitter">
-                                                <span> Twitter </span>
+                                            <button id="all_surface" class="btn btn-grey active check_social"
+                                                value="">
+                                                <span> All</span>
                                             </button>
                                             <button class="btn btn-grey check_social" value="Website">
-                                                <span> Website </span>
+                                                <span> Website/forum</span>
                                             </button>
-                                            <button class="btn btn-grey check_social" value="other">
-                                                <span> Other </span>
+                                            <button class="btn btn-grey check_social" value="Social">
+                                                <span> Social </span>
+                                            </button>
+                                            <button class="btn btn-grey check_social" value="Community">
+                                                <span> Community </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 hide-darkweb" style="display: none">
+                                        <h5 class="font-weight-bold">Dark Web</h5>
+                                        <div id="groupby-darkweb" class="btn-group special">
+                                            <button id="all_darkweb" class="btn btn-grey active check_darkweb"
+                                                value="">
+                                                <span> All</span>
+                                            </button>
+                                            <button class="btn btn-grey check_darkweb" value="Website">
+                                                <span> Website/forum</span>
+                                            </button>
+                                            <button class="btn btn-grey check_darkweb" value="Social">
+                                                <span> Social </span>
+                                            </button>
+                                            <button class="btn btn-grey check_darkweb" value="Community">
+                                                <span> Community </span>
                                             </button>
                                         </div>
                                     </div>
@@ -531,13 +299,216 @@
                         </div>
                     </section>
 
+                    <div class="container-fluid m-b-xs" style="margin-top: -15px;">
+                        <div class="row m-b-15" style="margin-bottom: 5px;">
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12" style="padding-left: 2px; padding-right: 2px;">
+                                <a href="javascript:void(0)" onclick="dataType2('reported')" style="text-decoration: none;">
+                                    <div style="background-color: #253448; height: 100px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; border: 1px solid #e4e4e4; border-radius: 4px;">
+                                        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                                            <h3 class="text-white text-upper" style="margin: 0 0 5px 0; font-size: 18px;">Reported</h3>
+                                            <span class="number-card number_reported" style="font-size: 30px; line-height: 1;color: #2CC470;">0</span>
+                                        </div>
+                                        <div style="width: 50px; height: 50px;">
+                                            <img src="{{ asset('images/icon/dataleak/statistics.png') }}" alt=""
+                                                onerror="setDefaultPic(this)" style="width: 100%; height: 100%; object-fit: contain;">
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12" style="padding-left: 2px; padding-right: 2px;">
+                                <a href="javascript:void(0)" onclick="dataType2('in_progress')" style="text-decoration: none;">
+                                    <div style="background-color: #253448; height: 100px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; border: 1px solid #e4e4e4; border-radius: 4px;">
+                                        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                                            <h3 class="text-white text-upper" style="margin: 0 0 5px 0; font-size: 18px;">In Progress</h3>
+                                            <span class="number-card number_in_progress" style="font-size: 30px; line-height: 1;color: #00DCFF;">0</span>
+                                        </div>
+                                        <div style="width: 50px; height: 50px;">
+                                            <img src="{{ asset('images/icon/dataleak/process.png') }}" alt=""
+                                                onerror="setDefaultPic(this)" style="width: 100%; height: 100%; object-fit: contain;">
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12" style="padding-left: 2px; padding-right: 2px;">
+                                <a href="javascript:void(0)" onclick="dataType2('close')" style="text-decoration: none;">
+                                    <div style="background-color: #253448; height: 100px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; border: 1px solid #e4e4e4; border-radius: 4px;">
+                                        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                                            <h3 class="text-white text-upper" style="margin: 0 0 5px 0; font-size: 18px;">Close</h3>
+                                            <span class="number-card number_close" style="font-size: 30px; line-height: 1;color: #FFAB09;">0</span>
+                                        </div>
+                                        <div style="width: 50px; height: 50px;">
+                                            <img src="{{ asset('images/icon/Close .png') }}" alt=""
+                                                onerror="setDefaultPic(this)" style="width: 100%; height: 100%; object-fit: contain;">
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row" style="display: flex; flex-wrap: nowrap; overflow-x: auto; min-width: 900px; align-items: flex-start; gap: 4px;">
+                            <div id="all-card-wrapper" style="flex: 0 0 330px; min-width: 330px; align-self: stretch; display: flex;">
+                                <div style="border: 1px solid #e4e4e4; border-radius: 4px; overflow: hidden; background: #fff; margin-bottom: 2px; flex: 1; display: flex; flex-direction: column;">
+                                    <div onclick="var w=$('#all-card-wrapper'); var c=$('#online-domains-content'); if(c.is(':visible')){w.css('align-self','flex-start');c.slideUp(300);}else{c.slideDown(300,function(){w.css('align-self','stretch');})} $(this).find('.fa-chevron-circle-down').toggleClass('fa-rotate-180');" 
+                                        style="background: linear-gradient(to right, #253448 60%, #3b5170ff 100%) !important; padding: 15px 25px; color: white; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                                        <div style="display: flex; align-items: center;">
+                                            <i class="fas fa-table" style="font-size: 18px; margin-right: 10px;"></i>
+                                            <h3 style="margin: 0; font-size: 18px; font-weight: 500;">ALL</h3>
+                                        </div>
+                                        <i class="fas fa-chevron-circle-down fa-rotate-180" style="transition: transform 0.3s; font-size: 24px;"></i>
+                                    </div>
+                                    <div id="online-domains-content">
+                                        <div style="display: flex; flex-wrap: nowrap; height: 100%;">
+                                            <div style="flex: 1; border-right: 1px solid #e4e4e4; min-width: 80px;">
+                                                <a href="#" onclick="dataType('social')"
+                                                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-decoration: none; color: inherit; height: 100%;">
+                                                    <div style="width: 80px; height: 80px; margin-bottom: 10px;">
+                                                        <img src="{{ asset('images/icebergline2.png') }}"
+                                                            alt="" onerror="setDefaultPic(this)"
+                                                            style="width: 100%; height: 100%; object-fit: contain;">
+                                                    </div>
+                                                    <span class="number-card" style="font-size: 28px; font-weight: 700; color: #3869D4; line-height: 1.2;"
+                                                        id="compromise-count">0</span>
+                                                    <span style="font-size: 14px; font-weight: 700; color: #000; text-transform: uppercase; min-height: 36px; display: flex; align-items: center;">SURFACE WEB</span>
+                                                </a>
+                                            </div>
+                                            <div style="flex: 1; min-width: 80px;">
+                                                <a href="#" onclick="dataType('darkweb_public')"
+                                                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-decoration: none; color: inherit; height: 100%;">
+                                                    <div style="width: 80px; height: 80px; margin-bottom: 10px;">
+                                                        <img src="{{ asset('images/icebergline1.png') }}"
+                                                            alt="" onerror="setDefaultPic(this)"
+                                                            style="width: 100%; height: 100%; object-fit: contain;">
+                                                    </div>
+                                                    <span class="number-card" style="font-size: 28px; font-weight: 700; color: #FCC838; line-height: 1.2;"
+                                                        id="darkweb-count">0</span>
+                                                    <span style="font-size: 14px; font-weight: 700; color: #000; text-transform: uppercase; min-height: 36px; display: flex; align-items: center;">DARK WEB</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="flex: 1; min-width: 700px;">
+                                <div style="display: flex; flex-wrap: nowrap; gap: 4px;">
+                                    <div style="flex: 1; min-width: 280px;">
+                                        <div style="border: 1px solid #e4e4e4; border-radius: 4px; overflow: hidden; background: #fff; margin-bottom: 2px;">
+                                            <div onclick="$('#social-content').slideToggle(300); $(this).find('.fa-chevron-circle-down').toggleClass('fa-rotate-180');" 
+                                                style="background: linear-gradient(to right, #253448 60%, #3b5170ff 100%) !important; padding: 15px 25px; color: white; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                                                <div style="display: flex; align-items: center;">
+                                                    <i class="fas fa-table" style="font-size: 18px; margin-right: 10px;"></i>
+                                                    <h3 style="margin: 0; font-size: 18px; font-weight: 500;">Surface Web</h3>
+                                                </div>
+                                                <i class="fas fa-chevron-circle-down fa-rotate-180" style="transition: transform 0.3s; font-size: 24px;"></i>
+                                            </div>
+                                            <div id="social-content">
+                                                <div style="display: flex; flex-wrap: wrap; align-items: stretch;">
+                                                    <div style="width: 33.33%; border-right: 1px solid #e4e4e4;">
+                                                        <a href="javascript:void(0)" onclick="dataType2('website_s')"
+                                                            style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 30px 20px; text-decoration: none; color: inherit; height: 100%;">
+                                                            <div style="width: 80px; height: 80px; margin-bottom: 10px;">
+                                                                <img src="{{ asset('images/icon/dataleak/s_website.png') }}" alt=""
+                                                                    onerror="setDefaultPic(this)"
+                                                                    style="width: 100%; height: 100%; object-fit: contain;">
+                                                            </div>
+                                                            <span id="icon_website_s" class="number-card_s" style="font-size: 28px; font-weight: 700; color: #3869D4; line-height: 1.2;">0</span>
+                                                            <span style="font-size: 14px; font-weight: 600; color: #000; text-align: center; min-height: 36px; display: flex; align-items: center;">Website / Forum</span>
+                                                        </a>
+                                                    </div>
+                                                    <div style="width: 33.33%; border-right: 1px solid #e4e4e4;">
+                                                        <a href="javascript:void(0)" onclick="dataType2('social_s')"
+                                                            style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 30px 20px; text-decoration: none; color: inherit; height: 100%;">
+                                                            <div style="width: 80px; height: 80px; margin-bottom: 10px;">
+                                                                <img src="{{ asset('images/icon/dataleak/s_social.png') }}" alt=""
+                                                                    onerror="setDefaultPic(this)"
+                                                                    style="width: 100%; height: 100%; object-fit: contain;">
+                                                            </div>
+                                                            <span id="icon_social_s" class="number-card_s" style="font-size: 28px; font-weight: 700; color: #FCC838; line-height: 1.2;">0</span>
+                                                            <span style="font-size: 14px; font-weight: 600; color: #000; text-align: center; min-height: 36px; display: flex; align-items: center;">Social</span>
+                                                        </a>
+                                                    </div>
+                                                    <div style="width: 33.33%;">
+                                                        <a href="javascript:void(0)" onclick="dataType2('community_s')"
+                                                            style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 30px 20px; text-decoration: none; color: inherit; height: 100%;">
+                                                            <div style="width: 80px; height: 80px; margin-bottom: 10px;">
+                                                                <img src="{{ asset('images/icon/dataleak/s_community.png') }}"
+                                                                    alt="" onerror="setDefaultPic(this)"
+                                                                    style="width: 100%; height: 100%; object-fit: contain;">
+                                                            </div>
+                                                            <span id="icon_community_s" class="number-card_s" style="font-size: 28px; font-weight: 700; color: #FF0000; line-height: 1.2;">0</span>
+                                                            <span style="font-size: 14px; font-weight: 600; color: #000; text-align: center; min-height: 36px; display: flex; align-items: center;">Community</span>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="flex: 1; min-width: 280px;">
+                                        <div style="border: 1px solid #e4e4e4; border-radius: 4px; overflow: hidden; background: #fff; margin-bottom: 2px;">
+                                            <div onclick="$('#social-content-2').slideToggle(300); $(this).find('.fa-chevron-circle-down').toggleClass('fa-rotate-180');" 
+                                                style="background: linear-gradient(to right, #253448 60%, #3b5170ff 100%) !important; padding: 15px 25px; color: white; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                                                <div style="display: flex; align-items: center;">
+                                                    <i class="fas fa-table" style="font-size: 18px; margin-right: 10px;"></i>
+                                                    <h3 style="margin: 0; font-size: 18px; font-weight: 500;">Dark Web</h3>
+                                                </div>
+                                                <i class="fas fa-chevron-circle-down fa-rotate-180" style="transition: transform 0.3s; font-size: 24px;"></i>
+                                            </div>
+                                            <div id="social-content-2">
+                                                <div style="display: flex; flex-wrap: wrap; align-items: stretch;">
+                                                    <div style="width: 33.33%; border-right: 1px solid #e4e4e4;">
+                                                        <a href="javascript:void(0)" onclick="dataType2('website_d')"
+                                                            style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 30px 20px; text-decoration: none; color: inherit; height: 100%;">
+                                                            <div style="width: 80px; height: 80px; margin-bottom: 10px;">
+                                                                <img src="{{ asset('images/icon/dataleak/d_website.png') }}" alt=""
+                                                                    onerror="setDefaultPic(this)"
+                                                                    style="width: 100%; height: 100%; object-fit: contain;">
+                                                            </div>
+                                                            <span id="icon_website_d" class="number-card_s" style="font-size: 28px; font-weight: 700; color: #6F57E9; line-height: 1.2;">0</span>
+                                                            <span style="font-size: 14px; font-weight: 600; color: #000; text-align: center; min-height: 36px; display: flex; align-items: center;">Website / Forum</span>
+                                                        </a>
+                                                    </div>
+                                                    <div style="width: 33.33%; border-right: 1px solid #e4e4e4;">
+                                                        <a href="javascript:void(0)" onclick="dataType2('social_d')"
+                                                            style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 30px 20px; text-decoration: none; color: inherit; height: 100%;">
+                                                            <div style="width: 80px; height: 80px; margin-bottom: 10px;">
+                                                                <img src="{{ asset('images/icon/dataleak/d_social.png') }}" alt=""
+                                                                    onerror="setDefaultPic(this)"
+                                                                    style="width: 100%; height: 100%; object-fit: contain;">
+                                                            </div>
+                                                            <span id="icon_social_d" class="number-card_s" style="font-size: 28px; font-weight: 700; color: #2CC470; line-height: 1.2;">0</span>
+                                                            <span style="font-size: 14px; font-weight: 600; color: #000; text-align: center; min-height: 36px; display: flex; align-items: center;">Social</span>
+                                                        </a>
+                                                    </div>
+                                                    <div style="width: 33.33%;">
+                                                        <a href="javascript:void(0)" onclick="dataType2('community_d')"
+                                                            style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 30px 20px; text-decoration: none; color: inherit; height: 100%;">
+                                                            <div style="width: 80px; height: 80px; margin-bottom: 10px;">
+                                                                <img src="{{ asset('images/icon/dataleak/d_community.png') }}"
+                                                                    alt="" onerror="setDefaultPic(this)"
+                                                                    style="width: 100%; height: 100%; object-fit: contain;">
+                                                            </div>
+                                                            <span id="icon_community_d" class="number-card_s" style="font-size: 28px; font-weight: 700; color: #FFAB09; line-height: 1.2;">0</span>
+                                                            <span style="font-size: 14px; font-weight: 600; color: #000; text-align: center; min-height: 36px; display: flex; align-items: center;">Community</span>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    
+
 
 
 
 
 
                     <section class="panel panel-default">
-                        <header class="panel-heading font-bold panel-header-blue">
+                        <header class="panel-heading font-bold panel-header-blue" style="background: linear-gradient(to right, #253448 60%, #3b5170ff 100%) !important; color: white !important; padding: 15px;">
                             <div class="row">
                                 <div class="col-xs-12">
                                     <i class="fas fa-table"></i> Table Data Leak
@@ -545,9 +516,9 @@
                             </div>
                         </header>
                         <div class="panel-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <h5 class="font-weight-bold">Severity</h5>
+                            <div class="row" style="display: flex; align-items: flex-end;">
+                                <div class="col-md-6">
+                                    <h5 class="font-weight-bold"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Severity</h5>
                                     <div class="st-dt-leak">
                                         <span class="st-dt vrh" data-toggle="tooltip" data-placement="right"
                                             data-html="true"
@@ -565,6 +536,11 @@
                                             title="<div class='st-flex'><div class='box-st-tooltip vrl'>Informational</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลที่เป็นข้อมูลทั่วไปหรือเป็นข่าวที่ยังไม่ได้รับการยืนยันว่าเป็นข้อมูลรั่วไหลจริง</div></div>">Very
                                             Low</span>
                                     </div>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    <button class="btn btn-sm btn-success ms-2" style="margin-left:10px;" id="btn-export-excel" >
+                                        <i class="fa fa-download"></i> Export Data Leak
+                                    </button>
                                 </div>
                             </div>
                             <div class="table-responsive">
@@ -799,6 +775,7 @@
             {{-- active_btn('#fillter_click_keyword .btn-selector'); --}}
             active_btn('#groupby-type .btn-grey');
             active_btn('#groupby-social .btn-grey');
+            active_btn('#groupby-darkweb .btn-grey');
             active_btn('#btngroup_status .btn-grey');
             active_btn('#btngroup_monitoring .btn-grey');
 
@@ -812,21 +789,21 @@
                 let right2 = document.getElementById("right2");
                 let right3 = document.getElementById("right3");
                 if (x.matches) {
-                    area_logo_os.style.minHeight = "0px";
-                    left1.style.marginLeft = "60px";
-                    left2.style.marginLeft = "60px";
-                    left3.style.marginLeft = "60px";
-                    right1.style.marginLeft = "60px";
-                    right2.style.marginLeft = "60px";
-                    right3.style.marginLeft = "60px";
+                    if (area_logo_os) area_logo_os.style.minHeight = "0px";
+                    if (left1) left1.style.marginLeft = "60px";
+                    if (left2) left2.style.marginLeft = "60px";
+                    if (left3) left3.style.marginLeft = "60px";
+                    if (right1) right1.style.marginLeft = "60px";
+                    if (right2) right2.style.marginLeft = "60px";
+                    if (right3) right3.style.marginLeft = "60px";
                 } else {
-                    area_logo_os.style.minHeight = "151px";
-                    left1.style.marginLeft = "90px";
-                    left2.style.marginLeft = "90px";
-                    left3.style.marginLeft = "90px";
-                    right1.style.marginLeft = "90px";
-                    right2.style.marginLeft = "90px";
-                    right3.style.marginLeft = "90px";
+                    if (area_logo_os) area_logo_os.style.minHeight = "151px";
+                    if (left1) left1.style.marginLeft = "90px";
+                    if (left2) left2.style.marginLeft = "90px";
+                    if (left3) left3.style.marginLeft = "90px";
+                    if (right1) right1.style.marginLeft = "90px";
+                    if (right2) right2.style.marginLeft = "90px";
+                    if (right3) right3.style.marginLeft = "90px";
                 }
             }
 
@@ -841,8 +818,13 @@
             $('.btn').click(function() {
                 if ($('.btn-social-click').hasClass('active')) {
                     $('.hide-social').show();
+                    $('.hide-darkweb').hide();
+                } else if ($('.btn-darkweb-click').hasClass('active')) {
+                    $('.hide-darkweb').show();
+                    $('.hide-social').hide();
                 } else {
                     $('.hide-social').hide();
+                    $('.hide-darkweb').hide();
                 }
             });
 
@@ -869,6 +851,9 @@
             var check_serverity = null;
             var check_monitoring = null;
             var check_social = 'Mobile';
+            var check_darkweb = null;
+            var click_type = null;
+            var click_type2 = null;
             var site_code = null;
 
             @if (!empty(get_role_custom()))
@@ -917,11 +902,23 @@
 
             $(".check_type").click(function() {
                 check_type = $(this).val();
-
+                if (check_type === 'surface_web') {
+                    check_darkweb = null;
+                } else if (check_type === 'darkweb') {
+                    check_social = null;
+                } else {
+                    check_social = null;
+                    check_darkweb = null;
+                }
             });
             $(".check_social").click(function() {
                 check_social = $(this).val();
+                check_darkweb = null;
+            });
 
+            $(".check_darkweb").click(function() {
+                check_darkweb = $(this).val();
+                check_social = null;
             });
 
             $(".check_serverity").click(function() {
@@ -989,6 +986,7 @@
                             d.check_serverity = check_serverity;
                             d.check_monitoring = check_monitoring;
                             d.check_social = check_social;
+                            d.check_darkweb = check_darkweb;
 
                             return d;
                         },
@@ -1010,7 +1008,7 @@
                             width: '1px',
                             render: function(data, type, full, meta) {
                                 return '<label><input type="checkbox" name="social_id" class="social_id"  value="' +
-                                    full.id + '"><span class="label-text"></span></label>';
+                                    full.ref_id + '"><span class="label-text"></span></label>';
                             },
                         },
                         {
@@ -1041,12 +1039,16 @@
                         },
                         {
                             targets: 3,
-                            width: '60px',
+                            width: '80px',
                             className: 'nowrap',
                             render: function(data, type, full, meta) {
 
                                 if (full.source_name) {
-                                    return full.source_name;
+                                    var maxLen = 15;
+                                    var displayText = full.source_name.length > maxLen 
+                                        ? full.source_name.substr(0, maxLen) + '...' 
+                                        : full.source_name;
+                                    return '<span data-rel="tooltip" title="' + full.source_name.replace(/"/g, '&quot;') + '" style="display:inline-block; max-width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + displayText + '</span>';
                                 }
                                 return '-';
 
@@ -1118,15 +1120,15 @@
                         {
                             targets: 7,
                             width: '10px',
-                            className: 'nowrap',
+                            className: 'nowrap text-center',
                             render: function(data, type, full, meta) {
 
                                 if (full.ref_status_monitoring == 'in_progress') {
-                                    return '<span class="badge" style="background-color: #FFC107;">Progress</span>';
+                                    return '<span class="badge" style="background-color: #FFC107; font-size: 13px; width: 95px; display: inline-block; text-align: center; padding: 8px 0; border-radius: 50px;">Progress</span>';
                                 } else if (full.ref_status_monitoring == 'reported') {
-                                    return '<span class="badge" style="background-color: #28A745;">Reported</span>';
+                                    return '<span class="badge" style="background-color: #28A745; font-size: 13px; width: 95px; display: inline-block; text-align: center; padding: 8px 0; border-radius: 50px;">Reported</span>';
                                 } else if (full.ref_status_monitoring == 'close') {
-                                    return '<span class="badge" style="background-color: #DC3545;">Close</span>';
+                                    return '<span class="badge" style="background-color: #DC3545; font-size: 13px; width: 95px; display: inline-block; text-align: center; padding: 8px 0; border-radius: 50px;">Close</span>';
                                 } else {
                                     return '-';
                                 }
@@ -1136,18 +1138,18 @@
                         {
                             targets: 6,
                             width: '8px',
-                            className: 'nowrap',
+                            className: 'nowrap text-center',
                             render: function(data, type, full, meta) {
                                 if (full.ref_serverity == 'critical') {
-                                    return '<span class="badge" style="background-color: #b93624;">Critical</span>';
+                                    return '<span class="badge" style="background-color: #b93624; font-size: 13px; width: 95px; display: inline-block; text-align: center; padding: 8px 0; border-radius: 50px;">Critical</span>';
                                 } else if (full.ref_serverity == 'high') {
-                                    return '<span class="badge" style="background-color: #fcc838;">High</span>';
+                                    return '<span class="badge" style="background-color: #fcc838;color:#000; font-size: 13px; width: 95px; display: inline-block; text-align: center; padding: 8px 0; border-radius: 50px;">High</span>';
                                 } else if (full.ref_serverity == 'medium') {
-                                    return '<span class="badge" style="background-color: #f2ff15;color:#333;">Medium</span>';
+                                    return '<span class="badge" style="background-color: #f2ff15;color:#000; font-size: 13px; width: 95px; display: inline-block; text-align: center; padding: 8px 0; border-radius: 50px;">Medium</span>';
                                 } else if (full.ref_serverity == 'low') {
-                                    return '<span class="badge" style="background-color: #409967;">Low</span>';
+                                    return '<span class="badge" style="background-color: #409967; font-size: 13px; width: 95px; display: inline-block; text-align: center; padding: 8px 0; border-radius: 50px;">Low</span>';
                                 } else if (full.ref_serverity == 'information') {
-                                    return '<span class="badge" style="background-color: #00dcff;">Information</span>';
+                                    return '<span class="badge" style="background-color: #00dcff; font-size: 13px; width: 95px; display: inline-block; text-align: center; padding: 8px 0; border-radius: 50px;">Information</span>';
                                 } else {
                                     return '-';
                                 }
@@ -1324,12 +1326,49 @@
                     $('#btn_monitoring').addClass('active');
                     check_monitoring = null;
                     check_type = null;
+                    check_darkweb = null;
+                    check_social = null;
                     $('.hide-social').hide();
+                    $('.hide-darkweb').hide();
+                    $('.check_darkweb').removeClass('active');
+                    $('#all_darkweb').addClass('active');
+                    $('.check_social').removeClass('active');
+                    $('#all_surface').addClass('active');
                     table_social_data();
                     get_count();
 
 
                 });
+            });
+
+            $('#btn-export-excel').click(function() {
+                var exportUrl = '{!! route("socialdatas.export_excel") !!}';
+                var params = new URLSearchParams();
+                var selectedIds = [];
+                
+                $('.social_id:checked').each(function() {
+                    selectedIds.push($(this).val());
+                });
+                
+                if (site_code) params.append('site', site_code);
+                if (keywords) params.append('keywords', keywords);
+                if (startDate) params.append('startDate', startDate);
+                if (endDate) params.append('endDate', endDate);
+                if (isDateSearch) params.append('isDateSearch', isDateSearch);
+                if (check_type) params.append('check_type', check_type);
+                if (check_social) params.append('check_social', check_social);
+                if (check_darkweb) params.append('check_darkweb', check_darkweb);
+                if (check_serverity) params.append('check_serverity', check_serverity);
+                if (check_monitoring) params.append('check_monitoring', check_monitoring);
+                if (click_type) params.append('click_type', click_type);
+                if (click_type2) params.append('click_type2', click_type2);
+                if (source) params.append('source', source);
+                
+                if (selectedIds.length > 0) {
+                    params.append('ids', selectedIds.join(','));
+                }
+                
+                window.location.href = exportUrl + '?' + params.toString();
             });
 
             $("#btn-change-status").click(function() {
@@ -1340,32 +1379,6 @@
                 });
 
                 $('#delete_all').modal('show');
-                $('.delete-all').click(function() {
-                    $.ajax({
-                        type: "POST",
-                        url: "{{ route('socialdatas.change_delete_dataleakdata') }}",
-                        data: {
-                            id: social_id
-                        },
-                        beforeSend: function() {
-                            loading('load');
-                        },
-                        success: function(response) {
-
-                            toastr.success(response.message, '@langapp('response_status')');
-                            window.location.href = response.redirect;
-                        },
-                        error: function(error) {
-                            loading('stop_load');
-                            var errors = error.response.data.errors;
-                            var errorsHtml = '';
-                            $.each(errors, function(key, value) {
-                                errorsHtml += '<li>' + value[0] + '</li>';
-                            });
-                            toastr.error(errorsHtml, '@langapp('response_status') ');
-                        }
-                    });
-                });
             });
 
 
@@ -1392,7 +1405,10 @@
                         isDateSearch: isDateSearch,
                         check_type: check_type,
                         click_type: click_type,
-
+                        check_social: check_social,
+                        check_darkweb: check_darkweb,
+                        check_serverity: check_serverity,
+                        check_monitoring: check_monitoring,
                     }),
                     beforeSend: function() {
 
@@ -1493,9 +1509,15 @@
                     url: '{!! site_url('social/count_icon') !!}',
                     data: ({
                         site_id: site_code,
+                        keywords: keywords,
                         startDate: startDate,
                         endDate: endDate,
                         isDateSearch: isDateSearch,
+                        check_type: check_type,
+                        check_social: check_social,
+                        check_darkweb: check_darkweb,
+                        check_serverity: check_serverity,
+                        check_monitoring: check_monitoring,
                     }),
                     beforeSend: function() {
                         {{-- loading('load'); --}}
@@ -1511,6 +1533,12 @@
                         $(".number_in_progress").html(response.number_in_progress);
                         $(".number_reported").html(response.number_reported);
                         $(".number_close").html(response.number_close);
+                        $("#icon_community_s").html(response.icon_community_s);
+                        $("#icon_community_d").html(response.icon_community_d);
+                        $("#icon_social_s").html(response.icon_social_s);
+                        $("#icon_social_d").html(response.icon_social_d);
+                        $("#icon_website_s").html(response.icon_website_s);
+                        $("#icon_website_d").html(response.icon_website_d);
                     },
                     error: function(error) {
                         {{-- loading('stop_load'); --}}
@@ -1524,6 +1552,74 @@
 
                 });
             }
+
+
+            $('#table_social_datas').on('click', '.social_id', function() {
+                if ($('.social_id:checked').length > 0) {
+                    $('#btn-change-status').prop('disabled', false);
+                } else {
+                    $('#btn-change-status').prop('disabled', true);
+                }
+            });
+
+            $('#select-all').click(function() {
+                $('.social_id').prop('checked', this.checked);
+                if ($('.social_id:checked').length > 0) {
+                    $('#btn-change-status').prop('disabled', false);
+                } else {
+                    $('#btn-change-status').prop('disabled', true);
+                }
+            });
+
+            $('#btn-change-status').click(function(e) {
+                e.preventDefault();
+                var selectedIds = [];
+                $('.social_id:checked').each(function() {
+                    selectedIds.push($(this).val());
+                });
+                
+                if (selectedIds.length === 0) {
+                    toastr.warning('Please select at least one item to delete.');
+                    return;
+                }
+                
+                $('#delete_all').modal('show');
+            });
+
+            $('.delete-all').off('click').click(function(e) {
+                e.preventDefault();
+                var selectedIds = [];
+                $('.social_id:checked').each(function() {
+                    selectedIds.push($(this).val());
+                });
+                
+                if (selectedIds.length === 0) {
+                    toastr.warning('Please select at least one item to delete.');
+                    $('#delete_all').modal('hide');
+                    return;
+                }
+                
+                $.ajax({
+                    type: 'POST',
+                    url: '{!! route("socialdatas.change_delete_dataleakdata") !!}',
+                    data: {
+                        id: selectedIds,
+                    },
+                    success: function(response) {
+                        $('#delete_all').modal('hide');
+                        if (response.success) {
+                            toastr.success(response.message || 'Items deleted successfully');
+                            window.location.href = '{!! route("socialdatas.index_all_site") !!}';
+                        } else {
+                            toastr.error(response.message || 'Failed to delete items');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $('#delete_all').modal('hide');
+                        toastr.error('An error occurred: ' + error);
+                    }
+                });
+            });
         </script>
     @endpush
 @endsection

@@ -3,6 +3,7 @@
 namespace Modules\SiteSettings\Http\Controllers;
 
 use App\Credentials;
+use App\CredentialLeakRef;
 use App\DataLeakFeed;
 use App\DataLeakFeedTemp;
 use App\DataLeakSocial;
@@ -36,7 +37,6 @@ use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Modules\SiteSettings\Entities\Activity;
-use App\CredentialLeakRef;
 use Illuminate\Support\Facades\Schema;
 
 
@@ -1395,17 +1395,14 @@ class DataLeakController extends Controller
         $socialRefTable     = $this->resolveTable(['data_leak_socail_ref', 'data_leak_social_ref']);
         $credentialRefTable = $this->resolveTable(['credential_leak_ref']);
 
-        // ---------- ROLE ----------
         $get_role = @get_role_custom();
 
-        // ✅ แปลง Collection site_id_arr ให้เป็น array ปกติ
         $site_ids = collect(@$get_role['site_id_arr'])
             ->pluck('site_id')
             ->filter()
             ->values()
             ->toArray();
 
-        // ✅ กำหนด flag สำหรับ client / site_client
         $isClientOrSiteClient = (
             (isset($get_role['client']) && (int)$get_role['client'] == 1) ||
             (isset($get_role['site_client']) && (int)$get_role['site_client'] == 1)
@@ -1413,7 +1410,6 @@ class DataLeakController extends Controller
 
         $hasRoleSiteLimit = !empty($site_ids);
 
-        // ---------- SELECTED SITE ----------
         $selectedSite = null;
         if ($request->site) {
             if ($s = SiteSettings::where('code', $request->site)->first()) {
@@ -1425,7 +1421,7 @@ class DataLeakController extends Controller
         $qSocial = DB::table($socialRefTable)
             ->join($feedTable, "$socialRefTable.data_leak_feed_id", '=', "$feedTable.id")
             ->join($siteTable, "$siteTable.id", '=', "$socialRefTable.site_id")
-            ->whereIn("$feedTable.feel_type", ['social', 'darkweb_public'])
+            ->whereIn("$feedTable.feel_type", ['social', 'darkweb_public','surface_web','darkweb'])
             ->whereNull("$socialRefTable.deleted_at")
             ->when($hasRoleSiteLimit, fn($q) => $q->whereIn("$socialRefTable.site_id", $site_ids))
             ->when($isClientOrSiteClient, fn($q) => $q->where("$feedTable.status", 1))
@@ -1438,7 +1434,7 @@ class DataLeakController extends Controller
                 "$socialRefTable.created_at as ref_created_at",
                 "$socialRefTable.updated_at as ref_updated_at",
                 "$socialRefTable.serverity as ref_serverity",
-                "$socialRefTable.status_monitoring as ref_status_monitoring",
+                DB::raw("CASE WHEN " . DB::getTablePrefix() . "$socialRefTable.status_monitoring IS NULL OR " . DB::getTablePrefix() . "$socialRefTable.status_monitoring = '' THEN 'in_progress' ELSE " . DB::getTablePrefix() . "$socialRefTable.status_monitoring END as ref_status_monitoring"),
                 "$feedTable.keyword",
                 "$feedTable.sourceid",
                 "$feedTable.source_name",
@@ -1462,33 +1458,88 @@ class DataLeakController extends Controller
             $qSocial->where("$socialRefTable.status_monitoring", $request->check_monitoring);
         }
 
-        if (!empty($request->check_type)) {
-            $type = strtolower(trim($request->check_type));
-            if (in_array($type, ['social', 'darkweb_public'])) {
-                $qSocial->where("$feedTable.feel_type", $type);
+        // Support both check_type and click_type
+        $typeParam = !empty($request->click_type) ? $request->click_type : $request->check_type;
+        if (!empty($typeParam)) {
+            $type = strtolower(trim($typeParam));
+            if ($type === 'social') {
+                // Surface web: exclude darkweb types
+                $qSocial->whereNotIn("$feedTable.feel_type", ['darkweb', 'darkweb_public']);
+            } elseif ($type === 'darkweb_public') {
+                // Dark web: only darkweb types
+                $qSocial->whereIn("$feedTable.feel_type", ['darkweb', 'darkweb_public']);
             }
         }
 
-        if (!empty($request->check_social) && $request->check_type === 'social') {
-            $check = strtolower($request->check_social);
-            if ($check === 'other') {
-                $qSocial->whereNotIn(DB::raw("LOWER($feedTable.keyword)"), ['mobile', 'facebook', 'line', 'twitter', 'website']);
-            } else {
-                $qSocial->where(DB::raw("LOWER($feedTable.keyword)"), '=', $check);
-            }
-        }
+        // if (!empty($request->check_social) && $request->check_type === 'social') {
+        //     $check = strtolower($request->check_social);
+        //     if ($check === 'other') {
+        //         $qSocial->whereNotIn(DB::raw("LOWER($feedTable.keyword)"), ['mobile', 'facebook', 'line', 'twitter', 'website']);
+        //     } else {
+        //         $qSocial->where(DB::raw("LOWER($feedTable.keyword)"), '=', $check);
+        //     }
+        // }
 
         // ---------- CLICK_TYPE2 ----------
         if (!empty($request->click_type2)) {
             $ct2 = strtolower(trim($request->click_type2));
             $feedAlias = DB::getTablePrefix() . $feedTable;
 
-            if (in_array($ct2, ['in_progress', 'reported', 'close'])) {
+            if ($ct2 === 'in_progress') {
+                // Include in_progress, null, and empty status_monitoring
+                $qSocial->where(function($q) use ($socialRefTable) {
+                    $q->where("$socialRefTable.status_monitoring", 'LIKE', '%in_progress%')
+                      ->orWhereNull("$socialRefTable.status_monitoring")
+                      ->orWhere("$socialRefTable.status_monitoring", '=', '');
+                });
+            } elseif (in_array($ct2, ['reported', 'close'])) {
                 $qSocial->where("$socialRefTable.status_monitoring", 'LIKE', "%{$ct2}%");
-            } elseif (in_array($ct2, ['mobile', 'facebook', 'line', 'twitter', 'website'])) {
-                $qSocial->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["{$ct2}%"]);
-            } elseif ($ct2 === 'other') {
-                $qSocial->whereNotIn(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), ['mobile', 'facebook', 'line', 'twitter', 'website']);
+            } elseif ($ct2 === 'website_s') {
+                // Filter by keyword 'website', exclude 'compromise' and darkweb types
+                $qSocial->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["website%"])
+                        ->where("$feedTable.feel_type", '!=', 'compromise')
+                        ->whereNotIn("$feedTable.feel_type", ['darkweb', 'darkweb_public', 'darkweb_private']);
+            } elseif ($ct2 === 'social_s') {
+                // Filter by social media keywords, exclude darkweb types
+                $qSocial->where(function($q) use ($feedAlias) {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["facebook%"])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["line%"])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["fanpage%"])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["twitter%"]);
+                })
+                ->where("$feedTable.feel_type", '!=', 'compromise')
+                ->whereNotIn("$feedTable.feel_type", ['darkweb', 'darkweb_public', 'darkweb_private']);
+            } elseif ($ct2 === 'community_s') {
+                // Filter remaining items: exclude website, facebook, line, twitter and darkweb types
+                $qSocial->whereNotIn(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), ['website', 'facebook', 'line', 'twitter'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`keyword`) NOT LIKE ?", ["website%"])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`keyword`) NOT LIKE ?", ["facebook%"])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`keyword`) NOT LIKE ?", ["fanpage%"])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`keyword`) NOT LIKE ?", ["line%"])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`keyword`) NOT LIKE ?", ["twitter%"])
+                        ->where("$feedTable.feel_type", '!=', 'compromise')
+                        ->whereNotIn("$feedTable.feel_type", ['darkweb', 'darkweb_public', 'darkweb_private']);
+            } elseif ($ct2 === 'website_d') {
+                // Filter by keyword 'website', only darkweb types
+                $qSocial->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["website%"])
+                        ->whereIn("$feedTable.feel_type", ['darkweb', 'darkweb_public', 'darkweb_private']);
+            } elseif ($ct2 === 'social_d') {
+                // Filter by social media keywords, only darkweb types
+                $qSocial->where(function($q) use ($feedAlias) {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["facebook%"])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["line%"])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["social%"])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["twitter%"]);
+                })
+                ->whereIn("$feedTable.feel_type", ['darkweb', 'darkweb_public', 'darkweb_private']);
+            } elseif ($ct2 === 'community_d') {
+                // Filter remaining items: exclude website, facebook, line, twitter, only darkweb types
+                $qSocial->whereNotIn(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), ['website', 'facebook', 'line', 'twitter'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`keyword`) NOT LIKE ?", ["website%"])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`keyword`) NOT LIKE ?", ["facebook%"])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`keyword`) NOT LIKE ?", ["line%"])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`keyword`) NOT LIKE ?", ["twitter%"])
+                        ->whereIn("$feedTable.feel_type", ['darkweb', 'darkweb_public', 'darkweb_private']);
             } else {
                 $qSocial->where(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), 'LIKE', "%{$ct2}%");
             }
@@ -1507,16 +1558,81 @@ class DataLeakController extends Controller
         }
 
         // ---------- FILTERS ----------
-        if ($request->keywords) {
-            $kw = strtolower(trim($request->keywords));
+        // Support both keyword and keywords
+        $keywordParam = $request->keyword ?? $request->keywords;
+        if ($keywordParam) {
+            $kw = strtolower(trim($keywordParam));
             $q->whereRaw(
-                "(LOWER(u.keyword) LIKE ? OR LOWER(fnStripTags(entity_decode(u.feedcontent))) LIKE ?)",
+                "(LOWER(u.keyword) LIKE ? OR LOWER(u.feedcontent) LIKE ?)",
                 ["%{$kw}%", "%{$kw}%"]
             );
         }
 
         if ($request->source) {
             $q->where("u.sourceid", 'LIKE', "%{$request->source}%");
+        }
+
+        // ---------- CHECK_TYPE FILTER (Surface Web / Darkweb) ----------
+        if (!empty($request->check_type)) {
+            $checkType = strtolower(trim($request->check_type));
+            if ($checkType === 'surface_web') {
+                // Surface Web: exclude darkweb types and compromise
+                $q->whereNotIn(DB::raw('u.feel_type'), ['darkweb', 'darkweb_public', 'darkweb_private'])
+                  ->where(DB::raw('u.feel_type'), '!=', 'compromise');
+            } elseif ($checkType === 'darkweb') {
+                // Dark Web: only darkweb types
+                $q->whereIn(DB::raw('u.feel_type'), ['darkweb', 'darkweb_public', 'darkweb_private']);
+            }
+        }
+
+        // ---------- CHECK_SOCIAL FILTER (Surface Web sub-options) ----------
+        if (!empty($request->check_social)) {
+            $checkSocial = strtolower(trim($request->check_social));
+            if ($checkSocial === 'website') {
+                // Website/forum
+                $q->whereRaw("LOWER(u.keyword) LIKE ?", ["website%"]);
+            } elseif ($checkSocial === 'social') {
+                // Social: facebook, line, twitter, fanpage
+                $q->where(function($query) {
+                    $query->whereRaw("LOWER(u.keyword) LIKE ?", ["facebook%"])
+                          ->orWhereRaw("LOWER(u.keyword) LIKE ?", ["line%"])
+                          ->orWhereRaw("LOWER(u.keyword) LIKE ?", ["twitter%"])
+                          ->orWhereRaw("LOWER(u.keyword) LIKE ?", ["fanpage%"]);
+                });
+            } elseif ($checkSocial === 'community') {
+                // Community: exclude website, social keywords
+                $q->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["website%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["facebook%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["line%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["twitter%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["fanpage%"]);
+            }
+        }
+
+        // ---------- CHECK_DARKWEB FILTER (Dark Web sub-options) ----------
+        if (!empty($request->check_darkweb)) {
+            $checkDarkweb = strtolower(trim($request->check_darkweb));
+            if ($checkDarkweb === 'website') {
+                // Website/forum
+                $q->whereRaw("LOWER(u.keyword) LIKE ?", ["website%"]);
+            } elseif ($checkDarkweb === 'social') {
+                // Social: facebook, line, twitter, telegram, etc
+                $q->where(function($query) {
+                    $query->whereRaw("LOWER(u.keyword) LIKE ?", ["facebook%"])
+                          ->orWhereRaw("LOWER(u.keyword) LIKE ?", ["line%"])
+                          ->orWhereRaw("LOWER(u.keyword) LIKE ?", ["twitter%"])
+                          ->orWhereRaw("LOWER(u.keyword) LIKE ?", ["telegram%"])
+                          ->orWhereRaw("LOWER(u.keyword) LIKE ?", ["social%"]);
+                });
+            } elseif ($checkDarkweb === 'community') {
+                // Community: exclude website, social keywords
+                $q->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["website%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["facebook%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["line%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["twitter%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["telegram%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["social%"]);
+            }
         }
 
         // ---------- DATE FILTER ----------
@@ -1567,6 +1683,549 @@ class DataLeakController extends Controller
         ]);
     }
 
+
+    public function socialdatas_export_excel(Request $request)
+    {
+        $feedTable          = $this->resolveTable(['data_leak_feed']);
+        $siteTable          = $this->resolveTable(['site']);
+        $socialRefTable     = $this->resolveTable(['data_leak_socail_ref', 'data_leak_social_ref']);
+
+        $get_role = @get_role_custom();
+        $site_ids = collect(@$get_role['site_id_arr'])
+            ->pluck('site_id')
+            ->filter()
+            ->values()
+            ->toArray();
+
+        $isClientOrSiteClient = (
+            (isset($get_role['client']) && (int)$get_role['client'] == 1) ||
+            (isset($get_role['site_client']) && (int)$get_role['site_client'] == 1)
+        );
+
+        $hasRoleSiteLimit = !empty($site_ids);
+
+        $selectedSite = null;
+        if ($request->site) {
+            if ($s = SiteSettings::where('code', $request->site)->first()) {
+                $selectedSite = (int) $s->id;
+            }
+        }
+
+        // ---------- SOCIAL REF QUERY ----------
+        $qSocial = DB::table($socialRefTable)
+            ->join($feedTable, "$socialRefTable.data_leak_feed_id", '=', "$feedTable.id")
+            ->join($siteTable, "$siteTable.id", '=', "$socialRefTable.site_id")
+            ->whereIn("$feedTable.feel_type", ['social', 'darkweb_public','surface_web','darkweb'])
+            ->whereNull("$socialRefTable.deleted_at")
+            ->when($hasRoleSiteLimit, fn($q) => $q->whereIn("$socialRefTable.site_id", $site_ids))
+            ->when($isClientOrSiteClient, fn($q) => $q->where("$feedTable.status", 1))
+            ->when($selectedSite, fn($q) => $q->where("$socialRefTable.site_id", $selectedSite))
+            ->select(
+                "$socialRefTable.id as ref_id",
+                "$socialRefTable.site_id as site_id",
+                "$socialRefTable.serverity as ref_serverity",
+                DB::raw("CASE WHEN " . DB::getTablePrefix() . "$socialRefTable.status_monitoring IS NULL OR " . DB::getTablePrefix() . "$socialRefTable.status_monitoring = '' THEN 'in_progress' ELSE " . DB::getTablePrefix() . "$socialRefTable.status_monitoring END as ref_status_monitoring"),
+                "$feedTable.keyword",
+                "$feedTable.sourceid",
+                "$feedTable.source_name",
+                "$feedTable.feel_type",
+                "$feedTable.feedcontent",
+                "$feedTable.feedtimepost",
+                "$feedTable.code as code_data",
+                "$siteTable.name as site_name"
+            );
+
+        // ---------- MAIN QUERY ----------
+        $q = DB::query()->fromSub($qSocial, 'u');
+
+        // ---------- IDS FILTER (for selected items only) ----------
+        if ($request->ids) {
+            $ids = is_array($request->ids) ? $request->ids : explode(',', $request->ids);
+            $q->whereIn(DB::raw('u.ref_id'), $ids);
+        }
+
+        // ---------- FILTERS ----------
+        $keywordParam = $request->keyword ?? $request->keywords;
+        if ($keywordParam) {
+            $kw = strtolower(trim($keywordParam));
+            $q->whereRaw(
+                "(LOWER(u.keyword) LIKE ? OR LOWER(u.feedcontent) LIKE ?)",
+                ["%{$kw}%", "%{$kw}%"]
+            );
+        }
+
+        if ($request->source) {
+            $q->where("u.sourceid", 'LIKE', "%{$request->source}%");
+        }
+
+        // ---------- CHECK_TYPE FILTER ----------
+        if (!empty($request->check_type)) {
+            $checkType = strtolower(trim($request->check_type));
+            if ($checkType === 'surface_web') {
+                $q->whereNotIn(DB::raw('u.feel_type'), ['darkweb', 'darkweb_public', 'darkweb_private'])
+                  ->where(DB::raw('u.feel_type'), '!=', 'compromise');
+            } elseif ($checkType === 'darkweb') {
+                $q->whereIn(DB::raw('u.feel_type'), ['darkweb', 'darkweb_public', 'darkweb_private']);
+            }
+        }
+
+        // ---------- CHECK_SOCIAL FILTER ----------
+        if (!empty($request->check_social)) {
+            $checkSocial = strtolower(trim($request->check_social));
+            if ($checkSocial === 'website') {
+                $q->whereRaw("LOWER(u.keyword) LIKE ?", ["website%"]);
+            } elseif ($checkSocial === 'social') {
+                $q->where(function($query) {
+                    $query->whereRaw("LOWER(u.keyword) LIKE ?", ["facebook%"])
+                          ->orWhereRaw("LOWER(u.keyword) LIKE ?", ["line%"])
+                          ->orWhereRaw("LOWER(u.keyword) LIKE ?", ["twitter%"])
+                          ->orWhereRaw("LOWER(u.keyword) LIKE ?", ["fanpage%"]);
+                });
+            } elseif ($checkSocial === 'community') {
+                $q->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["website%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["facebook%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["line%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["twitter%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["fanpage%"]);
+            }
+        }
+
+        // ---------- CHECK_DARKWEB FILTER ----------
+        if (!empty($request->check_darkweb)) {
+            $checkDarkweb = strtolower(trim($request->check_darkweb));
+            if ($checkDarkweb === 'website') {
+                $q->whereRaw("LOWER(u.keyword) LIKE ?", ["website%"]);
+            } elseif ($checkDarkweb === 'social') {
+                $q->where(function($query) {
+                    $query->whereRaw("LOWER(u.keyword) LIKE ?", ["facebook%"])
+                          ->orWhereRaw("LOWER(u.keyword) LIKE ?", ["line%"])
+                          ->orWhereRaw("LOWER(u.keyword) LIKE ?", ["twitter%"])
+                          ->orWhereRaw("LOWER(u.keyword) LIKE ?", ["telegram%"])
+                          ->orWhereRaw("LOWER(u.keyword) LIKE ?", ["social%"]);
+                });
+            } elseif ($checkDarkweb === 'community') {
+                $q->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["website%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["facebook%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["line%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["twitter%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["telegram%"])
+                  ->whereRaw("LOWER(u.keyword) NOT LIKE ?", ["social%"]);
+            }
+        }
+
+        // ---------- DATE FILTER ----------
+        if ((int) $request->isDateSearch === 1 && $request->startDate && $request->endDate) {
+            $start = Carbon::parse($request->startDate)->startOfDay()->toDateTimeString();
+            $end   = Carbon::parse($request->endDate)->endOfDay()->toDateTimeString();
+
+            $q->whereRaw("
+                u.feedtimepost IS NOT NULL
+                AND CAST(u.feedtimepost AS DATETIME) BETWEEN ? AND ?
+            ", [$start, $end]);
+        }
+
+        // ---------- ORDER & GET DATA ----------
+        $q->orderByRaw("u.feedtimepost DESC");
+        $data = $q->get();
+
+        // ---------- BUILD CSV ----------
+        $filename = 'social_data_export_' . date('Y-m-d_His') . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function() use ($data) {
+            $file = fopen('php://output', 'w');
+            
+            // UTF-8 BOM for Excel
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            
+            // Header row
+            fputcsv($file, [
+                'Site Name',
+                'Type',
+                'Source',
+                'Keyword',
+                'Content',
+                'Severity',
+                'Monitoring Status',
+                'Date',
+            ]);
+
+            foreach ($data as $row) {
+                // Clean content - remove HTML, decode entities, normalize whitespace
+                $content = $row->feedcontent ?? '';
+                $contentBefore = $content; // for debug
+                
+                // Remove XML declaration and processing instructions first
+                $content = preg_replace('/<\?xml[^>]*\??>/', '', $content);
+                $content = preg_replace('/<\?[^>]*\?>/', '', $content);
+                
+                $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
+                $content = strip_tags($content);
+                $content = preg_replace('/[\r\n\t]+/', ' ', $content); // Replace newlines/tabs with space
+                $content = preg_replace('/\s+/', ' ', $content); // Normalize multiple spaces
+                $content = trim($content);
+                
+                // Determine type: Darkweb or Surface Web
+                $typeDisplay = 'Surface Web';
+                $feelType = strtolower($row->feel_type ?? '');
+                if (strpos($feelType, 'darkweb') !== false || strpos($feelType, 'dark_web') !== false) {
+                    $typeDisplay = 'Darkweb';
+                }
+                
+                // Format date to day/month/year
+                $feedDate = '';
+                if (!empty($row->feedtimepost)) {
+                    try {
+                        $feedDate = Carbon::parse($row->feedtimepost)->format('d/m/Y');
+                    } catch (\Exception $e) {
+                        $feedDate = $row->feedtimepost;
+                    }
+                }
+                
+                fputcsv($file, [
+                    $row->site_name ?? '',
+                    $typeDisplay,
+                    $row->source_name ?? '',
+                    $row->keyword ?? '',
+                    $content,
+                    $row->ref_serverity ?? '',
+                    str_replace('_', ' ', $row->ref_status_monitoring ?? ''),
+                    $feedDate,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Export Credential Leak data to Excel/CSV
+     */
+    public function credentialdatas_export_excel(Request $request)
+    {
+        $feedTable          = $this->resolveTable(['data_leak_feed']);
+        $siteTable          = $this->resolveTable(['site']);
+        $credentialRefTable = $this->resolveTable(['credential_leak_ref']);
+
+        $get_role = @get_role_custom();
+        $site_ids = collect(@$get_role['site_id_arr'])
+            ->pluck('site_id')
+            ->filter()
+            ->values()
+            ->toArray();
+
+        $isClientOrSiteClient = (
+            (isset($get_role['client']) && (int)$get_role['client'] == 1) ||
+            (isset($get_role['site_client']) && (int)$get_role['site_client'] == 1)
+        );
+
+        $hasRoleSiteLimit = !empty($site_ids);
+
+        $selectedSite = null;
+        if ($request->site) {
+            if ($s = SiteSettings::where('code', $request->site)->first()) {
+                $selectedSite = (int) $s->id;
+            }
+        }
+
+        // ---------- CREDENTIAL REF QUERY ----------
+        $qCredential = DB::table($credentialRefTable)
+            ->join($feedTable, "$credentialRefTable.data_leak_feed_id", '=', "$feedTable.id")
+            ->join($siteTable, "$siteTable.id", '=', "$credentialRefTable.site_id")
+            ->whereIn("$feedTable.feel_type", ['surface_web', 'darkweb','darkweb_public'])
+            ->whereNull("$credentialRefTable.deleted_at")
+            ->when($hasRoleSiteLimit, fn($q) => $q->whereIn("$credentialRefTable.site_id", $site_ids))
+            ->when($isClientOrSiteClient, fn($q) => $q->where("$feedTable.status", 1))
+            ->when($selectedSite, fn($q) => $q->where("$credentialRefTable.site_id", $selectedSite));
+
+        if ($request->ids) {
+            $selectedIds = array_map('intval', explode(',', $request->ids));
+            $qCredential->whereIn("$credentialRefTable.id", $selectedIds);
+        }
+
+        $qCredential->select(
+                "$credentialRefTable.id as ref_id",
+                "$credentialRefTable.site_id as site_id",
+                "$credentialRefTable.serverity as ref_serverity",
+                DB::raw("CASE WHEN " . DB::getTablePrefix() . "$credentialRefTable.status_monitoring IS NULL OR " . DB::getTablePrefix() . "$credentialRefTable.status_monitoring = '' THEN 'in_progress' ELSE " . DB::getTablePrefix() . "$credentialRefTable.status_monitoring END as ref_status_monitoring"),
+                "$feedTable.keyword",
+                "$feedTable.sourceid",
+                "$feedTable.source_name",
+                "$feedTable.feel_type",
+                "$feedTable.feedcontent",
+                "$feedTable.feedtimepost",
+                "$feedTable.code as code_data",
+                "$siteTable.name as site_name"
+            );
+
+        // ---------- FILTERS ----------
+        $feedAlias = DB::getTablePrefix() . $feedTable;
+
+        // Keywords filter
+        $keywordParam = $request->keyword ?? $request->keywords;
+        if ($keywordParam) {
+            $kw = strtolower(trim($keywordParam));
+            $qCredential->where(function($query) use ($feedAlias, $kw) {
+                $query->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["%{$kw}%"])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ["%{$kw}%"])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`feedcontent`) LIKE ?", ["%{$kw}%"]);
+            });
+        }
+
+        // ---------- CHECK_TYPE FILTER ----------
+        if (!empty($request->check_type)) {
+            $checkType = strtolower(trim($request->check_type));
+            if ($checkType === 'surface_web' || $checkType === 'social') {
+                $qCredential->where("$feedTable.feel_type", 'surface_web');
+            } elseif ($checkType === 'darkweb' || $checkType === 'darkweb_public') {
+                $qCredential->where("$feedTable.feel_type", 'darkweb');
+            }
+        }
+
+        // ---------- CHECK_SOCIAL FILTER (Surface Web sub-categories) ----------
+        if (!empty($request->check_social)) {
+            $cs = strtolower(trim($request->check_social));
+            $qCredential->where("$feedTable.feel_type", 'surface_web');
+            if ($cs === 'website') {
+                $qCredential->where(function($q) use ($feedAlias) {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.net%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.org%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.co.th%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.io%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.th%']);
+                })
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%instagram%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%tiktok%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%youtube%']);
+            } elseif ($cs === 'social') {
+                $qCredential->where(function($q) use ($feedAlias) {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%line%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%instagram%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%tiktok%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%youtube%']);
+                });
+            } elseif ($cs === 'community') {
+                $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.net%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.org%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.th%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%']);
+            }
+        }
+
+        // ---------- CHECK_DARKWEB FILTER (Dark Web sub-categories) ----------
+        if (!empty($request->check_darkweb)) {
+            $cd = strtolower(trim($request->check_darkweb));
+            $qCredential->where("$feedTable.feel_type", 'darkweb');
+            if ($cd === 'website') {
+                $qCredential->where(function($q) use ($feedAlias) {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.net%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.org%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.onion%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.io%']);
+                })
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%']);
+            } elseif ($cd === 'social') {
+                $qCredential->where(function($q) use ($feedAlias) {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%line%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%']);
+                });
+            } elseif ($cd === 'community') {
+                $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.net%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.onion%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%']);
+            }
+        }
+
+        // ---------- CHECK_SERVERITY FILTER ----------
+        if (!empty($request->check_serverity)) {
+            $qCredential->where("$credentialRefTable.serverity", $request->check_serverity);
+        }
+
+        // ---------- CHECK_MONITORING FILTER ----------
+        if (!empty($request->check_monitoring)) {
+            $checkMonitoring = strtolower(trim($request->check_monitoring));
+            if ($checkMonitoring === 'in_progress') {
+                $qCredential->where(function($query) use ($credentialRefTable) {
+                    $query->where("$credentialRefTable.status_monitoring", 'in_progress')
+                          ->orWhereNull("$credentialRefTable.status_monitoring")
+                          ->orWhere("$credentialRefTable.status_monitoring", '');
+                });
+            } else {
+                $qCredential->where("$credentialRefTable.status_monitoring", $request->check_monitoring);
+            }
+        }
+
+        // ---------- CLICK_TYPE / CLICK_TYPE2 FILTER ----------
+        $clickType = !empty($request->click_type2) ? $request->click_type2 : $request->click_type;
+        if (!empty($clickType)) {
+            $ct = strtolower(trim($clickType));
+            
+            if (in_array($ct, ['in_progress', 'reported', 'close'])) {
+                $qCredential->where("$credentialRefTable.status_monitoring", 'LIKE', "%{$ct}%");
+            } elseif ($ct === 'social' || $ct === 'surface_web') {
+                $qCredential->where("$feedTable.feel_type", 'surface_web');
+            } elseif ($ct === 'darkweb_public' || $ct === 'darkweb') { 
+                $qCredential->where("$feedTable.feel_type", 'darkweb');
+            } elseif (in_array($ct, ['website_s', 'social_s', 'community_s'])) {
+                $qCredential->where("$feedTable.feel_type", 'surface_web');
+                if ($ct === 'website_s') {
+                    $qCredential->where(function($q) use ($feedAlias) {
+                        $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.net%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.org%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.th%']);
+                    })
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%instagram%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%tiktok%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%youtube%']);
+                } elseif ($ct === 'social_s') {
+                    $qCredential->where(function($q) use ($feedAlias) {
+                        $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%']);
+                    });
+                } elseif ($ct === 'community_s') {
+                    $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.th%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%']);
+                }
+            } elseif (in_array($ct, ['website_d', 'social_d', 'community_d'])) {
+                $qCredential->where("$feedTable.feel_type", 'darkweb');
+                if ($ct === 'website_d') {
+                    $qCredential->where(function($q) use ($feedAlias) {
+                        $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.onion%']);
+                    })
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%']);
+                } elseif ($ct === 'social_d') {
+                    $qCredential->where(function($q) use ($feedAlias) {
+                        $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%']);
+                    });
+                } elseif ($ct === 'community_d') {
+                    $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.onion%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%']);
+                }
+            }
+        }
+
+        // ---------- DATE FILTER ----------
+        if ($request->isDateSearch == 1 && $request->startDate && $request->endDate) {
+            $start = Carbon::parse($request->startDate)->startOfDay()->toDateTimeString();
+            $end   = Carbon::parse($request->endDate)->endOfDay()->toDateTimeString();
+            
+            $qCredential->whereRaw("
+                `$feedAlias`.`feedtimepost` IS NOT NULL
+                AND CAST(`$feedAlias`.`feedtimepost` AS DATETIME) BETWEEN ? AND ?
+            ", [$start, $end]);
+        }
+
+        // ---------- GET DATA ----------
+        $data = $qCredential->orderBy("$feedTable.feedtimepost", 'desc')->get();
+
+        // ---------- GENERATE CSV ----------
+        $filename = 'credential_leak_export_' . date('Y-m-d_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () use ($data) {
+            $file = fopen('php://output', 'w');
+            
+            // UTF-8 BOM for Excel
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            // Header row
+            fputcsv($file, ['Site', 'Type', 'Source', 'Keyword', 'Content', 'Severity', 'Monitoring', 'Date']);
+
+            foreach ($data as $row) {
+                // Clean content
+                $content = $row->feedcontent ?? '';
+                $content = preg_replace('/<\?xml[^>]*\??>/', '', $content);
+                $content = preg_replace('/<\?[^>]*\?>/', '', $content);
+                $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
+                $content = strip_tags($content);
+                $content = preg_replace('/[\r\n\t]+/', ' ', $content);
+                $content = preg_replace('/\s+/', ' ', $content);
+                $content = trim($content);
+                
+                // Determine type
+                $typeDisplay = 'Surface Web';
+                $feelType = strtolower($row->feel_type ?? '');
+                if (strpos($feelType, 'darkweb') !== false) {
+                    $typeDisplay = 'Darkweb';
+                }
+                
+                // Format date
+                $feedDate = '';
+                if (!empty($row->feedtimepost)) {
+                    try {
+                        $feedDate = Carbon::parse($row->feedtimepost)->format('d/m/Y');
+                    } catch (\Exception $e) {
+                        $feedDate = $row->feedtimepost;
+                    }
+                }
+                
+                fputcsv($file, [
+                    $row->site_name ?? '',
+                    $typeDisplay,
+                    $row->source_name ?? '',
+                    $row->keyword ?? '',
+                    $content,
+                    $row->ref_serverity ?? '',
+                    str_replace('_', ' ', $row->ref_status_monitoring ?? ''),
+                    $feedDate,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
     public function credentialdatas_all_site_tb(Request $request)
     {
         $feedTable          = $this->resolveTable(['data_leak_feed']);
@@ -1603,7 +2262,7 @@ class DataLeakController extends Controller
             ->join($feedTable, "$credentialRefTable.data_leak_feed_id", '=', "$feedTable.id")
             ->join($siteTable, "$siteTable.id", '=', "$credentialRefTable.site_id")
             // ->where("$feedTable.feel_type", 'credential')
-            ->whereIn("$feedTable.feel_type", ['surface_web', 'darkweb'])
+            ->whereIn("$feedTable.feel_type", ['surface_web', 'darkweb','darkweb_public'])
             ->whereNull("$credentialRefTable.deleted_at")
             ->when($hasRoleSiteLimit, fn($q) => $q->whereIn("$credentialRefTable.site_id", $site_ids))
             ->when($isClientOrSiteClient, fn($q) => $q->where("$feedTable.status", 1))
@@ -1638,7 +2297,114 @@ class DataLeakController extends Controller
             $qCredential->where("$credentialRefTable.status_monitoring", $request->check_monitoring);
         }
 
-        // ---------- CLICK_TYPE2 ----------
+        // ---------- CHECK_TYPE FILTER ----------
+        if (!empty($request->check_type)) {
+            $checkType = strtolower(trim($request->check_type));
+            if ($checkType === 'surface_web' || $checkType === 'social') {
+                $qCredential->where("$feedTable.feel_type", 'surface_web');
+            } elseif ($checkType === 'darkweb' || $checkType === 'darkweb_public') {
+                $qCredential->where("$feedTable.feel_type", 'darkweb');
+            }
+        }
+
+        // ---------- CHECK_SOCIAL FILTER (Surface Web sub-categories) ----------
+        // Uses source_name to categorize: website (domains), social (platforms), community (others)
+        if (!empty($request->check_social)) {
+            $cs = strtolower(trim($request->check_social));
+            $feedAlias = DB::getTablePrefix() . $feedTable;
+            $qCredential->where("$feedTable.feel_type", 'surface_web');
+            if ($cs === 'website') {
+                // Match domain extensions BUT exclude social platforms (same list as counts)
+                $qCredential->where(function($q) use ($feedAlias) {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.net%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.org%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.co.th%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.io%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.th%']);
+                })
+                // Exclude social platforms to avoid overlap
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%instagram%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%tiktok%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%youtube%']);
+            } elseif ($cs === 'social') {
+                // Match social media platforms
+                $qCredential->where(function($q) use ($feedAlias) {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%line%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%instagram%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%tiktok%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%youtube%']);
+                });
+            } elseif ($cs === 'community') {
+                // Community: exclude website domains and social platforms (same list as counts)
+                $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.net%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.org%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.th%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%']);
+            }
+        }
+
+        // ---------- CHECK_DARKWEB FILTER (Dark Web sub-categories) ----------
+        // Uses source_name to categorize: website (domains/.onion), social (platforms), community (others)
+        if (!empty($request->check_darkweb)) {
+            $cd = strtolower(trim($request->check_darkweb));
+            $feedAlias = DB::getTablePrefix() . $feedTable;
+            $qCredential->where("$feedTable.feel_type", 'darkweb');
+            if ($cd === 'website') {
+                // Match domain extensions including .onion for darkweb
+                // Website: has domain extension BUT exclude social platforms (to match count logic)
+                $qCredential->where(function($q) use ($feedAlias) {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.net%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.org%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.onion%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.io%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.co.th%']);
+                })
+                // Exclude social platforms to avoid overlap
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%']);
+            } elseif ($cd === 'social') {
+                // Match social media platforms
+                $qCredential->where(function($q) use ($feedAlias) {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%line%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%instagram%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%tiktok%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%youtube%']);
+                });
+            } elseif ($cd === 'community') {
+                // Community: exclude website domains and social platforms (forums, paste sites, etc)
+                $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.net%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.org%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.onion%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.io%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%instagram%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%tiktok%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%youtube%']);
+            }
+        }
+
         // ---------- CLICK_TYPE / CLICK_TYPE2 ----------
         $clickType = !empty($request->click_type2) ? $request->click_type2 : $request->click_type;
 
@@ -1651,13 +2417,88 @@ class DataLeakController extends Controller
             } elseif ($ct === 'social' || $ct === 'surface_web') {
                 $qCredential->where("$feedTable.feel_type", 'surface_web');
             } elseif ($ct === 'darkweb_public' || $ct === 'darkweb') { 
-                 $qCredential->where("$feedTable.feel_type", 'darkweb');
+                 $qCredential->whereIn("$feedTable.feel_type", ['darkweb', 'darkweb_public']);
             } elseif (in_array($ct, ['mobile', 'facebook', 'line', 'twitter', 'website'])) {
-                $qCredential->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["{$ct}%"]);
+                $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ["%{$ct}%"]);
             } elseif ($ct === 'other') {
-                $qCredential->whereNotIn(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), ['mobile', 'facebook', 'line', 'twitter', 'website']);
-            } else {
-                 //$qCredential->where(DB::raw("LOWER(`{$feedAlias}`.`keyword`)"), 'LIKE', "%{$ct}%");
+                $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%mobile%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%']);
+            } elseif (in_array($ct, ['website_s', 'social_s', 'community_s'])) {
+                // Surface Web sub-categories using source_name
+                $qCredential->where("$feedTable.feel_type", 'surface_web');
+                if ($ct === 'website_s') {
+                    // Website: has domain extension BUT exclude social platforms
+                    $qCredential->where(function($q) use ($feedAlias) {
+                        $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.net%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.org%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.co.th%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.io%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.th%']);
+                    })
+                    // Exclude social platforms
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%instagram%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%tiktok%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%youtube%']);
+                } elseif ($ct === 'social_s') {
+                    $qCredential->where(function($q) use ($feedAlias) {
+                        $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%line%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%instagram%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%tiktok%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%youtube%']);
+                    });
+                } elseif ($ct === 'community_s') {
+                    $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.net%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.org%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.th%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%']);
+                }
+            } elseif (in_array($ct, ['website_d', 'social_d', 'community_d'])) {
+                // Dark Web sub-categories using source_name
+                $qCredential->where("$feedTable.feel_type", 'darkweb');
+                if ($ct === 'website_d') {
+                    // Website: has domain extension BUT exclude social platforms
+                    $qCredential->where(function($q) use ($feedAlias) {
+                        $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.net%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.org%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.onion%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.io%']);
+                    })
+                    // Exclude social platforms
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%']);
+                } elseif ($ct === 'social_d') {
+                    $qCredential->where(function($q) use ($feedAlias) {
+                        $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%line%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%']);
+                    });
+                } elseif ($ct === 'community_d') {
+                    $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.net%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.org%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.onion%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%']);
+                }
             }
         }
 
@@ -1677,8 +2518,8 @@ class DataLeakController extends Controller
         if ($request->keywords) {
             $kw = strtolower(trim($request->keywords));
             $q->whereRaw(
-                "(LOWER(u.keyword) LIKE ? OR LOWER(fnStripTags(entity_decode(u.feedcontent))) LIKE ?)",
-                ["%{$kw}%", "%{$kw}%"]
+                "(LOWER(u.keyword) LIKE ? OR LOWER(u.source_name) LIKE ? OR LOWER(u.feedcontent) LIKE ?)",
+                ["%{$kw}%", "%{$kw}%", "%{$kw}%"]
             );
         }
 
@@ -1774,7 +2615,7 @@ class DataLeakController extends Controller
             ->join($feedTable, "$credentialRefTable.data_leak_feed_id", '=', "$feedTable.id")
             ->join($siteTable, "$siteTable.id", '=', "$credentialRefTable.site_id")
             // ->where("$feedTable.feel_type", 'credential')
-            ->whereIn("$feedTable.feel_type", ['surface_web', 'darkweb'])
+            ->whereIn("$feedTable.feel_type", ['surface_web', 'darkweb', 'darkweb_public'])
             ->whereNull("$credentialRefTable.deleted_at")
             ->when($hasRoleSiteLimit, fn($q) => $q->whereIn("$credentialRefTable.site_id", $site_ids))
             ->when($isClientOrSiteClient, fn($q) => $q->where("$feedTable.status", 1))
@@ -1784,55 +2625,329 @@ class DataLeakController extends Controller
                 "$credentialRefTable.site_id",
                 "$credentialRefTable.status_monitoring",
                 "$feedTable.keyword",
+                "$feedTable.source_name",
                 "$feedTable.feel_type",
                 "$feedTable.feedtimepost"
             );
+
+        // ---------- SINGLE SITE_ID FILTER (match table function logic) ----------
+        if (empty($selectedSite) && empty($site_ids) && !empty($get_role['site_id'])) {
+            $qCredential->where("$credentialRefTable.site_id", (int)$get_role['site_id']);
+        }
 
         // ---------- DATE FILTER ----------
         if ((int) $request->isDateSearch === 1 && $request->startDate && $request->endDate) {
             $start = Carbon::parse($request->startDate)->startOfDay()->toDateTimeString();
             $end   = Carbon::parse($request->endDate)->endOfDay()->toDateTimeString();
+            $feedAlias = DB::getTablePrefix() . $feedTable;
 
             $qCredential->whereRaw("
-                $feedTable.feedtimepost IS NOT NULL
-                AND CAST($feedTable.feedtimepost AS DATETIME) BETWEEN ? AND ?
+                `$feedAlias`.`feedtimepost` IS NOT NULL
+                AND CAST(`$feedAlias`.`feedtimepost` AS DATETIME) BETWEEN ? AND ?
             ", [$start, $end]);
+        }
+
+        // ---------- KEYWORDS FILTER ----------
+        if (!empty($request->keywords)) {
+            $keywords = $request->keywords;
+            $feedAlias = DB::getTablePrefix() . $feedTable;
+            $qCredential->where(function($q) use ($feedAlias, $keywords) {
+                $q->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ['%' . strtolower($keywords) . '%'])
+                  ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%' . strtolower($keywords) . '%'])
+                  ->orWhereRaw("LOWER(`{$feedAlias}`.`feedcontent`) LIKE ?", ['%' . strtolower($keywords) . '%']);
+            });
+        }
+
+        // ---------- CHECK_TYPE FILTER ----------
+        if (!empty($request->check_type)) {
+            $checkType = strtolower(trim($request->check_type));
+            if ($checkType === 'surface_web' || $checkType === 'social') {
+                $qCredential->where("$feedTable.feel_type", 'surface_web');
+            } elseif ($checkType === 'darkweb' || $checkType === 'darkweb_public') {
+                $qCredential->where("$feedTable.feel_type", 'darkweb');
+            }
+        }
+
+        // ---------- CHECK_SOCIAL FILTER (Surface Web sub-categories) ----------
+        // Uses source_name to categorize: website (domains), social (platforms), community (others)
+        if (!empty($request->check_social)) {
+            $cs = strtolower(trim($request->check_social));
+            $feedAlias = DB::getTablePrefix() . $feedTable;
+            $qCredential->where("$feedTable.feel_type", 'surface_web');
+            if ($cs === 'website') {
+                // Website: has domain extension BUT exclude social platforms
+                $qCredential->where(function($q) use ($feedAlias) {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.net%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.org%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.co.th%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.io%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.th%']);
+                })
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%instagram%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%tiktok%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%youtube%']);
+            } elseif ($cs === 'social') {
+                $qCredential->where(function($q) use ($feedAlias) {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%line%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%instagram%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%tiktok%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%youtube%']);
+                });
+            } elseif ($cs === 'community') {
+                $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.net%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.org%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.th%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%']);
+            }
+        }
+
+        // ---------- CHECK_DARKWEB FILTER (Dark Web sub-categories) ----------
+        // Uses source_name to categorize: website (domains/.onion), social (platforms), community (others)
+        if (!empty($request->check_darkweb)) {
+            $cd = strtolower(trim($request->check_darkweb));
+            $feedAlias = DB::getTablePrefix() . $feedTable;
+            $qCredential->where("$feedTable.feel_type", 'darkweb');
+            if ($cd === 'website') {
+                // Website: has domain extension BUT exclude social platforms
+                $qCredential->where(function($q) use ($feedAlias) {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.net%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.org%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.onion%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.io%']);
+                })
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%']);
+            } elseif ($cd === 'social') {
+                $qCredential->where(function($q) use ($feedAlias) {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%line%'])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%']);
+                });
+            } elseif ($cd === 'community') {
+                $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.net%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.onion%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%']);
+            }
+        }
+
+        // ---------- CHECK_SERVERITY FILTER ----------
+        if (!empty($request->check_serverity)) {
+            $qCredential->where("$credentialRefTable.serverity", $request->check_serverity);
+        }
+
+        // ---------- CHECK_MONITORING FILTER ----------
+        if (!empty($request->check_monitoring)) {
+            $checkMonitoring = strtolower(trim($request->check_monitoring));
+            if ($checkMonitoring === 'in_progress') {
+                $qCredential->where(function($q) use ($credentialRefTable) {
+                    $q->where("$credentialRefTable.status_monitoring", 'in_progress')
+                      ->orWhereNull("$credentialRefTable.status_monitoring")
+                      ->orWhere("$credentialRefTable.status_monitoring", '');
+                });
+            } else {
+                $qCredential->where("$credentialRefTable.status_monitoring", $request->check_monitoring);
+            }
+        }
+
+        // ---------- CLICK_TYPE / CLICK_TYPE2 FILTER ----------
+        // Uses source_name for sub-category filtering
+        $clickType = !empty($request->click_type2) ? $request->click_type2 : $request->click_type;
+
+        if (!empty($clickType)) {
+            $ct = strtolower(trim($clickType));
+            $feedAlias = DB::getTablePrefix() . $feedTable;
+
+            if (in_array($ct, ['in_progress', 'reported', 'close'])) {
+                $qCredential->where("$credentialRefTable.status_monitoring", 'LIKE', "%{$ct}%");
+            } elseif ($ct === 'social' || $ct === 'surface_web') {
+                $qCredential->where("$feedTable.feel_type", 'surface_web');
+            } elseif ($ct === 'darkweb_public' || $ct === 'darkweb') { 
+                $qCredential->where("$feedTable.feel_type", 'darkweb');
+            } elseif (in_array($ct, ['mobile', 'facebook', 'line', 'twitter', 'website'])) {
+                $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ["%{$ct}%"]);
+            } elseif ($ct === 'other') {
+                $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%mobile%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%']);
+            } elseif (in_array($ct, ['website_s', 'social_s', 'community_s'])) {
+                // Surface Web sub-categories using source_name
+                $qCredential->where("$feedTable.feel_type", 'surface_web');
+                if ($ct === 'website_s') {
+                    $qCredential->where(function($q) use ($feedAlias) {
+                        $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.net%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.org%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.th%']);
+                    });
+                } elseif ($ct === 'social_s') {
+                    $qCredential->where(function($q) use ($feedAlias) {
+                        $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%']);
+                    });
+                } elseif ($ct === 'community_s') {
+                    $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.th%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%']);
+                }
+            } elseif (in_array($ct, ['website_d', 'social_d', 'community_d'])) {
+                // Dark Web sub-categories using source_name
+                $qCredential->where("$feedTable.feel_type", 'darkweb');
+                if ($ct === 'website_d') {
+                    $qCredential->where(function($q) use ($feedAlias) {
+                        $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.onion%']);
+                    });
+                } elseif ($ct === 'social_d') {
+                    $qCredential->where(function($q) use ($feedAlias) {
+                        $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%']);
+                    });
+                } elseif ($ct === 'community_d') {
+                    $qCredential->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.onion%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%']);
+                }
+            }
         }
 
         // ---------- QUERY WRAPPER ----------
         $base = DB::query()->fromSub($qCredential, 'u');
 
-        // ---------- ICON COUNTS ----------
-        // Mapping: 
-        // icon_mobile (Social) -> surface_web
-        // icon_website (Dark Website) -> darkweb
+        // ---------- SURFACE WEB COUNTS (feel_type = surface_web) ----------
+        // Uses source_name to categorize: website (domains but NOT social), social (platforms), community (others)
+        $baseSurface = (clone $base)->where('feel_type', 'surface_web');
         
-        $icon_mobile   = (clone $base)->where('feel_type', 'surface_web')->count();
-        $icon_website  = (clone $base)->where('feel_type', 'darkweb')->count();
+        // Website: has domain extension BUT NOT a social platform (to avoid double counting)
+        $icon_website_s = (clone $baseSurface)->where(function($q) {
+            $q->whereRaw("LOWER(source_name) LIKE ?", ['%.com%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%.net%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%.org%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%.co.th%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%.io%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%.th%']);
+        })
+        // Exclude social platforms to avoid double counting
+        ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%twitter%'])
+        ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%facebook%'])
+        ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%line%'])
+        ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%telegram%'])
+        ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%instagram%'])
+        ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%tiktok%'])
+        ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%youtube%'])
+        ->count();
         
-        // Zero out unused icons for this view as per new requirement
-        $icon_facebook = 0;
-        $icon_line     = 0;
-        $icon_twitter  = 0;
-        $icon_other    = 0;
+        // Social: matches social platform names
+        $icon_social_s = (clone $baseSurface)->where(function($q) {
+            $q->whereRaw("LOWER(source_name) LIKE ?", ['%twitter%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%facebook%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%line%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%telegram%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%instagram%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%tiktok%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%youtube%']);
+        })->count();
+        
+        // Community: NOT website domains AND NOT social platforms
+        $icon_community_s = (clone $baseSurface)
+            ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%.com%'])
+            ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%.net%'])
+            ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%.org%'])
+            ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%.th%'])
+            ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%twitter%'])
+            ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%facebook%'])
+            ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%line%'])
+            ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%telegram%'])
+            ->count();
+        $surface_web_total = (clone $base)->where('feel_type', 'surface_web')->count();
+
+        // ---------- DARK WEB COUNTS (feel_type = darkweb or darkweb_public) ----------
+        // Uses source_name to categorize: website (domains/.onion but NOT social), social (platforms), community (others)
+        $baseDarkweb = (clone $base)->whereIn('feel_type', ['darkweb', 'darkweb_public']);
+        
+        // Website: has domain extension BUT NOT a social platform
+        $icon_website_d = (clone $baseDarkweb)->where(function($q) {
+            $q->whereRaw("LOWER(source_name) LIKE ?", ['%.com%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%.net%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%.org%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%.onion%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%.io%']);
+        })
+        // Exclude social platforms
+        ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%twitter%'])
+        ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%facebook%'])
+        ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%line%'])
+        ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%telegram%'])
+        ->count();
+        
+        // Social: matches social platform names
+        $icon_social_d = (clone $baseDarkweb)->where(function($q) {
+            $q->whereRaw("LOWER(source_name) LIKE ?", ['%twitter%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%facebook%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%line%'])
+              ->orWhereRaw("LOWER(source_name) LIKE ?", ['%telegram%']);
+        })->count();
+        
+        // Community: NOT website domains AND NOT social platforms
+        $icon_community_d = (clone $baseDarkweb)
+            ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%.com%'])
+            ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%.net%'])
+            ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%.onion%'])
+            ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%twitter%'])
+            ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%facebook%'])
+            ->whereRaw("LOWER(source_name) NOT LIKE ?", ['%telegram%'])
+            ->count();
+        $darkweb_total = (clone $base)->whereIn('feel_type', ['darkweb', 'darkweb_public'])->count();
 
         // ---------- STATUS COUNTS ----------
-        $number_in_progress = (clone $base)->where('status_monitoring', 'LIKE', '%in_progress%')->count();
+        $number_in_progress = (clone $base)->where(function($q) {
+            $q->where('status_monitoring', 'LIKE', '%in_progress%')
+              ->orWhereNull('status_monitoring')
+              ->orWhere('status_monitoring', '');
+        })->count();
         $number_reported    = (clone $base)->where('status_monitoring', 'LIKE', '%reported%')->count();
         $number_close       = (clone $base)->where('status_monitoring', 'LIKE', '%close%')->count();
 
         return response()->json([
-            "icon_mobile"        => $icon_mobile,
-            "icon_facebook"      => $icon_facebook, // Unused
-            "icon_line"          => $icon_line,     // Unused
-            "icon_twitter"       => $icon_twitter,  // Unused
-            "icon_website"       => $icon_website,
-            "icon_other"         => $icon_other,    // Unused
+            // Surface Web sub-category counts
+            "icon_website_s"     => $icon_website_s,
+            "icon_social_s"      => $icon_social_s,
+            "icon_community_s"   => $icon_community_s,
+            "surface_web_total"  => $surface_web_total,
+            // Dark Web sub-category counts
+            "icon_website_d"     => $icon_website_d,
+            "icon_social_d"      => $icon_social_d,
+            "icon_community_d"   => $icon_community_d,
+            "darkweb_total"      => $darkweb_total,
+            // Status counts
             "number_in_progress" => $number_in_progress,
             "number_reported"    => $number_reported,
             "number_close"       => $number_close,
         ]);
     }
+    
     public function credentialdatas_count_val(Request $request)
     {
         $feedTable          = $this->resolveTable(['data_leak_feed']);
@@ -1866,33 +2981,219 @@ class DataLeakController extends Controller
         $q = DB::table($credentialRefTable)
             ->join($feedTable, "$credentialRefTable.data_leak_feed_id", '=', "$feedTable.id")
             // ->where("$feedTable.feel_type", 'credential')
-            ->whereIn("$feedTable.feel_type", ['surface_web', 'darkweb'])
+            ->whereIn("$feedTable.feel_type", ['surface_web', 'darkweb', 'darkweb_public'])
             ->whereNull("$credentialRefTable.deleted_at")
             ->when($hasRoleSiteLimit, fn($q) => $q->whereIn("$credentialRefTable.site_id", $site_ids))
             ->when($isClientOrSiteClient, fn($q) => $q->where("$feedTable.status", 1))
             ->when($selectedSite, fn($q) => $q->where("$credentialRefTable.site_id", $selectedSite));
 
+        // ---------- SINGLE SITE_ID FILTER (match table function logic) ----------
+        if (empty($selectedSite) && empty($site_ids) && !empty($get_role['site_id'])) {
+            $q->where("$credentialRefTable.site_id", (int)$get_role['site_id']);
+        }
+
         // ---------- KEYWORDS ----------
         if ($request->keywords) {
             $kw = strtolower(trim($request->keywords));
-            $q->whereRaw("LOWER($feedTable.keyword) LIKE ?", ["%{$kw}%"]);
+            $feedAlias = DB::getTablePrefix() . $feedTable;
+            $q->where(function($query) use ($feedAlias, $kw) {
+                $query->whereRaw("LOWER(`{$feedAlias}`.`keyword`) LIKE ?", ["%{$kw}%"])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ["%{$kw}%"])
+                      ->orWhereRaw("LOWER(`{$feedAlias}`.`feedcontent`) LIKE ?", ["%{$kw}%"]);
+            });
         }
 
         // ---------- DATE FILTER ----------
         if ((int) $request->isDateSearch === 1 && $request->startDate && $request->endDate) {
             $start = Carbon::parse($request->startDate)->startOfDay()->toDateTimeString();
             $end   = Carbon::parse($request->endDate)->endOfDay()->toDateTimeString();
+            $feedAlias = DB::getTablePrefix() . $feedTable;
 
             $q->whereRaw("
-                $feedTable.feedtimepost IS NOT NULL
-                AND CAST($feedTable.feedtimepost AS DATETIME) BETWEEN ? AND ?
+                `$feedAlias`.`feedtimepost` IS NOT NULL
+                AND CAST(`$feedAlias`.`feedtimepost` AS DATETIME) BETWEEN ? AND ?
             ", [$start, $end]);
+        }
+
+        // ---------- CHECK_TYPE FILTER ----------
+        if (!empty($request->check_type)) {
+            $checkType = strtolower(trim($request->check_type));
+            if ($checkType === 'surface_web' || $checkType === 'social') {
+                $q->where("$feedTable.feel_type", 'surface_web');
+            } elseif ($checkType === 'darkweb' || $checkType === 'darkweb_public') {
+                $q->where("$feedTable.feel_type", 'darkweb');
+            }
+        }
+
+        // ---------- CHECK_SOCIAL FILTER (Surface Web sub-categories) ----------
+        // Uses source_name to categorize: website (domains), social (platforms), community (others)
+        if (!empty($request->check_social)) {
+            $cs = strtolower(trim($request->check_social));
+            $feedAlias = DB::getTablePrefix() . $feedTable;
+            $q->where("$feedTable.feel_type", 'surface_web');
+            if ($cs === 'website') {
+                // Website: has domain extension BUT exclude social platforms
+                $q->where(function($query) use ($feedAlias) {
+                    $query->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.net%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.org%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.co.th%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.io%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.th%']);
+                })
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%instagram%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%tiktok%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%youtube%']);
+            } elseif ($cs === 'social') {
+                $q->where(function($query) use ($feedAlias) {
+                    $query->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%line%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%instagram%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%tiktok%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%youtube%']);
+                });
+            } elseif ($cs === 'community') {
+                $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.net%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.org%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.th%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%']);
+            }
+        }
+
+        // ---------- CHECK_DARKWEB FILTER (Dark Web sub-categories) ----------
+        // Uses source_name to categorize: website (domains/.onion), social (platforms), community (others)
+        if (!empty($request->check_darkweb)) {
+            $cd = strtolower(trim($request->check_darkweb));
+            $feedAlias = DB::getTablePrefix() . $feedTable;
+            $q->where("$feedTable.feel_type", 'darkweb');
+            if ($cd === 'website') {
+                // Website: has domain extension BUT exclude social platforms
+                $q->where(function($query) use ($feedAlias) {
+                    $query->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.net%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.org%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.onion%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.io%']);
+                })
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%line%'])
+                ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%']);
+            } elseif ($cd === 'social') {
+                $q->where(function($query) use ($feedAlias) {
+                    $query->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%line%'])
+                          ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%']);
+                });
+            } elseif ($cd === 'community') {
+                $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.net%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.onion%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%telegram%']);
+            }
+        }
+
+        // ---------- CHECK_SERVERITY FILTER ----------
+        if (!empty($request->check_serverity)) {
+            $q->where("$credentialRefTable.serverity", $request->check_serverity);
+        }
+
+        // ---------- CHECK_MONITORING FILTER ----------
+        if (!empty($request->check_monitoring)) {
+            $checkMonitoring = strtolower(trim($request->check_monitoring));
+            if ($checkMonitoring === 'in_progress') {
+                $q->where(function($query) use ($credentialRefTable) {
+                    $query->where("$credentialRefTable.status_monitoring", 'in_progress')
+                          ->orWhereNull("$credentialRefTable.status_monitoring")
+                          ->orWhere("$credentialRefTable.status_monitoring", '');
+                });
+            } else {
+                $q->where("$credentialRefTable.status_monitoring", $request->check_monitoring);
+            }
+        }
+
+        // ---------- CLICK_TYPE / CLICK_TYPE2 FILTER ----------
+        // Uses source_name for sub-category filtering
+        $clickType = !empty($request->click_type2) ? $request->click_type2 : $request->click_type;
+
+        if (!empty($clickType)) {
+            $ct = strtolower(trim($clickType));
+            $feedAlias = DB::getTablePrefix() . $feedTable;
+
+            if (in_array($ct, ['in_progress', 'reported', 'close'])) {
+                $q->where("$credentialRefTable.status_monitoring", 'LIKE', "%{$ct}%");
+            } elseif ($ct === 'social' || $ct === 'surface_web') {
+                $q->where("$feedTable.feel_type", 'surface_web');
+            } elseif ($ct === 'darkweb_public' || $ct === 'darkweb') { 
+                $q->where("$feedTable.feel_type", 'darkweb');
+            } elseif (in_array($ct, ['mobile', 'facebook', 'line', 'twitter', 'website'])) {
+                $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ["%{$ct}%"]);
+            } elseif ($ct === 'other') {
+                $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%mobile%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%'])
+                    ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%']);
+            } elseif (in_array($ct, ['website_s', 'social_s', 'community_s'])) {
+                // Surface Web sub-categories using source_name
+                $q->where("$feedTable.feel_type", 'surface_web');
+                if ($ct === 'website_s') {
+                    $q->where(function($query) use ($feedAlias) {
+                        $query->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                              ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.net%'])
+                              ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.org%'])
+                              ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.th%']);
+                    });
+                } elseif ($ct === 'social_s') {
+                    $q->where(function($query) use ($feedAlias) {
+                        $query->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                              ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                              ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%']);
+                    });
+                } elseif ($ct === 'community_s') {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.th%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%']);
+                }
+            } elseif (in_array($ct, ['website_d', 'social_d', 'community_d'])) {
+                // Dark Web sub-categories using source_name
+                $q->where("$feedTable.feel_type", 'darkweb');
+                if ($ct === 'website_d') {
+                    $q->where(function($query) use ($feedAlias) {
+                        $query->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.com%'])
+                              ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%.onion%']);
+                    });
+                } elseif ($ct === 'social_d') {
+                    $q->where(function($query) use ($feedAlias) {
+                        $query->whereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%twitter%'])
+                              ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%facebook%'])
+                              ->orWhereRaw("LOWER(`{$feedAlias}`.`source_name`) LIKE ?", ['%telegram%']);
+                    });
+                } elseif ($ct === 'community_d') {
+                    $q->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.com%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%.onion%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%twitter%'])
+                        ->whereRaw("LOWER(`{$feedAlias}`.`source_name`) NOT LIKE ?", ['%facebook%']);
+                }
+            }
         }
 
         // Clone query for counting types
         $countCredential = (clone $q)->count(); // Total
         $countSocial     = (clone $q)->where("$feedTable.feel_type", 'surface_web')->count();
-        $countDarkweb    = (clone $q)->where("$feedTable.feel_type", 'darkweb')->count();
+        $countDarkweb    = (clone $q)->whereIn("$feedTable.feel_type", ['darkweb', 'darkweb_public'])->count();
 
         // ---------- RESPONSE ----------
         return response()->json([
@@ -1900,6 +3201,82 @@ class DataLeakController extends Controller
             "social"     => $countSocial,
             "darkweb"    => $countDarkweb,
         ]);
+    }
+
+    /**
+     * Bulk delete credential leak records (soft delete)
+     */
+    public function credentialdatas_bulk_delete(Request $request)
+    {
+        $ids = $request->ids;
+        
+        // Debug logging
+        \Log::info('credentialdatas_bulk_delete called', [
+            'raw_ids' => $ids,
+            'request_all' => $request->all()
+        ]);
+        
+        if (empty($ids) || !is_array($ids)) {
+            \Log::warning('credentialdatas_bulk_delete: No valid ids', ['ids' => $ids, 'is_array' => is_array($ids)]);
+            return response()->json([
+                'success' => false,
+                'message' => 'No items selected for deletion.'
+            ], 400);
+        }
+
+        $feedTable = $this->resolveTable(['data_leak_feed']);
+        $credentialRefTable = $this->resolveTable(['credential_leak_ref']);
+        
+        // \Log::info('Tables resolved', ['feedTable' => $feedTable, 'credentialRefTable' => $credentialRefTable]);
+
+        try {
+            $deletedCount = 0;
+            
+            foreach ($ids as $refId) {
+                // \Log::info('Processing refId', ['refId' => $refId]);
+                
+                // Get the credential leak ref record
+                $credentialRef = DB::table($credentialRefTable)
+                    ->where('id', $refId)
+                    ->whereNull('deleted_at')
+                    ->first();
+                
+                // \Log::info('Found credentialRef', ['credentialRef' => $credentialRef]);
+                
+                if ($credentialRef) {
+                    // Soft delete the credential_leak_ref record
+                    $updateRef = DB::table($credentialRefTable)
+                        ->where('id', $refId)
+                        ->update(['deleted_at' => now()]);
+                    
+                    // \Log::info('Updated credentialRef', ['refId' => $refId, 'result' => $updateRef]);
+                    
+                    // Also soft delete the associated data_leak_feed record
+                    if (!empty($credentialRef->data_leak_feed_id)) {
+                        $updateFeed = DB::table($feedTable)
+                            ->where('id', $credentialRef->data_leak_feed_id)
+                            ->update(['deleted_at' => now()]);
+                        
+                        // \Log::info('Updated feed', ['feed_id' => $credentialRef->data_leak_feed_id, 'result' => $updateFeed]);
+                    }
+                    
+                    $deletedCount++;
+                }
+            }
+
+            // \Log::info('Bulk delete completed', ['deletedCount' => $deletedCount]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully deleted {$deletedCount} record(s).",
+                'deleted_count' => $deletedCount
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting records: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     // View Content DataLeak
@@ -2068,6 +3445,9 @@ class DataLeakController extends Controller
 
     public function delete_dataleakdata($code)
     {
+        // Flag to track if this was a credential delete
+        $isCredentialDelete = false;
+        
         // 1) ลองหาใน Social Ref ก่อน
         $DataLeakSocialRef = DataLeakSocialRef::where('code', $code)->first();
 
@@ -2133,6 +3513,8 @@ class DataLeakController extends Controller
             $CredentialRef = CredentialLeakRef::where('code', $code)->first();
 
             if ($CredentialRef) {
+                $isCredentialDelete = true; // Mark as credential delete
+                
                 $feed = DataLeakFeed::find($CredentialRef->data_leak_feed_id);
 
                 if ($feed) {
@@ -2184,10 +3566,15 @@ class DataLeakController extends Controller
             }
         }
 
+        // Redirect to appropriate page based on what was deleted
+        $redirectRoute = $isCredentialDelete 
+            ? route('credentialleak.index') 
+            : route('socialdatas.index_all_site');
+
         return ajaxResponse(
             [
                 'message'  => langapp('changes_saved_successful'),
-                'redirect' => route('socialdatas.index_all_site'),
+                'redirect' => $redirectRoute,
             ],
             true,
             Response::HTTP_OK
@@ -2234,6 +3621,9 @@ class DataLeakController extends Controller
         // dd($request->id);
         foreach ($request->id as $social_id) {
             $DataLeakSocialRef = DataLeakSocialRef::where('id', $social_id)->first();
+            if (!$DataLeakSocialRef) {
+                continue; // Skip if record not found
+            }
             $DataLeakFeedTemp = DataLeakFeedTemp::where('id', $DataLeakSocialRef->temp_id)->first();
             if ($DataLeakFeedTemp) {
                 $DataLeakFeeds = DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->get();
@@ -2273,12 +3663,21 @@ class DataLeakController extends Controller
                         }
                     }
                 }
-                DataLeakFeed::where('temp_id', $DataLeakFeedTemp->id)->delete();
-                $data = DataLeakSocialRef::where('id', $social_id)->delete();
+                // Soft delete DataLeakFeed (using data_leak_feed_id from SocialRef)
+                if (!empty($DataLeakSocialRef->data_leak_feed_id)) {
+                    DataLeakFeed::where('id', $DataLeakSocialRef->data_leak_feed_id)->update(['deleted_at' => now()]);
+                }
+                // Soft delete DataLeakSocialRef
+                DataLeakSocialRef::where('id', $social_id)->update(['deleted_at' => now()]);
                 $DataLeakFeedTemp->approve = 0;
                 $DataLeakFeedTemp->save();
             } else {
-                $data = DataLeakSocialRef::where('id', $social_id)->delete();
+                // Soft delete DataLeakFeed (using data_leak_feed_id from SocialRef)
+                if (!empty($DataLeakSocialRef->data_leak_feed_id)) {
+                    DataLeakFeed::where('id', $DataLeakSocialRef->data_leak_feed_id)->update(['deleted_at' => now()]);
+                }
+                // Soft delete DataLeakSocialRef
+                DataLeakSocialRef::where('id', $social_id)->update(['deleted_at' => now()]);
             }
         }
         return ajaxResponse(
@@ -4804,7 +6203,6 @@ class DataLeakController extends Controller
 
     public function add_dataleak(Request $request)
     {
-
         $keyword = @$request->keyword;
         $other = @$request->other;
         if ($keyword == 'Other') {
@@ -4876,16 +6274,32 @@ class DataLeakController extends Controller
         if ($request->site) {
             foreach ($request->site as $site) {
                 $SiteSettings = SiteSettings::where('code', $site)->first();
-                $DataLeakSocialRefs = new DataLeakSocialRef;
-                $DataLeakSocialRefs->code = generator_uuid();
-                $DataLeakSocialRefs->site_id = $SiteSettings->id;
-                $DataLeakSocialRefs->data_leak_feed_id = $DataLeakFeed->id;
-                $DataLeakSocialRefs->keyword = $DataLeakFeed->keyword;
-                $DataLeakSocialRefs->feel_type = $DataLeakFeed->feel_type;
-                $DataLeakSocialRefs->status_monitoring = @$request->monitoring;
-                $DataLeakSocialRefs->serverity = @$request->serverity;
-                $DataLeakSocialRefs->status = 1;
-                $DataLeakSocialRefs->save();
+                
+                // Check if keyword is Credential, save to credential_leak_ref instead
+                if (strtolower($keyword_i) === 'credential') {
+                    $CredentialRef = new CredentialLeakRef;
+                    $CredentialRef->code = $DataLeakFeed->code;
+                    $CredentialRef->site_id = $SiteSettings->id;
+                    $CredentialRef->data_leak_feed_id = $DataLeakFeed->id;
+                    $CredentialRef->keyword = $DataLeakFeed->keyword;
+                    $CredentialRef->feel_type = $DataLeakFeed->feel_type;
+                    $CredentialRef->status_monitoring = @$request->monitoring;
+                    $CredentialRef->serverity = @$request->serverity;
+                    $CredentialRef->status = 1;
+                    $CredentialRef->content = $DataLeakFeed->feedcontent;
+                    $CredentialRef->save();
+                } else {
+                    $DataLeakSocialRefs = new DataLeakSocialRef;
+                    $DataLeakSocialRefs->code = generator_uuid();
+                    $DataLeakSocialRefs->site_id = $SiteSettings->id;
+                    $DataLeakSocialRefs->data_leak_feed_id = $DataLeakFeed->id;
+                    $DataLeakSocialRefs->keyword = $DataLeakFeed->keyword;
+                    $DataLeakSocialRefs->feel_type = $DataLeakFeed->feel_type;
+                    $DataLeakSocialRefs->status_monitoring = @$request->monitoring;
+                    $DataLeakSocialRefs->serverity = @$request->serverity;
+                    $DataLeakSocialRefs->status = 1;
+                    $DataLeakSocialRefs->save();
+                }
                 if ($request->sent_mail == true) {
                     $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
                     if ($site_email_alert) {
@@ -4916,20 +6330,46 @@ class DataLeakController extends Controller
                     }
                 }
             }
-            $site = route('socialdatas.index_all_site');
+            // Redirect based on keyword type
+            if (strtolower($keyword_i) === 'credential') {
+                $site = route('credentialleak.index');
+            } else {
+                $site = route('socialdatas.index_all_site');
+            }
         } else {
             $SiteSettings = SiteSettings::where('code', @$request->site_code)->first();
-            $DataLeakSocialRefs = new DataLeakSocialRef;
-            $DataLeakSocialRefs->code = generator_uuid();
-            $DataLeakSocialRefs->site_id = $SiteSettings->id;
-            $DataLeakSocialRefs->data_leak_feed_id = $DataLeakFeed->id;
-            $DataLeakSocialRefs->keyword = $DataLeakFeed->keyword;
-            $DataLeakSocialRefs->feel_type = $DataLeakFeed->feel_type;
-            $DataLeakSocialRefs->status_monitoring = @$request->monitoring;
-            $DataLeakSocialRefs->serverity = @$request->serverity;
-            $DataLeakSocialRefs->status = 1;
-            $DataLeakSocialRefs->save();
-            $site = route('socialdatas.index', ['id' => @$request->site_code]);
+            
+            // Check if keyword is Credential, save to credential_leak_ref instead
+            if (strtolower($keyword_i) === 'credential') {
+                $CredentialRef = new CredentialLeakRef;
+                $CredentialRef->code = $DataLeakFeed->code;
+                $CredentialRef->site_id = $SiteSettings->id;
+                $CredentialRef->data_leak_feed_id = $DataLeakFeed->id;
+                $CredentialRef->keyword = $DataLeakFeed->keyword;
+                $CredentialRef->feel_type = $DataLeakFeed->feel_type;
+                $CredentialRef->status_monitoring = @$request->monitoring;
+                $CredentialRef->serverity = @$request->serverity;
+                $CredentialRef->status = 1;
+                $CredentialRef->content = $DataLeakFeed->feedcontent;
+                $CredentialRef->save();
+            } else {
+                $DataLeakSocialRefs = new DataLeakSocialRef;
+                $DataLeakSocialRefs->code = generator_uuid();
+                $DataLeakSocialRefs->site_id = $SiteSettings->id;
+                $DataLeakSocialRefs->data_leak_feed_id = $DataLeakFeed->id;
+                $DataLeakSocialRefs->keyword = $DataLeakFeed->keyword;
+                $DataLeakSocialRefs->feel_type = $DataLeakFeed->feel_type;
+                $DataLeakSocialRefs->status_monitoring = @$request->monitoring;
+                $DataLeakSocialRefs->serverity = @$request->serverity;
+                $DataLeakSocialRefs->status = 1;
+                $DataLeakSocialRefs->save();
+            }
+            // Redirect based on keyword type
+            if (strtolower($keyword_i) === 'credential') {
+                $site = route('credentialleak.index');
+            } else {
+                $site = route('socialdatas.index', ['id' => @$request->site_code]);
+            }
             if ($request->sent_mail == true) {
                 $site_email_alert = site_config_email_alert::where("site_id", $SiteSettings->id)->get();
                 if ($site_email_alert) {
@@ -5014,6 +6454,7 @@ class DataLeakController extends Controller
         $data['DataLeakFeed'] = $DataLeakFeed;
         $data['DataLeakSocialRefs'] = $DataLeakSocialRefs;
         $data['site'] = $request->site ?? null;
+        // dd($data);
 
 
         return view('sitesettings::modal.edit_dataleak')->with($data);
@@ -5622,6 +7063,7 @@ class DataLeakController extends Controller
                 $ref->feel_type         = $request->feel_type ?? $ref->feel_type;
                 $ref->status_monitoring = $request->monitoring ?? $ref->status_monitoring;
                 $ref->serverity         = $request->serverity ?? $ref->serverity;
+                $ref->content           = $DataLeakFeed->feedcontent; // Sync content from DataLeakFeed
                 $ref->save();
             }
 
@@ -5682,10 +7124,17 @@ class DataLeakController extends Controller
         }
 
 
-        if ($request->site_code) {
-            $site = route('socialdatas.index', ['id' => @$request->site_code]);
+        // Redirect based on whether record is Credential or Data Leak
+        if ($CredentialRefs->count() > 0) {
+            // If there are CredentialLeakRef records, redirect to Credential Leak page
+            $site = route('credentialleak.index');
         } else {
-            $site = route('socialdatas.index_all_site');
+            // Otherwise redirect to Data Leak page
+            if ($request->site_code) {
+                $site = route('socialdatas.index', ['id' => @$request->site_code]);
+            } else {
+                $site = route('socialdatas.index_all_site');
+            }
         }
 
         return ajaxResponse(

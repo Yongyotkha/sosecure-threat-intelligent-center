@@ -289,9 +289,12 @@ Route::get('/dataleak/edit_dataleak_modal/{code}', 'DataLeakController@edit_data
 Route::post('/dataleak/edit_dataleak', 'DataLeakController@edit_dataleak')->name('dataleak.edit_dataleak')->middleware('can:menu_items');
 
 Route::post('socialdatas_all_site_tb', 'DataLeakController@socialdatas_all_site_tb')->name('socialdatas.socialdatas_all_site_tb')->middleware(['can:menu_items','permission:data_leak']);
+Route::get('socialdatas_export_excel', 'DataLeakController@socialdatas_export_excel')->name('socialdatas.export_excel')->middleware(['can:menu_items','permission:data_leak']);
 Route::post('credentialdatas_all_site_tb', 'DataLeakController@credentialdatas_all_site_tb')->name('socialdatas.credentialdatas_all_site_tb')->middleware(['can:menu_items','permission:data_leak']);
 Route::post('credentialdatas_count_icon', 'DataLeakController@credentialdatas_count_icon')->name('socialdatas.credentialdatas_count_icon')->middleware(['can:menu_items','permission:data_leak']);
 Route::post('credentialdatas_count_val', 'DataLeakController@credentialdatas_count_val')->name('socialdatas.credentialdatas_count_val')->middleware(['can:menu_items','permission:data_leak']);
+Route::get('credentialdatas_export_excel', 'DataLeakController@credentialdatas_export_excel')->name('socialdatas.credentialdatas_export_excel')->middleware(['can:menu_items','permission:data_leak']);
+Route::post('credentialdatas_bulk_delete', 'DataLeakController@credentialdatas_bulk_delete')->name('socialdatas.credentialdatas_bulk_delete')->middleware(['can:menu_items','permission:data_leak']);
 Route::post('darkweb_all_site_tb', 'DataLeakController@darkweb_all_site_tb')->name('socialdatas.darkweb_all_site_tb')->middleware(['can:menu_items','permission:compromised']);
 
 

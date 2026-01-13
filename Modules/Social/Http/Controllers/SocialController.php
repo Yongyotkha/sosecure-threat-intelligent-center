@@ -660,7 +660,7 @@ class SocialController extends Controller
         }
 
         $date_start = $request->startDate;
-        $date_end = $request->startDate;
+        $date_end = $request->endDate;
         $site_id = '';
         $site_code = $request->site_id;
 
@@ -687,8 +687,8 @@ class SocialController extends Controller
 
         if ($request->search_val == 1) {
 
-            $model = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->with('get_site')->with('get_data_leak_feed_one');
-            $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->with('get_site')->with('get_data_leak_feed_one');
+            $model = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public','surface_web','darkweb'])->whereHas('get_data_leak_feed_one', function($q) { $q->whereNotNull('keyword')->where('keyword', '!=', ''); })->with('get_site')->with('get_data_leak_feed_one');
+            $countGroupBy = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public','surface_web','darkweb'])->whereHas('get_data_leak_feed_one', function($q) { $q->whereNotNull('keyword')->where('keyword', '!=', ''); })->with('get_site')->with('get_data_leak_feed_one');
             //remove all  ->where('status', 1)
 
             // if($request -> type) {
@@ -722,8 +722,134 @@ class SocialController extends Controller
             // }
 
             if ($request->check_type) {
-                $model = $model->where('feel_type', '=', $request->check_type);
-                $countGroupBy = $countGroupBy->where('feel_type', '=', $request->check_type);
+                $checkType = strtolower(trim($request->check_type));
+                if ($checkType === 'surface_web') {
+                    $model = $model->whereNotIn('feel_type', ['darkweb', 'darkweb_public', 'darkweb_private', 'compromise']);
+                    $countGroupBy = $countGroupBy->whereNotIn('feel_type', ['darkweb', 'darkweb_public', 'darkweb_private', 'compromise']);
+                } elseif ($checkType === 'darkweb') {
+                    $model = $model->whereIn('feel_type', ['darkweb', 'darkweb_public', 'darkweb_private']);
+                    $countGroupBy = $countGroupBy->whereIn('feel_type', ['darkweb', 'darkweb_public', 'darkweb_private']);
+                }
+            }
+
+            // ───── CHECK_SOCIAL FILTER (Surface Web sub-options) ─────
+            if ($request->check_social) {
+                $checkSocial = strtolower(trim($request->check_social));
+                if ($checkSocial === 'website') {
+                    $model = $model->whereHas('get_data_leak_feed_one', function($q) {
+                        $q->whereRaw("LOWER(keyword) LIKE ?", ["website%"]);
+                    });
+                    $countGroupBy = $countGroupBy->whereHas('get_data_leak_feed_one', function($q) {
+                        $q->whereRaw("LOWER(keyword) LIKE ?", ["website%"]);
+                    });
+                } elseif ($checkSocial === 'social') {
+                    $model = $model->whereHas('get_data_leak_feed_one', function($q) {
+                        $q->where(function($qq) {
+                            $qq->whereRaw("LOWER(keyword) LIKE ?", ["facebook%"])
+                               ->orWhereRaw("LOWER(keyword) LIKE ?", ["line%"])
+                               ->orWhereRaw("LOWER(keyword) LIKE ?", ["twitter%"])
+                               ->orWhereRaw("LOWER(keyword) LIKE ?", ["fanpage%"]);
+                        });
+                    });
+                    $countGroupBy = $countGroupBy->whereHas('get_data_leak_feed_one', function($q) {
+                        $q->where(function($qq) {
+                            $qq->whereRaw("LOWER(keyword) LIKE ?", ["facebook%"])
+                               ->orWhereRaw("LOWER(keyword) LIKE ?", ["line%"])
+                               ->orWhereRaw("LOWER(keyword) LIKE ?", ["twitter%"])
+                               ->orWhereRaw("LOWER(keyword) LIKE ?", ["fanpage%"]);
+                        });
+                    });
+                } elseif ($checkSocial === 'community') {
+                    $model = $model->whereHas('get_data_leak_feed_one', function($q) {
+                        $q->whereRaw("LOWER(keyword) NOT LIKE ?", ["website%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["facebook%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["line%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["twitter%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["fanpage%"]);
+                    });
+                    $countGroupBy = $countGroupBy->whereHas('get_data_leak_feed_one', function($q) {
+                        $q->whereRaw("LOWER(keyword) NOT LIKE ?", ["website%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["facebook%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["line%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["twitter%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["fanpage%"]);
+                    });
+                }
+            }
+
+            // ───── CHECK_DARKWEB FILTER (Dark Web sub-options) ─────
+            if ($request->check_darkweb) {
+                $checkDarkweb = strtolower(trim($request->check_darkweb));
+                if ($checkDarkweb === 'website') {
+                    $model = $model->whereHas('get_data_leak_feed_one', function($q) {
+                        $q->whereRaw("LOWER(keyword) LIKE ?", ["website%"]);
+                    });
+                    $countGroupBy = $countGroupBy->whereHas('get_data_leak_feed_one', function($q) {
+                        $q->whereRaw("LOWER(keyword) LIKE ?", ["website%"]);
+                    });
+                } elseif ($checkDarkweb === 'social') {
+                    $model = $model->whereHas('get_data_leak_feed_one', function($q) {
+                        $q->where(function($qq) {
+                            $qq->whereRaw("LOWER(keyword) LIKE ?", ["facebook%"])
+                               ->orWhereRaw("LOWER(keyword) LIKE ?", ["line%"])
+                               ->orWhereRaw("LOWER(keyword) LIKE ?", ["twitter%"])
+                               ->orWhereRaw("LOWER(keyword) LIKE ?", ["telegram%"])
+                               ->orWhereRaw("LOWER(keyword) LIKE ?", ["social%"]);
+                        });
+                    });
+                    $countGroupBy = $countGroupBy->whereHas('get_data_leak_feed_one', function($q) {
+                        $q->where(function($qq) {
+                            $qq->whereRaw("LOWER(keyword) LIKE ?", ["facebook%"])
+                               ->orWhereRaw("LOWER(keyword) LIKE ?", ["line%"])
+                               ->orWhereRaw("LOWER(keyword) LIKE ?", ["twitter%"])
+                               ->orWhereRaw("LOWER(keyword) LIKE ?", ["telegram%"])
+                               ->orWhereRaw("LOWER(keyword) LIKE ?", ["social%"]);
+                        });
+                    });
+                } elseif ($checkDarkweb === 'community') {
+                    $model = $model->whereHas('get_data_leak_feed_one', function($q) {
+                        $q->whereRaw("LOWER(keyword) NOT LIKE ?", ["website%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["facebook%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["line%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["twitter%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["telegram%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["social%"]);
+                    });
+                    $countGroupBy = $countGroupBy->whereHas('get_data_leak_feed_one', function($q) {
+                        $q->whereRaw("LOWER(keyword) NOT LIKE ?", ["website%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["facebook%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["line%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["twitter%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["telegram%"])
+                          ->whereRaw("LOWER(keyword) NOT LIKE ?", ["social%"]);
+                    });
+                }
+            }
+
+            // ───── CHECK_SERVERITY FILTER ─────
+            if ($request->check_serverity) {
+                $model = $model->where('serverity', $request->check_serverity);
+                $countGroupBy = $countGroupBy->where('serverity', $request->check_serverity);
+            }
+
+            // ───── CHECK_MONITORING FILTER ─────
+            if ($request->check_monitoring) {
+                $checkMonitoring = strtolower(trim($request->check_monitoring));
+                if ($checkMonitoring === 'in_progress') {
+                    $model = $model->where(function($q) {
+                        $q->where('status_monitoring', 'in_progress')
+                          ->orWhereNull('status_monitoring')
+                          ->orWhere('status_monitoring', '');
+                    });
+                    $countGroupBy = $countGroupBy->where(function($q) {
+                        $q->where('status_monitoring', 'in_progress')
+                          ->orWhereNull('status_monitoring')
+                          ->orWhere('status_monitoring', '');
+                    });
+                } else {
+                    $model = $model->where('status_monitoring', $request->check_monitoring);
+                    $countGroupBy = $countGroupBy->where('status_monitoring', $request->check_monitoring);
+                }
             }
 
             // if($request ->click_type) {
@@ -782,9 +908,9 @@ class SocialController extends Controller
             $countGroupBy = $countGroupBy->select('feel_type', DB::raw('count(*) as total'))->groupBy('feel_type')->get();
             $model = $model->with('get_data_leak_feed_one')->orderBy('id', 'desc')->paginate(PAGINATE_NUM);
         } else {
-            $Data_leak_feed_all = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->count();
-            $news = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public']); //->get()
-            $countGroupBy = DataLeakSocialRef::select('feel_type', DB::raw('count(*) as total'))->where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public'])->groupBy('feel_type');
+            $Data_leak_feed_all = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public','surface_web','darkweb'])->whereHas('get_data_leak_feed_one', function($q) { $q->whereNotNull('keyword')->where('keyword', '!=', ''); })->count();
+            $news = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public','surface_web','darkweb'])->whereHas('get_data_leak_feed_one', function($q) { $q->whereNotNull('keyword')->where('keyword', '!=', ''); }); //->get()
+            $countGroupBy = DataLeakSocialRef::select('feel_type', DB::raw('count(*) as total'))->where('deleted_at', null)->whereIn('feel_type', ['social', 'darkweb_public','surface_web','darkweb'])->whereHas('get_data_leak_feed_one', function($q) { $q->whereNotNull('keyword')->where('keyword', '!=', ''); })->groupBy('feel_type');
             //remove all  ->where('status', 1)
 
             if (Auth::check()) {
@@ -818,18 +944,24 @@ class SocialController extends Controller
             $countGroupBy = $countGroupBy->get();
         }
 
+        // Initialize all possible feel_type keys (old and new)
         $count_sub_type["darkweb"] = 0;
+        $count_sub_type["darkweb_public"] = 0;
         $count_sub_type["social"] = 0;
+        $count_sub_type["surface_web"] = 0;
 
         foreach ($countGroupBy as $countGroup) {
             $count_sub_type[$countGroup->feel_type] = $countGroup->total;
         }
+        
         if ($request->ajax()) {
             $data = [
                 "html" => $html,
                 "count" => $Data_leak_feed_all,
-                "darkweb" => @$count_sub_type["darkweb_public"],
-                "social" => @$count_sub_type["social"],
+                // Combine old and new types: darkweb_public + darkweb → darkweb
+                "darkweb" => ($count_sub_type["darkweb_public"] ?? 0) + ($count_sub_type["darkweb"] ?? 0),
+                // Combine old and new types: social + surface_web → social
+                "social" => ($count_sub_type["social"] ?? 0) + ($count_sub_type["surface_web"] ?? 0),
             ];
             return response()->json($data);
         }
@@ -958,7 +1090,7 @@ class SocialController extends Controller
         // ───── Social Ref ─────
         $qSocial = DB::table("{$socialRefTable} as r")
             ->join("{$feedTable} as f", 'r.data_leak_feed_id', '=', 'f.id')
-            ->whereIn('f.feel_type', ['social', 'darkweb_public'])
+            ->whereIn('f.feel_type', ['social', 'darkweb_public','surface_web','darkweb'])
             ->whereNull('r.deleted_at')
             ->select(
                 'r.id as ref_id',
@@ -966,7 +1098,9 @@ class SocialController extends Controller
                 'r.status_monitoring',
                 'r.serverity',
                 'f.keyword',
+                'f.feedcontent',
                 'f.feedtimepost',
+                'f.feel_type',
                 DB::raw("'social_ref' as ref_type")
             );
 
@@ -993,6 +1127,88 @@ class SocialController extends Controller
         ", [$start, $end]);
         }
 
+        // ───── KEYWORDS FILTER (search in keyword and feedcontent) ─────
+        if (!empty($request->keywords)) {
+            $keywords = $request->keywords;
+            $q->where(function($query) use ($keywords) {
+                $query->whereRaw("LOWER(u.keyword) LIKE ?", ['%' . strtolower($keywords) . '%'])
+                      ->orWhereRaw("LOWER(u.feedcontent) LIKE ?", ['%' . strtolower($keywords) . '%']);
+            });
+        }
+
+        // ───── CHECK_TYPE FILTER (Surface Web / Darkweb) ─────
+        if (!empty($request->check_type)) {
+            $checkType = strtolower(trim($request->check_type));
+            if ($checkType === 'surface_web') {
+                $q->whereRaw("LOWER(u.feel_type) NOT IN ('darkweb', 'darkweb_public', 'darkweb_private', 'compromise')");
+            } elseif ($checkType === 'darkweb') {
+                $q->whereRaw("LOWER(u.feel_type) IN ('darkweb', 'darkweb_public', 'darkweb_private')");
+            }
+        }
+
+        // ───── CHECK_SOCIAL FILTER (Surface Web sub-options) ─────
+        if (!empty($request->check_social)) {
+            $checkSocial = strtolower(trim($request->check_social));
+            if ($checkSocial === 'website') {
+                $q->whereRaw("TRIM(LOWER(u.keyword)) LIKE ?", ["website%"]);
+            } elseif ($checkSocial === 'social') {
+                $q->where(function($query) {
+                    $query->whereRaw("TRIM(LOWER(u.keyword)) LIKE ?", ["facebook%"])
+                          ->orWhereRaw("TRIM(LOWER(u.keyword)) LIKE ?", ["line%"])
+                          ->orWhereRaw("TRIM(LOWER(u.keyword)) LIKE ?", ["twitter%"])
+                          ->orWhereRaw("TRIM(LOWER(u.keyword)) LIKE ?", ["fanpage%"]);
+                });
+            } elseif ($checkSocial === 'community') {
+                $q->whereRaw("TRIM(LOWER(u.keyword)) NOT LIKE ?", ["website%"])
+                  ->whereRaw("TRIM(LOWER(u.keyword)) NOT LIKE ?", ["facebook%"])
+                  ->whereRaw("TRIM(LOWER(u.keyword)) NOT LIKE ?", ["line%"])
+                  ->whereRaw("TRIM(LOWER(u.keyword)) NOT LIKE ?", ["twitter%"])
+                  ->whereRaw("TRIM(LOWER(u.keyword)) NOT LIKE ?", ["fanpage%"]);
+            }
+        }
+
+        // ───── CHECK_DARKWEB FILTER (Dark Web sub-options) ─────
+        if (!empty($request->check_darkweb)) {
+            $checkDarkweb = strtolower(trim($request->check_darkweb));
+            if ($checkDarkweb === 'website') {
+                $q->whereRaw("TRIM(LOWER(u.keyword)) LIKE ?", ["website%"]);
+            } elseif ($checkDarkweb === 'social') {
+                $q->where(function($query) {
+                    $query->whereRaw("TRIM(LOWER(u.keyword)) LIKE ?", ["facebook%"])
+                          ->orWhereRaw("TRIM(LOWER(u.keyword)) LIKE ?", ["line%"])
+                          ->orWhereRaw("TRIM(LOWER(u.keyword)) LIKE ?", ["twitter%"])
+                          ->orWhereRaw("TRIM(LOWER(u.keyword)) LIKE ?", ["telegram%"])
+                          ->orWhereRaw("TRIM(LOWER(u.keyword)) LIKE ?", ["social%"]);
+                });
+            } elseif ($checkDarkweb === 'community') {
+                $q->whereRaw("TRIM(LOWER(u.keyword)) NOT LIKE ?", ["website%"])
+                  ->whereRaw("TRIM(LOWER(u.keyword)) NOT LIKE ?", ["facebook%"])
+                  ->whereRaw("TRIM(LOWER(u.keyword)) NOT LIKE ?", ["line%"])
+                  ->whereRaw("TRIM(LOWER(u.keyword)) NOT LIKE ?", ["twitter%"])
+                  ->whereRaw("TRIM(LOWER(u.keyword)) NOT LIKE ?", ["telegram%"])
+                  ->whereRaw("TRIM(LOWER(u.keyword)) NOT LIKE ?", ["social%"]);
+            }
+        }
+
+        // ───── CHECK_SERVERITY FILTER ─────
+        if (!empty($request->check_serverity)) {
+            $q->whereRaw("LOWER(u.serverity) = ?", [strtolower(trim($request->check_serverity))]);
+        }
+
+        // ───── CHECK_MONITORING FILTER ─────
+        if (!empty($request->check_monitoring)) {
+            $checkMonitoring = strtolower(trim($request->check_monitoring));
+            if ($checkMonitoring === 'in_progress') {
+                $q->where(function($query) {
+                    $query->whereRaw("LOWER(u.status_monitoring) = 'in_progress'")
+                          ->orWhereRaw("u.status_monitoring IS NULL")
+                          ->orWhereRaw("u.status_monitoring = ''");
+                });
+            } else {
+                $q->whereRaw("LOWER(u.status_monitoring) = ?", [$checkMonitoring]);
+            }
+        }
+
         // ───── ICON COUNTS ─────
         $base = clone $q;
 
@@ -1001,6 +1217,8 @@ class SocialController extends Controller
         $icon_line = (clone $base)->whereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['line%'])->count();
         $icon_twitter = (clone $base)->whereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['twitter%'])->count();
         $icon_website = (clone $base)->whereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['website%'])->count();
+
+        
 
         $icon_other = (clone $base)
             ->whereRaw('TRIM(LOWER(u.keyword)) NOT IN (?, ?, ?, ?, ?)', [
@@ -1012,9 +1230,49 @@ class SocialController extends Controller
             ])
             ->count();
 
+        // ───── SURFACE WEB COUNTS (exclude darkweb types and compromise) ─────
+        $baseSurface = (clone $base)
+            ->whereRaw("LOWER(u.feel_type) NOT IN ('darkweb', 'darkweb_public', 'darkweb_private', 'compromise')");
+        
+        $icon_website_s = (clone $baseSurface)->whereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['website%'])->count();
+        $icon_social_s = (clone $baseSurface)
+            ->where(function($q) {
+                $q->whereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['facebook%'])
+                  ->orWhereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['line%'])
+                  ->orWhereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['twitter%']);
+            })->count();
+        $icon_community_s = (clone $baseSurface)
+            ->whereRaw('TRIM(LOWER(u.keyword)) NOT LIKE ?', ['website%'])
+            ->whereRaw('TRIM(LOWER(u.keyword)) NOT LIKE ?', ['facebook%'])
+            ->whereRaw('TRIM(LOWER(u.keyword)) NOT LIKE ?', ['line%'])
+            ->whereRaw('TRIM(LOWER(u.keyword)) NOT LIKE ?', ['twitter%'])
+            ->count();
+
+        // ───── DARK WEB COUNTS (only darkweb types) ─────
+        $baseDarkweb = (clone $base)
+            ->whereRaw("LOWER(u.feel_type) IN ('darkweb', 'darkweb_public', 'darkweb_private')");
+        
+        $icon_website_d = (clone $baseDarkweb)->whereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['website%'])->count();
+        $icon_social_d = (clone $baseDarkweb)
+            ->where(function($q) {
+                $q->whereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['facebook%'])
+                  ->orWhereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['line%'])
+                  ->orWhereRaw('TRIM(LOWER(u.keyword)) LIKE ?', ['twitter%']);
+            })->count();
+        $icon_community_d = (clone $baseDarkweb)
+            ->whereRaw('TRIM(LOWER(u.keyword)) NOT LIKE ?', ['website%'])
+            ->whereRaw('TRIM(LOWER(u.keyword)) NOT LIKE ?', ['facebook%'])
+            ->whereRaw('TRIM(LOWER(u.keyword)) NOT LIKE ?', ['line%'])
+            ->whereRaw('TRIM(LOWER(u.keyword)) NOT LIKE ?', ['twitter%'])
+            ->count();
+
         // ───── STATUS COUNTS ─────
         $number_in_progress = (clone $base)
-            ->whereRaw("LOWER(u.status_monitoring) = 'in_progress'")
+            ->where(function($q) {
+                $q->whereRaw("LOWER(u.status_monitoring) = 'in_progress'")
+                  ->orWhereRaw("u.status_monitoring IS NULL")
+                  ->orWhereRaw("u.status_monitoring = ''");
+            })
             ->count();
 
 
@@ -1029,6 +1287,15 @@ class SocialController extends Controller
             "icon_twitter"       => $icon_twitter,
             "icon_website"       => $icon_website,
             "icon_other"         => $icon_other,
+            // Surface Web counts
+            "icon_website_s"     => $icon_website_s,
+            "icon_social_s"      => $icon_social_s,
+            "icon_community_s"   => $icon_community_s,
+            // Dark Web counts
+            "icon_website_d"     => $icon_website_d,
+            "icon_social_d"      => $icon_social_d,
+            "icon_community_d"   => $icon_community_d,
+            // Status counts
             "number_in_progress" => $number_in_progress,
             "number_reported"    => $number_reported,
             "number_close"       => $number_close,

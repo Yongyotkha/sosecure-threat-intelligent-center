@@ -28,8 +28,8 @@
                 <label class="col-lg-3 control-label">Type <span class="text-danger">*</span> </label>
                 <div class="col-lg-9">
                     <select name="type" id="type" class="select2-option form-control" required>
-                        <option value="social">Public</option>
-                        <option value="darkweb_public">Dark Web</option>
+                        <option value="surface_web">Surface Web</option>
+                        <option value="darkweb">Dark Web</option>
                     </select>
                 </div>
             </div>
@@ -43,6 +43,9 @@
                         <option value="Facebook">Fanpage</option>
                         <option value="Twitter">Twitter</option>
                         <option value="Website">Website</option>
+                        <option value="Credential">Credential</option>
+                        <option value="Social">Social</option>
+                        <option value="Darkweb">Darkweb</option>
                         <option value="Other">Other</option>
                     </select>
                 </div>

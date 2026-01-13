@@ -14,9 +14,8 @@
                 <label class="col-lg-3 control-label">Type <span class="text-danger">*</span> </label>
                 <div class="col-lg-9">
                     <select name="type" id="type" class="select2-option form-control" required>
-                        <option value="social">Public</option>
-                        <option value="darkweb_public">Dark Web</option>
-                        <option value="credential">Credential</option>
+                        <option value="surface_web">Surface Web</option>
+                        <option value="darkweb">Dark Web</option>
                     </select>
                 </div>
             </div>
@@ -31,14 +30,14 @@
                         <option value="Website" {{@$DataLeakFeed->keyword == 'Website'?'selected':''}}>Website</option>
                         <option value="Credential" {{@$DataLeakFeed->keyword == 'Credential'?'selected':''}}>Credential</option>
                         <option value="Other" {{@$DataLeakFeed->keyword == 'Mobile'||@$DataLeakFeed->keyword == 'Facebook'||
-                        @$DataLeakFeed->keyword == 'Twitter'||@$DataLeakFeed->keyword == 'Website'
+                        @$DataLeakFeed->keyword == 'Twitter'||@$DataLeakFeed->keyword == 'Website'||@$DataLeakFeed->keyword == 'Credential'
                         ?'':'selected'}}>Other</option>
                     </select>
                 </div>
             </div>
             <div class="form-group row" id="area_other" style="{{@$DataLeakFeed->keyword == 'Mobile'||
                 @$DataLeakFeed->keyword == 'Facebook'||@$DataLeakFeed->keyword == 'Twitter'||
-                @$DataLeakFeed->keyword == 'Website'? 'display:none;':''}}">
+                @$DataLeakFeed->keyword == 'Website'||@$DataLeakFeed->keyword == 'Credential'? 'display:none;':''}}">
                 <label class="col-lg-3 control-label"> </label>
                 <div class="col-lg-9">
                     <input type="text" name="other" id="other1" placeholder="keyword etc." class="form-control" 
