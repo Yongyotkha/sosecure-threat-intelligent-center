@@ -145,6 +145,27 @@ class WebDefacementProccess extends Command
               $TransactionBatchjob_Update->transcation_date = now();
               $TransactionBatchjob_Update->save();
 
+              // บันทึก stat_log สำหรับ Web Down
+              try {
+                DB::table('webdefacement_stat_log')->insert([
+                  'site_id' => $WebdefacmentSetting_update->site_id,
+                  'webdefacement_setting_id' => $value->id,
+                  'result_id' => null,
+                  'status' => 'Down',
+                  'score' => 0,
+                  'diff_percent' => 0,
+                  'hash_changed' => 0,
+                  'image_changed' => 0,
+                  'alert_sent' => 1,
+                  'reason' => 'web_down',
+                  'checked_at' => now(),
+                  'created_at' => now(),
+                  'updated_at' => now(),
+                ]);
+              } catch (\Throwable $e) {
+                Log::error("[STAT_LOG] Failed for web down: " . $e->getMessage());
+              }
+
               // จบการทำงาน command ทันที
               return;
             } catch (\Exception $e) {
@@ -164,6 +185,27 @@ class WebDefacementProccess extends Command
               $TransactionBatchjob_Update->transcation_date = now();
               $TransactionBatchjob_Update->save();
 
+              // บันทึก stat_log สำหรับ Web Down
+              try {
+                DB::table('webdefacement_stat_log')->insert([
+                  'site_id' => $WebdefacmentSetting_update->site_id,
+                  'webdefacement_setting_id' => $value->id,
+                  'result_id' => null,
+                  'status' => 'Down',
+                  'score' => 0,
+                  'diff_percent' => 0,
+                  'hash_changed' => 0,
+                  'image_changed' => 0,
+                  'alert_sent' => 1,
+                  'reason' => 'web_down_email_failed',
+                  'checked_at' => now(),
+                  'created_at' => now(),
+                  'updated_at' => now(),
+                ]);
+              } catch (\Throwable $e) {
+                Log::error("[STAT_LOG] Failed for web down: " . $e->getMessage());
+              }
+
               // จบการทำงาน command ทันที
               return;
             }
@@ -176,6 +218,27 @@ class WebDefacementProccess extends Command
           $TransactionBatchjob_Update->progress = 3;
           $TransactionBatchjob_Update->transcation_date = now();
           $TransactionBatchjob_Update->save();
+
+          // บันทึก stat_log สำหรับ Web Down (no email)
+          try {
+            DB::table('webdefacement_stat_log')->insert([
+              'site_id' => $WebdefacmentSetting_update->site_id,
+              'webdefacement_setting_id' => $value->id,
+              'result_id' => null,
+              'status' => 'Down',
+              'score' => 0,
+              'diff_percent' => 0,
+              'hash_changed' => 0,
+              'image_changed' => 0,
+              'alert_sent' => 0,
+              'reason' => 'web_down_no_email',
+              'checked_at' => now(),
+              'created_at' => now(),
+              'updated_at' => now(),
+            ]);
+          } catch (\Throwable $e) {
+            Log::error("[STAT_LOG] Failed for web down: " . $e->getMessage());
+          }
 
           // จบการทำงาน command ทันที
           return;
@@ -238,6 +301,28 @@ class WebDefacementProccess extends Command
         $WebdefacmentSetting_update->domain_whitelist ?? $WebdefacmentSetting_update->domain_whitelist = '[]';
         $WebdefacmentSetting_update->asset_allow_patterns ?? $WebdefacmentSetting_update->asset_allow_patterns = '[ "\\\\.css$","\\\\.js$","\\\\.mjs$","\\\\.json$","\\\\.(png|jpe?g|gif|webp|svg)$","\\\\.(woff2?|ttf|otf|eot)$","^/assets/","^/static/","^/build/","^/dist/"]';
       } catch (Exception $e) {
+        Log::error("[WebDefacement] Error processing id={$value->id}: " . $e->getMessage());
+        
+        // บันทึก stat_log แม้เกิด error เพื่อให้ summary ไม่ขาด
+        try {
+          DB::table('webdefacement_stat_log')->insert([
+            'site_id' => $value->site_id,
+            'webdefacement_setting_id' => $value->id,
+            'result_id' => null,
+            'status' => 'Error',
+            'score' => 0,
+            'diff_percent' => 0,
+            'hash_changed' => 0,
+            'image_changed' => 0,
+            'alert_sent' => 0,
+            'reason' => 'process_error: ' . substr($e->getMessage(), 0, 100),
+            'checked_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+          ]);
+        } catch (\Throwable $statEx) {
+          Log::error("[STAT_LOG] Failed to save error stat: " . $statEx->getMessage());
+        }
       }
       $WebdefacmentSetting_update->save();
 
@@ -956,7 +1041,7 @@ class WebDefacementProccess extends Command
               </div>
               </div>';
               }
-              if ($WebdefacmentSetting_data->image_check == 1) {
+              if ($WebdefacmentSetting_data->image_check == 2) {
                 // $totalConfig += 0.5;
                 $url_id = $WebdefacmentDataOriginal_data->url_id;
                 $site_id = $WebdefacmentSetting_data->site_id;
@@ -968,36 +1053,16 @@ class WebDefacementProccess extends Command
                   $url_id = rand(10, 100);
                 }
 
-                $image_name = $site_id . '_' . $url_id . '_Defacement_Now';
-
-                // Call new screenshot command (mShots)
-                Artisan::call('app:WebDefacementsScreenshotCheck', [
-                    'url'     => $url,
-                    'port'    => $WebdefacmentSetting_data->port ?? '80', // use default if not set
-                    'site_id' => $site_id,
-                    'url_id'  => $url_id,
-                    'delay'   => $delay
-                ]);
-
-                // Capture output from the command
-                $outputJson = Artisan::output();
-                $screenshotRes = json_decode($outputJson, true);
-
-                if (isset($screenshotRes['Result']) && $screenshotRes['Result'] == 1) {
-                    $result["image_url"]                = $screenshotRes['image_url'];
-                    $result["image_path_original_full"] = $screenshotRes['image_path_original_full'];
-                    $result["image_path_original"]      = $screenshotRes['image_path_original'];
-                    $result["url_id"]                   = $screenshotRes['url_id'];
-                    $image_name                         = $site_id . '_' . $url_id . '_Defacement_Now'; 
-                    // Note: image_name logic might be redundant if path comes from command, 
-                    // but keeping var for compatibility if used below.
-                } else {
-                    $result['image_parcent'] = 0; // Fail safe
-                    Log::error("Screenshot command failed: " . ($screenshotRes['message'] ?? 'Unknown error'));
-                    // You might want to skip comparison if screenshot failed
-                }
-                
-                $Path_image = $result["image_path_original_full"] ?? '';
+                $image_name =  $site_id . '_' . $url_id . '_' . 'Defacement_Now';
+                $result["image_url"] = "/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
+                $path_include = base_path() . '/public/screenshot/use/DownloadImage.php';
+                include_once($path_include);
+                $downloadImg = new \DownloadImage();
+                $Path_image = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
+                $downloadImg->download($url, $Path_image, $delay);
+                $result["image_path_original_full"] = $Path_image;
+                $result["image_path_original"] = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
+                $result["url_id"] = $url_id;
 
                 $WebdefacmentImageMark_check = WebdefacmentImageMark::where('webdefacment_data_original_id', $webdefacment_id)->get();
                 if (count($WebdefacmentImageMark_check) > 0) {
@@ -2151,7 +2216,7 @@ class WebDefacementProccess extends Command
   private function getHtml3($url, $retryCount = 0, $options = [])
   {
     $browser = null;
-    $maxRetries = 3;
+    $maxRetries = 10;
 
     try {
       ini_set('max_execution_time', 300);

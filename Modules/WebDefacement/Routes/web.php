@@ -37,6 +37,10 @@ Route::group(
         Route::post('webdefacement.check_status', 'WebDefacementController@checkStatus')
             ->name('webdefacement.check_status')
             ->middleware('can:menu_items');
+        
+        Route::get('/export_report', 'WebDefacementController@exportReport')
+            ->name('webdefacement.export_report')
+            ->middleware('can:menu_items');
     }
 
 );

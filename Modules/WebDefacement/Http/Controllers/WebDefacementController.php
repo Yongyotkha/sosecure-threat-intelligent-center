@@ -14,6 +14,8 @@ use Artisan;
 use Modules\Users\Entities\User;
 use Modules\Users\Entities\UserSite;
 use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
+use Modules\WebDefacement\Entities\WebdefacmentDataLog;
+use Modules\WebDefacement\Entities\WebdefacmentStatDaily;
 // use DB;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Log;
@@ -1083,5 +1085,102 @@ class WebDefacementController extends Controller
         ];
 
         return isset($status[$code]) ? $status[$code] : 'Unrecognized Status';
+    }
+
+
+    public function exportReport(Request $request)
+    {
+        $role_custom = @check_role_custom();
+        if (!$role_custom['web_defacement']) {
+            check_permission403();
+        }
+
+        $webdefacementId = $request->input('webdefacement_id');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        if (empty($webdefacementId) || empty($startDate) || empty($endDate)) {
+            return response()->json(['error' => 'Missing required parameters'], 400);
+        }
+
+        $webdefacement = WebdefacmentSetting::find($webdefacementId);
+        if (!$webdefacement) {
+            return response()->json(['error' => 'Web Defacement not found'], 404);
+        }
+
+        $stats = WebdefacmentStatDaily::where('webdefacement_id', $webdefacementId)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->orderBy('date', 'asc')
+            ->get();
+
+        if ($stats->isEmpty()) {
+            return response()->json([
+                'error' => 'No data available for the selected date range. Please verify your date selection and try again.'
+            ], 404);
+        }
+
+        $filename = 'WebDefacement_Report_' . preg_replace('/[^a-zA-Z0-9]/', '_', $webdefacement->name) . '_' . $startDate . '_to_' . $endDate . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control' => 'max-age=0',
+        ];
+
+        $callback = function () use ($webdefacement, $stats, $startDate, $endDate) {
+            $file = fopen('php://output', 'w');
+
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            $startDateFormatted = \Carbon\Carbon::parse($startDate)->format('d/m/Y');
+            $endDateFormatted = \Carbon\Carbon::parse($endDate)->format('d/m/Y');
+
+            fputcsv($file, ['Name', $webdefacement->name]);
+            fputcsv($file, ['URL', $webdefacement->url]);
+            fputcsv($file, ['Domain', $webdefacement->domain]);
+            fputcsv($file, ['Site', $webdefacement->get_site->name ?? 'N/A']);
+            fputcsv($file, ['Report Period', $startDateFormatted . ' to ' . $endDateFormatted]);
+            fputcsv($file, ['Export At', now()->format('d/m/Y H:i:s')]);
+            fputcsv($file, ['']);
+
+            fputcsv($file, ['No', 'Date', 'Web Status', 'Status', 'Last Online', 'Last Check', 'Score']);
+
+            $no = 1;
+            foreach ($stats as $stat) {
+                // Format date
+                $dateFormatted = '';
+                $dateWithTime = '';
+                if (!empty($stat->date)) {
+                    $dateFormatted = \Carbon\Carbon::parse($stat->date)->format('d/m/Y');
+                    $dateWithTime = \Carbon\Carbon::parse($stat->date)->format('d/m/Y') . ' 23:59:59';
+                }
+
+                $webStatusDisplay = '';
+                $rawStatus = strtolower($webdefacement->web_status ?? '');
+                if ($rawStatus === 'up') {
+                    $webStatusDisplay = 'Online';
+                } elseif ($rawStatus === 'down') {
+                    $webStatusDisplay = 'Offline';
+                } else {
+                    $webStatusDisplay = $webdefacement->web_status ?? '';
+                }
+                fputcsv($file, [
+                    $no++,
+                    $dateFormatted,
+                    $webStatusDisplay,
+                    $stat->max_status ?? '',
+                    $dateWithTime,
+                    $dateWithTime,
+                    isset($stat->avg_score) ? round($stat->avg_score) : ''
+                ]);
+            }
+
+            fputcsv($file, ['']);
+            fputcsv($file, ['Total Days', count($stats)]);
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

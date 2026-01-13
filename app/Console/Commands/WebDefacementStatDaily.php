@@ -27,21 +27,13 @@ class WebDefacementStatDaily extends Command
     public function handle()
     {
         $dateOption = $this->option('date');
-        $targetDate = $dateOption ? Carbon::parse($dateOption)->toDateString() : now()->toDateString();
+        $targetDate = $dateOption 
+            ? Carbon::parse($dateOption)->toDateString() 
+            : now()->subDay()->toDateString();
 
         $this->info("🧩 เริ่มสรุปข้อมูลประจำวันที่ {$targetDate}");
 
-        // ตรวจสอบว่าตารางหลักมีข้อมูลไหม
-        $checkCount = DB::table('webdefacment_data_check')
-            ->whereDate('last_update', $targetDate)
-            ->count();
-
-        if ($checkCount === 0) {
-            $this->warn("ไม่มีข้อมูลในวันที่ {$targetDate}");
-            return;
-        }
-
-        // คำนวณสรุป
+        // 1) ลองดึงจาก webdefacement_stat_log ก่อน (แหล่งหลัก)
         $stats = DB::table('webdefacement_stat_log')
             ->selectRaw('
                     webdefacement_setting_id AS webdefacement_id,
@@ -54,6 +46,29 @@ class WebDefacementStatDaily extends Command
             ->whereDate('created_at', $targetDate)
             ->groupBy('webdefacement_setting_id')
             ->get();
+
+        // 2) Fallback: ถ้าไม่มีใน stat_log ให้ดึงจาก webdefacment_data_check แทน
+        if ($stats->isEmpty()) {
+            $this->info("ไม่พบข้อมูลใน stat_log, ลองดึงจาก webdefacment_data_check...");
+            
+            $stats = DB::table('webdefacment_data_check')
+                ->selectRaw('
+                        webdefacment_setting_id AS webdefacement_id,
+                        COUNT(*) AS scan_count,
+                        SUM(CASE WHEN percent_all > 0 THEN 1 ELSE 0 END) AS alert_count,
+                        AVG(percent_all) AS avg_score,
+                        MAX(percent_all) AS max_diff_percent,
+                        MAX(status_code) AS max_status
+                    ')
+                ->whereDate('last_update', $targetDate)
+                ->groupBy('webdefacment_setting_id')
+                ->get();
+        }
+
+        if ($stats->isEmpty()) {
+            $this->warn("ไม่มีข้อมูลในวันที่ {$targetDate}");
+            return;
+        }
 
 
 

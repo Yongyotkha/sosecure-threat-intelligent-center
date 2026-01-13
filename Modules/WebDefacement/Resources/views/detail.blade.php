@@ -183,9 +183,9 @@ return (string)$v;
                 <!-- ปุ่มด้านขวา -->
                 <div class="header-actions">
                     <button type="button" class="btn btn-success btn-sm" id="btn-export">
-                         Export Report
+                         <i class="fa fa-download"></i>Export Report
                     </button>
-                </div>
+                </div> 
             </div>
 
             <div class="d-none">
@@ -635,6 +635,7 @@ return (string)$v;
             </section>
             @endif
 
+             <!-- {{ $webdefacement->status_val }}  -->
 
             <!-- <div id="load_status"></div> -->
             @if (@$webdefacement->status_val != 'Normal') 
@@ -664,6 +665,42 @@ return (string)$v;
     </section>
 
 </section>
+
+
+<div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportModalLabel">
+                    <i class="fas fa-file-export"></i> Export Report <b>{{ $webdefacement->name }}</b>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="exportForm">
+                    <div class="form-group">
+                        <label for="export_date_range"><i class="fas fa-calendar-alt"></i> Select Date Range</label>
+                        <input type="text" class="form-control" id="export_date_range" name="date_range" 
+                               placeholder="Select date range..." autocomplete="off" readonly>
+                    </div>
+                    <input type="hidden" id="export_start_date" name="start_date">
+                    <input type="hidden" id="export_end_date" name="end_date">
+                    <input type="hidden" id="export_webdefacement_id" name="webdefacement_id" value="{{ $webdefacement->id }}">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-success" id="btn-do-export">
+                    <i class="fas fa-download"></i> Export
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -760,6 +797,103 @@ return (string)$v;
         $('.wdfm-card').hover(function(){
             $(this).find('.wdfm-header').toggleClass('wdfm-header-upper');
         }); 
+        
+        $('#export_date_range').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear',
+                format: 'YYYY-MM-DD'
+            },
+            opens: 'center',
+            drops: 'down'
+        });
+        
+        $('#export_date_range').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+            $('#export_start_date').val(picker.startDate.format('YYYY-MM-DD'));
+            $('#export_end_date').val(picker.endDate.format('YYYY-MM-DD'));
+        });
+        
+        $('#export_date_range').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+            $('#export_start_date').val('');
+            $('#export_end_date').val('');
+        });
+        
+        $('#btn-export').click(function() {
+            $('#exportModal').modal('show');
+        });
+        
+        $('#btn-do-export').click(function() {
+            var startDate = $('#export_start_date').val();
+            var endDate = $('#export_end_date').val();
+            var webdefacementId = $('#export_webdefacement_id').val();
+            
+            if (!startDate || !endDate) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Please select date range',
+                    text: 'You must select a date range to export.',
+                    heightAuto: false
+                });
+                return;
+            }
+            
+            $('#exportModal').modal('hide');
+            Swal.fire({
+                title: 'Generating Report...',
+                html: '<p>Please wait...</p>',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+            
+            var downloadUrl = "{{ route('webdefacement.export_report') }}" + 
+                              "?webdefacement_id=" + webdefacementId + 
+                              "&start_date=" + startDate + 
+                              "&end_date=" + endDate;
+            
+            fetch(downloadUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            return response.json().then(data => {
+                                throw new Error(data.error || 'Export failed');
+                            });
+                        } else {
+                            throw new Error('No data available for the selected date range. Please verify your date selection and try again.');
+                        }
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    Swal.close();
+                    var url = window.URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'WebDefacement_Report_' + startDate + '_to_' + endDate + '.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Export Completed',
+                        text: 'Your report has been downloaded successfully.',
+                        heightAuto: false
+                    });
+                })
+                .catch(error => {
+                    Swal.close();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Export Failed',
+                        text: error.message,
+                        heightAuto: false
+                    });
+                });
+        });
     });
 
     chart_circle('#chart_01');
@@ -839,14 +973,18 @@ return (string)$v;
                  
                         
 
-                        $('#status_val_webdefacement').html('{!!@get_webdefacment_status('Normal','color')!!}');
-                        $('#defacement_status').html('{!!@get_webdefacment_status('Normal','color')!!}');
+                        $('#status_val_webdefacement').html({!! json_encode(@get_webdefacment_status('Normal','color')) !!});
+                        $('#defacement_status').html({!! json_encode(@get_webdefacment_status('Normal','color')) !!});
                         $('#check_status_val_webdefacement').html(response.html);
                
                         $('#load_status').loading('stop');
                         toastr.success(response.message, '@langapp('response_status')');
                         stopLoader();
                         {{--window.location.href = response.redirect;--}}
+
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
                     },
                     error: function (error){
                         $('#load_status').loading('stop');
@@ -1097,9 +1235,9 @@ return (string)$v;
         });
 
         function alert_to_customer(id) {
-            let domain = '{{@$webdefacement->domain}}';
-            let namepage = '{{@$webdefacement->name}}';
-            let site = '{{@$webdefacement->get_site->name}}';
+            let domain = {!! json_encode(@$webdefacement->domain) !!};
+            let namepage = {!! json_encode(@$webdefacement->name) !!};
+            let site = {!! json_encode(@$webdefacement->get_site->name) !!};
             Swal.fire({
                 title: 'Are you sure To send this Alert?',
                 html: `
@@ -1185,6 +1323,9 @@ return (string)$v;
                         heightAuto: false
                     });
                     }
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
                 },
                 error: function(xhr) {
                     const msg =
