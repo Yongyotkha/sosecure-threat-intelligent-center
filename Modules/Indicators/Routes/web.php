@@ -77,5 +77,6 @@ Route::group(
         Route::post('/importToInsight', 'IndicatorsController@importToInsight')->name('indicators.importToInsight');
         Route::post('/ioc_enrichment', 'IndicatorsController@iocEnrichment')->name('indicators.ioc_enrichment');
         Route::post('/enrichment_status', 'IndicatorsController@checkEnrichmentStatus')->name('indicators.enrichment_status');
+        Route::post('/enrich_single_indicator', 'IndicatorsController@enrichSingleIndicator')->name('indicators.enrich_single_indicator');
     }
 );

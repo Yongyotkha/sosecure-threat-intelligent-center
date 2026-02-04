@@ -74,8 +74,13 @@ class IndicatorCheckService
     /**
      * Check a single IOC asynchronously
      * Returns a Promise that resolves to the result array
+     * 
+     * @param Client $client
+     * @param string $ioc
+     * @param string $type
+     * @param string|null $eventSource - Event source name (e.g., "ThreatFox Hunt: XWorm IOCs")
      */
-    public function checkIocAsync(Client $client, $ioc, $type)
+    public function checkIocAsync(Client $client, $ioc, $type, $eventSource = null)
     {
         $promises = [
             'vt' => $this->checkVirusTotalAsync($client, $ioc, $type),
@@ -85,12 +90,21 @@ class IndicatorCheckService
             'rst' => $this->checkRSTCloudAsync($client, $ioc, $type)
         ];
 
-        return Utils::all($promises)->then(function ($results) use ($ioc, $type) {
+        return Utils::all($promises)->then(function ($results) use ($ioc, $type, $eventSource) {
             $vtResult = $results['vt'];
             $abuseResult = $results['abuse'];
             $otxResult = $results['otx'];
             $tfResult = $results['tf'];
             $rstResult = $results['rst'];
+
+            // ThreatFox Confidence Boost: If event comes from ThreatFox feed 
+            // but ThreatFox API returns 0 (IOC may have expired from ThreatFox DB),
+            // use default high confidence since IOC was originally from ThreatFox
+            if ($eventSource && stripos($eventSource, 'threatfox') !== false) {
+                if (($tfResult['confidence_level'] ?? 0) == 0) {
+                    $tfResult['confidence_level'] = 100; // Max confidence for ThreatFox events (95+ = score 10)
+                }
+            }
 
             list($totalScore, $riskLevel, $activeScores, $activeWeights) = $this->calculateRisk(
                 $vtResult, $abuseResult, $tfResult, $otxResult,
@@ -123,13 +137,15 @@ class IndicatorCheckService
         $headers = ['x-apikey' => $key];
         
         $url = "";
+        // Match Python: VT only supports ip, domain, hash, url - NOT hostname
         if ($type === 'ip') $url = "https://www.virustotal.com/api/v3/ip_addresses/{$ioc}";
         elseif ($type === 'domain') $url = "https://www.virustotal.com/api/v3/domains/{$ioc}";
-        elseif (in_array($type, ['md5', 'sha1', 'sha256'])) $url = "https://www.virustotal.com/api/v3/files/{$ioc}";
+        elseif (in_array($type, ['md5', 'sha1', 'sha256', 'hash'])) $url = "https://www.virustotal.com/api/v3/files/{$ioc}";
         elseif ($type === 'url') {
             $id = rtrim(strtr(base64_encode($ioc), '+/', '-_'), '=');
             $url = "https://www.virustotal.com/api/v3/urls/{$id}";
         } else {
+            // hostname and other types: return empty (match Python behavior)
             return Promise\Create::promiseFor(["malicious" => 0, "unique_results" => [], "suspicious" => 0]);
         }
 
@@ -256,12 +272,8 @@ class IndicatorCheckService
     {
         $key = $this->getKey('RST');
         
-        $endpointType = '';
-        if ($type === 'ip') $endpointType = 'ip';
-        elseif ($type === 'domain') $endpointType = 'domain';
-        else return Promise\Create::promiseFor(["score" => 0, "threat" => []]);
-
-        $url = "https://api.rstcloud.net/v1/{$endpointType}/{$ioc}";
+        // Match Python: use generic /ioc?value= endpoint for all types
+        $url = "https://api.rstcloud.net/v1/ioc?value={$ioc}";
         
         return $client->getAsync($url, ['headers' => ['x-api-key' => $key], 'timeout' => 30, 'connect_timeout' => 15])->then(
             function ($response) {
@@ -295,18 +307,34 @@ class IndicatorCheckService
 
     protected function mapScore($val, $thresholds)
     {
+        // Python: def _map_score(value, thresholds):
+        //     for threshold, score in thresholds:
+        //         if value >= threshold:
+        //             return score
+        //     return 0
         foreach ($thresholds as $t) {
             if ($val >= $t[0]) return $t[1];
         }
         return 0;
     }
 
+    /**
+     * Calculate risk score - Exact Python port
+     * Python source: calculate_risk(vt=None, abuse=None, tf=None, otx=None, rst_score=None, ioc_type="unknown")
+     */
     protected function calculateRisk($vt, $abuse, $tf, $otx, $rst, $iocType)
     {
-        // Match Python: empty dict, only add sources when API returns data
+        // Python: scores = {}
         $scores = [];
 
-        // 1. Calculate score for each source
+        // Python: if vt:
+        //     malicious = vt.get("malicious", 0)
+        //     suspicious = vt.get("suspicious", 0)
+        //     vt_score = _map_score(malicious, THRESHOLDS["vt"])
+        //     if suspicious >= 5: vt_score += 2
+        //     elif suspicious >= 3: vt_score += 1
+        //     scores["vt"] = min(vt_score, 10)
+        // Match Python: always add score to dict if source has data (even if 0)
         if (!empty($vt) && isset($vt['malicious'])) {
             $malicious = $vt['malicious'];
             $suspicious = $vt['suspicious'] ?? 0;
@@ -316,77 +344,131 @@ class IndicatorCheckService
             if ($suspicious >= 5) $vtScore += 2;
             elseif ($suspicious >= 3) $vtScore += 1;
             
-            $scores['vt'] = min($vtScore, 10);
+            $vtScore = min($vtScore, 10);
+            $scores['vt'] = $vtScore; // Always add (match Python)
         }
 
+        // Python: if abuse and ioc_type == "ip":
+        //     abuse_confidence = abuse.get("score", 0)
+        //     total_reports = abuse.get("total_reports", 0)
+        //     score_part = _map_score(abuse_confidence, THRESHOLDS["abuse_score"])
+        //     reports_part = _map_score(total_reports, THRESHOLDS["abuse_reports"])
+        //     scores["abuse"] = min(score_part + reports_part, 10)
         if (!empty($abuse) && $iocType === 'ip' && isset($abuse['score'])) {
-            $abuseConfidence = $abuse['score'];
+            $abuseConfidence = is_numeric($abuse['score']) ? $abuse['score'] : 0;
             $totalReports = $abuse['total_reports'] ?? 0;
             
             $scorePart = $this->mapScore($abuseConfidence, self::THRESHOLDS['abuse_score']);
             $reportsPart = $this->mapScore($totalReports, self::THRESHOLDS['abuse_reports']);
             
-            $scores['abuse'] = min($scorePart + $reportsPart, 10);
+            $abuseScore = min($scorePart + $reportsPart, 10);
+            $scores['abuse'] = $abuseScore; // Always add (match Python)
         }
 
+        // Python: if tf:
+        //     confidence = tf.get("confidence_level", 0)
+        //     scores["tf"] = _map_score(confidence, THRESHOLDS["tf"])
         if (!empty($tf) && isset($tf['confidence_level'])) {
             $confidence = $tf['confidence_level'];
-            $scores['tf'] = $this->mapScore($confidence, self::THRESHOLDS['tf']);
+            $tfScore = $this->mapScore($confidence, self::THRESHOLDS['tf']);
+            $scores['tf'] = $tfScore; // Always add (match Python)
         }
 
+        // Python: if otx:
+        //     pulse_count = otx.get("pulse_count", 0)
+        //     scores["otx"] = _map_score(pulse_count, THRESHOLDS["otx"])
         if (!empty($otx) && isset($otx['pulse_count'])) {
             $pulseCount = $otx['pulse_count'];
-            $scores['otx'] = $this->mapScore($pulseCount, self::THRESHOLDS['otx']);
+            $otxScore = $this->mapScore($pulseCount, self::THRESHOLDS['otx']);
+            $scores['otx'] = $otxScore; // Always add (match Python)
         }
 
-        if (!empty($rst) && (isset($rst['score']) && $rst['score'] !== null)) {
-            $scores['rst'] = min((float)$rst['score'] / 10.0, 10);
+        // Python: if rst_score:
+        //     try:
+        //         scores["rst"] = min(float(rst_score) / 10.0, 10)
+        //     except (ValueError, TypeError):
+        //         pass
+        if (!empty($rst) && (isset($rst['score']) || isset($rst['risk_score']))) {
+            $rstScoreVal = $rst['score'] ?? $rst['risk_score'] ?? 0;
+            if (is_numeric($rstScoreVal) && $rstScoreVal > 0) {
+                 $rstScore = min((float)$rstScoreVal / 10.0, 10);
+                 $scores['rst'] = $rstScore;
+            }
         }
 
-        // 2. Calculate weighted average
+        // Python: if not scores:
+        //     return 0, "Informational"
         if (empty($scores)) {
             return [0, "Informational", [], []];
         }
-        
+
+        // Python: active_scores = [s for source, s in scores.items() if source in WEIGHTS]
+        // Python: active_weights = [WEIGHTS[source] for source in scores if source in WEIGHTS]
+        $sources = [];
         $activeScores = [];
         $activeWeights = [];
         
         foreach ($scores as $source => $score) {
             if (isset(self::WEIGHTS[$source])) {
-                $activeScores[$source] = $score;
-                $activeWeights[$source] = self::WEIGHTS[$source];
+                $sources[] = $source;
+                $activeScores[] = $score;
+                $activeWeights[] = self::WEIGHTS[$source];
             }
         }
 
-        // Weight Transfer Logic (Replicating Python Script Behavior/Bug)
+        // Python: if ioc_type != 'ip' and 'abuse' in WEIGHTS and 'vt' in scores:
+        //     if 'abuse' in active_weights:  # This is always False (bug in Python)
+        //         abuse_idx = list(scores.keys()).index('abuse') if 'abuse' in scores else -1
+        //         if abuse_idx != -1:
+        //             active_weights.pop(abuse_idx)
+        //     vt_idx = list(scores.keys()).index('vt')
+        //     active_weights[vt_idx] += WEIGHTS['abuse']
         if ($iocType !== 'ip' && isset(self::WEIGHTS['abuse']) && isset($scores['vt'])) {
-             if (isset($activeWeights['vt'])) {
-                 $activeWeights['vt'] += self::WEIGHTS['abuse'];
-             }
-        }
-        
-        
-        $totalWeight = array_sum($activeWeights);
-        if ($totalWeight == 0) return [0, "Informational", [], []];
-        
-        $weightedSum = 0;
-        foreach ($activeWeights as $source => $weight) {
-             if (isset($activeScores[$source])) {
-                 $weightedSum += $activeScores[$source] * $weight;
-             }
+            // Note: Python's 'abuse' in active_weights always returns False because
+            // active_weights is a list of floats, not a dict. So pop never happens.
+            // We replicate this behavior - just add abuse weight to vt.
+            $vtIdx = array_search('vt', $sources);
+            if ($vtIdx !== false) {
+                $activeWeights[$vtIdx] += self::WEIGHTS['abuse'];
+            }
         }
 
+        // Python: total_weight = sum(active_weights)
+        // Python: if total_weight == 0:
+        //     return 0, "Informational"
+        $totalWeight = array_sum($activeWeights);
+        if ($totalWeight == 0) {
+            return [0, "Informational", [], []];
+        }
+
+        // Python: weighted_sum = sum(s * w for s, w in zip(active_scores, active_weights))
+        $weightedSum = 0;
+        for ($i = 0; $i < count($activeScores); $i++) {
+            $weightedSum += $activeScores[$i] * $activeWeights[$i];
+        }
+
+        // Python: final_score = round(weighted_sum / total_weight)
         $finalScoreRaw = $weightedSum / $totalWeight;
-        $finalScore = ceil($finalScoreRaw); // Use ceil to be safer (1.25 -> 2)
-        
-        // 3. Determine risk level
+        $finalScore = (int)round($finalScoreRaw);
+
+        // Python risk levels:
+        // if final_score >= 9: level = "Critical"
+        // elif final_score >= 7: level = "High"
+        // elif final_score >= 4: level = "Medium"
+        // elif final_score >= 2: level = "Low"
+        // elif final_score >= 1: level = "Very Low"
+        // else: level = "Informational"
         if ($finalScore >= 9) $level = "Critical";
         elseif ($finalScore >= 7) $level = "High";
         elseif ($finalScore >= 4) $level = "Medium";
         elseif ($finalScore >= 2) $level = "Low";
         elseif ($finalScore >= 1) $level = "Very Low";
         else $level = "Informational";
-        
-        return [$finalScore, $level, $activeScores, $activeWeights];
+
+        // Debug: convert to associative for output
+        $debugScores = !empty($sources) ? array_combine($sources, $activeScores) : [];
+        $debugWeights = !empty($sources) ? array_combine($sources, $activeWeights) : [];
+
+        return [$finalScore, $level, $debugScores, $debugWeights];
     }
 }

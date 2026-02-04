@@ -224,15 +224,51 @@ class IndicatorsController extends Controller
             $countKey = [];
             $countVal = [];
 
-            if (!empty($cursor[0]->indicator_type_counts)) {
-                foreach ((array)$cursor[0]->indicator_type_counts as $key => $value) {
-                    $countKey[] = ucwords($key);
-                    $countVal[] = $value;
+            // Check if indicator_type_counts exists and has proper type names as keys
+            $typeCounts = $cursor[0]->indicator_type_counts ?? null;
+            $hasValidKeys = false;
+            
+            if (!empty($typeCounts)) {
+                $typeCountsArray = (array)$typeCounts;
+                // Check if first key is numeric (Array) or string (Object)
+                $firstKey = array_key_first($typeCountsArray);
+                $hasValidKeys = !is_numeric($firstKey);
+                
+                if ($hasValidKeys) {
+                    // Use existing indicator_type_counts
+                    foreach ($typeCountsArray as $key => $value) {
+                        $countKey[] = ucwords($key);
+                        $countVal[] = $value;
+                    }
+                }
+            }
+
+            // Fallback: Aggregate from fx_otx_events_indicator_ref if indicator_type_counts has numeric keys
+            if (!$hasValidKeys) {
+                $indicatorRefCol = $client->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+                $pipeline = [
+                    ['$match' => ['pulse_id' => $id, 'status' => 1]],
+                    ['$group' => ['_id' => '$type', 'count' => ['$sum' => 1]]],
+                    ['$sort' => ['count' => -1]]
+                ];
+                $aggregateResult = $indicatorRefCol->aggregate($pipeline)->toArray();
+                
+                foreach ($aggregateResult as $item) {
+                    if (!empty($item['_id'])) {
+                        $countKey[] = ucwords($item['_id']);
+                        $countVal[] = $item['count'];
+                    }
                 }
             }
 
             $data['countKey'] = $countKey;
             $data['countVal'] = $countVal;
+            
+            // Use actual count from aggregation if indicator_type_counts was recalculated
+            if (!$hasValidKeys && !empty($countVal)) {
+                $data['actual_indicator_count'] = array_sum($countVal);
+                $data['indicator_type_counts'] = count($countKey); // จำนวน types จริง
+            }
 
 
             $data['indicator_id'] = $request->id;
@@ -1663,7 +1699,7 @@ class IndicatorsController extends Controller
                     'serverSelectionTimeoutMS' => 5000,
                     'socketTimeoutMS' => 30000, // 30 วินาที
                 ]);
-                $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
+                $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
 
                 // ✅ Query แบบ optimized
                 $query = ['pulse_id' => $reqId];
@@ -1954,7 +1990,7 @@ class IndicatorsController extends Controller
             $reqId = $request->pulse_id;
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
 
 
             // direction
@@ -2235,8 +2271,8 @@ class IndicatorsController extends Controller
                     $DB_MONGO_KEY = env("DB_MONGO_DEV");
                     $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
                     if (app()->environment('local')) {
-                        $collection = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
-                        $collection_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
+                        $collection = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
+                        $collection_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
                     } else {
                         $collection = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
                         $collection_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
@@ -4791,13 +4827,11 @@ class IndicatorsController extends Controller
 
             
 
-                
-
             
         try {
             $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-            $jobsCollection = $clientMD->sosecure_threatintelligent_dev->ioc_enrichment_jobs;
+            $jobsCollection = $clientMD->sosecure_threatintelligent->ioc_enrichment_jobs;
             
             // Check for existing running job
             $existingJob = $jobsCollection->findOne([
@@ -4879,7 +4913,7 @@ class IndicatorsController extends Controller
         try {
             $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-            $jobsCollection = $clientMD->sosecure_threatintelligent_dev->ioc_enrichment_jobs;
+            $jobsCollection = $clientMD->sosecure_threatintelligent->ioc_enrichment_jobs;
             
             $job = $jobsCollection->findOne(['job_id' => $jobId]);
             
@@ -4900,5 +4934,233 @@ class IndicatorsController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+    
+    /**
+     * Enrich single indicator synchronously
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function enrichSingleIndicator(Request $request)
+    {
+        set_time_limit(60);
+        
+        $indicatorId = $request->input('indicator_id');
+        $indicator = $request->input('indicator');
+        $rawType = $request->input('type');
+        $pulseId = $request->input('pulse_id');
+        
+        // Normalize type to match what API endpoints expect
+        $type = $this->normalizeIndicatorType($rawType);
+        
+        Log::info("[Enrich Single] Received type='{$rawType}', normalized to='{$type}' for indicator='{$indicator}'");
+        
+        if (empty($indicator) || empty($type)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Indicator and type are required'
+            ], 400);
+        }
+        
+        try {
+            $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
+            $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+            $indicatorRefCollection = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+            
+            // Check if already enriched
+            $existing = $indicatorRefCollection->findOne([
+                'indicator_id' => $indicatorId,
+                'pulse_id' => $pulseId
+            ]);
+            
+            if ($existing && !empty($existing['attribute_score']) && $existing['attribute_score'] !== '0' && $existing['attribute_score'] !== 0) {
+                return response()->json([
+                    'status' => 'already_enriched',
+                    'message' => 'This indicator already has enrichment data',
+                    'score' => $existing['attribute_score'],
+                    'risk_level' => $existing['attribute_serverity'] ?? 'Informational'
+                ]);
+            }
+            
+            // Use IndicatorCheckService to enrich
+            $service = app(\App\Services\IndicatorCheckService::class);
+            $httpClient = new \GuzzleHttp\Client(['verify' => false, 'timeout' => 30]);
+            
+            // Get event name for ThreatFox boost
+            $eventsCollection = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $event = $eventsCollection->findOne(['pulse_id' => $pulseId]);
+            $eventName = $event['name'] ?? null;
+            
+            // Perform enrichment
+            $result = $service->checkIocAsync($httpClient, $indicator, $type, $eventName)->wait();
+            
+            // Collect tags from all sources
+            $enrichmentTags = [];
+            
+            // Add VT unique_results as tags
+            if (!empty($result['vt']['unique_results'])) {
+                $enrichmentTags = array_merge($enrichmentTags, $result['vt']['unique_results']);
+            }
+            
+            // Add ThreatFox tags
+            if (!empty($result['threatfox']['tags'])) {
+                $enrichmentTags = array_merge($enrichmentTags, $result['threatfox']['tags']);
+            }
+            
+            // Add RST Cloud threat tags
+            if (!empty($result['rstcloud_threat']) && is_array($result['rstcloud_threat'])) {
+                $enrichmentTags = array_merge($enrichmentTags, $result['rstcloud_threat']);
+            }
+            
+            // Unique and clean tags
+            $enrichmentTags = array_unique(array_filter($enrichmentTags));
+            $tagsString = implode(',', $enrichmentTags);
+            
+            // Update MongoDB
+            $updateData = [
+                'attribute_score' => (string)($result['total_score'] ?? 0),
+                'attribute_serverity' => $result['risk_level'] ?? 'Informational',
+                'vt_malicious' => $result['vt']['malicious'] ?? 0,
+                'vt_suspicious' => $result['vt']['suspicious'] ?? 0,
+                'threatfox_confidence' => $result['threatfox']['confidence_level'] ?? 0,
+                'otx_pulse_count' => $result['otx']['pulse_count'] ?? 0,
+                'rstcloud_score' => $result['rstcloud_score'] ?? 'N/A',
+                'enriched_at' => new \MongoDB\BSON\UTCDateTime()
+            ];
+            
+            // Add tags if we got any from enrichment
+            if (!empty($tagsString)) {
+                $updateData['tags'] = $tagsString;
+            }
+            
+            // Add AbuseIPDB data if IP
+            if ($type === 'ip' && !empty($result['abuse'])) {
+                $updateData['abuse_score'] = $result['abuse']['score'] ?? 0;
+                $updateData['abuse_reports'] = $result['abuse']['total_reports'] ?? 0;
+            }
+            
+            // Update indicator_ref collection
+            $indicatorRefCollection->updateOne(
+                ['indicator_id' => $indicatorId, 'pulse_id' => $pulseId],
+                ['$set' => $updateData]
+            );
+            
+            // Also update indicator_detail if exists
+            $indicatorDetailCollection = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+            $indicatorDetailCollection->updateOne(
+                ['indicator_id' => $indicatorId],
+                ['$set' => $updateData]
+            );
+            
+            // Also save to temp collection for sync with other functions
+            $dataKey = (string) \Illuminate\Support\Str::uuid();
+            $tempCollection = $clientMD->sosecure_threatintelligent->fx_indicators_temp;
+            $dataKeyCollection = $clientMD->sosecure_threatintelligent->fx_data_key;
+            
+            // Insert to temp collection
+            $tempRecord = [
+                'event_id' => $pulseId,
+                'attribute_id' => $indicatorId,
+                'attribute_name' => $indicator,
+                'attribute_type' => $rawType,
+                'attribute_tags' => $tagsString,
+                'attribute_score' => (string)($result['total_score'] ?? 0),
+                'attribute_serverity' => $result['risk_level'] ?? 'Informational',
+                'data_key' => $dataKey,
+                'imported_at' => date('Y-m-d H:i:s'),
+                'status' => 'completed'
+            ];
+            $tempCollection->insertOne($tempRecord);
+            
+            // Log data_key
+            $dataKeyCollection->insertOne([
+                'date' => date('Y-m-d H:i:s'),
+                'data_key' => $dataKey,
+                'imported_at' => date('Y-m-d H:i:s'),
+                'record_count' => 1,
+                'type' => 'attribute',
+                'note' => 'single_enrichment',
+                'indicator' => $indicator,
+                'timestamp' => time()
+            ]);
+            
+            Log::info("[Enrich Single] Enriched {$indicator} ({$type}): Score={$result['total_score']}, Risk={$result['risk_level']}");
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Enrichment completed',
+                'score' => $result['total_score'],
+                'risk_level' => $result['risk_level'],
+                'tags' => $enrichmentTags,
+                'details' => [
+                    'vt_malicious' => $result['vt']['malicious'] ?? 0,
+                    'otx_pulse_count' => $result['otx']['pulse_count'] ?? 0,
+                    'threatfox_confidence' => $result['threatfox']['confidence_level'] ?? 0
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error("[Enrich Single] Error: " . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Enrichment failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Normalize indicator type to standard format for API calls
+     * Converts 'IPv4', 'IPv4 - Private', 'FileHash-MD5', etc to 'ip', 'md5', etc
+     */
+    private function normalizeIndicatorType($rawType)
+    {
+        if (empty($rawType)) return 'unknown';
+        
+        $type = strtolower(trim($rawType));
+        
+        // IP variations
+        if (strpos($type, 'ipv4') !== false || strpos($type, 'ipv6') !== false) {
+            return 'ip';
+        }
+        if ($type === 'ip' || strpos($type, 'ip -') !== false || strpos($type, 'ip-') !== false) {
+            return 'ip';
+        }
+        
+        // Domain variations
+        if (strpos($type, 'domain') !== false) {
+            return 'domain';
+        }
+        
+        // Hostname variations
+        if (strpos($type, 'hostname') !== false) {
+            return 'hostname';
+        }
+        
+        // Hash variations
+        if (strpos($type, 'md5') !== false || strpos($type, 'filehash-md5') !== false) {
+            return 'md5';
+        }
+        if (strpos($type, 'sha1') !== false || strpos($type, 'filehash-sha1') !== false) {
+            return 'sha1';
+        }
+        if (strpos($type, 'sha256') !== false || strpos($type, 'filehash-sha256') !== false) {
+            return 'sha256';
+        }
+        if (strpos($type, 'hash') !== false) {
+            return 'hash';
+        }
+        
+        // URL variations
+        if (strpos($type, 'url') !== false || strpos($type, 'uri') !== false) {
+            return 'url';
+        }
+        
+        // Email
+        if (strpos($type, 'email') !== false) {
+            return 'email';
+        }
+        
+        return $type;
     }
 }

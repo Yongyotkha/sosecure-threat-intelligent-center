@@ -116,7 +116,7 @@ select.c-tags {
                             </div>
                             <div class="col-md-6">
                                 <h1 class="text-center">Type Attributes {{@$indicator_type_counts}}
-                                    ({{@$otx_events[0]['indicator_count']}})
+                                    ({{@$actual_indicator_count ?? @$otx_events[0]['indicator_count']}})
                                 </h1>
                                 <div id="chart-show-bar"></div>
                             </div>
@@ -160,7 +160,6 @@ select.c-tags {
                                     </div>
                                 </header>
 
-                                
                                     <div class="row">
                                         <div class="col-lg-3" style="margin-top: 10px;margin-bottom: -10px; margin-left: 10px">
                                            
@@ -553,9 +552,10 @@ select.c-tags {
                     {
                         targets: 6,
                         render: function (data, type, row) {
-                            var inner = '';
-
-                            inner =  '<a href="'+"{{route('indicators.detail_indicator')}}?id="+row.indicator_id+'&type='+row.type+'" class="btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
+                            var inner = '<div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-start;">';
+                            inner += '<a href="'+"{{route('indicators.detail_indicator')}}?id="+row.indicator_id+'&type='+row.type+'" class="btn btn-xs btn-info" style="flex:1;"><i class="far fa-eye"></i> View</a>';
+                            inner += '<button type="button" class="btn btn-xs btn-success btn-enrich-single" style="flex:1;" data-indicator-id="'+row.indicator_id+'" data-indicator="'+row.indicator+'" data-type="'+row.type+'" data-pulse-id="'+row.pulse_id+'" onclick="enrichSingleAttribute(this)"><i class="fas fa-atom"></i> Enrich</button>';
+                            inner += '</div>';
                             return inner;
                         }
 
@@ -820,6 +820,99 @@ function count_view_event(){
                     });
              }
 
+function enrichSingleAttribute(btn) {
+    var $btn = $(btn);
+    var $row = $btn.closest('tr');
+    var indicatorId = $btn.data('indicator-id');
+    var indicator = $btn.data('indicator');
+    var type = $btn.data('type');
+    var pulseId = $btn.data('pulse-id');
+    
+    var originalHtml = $btn.html();
+    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Enriching');
+    
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "{{ route('indicators.enrich_single_indicator') }}",
+        type: "POST",
+        data: {
+            indicator_id: indicatorId,
+            indicator: indicator,
+            type: type,
+            pulse_id: pulseId
+        },
+        success: function(response) {
+            if (response.status === 'success' || response.status === 'already_enriched') {
+                toastr.success('Score: ' + response.score + ', Risk: ' + response.risk_level, 'Enriched');
+                updateRowData($row, response);
+            } else {
+                toastr.error(response.message || 'Enrichment failed', 'Error');
+            }
+        },
+        error: function(xhr, status, error) {
+            toastr.error('Failed to enrich: ' + error, 'Error');
+        },
+        complete: function() {
+            $btn.prop('disabled', false).html(originalHtml);
+        }
+    });
+}
+
+function updateRowData($row, response) {
+    var $cells = $row.find('td');
+    
+    var score = response.score || 0;
+    var scoreBadge = getScoreBadge(score);
+    $cells.eq(3).html(scoreBadge);
+    
+    var severity = response.risk_level || 'Informational';
+    var severityBadge = getSeverityBadge(severity);
+    $cells.eq(4).html(severityBadge);
+    
+    if (response.tags && response.tags.length > 0) {
+        var $tagsSelect = $cells.eq(2).find('select');
+        if ($tagsSelect.length) {
+            response.tags.forEach(function(tag) {
+                if ($tagsSelect.find('option[value="' + tag + '"]').length === 0) {
+                    $tagsSelect.append('<option value="' + tag + '" selected>' + tag + '</option>');
+                }
+            });
+        }
+    }
+    
+    $row.css('background-color', '#d4edda');
+    setTimeout(function() {
+        $row.css('background-color', '');
+    }, 2000);
+}
+
+function getScoreBadge(score) {
+    var txt = String(score);
+    if (txt === '0') return '<span class="badge badge-infomation">0</span>';
+    if (txt === '1') return '<span class="badge badge-verylow">1</span>';
+    if (txt === '2' || txt === '3') return '<span class="badge badge-success">' + txt + '</span>';
+    if (txt === '4' || txt === '5' || txt === '6') return '<span class="badge badge-medium">' + txt + '</span>';
+    if (txt === '7' || txt === '8') return '<span class="badge badge-high">' + txt + '</span>';
+    if (txt === '9' || txt === '10') return '<span class="badge badge-critical">' + txt + '</span>';
+    return '<span class="badge badge-infomation">' + txt + '</span>';
+}
+
+function getSeverityBadge(severity) {
+    var val = (severity || '').toLowerCase();
+    var badgeMap = {
+        'critical': 'badge-critical',
+        'high': 'badge-high',
+        'medium': 'badge-medium',
+        'low': 'badge-success',
+        'information': 'badge-infomation',
+        'informational': 'badge-infomation',
+        'very low': 'badge-verylow'
+    };
+    var cls = badgeMap[val] || 'badge-infomation';
+    return '<span class="badge ' + cls + '">' + severity + '</span>';
+}
 
 
 

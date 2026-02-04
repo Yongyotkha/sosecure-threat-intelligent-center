@@ -432,6 +432,36 @@ select.c-tags {
         font-weight: 600;
         margin-top: 0.25rem;
     }
+
+    .table-loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 99999;
+        justify-content: center;
+        align-items: center;
+    }
+    .table-loading-overlay.show {
+        display: flex !important;
+    }
+    .table-loading-overlay .loading-box {
+        background: #fff;
+        padding: 15px 40px;
+        border-radius: 4px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        font-size: 14px;
+        color: #333;
+    }
+    .dataTables_processing {
+        display: none !important;
+    }
     
 
 </style>
@@ -668,13 +698,16 @@ select.c-tags {
                                                     <i class="fa fa-arrow-circle-up"></i>  Import CSV
                                                 </button>
                                                 <button onclick="showBulkIocInfo()" class="btn btn-custom-green" style="text-align: left;">
-                                                    <i class="fas fa-sync"></i>  IOC Enrichment
+                                                    <i class="fas fa-atom"></i> Enrichment
                                                 </button>
                                             </div>
                                         </div>
 
                                         
 
+                                    <div id="table-loading" class="table-loading-overlay">
+                                        <div class="loading-box">Loading...</div>
+                                    </div>
                                     <div class="table-responsive">
                                         <table class="table table-striped" id="table_events">
                                             <thead>
@@ -713,8 +746,6 @@ select.c-tags {
 
                                 </div>
                             </section>
-
-
 
                         </div>
                         <div class="tab-pane" id="tab_summary_type">
@@ -909,6 +940,14 @@ select.c-tags {
             });
 
             $('.select2-option').select2();
+
+            function showTableLoading() {
+                $('#table-loading').addClass('show');
+            }
+            
+            function hideTableLoading() {
+                $('#table-loading').removeClass('show');
+            }
 
             var start_date = '';
             var end_date = '';
@@ -1228,10 +1267,12 @@ select.c-tags {
             });
 
             function load_table(page = 1) {
+                showTableLoading();
+                
                 $('#table_events').DataTable({
                     ordering: true,
                     pageLength: 25,
-                    processing: true,
+                    processing: false,
                     serverSide: true,
                     destroy: true,
                     order: [
@@ -1243,16 +1284,21 @@ select.c-tags {
                         url: '{!! route('indicators.events_table') !!}',
                         dataSrc: function(json) {
                             count_page = json.recordsTotal;
+                            hideTableLoading();
                             return json.data;
                         },
                         data: function(d) {
 
                             d.count_page = count_page;
+                        },
+                        error: function() {
+                            hideTableLoading();
                         }
                     },
                     initComplete: function(settings, json) {
                         datatable = json.cursor;
                         $('[data-toggle="tooltip"]').tooltip();
+                        hideTableLoading();
                     },
                     "fnDrawCallback": function(oSettings) {
 
@@ -1531,7 +1577,7 @@ select.c-tags {
                                         onmouseover="this.style.backgroundColor='#17ae4eff';"
                                         onmouseout="this.style.backgroundColor='#22c55e';"
                                     >
-                                        <i class="fas fa-sync"></i> IOC
+                                        <i class="fas fa-atom"></i> Enrich
                                     </button>
                                 `;
 
@@ -1574,6 +1620,8 @@ select.c-tags {
             }
 
             function search_table(page = 1) {
+                showTableLoading();
+                
                 let startDate = $("#event_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
                 let endDate = $("#event_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
 
@@ -1582,7 +1630,7 @@ select.c-tags {
                     searching: false,
                     ordering: true,
                     pageLength: 25,
-                    processing: true,
+                    processing: false,
                     serverSide: true,
                     destroy: true,
                     order: [
@@ -1595,6 +1643,7 @@ select.c-tags {
                         dataSrc: function(json) {
 
                             count_page = json.recordsTotal;
+                            hideTableLoading();
                             return json.data;
                         },
                         data: function(d) {
@@ -1608,11 +1657,15 @@ select.c-tags {
                             d.industries = industries;
                             d.groups = group;
                             d.keyword_search = keyword_search;
+                        },
+                        error: function() {
+                            hideTableLoading();
                         }
                     },
                     initComplete: function(settings, json) {
                         datatable = json.cursor;
                         $('[data-rel="tooltip"]').tooltip();
+                        hideTableLoading();
                     },
                     "fnDrawCallback": function(oSettings) {
 
@@ -2133,6 +2186,9 @@ select.c-tags {
                 
                 btn.html('<i class="fas fa-spinner fa-spin"></i> Init...').prop('disabled', true);
                 
+
+                showSingleEnrichmentToast(displayName, indicatorCount);
+                
                 $.ajax({
                     type: "POST",
                     url: "{{ route('indicators.ioc_enrichment') }}",
@@ -2142,8 +2198,9 @@ select.c-tags {
                     },
                     success: function(res) {
                         if (res.job_id) {
-                            pollSingleJob(res.job_id, btn, originalText, displayName);
+                            pollSingleJob(res.job_id, btn, originalText, displayName, indicatorCount);
                         } else {
+                             hideSingleEnrichmentToast();
                              btn.html(originalText).prop('disabled', false);
                              Swal.fire({
                                 icon: 'error',
@@ -2153,6 +2210,7 @@ select.c-tags {
                         }
                     },
                     error: function(xhr) {
+                         hideSingleEnrichmentToast();
                          btn.html(originalText).prop('disabled', false);
                          Swal.fire({
                             icon: 'error',
@@ -2162,8 +2220,56 @@ select.c-tags {
                     }
                 });
             }
+            
+            function showSingleEnrichmentToast(eventName, indicatorCount) {
+                if ($('#enrichment-toast').length) {
+                    $('#enrichment-toast').remove();
+                }
+                var toastHtml = `
+                    <div id="enrichment-toast" class="enrichment-toast">
+                        <div class="toast-header">
+                            <div class="toast-title">
+                                <i class="fas fa-sync fa-spin"></i>
+                                <span>IOC Enrichment</span>
+                            </div>
+                        </div>
+                        <div class="toast-body">
+                            <div class="toast-event" id="toast-event-name">${eventName}</div>
+                            <div class="toast-status-text" id="toast-status-text" style="font-size:11px;color:#6b7280;margin-top:2px;">Starting job...</div>
+                        </div>
+                        <div class="toast-progress-bar">
+                            <div class="toast-progress-fill" id="toast-progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="toast-stats">
+                            <span id="toast-count">0 / ${indicatorCount || '?'} indicators</span>
+                            <span><span class="success" id="toast-success">0</span> processed</span>
+                        </div>
+                    </div>
+                `;
+                $('body').append(toastHtml);
+            }
+            
+            function updateSingleEnrichmentToast(processed, total, status) {
+                var pct = 0;
+                if (total > 0 && total !== '?') {
+                    pct = Math.round((processed / total) * 100);
+                }
+                $('#toast-progress-fill').css('width', pct + '%');
+                $('#toast-count').text(processed + ' / ' + (total || '?') + ' indicators');
+                $('#toast-success').text(processed);
+                if (status) {
+                    $('#toast-status-text').text(status);
+                }
+            }
+            
+            function hideSingleEnrichmentToast() {
+                $('#enrichment-toast').addClass('hiding');
+                setTimeout(function() {
+                    $('#enrichment-toast').remove();
+                }, 300);
+            }
 
-            function pollSingleJob(jobId, btn, originalText, displayName) {
+            function pollSingleJob(jobId, btn, originalText, displayName, indicatorCount) {
                 var checkInterval = 2000;
                 
                 var checkStatus = function() {
@@ -2176,26 +2282,44 @@ select.c-tags {
                         },
                         success: function(res) {
                             if (res.status === 'completed') {
+                                $('#enrichment-toast .toast-title i').removeClass('fa-spin fa-sync').addClass('fa-check-circle');
+                                $('#enrichment-toast').css('border-left-color', '#22c55e');
+                                $('#toast-event-name').text('Completed!');
+                                $('#toast-status-text').text('Enrichment finished successfully.');
+                                $('#toast-progress-fill').css('width', '100%');
+                                
                                 btn.html('<i class="fas fa-check"></i> Done').removeClass('btn-info').addClass('btn-success');
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Enrichment Completed',
-                                    html: '<b>' + displayName + '</b><br>Processed: ' + (res.processed_count || 0) + ' indicators',
-                                    confirmButtonText: 'Refresh',
-                                    allowOutsideClick: false
-                                }).then(() => {
-                                    location.reload();
-                                });
+                                
+                                setTimeout(function() {
+                                    hideSingleEnrichmentToast();
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Enrichment Completed',
+                                        html: '<b>' + displayName + '</b><br>Processed: ' + (res.processed_count || 0) + ' indicators',
+                                        confirmButtonText: 'Refresh',
+                                        allowOutsideClick: false
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                }, 1000);
                             } else if (res.status === 'failed') {
-                                btn.html(originalText).prop('disabled', false);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Job Failed',
-                                    text: res.error || 'Unknown error during processing'
-                                });
+                                $('#enrichment-toast .toast-title i').removeClass('fa-spin fa-sync').addClass('fa-exclamation-circle');
+                                $('#enrichment-toast').css('border-left-color', '#ef4444');
+                                $('#toast-event-name').text('Failed');
+                                $('#toast-status-text').text(res.error || 'Unknown error');
+                                
+                                setTimeout(function() {
+                                    hideSingleEnrichmentToast();
+                                    btn.html(originalText).prop('disabled', false);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Job Failed',
+                                        text: res.error || 'Unknown error during processing'
+                                    });
+                                }, 1500);
                             } else {
                                 var processed = res.processed_count || 0;
-                                var total = res.total_indicators || '?';
+                                var total = res.total_indicators || indicatorCount || '?';
                                 var pct = 0;
                                 if (total > 0 && total !== '?') {
                                      pct = Math.round((processed / total) * 100);
@@ -2203,6 +2327,8 @@ select.c-tags {
                                 } else {
                                      btn.html('<i class="fas fa-spinner fa-spin"></i> ' + processed);
                                 }
+                                
+                                updateSingleEnrichmentToast(processed, total, 'Processing indicators...');
                                 
                                 setTimeout(checkStatus, checkInterval);
                             }

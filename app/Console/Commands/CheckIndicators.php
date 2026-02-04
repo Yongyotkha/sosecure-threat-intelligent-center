@@ -15,7 +15,7 @@ class CheckIndicators extends Command
      *
      * @var string
      */
-    protected $signature = 'app:indicatorscheck {--file= : Path to CSV file} {--manual : Manual input mode} {--limit=0 : Maximum number of indicators to process (0 = unlimited)} {--resume : Resume from last checkpoint} {--force : Force start new job (ignore existing progress)} {--event= : Process single event by pulse_id} {--job= : Job ID for tracking progress}';
+    protected $signature = 'app:indicatorscheck {--file= : Path to CSV file} {--manual : Manual input mode} {--limit=0 : Maximum number of indicators to process (0 = unlimited)} {--resume : Resume from last checkpoint} {--force : Force start new job (ignore existing progress)} {--event= : Process single event by pulse_id} {--job= : Job ID for tracking progress} {--test= : Test single IOC with debug output (format: ioc:type)}';
 
     /**
      * The console command description.
@@ -51,6 +51,12 @@ class CheckIndicators extends Command
     {
         $this->info("\n=== IOC Threat Checker ===\n");
         
+        // Test mode - single IOC with full debug
+        $testIoc = $this->option('test');
+        if ($testIoc) {
+            return $this->testSingleIoc($testIoc);
+        }
+        
         // Check if processing single event
         $eventId = $this->option('event');
         if ($eventId) {
@@ -68,6 +74,96 @@ class CheckIndicators extends Command
 
         $this->info("\n=== Final Summary ===");
         $this->displaySummary($results);
+        
+        return 0;
+    }
+    
+    /**
+     * Test single IOC with full debug output
+     * Usage: php artisan app:indicatorscheck --test="student56.ru.com:hostname"
+     */
+    protected function testSingleIoc($testInput)
+    {
+        // Parse input (format: ioc:type or just ioc)
+        $parts = explode(':', $testInput, 2);
+        $ioc = trim($parts[0]);
+        $type = isset($parts[1]) ? trim($parts[1]) : $this->detectType($ioc);
+        
+        $this->info("Testing IOC: {$ioc}");
+        $this->info("Type: {$type}");
+        $this->info(str_repeat('-', 60));
+        
+        $client = new \GuzzleHttp\Client(['verify' => false, 'timeout' => 30]);
+        
+        // Call IOC check with debug
+        $result = $this->service->checkIocAsync($client, $ioc, $type, null)->wait();
+        
+        // Display raw API responses
+        $this->info("\n=== API Responses ===");
+        
+        // VirusTotal
+        $vt = $result['vt'] ?? [];
+        $this->line("\n<fg=cyan>VirusTotal:</>");
+        $this->line("  Malicious: " . ($vt['malicious'] ?? 0));
+        $this->line("  Suspicious: " . ($vt['suspicious'] ?? 0));
+        $this->line("  Unique Results: " . implode(', ', array_slice($vt['unique_results'] ?? [], 0, 5)));
+        
+        // AbuseIPDB (IP only)
+        if ($type === 'ip') {
+            $abuse = $result['abuse'] ?? [];
+            $this->line("\n<fg=cyan>AbuseIPDB:</>");
+            $this->line("  Score: " . ($abuse['score'] ?? '-'));
+            $this->line("  Total Reports: " . ($abuse['total_reports'] ?? 0));
+        }
+        
+        // ThreatFox
+        $tf = $result['threatfox'] ?? [];
+        $this->line("\n<fg=cyan>ThreatFox:</>");
+        $this->line("  Confidence Level: " . ($tf['confidence_level'] ?? 0));
+        $this->line("  Tags: " . implode(', ', $tf['tags'] ?? []));
+        
+        // OTX
+        $otx = $result['otx'] ?? [];
+        $this->line("\n<fg=cyan>OTX AlienVault:</>");
+        $this->line("  Pulse Count: " . ($otx['pulse_count'] ?? 0));
+        
+        // RSTCloud
+        $this->line("\n<fg=cyan>RSTCloud:</>");
+        $this->line("  Score: " . ($result['rstcloud_score'] ?? 'N/A'));
+        $this->line("  Threat: " . implode(', ', $result['rstcloud_threat'] ?? []));
+        
+        // Score Calculation Debug
+        $this->info("\n=== Score Calculation ===");
+        $debugScores = $result['debug_scores'] ?? [];
+        $debugWeights = $result['debug_weights'] ?? [];
+        
+        $this->line("\n<fg=yellow>Active Source Scores:</>");
+        foreach ($debugScores as $source => $score) {
+            $weight = $debugWeights[$source] ?? 0;
+            $this->line("  {$source}: score={$score}, weight={$weight}");
+        }
+        
+        $this->line("\n<fg=yellow>Calculation:</>");
+        $totalWeight = array_sum($debugWeights);
+        $weightedSum = 0;
+        foreach ($debugScores as $source => $score) {
+            $weight = $debugWeights[$source] ?? 0;
+            $contrib = $score * $weight;
+            $weightedSum += $contrib;
+            $this->line("  {$source}: {$score} × {$weight} = {$contrib}");
+        }
+        $this->line("  Total weight: {$totalWeight}");
+        $this->line("  Weighted sum: {$weightedSum}");
+        if ($totalWeight > 0) {
+            $rawScore = $weightedSum / $totalWeight;
+            $this->line("  Raw score: {$weightedSum} / {$totalWeight} = " . number_format($rawScore, 2));
+            $this->line("  Final score: round(" . number_format($rawScore, 2) . ") = " . round($rawScore));
+        }
+        
+        // Final Result
+        $this->info("\n=== Final Result ===");
+        $this->line("<fg=green>Score: " . $result['total_score'] . "</>");
+        $this->line("<fg=green>Risk Level: " . $result['risk_level'] . "</>");
         
         return 0;
     }
@@ -700,6 +796,7 @@ class CheckIndicators extends Command
         // One client for all requests
         $client = new Client(['verify' => false, 'timeout' => 15]);
         $eventResults = [];
+        $batchResults = [];
         
         // Create progress bar for this event
         $bar = $this->output->createProgressBar(count($eventIocs));
@@ -709,8 +806,9 @@ class CheckIndicators extends Command
         // Create a generator for promises
         $promises = (function () use ($client, $eventIocs, $dataKey) {
             foreach ($eventIocs as $item) {
-                yield $this->service->checkIocAsync($client, $item['ioc'], $item['type'])
+                yield $this->service->checkIocAsync($client, $item['ioc'], $item['type'], $item['event_name'] ?? null)
                     ->then(function ($result) use ($item, $dataKey) {
+                        // REMOVED extra usleep here to speed up
                         return array_merge($result, [
                             'event_name' => $item['event_name'] ?? 'N/A',
                             'event_tags' => $item['event_tags'] ?? [],
@@ -727,11 +825,21 @@ class CheckIndicators extends Command
         
         // Process with concurrency
         $each = new EachPromise($promises, [
-            'concurrency' => 5,
-            'fulfilled' => function ($result) use ($bar, &$eventResults, &$allIocs) {
+            'concurrency' => 1, // Sequential
+            'fulfilled' => function ($result) use ($bar, &$eventResults, &$batchResults, &$allIocs) {
                 $eventResults[] = $result;
+                $batchResults[] = $result;
                 $allIocs[] = $result;
                 $bar->advance();
+                
+                // Delay 4 seconds (SAFE: 5 keys * 4s = 20s cycle > 15s limit)
+                usleep(4000000); 
+
+                // Save batch every 50 items (Safety for Resume)
+                if (count($batchResults) >= 50) {
+                     $this->saveAndSyncResults($batchResults);
+                     array_splice($batchResults, 0); // Clear array
+                }
             },
             'rejected' => function ($reason) {
                 // Handle failure
@@ -742,8 +850,10 @@ class CheckIndicators extends Command
         $bar->finish();
         $this->line("");
         
-        // Save results to MongoDB indicator_temp
-        $this->saveResultsToMongo($eventResults);
+        // Save remaining batch
+        if (!empty($batchResults)) {
+            $this->saveAndSyncResults($batchResults);
+        }
         
         // Show summary for this event
         $this->displayEventSummary($eventResults);
@@ -770,7 +880,7 @@ class CheckIndicators extends Command
         // Create a generator for promises
         $promises = (function () use ($client, $eventIocs, $dataKey) {
             foreach ($eventIocs as $item) {
-                yield $this->service->checkIocAsync($client, $item['ioc'], $item['type'])
+                yield $this->service->checkIocAsync($client, $item['ioc'], $item['type'], $item['event_name'] ?? null)
                     ->then(function ($result) use ($item, $dataKey) {
                         return array_merge($result, [
                             'event_name' => $item['event_name'] ?? 'N/A',
@@ -788,13 +898,16 @@ class CheckIndicators extends Command
         
         // Process with concurrency
         $each = new EachPromise($promises, [
-            'concurrency' => 10,
+            'concurrency' => 1, // Sequential to avoid VT rate limiting (4 req/min)
             'fulfilled' => function ($result) use ($bar, &$eventResults, &$batchResults, &$allIocs, &$processedCount, $totalCount, $jobsCollection, $jobId) {
                 $eventResults[] = $result;
                 $batchResults[] = $result;
                 $allIocs[] = $result;
                 $processedCount++;
                 $bar->advance();
+                
+                // Delay 4 seconds between requests (5 keys * 4s = 20s cycle > 15s limit)
+                usleep(4000000); // 4 seconds
                 
                 // Save batch every 50 items
                 if (count($batchResults) >= 50) {
@@ -856,11 +969,17 @@ class CheckIndicators extends Command
             $db = $clientMD->sosecure_threatintelligent_dev;
             $temp = $db->fx_indicators_temp;
             $ref = $db->fx_otx_events_indicator_ref;
+            $dataKeyCollection = $db->fx_data_key;
+            
+            // Generate data_key for this batch
+            $dataKey = (string) \Illuminate\Support\Str::uuid();
+            $batchTimestamp = date('Y-m-d H:i:s');
             
             $opsTemp = [];
             $opsRef = [];
             
             foreach ($results as $result) {
+                // ... (tag processing logic remains same) ...
                 $tags = [];
                 if (!empty($result['event_tags']) && is_array($result['event_tags'])) {
                     $tags = array_merge($tags, $result['event_tags']);
@@ -876,11 +995,9 @@ class CheckIndicators extends Command
                 }
                 $tags = array_unique($tags);
                 
-                $importedAt = date('Y-m-d H:i:s');
-                
                 $doc = [
-                    'data_key' => $result['data_key'] ?? null,
-                    'imported_at' => $importedAt,
+                    'data_key' => $dataKey, // Use generated key
+                    'imported_at' => $batchTimestamp,
                     'event_id' => $result['pulse_id'] ?? null,
                     'public' => $result['event_public'] ?? 1,
                     'event_tags' => implode(', ', $result['event_tags'] ?? []),
@@ -910,7 +1027,8 @@ class CheckIndicators extends Command
                 $opsTemp[] = ['updateOne' => [
                     ['attribute_id' => $result['indicator_id']],
                     ['$set' => $doc],
-                    ['upsert' => true]
+                    ['upsert' => true] // Note: Using upsert=true might overwrite data_key if existing doc found
+                    // Ideally for "new import" logic, insertOne is used, but here we update existing logic
                 ]];
                 
                 if (!empty($result['indicator_id']) && !empty($result['pulse_id'])) {
@@ -922,7 +1040,7 @@ class CheckIndicators extends Command
                         'attribute_score' => (string)($result['total_score'] ?? 0),
                         'attribute_serverity' => $result['risk_level'] ?? 'Informational',
                         'tags' => implode(', ', $tags),
-                        'imported_at' => date('Y-m-d H:i:s')
+                        'imported_at' => $batchTimestamp
                     ]];
                     $opsRef[] = ['updateMany' => [$filterRef, $updateRef, ['upsert' => true]]];
                 }
@@ -931,7 +1049,18 @@ class CheckIndicators extends Command
             if ($opsTemp) $temp->bulkWrite($opsTemp);
             if ($opsRef) $ref->bulkWrite($opsRef);
             
-            $this->info("Saved & Synced batch of " . count($results));
+            // Log data_key
+            $dataKeyCollection->insertOne([
+                'date' => $batchTimestamp,
+                'data_key' => $dataKey,
+                'imported_at' => $batchTimestamp,
+                'record_count' => count($results),
+                'type' => 'attribute',
+                'note' => 'batch_enrichment',
+                'timestamp' => time()
+            ]);
+            
+            $this->info("Saved & Synced batch of " . count($results) . " (Key: {$dataKey})");
             
         } catch (\Exception $e) {
             $this->error("Save/Sync Error: " . $e->getMessage());
