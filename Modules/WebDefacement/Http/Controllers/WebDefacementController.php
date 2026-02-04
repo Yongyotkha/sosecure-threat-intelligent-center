@@ -746,7 +746,23 @@ class WebDefacementController extends Controller
             'webdefacment_id' => $webdefacment_id,
         ];
 
-        Artisan::call($command, $params);
+        try {
+            \Log::info("[deface_now] Starting command for ID: {$webdefacment_id}");
+            Artisan::call($command, $params);
+            \Log::info("[deface_now] Command completed for ID: {$webdefacment_id}");
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Defacement check completed'
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error("[deface_now] Error for ID {$webdefacment_id}: " . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function update_original_detail(Request $request)

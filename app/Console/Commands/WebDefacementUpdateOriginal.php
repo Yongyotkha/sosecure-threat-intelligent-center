@@ -179,27 +179,32 @@ class WebDefacementUpdateOriginal extends Command
         ]';
             $WebdefacmentSetting->save();
 
-            // --- ดึง HTML ---
-            $resp = $this->getHtml($url);
-            if ($resp['content'] === FALSE) {
-                $webContent = "";
-                $result["Result"]  = 0;
-                $result["message"] = "Html not found";
-                Log::warning("[UpdateOriginal] Html not found: {$url}");
-                echo json_encode($result);
-                return 0;
+            // Unified Logic: Use getHtml3 (Puppeteer) for ALL sites in UpdateOriginal too
+            $options = [];
+            // Preserve user agent logic if needed for specific ID (or move to DB later)
+            if ($webdefacment_id == 204) {
+                $options['userAgent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
             }
-            $webContent = $resp['content'];
+            
+            // Generate Screenshot Path (Standardized)
+            $url_id = $Original->url_id ?: rand(10, 100);
+            $site_id = $WebdefacmentSetting->site_id;
+            $image_name_full = "image_original.png";
+            $screenshot_path = base_path() . "/public/images/webdefacment_mages/{$site_id}/{$url_id}/{$image_name_full}";
+            $options['screenshot_path'] = $screenshot_path;
 
-            if ($webdefacment_id == 176 || $webdefacment_id == 173 || $webdefacment_id == 174 || $webdefacment_id == 204 || $webdefacment_id == 209) {
-                $options = [];
-                if ($webdefacment_id == 204) {
-                    $options['userAgent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
-                }
-                $response = $this->getHtml3($url, 0, $options);
-                $webContent = $response['content'];
-                // Log::info($response['content']);
+            // Fetch Content
+            $response = $this->getHtml3($url, 0, $options);
+
+            if (isset($response['success']) && $response['success'] === false) {
+                 $result["Result"] = 0;
+                 $result["message"] = "Puppeteer Error: " . ($response['error'] ?? 'Unknown');
+                 Log::warning("[UpdateOriginal] Puppeteer failed for {$url}: " . ($response['error'] ?? 'Unknown'));
+                 echo json_encode($result);
+                 return 0;
             }
+
+            $webContent = $response['content'];
             // file_put_contents(storage_path('app/dom_raw_original.html'), $webContent);
 
             
@@ -248,7 +253,23 @@ class WebDefacementUpdateOriginal extends Command
             // 5) assets/outbound จาก “ทั้งหน้า”
             [$assetsAll, $outboundNow] = $this->assetsAndOutboundFromHtml($domNorm, $url);
             $assetsNow = [];
+            
+            $ignoreAsstPat = json_decode($WebdefacmentSetting->asset_ignore_patterns ?: '[]', true) ?: [
+                'news_main_pic',
+                'files-rice-',
+            ];
+
             foreach ($assetsAll as $a) {
+                // Check ignore
+                $isIgnored = false;
+                foreach ($ignoreAsstPat as $ipat) {
+                    if (@preg_match('/' . $ipat . '/', $a)) {
+                        $isIgnored = true;
+                        break;
+                    }
+                }
+                if ($isIgnored) continue;
+
                 foreach ($allowPat as $pat) {
                     if (@preg_match('/' . $pat . '/', $a)) {
                         $assetsNow[] = $a;
@@ -298,10 +319,16 @@ class WebDefacementUpdateOriginal extends Command
                 $part_image = "/public/images/webdefacment_mages/{$site_id}/{$url_id}/image_original.png";
 
                 try {
-                    $path_include = base_path() . '/public/screenshot/use/DownloadImage.php';
-                    include_once($path_include);
-                    $downloadImg = new \DownloadImage();
-                    $downloadImg->download($url, $path_full, $delay);
+                    // [FIX] Disabled legacy DownloadImage. Using Puppeteer screenshot captured in getHtml3 above.
+                    // $path_include = base_path() . '/public/screenshot/use/DownloadImage.php';
+                    // include_once($path_include);
+                    // $downloadImg = new \DownloadImage();
+                    // $downloadImg->download($url, $path_full, $delay);
+
+                    // Check if Puppeteer saved the image
+                    if (!file_exists($path_full)) {
+                        Log::warning("[UpdateOriginal] Screenshot not found at {$path_full}");
+                    }
 
                     $cmp = new compareImages($path_full);
                     $imageHash = $cmp->getHasString();
@@ -1002,14 +1029,14 @@ class WebDefacementUpdateOriginal extends Command
     private function getHtml3($url, $retryCount = 0, $options = [])
   {
     $browser = null;
-    $maxRetries = 3;
+    $maxRetries = 10; // ✅ เพิ่มเป็น 10 เหมือน Process
 
     try {
       ini_set('max_execution_time', 300);
       ini_set('default_socket_timeout', 300);
       set_time_limit(0);
 
-      // ✅ บังคับให้ Chrome ใช้ HOME และ user data dir ที่ปลอดภัย
+      // ✅ ตั้ง HOME directory ให้ Chrome มี directory ที่เขียนได้
       $chromeHome = storage_path('app/chrome_home');
       if (!file_exists($chromeHome)) {
           mkdir($chromeHome, 0777, true);
@@ -1028,6 +1055,7 @@ class WebDefacementUpdateOriginal extends Command
         'idle_timeout' => 300,
       ]);
 
+      // ✅ ลบ --user-data-dir ออก (เหมือน Process)
       $browser = $puppeteer->launch([
         'executablePath' => '/usr/bin/google-chrome',
         'headless' => true,
@@ -1043,14 +1071,13 @@ class WebDefacementUpdateOriginal extends Command
           '--disable-background-networking',
           '--disable-features=IsolateOrigins,site-per-process',
           '--window-size=1920,1080',
-          "--user-data-dir={$chromeHome}/user_data",
         ],
       ]);
 
       $page = $browser->newPage();
-      $page->setDefaultNavigationTimeout(90000); // เพิ่มเป็น 90 วินาที
+      $page->setDefaultNavigationTimeout(90000);
 
-      // 🟩 Set User-Agent to bypass basic blocking
+      // 🟩 Set User-Agent
       if (!empty($options['userAgent'])) {
           $page->setUserAgent($options['userAgent']);
       } else {
@@ -1060,9 +1087,23 @@ class WebDefacementUpdateOriginal extends Command
       // 🟩 เปิด JavaScript
       $page->setJavaScriptEnabled(true);
 
+      // ✅ ใช้ waitUntil strategy ที่ต่างกันตาม retry count
+      // - retry 0: networkidle2 (ผ่อนปรนกว่า networkidle0)
+      // - retry 1+: load + domcontentloaded (เร็วขึ้น)
+      $waitStrategies = [
+          ['load', 'domcontentloaded', 'networkidle2'],  // retry 0
+          ['load', 'domcontentloaded'],                   // retry 1
+          ['load'],                                        // retry 2+
+      ];
+      $strategyIdx = min($retryCount, count($waitStrategies) - 1);
+      $waitUntil = $waitStrategies[$strategyIdx];
+      $timeout = $retryCount === 0 ? 90000 : 60000; // ลด timeout ใน retry
+      
+      \Log::info("[getHtml3] Attempt " . ($retryCount + 1) . " for {$url} (waitUntil: " . implode(',', $waitUntil) . ")");
+
       $page->goto($url, [
-        'timeout' => 90000,
-        'waitUntil' => ['load', 'domcontentloaded', 'networkidle0'], // รอ network ให้เงียบสนิท
+        'timeout' => $timeout,
+        'waitUntil' => $waitUntil,
       ]);
 
       // 🟩 รอให้หน้าเว็บโหลดเสร็จ
@@ -1142,30 +1183,77 @@ class WebDefacementUpdateOriginal extends Command
         throw new \Exception("Content too short, possible network error");
       }
 
-      // 🟩 Log เพื่อ debug
-      $elementCount = $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
-            () => document.querySelectorAll('*').length
-        "));
-      \Log::info("getHtml3: Captured {$elementCount} elements from {$url}");
+      // 🟩 Screenshot Capture
+      $screenshotSaved = false;
+      if (!empty($options['screenshot_path'])) {
+          try {
+              $dir = dirname($options['screenshot_path']);
+              
+              // สร้าง directory ถ้ายังไม่มี
+              if (!is_dir($dir)) {
+                  $mkdirResult = @mkdir($dir, 0775, true);
+                  if ($mkdirResult) {
+                      @chmod($dir, 0775);
+                  } else {
+                      \Log::warning("[getHtml3] Failed to create directory: {$dir}");
+                  }
+              }
+              
+              // ถ่ายภาพ
+              $page->screenshot([
+                  'path' => $options['screenshot_path'],
+                  'fullPage' => true
+              ]);
+              
+              // Verify ว่าไฟล์ถูกสร้างจริง
+              if (file_exists($options['screenshot_path'])) {
+                  $screenshotSaved = true;
+                  \Log::info("[getHtml3] Screenshot saved to {$options['screenshot_path']}");
+              } else {
+                  \Log::warning("[getHtml3] Screenshot command ran but file not created at {$options['screenshot_path']}");
+              }
+          } catch (\Throwable $e) {
+              \Log::warning("[getHtml3] Screenshot save failed ({$url}) - " . $e->getMessage());
+          }
+      }
+
+      // 🟩 Log เพื่อ debug (wrap in try-catch เพื่อไม่ให้ fail)
+      $elementCount = 0;
+      try {
+        $elementCount = $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
+              () => document.querySelectorAll('*').length
+          "));
+      } catch (\Throwable $evalEx) {
+        // ignore - ถ้า evaluate fail ก็ไม่เป็นไร
+      }
+      \Log::info("getHtml3: Captured {$elementCount} elements from {$url} (Screenshot: " . ($screenshotSaved ? 'Yes' : 'No') . ")");
 
       return ['content' => $content, 'success' => true];
     } catch (\Throwable $e) {
       $errorMsg = $e->getMessage();
 
-      // 🟩 ตรวจสอบว่าเป็น network error หรือไม่
-      $isNetworkError = (
+      // 🟩 ตรวจสอบว่าเป็น network/browser error ที่ควร retry หรือไม่
+      // ⚠️ EACCES (permission denied) ไม่ควร retry เพราะ retry ก็แก้ไม่ได้
+      $isPermissionError = stripos($errorMsg, 'EACCES') !== false || stripos($errorMsg, 'permission denied') !== false;
+      
+      $isRetryableError = !$isPermissionError && (
         stripos($errorMsg, 'ERR_SOCKET_NOT_CONNECTED') !== false ||
         stripos($errorMsg, 'ERR_CONNECTION') !== false ||
         stripos($errorMsg, 'ERR_NETWORK') !== false ||
         stripos($errorMsg, 'ERR_TIMED_OUT') !== false ||
         stripos($errorMsg, 'Navigation timeout') !== false ||
-        stripos($errorMsg, 'Content too short') !== false
+        stripos($errorMsg, 'Content too short') !== false ||
+        stripos($errorMsg, 'frame was detached') !== false ||
+        stripos($errorMsg, 'frame detached') !== false ||
+        stripos($errorMsg, 'Session closed') !== false ||
+        stripos($errorMsg, 'Protocol error') !== false ||
+        stripos($errorMsg, 'Target closed') !== false
       );
 
       \Log::error("Puphpeteer Error (attempt " . ($retryCount + 1) . "/{$maxRetries}): {$errorMsg} at {$url}");
 
-      // 🟩 ถ้าเป็น network error และยังลองไม่ถึง max retries ให้ลองใหม่
-      if ($isNetworkError && $retryCount < $maxRetries) {
+      // 🟩 ถ้าเป็น retryable error และยังลองไม่ถึง max retries ให้ลองใหม่
+      if ($isRetryableError && $retryCount < $maxRetries) {
         \Log::info("Retrying {$url} (attempt " . ($retryCount + 2) . "/{$maxRetries})");
 
         // ปิด browser ก่อน retry
@@ -1177,17 +1265,36 @@ class WebDefacementUpdateOriginal extends Command
           }
         }
 
-        // รอสักครู่ก่อน retry
-        sleep(2 + $retryCount); // รอนานขึ้นทุกครั้งที่ retry
+        // 🟩 Force kill Chrome processes ก่อน retry
+        @exec("pkill -9 -f 'chrome' >/dev/null 2>&1");
+        @exec("pkill -9 -f 'chromium' >/dev/null 2>&1");
+        
+        // รอนานขึ้นทุกครั้งที่ retry (3, 5, 7 วินาที)
+        sleep(3 + ($retryCount * 2));
 
         return $this->getHtml3($url, $retryCount + 1, $options);
       }
 
-      // 🟩 ถ้า retry หมดแล้วหรือไม่ใช่ network error ให้ใช้ fallback
-      // แต่ return พร้อม error flag เพื่อไม่ให้ diff
+      // 🟩 ถ้า retry หมดแล้วหรือไม่ใช่ retryable error ให้ใช้ curl fallback
+      \Log::info("[getHtml3] All Puppeteer retries failed for {$url}, trying curl fallback...");
       $fallbackResult = $this->getHtmlFallback($url);
-      $fallbackResult['success'] = false;
-      $fallbackResult['error'] = $errorMsg;
+      
+      // 🟩 ตรวจสอบว่า curl fallback ได้ content ที่ดีหรือไม่
+      $fallbackContent = $fallbackResult['content'] ?? '';
+      $hasValidContent = (
+        strlen($fallbackContent) > 500 && 
+        (stripos($fallbackContent, '<html') !== false || stripos($fallbackContent, '<body') !== false)
+      );
+      
+      if ($hasValidContent) {
+        \Log::info("[getHtml3] Curl fallback succeeded with " . strlen($fallbackContent) . " bytes for {$url}");
+        $fallbackResult['success'] = true;
+        $fallbackResult['fallback'] = true; // flag ว่าใช้ fallback
+      } else {
+        \Log::warning("[getHtml3] Curl fallback also failed or got invalid content for {$url}");
+        $fallbackResult['success'] = false;
+        $fallbackResult['error'] = $errorMsg;
+      }
 
       return $fallbackResult;
     } finally {
@@ -1217,16 +1324,27 @@ class WebDefacementUpdateOriginal extends Command
     function get_dataa3($url)
     {
         $ch = curl_init();
-        $timeout = 5;
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0)");
+        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_ENCODING, ""); // รองรับ gzip
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language: th-TH,th;q=0.9,en;q=0.8',
+            'Cache-Control: no-cache',
+        ]);
         $data = curl_exec($ch);
+        
+        if (curl_errno($ch)) {
+            \Log::warning("[get_dataa3] curl error: " . curl_error($ch) . " for {$url}");
+        }
+        
         curl_close($ch);
         return $data;
     }

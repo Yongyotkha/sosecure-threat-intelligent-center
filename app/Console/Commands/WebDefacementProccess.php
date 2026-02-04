@@ -140,10 +140,10 @@ class WebDefacementProccess extends Command
               $WebdefacmentSetting_update->webdeflacement_progress = 3;
               $WebdefacmentSetting_update->save();
 
-              // อัปเดต batch job
-              $TransactionBatchjob_Update->progress = 1;
-              $TransactionBatchjob_Update->transcation_date = now();
-              $TransactionBatchjob_Update->save();
+              // อัปเดต batch job -> ไม่ต้องทำใน loop เพราะจะทำทีเดียวตอนจบ function
+              // $TransactionBatchjob_Update->progress = 1; 
+              // $TransactionBatchjob_Update->transcation_date = now();
+              // $TransactionBatchjob_Update->save();
 
               // บันทึก stat_log สำหรับ Web Down
               try {
@@ -166,8 +166,8 @@ class WebDefacementProccess extends Command
                 Log::error("[STAT_LOG] Failed for web down: " . $e->getMessage());
               }
 
-              // จบการทำงาน command ทันที
-              return;
+              // เปลี่ยนจาก return (จบงาน) เป็น continue (ไปเว็บถัดไป)
+              continue;
             } catch (\Exception $e) {
               Log::error("Failed to queue web down alert email for {$url}: " . $e->getMessage());
 
@@ -180,10 +180,10 @@ class WebDefacementProccess extends Command
               $WebdefacmentSetting_update->webdeflacement_progress = 3;
               $WebdefacmentSetting_update->save();
 
-              // อัปเดต batch job
-              $TransactionBatchjob_Update->progress = 1;
-              $TransactionBatchjob_Update->transcation_date = now();
-              $TransactionBatchjob_Update->save();
+              // อัปเดต batch job -> ไม่ต้องทำใน loop
+              // $TransactionBatchjob_Update->progress = 1;
+              // $TransactionBatchjob_Update->transcation_date = now();
+              // $TransactionBatchjob_Update->save();
 
               // บันทึก stat_log สำหรับ Web Down
               try {
@@ -385,34 +385,73 @@ class WebDefacementProccess extends Command
 
             $image_path_2 = "";
 
-            if ($webdefacment_id == 173 || $webdefacment_id == 174 || $webdefacment_id == 209 || $webdefacment_id == 204) {
-              $options = [];
-              if ($webdefacment_id == 204) {
-                 $options['userAgent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
-              }
-              $response = $this->getHtml3($url, 0, $options);
+            // Unified Logic: Use getHtml3 (Puppeteer) for ALL sites
+            $options = [];
+            // If you want to support custom user agent from DB in the future, add it here.
+            // For now, we use the default defined in getHtml3 or add a generic one if needed.
+            
+            // 🟩 Screenshot Path Configuration
+            $site_id = $WebdefacmentSetting_data->site_id;
+            
+            // 🟩 แก้ไข: ดึง url_id จาก $WebdefacmentDataOriginal_data ที่มีอยู่แล้ว
+            $url_id = isset($WebdefacmentDataOriginal_data->url_id) ? $WebdefacmentDataOriginal_data->url_id : null;
+            
+            // Fallback ถ้าไม่มีค่า
+            if (!$url_id) { $url_id = rand(10, 100); }
+            
+            $image_name =  $site_id . '_' . $url_id . '_' . 'Defacement_Now';
+            // ใช้ Path ตรงกับที่ระบบใช้ (public/images/webdefacment_mages/...)
+            $screenshotPath = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
+            
+            $options['screenshot_path'] = $screenshotPath;
 
-              // 🟩 ตรวจสอบว่าดึง HTML สำเร็จหรือไม่ ถ้าไม่สำเร็จให้ข้าม diff
-              if (isset($response['success']) && $response['success'] === false) {
-                Log::warning("Skipping diff for {$url} due to network error: " . ($response['error'] ?? 'unknown'));
-                $WebdefacmentSetting_update->webdeflacement_progress = 1;
-                $WebdefacmentSetting_update->last_check = date("Y-m-d H:i:s");
-                $WebdefacmentSetting_update->save();
-                continue; // ข้ามไปเว็บถัดไปf
+            // 🟩 Assign Path to result (Relative path for DB)
+            $result["image_url"] = "/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
+            $result["image_path_original"] = $result["image_url"];
+
+            $response = $this->getHtml3($url, 0, $options);
+
+            // 🟩 ตรวจสอบว่าดึง HTML สำเร็จหรือไม่ ถ้าไม่สำเร็จให้ข้าม diff
+            // 🟩 [UPDATED] ถ้าเป็น network error (ไม่ใช่การเปลี่ยนแปลงของหน้าเว็บจริงๆ) 
+            //    ให้ข้ามรอบนี้และลองใหม่ในรอบถัดไป โดยไม่ trigger high alert
+            if (isset($response['success']) && $response['success'] === false) {
+              Log::warning("Skipping diff for {$url} due to network error (will retry next cycle): " . ($response['error'] ?? 'unknown'));
+              
+              // 🟩 [UPDATED] ตั้ง progress กลับเป็น 1 เพื่อให้ลองใหม่ในรอบถัดไป
+              //    ไม่ใช่ 3 (Error) ที่จะ trigger alert
+              $WebdefacmentSetting_update->webdeflacement_progress = 1; 
+              $WebdefacmentSetting_update->last_check = date("Y-m-d H:i:s");
+              $WebdefacmentSetting_update->save();
+
+              // 🟩 [UPDATED] ไม่ส่ง error email เพราะเป็นแค่ปัญหาการเชื่อมต่อชั่วคราว
+              //    ถ้าต้องการ track ให้บันทึก stat_log เฉย ๆ โดยไม่ trigger alert
+              try {
+                DB::table('webdefacement_stat_log')->insert([
+                  'site_id' => $WebdefacmentSetting_update->site_id,
+                  'webdefacement_setting_id' => $value->id,
+                  'result_id' => null,
+                  'status' => 'Skipped',
+                  'score' => 0,
+                  'diff_percent' => 0,
+                  'hash_changed' => 0,
+                  'image_changed' => 0,
+                  'alert_sent' => 0,
+                  'reason' => 'network_error_retry_next: ' . substr($response['error'] ?? 'unknown', 0, 100),
+                  'checked_at' => now(),
+                  'created_at' => now(),
+                  'updated_at' => now(),
+                ]);
+              } catch (\Throwable $statEx) {
+                Log::error("[STAT_LOG] Failed to save network error stat: " . $statEx->getMessage());
               }
 
-              $webContent = $response['content'];
-              if ($webdefacment_id == 204) {
-                // บันทึกไว้ที่ storage/debug_web_204_xxxxxx.html
-                $debugPath = storage_path('debug_web_204_' . date('His') . '.html');
-                file_put_contents($debugPath, $webContent);
-                Log::info("Debug file saved to: " . $debugPath);
-              }
-              // Log::info(strlen($response['content']));
-              // Log::info(strlen($response['content']));
-            } else {
-              $response   = $this->getHtml($url);
+              continue; // ข้ามไปเว็บถัดไป ลองใหม่รอบหน้า
             }
+
+            $webContent = $response['content'];
+            
+            // Optional: Debug specific site if needed (can be removed or kept generic)
+            // if ($webdefacment_id == 204) { ... }
 
             if ($response['content'] === FALSE) {
               $webContent = "";
@@ -443,47 +482,22 @@ class WebDefacementProccess extends Command
               // ===== [SECTION MONITOR] (patched) =====
               try {
                 // 1) config
-
-                if ($WebdefacmentSetting_data->id == 173 || $WebdefacmentSetting_data->id == 174) {
-                  $selectors = json_decode($WebdefacmentSetting_data->hash_selectors ?: '[]', true);
-
-                  if (empty($selectors)) {
-                    $selectors = [
-                      "head",
-                      "#header",
-                      ".header",
-                      "nav",
-                      "#nav",
-                      ".nav",
-                      "main",
-                      "#main",
-                      ".main",
-                      "#content",
-                      ".content",
-                      "content",
-                      ".entry-content"
-                    ];
-                  } else {
-                    $removeItems = ["footer", "#footer", ".footer"];
-                    $selectors = array_values(array_diff($selectors, $removeItems));
-                  }
-                } else {
-                  $selectors = json_decode($WebdefacmentSetting_data->hash_selectors ?: '[]', true) ?: [
-                    "head",
-                    "#header",
-                    ".header",
-                    "nav",
-                    "#nav",
-                    ".nav",
-                    "main",
-                    "#main",
-                    ".main",
-                    "#content",
-                    ".content",
-                    "content",
-                    ".entry-content"
-                  ];
-                }
+                // Unified Selectors Logic: Use DB config or Default (No specific ID check)
+                $selectors = json_decode($WebdefacmentSetting_data->hash_selectors ?: '[]', true) ?: [
+                  "head",
+                  "#header",
+                  ".header",
+                  "nav",
+                  "#nav",
+                  ".nav",
+                  "main",
+                  "#main",
+                  ".main",
+                  "#content",
+                  ".content",
+                  "content",
+                  ".entry-content"
+                ];
 
                 $ignores   = json_decode($WebdefacmentSetting_data->hash_ignore_selectors ?: '[]', true) ?: [
 
@@ -522,6 +536,10 @@ class WebDefacementProccess extends Command
                   '^/static/',
                   '^/build/',
                   '^/dist/'
+                ];
+                $ignoreAsstPat = json_decode($WebdefacmentSetting_data->asset_ignore_patterns ?: '[]', true) ?: [
+                  'news_main_pic',
+                  'files-rice-',
                 ];
 
                 // 2) normalize + extract (เหมือนเดิม)
@@ -609,6 +627,16 @@ class WebDefacementProccess extends Command
                 list($assetsAllFull, $outboundNow) = $this->assetsAndOutboundFromHtml($domNorm, $url);
                 $assetsNow = [];
                 foreach ($assetsAllFull as $a) {
+                  // Check ignore
+                  $isIgnored = false;
+                  foreach ($ignoreAsstPat as $ipat) {
+                    if (@preg_match('/' . $ipat . '/', $a)) {
+                      $isIgnored = true;
+                      break;
+                    }
+                  }
+                  if ($isIgnored) continue;
+
                   foreach ($allowPat as $pat) {
                     if (@preg_match('/' . $pat . '/', $a)) {
                       $assetsNow[] = $a;
@@ -1055,11 +1083,18 @@ class WebDefacementProccess extends Command
 
                 $image_name =  $site_id . '_' . $url_id . '_' . 'Defacement_Now';
                 $result["image_url"] = "/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
-                $path_include = base_path() . '/public/screenshot/use/DownloadImage.php';
-                include_once($path_include);
-                $downloadImg = new \DownloadImage();
+                
+                // [FIX] Removed legacy DownloadImage (curl based). Rely on Puppeteer screenshot saved in getHtml3 above.
+                // $path_include = base_path() . '/public/screenshot/use/DownloadImage.php';
+                // include_once($path_include);
+                // $downloadImg = new \DownloadImage();
                 $Path_image = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
-                $downloadImg->download($url, $Path_image, $delay);
+                // $downloadImg->download($url, $Path_image, $delay);
+
+                // Verify if file exists (captured by Puppeteer)
+                if (!file_exists($Path_image)) {
+                    Log::warning("Screenshot not found (Puppeteer may have failed): " . $Path_image);
+                }
                 $result["image_path_original_full"] = $Path_image;
                 $result["image_path_original"] = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
                 $result["url_id"] = $url_id;
@@ -1190,6 +1225,9 @@ class WebDefacementProccess extends Command
               }
 
 
+
+              // [MATCH BACKUP] No increment for _score_percent - same as original backup file
+              // $totalConfig += 1;
 
               $pointAlert = $this->calculatePoint2($result, $totalConfig);
 
@@ -1334,11 +1372,22 @@ class WebDefacementProccess extends Command
               $WebdefacmentSetting_update->last_online = date("Y-m-d H:i:s");
               $WebdefacmentSetting_update->status_val = $status;
 
+              // 🟩 Update Image Logic (Modified)
+              // ถ้ามี image_url ให้บันทึกเสมอ ไม่ว่นจะเป็น ID อะไร
+              if (!empty($result['image_url'])) {
+                  $WebdefacmentSetting_update->image_last = $result['image_url'];
+                  // ถ้ายังไม่มี image_original หรือต้องการ update ให้ใส่ logic เพิ่มตรงนี้ได้
+                  // $WebdefacmentSetting_update->image_original = $result['image_url']; 
+              }
+
               if (in_array($WebdefacmentSetting_update->id, [173, 174])) {
-                // ไม่เปลี่ยนภาพ
+                // Legacy check kept primarily to avoid logic breakage if relying on side effects, 
+                // but main logic is now unified. 
               } else {
-                $WebdefacmentSetting_update->image_last = $result['image_url'];
-                $WebdefacmentSetting_update->image_original = $result['image_url'];
+                 if (!empty($result['image_url'])) {
+                    $WebdefacmentSetting_update->image_last = $result['image_url'];
+                    $WebdefacmentSetting_update->image_original = $result['image_url'];
+                 }
               }
 
               // try {
@@ -1551,18 +1600,19 @@ class WebDefacementProccess extends Command
 
 
 
-    $result2 = array();
-    $result2["Result"] = 1;
-    $result2["messes "] = "";
 
-    //print_r($result2);
   }
 
 
   private function calculatePoint2($trackList, $totalConfig)
   {
-    //  $totalPoint = $trackList['all_element_parcent'] + $trackList['file_size_parcent'] + $trackList['hash_parcent'] + $trackList['image_parcent'] + $trackList['blacklist_parcent'];
+    // Reverted: Removed _score_percent from calculation as requested
+    // $totalPoint = $trackList['all_element_parcent'] + $trackList['file_size_parcent'] + $trackList['hash_parcent'] + $trackList['image_parcent'] + $trackList['blacklist_parcent'];
+    
+    // [ACTIVE] Use granular _score_percent (Deep Scan) instead of binary hash_parcent
     $totalPoint = $trackList['all_element_parcent'] + $trackList['file_size_parcent'] + $trackList['_score_percent'] + $trackList['image_parcent'] + $trackList['blacklist_parcent'];
+    
+    if ($totalConfig == 0) return 0;
     $result = $totalPoint / $totalConfig;
     return $result;
   }
@@ -2265,20 +2315,36 @@ class WebDefacementProccess extends Command
       // 🟩 เปิด JavaScript
       $page->setJavaScriptEnabled(true);
 
-      $page->goto($url, [
-        'timeout' => 90000,
-        'waitUntil' => ['load', 'domcontentloaded', 'networkidle0'], // รอ network ให้เงียบสนิท
+      // ✅ ใช้ waitUntil strategy ที่ต่างกันตาม retry count
+      // - retry 0: networkidle2 (ผ่อนปรนกว่า networkidle0)
+      // - retry 1+: load + domcontentloaded (เร็วขึ้น)
+      $waitStrategies = [
+          ['load', 'domcontentloaded', 'networkidle2'],  // retry 0
+          ['load', 'domcontentloaded'],                   // retry 1
+          ['load'],                                        // retry 2+
+      ];
+      $strategyIdx = min($retryCount, count($waitStrategies) - 1);
+      $waitUntil = $waitStrategies[$strategyIdx];
+      $timeout = $retryCount === 0 ? 90000 : 60000; // ลด timeout ใน retry
+      
+      \Log::info("[getHtml3] Attempt " . ($retryCount + 1) . " for {$url} (waitUntil: " . implode(',', $waitUntil) . ")");
+
+      $response = $page->goto($url, [
+        'timeout' => $timeout,
+        'waitUntil' => $waitUntil,
       ]);
 
-      // 🟩 รอให้หน้าเว็บโหลดเสร็จ
-      sleep(2);
+      // 🟩 เก็บ Status Code
+      $httpStatus = $response ? $response->status() : 0;
 
-      // 🟩 SCROLL เพื่อ TRIGGER LAZY LOADING
+      // 🟩 รอให้หน้าเว็บโหลดเสร็จ
+      sleep(1);
+
+      // 🟩 SCROLL เพื่อ TRIGGER LAZY LOADING (Optimized)
       $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
-            async () => {
-                // Scroll ลงไปทีละน้อยเพื่อ trigger lazy loading
-                const scrollStep = 300;
-                const scrollDelay = 200;
+            return (async () => {
+                const scrollStep = 800; 
+                const scrollDelay = 100; 
                 
                 const totalHeight = Math.max(
                     document.body.scrollHeight,
@@ -2292,12 +2358,12 @@ class WebDefacementProccess extends Command
                 
                 // Scroll กลับขึ้นบน
                 window.scrollTo(0, 0);
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
+                await new Promise(resolve => setTimeout(resolve, 200));
+            })();
         "));
 
       // 🟩 รอ network requests ที่เกิดจาก scroll
-      sleep(3); // รอให้ lazy loading โหลดเสร็จ
+      sleep(2); // ลดเวลาลงเล็กน้อย
 
       // 🟩 WAIT UNTIL DOM STABLE (เพิ่มเวลารอ)
       $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
@@ -2343,17 +2409,65 @@ class WebDefacementProccess extends Command
 
       // 🟩 ตรวจสอบว่า content ที่ได้มามีความสมบูรณ์หรือไม่
       if (strlen($content) < 500) {
-        \Log::warning("getHtml3: Content too short ({$url}), length: " . strlen($content));
-        throw new \Exception("Content too short, possible network error");
+        $title = $page->title();
+        $msg = "Content too short. Len: " . strlen($content) . ", Status: {$httpStatus}, Title: {$title}";
+        \Log::warning("getHtml3: {$msg} ({$url})");
+        throw new \Exception($msg);
       }
 
-      // 🟩 Log เพื่อ debug
-      $elementCount = $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
-            () => document.querySelectorAll('*').length
-        "));
-      \Log::info("getHtml3: Captured {$elementCount} elements from {$url}");
+      // 🟩 Screenshot Capture (Optional)
+      $screenshotBase64 = null;
+      $screenshotSaved = false;
 
-      return ['content' => $content, 'success' => true];
+      // 1. ถ้ามี Path ให้ Save ลงไฟล์เลย (ประหยัด memory)
+      if (!empty($options['screenshot_path'])) {
+          try {
+              $dir = dirname($options['screenshot_path']);
+              
+              // สร้าง directory ถ้ายังไม่มี
+              if (!is_dir($dir)) {
+                  $mkdirResult = @mkdir($dir, 0775, true);
+                  if ($mkdirResult) {
+                      @chmod($dir, 0775);
+                  } else {
+                      \Log::warning("[getHtml3] Failed to create directory: {$dir}");
+                  }
+              }
+              
+              // ถ่ายภาพ
+              $page->screenshot([
+                  'path' => $options['screenshot_path'],
+                  'fullPage' => true
+              ]);
+              
+              // Verify ว่าไฟล์ถูกสร้างจริง
+              if (file_exists($options['screenshot_path'])) {
+                  $screenshotSaved = true;
+              } else {
+                  \Log::warning("[getHtml3] Screenshot command ran but file not created at {$options['screenshot_path']}");
+              }
+          } catch (\Throwable $e) {
+              \Log::warning("[getHtml3] Screenshot save failed ({$url}) - " . $e->getMessage());
+          }
+      } 
+      // 2. ถ้าไม่มี Path แต่ขอ Screenshot ให้ส่ง Base64 กลับไป
+      elseif (!empty($options['screenshot'])) {
+          try {
+              $screenshotBase64 = $page->screenshot([
+                  'encoding' => 'base64',
+                  'fullPage' => true
+              ]);
+          } catch (\Throwable $e) {
+              \Log::warning("getHtml3: Screenshot base64 failed ({$url}) - " . $e->getMessage());
+          }
+      }
+
+      return [
+          'content' => $content, 
+          'success' => true, 
+          'screenshot_base64' => $screenshotBase64,
+          'screenshot_saved' => $screenshotSaved
+      ];
     } catch (\Throwable $e) {
       $errorMsg = $e->getMessage();
 
@@ -2390,7 +2504,9 @@ class WebDefacementProccess extends Command
 
       // 🟩 ถ้า retry หมดแล้วหรือไม่ใช่ network error ให้ใช้ fallback
       // แต่ return พร้อม error flag เพื่อไม่ให้ diff
-      $fallbackResult = $this->getHtmlFallback($url);
+      // $fallbackResult = $this->getHtmlFallback($url); // DISABLE FALLBACK
+      $fallbackResult = [];
+      $fallbackResult['content'] = ''; 
       $fallbackResult['success'] = false;
       $fallbackResult['error'] = $errorMsg;
 

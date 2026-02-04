@@ -58,7 +58,21 @@ class WebDefacementProccessbyWebdefacment_id extends Command
   public function handle()
   {
     $webdefacment_id = $this->argument('webdefacment_id');
-    $WebdefacmentSetting_datas =  WebdefacmentSetting::where('id', $webdefacment_id)->where('webdeflacement_progress', 1)->whereNull('deleted_at')->get();
+    
+    // 🟩 Debug logging
+    $debugRecord = WebdefacmentSetting::where('id', $webdefacment_id)->whereNull('deleted_at')->first();
+    \Log::info("[DefaceNow] ID: {$webdefacment_id}, webdeflacement_progress: " . ($debugRecord->webdeflacement_progress ?? 'NOT_FOUND'));
+    
+    // 🟩 เปลี่ยนเป็นไม่เช็ค webdeflacement_progress เพื่อให้ปุ่มทำงานได้เสมอ
+    $WebdefacmentSetting_datas =  WebdefacmentSetting::where('id', $webdefacment_id)->whereNull('deleted_at')->get();
+    
+    if ($WebdefacmentSetting_datas->isEmpty()) {
+        \Log::warning("[DefaceNow] No records found for ID: {$webdefacment_id}");
+        return;
+    }
+    
+    \Log::info("[DefaceNow] Found " . $WebdefacmentSetting_datas->count() . " record(s) for ID: {$webdefacment_id}");
+    
     foreach ($WebdefacmentSetting_datas as $key => $value) {
       $WebdefacmentSetting_update =   WebdefacmentSetting::find($value->id);
       $WebdefacmentSetting_update->webdeflacement_progress = 2;
@@ -117,13 +131,20 @@ class WebDefacementProccessbyWebdefacment_id extends Command
 
 
             $image_path_2 = "";
-            $response   = $this->getHtml($url);
+            // 🟩 ใช้ getHtml3 (Puppeteer) เพื่อให้จับ JS-rendered content ได้
+            $response   = $this->getHtml3($url);
 
-            if ($response['content'] === FALSE) {
+            // 🟩 รองรับ format จาก getHtml3
+            $htmlFetchFailed = !isset($response['content']) 
+                            || $response['content'] === FALSE 
+                            || $response['content'] === '' 
+                            || (isset($response['success']) && $response['success'] === false);
+
+            if ($htmlFetchFailed) {
               $webContent = "";
               $result["Result"] = 0;
-              $result["messes "] = "Html not found";
-              Log::info($result["messes "]);
+              $result["messes "] = "Html not found" . (isset($response['error']) ? ": " . $response['error'] : "");
+              Log::warning("[DefaceNow] HTML fetch failed for {$url}: " . ($response['error'] ?? 'unknown'));
             } else {
 
               // $webContent = $response['content'];
@@ -592,7 +613,7 @@ class WebDefacementProccessbyWebdefacment_id extends Command
               }
               if ($WebdefacmentSetting_data->filesize == 1) {
                 $totalConfig += 1;
-                $file_size = strlen($webContent); //filesize
+                $file_size = strlen($domNorm); //filesize - 🟩 Sync: ใช้ $domNorm เหมือน WebDefacementProccess
                 $result["file_size"] = $file_size;
 
                 if ($WebdefacmentDataOriginal_data->filesize == null || $WebdefacmentDataOriginal_data->filesize == 0) {
@@ -600,20 +621,22 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                   $WebdefacmentDataOriginal_data->save();
                 }
 
-                $diff = abs($WebdefacmentDataOriginal_data->filesize - $result['file_size']);
+                // 🟩 Sync กับ WebDefacementProccess: ใช้สัดส่วนจริง
+                $original = $WebdefacmentDataOriginal_data->filesize;
+                $new      = $result['file_size'];
+                $diff     = abs($original - $new);
 
-                if ($diff == 0) {
-                  $result['file_size_parcent'] = 0;
-                } else if ($diff == 1) {
-                  $result['file_size_parcent'] = 20;
-                } else if ($diff == 2) {
-                  $result['file_size_parcent'] = 40;
-                } else if ($diff == 3) {
-                  $result['file_size_parcent'] = 60;
-                } else if ($diff == 4) {
-                  $result['file_size_parcent'] = 80;
+                // ป้องกันหารศูนย์
+                if ($original === 0) {
+                  $result['file_size_parcent'] = $new > 0 ? 100 : 0;
                 } else {
-                  $result['file_size_parcent'] = 100;
+                  // คำนวณสัดส่วนต่างจากไฟล์เดิม
+                  $percent = ($diff / $original) * 100;
+
+                  // ถ้าอยากจำกัดสูงสุดไม่เกิน 100
+                  if ($percent > 100) $percent = 100;
+
+                  $result['file_size_parcent'] = round($percent, 2); // ปัดทศนิยม 2 ตำแหน่ง
                 }
 
 
@@ -642,7 +665,7 @@ class WebDefacementProccessbyWebdefacment_id extends Command
               }
               if ($WebdefacmentSetting_data->element == 1) {
                 $totalConfig += 1;
-                $allElement = preg_match_all('/<([^\/!][a-z1-9]*)/i', $webContent, $matches);
+                $allElement = preg_match_all('/<([^\/!][a-z1-9]*)/i', $domNorm, $matches); // 🟩 Sync: ใช้ $domNorm เหมือน WebDefacementProccess
                 $result['all_element'] = (int)$allElement;
 
                 if ($WebdefacmentDataOriginal_data->element == null || $WebdefacmentDataOriginal_data->element == 0) {
@@ -650,20 +673,17 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                   $WebdefacmentDataOriginal_data->save();
                 }
 
-                $diff = abs($WebdefacmentDataOriginal_data->element - $result['all_element']);
+                // 🟩 Sync กับ WebDefacementProccess: ใช้สัดส่วนจริง
+                $original = $WebdefacmentDataOriginal_data->element;
+                $new      = $result['all_element'];
+                $diff     = abs($original - $new);
 
-                if ($diff == 0) {
-                  $result['all_element_parcent'] = 0;
-                } else if ($diff <= 3) {
-                  $result['all_element_parcent'] = 20;
-                } else if ($diff <= 8) {
-                  $result['all_element_parcent'] = 40;
-                } else if ($diff <= 12) {
-                  $result['all_element_parcent'] = 60;
-                } else if ($diff <= 15) {
-                  $result['all_element_parcent'] = 80;
+                if ($original === 0) {
+                  $result['all_element_parcent'] = $new > 0 ? 100 : 0;
                 } else {
-                  $result['all_element_parcent'] = 100;
+                  $percent = ($diff / $original) * 100;  // เอาสัดส่วนการเปลี่ยนแปลงจริง
+                  if ($percent > 100) $percent = 100;    // จำกัดสูงสุดที่ 100%
+                  $result['all_element_parcent'] = round($percent, 2);
                 }
 
 
@@ -1328,152 +1348,109 @@ class WebDefacementProccessbyWebdefacment_id extends Command
   // ===== Helpers for section hashing & diff (PHP 7 compatible) =====
   private function normalizeHtml(string $html, array $ignoreSelectors = []): string
   {
-    // --- Fast strip ก่อน ลดงาน DOM ---
-    $html = preg_replace('#<script\b[^>]*>.*?</script>#is', '', $html);
-    $html = preg_replace('#<style\b[^>]*>.*?</style>#is',   '', $html);
-    $html = preg_replace('#<!--.*?-->#s',                   '', $html);
+    libxml_use_internal_errors(true);
 
-    // --- Encoding safety ---
-    if (!preg_match('//u', $html)) {
-      $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-    }
-
-    // --- โหลด DOM แบบ no-network / no-validate ---
+    // --- โหลด DOM ครั้งเดียว ---
     $doc = new \DOMDocument('1.0', 'UTF-8');
-    $doc->preserveWhiteSpace = false;
-    $doc->formatOutput = false;
-
-    $prevUseInternal = libxml_use_internal_errors(true);
-    if (function_exists('libxml_disable_entity_loader')) {
-      $prevDisable = libxml_disable_entity_loader(true); // กัน XXE/โหลดภายนอก (PHP 7.x)
-    }
-
-    $loaded = false;
-    if (PHP_VERSION_ID >= 70300) {
-      $loaded = @$doc->loadHTML($html, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NONET | LIBXML_COMPACT);
-    } else {
-      $loaded = @$doc->loadHTML($html); // PHP 7.0–7.2 ไม่มี options
-    }
-
-    if (function_exists('libxml_disable_entity_loader')) {
-      libxml_disable_entity_loader($prevDisable ?? false);
-    }
+    @$doc->loadHTML($html, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NONET | LIBXML_COMPACT);
     libxml_clear_errors();
-    libxml_use_internal_errors($prevUseInternal);
+    libxml_use_internal_errors(false);
 
-    if (!$loaded) {
-      // ถ้าโหลด DOM ไม่ขึ้น ให้คืนค่าที่ยุบช่องว่างแล้ว
-      return trim(preg_replace('/\s+/', ' ', $html));
-    }
+    $xpath = new \DOMXPath($doc);
 
-    // --- ตัด noscript/template และ ignore selectors ด้วย Crawler ---
-    $crawler = new Crawler($doc);
+    // --- ดึง <head> และ <body> แยกไว้ก่อน ---
+    $headNode = $doc->getElementsByTagName('head')->item(0);
+    $bodyNode = $doc->getElementsByTagName('body')->item(0);
+    $headHtml = $headNode ? $doc->saveHTML($headNode) : '<head></head>';
+    if (!$bodyNode) return $html; // กัน fail ถ้าไม่มี body
 
-    foreach (['noscript', 'template'] as $tag) {
-      foreach ($crawler->filter($tag) as $n) {
-        if ($n->parentNode) {
-          $n->parentNode->removeChild($n);
-        }
-      }
-    }
+    // --- รวม ignore selectors + default dynamic selectors ---
+    $defaultSelectors = [
+      "//*[contains(@class,'time')]",
+      "//*[contains(@class,'date')]",
+      "//*[contains(@class,'timestamp')]",
+      "//*[contains(@class,'counter')]",
+      "//*[contains(@class,'view')]",
+      "//*[contains(@class,'carousel')]",
+      "//*[contains(@class,'slider')]",
+      "//*[contains(@class,'ticker')]",
+      "//*[contains(@class,'marquee')]",
+      "//*[contains(@class,'swiper-container')]",
+      "//*[contains(@class,'ads')]",
+      "//*[contains(@class,'advert')]",
+      "//*[contains(@class,'banner')]",
+      "//*[contains(@class,'toast')]",
+      "//*[contains(@class,'modal')]",
+      "//*[contains(@class,'popup')]",
+      "//*[contains(@class,'live')]",
+      "//*[contains(@class,'countdown')]",
+      "//*[contains(@class,'slick-track')]",
+      "//*[contains(@class,'slick-slide')]",
+      "//*[contains(@class,'swiper-wrapper')]",
+      "//*[contains(@class,'swiper-slide')]",
+      "//*[contains(@class,'fade')]",
+      "//*[contains(@class,'floating-icon')]",
+      "//*[contains(@class,'footer-bottom-bar')]",
+      "//*[contains(@class,'cookie')]",
+      "//*[contains(@class,'header-top-bar')]",
+      "//*[@id='fb-root']",
+      "//*[contains(@class,'fb-customerchat')]",
+      "//*[starts-with(@id,'__BVID__')]",
+    ];
 
-    foreach ($ignoreSelectors as $sel) {
+    $selectors = array_values(array_unique(array_merge($ignoreSelectors, $defaultSelectors)));
+
+    // --- ลบ node ที่ match (เฉพาะใน body) ---
+    foreach ($selectors as $sel) {
       try {
-        foreach ($crawler->filter($sel) as $n) {
-          if ($n->parentNode) {
+        $nodeList = $xpath->query($sel);
+        if (!$nodeList || $nodeList->length === 0) continue;
+        $nodes = iterator_to_array($nodeList, false);
+
+        foreach ($nodes as $n) {
+          // skip ถ้า node อยู่ใน head
+          $p = $n->parentNode;
+          $insideHead = false;
+          while ($p) {
+            if (strtolower($p->nodeName) === 'head') {
+              $insideHead = true;
+              break;
+            }
+            $p = $p->parentNode;
+          }
+          if (!$insideHead && $n->parentNode) {
             $n->parentNode->removeChild($n);
           }
         }
       } catch (\Throwable $e) {
-        // selector ไม่ถูกต้อง → ข้าม
+        // ข้าม selector ที่ query ไม่ได้
       }
     }
 
-    // --- ลบ token/time/query สุ่ม ในทั้งเอกสาร ---
-    $html2 = $doc->saveHTML() ?: '';
-    $html2 = preg_replace([
-      '/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/',                 // ISO timestamp
-      '/csrf[_-]?token\s*=\s*[\'"][A-Za-z0-9+\/=]{20,}[\'"]/',  // csrf token
-      '/([?&])(cacheBust|cb|_|\d{1,2})=\d+/',                   // random qs
-    ], '', $html2);
-
-    // --- จัดเรียงแอตทริบิวต์ (จำกัดเพื่อความเร็ว/กันค้าง) ---
-    // เฉพาะเมื่อขนาดไม่เกิน 2.5 MB และเฉพาะแท็กสำคัญ
-    $MAX_BYTES_FOR_ATTR_SORT = 2500000;
-    $SORT_TAGS = [
-      'html',
-      'head',
-      'body',
-      'meta',
-      'link',
-      'script',
-      'img',
-      'a',
-      'div',
-      'span',
-      'header',
-      'footer',
-      'main',
-      'section',
-      'article',
-      'nav',
-      'h1',
-      'h2',
-      'h3',
-      'h4',
-      'h5',
-      'h6'
-    ];
-
-    if (strlen($html2) <= $MAX_BYTES_FOR_ATTR_SORT) {
-      $doc2 = new \DOMDocument('1.0', 'UTF-8');
-      $doc2->preserveWhiteSpace = false;
-      $doc2->formatOutput = false;
-
-      $prevUseInternal = libxml_use_internal_errors(true);
-      if (PHP_VERSION_ID >= 70300) {
-        @$doc2->loadHTML($html2, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NONET | LIBXML_COMPACT);
-      } else {
-        @$doc2->loadHTML($html2);
+    // --- ล้าง attribute สุ่มใน body ---
+    foreach ($doc->getElementsByTagName('*') as $el) {
+      if (!$el->hasAttributes()) continue;
+      $remove = [];
+      foreach (iterator_to_array($el->attributes) as $attr) {
+        $name = strtolower($attr->name);
+        if (preg_match('/^(data-|aria-|nonce|integrity|crossorigin)/', $name)) $remove[] = $name;
+        if (strpos($name, 'on') === 0) $remove[] = $name;
       }
-      libxml_clear_errors();
-      libxml_use_internal_errors($prevUseInternal);
-
-      $xp2 = new \DOMXPath($doc2);
-      $xpathExpr = '//' . implode(' | //', $SORT_TAGS);
-
-      foreach ($xp2->query($xpathExpr) as $el) {
-        /** @var \DOMElement $el */
-        if (!$el->hasAttributes()) continue;
-
-        $attrs = [];
-        foreach (iterator_to_array($el->attributes) as $attr) {
-          $name = $attr->name;
-          // ตัด attrs ที่สุ่ม/เสียงดัง
-          if (preg_match('/^(data-|aria-)/', $name)) continue;
-          if ($name === 'nonce' || $name === 'integrity' || $name === 'crossorigin') continue;
-          if ($name === 'onclick' || strpos($name, 'on') === 0) continue; // inline js
-          $attrs[$name] = $attr->value ?? '';
-        }
-
-        // เคลียร์ และใส่คืนแบบเรียงชื่อคงที่
-        while ($el->attributes->length) {
-          $el->removeAttribute($el->attributes->item(0)->name);
-        }
-        if ($attrs) {
-          ksort($attrs, SORT_NATURAL);
-          foreach ($attrs as $k => $v) {
-            $el->setAttribute($k, $v);
-          }
-        }
+      foreach ($remove as $r) {
+        $el->removeAttribute($r);
       }
-
-      $html2 = $doc2->saveHTML() ?: $html2;
     }
 
-    // --- ยุบช่องว่างและคืนค่า ---
-    $html2 = preg_replace('/\s+/', ' ', $html2);
-    return trim($html2);
+    // --- save body ที่เหลือ ---
+    $bodyHtml = $doc->saveHTML($bodyNode);
+
+    // --- ประกอบกลับ (ใช้ head เดิมจาก DOM) ---
+    $finalHtml = "<!DOCTYPE html>\n<html>\n{$headHtml}\n{$bodyHtml}\n</html>";
+
+    // --- ยุบช่องว่าง ---
+    $finalHtml = preg_replace('/\s+/', ' ', $finalHtml);
+
+    return trim($finalHtml);
   }
 
   private function sectionsText(string $normalizedHtml, array $selectors): array
@@ -1663,5 +1640,267 @@ class WebDefacementProccessbyWebdefacment_id extends Command
     if ($h === '-' || $h === 'null' || $h === 'undefined') return true;
 
     return false;
+  }
+
+  // ===== getHtml3: Puppeteer-based HTML fetch (synced from WebDefacementProccess) =====
+  private function getHtml3($url, $retryCount = 0, $options = [])
+  {
+    $browser = null;
+    $maxRetries = 10;
+
+    try {
+      ini_set('max_execution_time', 300);
+      ini_set('default_socket_timeout', 300);
+      set_time_limit(0);
+
+      putenv('NODE_PATH=' . base_path('puphpeteer_env/node_modules'));
+      $_ENV['NODE_PATH'] = base_path('puphpeteer_env/node_modules');
+
+      // 🟩 ปิด Chrome ที่ค้างไว้
+      @exec("pkill -f 'chrome --headless' >/dev/null 2>&1");
+
+      $puppeteer = new \Nesk\Puphpeteer\Puppeteer([
+        'read_timeout' => 300,
+        'idle_timeout' => 300,
+      ]);
+
+      $browser = $puppeteer->launch([
+        'executablePath' => '/usr/bin/google-chrome',
+        'headless' => true,
+        'args' => [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu',
+          '--single-process',
+          '--no-zygote',
+          '--disable-background-timer-throttling',
+          '--disable-renderer-backgrounding',
+          '--disable-background-networking',
+          '--disable-features=IsolateOrigins,site-per-process',
+          '--window-size=1920,1080',
+        ],
+      ]);
+
+      $page = $browser->newPage();
+      $page->setDefaultNavigationTimeout(90000);
+
+      // 🟩 Set User-Agent
+      if (!empty($options['userAgent'])) {
+          $page->setUserAgent($options['userAgent']);
+      } else {
+          $page->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+      }
+
+      $page->setJavaScriptEnabled(true);
+
+      // ✅ waitUntil strategy
+      $waitStrategies = [
+          ['load', 'domcontentloaded', 'networkidle2'],
+          ['load', 'domcontentloaded'],
+          ['load'],
+      ];
+      $strategyIdx = min($retryCount, count($waitStrategies) - 1);
+      $waitUntil = $waitStrategies[$strategyIdx];
+      $timeout = $retryCount === 0 ? 90000 : 60000;
+      
+      \Log::info("[getHtml3] Attempt " . ($retryCount + 1) . " for {$url} (waitUntil: " . implode(',', $waitUntil) . ")");
+
+      $response = $page->goto($url, [
+        'timeout' => $timeout,
+        'waitUntil' => $waitUntil,
+      ]);
+
+      $httpStatus = $response ? $response->status() : 0;
+      sleep(1);
+
+      // 🟩 SCROLL เพื่อ TRIGGER LAZY LOADING
+      $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
+            return (async () => {
+                const scrollStep = 800; 
+                const scrollDelay = 100; 
+                
+                const totalHeight = Math.max(
+                    document.body.scrollHeight,
+                    document.documentElement.scrollHeight
+                );
+                
+                for (let scrolled = 0; scrolled < totalHeight; scrolled += scrollStep) {
+                    window.scrollTo(0, scrolled);
+                    await new Promise(resolve => setTimeout(resolve, scrollDelay));
+                }
+                
+                window.scrollTo(0, 0);
+                await new Promise(resolve => setTimeout(resolve, 200));
+            })();
+        "));
+
+      sleep(2);
+
+      // 🟩 WAIT UNTIL DOM STABLE
+      $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
+            () => {
+                return new Promise(resolve => {
+                    let last = document.body.innerHTML.length;
+                    let stableCount = 0;
+                    let attempts = 0;
+                    const maxAttempts = 60;
+
+                    const check = () => {
+                        attempts++;
+                        const now = document.body.innerHTML.length;
+
+                        if (now === last) {
+                            stableCount++;
+                            if (stableCount >= 4) return resolve(true);
+                        } else {
+                            stableCount = 0;
+                        }
+
+                        last = now;
+
+                        if (attempts >= maxAttempts) {
+                            console.log('DOM stability timeout, proceeding anyway');
+                            return resolve(true);
+                        }
+
+                        setTimeout(check, 500);
+                    };
+
+                    check();
+                });
+            }
+        "));
+
+      sleep(1);
+
+      $content = $page->content();
+
+      if (strlen($content) < 500) {
+        $title = $page->title();
+        $msg = "Content too short. Len: " . strlen($content) . ", Status: {$httpStatus}, Title: {$title}";
+        \Log::warning("getHtml3: {$msg} ({$url})");
+        throw new \Exception($msg);
+      }
+
+      // 🟩 Screenshot Capture (Optional)
+      $screenshotBase64 = null;
+      $screenshotSaved = false;
+
+      if (!empty($options['screenshot_path'])) {
+          try {
+              $dir = dirname($options['screenshot_path']);
+              if (!is_dir($dir)) {
+                  $mkdirResult = @mkdir($dir, 0775, true);
+                  if ($mkdirResult) {
+                      @chmod($dir, 0775);
+                  } else {
+                      \Log::warning("[getHtml3] Failed to create directory: {$dir}");
+                  }
+              }
+              
+              $page->screenshot([
+                  'path' => $options['screenshot_path'],
+                  'fullPage' => true
+              ]);
+              
+              if (file_exists($options['screenshot_path'])) {
+                  $screenshotSaved = true;
+              } else {
+                  \Log::warning("[getHtml3] Screenshot command ran but file not created at {$options['screenshot_path']}");
+              }
+          } catch (\Throwable $e) {
+              \Log::warning("[getHtml3] Screenshot save failed ({$url}) - " . $e->getMessage());
+          }
+      } 
+      elseif (!empty($options['screenshot'])) {
+          try {
+              $screenshotBase64 = $page->screenshot([
+                  'encoding' => 'base64',
+                  'fullPage' => true
+              ]);
+          } catch (\Throwable $e) {
+              \Log::warning("getHtml3: Screenshot base64 failed ({$url}) - " . $e->getMessage());
+          }
+      }
+
+      return [
+          'content' => $content, 
+          'success' => true, 
+          'screenshot_base64' => $screenshotBase64,
+          'screenshot_saved' => $screenshotSaved
+      ];
+    } catch (\Throwable $e) {
+      $errorMsg = $e->getMessage();
+
+      $isNetworkError = (
+        stripos($errorMsg, 'ERR_SOCKET_NOT_CONNECTED') !== false ||
+        stripos($errorMsg, 'ERR_CONNECTION') !== false ||
+        stripos($errorMsg, 'ERR_NETWORK') !== false ||
+        stripos($errorMsg, 'ERR_TIMED_OUT') !== false ||
+        stripos($errorMsg, 'Navigation timeout') !== false ||
+        stripos($errorMsg, 'Content too short') !== false
+      );
+
+      \Log::error("Puphpeteer Error (attempt " . ($retryCount + 1) . "/{$maxRetries}): {$errorMsg} at {$url}");
+
+      if ($isNetworkError && $retryCount < $maxRetries) {
+        \Log::info("Retrying {$url} (attempt " . ($retryCount + 2) . "/{$maxRetries})");
+
+        if ($browser) {
+          try {
+            $browser->close();
+          } catch (\Throwable $ex) {
+            // ignore
+          }
+        }
+
+        sleep(2 + $retryCount);
+
+        return $this->getHtml3($url, $retryCount + 1, $options);
+      }
+
+      // 🟩 fallback disabled
+      $fallbackResult = [];
+      $fallbackResult['content'] = ''; 
+      $fallbackResult['success'] = false;
+      $fallbackResult['error'] = $errorMsg;
+
+      return $fallbackResult;
+    } finally {
+      if ($browser) {
+        try {
+          $browser->close();
+        } catch (\Throwable $ex) {
+          \Log::warning("Browser close failed: " . $ex->getMessage());
+        }
+      }
+    }
+  }
+
+  // Fallback function using curl
+  private function getHtmlFallback($url)
+  {
+    $content = $this->get_dataa3($url);
+    return array(
+      'content' => $content
+    );
+  }
+
+  function get_dataa3($url)
+  {
+    $ch = curl_init();
+    $timeout = 5;
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0)");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+    $data = curl_exec($ch);
+    curl_close($ch);
+    return $data;
   }
 }
