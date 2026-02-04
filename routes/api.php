@@ -292,6 +292,20 @@ Route::group(['prefix' => 'v1/saveData/{code}'], function () {
     Route::post('getIndicator', 'Api\ApiNewSaveDataController@getIndicator');
 });
 
+// Public API for Events & Indicators (with API Token Auth)
+Route::group(['prefix' => 'v1/public', 'middleware' => 'api.token'], function () {
+    Route::get('events', 'Api\PublicEventApiController@listEvents');
+    Route::get('events/feed', 'Api\PublicEventApiController@listEventsWithIndicators');
+    Route::get('events/{pulse_id}', 'Api\PublicEventApiController@getEvent');
+    Route::get('events/{pulse_id}/indicators', 'Api\PublicEventApiController@getEventIndicators');
+    Route::get('indicators', 'Api\PublicEventApiController@listIndicators');
+});
+
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+
+// Service API - Receive Events & Indicators (with Service API Token Auth)
+Route::group(['prefix' => 'v1/service', 'middleware' => 'api.token.service'], function () {
+    Route::post('events', 'Api\ServiceApiController@receiveEvent');
+});
