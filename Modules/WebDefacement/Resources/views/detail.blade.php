@@ -254,6 +254,13 @@ return (string)$v;
                 ];
                 }
 
+                if ($chk->score > -1) {
+                    $data['all']['deep_scan'] = [
+                        'name' => 'Structure',
+                        'value' => (float) ($chk->score * 100),
+                    ];
+                }
+
                 }
                 } catch (\Throwable $th) {
                 $chk = [];
@@ -822,6 +829,14 @@ return (string)$v;
         
         $('#btn-export').click(function() {
             $('#exportModal').modal('show');
+        });
+        
+        $('#exportModal').on('show.bs.modal', function() {
+            $('#float-btns').hide();
+        });
+        
+        $('#exportModal').on('hidden.bs.modal', function() {
+            $('#float-btns').show();
         });
         
         $('#btn-do-export').click(function() {

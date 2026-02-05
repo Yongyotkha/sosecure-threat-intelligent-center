@@ -41,14 +41,23 @@ class SystemSettingsController extends Controller
     {
 
         $get_data = $this->siteSettings->get_data($id);
-        $token = '';
+        // Get Feed Insight token (default type or null)
+        $token = ApiToken::where('site_id', $get_data->id)
+            ->where(function($q) {
+                $q->whereNull('type')
+                  ->orWhere('type', 'feed_insight');
+            })
+            ->orderBy('id', 'desc')
+            ->first();
+        $data['token'] = $token ? $token->token : '';
 
-        $token = ApiToken::getToken($get_data->id);
-        if ($token != '' && $token != null) {
-            $data['token'] = $token;
-        } else {
-            $data['token'] = '';
-        }
+        // Get Service Receive API token
+        $tokenServiceReceive = ApiToken::where('site_id', $get_data->id)
+            ->where('type', 'service_receive_api')
+            ->orderBy('id', 'desc')
+            ->first();
+        $data['token_service_receive'] = $tokenServiceReceive ? $tokenServiceReceive->token : '';
+
         $data['siteSettings'] = $get_data;
         $data['page'] = 'SystemSettings';
         $data['last_version'] = DeployCode::where('status', 1)->orderBy('version', 'desc')->where('deleted_at', null)->first()->version;

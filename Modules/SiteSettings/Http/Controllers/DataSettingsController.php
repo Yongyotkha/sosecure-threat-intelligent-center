@@ -248,11 +248,15 @@ class DataSettingsController extends Controller
                 if (count($request->menu_sub) > 0) {
                     foreach ($request->menu_sub as $menu_sub) {
                         $tb_menu_sub = Menu_sub::select("id")->where("code", $menu_sub)->first();
-                        $site_menu_sub_permission = new site_menu_sub_permission;
-                        $site_menu_sub_permission->site_id = $SiteSettings->id;
-                        $site_menu_sub_permission->menu_sub_id = $tb_menu_sub->id;
-                        $site_menu_sub_permission->menu_sub_code = $menu_sub;
-                        $site_menu_sub_permission->save();
+                        if ($tb_menu_sub) {
+                            $site_menu_sub_permission = new site_menu_sub_permission;
+                            $site_menu_sub_permission->site_id = $SiteSettings->id;
+                            $site_menu_sub_permission->menu_sub_id = $tb_menu_sub->id;
+                            $site_menu_sub_permission->menu_sub_code = $menu_sub;
+                            $site_menu_sub_permission->save();
+                        } else {
+                            Log::warning("Menu_sub not found with code: " . $menu_sub);
+                        }
                     }
                 }
             }

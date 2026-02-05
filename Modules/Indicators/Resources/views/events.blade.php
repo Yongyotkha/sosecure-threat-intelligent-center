@@ -433,32 +433,6 @@ select.c-tags {
         margin-top: 0.25rem;
     }
 
-    .table-loading-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.4);
-        z-index: 99999;
-        justify-content: center;
-        align-items: center;
-    }
-    .table-loading-overlay.show {
-        display: flex !important;
-    }
-    .table-loading-overlay .loading-box {
-        background: #fff;
-        padding: 15px 40px;
-        border-radius: 4px;
-        text-align: center;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        font-size: 14px;
-        color: #333;
-    }
     .dataTables_processing {
         display: none !important;
     }
@@ -705,9 +679,6 @@ select.c-tags {
 
                                         
 
-                                    <div id="table-loading" class="table-loading-overlay">
-                                        <div class="loading-box">Loading...</div>
-                                    </div>
                                     <div class="table-responsive">
                                         <table class="table table-striped" id="table_events">
                                             <thead>
@@ -940,14 +911,6 @@ select.c-tags {
             });
 
             $('.select2-option').select2();
-
-            function showTableLoading() {
-                $('#table-loading').addClass('show');
-            }
-            
-            function hideTableLoading() {
-                $('#table-loading').removeClass('show');
-            }
 
             var start_date = '';
             var end_date = '';
@@ -1267,7 +1230,7 @@ select.c-tags {
             });
 
             function load_table(page = 1) {
-                showTableLoading();
+                loading('load');
                 
                 $('#table_events').DataTable({
                     ordering: true,
@@ -1282,9 +1245,12 @@ select.c-tags {
                     ajax: {
                         type: "POST",
                         url: '{!! route('indicators.events_table') !!}',
+                        beforeSend: function() {
+                             loading('load');
+                        },
                         dataSrc: function(json) {
                             count_page = json.recordsTotal;
-                            hideTableLoading();
+                            loading('stop_load');
                             return json.data;
                         },
                         data: function(d) {
@@ -1292,13 +1258,13 @@ select.c-tags {
                             d.count_page = count_page;
                         },
                         error: function() {
-                            hideTableLoading();
+                            loading('stop_load');
                         }
                     },
                     initComplete: function(settings, json) {
                         datatable = json.cursor;
                         $('[data-toggle="tooltip"]').tooltip();
-                        hideTableLoading();
+                        loading('stop_load');
                     },
                     "fnDrawCallback": function(oSettings) {
 
@@ -1620,7 +1586,7 @@ select.c-tags {
             }
 
             function search_table(page = 1) {
-                showTableLoading();
+                loading('load');
                 
                 let startDate = $("#event_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
                 let endDate = $("#event_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm A');
@@ -1640,10 +1606,13 @@ select.c-tags {
                     ajax: {
                         type: "POST",
                         url: '{!! route('indicators.events_table') !!}',
+                        beforeSend: function() {
+                             loading('load');
+                        },
                         dataSrc: function(json) {
 
                             count_page = json.recordsTotal;
-                            hideTableLoading();
+                            loading('stop_load');
                             return json.data;
                         },
                         data: function(d) {
@@ -1659,13 +1628,13 @@ select.c-tags {
                             d.keyword_search = keyword_search;
                         },
                         error: function() {
-                            hideTableLoading();
+                            loading('stop_load');
                         }
                     },
                     initComplete: function(settings, json) {
                         datatable = json.cursor;
                         $('[data-rel="tooltip"]').tooltip();
-                        hideTableLoading();
+                        loading('stop_load');
                     },
                     "fnDrawCallback": function(oSettings) {
 

@@ -329,6 +329,9 @@ Route::get('/url_feed/delete_url_feed', 'UrlFeedController@delete_url_feed')->na
 Route::post('/url_feed/delete_url_feed', 'UrlFeedController@delete_url_feed')->name('urlfeed.delete_url_feed')->middleware('can:menu_items');
 Route::get('/url_feed/modal_view_url_feed', 'UrlFeedController@modal_view_url_feed')->name('urlfeed.modal_view_url_feed')->middleware('can:menu_items');
 
-//feed
-Route::post('/admin/api-tokens/generate', [MISPFeedController::class, 'generateToken'])
-    ->middleware('can:menu_items');Route::get('/credentialleak', 'DataLeakController@credential_leak')->name('credentialleak.index');
+//feed - API Token Generation
+use App\Http\Controllers\ApiTokenController;
+Route::post('/admin/api-tokens/generate', [ApiTokenController::class, 'generate'])
+    ->middleware('can:menu_items');
+
+Route::get('/credentialleak', 'DataLeakController@credential_leak')->name('credentialleak.index');

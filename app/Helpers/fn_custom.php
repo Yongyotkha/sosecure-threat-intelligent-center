@@ -1086,7 +1086,7 @@ function setEnvironmentValue($envKey, $envValue)
 
 function get_word_leak_compromise($val, $type)
 {
-    Log::info($val);
+    // Log::info($val);
     $html = '';
     if ($type == 'data_leak') {
         if ($val == 'social') {

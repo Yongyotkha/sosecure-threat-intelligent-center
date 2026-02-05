@@ -216,10 +216,10 @@ class MISPFeedController extends Controller
                 'deleted_at' => null,
             );
             // วันที่เริ่มต้น: เวลา 00:00 ของวันนี้
-            // $start = strtotime(date('Y-m-d 00:00:00')) * 1000;
+            $start = strtotime(date('Y-m-d 00:00:00')) * 1000;
 
             // เวลาเริ่มของเมื่อวาน (00:00:00)
-            $start = strtotime('-3 days midnight') * 1000;
+            // $start = strtotime('-3 days midnight') * 1000;
 
             // วันที่สิ้นสุด: เวลาปัจจุบัน
             $end = round(microtime(true) * 1000);
@@ -484,15 +484,17 @@ class MISPFeedController extends Controller
             $cursor = $col_fx_otx_events->find($query, $options);
             $cursor = $cursor->toArray();
 
-            // date_default_timezone_set('Asia/Bangkok');
-            // echo "PHP Timezone: " . date_default_timezone_get() . PHP_EOL;
+            // Debug: แสดงจำนวน record และตัวอย่างข้อมูล
+            // Log::info('listFeeds DEBUG', [
+            //     'total_records' => count($cursor),
+            //     'start_timestamp' => $start,
+            //     'start_readable' => date('Y-m-d H:i:s', $start / 1000),
+            //     'end_timestamp' => $end,
+            //     'end_readable' => date('Y-m-d H:i:s', $end / 1000),
+            //     'query' => $query,
+            //     'sample_data' => !empty($cursor) ? array_slice(json_decode(json_encode($cursor), true), 0, 3) : 'No data',
+            // ]);
 
-            // $start = strtotime(date('Y-m-d 00:00:00')) * 1000;
-            // echo "Start timestamp: $start" . PHP_EOL;
-            // echo "Readable: " . date('Y-m-d H:i:s', $start / 1000) . PHP_EOL;
-
-
-            Log::info($start, $query);
 
             $feeds = [];
             $data = array();

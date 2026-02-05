@@ -90,6 +90,8 @@ class Kernel extends HttpKernel
         'localize'           => \App\Http\Middleware\Localization::class,
         'jwt.auth'           => \App\Http\Middleware\JwtMiddleware::class,
         'jwt'                => \App\Http\Middleware\JWTT::class,
+        'api.token'          => \App\Http\Middleware\ApiTokenAuth::class,
+        'api.token.service'  => \App\Http\Middleware\ServiceApiTokenAuth::class,
     ];
 
     /**

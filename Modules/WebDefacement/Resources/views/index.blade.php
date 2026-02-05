@@ -712,7 +712,6 @@
                     const elemPct = Math.max(0, Math.min(100, parseFloat(item.element) || 0));
 
                     let score = parseFloat(item.detection_score_all) || 0;
-                    if (score >= 0 && score <= 1) score = score * 100;
                     score = Math.max(0, Math.min(100, score));
 
                     chart_c3(
@@ -1328,7 +1327,6 @@
     const toPctData = (v) => {
         let n = Number(v);
         if (!isFinite(n)) n = 0;
-        if (cfg.clampData && cfg.clamp01To100 && n >= 0 && n <= 1) n *= 100; 
         n = Math.max(0, Math.min(100, n));
         return n;
     };
@@ -1336,7 +1334,6 @@
     const toPctScore = (v) => {
         let n = Number(v);
         if (!isFinite(n)) n = 0;
-        if (n >= 0 && n <= 1) n *= 100;  
         n = Math.max(0, Math.min(100, n));
         return n;
     };

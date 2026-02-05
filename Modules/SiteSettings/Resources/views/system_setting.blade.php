@@ -341,7 +341,34 @@
                                         </div>
                                         <div class="col-lg-3" style="padding: 0; align-self: center" >
                                             <span>
-                                                <button id="btn-gen" type="button" class="btn btn-info" style="height: 30px;" onclick="generate_token()">Generate</button>
+                                                <button id="btn-gen" type="button" class="btn btn-info" style="height: 30px;" onclick="generate_token('feed_insight')">Generate</button>
+                                            </span>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-3 control-label">Service Receive API Token<span data-rel="tooltip"
+                                                title="Copy Token Key for service receive API"><i
+                                                    class="far fa-question-circle"></i></span> <span
+                                                class="text-danger">*</span> </label>
+                                        <div class="col-lg-6">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="input-group">
+                                                        <input type="input" class="form-control"
+                                                            id="token_service_receive"
+                                                            value="{{ $token_service_receive ?? ''}}" readonly>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-info" onclick="copy_token('token_service_receive')">Copy</button>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3" style="padding: 0; align-self: center" >
+                                            <span>
+                                                <button id="btn-gen-service" type="button" class="btn btn-info" style="height: 30px;" onclick="generate_token('service_receive_api')">Generate</button>
                                             </span>
                                             
                                         </div>
@@ -983,13 +1010,22 @@
         });
     }
 
-    async function generate_token() {
-    const btn   = document.getElementById('btn-gen');
-    const name  = (document.getElementById('tok-name')?.value || 'Feed Token').trim();
+    async function generate_token(type = null) {
+    let btn, inputId, tokenName;
+    if (type === 'service_receive_api') {
+        btn = document.getElementById('btn-gen-service');
+        inputId = 'token_service_receive';
+        tokenName = 'Service Receive API Token';
+    } else {
+        btn = document.getElementById('btn-gen');
+        inputId = 'token';
+        tokenName = (document.getElementById('tok-name')?.value || 'Feed Token').trim();
+        type = 'feed_insight';
+    }
+    
     const days  = document.getElementById('tok-days')?.value;
     const csrf  = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     const site  = document.getElementById('tok-site').value;
-
 
     btn && (btn.disabled = true);
 
@@ -1001,7 +1037,7 @@
           'Accept': 'application/json',
           'X-CSRF-TOKEN': csrf
         },
-        body: JSON.stringify({ name, days, site })
+        body: JSON.stringify({ name: tokenName, days, site, type })
       });
 
       if (!res.ok) {
@@ -1010,20 +1046,23 @@
       }
 
       const data = await res.json(); 
-      document.getElementById('token').value = data.token;
+      document.getElementById(inputId).value = data.token;
+      toastr.success('Token generated successfully', '@langapp("response_status")');
     } catch (e) {
-
+      toastr.error('Failed to generate token', '@langapp("response_status")');
     } finally {
       btn && (btn.disabled = false);
     }
   }
 
-  function copy_token() {
-    const text = document.getElementById('token').value;
+  function copy_token(inputId = 'token') {
+    const text = document.getElementById(inputId).value;
+    if (!text) {
+        toastr.warning('No token to copy', '@langapp("response_status")');
+        return;
+    }
     navigator.clipboard.writeText(text).then(() => {
-        const label = document.querySelector('label[for="token"]')?.textContent.trim() || 'Token';
-
-        toastr.success(`Copied ${label}`, '@langapp("response_status")');
+        toastr.success('Copied successfully', '@langapp("response_status")');
     }).catch(() => {
         toastr.error("Copy failed", '@langapp("response_status")');
     });
