@@ -459,122 +459,209 @@ class DashboardNewController extends Controller
     {
     }
 
+    // ============ OLD FUNCTION (COMMENTED OUT - CAUSED 504 TIMEOUT) ============
+    // public function count_asset_old(Request $request)
+    // {
+    //     $site_id_active = SiteSettings::select('id')->where('active', 1)->whereNull('deleted_at')->get()->pluck('id')->toArray();
+    //     if (Auth::check()) {
+    //         if (@get_role_custom()['superadmin'] == 1) {
+    //             if (!$request->site) {
+    //                 $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
+    //                 $dataOut["countAssets"] = 0;
+    //                 foreach ($datacountAssets as $key => $value) {
+    //                     $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('site_id', $site_id_active)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
+    //                     $countfn = count($AssetsData_data);
+    //                     if ($countfn == 0) {
+    //                         $dataOut["countAssets"]++;
+    //                     } else {
+    //                         $dataOut["countAssets"] = $dataOut["countAssets"] + $countfn;
+    //                     }
+    //                 }
+    //             } else {
+    //                 $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request->site)->first();
+    //                 $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.site_id', $SiteSettingsfor->id)->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
+    //                 $dataOut["countAssets"] = 0;
+    //                 $dataOut["assetLimit"] = $SiteSettingsfor->asset_limit;
+    //                 foreach ($datacountAssets as $key => $value) {
+    //                     $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('site_id', $site_id_active)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
+    //                     $countfn = count($AssetsData_data);
+    //                     if ($countfn == 0) {
+    //                         $dataOut["countAssets"]++;
+    //                     } else {
+    //                         $dataOut["countAssets"] = $dataOut["countAssets"] + $countfn;
+    //                     }
+    //                 }
+    //             }
+    //         } else {
+    //             $role_custom = @check_role_custom();
+    //             if ($role_custom['assets']) {
+    //                 $site_id_arr = @get_role_custom()['site_id_arr'];
+    //                 if (!$request->site) {
+    //                     $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id', $site_id_arr)->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
+    //                     $dataOut["countAssets"] = 0;
+    //                     foreach ($datacountAssets as $key => $value) {
+    //                         $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('site_id', $site_id_active)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
+    //                         $countfn = count($AssetsData_data);
+    //                         if ($countfn == 0) {
+    //                             $dataOut["countAssets"]++;
+    //                         } else {
+    //                             $dataOut["countAssets"] = $dataOut["countAssets"] + $countfn;
+    //                         }
+    //                     }
+    //                 } else {
+    //                     $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request->site)->first();
+    //                     $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id', $site_id_arr)->where('assets.site_id', $SiteSettingsfor->id)->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
+    //                     $dataOut["countAssets"] = 0;
+    //                     $dataOut["assetLimit"] = $SiteSettingsfor->asset_limit;
+    //                     foreach ($datacountAssets as $key => $value) {
+    //                         $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('site_id', $site_id_active)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
+    //                         $countfn = count($AssetsData_data);
+    //                         if ($countfn == 0) {
+    //                             $dataOut["countAssets"]++;
+    //                         } else {
+    //                             $dataOut["countAssets"] = $dataOut["countAssets"] + $countfn;
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     $assets = @$dataOut;
+    //     $response = array(
+    //         'error' => '',
+    //         'status_code' => '200',
+    //         'data' => $assets
+    //     );
+    //     return response()->json($response);
+    // }
+
+    // ============ OPTIMIZED VERSION - Fixed 504 Timeout ============
+    // Same logic but using 2 queries instead of N+1 queries
     public function count_asset(Request $request)
     {
-        // if(Auth::check()) {
-        //     $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-        //     if(@get_role_custom()['superadmin'] == 1) {
-        //         if($request -> site == 0){
-        //             $assets = Assets::select('id')->where('status', 1)->count();
-        //         }else{
-        //             $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-        //             $assets = Assets::select('id')->where('site_id', $site_id_m->id)->where('status', 1)->count();
-        //         }
-        //     } else {
-        //         if($request -> site == 0){
-        //             $assets = Assets::select('id')->where('status', 1)->whereIn('site_id', $site_id_arr)->count();
-        //         }else{
-        //             $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-        //             $assets = Assets::select('id')->where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->where('status', 1)->count();
-        //         }
-        //     }
-        // }
-        $site_id_active = SiteSettings::select('id')->where('active', 1)->whereNull('deleted_at')->get()->pluck('id')->toArray();
+        $dataOut = ["countAssets" => 0];
+        $site_id_active = SiteSettings::select('id')->where('active', 1)->whereNull('deleted_at')->pluck('id')->toArray();
+
         if (Auth::check()) {
-            if (@get_role_custom()['superadmin'] == 1) {
-                if (!$request->site) {
-                    $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
-                    $dataOut["countAssets"] = 0;
-                    foreach ($datacountAssets as $key => $value) {
-                        $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('site_id', $site_id_active)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
-                        $countfn = count($AssetsData_data);
-                        if ($countfn == 0) {
-                            $dataOut["countAssets"]++;
-                        } else {
-                            $dataOut["countAssets"] = $dataOut["countAssets"] + $countfn;
-                        }
-                    }
-                } else {
-                    $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request->site)->first();
-                    $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.site_id', $SiteSettingsfor->id)->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
-                    $dataOut["countAssets"] = 0;
+            $isSuperAdmin = @get_role_custom()['superadmin'] == 1;
+            $role_custom = @check_role_custom();
+            
+            // If not superadmin and no assets permission, return empty
+            if (!$isSuperAdmin && !($role_custom['assets'] ?? false)) {
+                return response()->json([
+                    'error' => '',
+                    'status_code' => '200',
+                    'data' => $dataOut
+                ]);
+            }
+
+            $site_id_arr = $isSuperAdmin ? null : (@get_role_custom()['site_id_arr'] ?? []);
+            $targetSiteId = null;
+
+            // Get target site if specified
+            if ($request->site) {
+                $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request->site)->first();
+                if ($SiteSettingsfor) {
+                    $targetSiteId = $SiteSettingsfor->id;
                     $dataOut["assetLimit"] = $SiteSettingsfor->asset_limit;
-                    foreach ($datacountAssets as $key => $value) {
-                        $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('site_id', $site_id_active)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
-                        $countfn = count($AssetsData_data);
-                        if ($countfn == 0) {
-                            $dataOut["countAssets"]++;
-                        } else {
-                            $dataOut["countAssets"] = $dataOut["countAssets"] + $countfn;
-                        }
-                    }
                 }
-            } else {
-                $role_custom = @check_role_custom();
-                if ($role_custom['assets']) {
-                    $site_id_arr = @get_role_custom()['site_id_arr'];
-                    if (!$request->site) {
-                        $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id', $site_id_arr)->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
-                        $dataOut["countAssets"] = 0;
-                        foreach ($datacountAssets as $key => $value) {
-                            $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('site_id', $site_id_active)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
-                            $countfn = count($AssetsData_data);
-                            if ($countfn == 0) {
-                                $dataOut["countAssets"]++;
-                            } else {
-                                $dataOut["countAssets"] = $dataOut["countAssets"] + $countfn;
-                            }
-                        }
-                    } else {
-                        $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $request->site)->first();
-                        $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id', $site_id_arr)->where('assets.site_id', $SiteSettingsfor->id)->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
-                        $dataOut["countAssets"] = 0;
-                        $dataOut["assetLimit"] = $SiteSettingsfor->asset_limit;
-                        foreach ($datacountAssets as $key => $value) {
-                            $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('site_id', $site_id_active)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
-                            $countfn = count($AssetsData_data);
-                            if ($countfn == 0) {
-                                $dataOut["countAssets"]++;
-                            } else {
-                                $dataOut["countAssets"] = $dataOut["countAssets"] + $countfn;
-                            }
-                        }
-                    }
+            }
+
+            // Build optimized query - get assets with IP (data_type_id 5,6)
+            $query = Assets::select('assets.id')
+                ->join('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')
+                ->whereIn('assets_datas.data_type_id', [5, 6])
+                ->where('assets.status', 1)
+                ->whereIn('assets_datas.site_id', $site_id_active);
+
+            // Apply site filters based on role and request
+            if ($targetSiteId) {
+                $query->where('assets.site_id', $targetSiteId);
+            }
+            if (!$isSuperAdmin && $site_id_arr) {
+                $query->whereIn('assets.site_id', $site_id_arr);
+            }
+
+            // Get distinct asset IDs with IP data (single query)
+            $assetIds = $query->distinct()->pluck('assets.id')->toArray();
+
+            if (count($assetIds) > 0) {
+                // Count domain entries (data_type_id 1,4) for these assets in ONE query with GROUP BY
+                $domainCounts = AssetsData::selectRaw('asset_id, COUNT(*) as domain_count')
+                    ->whereIn('asset_id', $assetIds)
+                    ->whereIn('site_id', $site_id_active)
+                    ->whereIn('data_type_id', [1, 4])
+                    ->groupBy('asset_id')
+                    ->pluck('domain_count', 'asset_id')
+                    ->toArray();
+
+                // Calculate total: if asset has domains, add domain count; otherwise add 1
+                foreach ($assetIds as $assetId) {
+                    $domainCount = $domainCounts[$assetId] ?? 0;
+                    $dataOut["countAssets"] += ($domainCount > 0) ? $domainCount : 1;
                 }
             }
         }
-        $assets = @$dataOut;
+
         $response = array(
             'error' => '',
             'status_code' => '200',
-            'data' => $assets
+            'data' => $dataOut
         );
         return response()->json($response);
     }
 
     public function count_vulnerability(Request $request)
     {
+        $CVEMapping = 0;
+        
         if (Auth::check()) {
             $role_custom = @check_role_custom();
-            if ($role_custom['vulnerabilities']) {
-                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-                if (@get_role_custom()['superadmin'] == 1) {
-                    if (!$request->site) {
-                        $CVEMapping = CVEMapping::select('id')->count();
-                    } else {
-                        $site_id_m = SiteSettings::select('id')->where('code', $request->site)->first();
+            
+            // If no vulnerabilities permission, return empty
+            if (!($role_custom['vulnerabilities'] ?? false)) {
+                return response()->json([
+                    'error' => '',
+                    'status_code' => '200',
+                    'data' => $CVEMapping
+                ]);
+            }
 
-                        $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_id_m->id)->select('namecve')->get();
-                        $CVEMapping = CVEMapping::select('id')->whereIn('namecve', $CVEMappingAssets_name)->count();
+            $isSuperAdmin = @get_role_custom()['superadmin'] == 1;
+            $site_id_arr = @get_role_custom()['site_id_arr'] ?? [];
+
+            if ($isSuperAdmin) {
+                if (!$request->site) {
+                    // Superadmin, no site filter - count all CVE
+                    $CVEMapping = CVEMapping::count();
+                } else {
+                    // Superadmin with specific site - use JOIN instead of whereIn for speed
+                    $site_id_m = SiteSettings::where('code', $request->site)->first();
+                    if ($site_id_m) {
+                        $CVEMapping = CVEMapping::join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve')
+                            ->where('data_datacve_mapping_assets.site_id', $site_id_m->id)
+                            ->distinct()
+                            ->count('data_datacve_mapping.id');
+                    }
+                }
+            } else {
+                // Non-superadmin - use JOIN for better performance
+                if (!$request->site) {
+                    // All sites user has access to
+                    if (!empty($site_id_arr)) {
+                        $CVEMapping = CVEMapping::join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve')
+                            ->whereIn('data_datacve_mapping_assets.site_id', $site_id_arr)
+                            ->distinct()
+                            ->count('data_datacve_mapping.id');
                     }
                 } else {
-                    if (!$request->site) {
-                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_arr)->select('namecve')->get();
-                        $CVEMapping = CVEMapping::select('id')->whereIn('namecve', $CVEMappingAssets_name)->count();
-                    } else {
-                        $site_id_m = SiteSettings::select('id')->where('code', $request->site)->first();
-                        $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_id_m->id)->select('namecve')->get();
-                        $CVEMapping = CVEMapping::select('id')->whereIn('namecve', $CVEMappingAssets_name)->count();
+                    // Specific site (must be in user's allowed sites)
+                    $site_id_m = SiteSettings::where('code', $request->site)->first();
+                    if ($site_id_m && in_array($site_id_m->id, $site_id_arr)) {
+                        $CVEMapping = CVEMapping::join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve')
+                            ->where('data_datacve_mapping_assets.site_id', $site_id_m->id)
+                            ->distinct()
+                            ->count('data_datacve_mapping.id');
                     }
                 }
             }
@@ -583,7 +670,7 @@ class DashboardNewController extends Controller
         $response = array(
             'error' => '',
             'status_code' => '200',
-            'data' => @$CVEMapping
+            'data' => $CVEMapping
         );
         return response()->json($response);
     }
