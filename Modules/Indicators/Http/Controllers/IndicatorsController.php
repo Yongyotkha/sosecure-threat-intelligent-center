@@ -244,14 +244,36 @@ class IndicatorsController extends Controller
             }
 
             // Fallback: Aggregate from fx_otx_events_indicator_ref if indicator_type_counts has numeric keys
-            if (!$hasValidKeys) {
+            // Also always use aggregation when date filter is active
+            $startDate = $request->query('startDate');
+            $endDate = $request->query('endDate');
+            $hasDateFilter = $startDate && $endDate;
+            
+            if (!$hasValidKeys || $hasDateFilter) {
                 $indicatorRefCol = $client->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+                
+                $matchQuery = ['pulse_id' => $id, 'status' => 1];
+                
+                // Add date filter if provided
+                if ($hasDateFilter) {
+                    $matchQuery['updated_at'] = [
+                        '$gte' => new \MongoDB\BSON\UTCDateTime(strtotime($startDate) * 1000),
+                        '$lte' => new \MongoDB\BSON\UTCDateTime(strtotime($endDate) * 1000)
+                    ];
+                }
+                
                 $pipeline = [
-                    ['$match' => ['pulse_id' => $id, 'status' => 1]],
+                    ['$match' => $matchQuery],
                     ['$group' => ['_id' => '$type', 'count' => ['$sum' => 1]]],
                     ['$sort' => ['count' => -1]]
                 ];
                 $aggregateResult = $indicatorRefCol->aggregate($pipeline)->toArray();
+                
+                // Reset arrays if using date filter
+                if ($hasDateFilter) {
+                    $countKey = [];
+                    $countVal = [];
+                }
                 
                 foreach ($aggregateResult as $item) {
                     if (!empty($item['_id'])) {
@@ -264,8 +286,8 @@ class IndicatorsController extends Controller
             $data['countKey'] = $countKey;
             $data['countVal'] = $countVal;
             
-            // Use actual count from aggregation if indicator_type_counts was recalculated
-            if (!$hasValidKeys && !empty($countVal)) {
+            // Use actual count from aggregation if indicator_type_counts was recalculated or date filter active
+            if ((!$hasValidKeys || $hasDateFilter) && !empty($countVal)) {
                 $data['actual_indicator_count'] = array_sum($countVal);
                 $data['indicator_type_counts'] = count($countKey); // จำนวน types จริง
             }
@@ -1704,6 +1726,28 @@ class IndicatorsController extends Controller
                 // ✅ Query แบบ optimized
                 $query = ['pulse_id' => $reqId];
 
+                // ✅ Date filter support
+                $startDateStr = $request->startDate;
+                $endDateStr = $request->endDate;
+                
+                if ($startDateStr && $endDateStr) {
+                    try {
+                        $startDate = Carbon::parse($startDateStr)->startOfDay();
+                        $endDate = Carbon::parse($endDateStr)->endOfDay();
+                        
+                        $query['updated_at'] = [
+                            '$gte' => new UTCDateTime($startDate->timestamp * 1000),
+                            '$lte' => new UTCDateTime($endDate->timestamp * 1000)
+                        ];
+                        
+                        // Modify cache key to include date filter
+                        $cacheKeyCount = "indicator_count_{$reqId}_{$startDateStr}_{$endDateStr}";
+                        $cacheKeyData = "indicator_data_{$reqId}_{$start}_{$rowperpage}_{$startDateStr}_{$endDateStr}";
+                    } catch (\Exception $e) {
+                        \Log::warning("Invalid date format: startDate={$startDateStr}, endDate={$endDateStr}");
+                    }
+                }
+
                 // ✅ Options พร้อม projection และ maxTimeMS
                 $options = [
                     'projection' => [
@@ -2258,7 +2302,27 @@ class IndicatorsController extends Controller
                     $nestedData['tags_list'] = $document_2["tags"] ?? [];
                     $nestedData['industries'] = explode_val($document_2["industries"] ?? []);
                     $nestedData['attr'] = '';
-                    $nestedData['attrCount'] = $document_2["indicator_count"];
+                    
+                    // Only count from collection when date filter is active
+                    if ($request->startDate && $request->endDate) {
+                        try {
+                            $indicatorRefCol = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+                            $attrQuery = [
+                                'pulse_id' => $document_2['pulse_id'],
+                                'updated_at' => [
+                                    '$gte' => new UTCDateTime(strtotime($request->startDate) * 1000),
+                                    '$lte' => new UTCDateTime(strtotime($request->endDate) * 1000)
+                                ]
+                            ];
+                            $nestedData['attrCount'] = $indicatorRefCol->countDocuments($attrQuery, ['maxTimeMS' => 3000]);
+                        } catch (\Exception $e) {
+                            // Fallback to cached count if query fails
+                            $nestedData['attrCount'] = $document_2["indicator_count"] ?? 0;
+                        }
+                    } else {
+                        // No date filter - use cached indicator_count for performance
+                        $nestedData['attrCount'] = $document_2["indicator_count"] ?? 0;
+                    }
                     $nestedData['public'] = ($document_2["public"]);
                     $nestedData['is_modified'] = ($document_2["is_modified"]);
                     // $nestedData['modified'] = change_date_utc_to_thai($document_2['modified']);

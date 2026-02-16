@@ -791,10 +791,10 @@ class CheckIndicators extends Command
     {
         if (empty($eventIocs)) return;
         
-        $this->line("  Processing " . count($eventIocs) . " indicators...");
+        $this->line("  Processing " . count($eventIocs) . " indicators (batch mode x5)...");
         
-        // One client for all requests
-        $client = new Client(['verify' => false, 'timeout' => 15]);
+        // One client for all requests with keep-alive
+        $client = new Client(['verify' => false, 'timeout' => 30, 'connect_timeout' => 15, 'headers' => ['Connection' => 'keep-alive']]);
         $eventResults = [];
         $batchResults = [];
         
@@ -803,12 +803,19 @@ class CheckIndicators extends Command
         $bar->setFormat('  %current%/%max% [%bar%] %percent:3s%%');
         $bar->start();
         
-        // Create a generator for promises
-        $promises = (function () use ($client, $eventIocs, $dataKey) {
-            foreach ($eventIocs as $item) {
-                yield $this->service->checkIocAsync($client, $item['ioc'], $item['type'], $item['event_name'] ?? null)
+        // Split IOCs into batches of 5 (matching VT key count)
+        $batchSize = 5;
+        $batches = array_chunk($eventIocs, $batchSize);
+        $rateLimitWindow = 15; // 15 seconds per batch to stay within VT rate limit
+        
+        foreach ($batches as $batch) {
+            $batchStartTime = microtime(true);
+            
+            // Create promises for all items in this batch
+            $promises = [];
+            foreach ($batch as $item) {
+                $promises[] = $this->service->checkIocAsync($client, $item['ioc'], $item['type'], $item['event_name'] ?? null)
                     ->then(function ($result) use ($item, $dataKey) {
-                        // REMOVED extra usleep here to speed up
                         return array_merge($result, [
                             'event_name' => $item['event_name'] ?? 'N/A',
                             'event_tags' => $item['event_tags'] ?? [],
@@ -821,32 +828,34 @@ class CheckIndicators extends Command
                         ]);
                     });
             }
-        })();
-        
-        // Process with concurrency
-        $each = new EachPromise($promises, [
-            'concurrency' => 1, // Sequential
-            'fulfilled' => function ($result) use ($bar, &$eventResults, &$batchResults, &$allIocs) {
-                $eventResults[] = $result;
-                $batchResults[] = $result;
-                $allIocs[] = $result;
-                $bar->advance();
-                
-                // Delay 4 seconds (SAFE: 5 keys * 4s = 20s cycle > 15s limit)
-                usleep(4000000); 
-
-                // Save batch every 50 items (Safety for Resume)
-                if (count($batchResults) >= 50) {
-                     $this->saveAndSyncResults($batchResults);
-                     array_splice($batchResults, 0); // Clear array
+            
+            // Execute all promises in parallel and wait for all to complete
+            $results = \GuzzleHttp\Promise\Utils::settle($promises)->wait();
+            
+            // Process results
+            foreach ($results as $result) {
+                if ($result['state'] === 'fulfilled') {
+                    $eventResults[] = $result['value'];
+                    $batchResults[] = $result['value'];
+                    $allIocs[] = $result['value'];
                 }
-            },
-            'rejected' => function ($reason) {
-                // Handle failure
+                $bar->advance();
             }
-        ]);
+            
+            // Save batch every 50 items (Safety for Resume)
+            if (count($batchResults) >= 50) {
+                $this->saveAndSyncResults($batchResults);
+                array_splice($batchResults, 0); // Clear array
+            }
+            
+            // Smart delay: wait for the remainder of the rate limit window
+            $batchElapsed = microtime(true) - $batchStartTime;
+            $remainingTime = $rateLimitWindow - $batchElapsed;
+            if ($remainingTime > 0) {
+                usleep((int)($remainingTime * 1000000));
+            }
+        }
         
-        $each->promise()->wait();
         $bar->finish();
         $this->line("");
         
@@ -863,9 +872,9 @@ class CheckIndicators extends Command
     {
         if (empty($eventIocs)) return;
         
-        $this->line("  Processing " . count($eventIocs) . " indicators with progress tracking...");
+        $this->line("  Processing " . count($eventIocs) . " indicators (batch mode x5)...");
         
-        // One client for all requests with shorter timeout
+        // One client for all requests with keep-alive
         $client = new Client(['verify' => false, 'timeout' => 30, 'connect_timeout' => 15, 'headers' => ['Connection' => 'keep-alive']]);
         $eventResults = [];
         $batchResults = [];
@@ -877,10 +886,18 @@ class CheckIndicators extends Command
         $bar->setFormat('  %current%/%max% [%bar%] %percent:3s%%');
         $bar->start();
         
-        // Create a generator for promises
-        $promises = (function () use ($client, $eventIocs, $dataKey) {
-            foreach ($eventIocs as $item) {
-                yield $this->service->checkIocAsync($client, $item['ioc'], $item['type'], $item['event_name'] ?? null)
+        // Split IOCs into batches of 5 (matching VT key count)
+        $batchSize = 5;
+        $batches = array_chunk($eventIocs, $batchSize);
+        $rateLimitWindow = 15; // 15 seconds per batch to stay within VT rate limit
+        
+        foreach ($batches as $batchIndex => $batch) {
+            $batchStartTime = microtime(true);
+            
+            // Create promises for all items in this batch
+            $promises = [];
+            foreach ($batch as $item) {
+                $promises[] = $this->service->checkIocAsync($client, $item['ioc'], $item['type'], $item['event_name'] ?? null)
                     ->then(function ($result) use ($item, $dataKey) {
                         return array_merge($result, [
                             'event_name' => $item['event_name'] ?? 'N/A',
@@ -894,47 +911,48 @@ class CheckIndicators extends Command
                         ]);
                     });
             }
-        })();
-        
-        // Process with concurrency
-        $each = new EachPromise($promises, [
-            'concurrency' => 1, // Sequential to avoid VT rate limiting (4 req/min)
-            'fulfilled' => function ($result) use ($bar, &$eventResults, &$batchResults, &$allIocs, &$processedCount, $totalCount, $jobsCollection, $jobId) {
-                $eventResults[] = $result;
-                $batchResults[] = $result;
-                $allIocs[] = $result;
-                $processedCount++;
-                $bar->advance();
-                
-                // Delay 4 seconds between requests (5 keys * 4s = 20s cycle > 15s limit)
-                usleep(4000000); // 4 seconds
-                
-                // Save batch every 50 items
-                if (count($batchResults) >= 50) {
-                     $this->saveAndSyncResults($batchResults);
-                     array_splice($batchResults, 0); // Clear array without breaking reference
+            
+            // Execute all promises in parallel and wait for all to complete
+            $results = \GuzzleHttp\Promise\Utils::settle($promises)->wait();
+            
+            // Process results
+            foreach ($results as $result) {
+                if ($result['state'] === 'fulfilled') {
+                    $eventResults[] = $result['value'];
+                    $batchResults[] = $result['value'];
+                    $allIocs[] = $result['value'];
                 }
-
-                // Update job progress every 10 items
-                if ($jobsCollection && $jobId && ($processedCount % 10 === 0)) {
-                    $remaining = max(0, $totalCount - $processedCount);
-                    $jobsCollection->updateOne(
-                        ['job_id' => $jobId],
-                        ['$set' => [
-                            'processed_count' => $processedCount,
-                            'remaining' => $remaining,
-                            'last_updated' => new \MongoDB\BSON\UTCDateTime()
-                        ]]
-                    );
-                }
-            },
-            'rejected' => function ($reason) use ($bar, &$processedCount) {
                 $processedCount++;
                 $bar->advance();
             }
-        ]);
+            
+            // Save batch every 50 items
+            if (count($batchResults) >= 50) {
+                $this->saveAndSyncResults($batchResults);
+                array_splice($batchResults, 0); // Clear array without breaking reference
+            }
+            
+            // Update job progress after each batch
+            if ($jobsCollection && $jobId) {
+                $remaining = max(0, $totalCount - $processedCount);
+                $jobsCollection->updateOne(
+                    ['job_id' => $jobId],
+                    ['$set' => [
+                        'processed_count' => $processedCount,
+                        'remaining' => $remaining,
+                        'last_updated' => new \MongoDB\BSON\UTCDateTime()
+                    ]]
+                );
+            }
+            
+            // Smart delay: wait for the remainder of the rate limit window
+            $batchElapsed = microtime(true) - $batchStartTime;
+            $remainingTime = $rateLimitWindow - $batchElapsed;
+            if ($remainingTime > 0) {
+                usleep((int)($remainingTime * 1000000));
+            }
+        }
         
-        $each->promise()->wait();
         $bar->finish();
         $this->line("");
         

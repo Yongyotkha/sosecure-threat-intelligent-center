@@ -307,6 +307,20 @@ select.c-tags {
                 var total_page = 0;
                 var count_page = -1;
                 var count_page2 = -1;
+
+                var urlParams = new URLSearchParams(window.location.search);
+                var filterStartDate = urlParams.get('startDate');
+                var filterEndDate = urlParams.get('endDate');
+
+                if (filterStartDate && filterEndDate) {
+                    var filterMsg = '<div class="alert alert-info m-b-10" style="margin: 10px 15px;">' +
+                        '<i class="fas fa-filter"></i> Filtering attributes by date: <strong>' + 
+                        filterStartDate + '</strong> to <strong>' + filterEndDate + '</strong>' +
+                        '<a href="' + window.location.pathname + '" class="btn btn-xs btn-default m-l-10">Clear Filter</a>' +
+                        '</div>';
+                    $('section.scrollable.wrapper').prepend(filterMsg);
+                }
+
                 const chart = new frappe.Chart("#chart-show-bar", { 
                     title: "",
                     data:{
@@ -453,7 +467,9 @@ select.c-tags {
                             data:function(d){
                                 d.pulse_id = pulse_id;
                                 d.count_page = count_page;    
-                                d.total_record  =  "{{@$otx_events[0]['indicator_count']}}";         
+                                d.total_record  =  "{{@$otx_events[0]['indicator_count']}}";
+                                if (filterStartDate) d.startDate = filterStartDate;
+                                if (filterEndDate) d.endDate = filterEndDate;
                             },
                             complete: function (data) {
                                load_table_pulse();
@@ -565,7 +581,7 @@ select.c-tags {
                         render: function (data, type, row) {
                             var inner = '-';
                             
-                            var dateVal = row.created_at || row.created;
+                            var dateVal = row.updated_at;
                             if (!dateVal) return inner;
                             
                             var v = null;
@@ -607,17 +623,17 @@ select.c-tags {
 
                             var txt = (data === undefined || data === null) ? '' : String(data).trim();
                             if (!txt) return '';
-                            if (txt === '0') return '<span class="badge badge-infomation">0</span>';
-                            if (txt === '1') return '<span class="badge badge-verylow">1</span>';
-                            if (txt === '2') return '<span class="badge badge-success">2</span>';
-                            if (txt === '3') return '<span class="badge badge-success">3</span>';
-                            if (txt === '4') return '<span class="badge badge-medium">4</span>';
-                            if (txt === '5') return '<span class="badge badge-medium">5</span>';
-                            if (txt === '6') return '<span class="badge badge-medium">6</span>';
-                            if (txt === '7') return '<span class="badge badge-high">7</span>';
-                            if (txt === '8') return '<span class="badge badge-high">8</span>';
-                            if (txt === '9') return '<span class="badge badge-critical">9</span>';
-                            if (txt === '10') return '<span class="badge badge-critical">10</span>';
+                            if (txt === '0') return '0';
+                            if (txt === '1') return '1';
+                            if (txt === '2') return '2';
+                            if (txt === '3') return '3';
+                            if (txt === '4') return '4';
+                            if (txt === '5') return '5';
+                            if (txt === '6') return '6';
+                            if (txt === '7') return '7';
+                            if (txt === '8') return '8';
+                            if (txt === '9') return '9';
+                            if (txt === '10') return '10';
 
                         }
                     },

@@ -1070,6 +1070,16 @@ select.c-tags {
 
             });
 
+            function getDetailUrl(pulseId) {
+                var baseUrl = '{{ route('indicators.events_detail') }}' + '/' + pulseId;
+                if (startDate && endDate) {
+                    var dateParams = '?startDate=' + encodeURIComponent(startDate.format('YYYY-MM-DD HH:mm:ss')) + 
+                                    '&endDate=' + encodeURIComponent(endDate.format('YYYY-MM-DD HH:mm:ss'));
+                    return baseUrl + dateParams;
+                }
+                return baseUrl;
+            }
+
             function convertToCSV(arr) {
                 var array = [Object.keys(arr[0])].concat(arr);
 
@@ -1772,9 +1782,7 @@ select.c-tags {
                             targets: 2,
                             render: function(data, type, row) {
                                 var inner = '';
-                                inner = '<div><a href="{{ route('indicators.events_detail') }}' + '/' +
-                                    row
-                                    .pulse_id + '">' + row.name + '</a></div>';
+                                inner = '<div><a href="' + getDetailUrl(row.pulse_id) + '">' + row.name + '</a></div>';
                                 return inner;
                             }
 
@@ -1892,8 +1900,7 @@ select.c-tags {
                                     '?pulse_id=' + row.pulse_id +
                                     '" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
                                 inner +=
-                                    '<a style="max-width:83px;width:100%;" href="{{ route('indicators.events_detail') }}' +
-                                    '/' + row.pulse_id +
+                                    '<a style="max-width:83px;width:100%;" href="' + getDetailUrl(row.pulse_id) +
                                     '" class="m-t-xs btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
                                 inner += '</div>';
 
