@@ -321,7 +321,7 @@
 
 
                                     <div class="form-group row">
-                                        <label class="col-lg-3 control-label">Feed Insight Token<span data-rel="tooltip"
+                                        <label class="col-lg-3 control-label">Feed Token<span data-rel="tooltip"
                                                 title="Copy Token Key for feed insight"><i
                                                     class="far fa-question-circle"></i></span> <span
                                                 class="text-danger">*</span> </label>
@@ -348,7 +348,7 @@
                                     </div>
 
                                     <div class="form-group row">
-                                        <label class="col-lg-3 control-label">Service Receive API Token<span data-rel="tooltip"
+                                        <label class="col-lg-3 control-label">Service Token<span data-rel="tooltip"
                                                 title="Copy Token Key for service receive API"><i
                                                     class="far fa-question-circle"></i></span> <span
                                                 class="text-danger">*</span> </label>
