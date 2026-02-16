@@ -30,6 +30,6 @@ Route::group(
         Route::get('scans_assets_edit_modal/{id}/{code}/{page}', 'ScansController@scans_assets_edit_modal')->name('scans_assets.scans_assets_edit_modal');
         Route::post('scans_assets_edit', 'ScansController@scans_assets_edit')->name('scans_assets.scans_assets_edit');
         Route::post('delete_assets_select', 'ScansController@delete_assets_select')->name('scans.delete_assets');
-        
+        Route::post('get_cve_details', 'ScansController@get_cve_details')->name('scans.get_cve_details');
     }
 );

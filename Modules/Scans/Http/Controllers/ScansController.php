@@ -470,7 +470,11 @@ class ScansController extends Controller
     public function tableDataScans(Request $request)
     {
         $SiteSettings = TransactionTimeStampScans::where('code', $request->code)->first();
-        $TransactionScans = TransactionScans::where('site_id', $SiteSettings->site_id)->where('domain_id', $SiteSettings->domain_id)->where('module','!=','sfp_citadel')->orderBy('status', 'desc')->get();
+        $TransactionScans = TransactionScans::where('site_id', $SiteSettings->site_id)
+            ->where('domain_id', $SiteSettings->domain_id)
+            ->where('module','!=','sfp_citadel')
+            ->orderBy('updated_at', 'desc') // Show latest first
+            ->get();
         return DataTables::of($TransactionScans)
             ->editColumn('chk', function (TransactionScans $data) {
                 $res = '';
@@ -487,7 +491,18 @@ class ScansController extends Controller
                 }
                 return $res;
             })
-            ->addColumn('use', function (TransactionScans $data) {
+            ->editColumn('raw_data', function (TransactionScans $data) {
+                $fullText = $data->raw_data;
+                if (strlen($fullText) > 50) {
+                    $truncated = substr($fullText, 0, 47) . '...';
+                    return '<span title="' . htmlspecialchars($fullText) . '" style="cursor: default;">' . htmlspecialchars($truncated) . '</span>';
+                }
+                return htmlspecialchars($fullText);
+            })
+            ->addColumn('source', function (TransactionScans $data) {
+            return $data->source ?? '-';
+        })
+        ->addColumn('use', function (TransactionScans $data) {
                 $res = '';
                 if ($data->status_asset_use == 1) {
                     $res .= '<span class="badge badge-success">Used</span>';
@@ -496,11 +511,15 @@ class ScansController extends Controller
                 } else if ($data->status == 1) {
                     $res .= '<span class="badge badge-warning" style="background-color: #ffc107;">Discovered</span>';
                 } else if ($data->status == 2) {
-                    $res .= '<span class="badge badge-primary" style="background-color: #3869d4;">New</span>';
+                    $res .= '<span class="badge badge-primary" style="background-color: #3869d4;">New</span>&nbsp;';
+                }
+
+                if ($data->data_type == 'CVE') {
+                    $res .= ' <button class="btn btn-xs btn-info" onclick="view_cve_details(\''.$data->domain_id.'\', \''.$data->site_id.'\')" title="View CVE Details"><i class="fas fa-search"></i></button>';
                 }
                 return $res;
             })
-            ->rawColumns(['chk', 'use'])
+            ->rawColumns(['chk', 'use', 'raw_data'])
             ->toJson();
     }
 
@@ -908,6 +927,18 @@ class ScansController extends Controller
                 Response::HTTP_OK
             );
         }
+    }
+
+    public function get_cve_details(Request $request)
+    {
+        $site_id = $request->site_id;
+        $domain_id = $request->domain_id;
+
+        $cve_details = \App\TransactionScansCveTemp::where('site_id', $site_id)
+            ->where('domain_id', $domain_id)
+            ->get();
+
+        return response()->json(['status' => 'success', 'data' => $cve_details]);
     }
 
 }

@@ -114,6 +114,7 @@
                             <th>Asset</th>
                             <th>Referent</th>
                             <th class="text-center">Last Update</th>
+                            <th class="text-center">Source</th>
                             <th class="text-center">Status</th>
                             {{-- <th>Module</th> --}}
                         </tr>
@@ -224,6 +225,11 @@
                 {
                     data: 'updated_at',
                     name: 'updated_at',
+                    className: 'text-center'
+                },
+                {
+                    data: 'source',
+                    name: 'source',
                     className: 'text-center'
                 },
                 {

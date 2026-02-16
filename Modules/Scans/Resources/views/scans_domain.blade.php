@@ -235,5 +235,84 @@
 
 @push('pagescript')
 @include('stacks.js.fullscreen')
+<script>
+    function view_cve_details(domain_id, site_id) {
+        $('#modal_cve_detail').modal('show');
+        $('#cve_detail_content').html('<div class="text-center"><i class="fas fa-spinner fa-spin fa-3x"></i></div>');
+        
+        axios.post('{{ route('scans.get_cve_details') }}', {
+            domain_id: domain_id,
+            site_id: site_id
+        })
+        .then(function (response) {
+            let html = '<div class="table-responsive"><table class="table table-striped table-bordered"><thead><tr><th style="width: 150px; min-width: 150px; white-space: nowrap;">CVE ID</th><th style="width: 180px;">Severity</th><th>Description</th></tr></thead><tbody>';
+            if(response.data.data.length > 0){
+                response.data.data.forEach(item => {
+                    let badgeColor = '#777';
+                    let textColor = 'white';
+                    
+                    let severity = item.severity ? item.severity.toUpperCase() : 'UNKNOWN';
+                    
+                    if(severity == 'CRITICAL') { 
+                        badgeColor = '#e64732'; 
+                        textColor = 'white';
+                    }
+                    else if(severity == 'HIGH') { 
+                        badgeColor = '#fcc838'; 
+                        textColor = 'black'; 
+                    }
+                    else if(severity == 'MEDIUM') { 
+                        badgeColor = '#f2ff15'; 
+                        textColor = 'black'; 
+                    }
+                    else if(severity == 'LOW') { 
+                        badgeColor = '#88ce4f'; 
+                        textColor = 'white';
+                    }
+                    else if(severity == 'INFORMATION' || severity == 'INFO' || severity == 'NONE') { 
+                        badgeColor = '#00dcff'; 
+                        textColor = 'black';
+                    }
+
+                    let scoreHtml = item.cvss_score ? `<span style="padding: 1px 4px; font-weight: bold; margin-right: 5px;">${item.cvss_score}</span>` : '';
+
+                    html += `<tr>
+                        <td style="white-space: nowrap;"><a href="https://nvd.nist.gov/vuln/detail/${item.namecve}" target="_blank" class="text-info font-bold">${item.namecve}</a></td>
+                        <td><span class="badge" style="background-color: ${badgeColor}; color: ${textColor}; padding: 4px 10px; font-size: 11px; display: inline-block; min-width: 100px; text-align: left; border-radius: 12px;">${scoreHtml}${severity}</span></td>
+                        <td><small>${item.description}</small></td>
+                    </tr>`;
+                });
+            } else {
+                html += '<tr><td colspan="4" class="text-center">No CVE details found.</td></tr>';
+            }
+            html += '</tbody></table></div>';
+            $('#cve_detail_content').html(html);
+        })
+        .catch(function (error) {
+            console.log(error);
+            $('#cve_detail_content').html('<div class="text-danger">Error loading data.</div>');
+        });
+    }
+</script>
+
+<!-- Modal CVE Detail -->
+<div class="modal fade" id="modal_cve_detail" tabindex="-1" role="dialog" aria-labelledby="cveModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" style="width: 90%; max-width: 1400px;" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="cveModalLabel"><i class="fas fa-bug"></i> CVE Details</h5>
+            </div>
+            <div class="modal-body" id="cve_detail_content">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endpush
 @endsection
