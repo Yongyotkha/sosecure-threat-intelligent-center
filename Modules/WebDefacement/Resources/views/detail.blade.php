@@ -254,12 +254,7 @@ return (string)$v;
                 ];
                 }
 
-                if ($chk->score > -1) {
-                    $data['all']['deep_scan'] = [
-                        'name' => 'Structure',
-                        'value' => (float) ($chk->score * 100),
-                    ];
-                }
+
 
                 }
                 } catch (\Throwable $th) {
@@ -1065,6 +1060,7 @@ return (string)$v;
                                
                                 if(response.success){
                                     toastr.success('Update Success', '@langapp('response_status')');
+                                    setTimeout(function() { location.reload(); }, 1000);
                                 } else {
                                     toastr.error(data.message, '@langapp('response_status')');
                                 }
@@ -1164,6 +1160,7 @@ return (string)$v;
         
                         if(data.Result==1){
                             toastr.success('Update Success', '@langapp('response_status')');
+                            setTimeout(function() { location.reload(); }, 1000);
                         } else {
                             toastr.error(data.message, '@langapp('response_status')');
                         }

@@ -363,6 +363,61 @@ class WebDefacementUpdateOriginal extends Command
             $Original->updated_at  = date("Y-m-d H:i:s");
             $Original->save();
 
+            // === [RESET DASHBOARD & SCORES] ===
+            // เมื่อ Update Original แล้ว ต้อง reset คะแนนและ dashboard ให้เป็น 0 ทั้งหมด
+            // เพราะ baseline ใหม่ = สถานะปัจจุบัน ดังนั้นต้องไม่มีความต่าง
+
+            // 1) Reset สถานะใน WebdefacmentSetting
+            $WebdefacmentSetting->status_val             = 'Normal';
+            $WebdefacmentSetting->is_alert_sent          = false;
+            $WebdefacmentSetting->alert_sent_at          = null;
+            $WebdefacmentSetting->webdeflacement_progress = 1;
+            $WebdefacmentSetting->last_check             = date("Y-m-d H:i:s");
+            $WebdefacmentSetting->last_online            = date("Y-m-d H:i:s");
+            $WebdefacmentSetting->save();
+
+            // 2) สร้าง WebdefacmentDataCheck record ใหม่ที่มีค่า 0% ทุกช่อง
+            //    เพื่อให้ Dashboard แสดงผลว่าตรงกับ Original 100%
+            $resetCheck = new WebdefacmentDataCheck;
+            $resetCheck->webdefacment_setting_id = $webdefacment_id;
+            $resetCheck->hash_old        = $hash_code;
+            $resetCheck->hash_new        = $hash_code;
+            $resetCheck->hash_percent    = 0;
+            $resetCheck->filesize_old    = $file_size;
+            $resetCheck->filesize_new    = $file_size;
+            $resetCheck->filesize_percent = 0;
+            $resetCheck->element_old     = $all_element;
+            $resetCheck->element_new     = $all_element;
+            $resetCheck->element_percent = 0;
+            $resetCheck->image_old       = $imageHash;
+            $resetCheck->image_new       = $imageHash;
+            $resetCheck->image_diff      = 0;
+            $resetCheck->image_percent   = 0;
+            $resetCheck->image_url       = $image_url;
+            $resetCheck->image_part      = $part_image;
+            $resetCheck->keyword         = '';
+            $resetCheck->keyword_percent = 0;
+            $resetCheck->last_update     = date("Y-m-d H:i:s");
+            $resetCheck->percent_all     = 0;
+            $resetCheck->status_code     = 'Normal';
+            $resetCheck->webdeflacement_progress = 1;
+
+            // Section monitor fields (reset ให้ตรงกับ baseline ใหม่)
+            $resetCheck->scope_snapshot       = 'sections';
+            $resetCheck->selectors_snapshot   = json_encode($selectors, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+            $resetCheck->merkle_old           = $merkleNow;
+            $resetCheck->merkle_new           = $merkleNow;
+            $resetCheck->simhash_bits         = 0;
+            $resetCheck->section_diffs        = json_encode([], JSON_UNESCAPED_UNICODE);
+            $resetCheck->assets_add           = json_encode([], JSON_UNESCAPED_UNICODE);
+            $resetCheck->assets_del           = json_encode([], JSON_UNESCAPED_UNICODE);
+            $resetCheck->outbound_new_not_whitelisted = json_encode([], JSON_UNESCAPED_UNICODE);
+            $resetCheck->score               = 0;
+            $resetCheck->reason              = 'baseline_updated';
+            $resetCheck->save();
+
+            Log::info("[UpdateOriginal] Dashboard & scores reset to 0 for webdefacment_id={$webdefacment_id}");
+
             $result = [
                 "Result" => 1,
                 "message" => "",
@@ -372,7 +427,7 @@ class WebDefacementUpdateOriginal extends Command
                 "image_url" => $image_url,
                 "part_image" => $part_image,
                 "imageHash" => $imageHash,
-                // "baseline_inited" => $isFirstBaseline ? 1 : 0,
+                "dashboard_reset" => true,
             ];
         } catch (\Throwable $e) {
             Log::error("[UpdateOriginal] error: {$e->getMessage()} @ {$e->getFile()}:{$e->getLine()}");

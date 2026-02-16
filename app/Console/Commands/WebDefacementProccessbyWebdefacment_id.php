@@ -20,6 +20,8 @@ use Modules\WebDefacement\Entities\TestHTMLWeb;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\DefacementAlertMail;
 use App\Entities\TransactionBatchjob;
+use Illuminate\Support\Facades\DB;
+use App\Services\WebDefacementService;
 
 
 class WebDefacementProccessbyWebdefacment_id extends Command
@@ -58,20 +60,12 @@ class WebDefacementProccessbyWebdefacment_id extends Command
   public function handle()
   {
     $webdefacment_id = $this->argument('webdefacment_id');
-    
-    // 🟩 Debug logging
-    $debugRecord = WebdefacmentSetting::where('id', $webdefacment_id)->whereNull('deleted_at')->first();
-    \Log::info("[DefaceNow] ID: {$webdefacment_id}, webdeflacement_progress: " . ($debugRecord->webdeflacement_progress ?? 'NOT_FOUND'));
-    
-    // 🟩 เปลี่ยนเป็นไม่เช็ค webdeflacement_progress เพื่อให้ปุ่มทำงานได้เสมอ
-    $WebdefacmentSetting_datas =  WebdefacmentSetting::where('id', $webdefacment_id)->whereNull('deleted_at')->get();
-    
+
+    $WebdefacmentSetting_datas = WebdefacmentSetting::where('id', $webdefacment_id)->whereNull('deleted_at')->get();
+
     if ($WebdefacmentSetting_datas->isEmpty()) {
-        \Log::warning("[DefaceNow] No records found for ID: {$webdefacment_id}");
         return;
     }
-    
-    \Log::info("[DefaceNow] Found " . $WebdefacmentSetting_datas->count() . " record(s) for ID: {$webdefacment_id}");
     
     foreach ($WebdefacmentSetting_datas as $key => $value) {
       $WebdefacmentSetting_update =   WebdefacmentSetting::find($value->id);
@@ -131,10 +125,8 @@ class WebDefacementProccessbyWebdefacment_id extends Command
 
 
             $image_path_2 = "";
-            // 🟩 ใช้ getHtml3 (Puppeteer) เพื่อให้จับ JS-rendered content ได้
-            $response   = $this->getHtml3($url);
+            $response = $this->getHtml3($url);
 
-            // 🟩 รองรับ format จาก getHtml3
             $htmlFetchFailed = !isset($response['content']) 
                             || $response['content'] === FALSE 
                             || $response['content'] === '' 
@@ -146,45 +138,63 @@ class WebDefacementProccessbyWebdefacment_id extends Command
               $result["messes "] = "Html not found" . (isset($response['error']) ? ": " . $response['error'] : "");
               Log::warning("[DefaceNow] HTML fetch failed for {$url}: " . ($response['error'] ?? 'unknown'));
             } else {
-
-              // $webContent = $response['content'];
-
-              // Debug web content
-
-              // if ($webdefacment_id == 167) {
-              //   $webContent = TestHTMLWeb::testHTML();
-              //   // Log::info($webContent);
-              // } else {
-              //   $webContent = $response['content'];
-              // }
               $webContent = $response['content'];
-
-
-              // End Debug web content
 
               // ===== [SECTION MONITOR] baseline + diff (no-null, adopt keys) =====
               // ===== [SECTION MONITOR] (patched) =====
               try {
                 // 1) config
-                $selectors = json_decode($WebdefacmentSetting_data->hash_selectors ?: '[]', true) ?: ["header", "nav", "main", "#content", ".entry-content", "footer"];
+                // 🟩 Synced with WebDefacementProccess (Cron)
+                $selectors = json_decode($WebdefacmentSetting_data->hash_selectors ?: '[]', true) ?: [
+                  "head",
+                  "#header",
+                  ".header",
+                  "nav",
+                  "#nav",
+                  ".nav",
+                  "main",
+                  "#main",
+                  ".main",
+                  "#content",
+                  ".content",
+                  "content",
+                  ".entry-content"
+                ];
                 $ignores   = json_decode($WebdefacmentSetting_data->hash_ignore_selectors ?: '[]', true) ?: [
-                  ".time",
-                  ".date",
-                  ".timestamp",
-                  ".counter",
-                  ".views",
-                  ".carousel",
-                  ".slider",
-                  ".ticker",
-                  ".marquee",
-                  ".ads",
-                  ".advert",
-                  ".banner",
-                  "#cookie-consent",
-                  ".toast",
-                  ".modal",
-                  ".live",
-                  ".countdown"
+                  "//*[contains(@class,'time')]",
+                  "//*[contains(@class,'date')]",
+                  "//*[contains(@class,'timestamp')]",
+                  "//*[contains(@class,'counter')]",
+                  "//*[contains(@class,'view')]",
+                  "//*[contains(@class,'carousel')]",
+                  "//*[contains(@class,'slider')]",
+                  "//*[contains(@class,'ticker')]",
+                  "//*[contains(@class,'marquee')]",
+                  "//*[contains(@class,'swiper-container')]",
+                  "//*[contains(@class,'ads')]",
+                  "//*[contains(@class,'advert')]",
+                  "//*[contains(@class,'banner')]",
+                  "//*[@id='cookie-consent']",
+                  "//*[contains(@class,'toast')]",
+                  "//*[contains(@class,'modal')]",
+                  "//*[contains(@class,'live')]",
+                  "//*[contains(@class,'countdown')]",
+                  "//*[contains(@class,'slick-track')]",
+                  "//*[contains(@class,'slick-slide')]",
+                  "//*[contains(@class,'swiper-wrapper')]",
+                  "//*[contains(@class,'swiper-slide')]",
+                  "//*[contains(@class,'fade')]",
+                  "//*[starts-with(@id,'__BVID__')]",
+                  "//*[contains(@class,'carousel-inner')]",
+                  "//*[contains(@class,'carousel-item')]",
+                  "//*[@id='fb-root']",
+                  "//*[contains(@class,'fb-customerchat')]",
+                  "//*[contains(@class,'popup')]",
+                  "//*[contains(@class,'v-application')]",
+                  "//*[contains(@class,'v-main')]",
+                  "//*[contains(@class,'v-navigation-drawer')]",
+                  "//*[contains(@class,'v-skeleton-loader')]",
+                  "//*[starts-with(@id,'__nuxt')]"
                 ];
                 $whitelist = json_decode($WebdefacmentSetting_data->domain_whitelist ?: '[]', true) ?: [];
                 $allowPat  = json_decode($WebdefacmentSetting_data->asset_allow_patterns ?: '[]', true) ?: [
@@ -198,6 +208,10 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                   '^/build/',
                   '^/dist/'
                 ];
+                $ignoreAsstPat = json_decode($WebdefacmentSetting_data->asset_ignore_patterns ?: '[]', true) ?: [
+                  'news_main_pic',
+                  'files-rice-',
+                ];
 
                 // 2) normalize + extract (เหมือนเดิม)
                 $domNorm      = $this->normalizeHtml($webContent, $ignores);
@@ -205,23 +219,7 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                 $sectionsHtml = $this->sectionsHtml($domNorm, $selectors);
                 $textAll      = implode("\n", array_values($sectionsText));
 
-                $c = new \Symfony\Component\DomCrawler\Crawler($domNorm);
-                $cnt = [
-                  'footer'  => $c->filter('footer')->count(),
-                  '#footer' => $c->filter('#footer')->count(),
-                  '.footer' => $c->filter('.footer')->count(),
-                  '#main'   => $c->filter('#main')->count(),
-                  '.main'   => $c->filter('.main')->count(),
-                  'body'    => $c->filter('body')->count(),
-                  'content' => $c->filter('contents')->count(),
-                  '.entry-content' => $c->filter('.entry-content')->count(),
-                  'nav'     => $c->filter('nav')->count(),
-                  'header'  => $c->filter('header')->count(),
-                  'main'    => $c->filter('main')->count(),
-                  '#content' => $c->filter('#content')->count(),
-                  '.contents' => $c->filter('.contents')->count(),
-                ];
-                // \Log::debug('[SELS.footer] '.json_encode($cnt));
+
 
 
                 // 2.1 Fallback ถ้า selectors ไม่โดนเลย → เอา body ทั้งก้อนมาใช้
@@ -251,39 +249,32 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                 $secDigSorted = $secDigNow;
                 ksort($secDigSorted, SORT_NATURAL);
                 $merkleNow = $this->merkleCanonical($secDigNow);
-                // $merkleNow = $this->merkleRoot(array_values($secDigSorted));
 
-                // (แนะนำ) เก็บไว้ debug ด้วย จะเห็นว่าใช้ leaves อะไรและลำดับไหน
-                $result['_merkle_leaves'] = $secDigSorted;
-
-
-                // $merkleNow = $this->merkleRoot(array_values($secDigNow));
-                // $simNowHex = $this->simhash64_hex($textAll);
-
-                // ===== ใช้ข้อความจากทั้งหน้าเว็บเพื่อทำ simhash =====
                 $crawler = new \Symfony\Component\DomCrawler\Crawler($domNorm);
                 if ($crawler->filter('body')->count()) {
-                  // เอาเฉพาะข้อความใน body แล้ว normalize ช่องว่าง
                   $textFullPage = trim(preg_replace('/\s+/', ' ', $crawler->filter('body')->text(' ')));
                 } else {
-                  // fallback ถ้าไม่มี <body>
                   $textFullPage = trim(preg_replace('/\s+/', ' ', strip_tags($domNorm)));
                 }
 
-                // simhash ของ "ทั้งหน้าเว็บ"
                 $simNowHex = $this->simhash64_hex($textFullPage);
-
-                Log::debug('defacement.simhash.fullpage', [
-                  'text_length' => strlen($textFullPage),
-                  'simNowHex'   => $simNowHex,
-                ]);
 
 
 
                 // 4) !! เปลี่ยนตรงนี้ !!  ดึง assets/outbound จาก “ทั้งหน้าเดิม” ไม่ใช่เฉพาะ sections
-                list($assetsAllFull, $outboundNow) = $this->assetsAndOutboundFromHtml($webContent, $url);
+                list($assetsAllFull, $outboundNow) = $this->assetsAndOutboundFromHtml($domNorm, $url);
                 $assetsNow = [];
                 foreach ($assetsAllFull as $a) {
+                  // Check ignore first
+                  $isIgnored = false;
+                  foreach ($ignoreAsstPat as $ipat) {
+                    if (@preg_match('/' . $ipat . '/', $a)) {
+                      $isIgnored = true;
+                      break;
+                    }
+                  }
+                  if ($isIgnored) continue;
+
                   foreach ($allowPat as $pat) {
                     if (@preg_match('/' . $pat . '/', $a)) {
                       $assetsNow[] = $a;
@@ -484,7 +475,7 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                   $sectionsChanged  = 0;
                   $skippedEmptyPair = 0;
 
-                  Log::info('sectionDiffs: ' . json_encode(($sectionDiffs ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+
 
                   if (is_array($sectionDiffs) && !empty($sectionDiffs)) {
                     foreach ($sectionDiffs as $row) {
@@ -522,20 +513,6 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                     $sectionRatio = 0.0;
                   }
 
-                  // ===== log ตรวจสอบ =====
-                  Log::debug('defacement.section_diff.stats', [
-                    'sections_total'      => $sectionsTotal,
-                    'sections_changed'    => $sectionsChanged,
-                    'skipped_empty_pairs' => $skippedEmptyPair,
-                    'section_ratio'       => round($sectionRatio, 4),
-                  ]);
-
-
-                  // รอบ adopted ไม่คิดสัญญาณจาก section_diff
-                  if ($adopted ?? false) {
-                    $sectionRatio = 0.0;
-                  }
-
                   // คอมโพเนนต์ตามน้ำหนักใหม่
                   $component_section = 0.50 * $sectionRatio;                    // สูงสุด 0.50
                   $component_assets  = 0.20 * $signals_assets;                  // สูงสุด 0.20
@@ -545,20 +522,11 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                   // รวมคะแนนสุดท้าย (0..1)
                   $score = $component_section + $component_assets + $component_domain + $component_bits;
 
-                  Log::debug('defacement.score', [
-                    'component_section' => round($component_section, 3),
-                    'component_assets'  => round($component_assets, 3),
-                    'component_domain'  => round($component_domain, 3),
-                    'component_bits'    => round($component_bits, 3),
-                    'score'             => $score,
-                  ]);
-
-                  // คํานวณเหตุผล
+                  // คํานวณเหตุผล (synced with Cron)
                   $reason = $adopted ? 'baseline_adopted_new_selectors'
                     : (!empty($outbound_new_not_whitelisted) ? 'new_outbound_domain'
                       : ((count($assets_add) + count($assets_del)) >= 2 ? 'assets_delta'
                         : ($score >= 0.75 ? 'score_threshold' : null)));
-                  // Log::debug('now'.$merkleNow.'base'.$baselineMerkle);
                 }
 
 
@@ -572,12 +540,13 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                 $result['_assets_add']             = $assets_add;
                 $result['_assets_del']             = $assets_del;
                 $result['_outbound_new_not_wl']    = $outbound_new_not_whitelisted;
+
+
                 $result['_score']                  = round($score, 3);
                 $result['_reason']                 = $reason;
 
                 $result['_score_percent']          = $score * 100;
 
-                Log::debug('[SECTION] merkleNow=' . $merkleNow . ' simBits=' . $simBits . ' isFirst=' . ($isFirstBaseline ? '1' : '0') . 'sections_diffs=' . count($sectionDiffs));
               } catch (\Throwable $e) {
                 Log::error('[SECTION MONITOR] ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
               }
@@ -639,23 +608,6 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                   $result['file_size_parcent'] = round($percent, 2); // ปัดทศนิยม 2 ตำแหน่ง
                 }
 
-
-                // $all_element_parcent = ($WebdefacmentDataOriginal_data->filesize - $result['file_size']);
-                // if ($all_element_parcent == 0) {
-                //   $result['file_size_parcent'] = 0;
-                // } else  if ($all_element_parcent == 1 || $all_element_parcent == -1) {
-                //   $result['file_size_parcent'] = 20;
-                // } else if ($all_element_parcent == 2 || $all_element_parcent == -2) {
-                //   $result['file_size_parcent'] = 40;
-                // } else if ($all_element_parcent == 3 || $all_element_parcent == -3) {
-                //   $result['file_size_parcent'] = 60;
-                // } else  if ($all_element_parcent == 4 || $all_element_parcent == -4) {
-                //   $result['file_size_parcent'] = 80;
-                // } else {
-                //   $result['file_size_parcent'] = 100;
-                // }
-
-
                 $message = $message . '
                 <div class="card-log">
                 <div class="card-log-body">
@@ -685,22 +637,6 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                   if ($percent > 100) $percent = 100;    // จำกัดสูงสุดที่ 100%
                   $result['all_element_parcent'] = round($percent, 2);
                 }
-
-
-                // $all_element_parcent = ($WebdefacmentDataOriginal_data->element - $result['all_element']);
-                // if ($all_element_parcent == 0) {
-                //   $result['all_element_parcent'] = 0;
-                // } else if ($all_element_parcent <= 3 || $all_element_parcent >= -3) {
-                //   $result['all_element_parcent'] = 20;
-                // } else if ($all_element_parcent <= 8 || $all_element_parcent >= -8) {
-                //   $result['all_element_parcent'] = 40;
-                // } else if ($all_element_parcent < 12 || $all_element_parcent >= -12) {
-                //   $result['all_element_parcent'] = 60;
-                // } else  if ($all_element_parcent <= 15 || $all_element_parcent >= -15) {
-                //   $result['all_element_parcent'] = 80;
-                // } else {
-                //   $result['all_element_parcent'] = 100;
-                // }
                 $message = $message . '
               <div class="card-log">
               <div class="card-log-body">
@@ -708,7 +644,7 @@ class WebDefacementProccessbyWebdefacment_id extends Command
               </div>
               </div>';
               }
-              if ($WebdefacmentSetting_data->image_check == 1) {
+              if ($WebdefacmentSetting_data->image_check == 2) {
                 $totalConfig += 0.5;
                 $url_id = $WebdefacmentDataOriginal_data->url_id;
                 $site_id = $WebdefacmentSetting_data->site_id;
@@ -858,6 +794,20 @@ class WebDefacementProccessbyWebdefacment_id extends Command
 
 
 
+              // 🟩 Added: Log Assets Difference (Add/Del)
+              $assets_diff_count = count($result['_assets_add'] ?? []) + count($result['_assets_del'] ?? []);
+              if ($assets_diff_count > 0) {
+                  $assetsMsg = "Changed: $assets_diff_count files";
+                  $message = $message . '
+                  <div class="card-log">
+                  <div class="card-log-body">
+                  <p>Assets Difference: ' . $assetsMsg . '</p>
+                  </div>
+                  </div>';
+              }
+
+
+
               $pointAlert = $this->calculatePoint2($result, $totalConfig);
 
               $status = 'Normal';
@@ -866,6 +816,8 @@ class WebDefacementProccessbyWebdefacment_id extends Command
               } else if ($pointAlert >= 75) {
                 $status = 'High';
               }
+
+              /* 🟩 REMOVED Force Medium Block by user request */
               $WebdefacmentDataCheck_save = new WebdefacmentDataCheck;
               $WebdefacmentDataCheck_save->webdefacment_setting_id = $webdefacment_id;
               $WebdefacmentDataCheck_save->hash_old =  $WebdefacmentDataOriginal_data->hash;
@@ -937,15 +889,10 @@ class WebDefacementProccessbyWebdefacment_id extends Command
               if ($status == 'Normal' || $status == 'Medium') {
                 $WebdefacmentSetting_update->webdeflacement_progress = 1;
 
-                if ($status == 'Medium') {
+                if ($status == 'Medium' || (count($result['_assets_add'] ?? []) + count($result['_assets_del'] ?? []) > 0)) {
                   $WebdefacmentDataLog_save = new WebdefacmentDataLog;
                   $WebdefacmentDataLog_save->webdefacment_setting_id  = $webdefacment_id;
                   $WebdefacmentDataLog_save->webdefacment_data_check_id  = $WebdefacmentDataCheck_save->id;
-                  //  $WebdefacmentDataLog_save->message ='hash:'.$result['hash_code'].'(percent:'.$result['hash_parcent'].'%)';
-                  // $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>filesize:'.$result['file_size'].'(percent:'.$result['file_size_parcent'].'%)';
-                  // $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>element:'.$result['all_element'].'(percent:'.$result['all_element_parcent'].'%)';
-                  // $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>image:'.$result['image_diff'].'(percent:'.$result['image_parcent'].'%)';
-                  //   $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>blacklistKeywords:'.implode (",", $blackListFoundString);
 
                   $WebdefacmentDataLog_save->hash_percent  = $result['hash_parcent'];
                   $WebdefacmentDataLog_save->filesize_percent  = $result['file_size_parcent'];
@@ -965,19 +912,6 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                 $WebdefacmentDataLog_save->webdefacment_setting_id  = $webdefacment_id;
                 $WebdefacmentDataLog_save->webdefacment_data_check_id  = $WebdefacmentDataCheck_save->id;
 
-
-
-
-
-
-
-
-
-                //  $WebdefacmentDataLog_save->message ='hash:'.$result['hash_code'].'(percent:'.$result['hash_parcent'].'%)';
-                // $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>filesize:'.$result['file_size'].'(percent:'.$result['file_size_parcent'].'%)';
-                // $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>element:'.$result['all_element'].'(percent:'.$result['all_element_parcent'].'%)';
-                // $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>image:'.$result['image_diff'].'(percent:'.$result['image_parcent'].'%)';
-                //   $WebdefacmentDataLog_save->message =$WebdefacmentDataLog_save->message.'<br>blacklistKeywords:'.implode (",", $blackListFoundString);
                 $WebdefacmentDataLog_save->message = $message;
                 $WebdefacmentDataLog_save->created_date  = date("Y-m-d H:i:s");
                 $WebdefacmentDataLog_save->updated_date  = date("Y-m-d H:i:s");
@@ -999,35 +933,7 @@ class WebDefacementProccessbyWebdefacment_id extends Command
               $WebdefacmentSetting_update->last_online = date("Y-m-d H:i:s");
               $WebdefacmentSetting_update->status_val = $status;
 
-              // try {
-              //   // หากสถานะเป็น High และยังไม่เคยส่งแจ้งเตือน
-              //   if ($status === 'High' && !$WebdefacmentSetting_update->is_alert_sent) {
-              //     // ดึงอีเมล
-              //     $emails = DB::table('site_config_email_alert_defacement')
-              //       ->where('site_id', $WebdefacmentSetting_update->site_id)
-              //       ->pluck('email')
-              //       ->filter()
-              //       ->unique()
-              //       ->values()
-              //       ->all();
-
-              //     if (!empty($emails)) {
-              //       try {
-              //         Mail::to($emails)->send(new DefacementAlertMail($WebdefacmentSetting_update));
-              //         $WebdefacmentSetting_update->is_alert_sent = true;
-              //         $WebdefacmentSetting_update->alert_sent_at = now();
-              //       } catch (\Throwable $e) {
-              //         Log::error("แจ้งเตือนล้มเหลว: " . $e->getMessage());
-              //         // ยังไม่ต้อง set is_alert_sent เพื่อให้ retry รอบหน้า
-              //       }
-              //     }
-              //   }
-              // } catch (\Throwable $e) {
-              //   Log::error("ส่งแจ้งเตือนล้มเหลว: " . $e->getMessage());
-              // }
-
               try {
-                // หากสถานะเป็น High และยังไม่เคยส่งแจ้งเตือน
                 if ($status === 'High' && !$WebdefacmentSetting_update->is_alert_sent) {
 
                   // 1) ดึงอีเมลปลายทาง
@@ -1059,17 +965,6 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                       $diff['assets_del']    = $toArr(isset($diff['assets_del']) ? $diff['assets_del'] : []);
                       $diff['outbound_new']  = $toArr(isset($diff['outbound_new']) ? $diff['outbound_new'] : []);
 
-                      // (ออปชัน) log สั้น ๆ เพื่อดีบัก
-                      Log::info('defacement command diff snapshot', [
-                        'setting_id' => $WebdefacmentSetting_update->id,
-                        'success'    => isset($diff['success']) ? $diff['success'] : null,
-                        'sec_count'  => count($diff['section_diffs']),
-                        'add_count'  => count($diff['assets_add']),
-                        'del_count'  => count($diff['assets_del']),
-                        'out_count'  => count($diff['outbound_new']),
-                      ]);
-
-                      // 4) ส่งอีเมล พร้อม diff (ไม่ต้องมี viewUrl ตอนนี้ → ส่ง null)
                       Mail::to($emails)->send(
                         new DefacementAlertMail($WebdefacmentSetting_update, $diff, 20, null)
                       );
@@ -1117,7 +1012,7 @@ class WebDefacementProccessbyWebdefacment_id extends Command
 
 
 
-              print_r($webdefacment_id);
+              // print_r($webdefacment_id);
             }
           } else {
             // $result["Result"] = 0;
@@ -1146,8 +1041,10 @@ class WebDefacementProccessbyWebdefacment_id extends Command
 
  private function calculatePoint2($trackList, $totalConfig)
   {
-    //  $totalPoint = $trackList['all_element_parcent'] + $trackList['file_size_parcent'] + $trackList['hash_parcent'] + $trackList['image_parcent'] + $trackList['blacklist_parcent'];
+    // [ACTIVE] Use granular _score_percent (Deep Scan) instead of binary hash_parcent
     $totalPoint = $trackList['all_element_parcent'] + $trackList['file_size_parcent'] + $trackList['_score_percent'] + $trackList['image_parcent'] + $trackList['blacklist_parcent'];
+    
+    if ($totalConfig == 0) return 0;
     $result = $totalPoint / $totalConfig;
     return $result;
   }

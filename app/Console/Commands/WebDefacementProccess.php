@@ -448,7 +448,86 @@ class WebDefacementProccess extends Command
               continue; // ข้ามไปเว็บถัดไป ลองใหม่รอบหน้า
             }
 
+            // 🟩 [NEW] Soft Error / Anomaly Detection Logic
+            // ตรวจสอบว่า Content ที่ได้มาเป็น "หน้า Error" หรือไม่ (เช่น 403, 404, Maintenance) แม้จะได้ HTTP 200
+            $softErrorReason = null;
             $webContent = $response['content'];
+            $contentLen = strlen($webContent);
+
+            // 1. Keyword Definitions
+            $errorKeywords = [
+                'Access Denied', 
+                '403 Forbidden', 
+                '404 Not Found', 
+                '500 Internal Server Error', 
+                '502 Bad Gateway', 
+                '503 Service Unavailable', 
+                '504 Gateway Time-out', 
+                'Under Maintenance', 
+                'Site Offline', 
+                'Security Check', 
+                'Cloudflare', 
+                'Sucuri', 
+                'Just a moment...',
+                'Attention Required!',
+                'WAF Block'
+            ];
+
+            // 2. Check for Keywords in Short Content (Dangerous if content is small)
+            // ถ้า Content สั้นผิดปกติ (< 2000 chars) และมี keywords พวกนี้ -> ชัวร์ว่าเป็น Error page
+            if ($contentLen < 2000) {
+                foreach ($errorKeywords as $kw) {
+                    if (stripos($webContent, $kw) !== false) {
+                        $softErrorReason = "Technical Error Page detected (Keyword: '{$kw}', Len: {$contentLen})";
+                        break;
+                    }
+                }
+            }
+            
+            // 3. Check for Drastic Drop (Anomaly) vs Baseline
+            // ถ้า Content หายไปเกือบหมด (> 80%) เทียบกับ Baseline โดยไม่สนใจ Keyword
+            if (!$softErrorReason && $WebdefacmentDataOriginal_data) {
+                $baseSize = $WebdefacmentDataOriginal_data->filesize ?? 0;
+                if ($baseSize > 5000) { // เฉพาะเว็บที่มี content พอสมควร
+                    $dropRatio = ($baseSize - $contentLen) / $baseSize;
+                    if ($dropRatio > 0.80) { // หายไปเกิน 80%
+                        $softErrorReason = "Drastic content drop detected (Base: {$baseSize} -> Now: {$contentLen}, Drop: " . round($dropRatio * 100) . "%)";
+                    }
+                }
+            }
+
+            // 4. Handle Soft Error (Treat exactly like Network Error)
+            if ($softErrorReason) {
+                Log::warning("Skipping diff for {$url} due to Soft Error (will retry next cycle): {$softErrorReason}");
+                
+                $WebdefacmentSetting_update->webdeflacement_progress = 1; 
+                $WebdefacmentSetting_update->last_check = date("Y-m-d H:i:s");
+                $WebdefacmentSetting_update->save();
+
+                try {
+                    DB::table('webdefacement_stat_log')->insert([
+                      'site_id' => $WebdefacmentSetting_update->site_id,
+                      'webdefacement_setting_id' => $value->id,
+                      'result_id' => null,
+                      'status' => 'Skipped',
+                      'score' => 0,
+                      'diff_percent' => 0,
+                      'hash_changed' => 0,
+                      'image_changed' => 0,
+                      'alert_sent' => 0,
+                      'reason' => 'soft_error_retry_next: ' . substr($softErrorReason, 0, 100),
+                      'checked_at' => now(),
+                      'created_at' => now(),
+                      'updated_at' => now(),
+                    ]);
+                  } catch (\Throwable $statEx) {
+                    // ignore
+                  }
+
+                continue; // Skip processing
+            }
+
+
             
             // Optional: Debug specific site if needed (can be removed or kept generic)
             // if ($webdefacment_id == 204) { ... }
