@@ -17,3 +17,9 @@ vendor/*
 .env
 .env.example
 /vendor/laravel/framework/src/Illuminate/Cache/FileStore.php
+/public/images/file_editor
+/public/images/webdefacment_mages
+/puphpeteer_env
+/resources/tools/firefox
+/cache_log
+vendor/squizlabs
