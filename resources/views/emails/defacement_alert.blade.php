@@ -570,7 +570,7 @@ $mn = (string) ($diff['merkle_new'] ?? '');
             string $label = '',
             int $size = 86,
             int $thickness = 8,
-            int $retina = 4
+            int $retina = 2
           ): string {
             $pct = max(0, min(100, $pct));
             $retina = max(1, $retina);
@@ -608,8 +608,12 @@ $mn = (string) ($diff['merkle_new'] ?? '');
 
             $percentText = $pct . '%';
             $fontPath = base_path('resources/fonts/Montserrat-Regular.ttf');
-            if (is_file($fontPath) && function_exists('imagettftext')) {
-              $fontSize = (int) round($S * 0.2);
+            
+            // ตรวจสอบว่ามี FreeType และไฟล์ Font หรือไม่
+            $hasTTF = is_file($fontPath) && function_exists('imagettftext');
+
+            if ($hasTTF) {
+              $fontSize = (int) round($S * 0.2); // ปรับลดเป็น 0.2 (ขนาดตั้งต้นแบบคมชัด)
               $bbox = imagettfbbox($fontSize, 0, $fontPath, $percentText);
               $textW = $bbox[2] - $bbox[0];
               $textH = $bbox[1] - $bbox[7];
@@ -617,12 +621,33 @@ $mn = (string) ($diff['merkle_new'] ?? '');
               $y = (int) (($S + $textH) / 2);
               imagettftext($im, $fontSize, 0, $x, $y, $textC, $fontPath, $percentText);
             } else {
-              $font = 12;
+              // --- FALLBACK CASE (เครื่อง UAT มักจะติดตรงนี้) ---
+              // ขยายขนาดขึ้นเล็กน้อย (80x80) เพื่อให้ภาพไม่แตก (Quality ดีขึ้น) 
+              // แต่ยังรักษาความใหญ่ของ Font มาตรฐานไว้
+              imagedestroy($im);
+              
+              $smallS = 90; 
+              $smallT = 8;
+              $im = imagecreatetruecolor($smallS, $smallS);
+              imagesavealpha($im, true);
+              $trans = imagecolorallocatealpha($im, 0, 0, 0, 127);
+              imagefill($im, 0, 0, $trans);
+              
+              $gray = imagecolorallocate($im, 229, 231, 235);
+              $fg = ($pct >= 80) ? imagecolorallocate($im, 220, 38, 38) : (($pct >= 50) ? imagecolorallocate($im, 217, 119, 6) : imagecolorallocate($im, 22, 163, 74));
+              $white = imagecolorallocate($im, 255, 255, 255);
+              $textC = imagecolorallocate($im, 5, 20, 50);
+
+              imagefilledellipse($im, $smallS/2, $smallS/2, $smallS-2, $smallS-2, $gray);
+              if ($pct > 0) {
+                imagefilledarc($im, $smallS/2, $smallS/2, $smallS-2, $smallS-2, -90, -90+(360*$pct/100), $fg, IMG_ARC_PIE);
+              }
+              imagefilledellipse($im, $smallS/2, $smallS/2, $smallS-(2*$smallT), $smallS-(2*$smallT), $white);
+
+              $font = 5; 
               $textW = imagefontwidth($font) * strlen($percentText);
               $textH = imagefontheight($font);
-              $x = (int) (($S - $textW) / 2);
-              $y = (int) (($S - $textH) / 2);
-              imagestring($im, $font, $x, $y, $percentText, $textC);
+              imagestring($im, $font, ($smallS-$textW)/2, ($smallS-$textH)/2, $percentText, $textC);
             }
 
             ob_start();
