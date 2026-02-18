@@ -273,6 +273,7 @@
                                 @endif
                                 @if($role_custom['data_leak'])
                                     <button class="btn btn-selector" onclick="select_pagename('Data Leak')"><i class="fas fa-database icon"><b class="bg-info"></b></i> Data Leak</button>
+                                     <button class="btn btn-selector" onclick="select_pagename('Credential Leak')"><i class="fas fa-key icon"><b class="bg-info"></b></i> Credential Leak</button>
                                 @endif
                                 @if($role_custom['web_defacement'])
                                     <button class="btn btn-selector" onclick="select_pagename('Web Defacement')"><i class="fas fa-globe icon"><b class="bg-info"></b></i> Web Defacement</button>
@@ -519,7 +520,7 @@ Highcharts.setOptions({
             count_vulnerability_host();
         @endif
 
-        {{--data_table();--}}
+        data_table();
         set_cookie_site($(`#${id_select_site}`).val());
     }
 
@@ -530,7 +531,7 @@ Highcharts.setOptions({
         end = moment();
         cb(start, end);
         pagename = '';
-        {{--data_table();--}}
+        data_table();
         {{--$('#type').val('').trigger('change');$('#keyword').val('');--}}
 
 
@@ -539,7 +540,7 @@ Highcharts.setOptions({
 
     function select_pagename(value) {
         pagename = value;
-        {{--data_table();--}}   
+        data_table();   
     }
 
     $( document ).ready(function() {
@@ -578,7 +579,7 @@ Highcharts.setOptions({
                 count_vulnerability_host();
             @endif
             
-            {{--data_table();--}}
+            data_table();
         }
         
         {{--document.getElementById('current-date').innerHTML = today_date;--}}
@@ -596,7 +597,7 @@ Highcharts.setOptions({
 
         $('#date-rang').on('apply.daterangepicker', function(ev, picker) {
             
-            {{--data_table();--}}
+            data_table();
             if (!picker.startDate.isValid() || !picker.endDate.isValid()) {
                 
             }
