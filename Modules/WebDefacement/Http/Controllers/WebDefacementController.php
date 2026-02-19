@@ -841,32 +841,33 @@ class WebDefacementController extends Controller
         }
         $webdefacement = WebdefacmentSetting::where('id', $request->id)->first();
 
-        if ($webdefacement->get_webdefacment_data_original_detail[0]->url_id) {
-            $url_id = $webdefacement->get_webdefacment_data_original_detail[0]->url_id;
-        } else {
-            $url_id = 0;
+        if (!$webdefacement) {
+            return response()->json(['Result' => 0, 'message' => 'Setting not found'], 404);
         }
 
-        $html = '';
-        $site_id = $webdefacement->site_id;
-        $url_web = $webdefacement->url;
-        $port_web = $webdefacement->port;
-        // $url_id = $webdefacement->url_id;
-        $delay_screenshot_val = $webdefacement->delay_screen_shot_val;
+        // ใช้ UpdateOriginal command ซึ่งใช้ Puppeteer + ถ่าย screenshot อยู่แล้ว
+        $command = 'app:WebDefacementUpdateOriginal';
+        $params = ['webdefacment_id' => $webdefacement->id];
 
-        // dd($port_web);
-        $command = 'app:WebDefacementsCreenshotCheck';
+        try {
+            Artisan::call($command, $params);
+            $output = Artisan::output();
 
-        $params = [
-            'url' => $url_web,
-            'port' => $port_web,
-            'site_id' => $site_id,
-            'url_id' => $url_id,
-            'delay' => $delay_screenshot_val,
-        ];
+            // Reload เพื่อเอา image_original ล่าสุดจาก DB
+            $webdefacement->refresh();
 
-        Artisan::call($command, $params);
-        $result = Artisan::output();
+            return json_encode([
+                'Result'    => 1,
+                'image_url' => $webdefacement->image_original ?? '',
+                'message'   => 'Screenshot updated successfully',
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('[update_image] Error: ' . $e->getMessage());
+            return json_encode([
+                'Result'  => 0,
+                'message' => 'Failed to update screenshot: ' . $e->getMessage(),
+            ]);
+        }
     }
 
     function get_code_site(Request $request)

@@ -248,7 +248,7 @@ class WebDefacementUpdateOriginal extends Command
             } else {
                 $textFull = trim(preg_replace('/\s+/', ' ', strip_tags($domNorm)));
             }
-            $simNowHex = $this->simhash64_hex($textFull);
+            $simNowHex = $this->simhash64_hex($this->normalizeTextForSimhash($textFull));
 
             // 5) assets/outbound จาก “ทั้งหน้า”
             [$assetsAll, $outboundNow] = $this->assetsAndOutboundFromHtml($domNorm, $url);
@@ -859,6 +859,33 @@ class WebDefacementUpdateOriginal extends Command
     private function sha256(string $s): string
     {
         return hash('sha256', $s);
+    }
+
+    // ===== Normalize text ก่อน SimHash: ลบ dynamic content (วันที่/เวลา/token/ตัวเลข) =====
+    private function normalizeTextForSimhash(string $text): string
+    {
+        // 1) ลบ ISO date: 2026-02-16, 2026/02/16
+        $text = preg_replace('/\b\d{4}[-\/]\d{1,2}[-\/]\d{1,2}\b/', '', $text);
+
+        // 2) ลบ date แบบ dd/mm/yyyy, dd-mm-yyyy
+        $text = preg_replace('/\b\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}\b/', '', $text);
+
+        // 3) ลบเวลา: 13:41:46, 1:41 PM, 13:41
+        $text = preg_replace('/\b\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM|am|pm)?\b/', '', $text);
+
+        // 4) ลบ hex tokens ยาว >= 16 ตัว (CSRF, nonce, session)
+        $text = preg_replace('/\b[0-9a-fA-F]{16,}\b/', '', $text);
+
+        // 5) ลบ UUID
+        $text = preg_replace('/\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b/', '', $text);
+
+        // 6) ลบตัวเลข standalone (view count, pagination, etc.)
+        $text = preg_replace('/\b\d{1,10}\b/', '', $text);
+
+        // 7) ยุบ whitespace
+        $text = preg_replace('/\s+/', ' ', $text);
+
+        return trim($text);
     }
 
     // ===== SimHash แบบเก็บเป็น HEX 16 ตัวอักษร (อิสระจาก 32/64-bit) =====

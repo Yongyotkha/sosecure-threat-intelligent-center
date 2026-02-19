@@ -1188,58 +1188,8 @@ return (string)$v;
 
 
         function update_image() { 
-        
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            heightAuto: false,
-            confirmButtonText: 'Yes'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    type:"POST",
-                    url:"{{ route('webdefacement.update_image') }}",
-                    data:{id: {!!json_encode(@$webdefacement->id)!!}},
-                    beforeSend: function(){
-                        $('#Defacement').loading('start');
-                    },
-                    success:function(response) {
-
-                        let data = JSON.parse(response);
-
-                        $('#updateImage_original').html(`<a href="${base_url}/${data.image_url}" data-lightbox="name-img-2"><img src="${base_url}/${data.image_url}" onerror="setDefaultPic(this)"/>a>`);
-                
-                            $('#Defacement').loading('stop');
-
-                        
-                    
-                
-                        if(data.Result==1){
-                            toastr.success('Update Success', '@langapp('response_status')');
-                        } else {
-                            toastr.error(data.message, '@langapp('response_status')');
-                        }
-                        {{--window.location.href = response.redirect;--}}
-                    },
-                    error: function (error){
-                        ('#updateImage_original').loading('stop');
-                        var errors = error.response.data.errors;
-                        var errorsHtml = '';
-                        $.each(errors, function (key, value) {
-                            errorsHtml += '<li>' + value[0] + '</li>';
-                        });
-                        toastr.error(errorsHtml, '@langapp('response_status') ');
-                    }
-    
-                });
-
-            }   
-        })
-    };
+            update_original();
+        };
 
 
         $.ajaxSetup({

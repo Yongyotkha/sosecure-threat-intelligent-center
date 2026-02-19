@@ -158,7 +158,10 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                   "#content",
                   ".content",
                   "content",
-                  ".entry-content"
+                  ".entry-content",
+                  "footer",
+                  "#footer",
+                  ".footer"
                 ];
                 $ignores   = json_decode($WebdefacmentSetting_data->hash_ignore_selectors ?: '[]', true) ?: [
                   "//*[contains(@class,'time')]",
@@ -257,7 +260,7 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                   $textFullPage = trim(preg_replace('/\s+/', ' ', strip_tags($domNorm)));
                 }
 
-                $simNowHex = $this->simhash64_hex($textFullPage);
+                $simNowHex = $this->simhash64_hex($this->normalizeTextForSimhash($textFullPage));
 
 
 
@@ -517,7 +520,9 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                   $component_section = 0.50 * $sectionRatio;                    // สูงสุด 0.50
                   $component_assets  = 0.20 * $signals_assets;                  // สูงสุด 0.20
                   $component_domain  = 0.20 * $signals_outbound;                // สูงสุด 0.20
-                  $component_bits    = 0.10 * min(1.0, $simBits / 64.0);        // สูงสุด 0.10
+                  $simBitsThreshold  = 30; // ≤30 bits = dynamic noise, ไม่นับเป็นคะแนน
+                  $effectiveSimBits  = max(0, $simBits - $simBitsThreshold);
+                  $component_bits    = 0.10 * min(1.0, $effectiveSimBits / (64.0 - $simBitsThreshold));  // สูงสุด 0.10
 
                   // รวมคะแนนสุดท้าย (0..1)
                   $score = $component_section + $component_assets + $component_domain + $component_bits;
@@ -1418,6 +1423,33 @@ class WebDefacementProccessbyWebdefacment_id extends Command
   private function sha256(string $s): string
   {
     return hash('sha256', $s);
+  }
+
+  // ===== Normalize text ก่อน SimHash: ลบ dynamic content (วันที่/เวลา/token/ตัวเลข) =====
+  private function normalizeTextForSimhash(string $text): string
+  {
+    // 1) ลบ ISO date: 2026-02-16, 2026/02/16
+    $text = preg_replace('/\b\d{4}[-\/]\d{1,2}[-\/]\d{1,2}\b/', '', $text);
+
+    // 2) ลบ date แบบ dd/mm/yyyy, dd-mm-yyyy
+    $text = preg_replace('/\b\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}\b/', '', $text);
+
+    // 3) ลบเวลา: 13:41:46, 1:41 PM, 13:41
+    $text = preg_replace('/\b\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM|am|pm)?\b/', '', $text);
+
+    // 4) ลบ hex tokens ยาว >= 16 ตัว (CSRF, nonce, session)
+    $text = preg_replace('/\b[0-9a-fA-F]{16,}\b/', '', $text);
+
+    // 5) ลบ UUID
+    $text = preg_replace('/\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b/', '', $text);
+
+    // 6) ลบตัวเลข standalone (view count, pagination, etc.)
+    $text = preg_replace('/\b\d{1,10}\b/', '', $text);
+
+    // 7) ยุบ whitespace
+    $text = preg_replace('/\s+/', ' ', $text);
+
+    return trim($text);
   }
 
   // ===== SimHash แบบเก็บเป็น HEX 16 ตัวอักษร (อิสระจาก 32/64-bit) =====
