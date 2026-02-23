@@ -3,7 +3,7 @@
         <header class="panel-heading font-bold panel-header-blue">
             <div class="row">
                 <div class="col-md-12">
-                    <i class="fas fa-filter"></i> Filter
+                    <i class="fas fa-filter"></i> Filters
                 </div>
         </header>
         <div class="panel-body">
