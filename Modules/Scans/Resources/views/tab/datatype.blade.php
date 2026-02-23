@@ -339,98 +339,112 @@
                 }
 
                 let table_idx = 0;
+                html += `<table class="table table-bordered asset-table-unified">
+                    <thead>
+                        <tr>
+                            <th>Source Asset</th>
+                            <th>Data Type</th>
+                            <th>Value</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+                let all_assets_info = [];
+
                 for(let type in groupedByType){
                     for(let i in groupedByType[type]){
-                        table_idx++;
                         const data_referent = groupedByType[type][i];
                         const raw_data = data_referent.raw_data;
                         const data_transaction = data_referent.data;
                         const selected_type = data_referent.selected_type;
+                        
+                        let count = 0;
+                        let checkSubAssetDplicate = [];
 
-                        html += `<div class="col-md-3">
-                            <h4 class="text-dark">${raw_data}</h4>
-                        </div>
-                        <div class="col-md-9">
-                            <table class="table table-bordered asset-table-${table_idx}">
-                                <tbody>`;
-                                    let count = 0;
-                                    let checkSubAssetDplicate = [];
+                        all_assets_info.push({
+                            raw_data: raw_data,
+                            domain_id: (data_transaction && data_transaction[0]) ? data_transaction[0].domain_id : '',
+                            site_id: (data_transaction && data_transaction[0]) ? data_transaction[0].site_id : ''
+                        });
+
+                        if (data_transaction && data_transaction.length > 0) {
+                            for(let c in data_transaction){
+                                const data_transaction_val = data_transaction[c];
+                                if (checkSubAssetDplicate.indexOf(`${data_transaction_val.data_type}${data_transaction_val.raw_data}`) == -1) {
+                                    checkSubAssetDplicate.push(`${data_transaction_val.data_type}${data_transaction_val.raw_data}`);
+                                    number_rows++;
+                                    count++;
                                     
-                                    if (data_transaction && data_transaction.length > 0) {
-                                        for(let c in data_transaction){
-                                            const data_transaction_val = data_transaction[c];
-                                            if (checkSubAssetDplicate.indexOf(`${data_transaction_val.data_type}${data_transaction_val.raw_data}`) == -1) {
-                                                checkSubAssetDplicate.push(`${data_transaction_val.data_type}${data_transaction_val.raw_data}`);
-                                                number_rows++;
-                                                count++;
-                                                if(count == 1){
-                                                    html += `<input type="hidden" name="assets[]" class="form-control" value="${raw_data}" data-domain_id="${data_transaction_val.domain_id || ''}" data-site_id="${data_transaction_val.site_id || ''}">`;
+                                    html += `<tr id="rows_${number_rows}">
+                                        <td style="vertical-align: middle;">
+                                            <strong>${raw_data}</strong>
+                                            <input type="hidden" name="assets[]" value="${raw_data}" data-domain_id="${data_transaction_val.domain_id || ''}" data-site_id="${data_transaction_val.site_id || ''}">
+                                        </td>
+                                        <td>
+                                            <select name="data_type[]" class="select2 form-control">`;
+                                            for(let b in result.data_type){
+                                                base_datatype = result.data_type;
+                                                const data_type = result.data_type[b];
+                                                let isSelected = false;
+                                                if (selected_type && data_transaction_val.raw_data == raw_data) {
+                                                    isSelected = (data_type.value && data_type.value.trim().toLowerCase() == selected_type.trim().toLowerCase());
+                                                } else if (data_transaction_val.data_type) {
+                                                    isSelected = (data_type.value && data_type.value.trim().toLowerCase() == data_transaction_val.data_type.trim().toLowerCase());
                                                 }
-                                                
-                                                html += `<tr id="rows_${number_rows}">
-                                                    <td>
-                                                        <select name="data_type[]" class="select2 form-control">`;
-                                                        for(let b in result.data_type){
-                                                            base_datatype = result.data_type;
-                                                            const data_type = result.data_type[b];
-                                                            
-                                                            let isSelected = false;
-                                                            if (selected_type && data_transaction_val.raw_data == raw_data) {
-                                                                isSelected = (data_type.value && data_type.value.trim().toLowerCase() == selected_type.trim().toLowerCase());
-                                                            } else if (data_transaction_val.data_type) {
-                                                                isSelected = (data_type.value && data_type.value.trim().toLowerCase() == data_transaction_val.data_type.trim().toLowerCase());
-                                                            }
-
-                                                            html += `<option value="${data_type.id}" ${isSelected ? 'selected' : ''} data-raw_data="${raw_data}">${data_type.value}</option>`;
-                                                        }
-                                                        html += `</select>
-                                                    </td>
-                                                    <td>
-                                                        <input type="text" name="raw_data[]" class="form-control" value="${data_transaction_val.raw_data}" data-raw_data="${raw_data}">
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_tr(${number_rows})">
-                                                            <span>@icon('solid/trash-alt')
-                                                        </button>
-                                                    </td>
-                                                </tr>`;
+                                                html += `<option value="${data_type.id}" ${isSelected ? 'selected' : ''} data-raw_data="${raw_data}">${data_type.value}</option>`;
                                             }
-                                        }
-                                    } else {
-                                        number_rows++;
-                                        html += `<input type="hidden" name="assets[]" class="form-control" value="${raw_data}">`;
-                                        html += `<tr id="rows_${number_rows}">
-                                            <td>
-                                                <select name="data_type[]" class="select2 form-control">`;
-                                                for(let b in result.data_type){
-                                                    base_datatype = result.data_type;
-                                                    const data_type = result.data_type[b];
-                                                    let isSelected = (selected_type && data_type.value && data_type.value.trim().toLowerCase() == selected_type.trim().toLowerCase());
-                                                    html += `<option value="${data_type.id}" ${isSelected ? 'selected' : ''} data-raw_data="${raw_data}">${data_type.value}</option>`;
-                                                }
-                                                html += `</select>
-                                            </td>
-                                            <td>
-                                                <input type="text" name="raw_data[]" class="form-control" value="${raw_data}" data-raw_data="${raw_data}">
-                                            </td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_tr(${number_rows})">
-                                                    <span>@icon('solid/trash-alt')
-                                                </button>
-                                            </td>
-                                        </tr>`;
+                                            html += `</select>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="raw_data[]" class="form-control" value="${data_transaction_val.raw_data}" data-raw_data="${raw_data}">
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_tr(${number_rows})">
+                                                <span>@icon('solid/trash-alt')
+                                            </button>
+                                        </td>
+                                    </tr>`;
+                                }
+                            }
+                        } else {
+                            number_rows++;
+                            html += `<tr id="rows_${number_rows}">
+                                <td style="vertical-align: middle;">
+                                    <strong>${raw_data}</strong>
+                                    <input type="hidden" name="assets[]" value="${raw_data}">
+                                </td>
+                                <td>
+                                    <select name="data_type[]" class="select2 form-control">`;
+                                    for(let b in result.data_type){
+                                        base_datatype = result.data_type;
+                                        const data_type = result.data_type[b];
+                                        let isSelected = (selected_type && data_type.value && data_type.value.trim().toLowerCase() == selected_type.trim().toLowerCase());
+                                        html += `<option value="${data_type.id}" ${isSelected ? 'selected' : ''} data-raw_data="${raw_data}">${data_type.value}</option>`;
                                     }
-                                html += `</tbody>
-                            </table>
-                            <div class="text-center">
-                                    <button type="button" class="btn btn-sm btn-info m-xs add-row" value="Add Row" onclick="add_assets('${raw_data}','${table_idx}')">
-                                        <span>@icon('solid/plus')  Add
+                                    html += `</select>
+                                </td>
+                                <td>
+                                    <input type="text" name="raw_data[]" class="form-control" value="${raw_data}" data-raw_data="${raw_data}">
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_tr(${number_rows})">
+                                        <span>@icon('solid/trash-alt')
                                     </button>
-                                </div>
-                            </div>
-                            <div class="clearfix m-b-lg"></div>`;   
+                                </td>
+                            </tr>`;
+                        }
                     }
                 }
+                html += `</tbody></table>
+                <div class="text-center">
+                    <button type="button" class="btn btn-sm btn-info m-xs add-row" value="Add Row" onclick="add_assets_unified()">
+                        <span>@icon('solid/plus')  Add
+                    </button>
+                </div>`;
+
+                window.current_assets_list = all_assets_info; 
+
                 $('#show_asets').html(html);
                 $('.select2').select2({
                     width: '100%'
@@ -525,6 +539,45 @@
         </tr>
         `;
         $("table.asset-table-manual-"+table_row+" tbody#assets_show_" + tbody_rows).append(markup);
+    }
+
+    function add_assets_unified(){
+        number_rows++;
+        var markup = ``;
+        markup = `
+        <tr id="rows_${number_rows}">
+            <td>
+                <select name="assets[]" class="select2 form-control">`;
+                if(window.current_assets_list){
+                    for(let i in window.current_assets_list){
+                        let asset = window.current_assets_list[i];
+                        markup += `<option value="${asset.raw_data}" data-domain_id="${asset.domain_id}" data-site_id="${asset.site_id}">${asset.raw_data}</option>`;
+                    }
+                }
+                markup += `</select>
+            </td>
+            <td>
+                <select name="data_type[]" class="select2 form-control">`;
+                for(let b in base_datatype){
+                    const data_type = base_datatype[b];
+                    markup += `<option value="${data_type.id}">${data_type.value}</option>`;
+                }
+            markup += `</select>
+            </td>
+            <td>
+                <input type="text" name="raw_data[]" class="form-control" value="">
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger m-xs delete-row" onclick="delete_tr(${number_rows})">
+                    <span>@icon('solid/trash-alt')
+                </button>
+            </td>
+        </tr>
+        `;
+        $("table.asset-table-unified tbody").append(markup);
+        $('.select2').select2({
+            width: '100%'
+        });
     }
 
     function add_assets(raw_data,i){
