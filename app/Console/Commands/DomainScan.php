@@ -105,8 +105,8 @@ class DomainScan extends Command
         $scanTime = round(microtime(true) - $startTime, 2);
         $this->printSummary($domain, $scanTime);
 
-        // Export JSON
-        $this->exportJson($domain, $scanTime);
+        // Export JSON (Commented out to save space)
+        // $this->exportJson($domain, $scanTime);
 
         // Phase 4: Save to DB (only with --save flag)
         if ($this->option('save')) {
@@ -199,24 +199,38 @@ class DomainScan extends Command
                 $r ? $saved++ : $skipped++;
             }
 
-            // SSL record (if TLS info exists)
+            // SSL records (break down version, cipher, sha256)
             if (!empty($p['ssl_info'])) {
-                $sha256 = $p['ssl_info']['sha256'] ?? ''; // Fixed key name per user JSON
-                $version = $p['ssl_info']['version'] ?? '';
-                $cipher = $p['ssl_info']['cipher'] ?? '';
+                $referent = $p['target'];
+                $ssl = $p['ssl_info'];
                 
-                $sslRaw = "TLS:{$version} Cipher:{$cipher}";
-                if ($sha256) $sslRaw .= " SHA256:{$sha256}";
+                if (!empty($ssl['version'])) {
+                    $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL Version', $ssl['version'], $referent, 'censys');
+                    $r ? $saved++ : $skipped++;
+                }
 
-                $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL', $sslRaw, $referent, 'censys');
-                $r ? $saved++ : $skipped++;
+                if (!empty($ssl['cipher'])) {
+                    $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL Cipher', $ssl['cipher'], $referent, 'censys');
+                    $r ? $saved++ : $skipped++;
+                }
+
+                if (!empty($ssl['sha256'])) {
+                    $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL SHA256', $ssl['sha256'], $referent, 'censys');
+                    $r ? $saved++ : $skipped++;
+                }
             }
         }
 
-        // --- OS/ASN/Geo ---
+        // --- OS/Network/Geo ---
         foreach ($this->osResults as $os) {
             $referent = $os['target'];
             
+            // Save IP Address from OS info if available
+            if (!empty($os['ip'])) {
+                $r = $this->saveScanRecord($siteId, $domainId, $module, 'IP Address', $os['ip'], $referent, 'censys');
+                $r ? $saved++ : $skipped++;
+            }
+
             // Save OS Name/Version (Skip if name is empty)
             if (!empty($os['os_name'])) {
                 $osRaw = $os['os_name'];
@@ -225,15 +239,10 @@ class DomainScan extends Command
                 $r ? $saved++ : $skipped++;
             }
 
+            // ASN -> Network
             if (!empty($os['asn'])) {
                 $asnRaw = "AS{$os['asn']} {$os['asn_name']}";
-                $r = $this->saveScanRecord($siteId, $domainId, $module, 'OS', $asnRaw, $referent, 'censys');
-                $r ? $saved++ : $skipped++;
-            }
-
-            if (!empty($os['country'])) {
-                $geoRaw = "{$os['city']}, {$os['country']}";
-                $r = $this->saveScanRecord($siteId, $domainId, $module, 'OS', $geoRaw, $referent, 'censys');
+                $r = $this->saveScanRecord($siteId, $domainId, $module, 'Network', $asnRaw, $referent, 'censys');
                 $r ? $saved++ : $skipped++;
             }
         }
@@ -248,12 +257,8 @@ class DomainScan extends Command
             $r ? $saved++ : $skipped++;
         }
 
-        // --- CVE → transaction_scans (1 pointer record per domain) ---
+        // --- CVE details first (to check for new ones) ---
         if (!empty($this->cveResults)) {
-            $r = $this->saveScanRecord($siteId, $domainId, $module, 'CVE', $domain, $domain, 'nist_nvd');
-            $r ? $saved++ : $skipped++;
-
-            // --- CVE details → transaction_scans_cve_temp ---
             $cveSaved = 0;
             $cveSkipped = 0;
             foreach ($this->cveResults as $cve) {
@@ -277,7 +282,8 @@ class DomainScan extends Command
                 $temp->description = $cve['description'];
                 $temp->published   = $cve['published'];
                 $temp->modified    = $cve['modified'];
-                $temp->target      = $cve['target'];
+                // Clean target (no port)
+                $temp->target      = explode(':', $cve['target'])[0];
                 $temp->affected_cpe = $cve['affected_cpe'];
                 $temp->source      = 'nist_nvd';
                 $temp->is_mapped   = 0;
@@ -286,6 +292,12 @@ class DomainScan extends Command
             }
 
             $this->info("  📋 CVE Temp: {$cveSaved} saved, {$cveSkipped} skipped (duplicate)");
+
+            // --- CVE main pointer → transaction_scans ---
+            // If we saved at least one NEW CVE ID, force status to 2 (New)
+            // SaveScanRecord will handle the status logic internally but we need to know if it's "New" overall
+            $r = $this->saveCvePointerRecord($siteId, $domainId, $module, 'CVE', $domain, $domain, 'nist_nvd', ($cveSaved > 0));
+            $r ? $saved++ : $skipped++;
         }
 
         $this->info("  ✅ transaction_scans: {$saved} saved, {$skipped} skipped (duplicate)");
@@ -293,6 +305,19 @@ class DomainScan extends Command
 
     private function saveScanRecord($siteId, $domainId, $module, $dataType, $rawData, $referent, $source)
     {
+        return $this->processScanSave($siteId, $domainId, $module, $dataType, $rawData, $referent, $source, false);
+    }
+
+    private function saveCvePointerRecord($siteId, $domainId, $module, $dataType, $rawData, $referent, $source, $forceNew)
+    {
+        return $this->processScanSave($siteId, $domainId, $module, $dataType, $rawData, $referent, $source, $forceNew);
+    }
+
+    private function processScanSave($siteId, $domainId, $module, $dataType, $rawData, $referent, $source, $forceNew = false)
+    {
+        // Strip port from referent if it exists (e.g. "domain.com:80" -> "domain.com")
+        $referent = explode(':', $referent)[0];
+
         // Dedup check: same site + domain + module + data_type + raw_data
         $exists = TransactionScans::where('site_id', $siteId)
             ->where('domain_id', $domainId)
@@ -303,12 +328,16 @@ class DomainScan extends Command
 
         if ($exists) {
             $exists->updated_at = Carbon::now();
-            if (empty($exists->referent) && !empty($referent)) {
+            
+            // Always ensure referent is clean (no port)
+            if ($exists->referent !== $referent) {
                 $exists->referent = $referent;
             }
-            $exists->status = 2; // Discover / Updated
+
+            // If forceNew is true, set status to 2 (New), otherwise 1 (Discovered)
+            $exists->status = $forceNew ? 2 : 1; 
             $exists->save();
-            return false; // skipped (already exists/updated)
+            return false; // already existed/updated
         }
 
         $record = new TransactionScans();
@@ -320,7 +349,7 @@ class DomainScan extends Command
         $record->raw_data  = (string)$rawData;
         $record->referent  = $referent;
         $record->source    = $source;
-        $record->status    = 1; // New
+        $record->status    = 2; // New
         $record->save();
         return true; // saved
     }

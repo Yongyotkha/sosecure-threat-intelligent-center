@@ -185,6 +185,10 @@
                     
             $('.test').html(html);
             $('#add_referent').html(html2);
+            $('.select2').select2({
+                width: '100%',
+                dropdownParent: $('#asset_to_use_manual')
+            });
         }).catch(function (error) {
             loading('stop_load');
             var errors = error;
@@ -261,6 +265,10 @@
         </tr>
         `;
         $('.test').append(markup);
+        $('.select2').select2({
+            width: '100%',
+            dropdownParent: $('#asset_to_use_manual')
+        });
     }
 
     function delete_assets_manual(c){

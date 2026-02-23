@@ -72,9 +72,9 @@ class ScansController extends Controller
 
     public function get_referent(Request $request)
     {
-        $TransactionScans = [];
         foreach ($request->values as $key => $data) {
             $TransactionScans[$key]['raw_data'] = $data['raw_data'];
+            $TransactionScans[$key]['selected_type'] = $data['data_type'] ?? '';
             $TransactionScans[$key]['data'] = TransactionScans::where('site_id', $data['site_id'])
                 ->where('domain_id', $data['domain_id'])
                 ->where('referent', $data['raw_data'])
@@ -485,7 +485,7 @@ class ScansController extends Controller
                     </label>';
                 } else {
                     $res .= '<label>
-                        <input name="select[]" value="' . $data->raw_data . '" data-domain="' . $data->domain_id . '" data-site="' . $data->site_id . '" class="select-chk" type="checkbox" />
+                        <input name="select[]" value="' . $data->raw_data . '" data-domain="' . $data->domain_id . '" data-site="' . $data->site_id . '" data-type="' . $data->data_type . '" class="select-chk" type="checkbox" />
                         <span class="label-text"></span>
                     </label>';
                 }
