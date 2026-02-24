@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use App\TransactionScans;
 use App\TransactionScansCveTemp;
+use App\DataTypes;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\Domain;
 use Carbon\Carbon;
@@ -313,8 +314,27 @@ class DomainScan extends Command
         return $this->processScanSave($siteId, $domainId, $module, $dataType, $rawData, $referent, $source, $forceNew);
     }
 
+    private function ensureDataTypeExists($value)
+    {
+        if (empty($value)) return;
+
+        $exists = DataTypes::whereRaw('LOWER(value) = ?', [strtolower($value)])->first();
+        if ($exists) return;
+
+        $dt = new DataTypes();
+        $dt->code   = Str::uuid()->toString();
+        $dt->status = 1;
+        $dt->value  = $value;
+        $dt->save();
+
+        $this->line("     📝 DataType registered: {$value}");
+    }
+
     private function processScanSave($siteId, $domainId, $module, $dataType, $rawData, $referent, $source, $forceNew = false)
     {
+        // Auto-register data type to data_types table
+        $this->ensureDataTypeExists($dataType);
+
         // Strip port from referent if it exists (e.g. "domain.com:80" -> "domain.com")
         $referent = explode(':', $referent)[0];
 
