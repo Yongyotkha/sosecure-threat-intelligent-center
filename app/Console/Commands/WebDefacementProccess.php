@@ -2440,15 +2440,78 @@ class WebDefacementProccess extends Command
       
       \Log::info("[getHtml3] Attempt " . ($retryCount + 1) . " for {$url} (waitUntil: " . implode(',', $waitUntil) . ")");
 
-      $response = $page->goto($url, [
-        'timeout' => $timeout,
-        'waitUntil' => $waitUntil,
-      ]);
+      // 🟩 จับ "frame was detached" ที่เกิดจากเว็บ redirect ข้าม origin ระหว่าง goto
+      //    เฉพาะ site ที่ redirect แบบนี้เท่านั้นจะเข้า path นี้ — site อื่นไม่ได้รับผลกระทบ
+      $response = null;
+      $httpStatus = 0;
 
-      // 🟩 เก็บ Status Code
-      $httpStatus = $response ? $response->status() : 0;
+      try {
+          $response = $page->goto($url, [
+            'timeout' => $timeout,
+            'waitUntil' => $waitUntil,
+          ]);
+          $httpStatus = $response ? $response->status() : 0;
+      } catch (\Throwable $gotoEx) {
+          if (stripos($gotoEx->getMessage(), 'frame was detached') !== false ||
+              stripos($gotoEx->getMessage(), 'Execution context was destroyed') !== false) {
+              // 🟩 Frame เดิมหลุดเพราะ page redirect ข้าม origin
+              //    page object เดิมใช้ไม่ได้แล้ว → ดึง page ใหม่จาก browser
+              \Log::info("[getHtml3] Frame detached for {$url} — recovering via browser.pages()...");
+              sleep(5); // รอให้ page หลัง redirect โหลดเสร็จ
 
-      // 🟩 รอให้หน้าเว็บโหลดเสร็จ
+              try {
+                  // ดึง page ล่าสุดจาก browser (page ที่ redirect ไปแล้ว)
+                  $allPages = $browser->pages();
+                  $newPage = end($allPages);
+
+                  // รอ body โหลด
+                  try {
+                      $newPage->waitForSelector('body', ['timeout' => 15000]);
+                  } catch (\Throwable $ignore) {
+                      // ถ้า timeout ก็ไม่เป็นไร ลองดึง content ต่อ
+                  }
+
+                  sleep(2);
+                  $content = $newPage->content();
+
+                  if (strlen($content) < 500) {
+                      \Log::warning("[getHtml3] Frame-detach recovery: content too short (" . strlen($content) . " bytes) for {$url}");
+                      throw new \Exception("Frame-detach recovery: content too short");
+                  }
+
+                  \Log::info("[getHtml3] Frame-detach recovery SUCCESS for {$url} — got " . strlen($content) . " bytes");
+
+                  // 🟩 Screenshot จาก page ใหม่
+                  $screenshotBase64 = null;
+                  $screenshotSaved = false;
+                  if (!empty($options['screenshot_path'])) {
+                      try {
+                          $dir = dirname($options['screenshot_path']);
+                          if (!is_dir($dir)) { @mkdir($dir, 0775, true); }
+                          $newPage->screenshot(['path' => $options['screenshot_path'], 'fullPage' => true]);
+                          $screenshotSaved = file_exists($options['screenshot_path']);
+                      } catch (\Throwable $ssEx) {
+                          \Log::warning("[getHtml3] Screenshot after frame-detach failed: " . $ssEx->getMessage());
+                      }
+                  }
+
+                  return [
+                      'content' => $content,
+                      'success' => true,
+                      'screenshot_base64' => $screenshotBase64,
+                      'screenshot_saved' => $screenshotSaved,
+                  ];
+              } catch (\Throwable $recoveryEx) {
+                  \Log::warning("[getHtml3] Frame-detach recovery FAILED for {$url}: " . $recoveryEx->getMessage());
+                  // ถ้า recovery ไม่สำเร็จ → throw ต่อให้ retry logic จัดการ
+                  throw $recoveryEx;
+              }
+          } else {
+              throw $gotoEx;
+          }
+      }
+
+      // 🟩 รอให้หน้าเว็บโหลดเสร็จ (สำหรับ site ที่ goto สำเร็จปกติ)
       sleep(1);
 
       // 🟩 SCROLL เพื่อ TRIGGER LAZY LOADING (Optimized)
@@ -2589,7 +2652,11 @@ class WebDefacementProccess extends Command
         stripos($errorMsg, 'ERR_NETWORK') !== false ||
         stripos($errorMsg, 'ERR_TIMED_OUT') !== false ||
         stripos($errorMsg, 'Navigation timeout') !== false ||
-        stripos($errorMsg, 'Content too short') !== false
+        stripos($errorMsg, 'Content too short') !== false ||
+        stripos($errorMsg, 'frame was detached') !== false ||
+        stripos($errorMsg, 'Execution context was destroyed') !== false ||
+        stripos($errorMsg, 'Session closed') !== false ||
+        stripos($errorMsg, 'Target closed') !== false
       );
 
       \Log::error("Puphpeteer Error (attempt " . ($retryCount + 1) . "/{$maxRetries}): {$errorMsg} at {$url}");

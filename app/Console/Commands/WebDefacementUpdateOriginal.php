@@ -363,6 +363,11 @@ class WebDefacementUpdateOriginal extends Command
             $Original->updated_at  = date("Y-m-d H:i:s");
             $Original->save();
 
+            // === บันทึก image_original ลง WebdefacmentSetting ===
+            // เพื่อให้ Controller/UI ดึงรูป original ไปแสดงได้ถูกต้อง
+            $WebdefacmentSetting->image_original = $image_url;
+            $WebdefacmentSetting->save();
+
             // === [RESET DASHBOARD & SCORES] ===
             // เมื่อ Update Original แล้ว ต้อง reset คะแนนและ dashboard ให้เป็น 0 ทั้งหมด
             // เพราะ baseline ใหม่ = สถานะปัจจุบัน ดังนั้นต้องไม่มีความต่าง

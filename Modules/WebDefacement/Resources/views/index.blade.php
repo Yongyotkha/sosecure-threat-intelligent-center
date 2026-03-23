@@ -33,11 +33,13 @@
                         </select>
                     </div>
 
+                    @if (!empty(get_role_custom()) && @get_role_custom()['client'] != 1)
                     <a href="#hide-advance-search" id="advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }} m-l-xs">
                         <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                     </a>
+                    @endif
 
-                    @if(@get_role_custom()['superadmin'] == 1 || @get_role_custom()['client'] == 1)
+                    @if(@get_role_custom()['superadmin'] == 1)
                     <a href="#" id="btn_md_create"
                         class="btn btn-sm btn-{{ get_option('theme_color')  }}" data-toggle="modal"
                         data-target="#wdfm_website">
@@ -714,24 +716,47 @@
                     let score = parseFloat(item.detection_score_all) || 0;
                     score = Math.max(0, Math.min(100, score));
 
-                    chart_c3(
-                        target,
-                        [
+                    let chart_columns = [
                         ['Hash', parseFloat(item.score) || 0],
                         ['Filesize', (parseFloat(item.filesize_percent) >= 1 ? parseFloat(item.filesize_percent) : 0)],
                         ['Element', (parseFloat(item.element_percent) >= 1 ? parseFloat(item.element_percent) : 0)],
                         ['Blacklist', (parseFloat(item.blacklist_percent) >= 1 ? parseFloat(item.blacklist_percent) : 0)],
                         ['Image', (parseFloat(item.image_percent) >= 1 ? parseFloat(item.image_percent) : 0)],
-                        ],
-                        score,
-                        {
-                            colors: {                 
-                            Hash: '#2D7BD8',        
-                            Filesize: '#10B981',    
+                    ];
+
+                    let chart_colors = {                 
+                        Hash: '#2D7BD8',        
+                        Filesize: '#10B981',    
+                        Element: '#d3e207ff',
+                        Blacklist: '#ff0202ff',
+                        Image: '#f18f17ff'      
+                    };
+
+                    if (score < 1) {
+                        chart_columns = [
+                            ['Hash', 0],
+                            ['Filesize', 0],
+                            ['Element', 0],
+                            ['Blacklist', 0],
+                            ['Image', 0],
+                            ['Safe', 100]
+                        ];
+                        chart_colors = {
+                            Hash: '#2D7BD8',
+                            Filesize: '#10B981',
                             Element: '#d3e207ff',
                             Blacklist: '#ff0202ff',
-                            Image: '#f18f17ff'      
-                            },
+                            Image: '#f18f17ff',
+                            Safe: '#d1d5db'
+                        };
+                    }
+
+                    chart_c3(
+                        target,
+                        chart_columns,
+                        score,
+                        {
+                            colors: chart_colors,
                             titleSize: 15,    
                             clampData: false,
                             normalize: false
