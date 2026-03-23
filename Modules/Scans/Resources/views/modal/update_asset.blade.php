@@ -141,7 +141,6 @@
                     html += `<tr id="rows_manual_${i}">
                         <td>`;
                         if(i==0){
-                            html += 
                             html += '<input type="hidden" id="domain_id_manual" class="form-control" value="{{ @$site->domain_id }}">';
                             html += '<input type="hidden" id="site_id_manual" class="form-control" value="{{ @$site->site_id }}">';
                             html += `<input type="text" name="assets_manual[]" data-raw_data_manual="${0}" value = "${@json($scans->raw_data)}" class="form-control">`;
@@ -185,9 +184,11 @@
                     
             $('.test').html(html);
             $('#add_referent').html(html2);
-            $('.select2').select2({
-                width: '100%',
-                dropdownParent: $('#asset_to_use_manual')
+            $('.select2').each(function() {
+                $(this).select2({
+                    width: '100%',
+                    dropdownParent: $(this).closest('.modal')
+                });
             });
         }).catch(function (error) {
             loading('stop_load');
@@ -265,9 +266,11 @@
         </tr>
         `;
         $('.test').append(markup);
-        $('.select2').select2({
-            width: '100%',
-            dropdownParent: $('#asset_to_use_manual')
+        $('.select2').each(function() {
+            $(this).select2({
+                width: '100%',
+                dropdownParent: $(this).closest('.modal')
+            });
         });
     }
 

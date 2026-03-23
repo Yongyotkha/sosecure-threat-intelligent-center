@@ -22,6 +22,8 @@ class TransactionScansCveTemp extends Model
         'modified',
         'target',
         'affected_cpe',
+        'cpe_code',
+        'cpe_uri',
         'source',
         'is_mapped',
     ];

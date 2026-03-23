@@ -22,6 +22,7 @@ use App\transaction_client_cpe;
 use Artisan;
 use Modules\SiteSettings\Entities\cve_assets;
 use Modules\Assets\Entities\Assets_port;
+use App\DataTypes;
 class AssetsController extends Controller
 {
     /**
@@ -36,6 +37,7 @@ class AssetsController extends Controller
     protected $client;
     protected $urlLimit = 3;
     protected $base_url;
+    protected $url_table_asset;
     protected $url_indicator_events_table;
     /**
      * Request instance
@@ -471,12 +473,12 @@ class AssetsController extends Controller
             if($site){
                 if(isset($request->domaincode)){
                     $DomainFor = Domain::withTrashed()->where('code',$request->domaincode)->first();
-                    $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [1,4])->where('status', 1)->where('site_id', $site->id)->where('domain_id', $DomainFor->id)->distinct()->get();
+                    $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [1,4,14])->where('status', 1)->where('site_id', $site->id)->where('domain_id', $DomainFor->id)->distinct()->get();
                 }else{
-                    $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [1,4])->where('status', 1)->where('site_id', $site->id)->distinct()->get();
+                    $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [1,4,14])->where('status', 1)->where('site_id', $site->id)->distinct()->get();
                 }
             }else{
-                $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [1,4])->where('status', 1)->distinct()->get();
+                $returnData = AssetsData::select('value AS val_select')->whereIn('data_type_id', [1,4,14])->where('status', 1)->distinct()->get();
             }
         }else if($selectedGroup=='ip'){
             if($site){
@@ -540,55 +542,65 @@ class AssetsController extends Controller
                 $Domain_list = [];
                 $IP_List = [];
                 foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
-                    if ($AssetsData_datavalue->data_type_id == 1 || $AssetsData_datavalue->data_type_id == 4) {
-                        //Domain
+                    if ($AssetsData_datavalue->data_type_id == 1 || $AssetsData_datavalue->data_type_id == 4 || $AssetsData_datavalue->data_type_id == 14) {
+                        //Domain / Subdomain
                         array_push($Domain_list, $AssetsData_datavalue);
     
                     } elseif ($AssetsData_datavalue->data_type_id == 5 || $AssetsData_datavalue->data_type_id == 6) {
                         //IP Asset
                         array_push($IP_List, $AssetsData_datavalue);
     
+                    } elseif (!in_array($AssetsData_datavalue->data_type_id, [1, 4, 14, 5, 6, 17, 13, 12])) {
+                        // Other Data types but NOT CP-E (17), Port (13), or Phone (12)
+                        array_push($IP_List, $AssetsData_datavalue);
                     } else {
     
                     }
                 }
     
+                // --- NEW CPE FETCHING LOGIC ---
+                // Fetch ALL CPEs for the entire Asset group (all AssetsData linked to this Asset)
+                $allAssetDataIds = $AssetsData_data->pluck('id')->toArray();
+                $CPE_Data = CPE::whereIn('asset_id', $allAssetDataIds)->get();
+                
+                $CPE_List = array();
+                $CPE_Vendor = array();
+                $CPE_Title = array();
+                $CPE_Version = array();
+                $CPE_Edition = array();
+                $CPE_Remark = array();
+                $CPE_Ostype = array();
+                $CPE_Del = array();
+                $CPE_OtherCheck = 0;
+                
+                foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
+                    array_push($CPE_List, $CPE_Datavalue->result." - OSType: ".(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:""));
+                    array_push($CPE_Vendor, '<span class="il-block">&nbsp;'.$CPE_Datavalue->vendor.'</span>');
+                    array_push($CPE_Title, '<span class="il-block">&nbsp;'.$CPE_Datavalue->title.'</span>');
+                    array_push($CPE_Version, '<span class="il-block">&nbsp;'.$CPE_Datavalue->version.'</span>');
+                    array_push($CPE_Edition, '<span class="il-block">&nbsp;'.$CPE_Datavalue->edition.'</span>');
+                    array_push($CPE_Remark, '<span class="il-block">&nbsp;'.$CPE_Datavalue->remark.'</span>');
+                    array_push($CPE_Del, '<span class="il-block" style="box-sizing:border-box; -moz-box-sizing:border-box;">&nbsp;'.'<a href="'.route("assets.assets_delete_cpe", ["cpecode" => $CPE_Datavalue->code,"menu" => $menu]).'" class="btn btn-xs btn-danger" style="display:inline; font-size: 11px;" data-toggle="ajaxModal"><i class="fas fa-trash"></i></a>'.'</span>');
+                    array_push($CPE_Ostype, '<span class="il-block">&nbsp;'.(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:"").'</span>');
+                    if(($CPE_Datavalue->os_type!=1)&&($CPE_Datavalue->os_type!=2)){
+                        $CPE_OtherCheck = 1;
+                    }
+                }
+
+                $CPR_string = "";
+                if (count($CPE_List) > 0) {
+                    $CPR_string = implode(' <br> ', (array) $CPE_List);
+                    $CPE_Vendor = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Vendor);
+                    $CPE_Title = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Title);
+                    $CPE_Version = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Version);
+                    $CPE_Edition = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Edition);
+                    $CPE_Remark = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Remark);
+                    $CPE_Ostype = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Ostype);
+                    $CPE_Del = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Del);
+                }
+                // --- END NEW CPE FETCHING LOGIC ---
+
                 foreach ($IP_List as $IP_Listkey => $IP_Listvalue) {
-                    $CPR_string = "";
-                    $CPE_Data = CPE::where('asset_id', $IP_Listvalue->id)->get();
-                    $CPE_List = array();
-                    $CPE_Vendor = array();
-                    $CPE_Title = array();
-                    $CPE_Version = array();
-                    $CPE_Edition = array();
-                    $CPE_Remark = array();
-                    $CPE_Ostype = array();
-                    $CPE_Del = array();
-                    $CPE_OtherCheck = 0;
-                    foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
-                        array_push($CPE_List, $CPE_Datavalue->result." - OSType: ".(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:""));
-                        array_push($CPE_Vendor, '<span class="il-block">&nbsp;'.$CPE_Datavalue->vendor.'</span>');
-                        array_push($CPE_Title, '<span class="il-block">&nbsp;'.$CPE_Datavalue->title.'</span>');
-                        array_push($CPE_Version, '<span class="il-block">&nbsp;'.$CPE_Datavalue->version.'</span>');
-                        array_push($CPE_Edition, '<span class="il-block">&nbsp;'.$CPE_Datavalue->edition.'</span>');
-                        array_push($CPE_Remark, '<span class="il-block">&nbsp;'.$CPE_Datavalue->remark.'</span>');
-                        array_push($CPE_Del, '<span class="il-block" style="box-sizing:border-box; -moz-box-sizing:border-box;">&nbsp;'.'<a href="'.route("assets.assets_delete_cpe", ["cpecode" => $CPE_Datavalue->code,"menu" => $menu]).'" class="btn btn-xs btn-danger" style="display:inline; font-size: 11px;" data-toggle="ajaxModal"><i class="fas fa-trash"></i></a>'.'</span>');
-                        array_push($CPE_Ostype, '<span class="il-block">&nbsp;'.(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:"").'</span>');
-                        if(($CPE_Datavalue->os_type!=1)&&($CPE_Datavalue->os_type!=2)){
-                            $CPE_OtherCheck = 1;
-                        }
-                    }
-    
-                    if (count($CPE_List) > 0) {
-                        $CPR_string = implode(' <br> ', (array) $CPE_List);
-                        $CPE_Vendor = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Vendor);
-                        $CPE_Title = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Title);
-                        $CPE_Version = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Version);
-                        $CPE_Edition = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Edition);
-                        $CPE_Remark = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Remark);
-                        $CPE_Ostype = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Ostype);
-                        $CPE_Del = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Del);
-                    }
     
                    
                     $TTSS = TransactionTimeStampScans::select('code')->where('site_id', $value->site_id)->where('domain_id', $value->domain_id)->first();
@@ -616,7 +628,13 @@ class AssetsController extends Controller
                         $Assets_data_list['site_name'] = @$SiteSettings[$IP_Listvalue->site_id]["name"];
 
 
-                        $Assets_port_data =  Assets_port::where('status',1)->where('site_id',$IP_Listvalue->site_id)->where('asset_name',$IP_Listvalue->value)->get();
+
+                        $asset_names_to_search = [$IP_Listvalue->value];
+                        foreach ($Domain_list as $d_item) {
+                            $asset_names_to_search[] = $d_item->value;
+                        }
+                        $Assets_port_data =  Assets_port::where('status',1)->where('site_id',$IP_Listvalue->site_id)->whereIn('asset_name', array_unique($asset_names_to_search))->get();
+                        
                         $port = '';
                         foreach ($Assets_port_data as $Assets_port_data_key => $Assets_port_data_value) {
                           $port = $port.'<div> <span class="bg-port">'.$Assets_port_data_value->port.'</span> '.$Assets_data_list['cpe'].' </div>';
@@ -625,7 +643,7 @@ class AssetsController extends Controller
                         $Assets_data_list['status'] = $IP_Listvalue->status;
                         $Assets_data_list['created_at'] = $IP_Listvalue->created_at;
                         $Assets_data_list['updated_at'] = $IP_Listvalue->updated_at;
-                        $Assets_data_list['domain'] = "";
+                        $Assets_data_list['domain'] = $value->domain_id ? (Domain::where('id', $value->domain_id)->value('name') ?? "") : "";
                         $Assets_data_list['ip'] = $IP_Listvalue->value;
                         $Assets_data_list['CPE'] = $CPR_string;
     
@@ -659,7 +677,10 @@ class AssetsController extends Controller
 
 
 
-                            $Assets_port_data =  Assets_port::where('status',1)->where('site_id',$IP_Listvalue->site_id)->where('asset_name',$IP_Listvalue->value)->get();
+
+                            $asset_names_to_search = [$IP_Listvalue->value, $Domain_listvalue->value];
+                            $Assets_port_data =  Assets_port::where('status',1)->where('site_id',$IP_Listvalue->site_id)->whereIn('asset_name', array_unique($asset_names_to_search))->get();
+                            
                             $port = '';
                             foreach ($Assets_port_data as $Assets_port_data_key => $Assets_port_data_value) {
                               $port = $port.'<div> <span class="bg-port">'.$Assets_port_data_value->port.'</span> '.$Assets_data_list['cpe'].' </div>';
@@ -701,11 +722,11 @@ class AssetsController extends Controller
             $dataOut["assetLimit"] = $asset_limit;
             foreach ($datacountAssets as $key => $value) {
                 if($request -> site){
-                    $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])
+                    $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4,14])
                     ->where('site_id', $SiteSettingsfor->id)
                     ->get()->toArray();
                 }else{
-                    $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])
+                    $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4,14])
                     ->get()->toArray();
                 }
                
@@ -720,32 +741,30 @@ class AssetsController extends Controller
             if($request -> site){
                 $site_id = $SiteSettingsfor->id;
             }
-            
+            $countAssets = count($Assets_list);
+            $countWindows = 0;
+            $countLinux = 0;
+            $countOther = 0;
 
-            // $dataOut["countWindows"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();
-            $dataOut["countWindows"] = @CPE::select('id')->whereHas('get_assets', function($q) use ($site_id){
-                $q->where('os_type', 1)->whereIn('data_type_id', [5,6]);
-                if($site_id){
-                    $q->where('site_id', $site_id);
-                }
-            })->count();
-            // $dataOut["countLinux"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
-            $dataOut["countLinux"] = @CPE::select('id')->whereHas('get_assets', function($q) use ($site_id){
-                $q->where('os_type', 2)->whereIn('data_type_id', [5,6]);
-                if($site_id){
-                    $q->where('site_id', $site_id);
-                }
-            })->count();
+            foreach ($Assets_list as $row) {
+                // Protect against cases where $row['CPE_Ostype'] is an empty array instead of a string
+                $osTypesStr = is_string($row['CPE_Ostype']) ? strip_tags($row['CPE_Ostype']) : '';
+                $hasWin = (stripos($osTypesStr, 'Windows') !== false);
+                $hasLin = (stripos($osTypesStr, 'Linux') !== false);
+                
+                if ($hasWin) $countWindows++;
+                if ($hasLin) $countLinux++;
+                if ($row['CPE_OtherCheck'] == 1) $countOther++;
+            }
 
-            $dataOut["countOther"] = @CPE::select('id')->whereHas('get_assets', function($q) use ($site_id){
-                if($site_id){
-                    $q->where('site_id', $site_id);
-                }
-                $q->whereIn('data_type_id', [5,6])->where(function ($query) {
-                    $query->whereNotIn('os_type', [1,2])
-                        ->orWhereNull('os_type')->orWhere('os_type','');
-                });
-            })->count();
+            $dataOut["recordsTotal"] = count($Assets_list);
+            $dataOut["recordsFiltered"] = count($Assets_list);
+            $dataOut["countAssets"] = $countAssets;
+            $dataOut["assetLimit"] = $asset_limit;
+
+            $dataOut["countWindows"] = $countWindows;
+            $dataOut["countLinux"] = $countLinux;
+            $dataOut["countOther"] = $countOther;
 
             $dataOut["data"] =  $Assets_list;
             return response()->json($dataOut);
@@ -841,20 +860,24 @@ class AssetsController extends Controller
                 $Assets_data = Assets::where('status', 1)->get();
             }
             $OsType = OSType::get()->keyBy('id')->toArray();
+            $DataTypesMap = DataTypes::get()->keyBy('id')->toArray();
             $SiteSettings = SiteSettings::withTrashed()->get()->keyBy('id')->toArray();
             foreach ($Assets_data as $key => $value) {
                 $AssetsData_data = AssetsData::where('site_id', $value->site_id)->where('asset_id', $value->id)->get();
                 $Domain_list = [];
                 $IP_List = [];
                 foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
-                    if ($AssetsData_datavalue->data_type_id == 1 || $AssetsData_datavalue->data_type_id == 4) {
-                        //Domain
+                    if ($AssetsData_datavalue->data_type_id == 1 || $AssetsData_datavalue->data_type_id == 4 || $AssetsData_datavalue->data_type_id == 14) {
+                        //Domain / Subdomain
                         array_push($Domain_list, $AssetsData_datavalue);
     
                     } elseif ($AssetsData_datavalue->data_type_id == 5 || $AssetsData_datavalue->data_type_id == 6) {
                         //IP Asset
                         array_push($IP_List, $AssetsData_datavalue);
     
+                    } elseif ($AssetsData_datavalue->data_type_id != 17) {
+                        // Other Data types (not CPE)
+                        array_push($IP_List, $AssetsData_datavalue);
                     } else {
     
                     }
@@ -912,11 +935,11 @@ class AssetsController extends Controller
                                     $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal"><i class="fas fa-plus"></i> Add CPE </a>';
                                     if(isset($TTSS->code)){
                                         $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$TTSS->code, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
-                                        <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                                        <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 30.6l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                                         </a>';
                                     }else{
                                         $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
-                                        <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                                        <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 30.6l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                                         </a>';
                                     }
                                     
@@ -937,7 +960,8 @@ class AssetsController extends Controller
                                     $Assets_data_list['status'] = $IP_Listvalue->status;
                                     $Assets_data_list['created_at'] = $IP_Listvalue->created_at;
                                     $Assets_data_list['updated_at'] = $IP_Listvalue->updated_at;
-                                    $Assets_data_list['domain'] = "";
+                                    $Assets_data_list['domain'] = $value->domain_id ? (Domain::where('id', $value->domain_id)->value('name') ?? "") : "";
+                                    $Assets_data_list['data_type'] = @$DataTypesMap[$IP_Listvalue->data_type_id]['value'] ?? '';
                                     $Assets_data_list['ip'] = $IP_Listvalue->value;
                                     $Assets_data_list['CPE'] = $CPR_string;
                 
@@ -957,11 +981,11 @@ class AssetsController extends Controller
                                 $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal"><i class="fas fa-plus"></i> Add CPE </a>';
                                 if(isset($TTSS->code)){
                                     $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$TTSS->code, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
-                                    <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                                    <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 30.6l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                                     </a>';
                                 }else{
                                     $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
-                                    <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                                    <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 30.6l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                                     </a>';
                                 }
                                 
@@ -982,7 +1006,8 @@ class AssetsController extends Controller
                                 $Assets_data_list['status'] = $IP_Listvalue->status;
                                 $Assets_data_list['created_at'] = $IP_Listvalue->created_at;
                                 $Assets_data_list['updated_at'] = $IP_Listvalue->updated_at;
-                                $Assets_data_list['domain'] = "";
+                                $Assets_data_list['domain'] = $value->domain_id ? (Domain::where('id', $value->domain_id)->value('name') ?? "") : "";
+                                $Assets_data_list['data_type'] = @$DataTypesMap[$IP_Listvalue->data_type_id]['value'] ?? '';
                                 $Assets_data_list['ip'] = $IP_Listvalue->value;
                                 $Assets_data_list['CPE'] = $CPR_string;
             
@@ -995,10 +1020,46 @@ class AssetsController extends Controller
                                 $Assets_data_list['CPE_Del'] = $CPE_Del;
                                 $Assets_data_list['CPE_OtherCheck'] = $CPE_OtherCheck;
                                 array_push($Assets_list, $Assets_data_list);
-                        }
-    
+                            }
                     } else {
                         foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
+
+                            $CPR_string = "";
+                            $CPE_Data = \Modules\Scans\Entities\CPE::where('asset_id', $Domain_listvalue->id)->get();
+                            $CPE_List = array();
+                            $CPE_Vendor = array();
+                            $CPE_Title = array();
+                            $CPE_Version = array();
+                            $CPE_Edition = array();
+                            $CPE_Remark = array();
+                            $CPE_Ostype = array();
+                            $CPE_Del = array();
+                            $CPE_OtherCheck = 0;
+                            foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
+                                array_push($CPE_List, $CPE_Datavalue->result." - OSType: ".(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:""));
+                                array_push($CPE_Vendor, '<span class="il-block">&nbsp;'.$CPE_Datavalue->vendor.'</span>');
+                                array_push($CPE_Title, '<span class="il-block">&nbsp;'.$CPE_Datavalue->title.'</span>');
+                                array_push($CPE_Version, '<span class="il-block">&nbsp;'.$CPE_Datavalue->version.'</span>');
+                                array_push($CPE_Edition, '<span class="il-block">&nbsp;'.$CPE_Datavalue->edition.'</span>');
+                                array_push($CPE_Remark, '<span class="il-block">&nbsp;'.$CPE_Datavalue->remark.'</span>');
+                                array_push($CPE_Del, '<span class="il-block" style="box-sizing:border-box; -moz-box-sizing:border-box;">&nbsp;'.'<a href="'.route("assets.assets_delete_cpe", ["cpecode" => $CPE_Datavalue->code,"menu" => $menu]).'" class="btn btn-xs btn-danger" style="display:inline; font-size: 11px;" data-toggle="ajaxModal"><i class="fas fa-trash"></i></a>'.'</span>');
+                                array_push($CPE_Ostype, '<span class="il-block">&nbsp;'.(isset($OsType[$CPE_Datavalue->os_type]["name"])?$OsType[$CPE_Datavalue->os_type]["name"]:"").'</span>');
+                                if(($CPE_Datavalue->os_type!=1)&&($CPE_Datavalue->os_type!=2)){
+                                    $CPE_OtherCheck = 1;
+                                }
+                            }
+            
+                            if (count($CPE_List) > 0) {
+                                $CPR_string = implode(' <br> ', (array) $CPE_List);
+                                $CPE_Vendor = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Vendor);
+                                $CPE_Title = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Title);
+                                $CPE_Version = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Version);
+                                $CPE_Edition = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Edition);
+                                $CPE_Remark = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Remark);
+                                $CPE_Ostype = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Ostype);
+                                $CPE_Del = implode('<hr class="m-0" style="border: 1px solid #efefef;">', (array) $CPE_Del);
+                            }
+
                             $Assets_port_data =  Assets_port::where('status',1)->where('site_id',$IP_Listvalue->site_id)->where('asset_name',$IP_Listvalue->value)->get();
                             $port = '';
                             if(count($Assets_port_data) > 0){
@@ -1007,7 +1068,7 @@ class AssetsController extends Controller
                                 $Assets_data_list['chk'] = "";
                                 $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->code]).'?iddomain='.$Domain_listvalue->code.'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal"><i class="fas fa-plus"></i> Add CPE </a>';
                                 $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
-                                <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                                <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 30.6l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                                 </a>';
                                 //<a href="' . route("scans_assets.delete", ["id" => $value->code, "code" => @$TTSS->code, "page" => $menu]) . '" class="btn btn-xs btn-danger m-xs" data-toggle="ajaxModal">
                                 // <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z"></path></svg>
@@ -1029,6 +1090,7 @@ class AssetsController extends Controller
                                 $Assets_data_list['created_at'] = $IP_Listvalue->created_at;
                                 $Assets_data_list['updated_at'] = $IP_Listvalue->updated_at;
                                 $Assets_data_list['domain'] = $Domain_listvalue->value;
+                                $Assets_data_list['data_type'] = @$DataTypesMap[$IP_Listvalue->data_type_id]['value'] ?? '';
                                 $Assets_data_list['ip'] = $IP_Listvalue->value;
                                 $Assets_data_list['CPE'] = $CPR_string;
         
@@ -1048,7 +1110,7 @@ class AssetsController extends Controller
                                 $Assets_data_list['chk'] = "";
                                 $Assets_data_list['cpe'] = '<a href="'.route("assets.assets_add_cpe", ["id" => $value->code,"page" => $menu, "idip" => $IP_Listvalue->code]).'?iddomain='.$Domain_listvalue->code.'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal"><i class="fas fa-plus"></i> Add CPE </a>';
                                 $Assets_data_list['action'] = '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $value->code, "code" => @$value->site_id, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
-                                <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                                <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 30.6l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
                                 </a>';
                                 //<a href="' . route("scans_assets.delete", ["id" => $value->code, "code" => @$TTSS->code, "page" => $menu]) . '" class="btn btn-xs btn-danger m-xs" data-toggle="ajaxModal">
                                 // <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z"></path></svg>
@@ -1069,10 +1131,11 @@ class AssetsController extends Controller
                                 $Assets_data_list['status'] = $IP_Listvalue->status;
                                 $Assets_data_list['created_at'] = $IP_Listvalue->created_at;
                                 $Assets_data_list['updated_at'] = $IP_Listvalue->updated_at;
-                                $Assets_data_list['domain'] = $Domain_listvalue->value;
+                                $Assets_data_list['domain'] = $value->domain_id ? (Domain::where('id', $value->domain_id)->value('name') ?? "") : "";
+                                $Assets_data_list['data_type'] = @$DataTypesMap[$IP_Listvalue->data_type_id]['value'] ?? '';
                                 $Assets_data_list['ip'] = $IP_Listvalue->value;
                                 $Assets_data_list['CPE'] = $CPR_string;
-        
+            
                                 $Assets_data_list['CPE_Vendor'] = $CPE_Vendor;
                                 $Assets_data_list['CPE_Title'] = $CPE_Title;
                                 $Assets_data_list['CPE_Version'] = $CPE_Version;
@@ -1082,12 +1145,9 @@ class AssetsController extends Controller
                                 $Assets_data_list['CPE_Del'] = $CPE_Del;
                                 $Assets_data_list['CPE_OtherCheck'] = $CPE_OtherCheck;
                                 array_push($Assets_list, $Assets_data_list);
-
                             }
-    
                         }
                     }
-    
                 }
     
             }
@@ -1103,11 +1163,11 @@ class AssetsController extends Controller
             $dataOut["assetLimit"] = $asset_limit;
             foreach ($datacountAssets as $key => $value) {
                 if($request -> site){
-                    $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])
+                    $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4,14])
                     ->where('site_id', @$SiteSettingsfor->id)
                     ->get()->toArray();
                 }else{
-                    $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                    $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4,14])->get()->toArray();
                 }
                 $countfn = count($AssetsData_data);
                 if($countfn==0){
@@ -1123,27 +1183,31 @@ class AssetsController extends Controller
             }
 
             // $dataOut["countWindows"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();
-            $dataOut["countWindows"] = @CPE::select('id')->whereHas('get_assets', function($q) use ($site_id){
-                if($site_id){
-                    $q->where('site_id', $site_id);
-                }
-                $q->where('os_type', 1)->whereIn('data_type_id', [5,6]);
-            })->count();
-            // $dataOut["countLinux"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
-            $dataOut["countLinux"] = @CPE::select('id')->whereHas('get_assets', function($q) use ($site_id){
-                if($site_id){
-                    $q->where('site_id', $site_id);
-                }
-                $q->where('os_type', 2)->whereIn('data_type_id', [5,6]);
+            $baseQuery = \Modules\Scans\Entities\Assets::where('status', 1);
+            if ($site_id) {
+                $baseQuery->where('site_id', $site_id);
+            }
+
+            $dataOut["countWindows"] = (clone $baseQuery)->whereHas('get_assets_data', function($q) {
+                $q->whereIn('id', function($query) {
+                    $query->select('asset_id')->from('cpe')->where('os_type', 1);
+                });
             })->count();
 
-            $dataOut["countOther"] = @CPE::select('id')->whereHas('get_assets', function($q) use ($site_id){
-                if($site_id){
-                    $q->where('site_id', $site_id);
-                }
-                $q->whereIn('data_type_id', [5,6])->where(function ($query) {
-                    $query->whereNotIn('os_type', [1,2])
-                        ->orWhereNull('os_type')->orWhere('os_type','');
+            $dataOut["countLinux"] = (clone $baseQuery)->whereHas('get_assets_data', function($q) {
+                $q->whereIn('id', function($query) {
+                    $query->select('asset_id')->from('cpe')->where('os_type', 2);
+                });
+            })->count();
+
+            $dataOut["countOther"] = (clone $baseQuery)->whereHas('get_assets_data', function($q) {
+                $q->whereIn('id', function($query) {
+                    $query->select('asset_id')->from('cpe')
+                          ->where(function($q3) {
+                              $q3->whereNotIn('os_type', [1,2])
+                                 ->orWhereNull('os_type')
+                                 ->orWhere('os_type', '');
+                          });
                 });
             })->count();
 
@@ -1180,6 +1244,8 @@ class AssetsController extends Controller
 //-------------------------------------------------------------------------------------------------
     public function selectCPE_by(Request $request)
     {
+        $input = $request->all();
+
         $os_id = $request->os_id;
         if($os_id == 4) {
             $CPEData = data_cveven::select('rawtext as cpe')->where('rawtext','!=',null)->get();
@@ -1203,7 +1269,7 @@ class AssetsController extends Controller
             $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.site_id',$SiteSettingsfor->id)->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
             $dataOut["countAssets"] = 0;
             foreach ($datacountAssets as $key => $value) {
-                $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4,14])->get()->toArray();
                 $countfn = count($AssetsData_data);
                 if($countfn==0){
                     $dataOut["countAssets"]++;
@@ -1212,19 +1278,34 @@ class AssetsController extends Controller
                 }
             }
 
-            // $dataOut["countWindows"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();
-            $dataOut["countWindows"] = @CPE::select('id')->whereHas('get_assets', function($q) use ($SiteSettingsfor) {
-                $q->where('os_type', 1)->where('site_id',$SiteSettingsfor->id)->whereIn('data_type_id', [5,6]);
-            })->count();
-            // $dataOut["countLinux"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
-            $dataOut["countLinux"] = @CPE::select('id')->whereHas('get_assets', function($q) use ($SiteSettingsfor) {
-                $q->where('os_type', 2)->where('site_id',$SiteSettingsfor->id)->whereIn('data_type_id', [5,6]);
+            $dataOut["countAssets"] = @\Modules\Scans\Entities\Assets::where('status',1)->where('site_id',$SiteSettingsfor->id)->count();
+            if(!$dataOut["countAssets"]){
+                $dataOut["countAssets"]=0;
+            }
+
+            $site_id = $SiteSettingsfor->id;
+            $baseQuery = \Modules\Scans\Entities\Assets::where('status', 1)->where('site_id', $site_id);
+
+            $dataOut["countWindows"] = (clone $baseQuery)->whereHas('get_assets_data', function($q) {
+                $q->whereIn('id', function($query) {
+                    $query->select('asset_id')->from('cpe')->where('os_type', 1);
+                });
             })->count();
 
-            $dataOut["countOther"] = @CPE::select('id')->whereHas('get_assets', function($q) use ($SiteSettingsfor) {
-                $q->where('site_id',$SiteSettingsfor->id)->whereIn('data_type_id', [5,6])->where(function ($query) {
-                    $query->whereNotIn('os_type', [1,2])
-                        ->orWhereNull('os_type')->orWhere('os_type','');
+            $dataOut["countLinux"] = (clone $baseQuery)->whereHas('get_assets_data', function($q) {
+                $q->whereIn('id', function($query) {
+                    $query->select('asset_id')->from('cpe')->where('os_type', 2);
+                });
+            })->count();
+
+            $dataOut["countOther"] = (clone $baseQuery)->whereHas('get_assets_data', function($q) {
+                $q->whereIn('id', function($query) {
+                    $query->select('asset_id')->from('cpe')
+                          ->where(function($q3) {
+                              $q3->whereNotIn('os_type', [1,2])
+                                 ->orWhereNull('os_type')
+                                 ->orWhere('os_type', '');
+                          });
                 });
             })->count();
         }else{
@@ -1234,7 +1315,7 @@ class AssetsController extends Controller
             $datacountAssets = @Assets::select('assets.id','assets_datas.data_type_id','assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets_datas.data_type_id',[5,6])->where('assets.status', 1)->get();
             $dataOut["countAssets"] = 0;
             foreach ($datacountAssets as $key => $value) {
-                $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4])->get()->toArray();
+                $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id',[1,4,14])->get()->toArray();
                 $countfn = count($AssetsData_data);
                 if($countfn==0){
                     $dataOut["countAssets"]++;
@@ -1243,19 +1324,33 @@ class AssetsController extends Controller
                 }
             }
 
-            // $dataOut["countWindows"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();
-            $dataOut["countWindows"] = @CPE::select('id')->whereHas('get_assets', function($q){
-                $q->where('os_type', 1)->whereIn('data_type_id', [5,6]);
-            })->count();
-            // $dataOut["countLinux"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('LINUX'))->count();
-            $dataOut["countLinux"] = @CPE::select('id')->whereHas('get_assets', function($q){
-                $q->where('os_type', 2)->whereIn('data_type_id', [5,6]);
+            // $dataOut["countWindows"] = @CPEData::whereRaw('LOWER(os_type) = ?', strtolower('WINDOWS'))->count();            $dataOut["countAssets"] = @\Modules\Scans\Entities\Assets::where('status', 1)->count();
+            if(!$dataOut["countAssets"]){
+                $dataOut["countAssets"]=0;
+            }
+
+            $baseQueryAll = \Modules\Scans\Entities\Assets::where('status', 1);
+
+            $dataOut["countWindows"] = (clone $baseQueryAll)->whereHas('get_assets_data', function($q) {
+                $q->whereIn('id', function($query) {
+                    $query->select('asset_id')->from('cpe')->where('os_type', 1);
+                });
             })->count();
 
-            $dataOut["countOther"] = @CPE::select('id')->whereHas('get_assets', function($q){
-                $q->whereIn('data_type_id', [5,6])->where(function ($query) {
-                    $query->whereNotIn('os_type', [1,2])
-                        ->orWhereNull('os_type')->orWhere('os_type','');
+            $dataOut["countLinux"] = (clone $baseQueryAll)->whereHas('get_assets_data', function($q) {
+                $q->whereIn('id', function($query) {
+                    $query->select('asset_id')->from('cpe')->where('os_type', 2);
+                });
+            })->count();
+
+            $dataOut["countOther"] = (clone $baseQueryAll)->whereHas('get_assets_data', function($q) {
+                $q->whereIn('id', function($query) {
+                    $query->select('asset_id')->from('cpe')
+                          ->where(function($q3) {
+                              $q3->whereNotIn('os_type', [1,2])
+                                 ->orWhereNull('os_type')
+                                 ->orWhere('os_type', '');
+                          });
                 });
             })->count();
         }

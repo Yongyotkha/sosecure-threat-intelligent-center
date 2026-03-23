@@ -314,6 +314,7 @@
                                             </label>
                                         </th> --}}
                                         <th rowspan="2" class="align-middle">Site</th>
+                                        <th rowspan="2" class="align-middle">Data Type</th>
                                         <th rowspan="2" class="align-middle">Host</th>
                                         <th rowspan="2" class="align-middle">Assets</th>
                                         @if(!empty(get_role_custom()))
@@ -507,6 +508,20 @@
 @include('stacks.js.advanced_search')
 
 <script>
+    var loadingCount = 0;
+    var originalLoading = (typeof window.loading === "function") ? window.loading : function(){};
+    window.loading = function(mode){
+        if(mode == 'load'){
+            loadingCount++;
+            if(loadingCount == 1) originalLoading('load');
+        }else if(mode == 'stop_load'){
+            loadingCount--;
+            if(loadingCount <= 0){
+                loadingCount = 0;
+                originalLoading('stop_load');
+            }
+        }
+    };
     
     active_btn('#groupby-btn .btn-grey');
     active_btn('#groupby-status .btn-grey');
@@ -519,8 +534,6 @@
         menu = 'site';
         @endif
     @endif
-    {{--$('#table-assets-template-test').DataTable();--}}
-    
     $(document).ready(function () {
         selectGroupByFirst();
 
@@ -531,64 +544,13 @@
         $('#fillter-advance').click(function(){
             $('.hide-fillter').toggle();
         });
-        {{--data_table();--}}
+        
         $.when(data_table()).then(cookie_change_site("{{route('systemsetting.check_cookie_site')}}",id_select_site));
         
     });
 
     var site_id = 0;
     $(function () {
-        {{--$('#table-assets-template').DataTable({
-            processing: true,
-            serverSide: true,
-            destroy: true,
-            ajax: {
-                contentType: "application/json",
-                dataType: 'JSON',
-                type: "POST",
-                url: '{!! route('scans.data_scans_assets') !!}',
-                data: function ( d ) {
-                    d.menu = 'system';
-                    d.site_id = site_id;
-                    return JSON.stringify( d );
-                }
-            },
-            columns: [
-                {
-                    data: 'chk',
-                    name: 'chk',
-                },
-                {
-                    data: 'site',
-                    name: 'site',
-                },
-                {
-                    data: 'assets',
-                    name: 'assets',
-                },
-                {
-                    data: 'referent',
-                    name: 'referent',
-                }, 
-                {
-                    data: 'cpe',
-                    name: 'cpe',
-                }, 
-                {
-                    data: 'status',
-                    name: 'status',
-                    className: 'w-10 text-center'
-                },  
-
-                        {
-                            data: 'action',
-                            name: 'action',
-                            className: 'no-wrap'
-                        },   
-   
-            ],
-        });--}}
-
         
     });
 
@@ -598,8 +560,8 @@
     }
 
     var selectedGroup = 'domain';
-    function selectGroupBy(columnGroup){
-        if(selectedGroup!=columnGroup){
+    function selectGroupBy(columnGroup, force = false){
+        if(selectedGroup!=columnGroup || force){
             selectedGroup = columnGroup;
             $.ajax({
                 headers: {
@@ -672,8 +634,6 @@
     }
 
     function searchTB(searchLinkAll='',colsearchLinkAll=''){
-        
-        console.log(searchLinkAll+' / '+colsearchLinkAll);
 
         let selectedValue = $('#groupby-select').children("option:selected").val();
         let columnSearch = selectedGroup;
@@ -704,63 +664,87 @@
         }
         
         if(columnSearch=='domain'){
-            columnSearch = 1;
+            columnSearch = 'domain:name';
             if(selectedValue != null && selectedValue != " " && selectedValue != [])
             {   
                 selectedValue = '^'+selectedValue+'$';
-                console.log('rerr');
             }
         }else if(columnSearch=='ip'){
-            columnSearch = 2;
+            columnSearch = 'ip:name';
         }else if(columnSearch=='cpe'){
-            {{--columnSearch = [3, 4,5,6,7,12];--}}
-            columnSearch = 12;
+            columnSearch = 'CPE:name';
         }else if(columnSearch == 'os_type'){
-            columnSearch = 9;
             if(selectedValue == 'OthER'){
-                selectedValue = 'other';
+                columnSearch = 'CPE_OtherCheck:name';
+                selectedValue = '1';
             }
-            else if(selectedValue == 'Windows'){
-                selectedValue = 'Windows';
+            else {
+                columnSearch = 'CPE_Ostype:name';
             }
-            else if(selectedValue == 'Linux'){
-                selectedValue = 'Linux';
-            }
-            else if(selectedValue == 'Redhat'){
-                selectedValue = 'Redhat';
-            }
-
-            console.log(columnSearch+' / '+selectedValue);
-
         }else if(columnSearch=='ip_asset_id'){
  
         }else{
             columnSearch = 100;
             selectedValue = '';
         }
+
         t.search( '' ).columns().search( '' ).draw();
-        if(columnSearch=='ip_asset_id'){
-            selectedValue = '^' + selectedValue +'$';
-            columnSearch = 13;
-            t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue, true, false).column(10).search(active_tb).draw();
-        }else{
-            if(columnSearch == 1)
-            {
-                t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue, true, false).column(10).search(active_tb, true, false).draw();
+        
+        loading('load');
+        setTimeout(function() {
+            let allData = t.rows().data().toArray();
+            
+            if (allData.length > 0) {
+                let w = 0, l = 0, o = 0, total = 0;
+                
+                allData.forEach(function(row) {
+                    let matchSite = (selectedSiteName === '') || (row.site_name && row.site_name.includes(selectedSiteName));
+                    let statusText = row.status == 1 ? 'Active' : 'Inactive';
+                    let matchStatus = (active_tb === '') || (new RegExp(active_tb).test(statusText));
+
+                    if (matchSite && matchStatus) {
+                        total++;
+                        let os = row.CPE_Ostype ? row.CPE_Ostype.toString().toLowerCase() : '';
+                        if (os.includes('window')) w++;
+                        if (os.includes('linux')) l++;
+                        if (row.CPE_OtherCheck == 1) o++;
+                    }
+                });
+
+                let currentAssetsHtml = $('#count_assets').html() || "";
+                let limitMatch = currentAssetsHtml.match(/\/(\d+)$/);
+                let limitText = limitMatch ? "/" + limitMatch[1] : "";
+                
+                $('#count_assets').html(total + limitText);
+                $('#count_windows').html(w);
+                $('#count_linux').html(l);
+                $('#count_other').html(o);
             }
-            else
-            {
-                t.column(0).search(selectedSiteName, false, true,false).column(columnSearch).search(selectedValue).column(10).search(active_tb, true, false).draw();
+            
+            let siteCol = t.column('site_name:name');
+            let searchCol = columnSearch ? t.column(columnSearch) : null;
+            let statusCol = t.column('status:name');
+
+            if(siteCol.length) siteCol.search(selectedSiteName, false, true, false);
+            if(searchCol && searchCol.length) {
+                if(columnSearch == 'domain:name' || columnSearch == 'ip_asset_id:name'){
+                    searchCol.search(selectedValue, true, false);
+                } else {
+                    searchCol.search(selectedValue);
+                }
             }
-        }
-       
-        {{--ads.column(5).search(active_tb).draw();
-        t.search( '' ).columns().search( '' ).draw();--}}
+            if(statusCol.length) statusCol.search(active_tb, true, false);
+            
+            t.draw();
+            loading('stop_load');
+        }, 50);
     }
 
     var t;
     function changeSite(val){
-        set_cookie_site($(`#${id_select_site}`).val());
+        loading('load');
+        site_id = $(`#${id_select_site}`).val();
+        set_cookie_site(site_id);
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -775,24 +759,20 @@
                 
             },
         }).done(function(data){
-            $('#count_other').html(data.countOther+"");
+            let currentAssetsHtml = $('#count_assets').html() || "";
+            let currentTotal = currentAssetsHtml.split('/')[0];
             if(data.assetLimit){
-                $('#count_assets').html(data.countAssets+"/"+data.assetLimit);
+                $('#count_assets').html(currentTotal+"/"+data.assetLimit);
             }else{
-                $('#count_assets').html(data.countAssets+"");
+                $('#count_assets').html(currentTotal+"");
             }
-           
-            $('#count_windows').html(data.countWindows+"");
-            $('#count_linux').html(data.countLinux+"");
-            
-            
+            selectGroupBy(selectedGroup, true);
+            searchTB();
+            loading('stop_load');
         }).fail(function(jqXHR, ajaxOptions, thrownError){
-            
+            loading('stop_load');
             console.log("No response from server");
         });
-        searchTB();
-        {{--site_id = val;
-        selectGroupByFirst();--}}
     }
 
     function data_table(){
@@ -812,6 +792,9 @@
                 data:function(d){
                     d.menu = menu ? menu : "{{$menu}}";
                     d.site = site_code != null ? site_code : $('#site_code').val();
+                },
+                beforeSend: function(){
+                    loading('load');
                 }
             },
             initComplete : function( settings, json){
@@ -823,6 +806,14 @@
                 $('#count_windows').html(json.countWindows+"");
                 $('#count_linux').html(json.countLinux+"");
                 $('#count_other').html(json.countOther+"");
+                
+                let check = {!!json_encode($Search_Link_All)!!};
+                if(check===""){
+                    searchTB();
+                }else{
+                    searchTB(check,'ip_asset_id');
+                }
+                loading('stop_load');
             },
             columns: [
                 {{--{
@@ -835,6 +826,11 @@
                     data: 'site_name',
                     name: 'site_name',
                     className: 'no-wrap'
+                },
+                {
+                    data: 'data_type',
+                    name: 'data_type',
+                    visible: false,
                 },
                 {
                     width: '20%',
@@ -960,7 +956,7 @@
                    
                 }, --}}
                 {
-                    targets: 12,
+                    targets: 13,
                     render: function (data, type, row, meta) {
                         return row.cpe+row.action+`<span style="visibility: hidden;width: 0px;overflow: hidden;display: inline-block;">${row.CPE}</span>`;
                         
@@ -970,9 +966,9 @@
                 {
                     @if(!empty(get_role_custom()))
                     @if(@get_role_custom()['client'] != 1)
-                    targets: 11,
+                    targets: 12,
                     @else 
-                    targets: 9,
+                    targets: 10,
                     @endif
                 @endif
                     render: function (data, type, row, meta) {
@@ -990,14 +986,9 @@
 
         });
 
-        let check = {!!json_encode($Search_Link_All)!!};
-        if(check===""){
-            searchTB();
-        }else{
-            searchTB(check,'ip_asset_id');
-        }
 
-        $("div.btnaction").html('<button id="btn_view_1" class="btn btn-info" onclick="btn_view(1)" >Host Info</button> <button  id="btn_view_2" onclick="btn_view(2)" class="btn">Service / Port</button>');
+        {{-- $("div.btnaction").html('<button id="btn_view_1" class="btn btn-info" onclick="btn_view(1)" >Host Info</button> <button  id="btn_view_2" onclick="btn_view(2)" class="btn">Service / Port</button>'); --}}
+        $("div.btnaction").html('<button id="btn_view_1" class="btn btn-info" onclick="btn_view(1)" >Host Info</button>');
     }
 
 
@@ -1012,12 +1003,15 @@
             destroy: true,
             "dom": '<"btnaction"><"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             order: [[ 0, "asc" ]],
-            ajax: {
+                ajax: {
                 type: "POST",
                 url: '{!! route('assets.table_asset_host')!!}',
                 data:function(d){
                     d.menu = menu ? menu : "{{$menu}}";
                     d.site = site_code != null ? site_code : $('#site_code').val();
+                },
+                beforeSend: function(){
+                    loading('load');
                 }
             },
             initComplete : function( settings, json){
@@ -1030,6 +1024,13 @@
                 $('#count_linux').html(json.countLinux+"");
                 $('#count_other').html(json.countOther+"");
                 
+                let check = {!!json_encode($Search_Link_All)!!};
+                if(check===""){
+                    searchTB();
+                }else{
+                    searchTB(check,'ip_asset_id');
+                }
+                loading('stop_load');
             },
             columns: [
                 {{--{
@@ -1042,6 +1043,11 @@
                     data: 'site_name',
                     name: 'site_name',
                     className: 'no-wrap'
+                },
+                {
+                    data: 'data_type',
+                    name: 'data_type',
+                    className: 'no-wrap',
                 },
                 {
                     width: '20%',
@@ -1178,7 +1184,7 @@
             var rows = api.rows( {page:'current'} ).nodes();
             var last=null;
  
-            api.column(3, {page:'current'} ).data().each( function ( group, i ) {
+            api.column(4, {page:'current'} ).data().each( function ( group, i ) {
                 if ( last !== group ) {
                     $(rows).eq( i ).before(
                         '<tr class="group"><td colspan="4">'+group+'</td></tr>'
@@ -1192,12 +1198,6 @@
 
         });
 
-        let check = {!!json_encode($Search_Link_All)!!};
-        if(check===""){
-            searchTB();
-        }else{
-            searchTB(check,'ip_asset_id');
-        }
 
         $("div.btnaction").html('<button id="btn_view_1" class="btn btn-info" onclick="btn_view(1)" >Host Info</button> <button  id="btn_view_2" onclick="btn_view(2)" class="btn">Service / Port</button>');
     }

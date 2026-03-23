@@ -17,8 +17,12 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
 use Modules\Scans\Entities\Assets;
 use Modules\Scans\Entities\AssetsData;
+use Modules\Assets\Entities\Assets_port;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\Domain;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class ScansController extends Controller
 {
@@ -75,11 +79,37 @@ class ScansController extends Controller
         foreach ($request->values as $key => $data) {
             $TransactionScans[$key]['raw_data'] = $data['raw_data'];
             $TransactionScans[$key]['selected_type'] = $data['data_type'] ?? '';
-            $TransactionScans[$key]['data'] = TransactionScans::where('site_id', $data['site_id'])
-                ->where('domain_id', $data['domain_id'])
-                ->where('referent', $data['raw_data'])
-                ->orwhere('raw_data', $data['raw_data'])
-                ->get();
+            
+            // Identify "Roots" for this item to find related records
+            $roots = [];
+            $dataType = $data['data_type'] ?? '';
+            $rawData = $data['raw_data'] ?? '';
+            $referent = $data['referent'] ?? '';
+            $ipAddress = $data['ip_address'] ?? '';
+
+            if (in_array($dataType, ['IP Address', 'IPv6 Address', 'Domain Name', 'Subdomain', 'Internet Name', 'Network'])) {
+                $roots[] = $rawData;
+            }
+            if (!empty($referent)) $roots[] = $referent;
+            if (!empty($ipAddress)) $roots[] = $ipAddress;
+            
+            $roots = array_unique(array_filter($roots));
+
+            $query = TransactionScans::where('site_id', $data['site_id'])
+                ->where('domain_id', $data['domain_id']);
+
+            if (count($roots) > 0) {
+                $query->where(function ($q) use ($roots) {
+                    $q->whereIn('raw_data', $roots)
+                      ->orWhereIn('referent', $roots)
+                      ->orWhereIn('ip_address', $roots);
+                });
+            } else if (!empty($data['id'])) {
+                // Fallback to strict ID if no roots found
+                $query->where('id', $data['id']);
+            }
+
+            $TransactionScans[$key]['data'] = $query->get();
         }
         $DataTypes = DataTypes::where('status', 1)->get();
         return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $TransactionScans, 'data_type' => $DataTypes]);
@@ -93,6 +123,7 @@ class ScansController extends Controller
 
     public function save_assets(Request $request)
     {
+
         foreach ($request->assets as $data) {
             $Assets = Assets::where('raw_data', $data['raw_data'])->where('site_id', $data['site_id'])->where('domain_id', $data['domain_id'])->first();
             if (!$Assets) {
@@ -121,51 +152,351 @@ class ScansController extends Controller
                     $transaction_client_asset -> save();
                 }
             }
+            $savedAssetsDataMap = [];
+            $cveAssetIdMap = []; // Track actual cve_assets.id for mapping
+
+            // Identify the actual IP Address for this asset to ensure "By IPs" view is correct
+            $ipTypeId = \App\DataTypes::where('value', 'IP Address')->value('id');
+            $assetIP = \Modules\Scans\Entities\AssetsData::where('asset_id', $Assets->id)
+                ->where('data_type_id', $ipTypeId)
+                ->value('value') ?: $Assets->raw_data;
+
             foreach ($request->assets_data as $item) {
+                if (!$item || !isset($item['raw_data_base'])) continue;
+
+                // If we are saving an IP Address in this request, update our assetIP
+                if ($item['data_type'] == $ipTypeId) {
+                    $assetIP = $item['raw_data'];
+                }
+                \Log::debug("Saving AssetsData... item[data_type]: " . ($item['data_type'] ?? 'N/A') . ", item[raw_data]: " . ($item['raw_data'] ?? 'N/A') . ", item[raw_data_base]: " . ($item['raw_data_base'] ?? 'N/A') . (isset($item['ip_address']) ? ", item[ip_address]: " . $item['ip_address'] : ""));
+                
+                // If ip_address is provided, use it instead of the domain as the base for ports and other findings
+                $mappingBase = (!empty($item['ip_address'])) ? $item['ip_address'] : $item['raw_data_base'];
+
+                // --- SMART ASSET LINKING ---
+                // Find or create the correct parent Asset based on mappingBase
+                $currentAsset = Assets::where('raw_data', $mappingBase)->where('site_id', $data['site_id'])->where('domain_id', $data['domain_id'])->first();
+                if (!$currentAsset) {
+                    $currentAsset = new Assets;
+                    $currentAsset->code = generator_uuid();
+                    $currentAsset->created_by = Auth::user()->id;
+                    $currentAsset->site_id = $data['site_id'];
+                    $currentAsset->domain_id = $data['domain_id'];
+                    $currentAsset->status = 1;
+                    $currentAsset->raw_data = $mappingBase;
+                    $currentAsset->save();
+
+                    $tr_asset = transaction_client_asset::where('site_id', $data['site_id'])->where('transaction_id', $currentAsset->id)->first();
+                    if (!$tr_asset) {
+                        $tr_asset = new transaction_client_asset();
+                        $tr_asset->site_id = $data['site_id'];
+                        $tr_asset->transaction_id = $currentAsset->id;
+                    }
+                    $tr_asset->transaction_mode = 'insert';
+                    $tr_asset->transaction_data_status = 1;
+                    $tr_asset->status = 1;
+                    $tr_asset->save();
+                }
+                // --- END SMART ASSET LINKING ---
+
+                // Ensure this Asset has an identity (Subdomain or IP) saved in assets_datas to display correctly in Host list
+                $identityType = (filter_var($mappingBase, FILTER_VALIDATE_IP)) ? 5 : 14; 
+                $assetIdentity = AssetsData::where('asset_id', $currentAsset->id)
+                    ->where('value', $mappingBase)
+                    ->where('data_type_id', $identityType)
+                    ->where('site_id', $data['site_id'])
+                    ->first();
+                if (!$assetIdentity) {
+                    $assetIdentity = new AssetsData;
+                    $assetIdentity->code = generator_uuid();
+                    $assetIdentity->created_by = Auth::user()->id;
+                    $assetIdentity->site_id = $data['site_id'];
+                    $assetIdentity->domain_id = $data['domain_id'];
+                    $assetIdentity->status = 1;
+                    $assetIdentity->value = $mappingBase;
+                    $assetIdentity->data_type_id = $identityType;
+                    $assetIdentity->asset_id = $currentAsset->id;
+                    $assetIdentity->save();
+                }
+
+
                 $AssetsData = AssetsData::where('site_id', $data['site_id'])
                     ->where('domain_id', $data['domain_id'])
                     ->where('value', $item['raw_data'])
                     ->where('data_type_id', $item['data_type'])
-                    ->where('asset_id', $Assets->id)
+                    ->where('asset_id', $currentAsset->id)
                     ->first();
+                
                 if (!$AssetsData) {
-                    if ($item['raw_data_base'] == $Assets->raw_data) {
-                        $AssetsData = new AssetsData;
-                        $AssetsData->code = generator_uuid();
-                        $AssetsData->created_by = Auth::user()->id;
-                        $AssetsData->site_id = $data['site_id'];
-                        $AssetsData->domain_id = $data['domain_id'];
-                        $AssetsData->status = 1;
-                        $AssetsData->value = $item['raw_data'];
-                        $AssetsData->data_type_id = $item['data_type'];
-                        $AssetsData->asset_id = $Assets->id;
-                        $AssetsData->save();
+                    // Always save if we have a valid parent (which we now do via Smart Asset Linking)
+                    $AssetsData = new AssetsData;
+                    $AssetsData->code = generator_uuid();
+                    $AssetsData->created_by = Auth::user()->id;
+                    $AssetsData->site_id = $data['site_id'];
+                    $AssetsData->domain_id = $data['domain_id'];
+                    $AssetsData->status = 1;
+                    $AssetsData->value = $item['raw_data'];
+                    $AssetsData->data_type_id = $item['data_type'];
+                    $AssetsData->asset_id = $currentAsset->id;
+                    
+                    // ARCHITECTURAL IMPROVEMENT: Set parent relationship
+                    // If it's not the identity itself (IP/Domain), link it to the identity
+                    if ($item['raw_data'] != $mappingBase) {
+                        $AssetsData->refer_asset_id = $assetIdentity->id;
+                    }
+                    
+                    $AssetsData->save();
+                }
 
-                        $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $data['site_id'])->where('transaction_id', $AssetsData->id)->first();
-                        if($transaction_client_asset_data){
-                            $transaction_client_asset_data -> transaction_mode = 'insert';
-                            $transaction_client_asset_data -> transaction_data_status = 1;
-                            $transaction_client_asset_data -> status = 1;
-                            $transaction_client_asset_data -> save();
-                        }else{
-                            $transaction_client_asset_data = new transaction_client_asset_data();
-                            $transaction_client_asset_data -> site_id = $data['site_id'];
-                            $transaction_client_asset_data -> transaction_id = $AssetsData->id;
-                            $transaction_client_asset_data -> transaction_mode = 'insert';
-                            $transaction_client_asset_data -> transaction_data_status = 1;
-                            $transaction_client_asset_data -> status = 1;
-                            $transaction_client_asset_data -> save();
+                if ($AssetsData && $item['data_type'] != 17) {
+                    $savedAssetsDataMap[$item['raw_data']] = $AssetsData->id;
+                }
+
+                if ($AssetsData && $item['data_type'] == 17) {
+                    // Add to CPE and cve_assets tables if it's a CPE
+                    $cpe_string = $item['raw_data'];
+                    $cpe_parts = explode(':', $cpe_string);
+                    $vendor_name = isset($cpe_parts[3]) ? $cpe_parts[3] : '';
+                    $product_name = isset($cpe_parts[4]) ? $cpe_parts[4] : '';
+                    $product_version = isset($cpe_parts[5]) ? $cpe_parts[5] : '*';
+                    $product_edition = isset($cpe_parts[6]) ? $cpe_parts[6] : '*';
+
+                    // Find the parent AssetsData (IP, Domain or Port) to link the CPE to
+                    // BEST PRACTICE: Link to the assetIdentity (IP or Domain) for maximum visibility in the UI
+                    $cpe_asset_id = $assetIdentity->id; 
+
+                    $newCPE = \Modules\Scans\Entities\CPE::where('asset_id', $cpe_asset_id)->where('result', $cpe_string)->first();
+                    if (!$newCPE) {
+                        $newCPE = new \Modules\Scans\Entities\CPE();
+                        $newCPE->code = generator_uuid();
+                    }
+                    $newCPE->asset_id = $cpe_asset_id; 
+                    $newCPE->result = $cpe_string;
+                    $newCPE->vendor = $vendor_name;
+                    $newCPE->title = $product_name;
+                    $newCPE->version = $product_version;
+                    $newCPE->edition = $product_edition;
+                    
+                    $os_type = null;
+                    if (stripos($cpe_string, 'windows') !== false) {
+                        $os_type = 1;
+                    } elseif (stripos($cpe_string, 'linux') !== false || stripos($cpe_string, 'ubuntu') !== false || stripos($cpe_string, 'centos') !== false) {
+                        $os_type = 2;
+                    }
+                    $newCPE->os_type = $os_type;
+                    $newCPE->select = 'add'; 
+                    $newCPE->cpe_data_id = 0;
+                    $newCPE->credentials_id = null;
+                    $newCPE->remark = null;
+                    $newCPE->save();
+
+                    // Add to cve_assets table
+                    $cve_assets_ref = \Modules\SiteSettings\Entities\cve_assets::where('site_id', $data['site_id'])->where('ref_cpe', $newCPE->id)->first();
+                    if (!$cve_assets_ref) {
+                        $cve_assets_ref = new \Modules\SiteSettings\Entities\cve_assets();
+                        $cve_assets_ref->code = generator_uuid();
+                    }
+                    $cve_assets_ref->vendor = $newCPE->vendor;
+                    $cve_assets_ref->title = $newCPE->title;
+                    $cve_assets_ref->version = $newCPE->version;
+                    $cve_assets_ref->edition = $newCPE->edition;
+                    $site = \Modules\SiteSettings\Entities\SiteSettings::withTrashed()->where('id', $data['site_id'])->first();
+                    $domain = \Modules\SiteSettings\Entities\Domain::withTrashed()->where('id', $data['domain_id'])->first();
+                    $cve_assets_ref->Site = $site ? $site->name : '';
+                    
+                    // Get parent value for display (used for internal mapping keys)
+                    $parentValue = $currentAsset->raw_data;
+                    foreach($savedAssetsDataMap as $val => $sid) {
+                        if($sid == $cpe_asset_id) {
+                            $parentValue = $val;
+                            break;
                         }
+                    }
+                    $cve_assets_ref->IP = $assetIP;
+                    $cve_assets_ref->Hostname = $domain ? $domain->name : '';
+                    $cve_assets_ref->site_id = $data['site_id'];
+                    $cve_assets_ref->active = 1;
+                    $cve_assets_ref->ref_cpe = $newCPE->id;
+                    $cve_assets_ref->save();
 
-                        $TransactionScans = TransactionScans::where('site_id', $data['site_id'])
-                            ->where('domain_id', $data['domain_id'])
-                            ->where('raw_data', $item['raw_data'])
-                            ->where('data_type', $AssetsData->get_data_type->value)
+                    $newCPE->ref_cve_assets = $cve_assets_ref->id;
+                    $newCPE->save();
+
+                    // Track this cve_asset_id for future mappings (like Direct CVEs)
+                    $cveAssetIdMap[$parentValue] = $cve_assets_ref->id;
+
+                    // 🔥 IMMEDIATE MAPPING for this new CPE 🔥
+                    // Find CVEs in CveTemp that match this CPE's vendor and title and target IP/Host
+                    $matchingCVEs = \App\TransactionScansCveTemp::where('site_id', $data['site_id'])
+                        ->where('is_mapped', '!=', 1)
+                        ->where(function ($query) use ($parentValue, $domain) {
+                            $query->where('target', $parentValue);
+                            if ($domain) {
+                                $query->orWhere('target', $domain->name);
+                            }
+                        })
+                        ->where(function ($query) use ($vendor_name, $product_name) {
+                            $query->where('affected_cpe', 'like', "%:$vendor_name:$product_name:%")
+                                  ->orWhere('cpe_uri', 'like', "%:$vendor_name:$product_name:%");
+                        })
+                        ->get();
+
+                    foreach ($matchingCVEs as $cve_temp) {
+                        $this->save_cve_mapping($cve_temp->namecve, $data['site_id'], $cve_assets_ref->id, $cve_temp);
+                    }
+
+                    $transaction_client_cpe = \App\transaction_client_cpe::where('site_id', $data['site_id'])->where('transaction_id', $newCPE->id)->first();
+                    if($transaction_client_cpe){
+                        $transaction_client_cpe->transaction_mode = 'insert';
+                        $transaction_client_cpe->transaction_data_status = 1;
+                        $transaction_client_cpe->status = 1;
+                        $transaction_client_cpe->save();
+                    }else{
+                        $transaction_client_cpe = new \App\transaction_client_cpe();
+                        $transaction_client_cpe->site_id = $data['site_id'];
+                        $transaction_client_cpe->transaction_id = $newCPE->id;
+                        $transaction_client_cpe->transaction_mode = 'insert';
+                        $transaction_client_cpe->transaction_data_status = 1;
+                        $transaction_client_cpe->status = 1;
+                        $transaction_client_cpe->save();
+                    }
+                }
+
+
+
+
+
+
+                if ($item['data_type'] == 13) {
+                    // Record to assets_port table for structured display
+                    // Use ip_address if available, otherwise fallback to raw_data_base
+                    $portAssetName = (!empty($item['ip_address'])) ? $item['ip_address'] : $item['raw_data_base'];
+                    
+                    $newPort = Assets_port::where('site_id', $data['site_id'])
+                        ->where('asset_name', $portAssetName)
+                        ->where('port', $item['raw_data'])
+                        ->first();
+                    if (!$newPort) {
+                        $newPort = new Assets_port();
+                    }
+                    $newPort->site_id = $data['site_id'];
+                    $newPort->asset_name = $portAssetName;
+                    $newPort->port = $item['raw_data'];
+                    $newPort->status = 1;
+                    $newPort->save();
+                }
+
+                if ($AssetsData) {
+                    $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $data['site_id'])->where('transaction_id', $AssetsData->id)->first();
+                    if($transaction_client_asset_data){
+                        $transaction_client_asset_data -> transaction_mode = 'insert';
+                        $transaction_client_asset_data -> transaction_data_status = 1;
+                        $transaction_client_asset_data -> status = 1;
+                        $transaction_client_asset_data -> save();
+                    }else{
+                        $transaction_client_asset_data = new transaction_client_asset_data();
+                        $transaction_client_asset_data -> site_id = $data['site_id'];
+                        $transaction_client_asset_data -> transaction_id = $AssetsData->id;
+                        $transaction_client_asset_data -> transaction_mode = 'insert';
+                        $transaction_client_asset_data -> transaction_data_status = 1;
+                        $transaction_client_asset_data -> status = 1;
+                        $transaction_client_asset_data -> save();
+                    }
+                }
+
+                
+                // ALWAYS update TransactionScans if the user submits it, recovering any stuck states
+                $dataTypeValue = null;
+                if ($AssetsData && $AssetsData->get_data_type) {
+                    $dataTypeValue = $AssetsData->get_data_type->value;
+                } else {
+                    // Fallback lookup if not loaded or saving fresh
+                    $dataTypeValue = \App\DataTypes::where('id', $item['data_type'])->value('value');
+                }
+
+                if ($dataTypeValue) {
+                    $TransactionScans = TransactionScans::where('site_id', $data['site_id'])
+                        ->where('domain_id', $data['domain_id'])
+                        ->where('raw_data', $item['raw_data'])
+                        ->whereRaw('LOWER(data_type) = LOWER(?)', [$dataTypeValue])
+                        ->first();
+                    
+                    if ($TransactionScans && $TransactionScans->status_asset_use != 1) {
+                        $TransactionScans->status_asset_use = 1;
+                        $TransactionScans->save();
+                    }
+                }
+
+                // Restore immediate mapping for Direct CVE (Datatype 16)
+                if ($AssetsData && $item['data_type'] == 16) {
+                    $mappingTarget = (!empty($item['ip_address'])) ? $item['ip_address'] : $item['raw_data_base'];
+                    $cve_asset_id = isset($cveAssetIdMap[$mappingTarget]) ? $cveAssetIdMap[$mappingTarget] : null;
+
+                    if (!$cve_asset_id) {
+                        // Look up in database if not in current session map
+                        $existingCveAsset = \Modules\SiteSettings\Entities\cve_assets::where('site_id', $data['site_id'])
+                            ->where(function($q) use ($mappingTarget) {
+                                $q->where('IP', $mappingTarget)->orWhere('Hostname', $mappingTarget);
+                            })
                             ->first();
-                        if ($TransactionScans) {
-                            $TransactionScans->status_asset_use = 1;
-                            $TransactionScans->save();
+                        $cve_asset_id = $existingCveAsset ? $existingCveAsset->id : null;
+                    }
+
+                    if ($cve_asset_id) {
+                        $this->save_cve_mapping($item['raw_data'], $data['site_id'], $cve_asset_id);
+                    } else {
+                        \Log::warning("[MAPPING] Could not find cve_assets record for Direct CVE: " . $item['raw_data'] . " on target: " . $mappingTarget);
+                    }
+                }
+            }
+        }
+
+        // Catch-all Smart Sweep (moved outside all loops for performance)
+        foreach ($request->assets as $data) {
+            $site_data = \App\Entities\Sites::where('id', $data['site_id'])->first();
+            $site_name = $site_data ? $site_data->name : '';
+            $site_cve_assets = \DB::table('cve_assets')
+                ->where(function($q) use ($site_name, $data) {
+                    $q->where('site_id', $data['site_id']);
+                    if ($site_name) {
+                        $q->orWhere('Site', 'like', '%' . $site_name . '%');
+                    }
+                })
+                ->where('active', 1)
+                ->get();
+
+            $cve_temps = \App\TransactionScansCveTemp::where('site_id', $data['site_id'])
+                ->where('domain_id', $data['domain_id'])
+                ->where('is_mapped', '!=', 1)
+                ->get();
+            
+            if (count($cve_temps) > 0) {
+                \Log::info("DEBUG: Catch-all sweep for " . count($cve_temps) . " unmapped CVEs");
+                foreach ($cve_temps as $cve_temp) {
+                    $matched_asset_ids = [];
+                    $cpe_str = $cve_temp->affected_cpe ?: $cve_temp->cpe_uri;
+                    $vendor = ''; $product = '';
+                    if ($cpe_str) {
+                        $parts = explode(':', $cpe_str);
+                        $vendor = $parts[3] ?? '';
+                        $product = $parts[4] ?? '';
+                    }
+
+                    foreach ($site_cve_assets as $asset) {
+                        $ip_match = ($cve_temp->target && (strcasecmp($asset->IP, $cve_temp->target) == 0 || strcasecmp($asset->Hostname, $cve_temp->target) == 0));
+                        if ($vendor && $product) {
+                            if ($ip_match && strcasecmp($asset->vendor, $vendor) == 0 && strcasecmp($asset->title, $product) == 0) {
+                                $matched_asset_ids[] = $asset->id;
+                            }
+                        } else {
+                            if ($ip_match) {
+                                $matched_asset_ids[] = $asset->id;
+                            }
                         }
+                    }
+
+                    foreach (array_unique($matched_asset_ids) as $asset_id) {
+                        $this->save_cve_mapping($cve_temp->namecve, $data['site_id'], $asset_id, $cve_temp);
                     }
                 }
             }
@@ -206,45 +537,329 @@ class ScansController extends Controller
                     $transaction_client_asset -> save();
                 }
             }
+            $savedAssetsDataMap = [];
+            $cveAssetIdMap = [];
+
+            // Identify the actual IP Address for this asset to ensure "By IPs" view is correct
+            $ipTypeId = \App\DataTypes::where('value', 'IP Address')->value('id');
+            $assetIP = \Modules\Scans\Entities\AssetsData::where('asset_id', $Assets->id)
+                ->where('data_type_id', $ipTypeId)
+                ->value('value') ?: $Assets->raw_data;
+
             foreach ($request->assets_data as $item) {
+                if (!$item || !isset($item['raw_data_base'])) continue;
+
+                // If we are saving an IP Address in this request, update our assetIP
+                if ($item['data_type'] == $ipTypeId) {
+                    $assetIP = $item['raw_data'];
+                }
+                // --- SMART ASSET LINKING ---
+                // If ip_address is provided, use it instead of the domain as the base for ports and other findings
+                $mappingBase = (!empty($item['ip_address'])) ? $item['ip_address'] : $item['raw_data_base'];
+                $currentAsset = Assets::where('raw_data', $mappingBase)->where('site_id', $data['site_id'])->where('domain_id', $data['domain_id'])->first();
+                if (!$currentAsset) {
+                    $currentAsset = new Assets;
+                    $currentAsset->code = generator_uuid();
+                    $currentAsset->created_by = Auth::user()->id;
+                    $currentAsset->site_id = $data['site_id'];
+                    $currentAsset->domain_id = $data['domain_id'];
+                    $currentAsset->status = 1;
+                    $currentAsset->raw_data = $mappingBase;
+                    $currentAsset->save();
+
+                    $tr_asset = transaction_client_asset::where('site_id', $data['site_id'])->where('transaction_id', $currentAsset->id)->first();
+                    if (!$tr_asset) {
+                        $tr_asset = new transaction_client_asset();
+                        $tr_asset->site_id = $data['site_id'];
+                        $tr_asset->transaction_id = $currentAsset->id;
+                    }
+                    $tr_asset->transaction_mode = 'insert';
+                    $tr_asset->transaction_data_status = 1;
+                    $tr_asset->status = 1;
+                    $tr_asset->save();
+                }
+                // --- END SMART ASSET LINKING ---
+
+                // Ensure this Asset has an identity (Subdomain or IP) saved in assets_datas to display correctly in Host list
+                $identityType = (filter_var($mappingBase, FILTER_VALIDATE_IP)) ? 5 : 14; 
+                $assetIdentity = AssetsData::where('asset_id', $currentAsset->id)
+                    ->where('value', $mappingBase)
+                    ->where('data_type_id', $identityType)
+                    ->where('site_id', $data['site_id'])
+                    ->first();
+                if (!$assetIdentity) {
+                    $assetIdentity = new AssetsData;
+                    $assetIdentity->code = generator_uuid();
+                    $assetIdentity->created_by = Auth::user()->id;
+                    $assetIdentity->site_id = $data['site_id'];
+                    $assetIdentity->domain_id = $data['domain_id'];
+                    $assetIdentity->status = 1;
+                    $assetIdentity->value = $mappingBase;
+                    $assetIdentity->data_type_id = $identityType;
+                    $assetIdentity->asset_id = $currentAsset->id;
+                    $assetIdentity->save();
+                }
+
+
                 $AssetsData = AssetsData::where('site_id', $data['site_id'])
                     ->where('domain_id', $data['domain_id'])
                     ->where('value', $item['raw_data'])
                     ->where('data_type_id', $item['data_type'])
+                    ->where('asset_id', $currentAsset->id)
                     ->first();
+                
                 if (!$AssetsData) {
+                    // Always save if we have a valid parent (which we now do via Smart Asset Linking)
+                    $AssetsData = new AssetsData;
+                    $AssetsData->code = generator_uuid();
+                    $AssetsData->created_by = Auth::user()->id;
+                    $AssetsData->site_id = $data['site_id'];
+                    $AssetsData->domain_id = $data['domain_id'];
+                    $AssetsData->status = 1;
+                    $AssetsData->value = $item['raw_data'];
+                    $AssetsData->data_type_id = $item['data_type'];
+                    $AssetsData->asset_id = $currentAsset->id;
                     
-                    if ($item['raw_data_base'] == $data['raw_data_base']) {
-                        $AssetsData = new AssetsData;
-                        $AssetsData->code = generator_uuid();
-                        $AssetsData->created_by = Auth::user()->id;
-                        $AssetsData->site_id = $data['site_id'];
-                        $AssetsData->domain_id = $data['domain_id'];
-                        $AssetsData->status = 1;
-                        $AssetsData->value = $item['raw_data'];
-                        $AssetsData->data_type_id = $item['data_type'];
-                        $AssetsData->asset_id = $Assets->id;
-                        $AssetsData->save();
+                    // ARCHITECTURAL IMPROVEMENT: Set parent relationship
+                    // If it's not the identity itself (IP/Domain), link it to the identity
+                    if ($item['raw_data'] != $mappingBase) {
+                        $AssetsData->refer_asset_id = $assetIdentity->id;
+                    }
+                    
+                    $AssetsData->save();
+                }
 
-                        $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $data['site_id'])->where('transaction_id', $AssetsData->id)->first();
-                        if($transaction_client_asset_data){
-                            $transaction_client_asset_data -> transaction_mode = 'insert';
-                            $transaction_client_asset_data -> transaction_data_status = 1;
-                            $transaction_client_asset_data -> status = 1;
-                            $transaction_client_asset_data -> save();
-                        }else{
-                            $transaction_client_asset_data = new transaction_client_asset_data();
-                            $transaction_client_asset_data -> site_id = $data['site_id'];
-                            $transaction_client_asset_data -> transaction_id = $AssetsData->id;
-                            $transaction_client_asset_data -> transaction_mode = 'insert';
-                            $transaction_client_asset_data -> transaction_data_status = 1;
-                            $transaction_client_asset_data -> status = 1;
-                            $transaction_client_asset_data -> save();
+                if ($AssetsData && $item['data_type'] != 17) {
+                    $savedAssetsDataMap[$item['raw_data']] = $AssetsData->id;
+                }
+
+                if ($AssetsData && $item['data_type'] == 17) {
+                    // Add to CPE and cve_assets tables if it's a CPE
+                    $cpe_string = $item['raw_data'];
+                    $cpe_parts = explode(':', $cpe_string);
+                    $vendor_name = isset($cpe_parts[3]) ? $cpe_parts[3] : '';
+                    $product_name = isset($cpe_parts[4]) ? $cpe_parts[4] : '';
+                    $product_version = isset($cpe_parts[5]) ? $cpe_parts[5] : '*';
+                    $product_edition = isset($cpe_parts[6]) ? $cpe_parts[6] : '*';
+
+                    // Find the parent AssetsData (IP, Domain or Port) to link the CPE to
+                    // BEST PRACTICE: Link to the assetIdentity (IP or Domain) for maximum visibility in the UI
+                    $cpe_asset_id = $assetIdentity->id; 
+
+                    $newCPE = \Modules\Scans\Entities\CPE::where('asset_id', $cpe_asset_id)->where('result', $cpe_string)->first();
+                    if (!$newCPE) {
+                        $newCPE = new \Modules\Scans\Entities\CPE();
+                        $newCPE->code = generator_uuid();
+                    }
+                    $newCPE->asset_id = $cpe_asset_id; 
+                    $newCPE->result = $cpe_string;
+                    $newCPE->vendor = $vendor_name;
+                    $newCPE->title = $product_name;
+                    $newCPE->version = $product_version;
+                    $newCPE->edition = $product_edition;
+                    
+                    $os_type = null;
+                    if (stripos($cpe_string, 'windows') !== false) {
+                        $os_type = 1;
+                    } elseif (stripos($cpe_string, 'linux') !== false || stripos($cpe_string, 'ubuntu') !== false || stripos($cpe_string, 'centos') !== false) {
+                        $os_type = 2;
+                    }
+                    $newCPE->os_type = $os_type;
+                    $newCPE->select = 'add'; 
+                    $newCPE->cpe_data_id = 0;
+                    $newCPE->credentials_id = null;
+                    $newCPE->remark = null;
+                    $newCPE->save();
+
+                    // Add to cve_assets table
+                    $cve_assets_ref = \Modules\SiteSettings\Entities\cve_assets::where('site_id', $data['site_id'])->where('ref_cpe', $newCPE->id)->first();
+                    if (!$cve_assets_ref) {
+                        $cve_assets_ref = new \Modules\SiteSettings\Entities\cve_assets();
+                        $cve_assets_ref->code = generator_uuid();
+                    }
+                    $cve_assets_ref->vendor = $newCPE->vendor;
+                    $cve_assets_ref->title = $newCPE->title;
+                    $cve_assets_ref->version = $newCPE->version;
+                    $cve_assets_ref->edition = $newCPE->edition;
+                    $site = \Modules\SiteSettings\Entities\SiteSettings::withTrashed()->where('id', $data['site_id'])->first();
+                    $domain = \Modules\SiteSettings\Entities\Domain::withTrashed()->where('id', $data['domain_id'])->first();
+                    $cve_assets_ref->Site = $site ? $site->name : '';
+                    
+                    $parentValue = $currentAsset->raw_data;
+                    foreach($savedAssetsDataMap as $val => $sid) {
+                        if($sid == $cpe_asset_id) {
+                            $parentValue = $val;
+                            break;
                         }
+                    }
+                    $cve_assets_ref->IP = $assetIP;
+                    $cve_assets_ref->Hostname = $domain ? $domain->name : '';
+                    $cve_assets_ref->site_id = $data['site_id'];
+                    $cve_assets_ref->active = 1;
+                    $cve_assets_ref->ref_cpe = $newCPE->id;
+                    $cve_assets_ref->save();
+
+                    $newCPE->ref_cve_assets = $cve_assets_ref->id;
+                    $newCPE->save();
+
+                    // Track this cve_asset_id for internal mapping
+                    $cveAssetIdMap[$parentValue] = $cve_assets_ref->id;
+
+                    // 🔥 IMMEDIATE MAPPING for this new CPE 🔥
+                    $matchingCVEs = \App\TransactionScansCveTemp::where('site_id', $data['site_id'])
+                        ->where('is_mapped', '!=', 1)
+                        ->where(function ($query) use ($parentValue, $domain) {
+                            $query->where('target', $parentValue);
+                            if ($domain) {
+                                $query->orWhere('target', $domain->name);
+                            }
+                        })
+                        ->where(function ($query) use ($vendor_name, $product_name) {
+                            $query->where('affected_cpe', 'like', "%:$vendor_name:$product_name:%")
+                                  ->orWhere('cpe_uri', 'like', "%:$vendor_name:$product_name:%");
+                        })
+                        ->get();
+
+                    foreach ($matchingCVEs as $cve_temp) {
+                        $this->save_cve_mapping($cve_temp->namecve, $data['site_id'], $cve_assets_ref->id, $cve_temp);
+                    }
+
+                    $transaction_client_cpe = \App\transaction_client_cpe::where('site_id', $data['site_id'])->where('transaction_id', $newCPE->id)->first();
+                    if($transaction_client_cpe){
+                        $transaction_client_cpe->transaction_mode = 'insert';
+                        $transaction_client_cpe->transaction_data_status = 1;
+                        $transaction_client_cpe->status = 1;
+                        $transaction_client_cpe->save();
+                    }else{
+                        $transaction_client_cpe = new \App\transaction_client_cpe();
+                        $transaction_client_cpe->site_id = $data['site_id'];
+                        $transaction_client_cpe->transaction_id = $newCPE->id;
+                        $transaction_client_cpe->transaction_mode = 'insert';
+                        $transaction_client_cpe->transaction_data_status = 1;
+                        $transaction_client_cpe->status = 1;
+                        $transaction_client_cpe->save();
+                    }
+                }
+
+
+
+
+
+
+                if ($AssetsData) {
+                    $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $data['site_id'])->where('transaction_id', $AssetsData->id)->first();
+                    if($transaction_client_asset_data){
+                        $transaction_client_asset_data -> transaction_mode = 'insert';
+                        $transaction_client_asset_data -> transaction_data_status = 1;
+                        $transaction_client_asset_data -> status = 1;
+                        $transaction_client_asset_data -> save();
+                    }else{
+                        $transaction_client_asset_data = new transaction_client_asset_data();
+                        $transaction_client_asset_data -> site_id = $data['site_id'];
+                        $transaction_client_asset_data -> transaction_id = $AssetsData->id;
+                        $transaction_client_asset_data -> transaction_mode = 'insert';
+                        $transaction_client_asset_data -> transaction_data_status = 1;
+                        $transaction_client_asset_data -> status = 1;
+                        $transaction_client_asset_data -> save();
+                    }
+                }
+
+                // ALWAYS update TransactionScans if the user submits it, recovering any stuck states
+                $dataTypeValue = null;
+                if ($AssetsData && $AssetsData->get_data_type) {
+                    $dataTypeValue = $AssetsData->get_data_type->value;
+                } else {
+                    // Fallback lookup if not loaded or saving fresh
+                    $dataTypeValue = \App\DataTypes::where('id', $item['data_type'])->value('value');
+                }
+
+                if ($dataTypeValue) {
+                    $TransactionScans = TransactionScans::where('site_id', $data['site_id'])
+                        ->where('domain_id', $data['domain_id'])
+                        ->where('raw_data', $item['raw_data'])
+                        ->whereRaw('LOWER(data_type) = LOWER(?)', [$dataTypeValue])
+                        ->first();
+                    
+                    if ($TransactionScans && $TransactionScans->status_asset_use != 1) {
+                        $TransactionScans->status_asset_use = 1;
+                        $TransactionScans->save();
+                    }
+                }
+
+                // Restore immediate mapping for Direct CVE (Datatype 16)
+                if ($AssetsData && $item['data_type'] == 16) {
+                    $mappingTarget = $item['raw_data_base'];
+                    $cve_asset_id = isset($cveAssetIdMap[$mappingTarget]) ? $cveAssetIdMap[$mappingTarget] : null;
+
+                    if (!$cve_asset_id) {
+                        $existingCveAsset = \Modules\SiteSettings\Entities\cve_assets::where('site_id', $data['site_id'])
+                            ->where(function($q) use ($mappingTarget) {
+                                $q->where('IP', $mappingTarget)->orWhere('Hostname', $mappingTarget);
+                            })
+                            ->first();
+                        $cve_asset_id = $existingCveAsset ? $existingCveAsset->id : null;
+                    }
+
+                    if ($cve_asset_id) {
+                        $this->save_cve_mapping($item['raw_data'], $data['site_id'], $cve_asset_id);
+                    } else {
+                        \Log::warning("[MAPPING-NEW] Could not find cve_assets record for Direct CVE: " . $item['raw_data'] . " on target: " . $mappingTarget);
                     }
                 }
             }
         }
+
+        // Catch-all Smart Sweep (moved outside all loops for performance)
+        foreach ($request->assets as $data) {
+            $site_data = \App\Entities\Sites::where('id', $data['site_id'])->first();
+            $site_name = $site_data ? $site_data->name : '';
+            $site_cve_assets = \DB::table('cve_assets')
+                ->where(function($q) use ($site_name, $data) {
+                    $q->where('site_id', $data['site_id']);
+                    if ($site_name) {
+                        $q->orWhere('Site', 'like', '%' . $site_name . '%');
+                    }
+                })
+                ->where('active', 1)
+                ->get();
+
+            $cve_temps = \App\TransactionScansCveTemp::where('site_id', $data['site_id'])
+                ->where('domain_id', $data['domain_id'])
+                ->where('is_mapped', '!=', 1)
+                ->get();
+            
+            if (count($cve_temps) > 0) {
+                \Log::info("DEBUG: Catch-all sweep for " . count($cve_temps) . " unmapped CVEs");
+                foreach ($cve_temps as $cve_temp) {
+                    $matched_asset_ids = [];
+                    $cpe_str = $cve_temp->affected_cpe ?: $cve_temp->cpe_uri;
+                    $vendor = ''; $product = '';
+                    if ($cpe_str) {
+                        $parts = explode(':', $cpe_str);
+                        $vendor = $parts[3] ?? '';
+                        $product = $parts[4] ?? '';
+                    }
+
+                    foreach ($site_cve_assets as $asset) {
+                        $ip_match = ($cve_temp->target && (strcasecmp($asset->IP, $cve_temp->target) == 0 || strcasecmp($asset->Hostname, $cve_temp->target) == 0));
+                        if ($vendor && $product) {
+                            if ($ip_match && strcasecmp($asset->vendor, $vendor) == 0 && strcasecmp($asset->title, $product) == 0) {
+                                $matched_asset_ids[] = $asset->id;
+                            }
+                        } else {
+                            if ($ip_match) {
+                                $matched_asset_ids[] = $asset->id;
+                            }
+                        }
+                    }
+
+                    foreach (array_unique($matched_asset_ids) as $asset_id) {
+                        $this->save_cve_mapping($cve_temp->namecve, $data['site_id'], $asset_id, $cve_temp);
+                    }
+                }
+            }
+        }
+
         return response()->json(['message' => langapp('changes_saved_successful'), 'error' => '', 'status_code' => '200', 'data' => '']);
     }
 
@@ -479,13 +1094,10 @@ class ScansController extends Controller
             ->editColumn('chk', function (TransactionScans $data) {
                 $res = '';
                 if ($data->status_asset_use == 1) {
-                    $res .= '<label>
-                    <input type="checkbox" checked onclick="return false;"/>
-                        <span class="label-text"></span>
-                    </label>';
+                    $res .= '';
                 } else {
                     $res .= '<label>
-                        <input name="select[]" value="' . $data->raw_data . '" data-domain="' . $data->domain_id . '" data-site="' . $data->site_id . '" data-type="' . $data->data_type . '" class="select-chk" type="checkbox" />
+                        <input name="select[]" value="' . $data->raw_data . '" data-id="' . $data->id . '" data-domain="' . $data->domain_id . '" data-site="' . $data->site_id . '" data-type="' . $data->data_type . '" data-ip="' . ($data->ip_address ?? '') . '" data-referent="' . $data->referent . '" class="select-chk" type="checkbox" />
                         <span class="label-text"></span>
                     </label>';
                 }
@@ -769,17 +1381,60 @@ class ScansController extends Controller
     public function redo_process($code)
     {
         $TransactionTimeStampScans = TransactionTimeStampScans::where('code', $code)->first();
-        $TransactionTimeStampScans->progress = 0;
+        if (!$TransactionTimeStampScans) {
+            return ajaxResponse(['message' => "Record not found"], false, Response::HTTP_NOT_FOUND);
+        }
+
+        // 1. Update status to 'scanning'
+        Log::debug("Manual Scan Triggered for record code: {$code}, Domain ID: {$TransactionTimeStampScans->domain_id}");
+        $TransactionTimeStampScans->progress = 1; 
+        $TransactionTimeStampScans->created_at = now();
         $TransactionTimeStampScans->save();
 
-        return ajaxResponse(
-            [
-                'message' => "Successfully",
-                'redirect' => '/scans',
-            ],
-            true,
-            Response::HTTP_OK
-        );
+        // 2. Prepare to catch command output
+        $output = new BufferedOutput;
+
+        try {
+            Log::info("Manual Scan Starting: Artisan call app:DomainScan for Domain ID: {$TransactionTimeStampScans->domain_id}");
+            // 3. Execute DomainScan command
+            // We use the domain_id from the record
+            Artisan::call('app:DomainScan', [
+                'domain_id' => $TransactionTimeStampScans->domain_id,
+                '--save'    => true
+            ], $output);
+
+            // 4. Update status to 'complete'
+            $TransactionTimeStampScans->progress = 3;
+            $TransactionTimeStampScans->updated_at = now();
+            $TransactionTimeStampScans->save();
+
+            return ajaxResponse(
+                [
+                    'message' => "Scan Completed Successfully",
+                    'redirect' => route('scans.index', ['tab' => 'overview', 'site_code' => $code]),
+                    'output'   => $output->fetch()
+                ],
+                true,
+                Response::HTTP_OK
+            );
+
+        } catch (\Exception $e) {
+            Log::error("Manual Scan Error: " . $e->getMessage());
+            
+            // Revert status to 'complete' (or whatever it was) if it fails? 
+            // Or maybe mark as error? For now just keep it as 'complete' or original
+            $TransactionTimeStampScans->progress = 3; 
+            $TransactionTimeStampScans->save();
+
+            return ajaxResponse(
+                [
+                    'message' => "Scan Failed: " . $e->getMessage(),
+                    'redirect' => route('scans.index', ['tab' => 'overview', 'site_code' => $code]),
+                ],
+                false,
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public function scans_assets_edit_modal($id, $code, $page)
@@ -815,55 +1470,80 @@ class ScansController extends Controller
             $myArray = explode(',', $data['data_type']);
             
 
-            if (!empty($myArray[1])) {
-                $AssetsData = AssetsData::where('id', $myArray[1])->first();
-                $AssetsData->value = $data['raw_data'];
-                $AssetsData->data_type_id = $myArray[0];
-                $AssetsData->save();
-                $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $AssetsData->site_id)->where('transaction_id', $AssetsData->id)->first();
-                if($transaction_client_asset_data){
-                    $transaction_client_asset_data -> transaction_mode = 'update';
-                    $transaction_client_asset_data -> transaction_data_status = 1;
-                    $transaction_client_asset_data -> status = 1;
-                    $transaction_client_asset_data -> save();
-                }else{
-                    $transaction_client_asset_data = new transaction_client_asset_data();
-                    $transaction_client_asset_data -> site_id = $AssetsData->site_id;
-                    $transaction_client_asset_data -> transaction_id = $AssetsData->id;
-                    $transaction_client_asset_data -> transaction_mode = 'update';
-                    $transaction_client_asset_data -> transaction_data_status = 1;
-                    $transaction_client_asset_data -> status = 1;
-                    $transaction_client_asset_data -> save();
+            if ($myArray[0] != 13) { // NEW: Only process if not a port
+                if (!empty($myArray[1])) {
+                    $AssetsData = AssetsData::where('id', $myArray[1])->first();
+                    $AssetsData->value = $data['raw_data'];
+                    $AssetsData->data_type_id = $myArray[0];
+                    $AssetsData->save();
+                    $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $AssetsData->site_id)->where('transaction_id', $AssetsData->id)->first();
+                    if($transaction_client_asset_data){
+                        $transaction_client_asset_data -> transaction_mode = 'update';
+                        $transaction_client_asset_data -> transaction_data_status = 1;
+                        $transaction_client_asset_data -> status = 1;
+                        $transaction_client_asset_data -> save();
+                    }else{
+                        $transaction_client_asset_data = new transaction_client_asset_data();
+                        $transaction_client_asset_data -> site_id = $AssetsData->site_id;
+                        $transaction_client_asset_data -> transaction_id = $AssetsData->id;
+                        $transaction_client_asset_data -> transaction_mode = 'update';
+                        $transaction_client_asset_data -> transaction_data_status = 1;
+                        $transaction_client_asset_data -> status = 1;
+                        $transaction_client_asset_data -> save();
+                    }
+                } else {
+                
+                    $AssetsData = new AssetsData;
+                    $AssetsData->code = generator_uuid();
+                    $AssetsData -> created_by = Auth::user()->id;
+                    $AssetsData->site_id = $request->assets[0]['site_id'];
+                    $AssetsData->domain_id = $request->assets[0]['domain_id'];
+                    $AssetsData->status = 1;
+                    $AssetsData->value = $data['raw_data'];
+                    $AssetsData->data_type_id = $myArray[0];
+                    $AssetsData->asset_id = $Assets_id;
+                    $AssetsData->save();
+                    $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $AssetsData->site_id)->where('transaction_id', $AssetsData->id)->first();
+                    if($transaction_client_asset_data){
+                        $transaction_client_asset_data -> transaction_mode = 'insert';
+                        $transaction_client_asset_data -> transaction_data_status = 1;
+                        $transaction_client_asset_data -> status = 1;
+                        $transaction_client_asset_data -> save();
+                    }else{
+                        $transaction_client_asset_data = new transaction_client_asset_data();
+                        $transaction_client_asset_data -> site_id = $AssetsData->site_id;
+                        $transaction_client_asset_data -> transaction_id = $AssetsData->id;
+                        $transaction_client_asset_data -> transaction_mode = 'insert';
+                        $transaction_client_asset_data -> transaction_data_status = 1;
+                        $transaction_client_asset_data -> status = 1;
+                        $transaction_client_asset_data -> save();
+                    }
                 }
+                array_push($arr, $AssetsData->id);
             } else {
-             
-                $AssetsData = new AssetsData;
-                $AssetsData->code = generator_uuid();
-                $AssetsData -> created_by = Auth::user()->id;
-                $AssetsData->site_id = $request->assets[0]['site_id'];
-                $AssetsData->domain_id = $request->assets[0]['domain_id'];
-                $AssetsData->status = 1;
-                $AssetsData->value = $data['raw_data'];
-                $AssetsData->data_type_id = $myArray[0];
-                $AssetsData->asset_id = $Assets_id;
-                $AssetsData->save();
-                $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $AssetsData->site_id)->where('transaction_id', $AssetsData->id)->first();
-                if($transaction_client_asset_data){
-                    $transaction_client_asset_data -> transaction_mode = 'insert';
-                    $transaction_client_asset_data -> transaction_data_status = 1;
-                    $transaction_client_asset_data -> status = 1;
-                    $transaction_client_asset_data -> save();
-                }else{
-                    $transaction_client_asset_data = new transaction_client_asset_data();
-                    $transaction_client_asset_data -> site_id = $AssetsData->site_id;
-                    $transaction_client_asset_data -> transaction_id = $AssetsData->id;
-                    $transaction_client_asset_data -> transaction_mode = 'insert';
-                    $transaction_client_asset_data -> transaction_data_status = 1;
-                    $transaction_client_asset_data -> status = 1;
-                    $transaction_client_asset_data -> save();
+                // If it's a port, delete it from AssetsData if it was there before (cleaning up)
+                if (!empty($myArray[1])) {
+                    $AssetsData = AssetsData::where('id', $myArray[1])->first();
+                    if ($AssetsData) {
+                        $AssetsData->delete();
+                    }
                 }
             }
-            array_push($arr, $AssetsData->id);
+            if ($myArray[0] == 13) {
+                // Record to assets_port table for structured display
+                $newPort = Assets_port::where('site_id', $Assets->site_id)
+                    ->where('asset_name', $Assets->raw_data)
+                    ->where('port', $data['raw_data'])
+                    ->first();
+                if (!$newPort) {
+                    $newPort = new Assets_port();
+                }
+                $newPort->site_id = $Assets->site_id;
+                $newPort->asset_name = $Assets->raw_data;
+                $newPort->port = $data['raw_data'];
+                $newPort->status = 1;
+                $newPort->save();
+            }
         }
 
         
@@ -939,6 +1619,88 @@ class ScansController extends Controller
             ->get();
 
         return response()->json(['status' => 'success', 'data' => $cve_details]);
+    }
+
+    private function save_cve_mapping($cve_name, $site_id, $cve_asset_id, $cve_temp = null)
+    {
+        if (!$cve_temp) {
+            $cve_temp = \App\TransactionScansCveTemp::where('namecve', $cve_name)
+                ->where('site_id', $site_id)
+                ->first();
+        }
+
+        if (!$cve_temp) return false;
+
+        \Log::info("[MAPPING] Linking {$cve_name} to cve_asset {$cve_asset_id} (Site: {$site_id})");
+
+        \DB::table('data_datacve')->updateOrInsert(
+            ['namecve' => $cve_name],
+            [
+                'published' => $cve_temp->published,
+                'modified' => $cve_temp->modified,
+                'description' => $cve_temp->description,
+                'cvss_score' => $cve_temp->cvss_score,
+                'severity' => $cve_temp->severity,
+                'updated_at' => now(),
+                'created_at' => \DB::raw('IFNULL(created_at, NOW())')
+            ]
+        );
+
+        $datacve_record = \DB::table('data_datacve')->where('namecve', $cve_name)->first();
+        $datacve_id = $datacve_record ? $datacve_record->id : 0;
+
+        \DB::table('data_cve_sources')->updateOrInsert(
+            ['namecve' => $cve_name, 'source' => 'online'],
+            [
+                'datacve_id' => $datacve_id,
+                'updated_at' => now(),
+                'created_at' => \DB::raw('IFNULL(created_at, NOW())')
+            ]
+        );
+
+        \DB::table('data_datacve_mapping')->updateOrInsert(
+            ['namecve' => $cve_name, 'site_id' => $site_id],
+            [
+                'cveven_id' => $cve_asset_id,
+                'published' => $cve_temp->published,
+                'modified' => $cve_temp->modified,
+                'description' => $cve_temp->description,
+                'cvss_score' => $cve_temp->cvss_score,
+                'severity' => $cve_temp->severity,
+                'updated_at' => now(),
+                'created_at' => \DB::raw('IFNULL(created_at, NOW())')
+            ]
+        );
+
+        \DB::table('data_datacve_mapping_assets')->updateOrInsert(
+            [
+                'namecve' => $cve_name,
+                'site_id' => $site_id,
+                'cve_asset_id' => $cve_asset_id
+            ],
+            [
+                'code' => (string) \Illuminate\Support\Str::uuid(),
+                'updated_at' => now(),
+                'created_at' => \DB::raw('IFNULL(created_at, NOW())')
+            ]
+        );
+
+        \DB::table('transaction_client_data_datacve_mapping')->updateOrInsert(
+            [
+                'site_id' => $site_id,
+                'transaction_id' => $cve_name
+            ],
+            [
+                'transaction_mode' => 'insert',
+                'transaction_data_status' => 1,
+                'status' => 1,
+                'updated_at' => now(),
+                'created_at' => \DB::raw('IFNULL(created_at, NOW())')
+            ]
+        );
+
+        $cve_temp->is_mapped = 1;
+        return $cve_temp->save();
     }
 
 }

@@ -6,9 +6,12 @@ use Illuminate\Console\Command;
 use GuzzleHttp\Client;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use App\TransactionScans;
 use App\TransactionScansCveTemp;
 use App\DataTypes;
+use App\DataScans;
+use App\TransactionTimeStampScans;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\SiteSettings\Entities\Domain;
 use Carbon\Carbon;
@@ -45,6 +48,18 @@ class DomainScan extends Command
             $total = 0;
 
             foreach ($sites as $site) {
+                // Check permission: site must have menu_id=6 in site_menu_permission
+                $hasPermission = DB::table('site_menu_permission')
+                    ->where('site_id', $site->id)
+                    ->where('menu_id', 11)
+                    ->whereNull('deleted_at')
+                    ->exists();
+
+                if (!$hasPermission) {
+                    $this->line("  ⏭️  Site ID {$site->id}: ไม่มี permission (menu_id=11) — ข้าม");
+                    continue;
+                }
+
                 // Active Domains (status=1)
                 $domains = Domain::where('site_id', $site->id)
                     ->where('status', 1)
@@ -106,7 +121,7 @@ class DomainScan extends Command
         $scanTime = round(microtime(true) - $startTime, 2);
         $this->printSummary($domain, $scanTime);
 
-        // Export JSON (Commented out to save space)
+        // Export JSON
         // $this->exportJson($domain, $scanTime);
 
         // Phase 4: Save to DB (only with --save flag)
@@ -190,33 +205,33 @@ class DomainScan extends Command
         // --- Ports ---
         foreach ($this->ports as $p) {
             $rawData = $p['port'];
-            $referent = $p['target']; // Just domain/target, no port
-            $r = $this->saveScanRecord($siteId, $domainId, $module, 'Port', $rawData, $referent, 'censys');
-            $r ? $saved++ : $skipped++;
-
             // Save IP Address from Port info
             if (!empty($p['ip'])) {
-                $r = $this->saveScanRecord($siteId, $domainId, $module, 'IP Address', $p['ip'], $referent, 'censys');
+                $r = $this->saveScanRecord($siteId, $domainId, $module, 'IP Address', $p['ip'], $p['target'], 'censys', null, $p['ip']);
                 $r ? $saved++ : $skipped++;
             }
+
+            $r = $this->saveScanRecord($siteId, $domainId, $module, 'Port', $rawData, $p['target'], 'censys', null, $p['ip'] ?? null);
+            $r ? $saved++ : $skipped++;
 
             // SSL records (break down version, cipher, sha256)
             if (!empty($p['ssl_info'])) {
                 $referent = $p['target'];
+                $ip_address = $p['ip'] ?? null;
                 $ssl = $p['ssl_info'];
                 
                 if (!empty($ssl['version'])) {
-                    $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL Version', $ssl['version'], $referent, 'censys');
+                    $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL Version', $ssl['version'], $referent, 'censys', null, $ip_address);
                     $r ? $saved++ : $skipped++;
                 }
 
                 if (!empty($ssl['cipher'])) {
-                    $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL Cipher', $ssl['cipher'], $referent, 'censys');
+                    $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL Cipher', $ssl['cipher'], $referent, 'censys', null, $ip_address);
                     $r ? $saved++ : $skipped++;
                 }
 
                 if (!empty($ssl['sha256'])) {
-                    $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL SHA256', $ssl['sha256'], $referent, 'censys');
+                    $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL SHA256', $ssl['sha256'], $referent, 'censys', null, $ip_address);
                     $r ? $saved++ : $skipped++;
                 }
             }
@@ -225,10 +240,11 @@ class DomainScan extends Command
         // --- OS/Network/Geo ---
         foreach ($this->osResults as $os) {
             $referent = $os['target'];
+            $ip_address = $os['ip'] ?? null;
             
             // Save IP Address from OS info if available
             if (!empty($os['ip'])) {
-                $r = $this->saveScanRecord($siteId, $domainId, $module, 'IP Address', $os['ip'], $referent, 'censys');
+                $r = $this->saveScanRecord($siteId, $domainId, $module, 'IP Address', $os['ip'], $os['target'], 'censys', null, $os['ip']);
                 $r ? $saved++ : $skipped++;
             }
 
@@ -236,7 +252,7 @@ class DomainScan extends Command
             if (!empty($os['os_name'])) {
                 $osRaw = $os['os_name'];
                 if (!empty($os['os_version'])) $osRaw .= " " . $os['os_version'];
-                $r = $this->saveScanRecord($siteId, $domainId, $module, 'OS', $osRaw, $referent, 'censys');
+                $r = $this->saveScanRecord($siteId, $domainId, $module, 'OS', $osRaw, $referent, 'censys', null, $ip_address);
                 $r ? $saved++ : $skipped++;
             }
 
@@ -250,11 +266,11 @@ class DomainScan extends Command
 
         // --- CPE ---
         foreach ($this->cpeResults as $cpe) {
-            $ver = $cpe['version'] ?: '*';
-            $rawData = "{$cpe['vendor']}:{$cpe['product']}:{$ver}";
-            $referent = $cpe['target']; // Just domain/target, no port
+            $rawData = $cpe['cpe_uri'];
+            $referent = $cpe['target'];
+            $ip_address = $cpe['ip'] ?? null;
 
-            $r = $this->saveScanRecord($siteId, $domainId, $module, 'CPE', $rawData, $referent, 'censys');
+            $r = $this->saveScanRecord($siteId, $domainId, $module, 'CPE', $rawData, $referent, 'censys', $cpe['code'], $ip_address);
             $r ? $saved++ : $skipped++;
         }
 
@@ -284,10 +300,12 @@ class DomainScan extends Command
                 $temp->published   = $cve['published'];
                 $temp->modified    = $cve['modified'];
                 // Clean target (no port)
-                $temp->target      = explode(':', $cve['target'])[0];
+                $temp->target       = explode(':', $cve['target'])[0];
                 $temp->affected_cpe = $cve['affected_cpe'];
-                $temp->source      = 'nist_nvd';
-                $temp->is_mapped   = 0;
+                $temp->cpe_code     = $cve['cpe_code'];
+                $temp->cpe_uri      = $cve['cpe_uri'];
+                $temp->source       = 'nist_nvd';
+                $temp->is_mapped    = 0;
                 $temp->save();
                 $cveSaved++;
             }
@@ -301,12 +319,65 @@ class DomainScan extends Command
             $r ? $saved++ : $skipped++;
         }
 
+
         $this->info("  ✅ transaction_scans: {$saved} saved, {$skipped} skipped (duplicate)");
+
+        // --- NEW: Update DataScans summary and elements count for Overview balance ---
+        $this->updateSummaryData($siteId, $domainId);
     }
 
-    private function saveScanRecord($siteId, $domainId, $module, $dataType, $rawData, $referent, $source)
+    private function updateSummaryData($siteId, $domainId)
     {
-        return $this->processScanSave($siteId, $domainId, $module, $dataType, $rawData, $referent, $source, false);
+        $this->info("  📊 Updating summary data (DataScans / Elements)...");
+
+        // 1. Update elements in TransactionTimeStampScans (the latest scan record for this site/domain)
+        $totalElements = TransactionScans::where('site_id', $siteId)
+            ->where('domain_id', $domainId)
+            ->count();
+
+        $timestampScan = TransactionTimeStampScans::where('site_id', $siteId)
+            ->where('domain_id', $domainId)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($timestampScan) {
+            $timestampScan->elements = $totalElements;
+            // Optionally set progress to 3 (Complete) if it's not already, 
+            // but usually progress is handled by the overall scan management.
+            if ($timestampScan->progress < 3) {
+                $timestampScan->progress = 3;
+            }
+            $timestampScan->save();
+        }
+
+        // 2. Update DataScans summary (Clear and Recalculate)
+        // This ensures the Host list circles in Overview match the actual data in TransactionScans
+        DataScans::where('site_id', $siteId)
+            ->where('domain_id', $domainId)
+            ->delete();
+
+        $counts = TransactionScans::where('site_id', $siteId)
+            ->where('domain_id', $domainId)
+            ->select('data_type', DB::raw('count(*) as total'))
+            ->groupBy('data_type')
+            ->get();
+
+        foreach ($counts as $count) {
+            $ds = new DataScans();
+            $ds->code      = (string)Str::uuid();
+            $ds->site_id   = $siteId;
+            $ds->domain_id = $domainId;
+            $ds->data_type = $count->data_type;
+            $ds->total     = $count->total;
+            $ds->save();
+        }
+
+        $this->info("     Done. Overview is now balanced.");
+    }
+
+    private function saveScanRecord($siteId, $domainId, $module, $dataType, $rawData, $referent, $source, $code = null, $ip_address = null)
+    {
+        return $this->processScanSave($siteId, $domainId, $module, $dataType, $rawData, $referent, $source, false, $code, $ip_address);
     }
 
     private function saveCvePointerRecord($siteId, $domainId, $module, $dataType, $rawData, $referent, $source, $forceNew)
@@ -330,7 +401,7 @@ class DomainScan extends Command
         $this->line("     📝 DataType registered: {$value}");
     }
 
-    private function processScanSave($siteId, $domainId, $module, $dataType, $rawData, $referent, $source, $forceNew = false)
+    private function processScanSave($siteId, $domainId, $module, $dataType, $rawData, $referent, $source, $forceNew = false, $code = null, $ip_address = null)
     {
         // Auto-register data type to data_types table
         $this->ensureDataTypeExists($dataType);
@@ -354,21 +425,24 @@ class DomainScan extends Command
                 $exists->referent = $referent;
             }
 
-            // If forceNew is true, set status to 2 (New), otherwise 1 (Discovered)
-            $exists->status = $forceNew ? 2 : 1; 
+            // If record is already 'Used' (status_asset_use == 1), don't revert its status to Discovered/New
+            if ($exists->status_asset_use != 1) {
+                $exists->status = $forceNew ? 2 : 1;
+            }
             $exists->save();
             return false; // already existed/updated
         }
 
         $record = new TransactionScans();
-        $record->code      = Str::uuid()->toString();
+        $record->code      = $code ?: Str::uuid()->toString();
         $record->site_id   = $siteId;
         $record->domain_id = $domainId;
         $record->module    = $module;
         $record->data_type = $dataType;
         $record->raw_data  = (string)$rawData;
-        $record->referent  = $referent;
-        $record->source    = $source;
+        $record->referent   = $referent;
+        $record->ip_address = $ip_address;
+        $record->source     = $source;
         $record->status    = 2; // New
         $record->save();
         return true; // saved
@@ -632,7 +706,7 @@ class DomainScan extends Command
                         $version = $sw['version'] ?? null;
 
                         if ($vendor || $product) {
-                            $cpeUri = "cpe:2.3:a:{$vendor}:{$product}:" . ($version ?: '*');
+                            $cpeUri = "cpe:2.3:a:{$vendor}:{$product}:" . ($version ?: '*') . ":*:*:*:*:*:*:*";
 
                             // Update port version from software
                             $lastKey = count($this->ports) - 1;
@@ -643,7 +717,9 @@ class DomainScan extends Command
                             // Avoid duplicate CPE
                             if (!$this->isCpeKnown($target, $port, $vendor, $product)) {
                                 $this->cpeResults[] = [
+                                    'code'    => Str::uuid()->toString(),
                                     'target'  => $target,
+                                    'ip'      => $ip,
                                     'port'    => $port,
                                     'vendor'  => $vendor,
                                     'product' => $product,
@@ -662,6 +738,9 @@ class DomainScan extends Command
             $os       = $data['result']['operating_system'] ?? [];
 
             if ($asn || $location || $os) {
+                $osName    = $os['product'] ?? ($os['name'] ?? null);
+                $osVersion = $os['version'] ?? null;
+
                 $this->osResults[] = [
                     'target'      => $target,
                     'ip'          => $ip,
@@ -669,11 +748,32 @@ class DomainScan extends Command
                     'asn_name'    => $asn['description'] ?? ($asn['name'] ?? ''),
                     'country'     => $location['country'] ?? '',
                     'city'        => $location['city'] ?? '',
-                    'os_name'     => $os['product'] ?? ($os['name'] ?? null),
+                    'os_name'     => $osName,
                     'os_family'   => $os['family'] ?? null,
-                    'os_version'  => $os['version'] ?? null,
+                    'os_version'  => $osVersion,
                     'os_vendor'   => $os['vendor'] ?? null,
                 ];
+
+                // Add OS to CPE Results
+                if ($osName) {
+                    $osVendor  = $os['vendor']  ?? 'unknown';
+                    $osProduct = str_replace(' ', '_', strtolower($osName));
+                    $osVer     = $osVersion ?: '*';
+                    $osCpeUri  = "cpe:2.3:o:{$osVendor}:{$osProduct}:{$osVer}:*:*:*:*:*:*:*";
+
+                    if (!$this->isCpeKnown($target, 0, $osVendor, $osName)) {
+                        $this->cpeResults[] = [
+                            'code'    => Str::uuid()->toString(),
+                            'target'  => $target,
+                            'ip'      => $ip,
+                            'port'    => 0,
+                            'vendor'  => $osVendor,
+                            'product' => $osName,
+                            'version' => $osVersion,
+                            'cpe_uri' => $osCpeUri,
+                        ];
+                    }
+                }
             }
 
             $this->line("     ✔ {$target} ({$ip}): " . count($services) . " services");
@@ -787,7 +887,9 @@ class DomainScan extends Command
                             'description'  => $desc,
                             'published'    => $published,
                             'modified'     => $modified,
-                            'affected_cpe' => "{$cpe['vendor']}:{$cpe['product']}:" . ($cpe['version'] ?: '*'),
+                            'affected_cpe' => $cpe['cpe_uri'],
+                            'cpe_code'     => $cpe['code'],
+                            'cpe_uri'      => $cpe['cpe_uri'],
                         ];
                         $found++;
                     }
@@ -872,8 +974,7 @@ class DomainScan extends Command
             $this->info("");
             $this->info("🎯 CPE Components:");
             foreach ($this->cpeResults as $cpe) {
-                $ver = $cpe['version'] ?: '*';
-                $this->line("   {$cpe['target']}:{$cpe['port']} — {$cpe['vendor']}:{$cpe['product']}:{$ver}");
+                $this->line("   {$cpe['target']}:{$cpe['port']} — {$cpe['cpe_uri']}");
             }
         }
 

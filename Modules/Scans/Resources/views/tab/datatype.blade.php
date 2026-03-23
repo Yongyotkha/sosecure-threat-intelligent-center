@@ -321,7 +321,15 @@
             $('#show_asets').html("");
             loading('load');
             var values = $("input[name='select[]']:checked").map(function(){
-                return {'raw_data' : $(this).val(), 'domain_id' : $(this).data('domain') , 'site_id' : $(this).data('site'), 'data_type' : $(this).data('type')};
+                return {
+                    'raw_data' : $(this).val(), 
+                    'id' : $(this).data('id'),
+                    'domain_id' : $(this).data('domain'), 
+                    'site_id' : $(this).data('site'), 
+                    'data_type' : $(this).data('type'),
+                    'ip_address' : $(this).data('ip'),
+                    'referent' : $(this).data('referent')
+                };
             }).get();
             axios.post('/scans/get_referent', {
                 values: values,
@@ -331,18 +339,20 @@
                 var html = ``;
                 
                 let groupedByType = {};
-                for(let i in result.data){
-                    const item = result.data[i];
+                result.data.forEach((item, i) => {
                     const type = item.selected_type || 'Other';
                     if (!groupedByType[type]) groupedByType[type] = [];
+                    let origValue = values[i];
+                    item.ip_address = origValue ? origValue.ip_address : '';
+                    item.referent = origValue ? origValue.referent : '';
                     groupedByType[type].push(item);
-                }
+                });
 
                 let table_idx = 0;
                 html += `<table class="table table-bordered asset-table-unified">
                     <thead>
                         <tr>
-                            <th>Source Asset</th>
+                            <th>Asset</th>
                             <th>Data Type</th>
                             <th>Value</th>
                             <th></th>
@@ -362,8 +372,10 @@
                         let count = 0;
                         let checkSubAssetDplicate = [];
 
+                        let parent_asset = data_referent.referent ? data_referent.referent : raw_data;
+
                         all_assets_info.push({
-                            raw_data: raw_data,
+                            raw_data: parent_asset,
                             domain_id: (data_transaction && data_transaction[0]) ? data_transaction[0].domain_id : '',
                             site_id: (data_transaction && data_transaction[0]) ? data_transaction[0].site_id : ''
                         });
@@ -375,11 +387,12 @@
                                     checkSubAssetDplicate.push(`${data_transaction_val.data_type}${data_transaction_val.raw_data}`);
                                     number_rows++;
                                     count++;
-                                    
+                                    let row_parent_asset = (String(data_transaction_val.raw_data).trim() == String(raw_data).trim()) ? parent_asset : (data_transaction_val.referent ? data_transaction_val.referent : parent_asset);
+
                                     html += `<tr id="rows_${number_rows}">
                                         <td style="vertical-align: middle;">
-                                            <strong>${raw_data}</strong>
-                                            <input type="hidden" name="assets[]" value="${raw_data}" data-domain_id="${data_transaction_val.domain_id || ''}" data-site_id="${data_transaction_val.site_id || ''}">
+                                            <strong>${row_parent_asset}</strong>
+                                            <input type="hidden" name="assets[]" value="${row_parent_asset}" data-domain_id="${data_transaction_val.domain_id || ''}" data-site_id="${data_transaction_val.site_id || ''}">
                                         </td>
                                         <td>
                                             <select name="data_type[]" class="select2 form-control">`;
@@ -392,12 +405,12 @@
                                                 } else if (data_transaction_val.data_type) {
                                                     isSelected = (data_type.value && data_type.value.trim().toLowerCase() == data_transaction_val.data_type.trim().toLowerCase());
                                                 }
-                                                html += `<option value="${data_type.id}" ${isSelected ? 'selected' : ''} data-raw_data="${raw_data}">${data_type.value}</option>`;
+                                                html += `<option value="${data_type.id}" ${isSelected ? 'selected' : ''} data-raw_data="${row_parent_asset}">${data_type.value}</option>`;
                                             }
                                             html += `</select>
                                         </td>
                                         <td>
-                                            <input type="text" name="raw_data[]" class="form-control" value="${data_transaction_val.raw_data}" data-raw_data="${raw_data}">
+                                            <input type="text" name="raw_data[]" class="form-control" value="${data_transaction_val.raw_data}" data-raw_data="${row_parent_asset}" data-ip="${data_referent.ip_address || ''}">
                                         </td>
                                         <td>
                                             <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_tr(${number_rows})">
@@ -411,8 +424,8 @@
                             number_rows++;
                             html += `<tr id="rows_${number_rows}">
                                 <td style="vertical-align: middle;">
-                                    <strong>${raw_data}</strong>
-                                    <input type="hidden" name="assets[]" value="${raw_data}">
+                                    <strong>${parent_asset}</strong>
+                                    <input type="hidden" name="assets[]" value="${parent_asset}">
                                 </td>
                                 <td>
                                     <select name="data_type[]" class="select2 form-control">`;
@@ -420,12 +433,12 @@
                                         base_datatype = result.data_type;
                                         const data_type = result.data_type[b];
                                         let isSelected = (selected_type && data_type.value && data_type.value.trim().toLowerCase() == selected_type.trim().toLowerCase());
-                                        html += `<option value="${data_type.id}" ${isSelected ? 'selected' : ''} data-raw_data="${raw_data}">${data_type.value}</option>`;
+                                        html += `<option value="${data_type.id}" ${isSelected ? 'selected' : ''} data-raw_data="${parent_asset}">${data_type.value}</option>`;
                                     }
                                     html += `</select>
                                 </td>
                                 <td>
-                                    <input type="text" name="raw_data[]" class="form-control" value="${raw_data}" data-raw_data="${raw_data}">
+                                    <input type="text" name="raw_data[]" class="form-control" value="${raw_data}" data-raw_data="${parent_asset}" data-ip="${data_referent.ip_address || ''}">
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_tr(${number_rows})">
@@ -479,6 +492,7 @@
                         </td>
                         <td>
                             <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${number_rows_data_manual}">
+                            <input type="hidden" id="ip_manual_${number_rows_data_manual}" value="">
                         </td>
                         <td>
                             <select name="data_type_manual[]" class="select2 form-control">`;
@@ -527,6 +541,7 @@
             </td>
             <td>
                 <input type="text" name="raw_data_manual[]" class="form-control" data-raw_data_manual="${rows_data_manual}">
+                <input type="hidden" id="ip_manual_${rows_data_manual}" value="">
             </td>
             <td>
                 <button type="button" class="btn btn-sm btn-success m-xs delete-row" onclick="retry_test();">
@@ -648,7 +663,11 @@
             return {'raw_data' : $(this).val(), 'domain_id' : $(this).data('domain_id') , 'site_id' : $(this).data('site_id')};
         }).get();
         var raw_data = $("input[name='raw_data[]']").map(function(){
-            return {'raw_data' : $(this).val(), 'raw_data_base' : $(this).data('raw_data')};
+            return {
+                'raw_data' : $(this).val(), 
+                'raw_data_base' : $(this).data('raw_data'),
+                'ip_address' : $(this).data('ip')
+            };
         }).get();
         var data_type = $("select[name='data_type[]'] option:selected").map(function(){
             return {'data_type' : $(this).val(), 'raw_data_base' : $(this).data('raw_data')};
@@ -658,14 +677,15 @@
                 return {
                     data_type: data_type[i].data_type,
                     raw_data: v.raw_data,
-                    raw_data_base: v.raw_data_base
+                    raw_data_base: v.raw_data_base,
+                    ip_address: v.ip_address
                 };
             }
         });
+
         axios.post('/scans/save_assets', {
-            
             assets: values,
-            assets_data: res,
+            assets_data: res
         }).then(function (response) {
             
             
@@ -701,13 +721,15 @@
                 return {
                     data_type: data_type[i].data_type,
                     raw_data: v.raw_data,
-                    raw_data_base: v.raw_data_base
+                    raw_data_base: v.raw_data_base,
+                    ip_address: $('#ip_manual_' + v.raw_data_base).val() || ''
                 };
             }
-        }); 
+        });
+
         axios.post('/scans/save_assets_new', {
             assets: values,
-            assets_data: res,
+            assets_data: res
         }).then(function (response) {
             loading('stop_load');
             $('#table-scans-data').DataTable().ajax.reload();
