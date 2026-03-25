@@ -25,7 +25,7 @@ class MDMISPFeedDaily_Database_months extends Command
 
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
         $clientMD = new MongoClient($DB_MONGO_KEY);
-        $progressCol = $clientMD->sosecure_threatintelligent->job_progress;
+        $progressCol = $clientMD->sosecure_threatintelligent_dev->job_progress;
 
         // 🧠 กำหนดช่วงเวลา 2 เดือนล่าสุด
         $startTs = Carbon::now()->subMonths(2)->startOfDay()->timestamp;
@@ -91,7 +91,7 @@ class MDMISPFeedDaily_Database_months extends Command
                 ->toArray();
         });
 
-        // 🔹 step 2: ดึง event ในช่วงเวลา
+        // 🔹 step 2: ดึง event ในช่วงเวลา (ตาม event timestamp)
         $mysqlEvents = $this->queryWithRetry(function () use ($chk_tag, $startTs, $endTs) {
             return DB::connection('mysql_misp')->table('events')
                 ->select('id', 'info', 'date', 'published', 'publish_timestamp', 'timestamp', 'orgc_id', 'org_id')
@@ -106,10 +106,52 @@ class MDMISPFeedDaily_Database_months extends Command
                 ->get();
         });
 
+        // 🔹 step 2b: ดึง event เพิ่มเติมจาก attributes ที่มี timestamp ในช่วงเวลา
+        //    (จับ attributes ที่ถูกเพิ่ม/แก้ไขใหม่ แม้ event หลักจะมี timestamp นอกช่วง)
+        $existingEventIds = $mysqlEvents->pluck('id')->toArray();
+
+        $additionalEvents = $this->queryWithRetry(function () use ($chk_tag, $startTs, $endTs, $existingEventIds) {
+            // หา event_id จาก attributes ที่มี timestamp ในช่วง แต่ event ยังไม่ได้ดึงมา
+            $eventIdsFromAttrs = DB::connection('mysql_misp')->table('attributes')
+                ->select('event_id')
+                ->whereBetween('timestamp', [$startTs, $endTs])
+                ->when(!empty($existingEventIds), function ($q) use ($existingEventIds) {
+                    $q->whereNotIn('event_id', $existingEventIds);
+                })
+                ->distinct()
+                ->limit(20)
+                ->pluck('event_id')
+                ->toArray();
+
+            if (empty($eventIdsFromAttrs)) {
+                return collect();
+            }
+
+            return DB::connection('mysql_misp')->table('events')
+                ->select('id', 'info', 'date', 'published', 'publish_timestamp', 'timestamp', 'orgc_id', 'org_id')
+                ->whereIn('id', $eventIdsFromAttrs)
+                ->whereNotExists(function ($query) use ($chk_tag) {
+                    $query->select(DB::raw(1))
+                        ->from('event_tags')
+                        ->whereColumn('event_tags.event_id', 'events.id')
+                        ->whereIn('event_tags.tag_id', $chk_tag);
+                })
+                ->orderBy('id')
+                ->get();
+        });
+
+        // เก็บ event IDs ของ events เพิ่มเติม เพื่อจำกัด attributes ตอนดึง
+        $additionalEventIds = [];
+        if ($additionalEvents->count() > 0) {
+            $additionalEventIds = $additionalEvents->pluck('id')->toArray();
+            $this->info("📎 Found {$additionalEvents->count()} additional events from attribute timestamps (limit 20 attrs each)");
+            $mysqlEvents = $mysqlEvents->merge($additionalEvents);
+        }
+
         // 🔹 step 3: เตรียมเชื่อม MongoDB
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
         $clientMD = new MongoClient($DB_MONGO_KEY);
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
 
         $insertedCount = 0;
         $skippedCount = 0;
@@ -132,11 +174,22 @@ class MDMISPFeedDaily_Database_months extends Command
             $this->info("🚀 Processing NEW event {$event->id}");
 
             try {
-                // ✅ ดึง attributes ทั้งหมดแบบ chunk
-                DB::connection('mysql_misp')->table('attributes')
+                // ✅ จำกัด attributes 20 ตัวต่อ event (สำหรับ debug)
+                $attrLimit = 20;
+                $isAdditionalEvent = in_array($event->id, $additionalEventIds);
+
+                $this->info("📎 Event {$event->id}" . ($isAdditionalEvent ? " (additional)" : "") . " - limiting to {$attrLimit} attributes");
+
+                // ✅ ดึง attributes สุ่มจากวันต่างๆ (ไม่เอาแค่ id ติดกัน)
+                $rows = DB::connection('mysql_misp')->table('attributes')
                     ->where('event_id', $event->id)
-                    ->orderBy('id')
-                    ->chunk(1000, function ($rows) use ($event, $col_fx_otx_events, &$insertedCount) {
+                    ->inRandomOrder()
+                    ->limit($attrLimit)
+                    ->get();
+
+                $rowChunks = [$rows];
+
+                foreach ($rowChunks as $rows) {
 
                         $attributes = $rows->map(function ($attr) {
                             return [
@@ -185,7 +238,7 @@ class MDMISPFeedDaily_Database_months extends Command
                         $insertedCount++;
 
                         $this->info("💾 Saved event {$event->id}");
-                    });
+                }
 
             } catch (\Exception $e) {
                 $this->error("❌ Error processing event {$event->id}: " . $e->getMessage());
@@ -203,8 +256,8 @@ class MDMISPFeedDaily_Database_months extends Command
 
             $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-            $no_Indicator = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+            $no_Indicator = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
             $countPulse = $no_Indicator->countDocuments([
                 'pulse_id' => 'misp.' . $valueEvent["id"]
             ]);
@@ -319,10 +372,10 @@ class MDMISPFeedDaily_Database_months extends Command
 
             $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
-            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
-            $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
-            $col_fx_otx_type = $clientMD->sosecure_threatintelligent->fx_otx_type;
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
+            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
+            $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent_dev->fx_transaction_otx_indicators_data;
+            $col_fx_otx_type = $clientMD->sosecure_threatintelligent_dev->fx_otx_type;
             $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
             $data["all"] = 0;
             $data["byType"] = array();

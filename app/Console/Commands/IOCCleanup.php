@@ -15,6 +15,7 @@ class IOCCleanup extends Command
      */
     protected $signature = 'app:IOCCleanup
                             {--batch=2000 : Batch size for deletion}
+                            {--limit=1000000 : Max total records to delete across all phases (0=unlimited)}
                             {--dry-run : Show counts without actually deleting}';
 
     /**
@@ -46,13 +47,13 @@ class IOCCleanup extends Command
      * Safety: only delete orphan events older than this many days.
      * Set to 0 to delete immediately.
      */
-    protected $orphanEventSafetyDays = 0;
+    protected $orphanEventSafetyDays = 7;
 
     /**
      * Safety: only delete orphan details older than this many days.
      * Set to 0 to delete immediately.
      */
-    protected $orphanDetailSafetyDays = 0;
+    protected $orphanDetailSafetyDays = 7;
 
     /**
      * MongoDB client instance.
@@ -63,6 +64,16 @@ class IOCCleanup extends Command
      * MongoDB database instance.
      */
     protected $db;
+
+    /**
+     * Global counter: total records deleted across all phases.
+     */
+    protected $globalDeleted = 0;
+
+    /**
+     * Global limit: max records to delete per run (0 = unlimited).
+     */
+    protected $globalLimit = 0;
 
     /**
      * Create a new command instance.
@@ -84,6 +95,8 @@ class IOCCleanup extends Command
         $startTime = microtime(true);
         $batchSize = (int) $this->option('batch');
         $dryRun    = (bool) $this->option('dry-run');
+        $this->globalLimit = (int) $this->option('limit');
+        $this->globalDeleted = 0;
 
         if ($batchSize < 1) {
             $this->error('Batch size must be at least 1.');
@@ -94,6 +107,7 @@ class IOCCleanup extends Command
         $this->info('  IOC MongoDB Cleanup Command');
         $this->info('============================================================');
         $this->info('  Batch size : ' . $batchSize);
+        $this->info('  Limit      : ' . ($this->globalLimit > 0 ? number_format($this->globalLimit) . ' records' : 'unlimited'));
         $this->info('  Mode       : ' . ($dryRun ? 'DRY-RUN (no data will be deleted)' : 'LIVE DELETE'));
         $this->info('  Time       : ' . now()->format('Y-m-d H:i:s'));
         $this->info('============================================================');
@@ -140,24 +154,36 @@ class IOCCleanup extends Command
         $refStats = $this->cleanupIndicatorRefs($batchSize, $dryRun);
 
         // --- Phase 2: Cleanup orphan events ---
-        $this->line('');
-        $this->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        $this->info('  PHASE 2: Cleanup orphan fx_otx_events');
-        $this->info('  (events with no refs, created_at > ' . $this->orphanEventSafetyDays . ' days ago)');
-        $this->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        $this->line('');
+        $orphanEventsDeleted = 0;
+        if (!$this->isLimitReached()) {
+            $this->line('');
+            $this->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            $this->info('  PHASE 2: Cleanup orphan fx_otx_events');
+            $this->info('  (events with no refs, created_at > ' . $this->orphanEventSafetyDays . ' days ago)');
+            $this->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            $this->line('');
 
-        $orphanEventsDeleted = $this->cleanupOrphanEvents($batchSize, $dryRun);
+            $orphanEventsDeleted = $this->cleanupOrphanEvents($batchSize, $dryRun);
+        } else {
+            $this->line('');
+            $this->warn('  PHASE 2: Skipped (limit reached)');
+        }
 
         // --- Phase 3: Cleanup orphan indicator details ---
-        $this->line('');
-        $this->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        $this->info('  PHASE 3: Cleanup orphan fx_otx_indicator_detail');
-        $this->info('  (details with no refs, created_at > ' . $this->orphanDetailSafetyDays . ' days ago)');
-        $this->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        $this->line('');
+        $orphanDetailsDeleted = 0;
+        if (!$this->isLimitReached()) {
+            $this->line('');
+            $this->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            $this->info('  PHASE 3: Cleanup orphan fx_otx_indicator_detail');
+            $this->info('  (details with no refs, created_at > ' . $this->orphanDetailSafetyDays . ' days ago)');
+            $this->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            $this->line('');
 
-        $orphanDetailsDeleted = $this->cleanupOrphanDetails($batchSize, $dryRun);
+            $orphanDetailsDeleted = $this->cleanupOrphanDetails($batchSize, $dryRun);
+        } else {
+            $this->line('');
+            $this->warn('  PHASE 3: Skipped (limit reached)');
+        }
 
         // --- Summary ---
         $elapsed = round(microtime(true) - $startTime, 2);
@@ -169,6 +195,11 @@ class IOCCleanup extends Command
 
         if ($dryRun) {
             $this->warn('║  ⚠  DRY-RUN MODE — No data was deleted                     ║');
+            $this->info('╠══════════════════════════════════════════════════════════════╣');
+        }
+
+        if ($this->isLimitReached()) {
+            $this->warn('║  ⚠  LIMIT REACHED — ' . str_pad(number_format($this->globalLimit) . ' records', 37) . '  ║');
             $this->info('╠══════════════════════════════════════════════════════════════╣');
         }
 
@@ -224,7 +255,11 @@ class IOCCleanup extends Command
         $this->info('╚══════════════════════════════════════════════════════════════╝');
 
         $this->line('');
-        $this->info($dryRun ? 'Dry-run completed.' : 'Cleanup completed successfully.');
+        if ($this->isLimitReached()) {
+            $this->info('Cleanup stopped at limit (' . number_format($this->globalLimit) . ' records). Run again to continue.');
+        } else {
+            $this->info($dryRun ? 'Dry-run completed.' : 'Cleanup completed successfully.');
+        }
 
         return 0;
     }
@@ -263,12 +298,21 @@ class IOCCleanup extends Command
         ]];
 
         // --- 1A: Enriched refs (by severity) ---
-        $this->info('  [1A] Enriched refs (by severity, based on created_at):');
+        // Use imported_at (enrich/import time) instead of created_at for enriched records.
+        // This prevents recently-enriched indicators from being deleted prematurely
+        // when their original created_at is old.
+        $this->info('  [1A] Enriched refs (by severity, based on imported_at):');
         foreach ($this->retentionBySeverity as $severity => $config) {
-            $cutoff = $this->makeCutoffDate($config['days']);
+            if ($this->isLimitReached()) {
+                $this->warn("      {$severity}: skipped (limit reached)");
+                $stats['enriched'][$severity] = 0;
+                continue;
+            }
+
+            $cutoff = $this->makeCutoffDateString($config['days']);
             $query = [
                 'attribute_serverity' => ['$in' => $config['values']],
-                'created_at' => ['$lt' => $cutoff]
+                'imported_at' => ['$lt' => $cutoff]
             ];
 
             if ($dryRun) {
@@ -277,7 +321,7 @@ class IOCCleanup extends Command
                 $stats['enriched'][$severity] = $count;
                 $this->info("      {$severity} (>{$config['days']}d): would delete {$count} records");
             } else {
-                $deleted = $this->batchDelete($collection, $query, $batchSize, false);
+                $deleted = $this->batchDelete($collection, $query, $batchSize);
                 $stats['enriched'][$severity] = $deleted;
                 $this->info("      {$severity} (>{$config['days']}d): deleted {$deleted} records");
             }
@@ -287,8 +331,14 @@ class IOCCleanup extends Command
         $this->line('');
         $this->info('  [1B] Score-only refs (has score, no severity):');
         foreach ($scoreRanges as $severityLabel => $range) {
+            if ($this->isLimitReached()) {
+                $this->warn("      {$severityLabel}: skipped (limit reached)");
+                $stats['score_only'][$severityLabel] = 0;
+                continue;
+            }
+
             $config = $this->retentionBySeverity[$severityLabel];
-            $cutoff = $this->makeCutoffDate($config['days']);
+            $cutoff = $this->makeCutoffDateString($config['days']);
 
             $scoreValues = [];
             for ($s = $range['min']; $s <= $range['max']; $s++) {
@@ -296,14 +346,14 @@ class IOCCleanup extends Command
             }
 
             if ($dryRun) {
-                // For Dry-run speed: Query ONLY by score + created_at
-                // This matches the index {attribute_score:1, created_at:1} perfectly.
+                // For Dry-run speed: Query ONLY by score + imported_at
+                // This matches the index {attribute_score:1, imported_at:1} perfectly.
                 // We skip checking "severity is null" to avoid slow $or scans.
                 // It might slightly overcount (if a record has BOTH score & severity),
                 // but that's acceptable for a fast dry-run estimate on 14M records.
                 $query = [
                     'attribute_score' => ['$in' => $scoreValues],
-                    'created_at'      => ['$lt' => $cutoff],
+                    'imported_at'     => ['$lt' => $cutoff],
                 ];
                 $count = $collection->countDocuments($query, ['maxTimeMS' => 60000]);
                 $stats['score_only'][$severityLabel] = $count;
@@ -312,9 +362,9 @@ class IOCCleanup extends Command
                 // Live mode uses FULL ACCURACY
                 $query = array_merge($noSeverityCondition, [
                     'attribute_score' => ['$in' => $scoreValues],
-                    'created_at'      => ['$lt' => $cutoff],
+                    'imported_at'     => ['$lt' => $cutoff],
                 ]);
-                $deleted = $this->batchDelete($collection, $query, $batchSize, false);
+                $deleted = $this->batchDelete($collection, $query, $batchSize);
                 $stats['score_only'][$severityLabel] = $deleted;
                 $this->info("      {$severityLabel} (score {$range['min']}-{$range['max']}, >{$config['days']}d): deleted {$deleted} records");
             }
@@ -322,45 +372,50 @@ class IOCCleanup extends Command
 
         // --- 1C: Non-enriched refs ---
         $this->line('');
-        $this->info('  [1C] Non-enriched refs (no score/severity, created_at > ' . $this->nonEnrichedRetentionDays . 'd):');
-        $cutoff = $this->makeCutoffDate($this->nonEnrichedRetentionDays);
-
-        if ($dryRun) {
-            // For Dry-run speed: Simplified query
-            // We only check if attribute_score exists:false or is null.
-            // We skip the komplex $or checks for empty strings '0' etc to avoid slow scans.
-            // This is an ESTIMATE for speed.
-            $query = [
-                'attribute_score' => ['$exists' => false],
-                'created_at'      => ['$lt' => $cutoff],
-            ];
-            // If the count is still too slow, we catch the timeout and show a message
-            try {
-                // Increase timeout to 5 minutes (300000ms) to ensure we get a result
-                $count = $collection->countDocuments($query, ['maxTimeMS' => 300000]);
-                $stats['non_enriched'] = $count;
-                $this->info("      Non-enriched (>{$this->nonEnrichedRetentionDays}d): would delete ~{$count} records (estimate)");
-            } catch (\Exception $e) {
-                $this->warn("      Non-enriched: prediction skipped (timed out). Live run will process correctly.");
-                $stats['non_enriched'] = -1; // Indicate unknown
-            }
+        if ($this->isLimitReached()) {
+            $this->warn('  [1C] Non-enriched refs: skipped (limit reached)');
+            $stats['non_enriched'] = 0;
         } else {
-            // Live mode uses FULL ACCURACY
-            $query = [
-                '$and' => [
-                    ['$or' => [
-                        ['attribute_score' => null],
-                        ['attribute_score' => ''],
-                        ['attribute_score' => '0'],
-                        ['attribute_score' => ['$exists' => false]],
-                    ]],
-                    $noSeverityCondition,
-                    ['created_at' => ['$lt' => $cutoff]],
-                ],
-            ];
-            $deleted = $this->batchDelete($collection, $query, $batchSize, false);
-            $stats['non_enriched'] = $deleted;
-            $this->info("      Non-enriched (>{$this->nonEnrichedRetentionDays}d): deleted {$deleted} records");
+            $this->info('  [1C] Non-enriched refs (no score/severity, created_at > ' . $this->nonEnrichedRetentionDays . 'd):');
+            $cutoff = $this->makeCutoffDate($this->nonEnrichedRetentionDays);
+
+            if ($dryRun) {
+                // For Dry-run speed: Simplified query
+                // We only check if attribute_score exists:false or is null.
+                // We skip the komplex $or checks for empty strings '0' etc to avoid slow scans.
+                // This is an ESTIMATE for speed.
+                $query = [
+                    'attribute_score' => ['$exists' => false],
+                    'created_at'      => ['$lt' => $cutoff],
+                ];
+                // If the count is still too slow, we catch the timeout and show a message
+                try {
+                    // Increase timeout to 5 minutes (300000ms) to ensure we get a result
+                    $count = $collection->countDocuments($query, ['maxTimeMS' => 300000]);
+                    $stats['non_enriched'] = $count;
+                    $this->info("      Non-enriched (>{$this->nonEnrichedRetentionDays}d): would delete ~{$count} records (estimate)");
+                } catch (\Exception $e) {
+                    $this->warn("      Non-enriched: prediction skipped (timed out). Live run will process correctly.");
+                    $stats['non_enriched'] = -1; // Indicate unknown
+                }
+            } else {
+                // Live mode uses FULL ACCURACY
+                $query = [
+                    '$and' => [
+                        ['$or' => [
+                            ['attribute_score' => null],
+                            ['attribute_score' => ''],
+                            ['attribute_score' => '0'],
+                            ['attribute_score' => ['$exists' => false]],
+                        ]],
+                        $noSeverityCondition,
+                        ['created_at' => ['$lt' => $cutoff]],
+                    ],
+                ];
+                $deleted = $this->batchDelete($collection, $query, $batchSize);
+                $stats['non_enriched'] = $deleted;
+                $this->info("      Non-enriched (>{$this->nonEnrichedRetentionDays}d): deleted {$deleted} records");
+            }
         }
 
         return $stats;
@@ -441,10 +496,25 @@ class IOCCleanup extends Command
                 if ($dryRun) {
                     $totalDeleted += count($orphanIds);
                 } else {
+                    // Respect global limit: only delete up to remaining quota
+                    $remaining = $this->getRemainingQuota();
+                    if ($remaining !== null && count($orphanIds) > $remaining) {
+                        $orphanIds = array_slice($orphanIds, 0, $remaining);
+                    }
+                    if (empty($orphanIds)) {
+                        break;
+                    }
+
                     $result = $eventsCol->deleteMany([
                         '_id' => ['$in' => $orphanIds],
                     ]);
-                    $totalDeleted += $result->getDeletedCount();
+                    $deletedCount = $result->getDeletedCount();
+                    $totalDeleted += $deletedCount;
+                    $this->globalDeleted += $deletedCount;
+
+                    if ($this->isLimitReached()) {
+                        break;
+                    }
                 }
             }
 
@@ -531,10 +601,25 @@ class IOCCleanup extends Command
                 if ($dryRun) {
                     $totalDeleted += count($orphanIds);
                 } else {
+                    // Respect global limit: only delete up to remaining quota
+                    $remaining = $this->getRemainingQuota();
+                    if ($remaining !== null && count($orphanIds) > $remaining) {
+                        $orphanIds = array_slice($orphanIds, 0, $remaining);
+                    }
+                    if (empty($orphanIds)) {
+                        break;
+                    }
+
                     $result = $detailCol->deleteMany([
                         '_id' => ['$in' => $orphanIds],
                     ]);
-                    $totalDeleted += $result->getDeletedCount();
+                    $deletedCount = $result->getDeletedCount();
+                    $totalDeleted += $deletedCount;
+                    $this->globalDeleted += $deletedCount;
+
+                    if ($this->isLimitReached()) {
+                        break;
+                    }
                 }
             }
 
@@ -550,25 +635,30 @@ class IOCCleanup extends Command
 
     /**
      * Batch delete records matching query.
+     * Respects the global limit — stops when quota is exhausted.
      *
      * @param \MongoDB\Collection $collection
      * @param array               $query
      * @param int                 $batchSize
-     * @param bool                $dryRun
-     * @return int Total deleted (or would-delete) count
+     * @return int Total deleted count
      */
-    protected function batchDelete($collection, array $query, int $batchSize, bool $dryRun): int
+    protected function batchDelete($collection, array $query, int $batchSize): int
     {
-        if ($dryRun) {
-            return $collection->countDocuments($query);
-        }
-
         $totalDeleted = 0;
 
         while (true) {
+            // Check global limit before each batch
+            if ($this->isLimitReached()) {
+                break;
+            }
+
+            // Adjust batch size to not exceed remaining quota
+            $remaining = $this->getRemainingQuota();
+            $currentBatch = ($remaining !== null) ? min($batchSize, $remaining) : $batchSize;
+
             $docs = $collection->find($query, [
                 'projection' => ['_id' => 1],
-                'limit'      => $batchSize,
+                'limit'      => $currentBatch,
             ])->toArray();
 
             if (empty($docs)) {
@@ -583,7 +673,9 @@ class IOCCleanup extends Command
                 '_id' => ['$in' => $ids],
             ]);
 
-            $totalDeleted += $result->getDeletedCount();
+            $deletedCount = $result->getDeletedCount();
+            $totalDeleted += $deletedCount;
+            $this->globalDeleted += $deletedCount;
         }
 
         return $totalDeleted;
@@ -602,6 +694,40 @@ class IOCCleanup extends Command
     }
 
     /**
+     * Create a date string for (now - $days) in Y-m-d H:i:s format.
+     * Used for comparing against imported_at which is stored as a string.
+     *
+     * @param int $days
+     * @return string
+     */
+    protected function makeCutoffDateString(int $days): string
+    {
+        return date('Y-m-d H:i:s', strtotime("-{$days} days"));
+    }
+
+    /**
+     * Check if the global deletion limit has been reached.
+     */
+    protected function isLimitReached(): bool
+    {
+        if ($this->globalLimit <= 0) {
+            return false; // unlimited
+        }
+        return $this->globalDeleted >= $this->globalLimit;
+    }
+
+    /**
+     * Get remaining deletion quota (null = unlimited).
+     */
+    protected function getRemainingQuota(): ?int
+    {
+        if ($this->globalLimit <= 0) {
+            return null; // unlimited
+        }
+        return max(0, $this->globalLimit - $this->globalDeleted);
+    }
+
+    /**
      * Ensure MongoDB indexes exist for fast cleanup queries.
      * createIndex is idempotent — if index already exists, it's a no-op.
      */
@@ -611,8 +737,8 @@ class IOCCleanup extends Command
         $indexOpts = ['background' => true];
 
         $indexes = [
-            ['col' => $ref, 'keys' => ['attribute_serverity' => 1, 'created_at' => 1], 'name' => 'cleanup_severity_created'],
-            ['col' => $ref, 'keys' => ['attribute_score' => 1, 'created_at' => 1], 'name' => 'cleanup_score_created'],
+            ['col' => $ref, 'keys' => ['attribute_serverity' => 1, 'imported_at' => 1], 'name' => 'cleanup_severity_imported'],
+            ['col' => $ref, 'keys' => ['attribute_score' => 1, 'imported_at' => 1], 'name' => 'cleanup_score_imported'],
             ['col' => $ref, 'keys' => ['pulse_id' => 1], 'name' => 'cleanup_pulse_id'],
             ['col' => $ref, 'keys' => ['indicator_id' => 1], 'name' => 'cleanup_indicator_id'],
             ['col' => $this->db->fx_otx_events, 'keys' => ['created_at' => 1], 'name' => 'cleanup_created_at'],

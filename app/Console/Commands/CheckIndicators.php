@@ -15,7 +15,7 @@ class CheckIndicators extends Command
      *
      * @var string
      */
-    protected $signature = 'app:indicatorscheck {--file= : Path to CSV file} {--manual : Manual input mode} {--limit=0 : Maximum number of indicators to process (0 = unlimited)} {--resume : Resume from last checkpoint} {--force : Force start new job (ignore existing progress)} {--event= : Process single event by pulse_id} {--job= : Job ID for tracking progress} {--test= : Test single IOC with debug output (format: ioc:type)}';
+    protected $signature = 'app:indicatorscheck {--file= : Path to CSV file} {--manual : Manual input mode} {--limit=0 : Maximum number of indicators to process (0 = unlimited)} {--resume : Resume from last checkpoint} {--force : Force start new job (ignore existing progress)} {--event= : Process single event by pulse_id} {--job= : Job ID for tracking progress} {--test= : Test single IOC with debug output (format: ioc:type)} {--start-date= : Start date filter for updated_at} {--end-date= : End date filter for updated_at}';
 
     /**
      * The console command description.
@@ -244,7 +244,7 @@ class CheckIndicators extends Command
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
             
             // Get or create data_key for this batch
-            $dataKeyCollection = $clientMD->sosecure_threatintelligent_dev->fx_data_key;
+            $dataKeyCollection = $clientMD->sosecure_threatintelligent->fx_data_key;
             
             // Generate file_name with timestamp
             $timestamp = date('Y-m-d_H.i.s');
@@ -267,7 +267,7 @@ class CheckIndicators extends Command
             $this->info("File name: {$fileName}");
             
             // Fetch events within today's date range
-            $eventsCollection = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+            $eventsCollection = $clientMD->sosecure_threatintelligent->fx_otx_events;
             
             // Get the most recent event to determine the latest date
             $latestEvent = $eventsCollection->findOne([], ['sort' => ['modified' => -1]]);
@@ -315,7 +315,7 @@ class CheckIndicators extends Command
             }
             
             // Job progress tracking
-            $jobProgressCollection = $clientMD->sosecure_threatintelligent_dev->job_progress;
+            $jobProgressCollection = $clientMD->sosecure_threatintelligent->job_progress;
             $jobName = 'indicators_check';
             $isResume = $this->option('resume');
             $isForce = $this->option('force');
@@ -402,7 +402,7 @@ class CheckIndicators extends Command
             }
             
             // For each event, fetch its indicators
-            $indicatorRefCollection = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
+            $indicatorRefCollection = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
             $iocs = [];
             $totalIndicators = $totalProcessed;
             $skippedCount = 0;
@@ -525,7 +525,7 @@ class CheckIndicators extends Command
     protected function processMongoInputFallback($clientMD)
     {
         try {
-            $collection = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
+            $collection = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
             
             $pipeline = [
                 ['$sample' => ['size' => 10]]
@@ -587,7 +587,7 @@ class CheckIndicators extends Command
             
             // Setup job tracking if job_id provided
             if ($jobId) {
-                $jobsCollection = $clientMD->sosecure_threatintelligent_dev->ioc_enrichment_jobs;
+                $jobsCollection = $clientMD->sosecure_threatintelligent->ioc_enrichment_jobs;
                 $jobsCollection->updateOne(
                     ['job_id' => $jobId],
                     ['$set' => [
@@ -598,7 +598,7 @@ class CheckIndicators extends Command
             }
             
             // Fetch the specific event first to get its date
-            $eventsCollection = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+            $eventsCollection = $clientMD->sosecure_threatintelligent->fx_otx_events;
             $event = $eventsCollection->findOne(['pulse_id' => $pulseId]);
             
             if (!$event) {
@@ -631,7 +631,7 @@ class CheckIndicators extends Command
             $this->info("Event date: " . $eventDate->format('Y-m-d'));
             
             // Get or create data_key for this batch
-            $dataKeyCollection = $clientMD->sosecure_threatintelligent_dev->fx_data_key;
+            $dataKeyCollection = $clientMD->sosecure_threatintelligent->fx_data_key;
             
             // Generate file_name with timestamp
             $timestamp = date('Y-m-d_H.i.s');
@@ -654,12 +654,30 @@ class CheckIndicators extends Command
             $dataKeyCollection->insertOne($dataKeyDoc);
             $this->info("Created new data_key: {$dataKey}");
             
-            $indicatorRefCollection = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
+            $indicatorRefCollection = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
             
-            $indicators = $indicatorRefCollection->find([
+            $query = [
                 'pulse_id' => $pulseId,
                 'status' => 1
-            ])->toArray();
+            ];
+            
+            $startDate = $this->option('start-date');
+            $endDate = $this->option('end-date');
+            
+            if ($startDate && $endDate) {
+                // Determine if we are filtering by modified or created, standardizing on updated_at matching events_detail logic
+                try {
+                    $query['updated_at'] = [
+                        '$gte' => new \MongoDB\BSON\UTCDateTime(strtotime($startDate) * 1000),
+                        '$lte' => new \MongoDB\BSON\UTCDateTime(strtotime($endDate) * 1000)
+                    ];
+                    $this->info("Applying date filter: {$startDate} to {$endDate}");
+                } catch (\Exception $e) {
+                    $this->warn("Failed to parse dates for filtering: " . $e->getMessage());
+                }
+            }
+
+            $indicators = $indicatorRefCollection->find($query)->toArray();
             
             $this->info("Found " . count($indicators) . " indicators for this event");
             
@@ -984,7 +1002,7 @@ class CheckIndicators extends Command
         try {
             $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-            $db = $clientMD->sosecure_threatintelligent_dev;
+            $db = $clientMD->sosecure_threatintelligent;
             $temp = $db->fx_indicators_temp;
             $ref = $db->fx_otx_events_indicator_ref;
             $dataKeyCollection = $db->fx_data_key;

@@ -570,7 +570,9 @@ select.c-tags {
                         render: function (data, type, row) {
                             var inner = '<div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-start;">';
                             inner += '<a href="'+"{{route('indicators.detail_indicator')}}?id="+row.indicator_id+'&type='+row.type+'" class="btn btn-xs btn-info" style="flex:1;"><i class="far fa-eye"></i> View</a>';
+                            @if (!empty(get_role_custom()) && @get_role_custom()['client'] != 1)
                             inner += '<button type="button" class="btn btn-xs btn-success btn-enrich-single" style="flex:1;" data-indicator-id="'+row.indicator_id+'" data-indicator="'+row.indicator+'" data-type="'+row.type+'" data-pulse-id="'+row.pulse_id+'" onclick="enrichSingleAttribute(this)"><i class="fas fa-atom"></i> Enrich</button>';
+                            @endif
                             inner += '</div>';
                             return inner;
                         }

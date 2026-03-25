@@ -668,12 +668,14 @@ select.c-tags {
                                                 <button onclick="exportCSV(this)" class="btn btn-custom" style="text-align: left;" value="2">
                                                     <i class="fa fa-arrow-circle-down"></i>  Event & Attributes
                                                 </button>
+                                                @if (!empty(get_role_custom()) && @get_role_custom()['client'] != 1)
                                                 <button onclick="openModal()" class="btn btn-custom" style="text-align: left;">
                                                     <i class="fa fa-arrow-circle-up"></i>  Import CSV
                                                 </button>
                                                 <button onclick="showBulkIocInfo()" class="btn btn-custom-green" style="text-align: left;">
                                                     <i class="fas fa-atom"></i> Enrichment
                                                 </button>
+                                                @endif
                                             </div>
                                         </div>
 
@@ -1543,19 +1545,11 @@ select.c-tags {
                                 var inner = '';
                                 inner += '<div style="display:flex;flex-direction:column;">';
                                 
-                                inner += `
-                                    <button
-                                        class="btn btn-xs btn-ioc-enrichment"
-                                        data-id="${row.pulse_id}"
-                                        data-count="${row.attrCount || 0}"
-                                        onclick="iocEnrichment('${row.pulse_id}', '${(row.name || '').replace(/'/g, "\\'")}', ${row.attrCount || 0})"
-                                        style="cursor: pointer; max-width:83px; width:100%; background-color: #22c55e; border: 1px solid #22c55e; color: #fff;"
-                                        onmouseover="this.style.backgroundColor='#17ae4eff';"
-                                        onmouseout="this.style.backgroundColor='#22c55e';"
-                                    >
-                                        <i class="fas fa-atom"></i> Enrich
-                                    </button>
-                                `;
+                                @if (!empty(get_role_custom()) && @get_role_custom()['client'] != 1)
+                                inner += '<button class="btn btn-xs btn-ioc-enrichment" data-id="' + row.pulse_id + '" data-count="' + (row.attrCount || 0) + '" onclick="iocEnrichment(\'' + row.pulse_id + '\', \'' + (row.name || '').replace(/'/g, "\\'") + '\', ' + (row.attrCount || 0) + ')" style="cursor: pointer; max-width:83px; width:100%; background-color: #22c55e; border: 1px solid #22c55e; color: #fff;" onmouseover="this.style.backgroundColor=\'#17ae4eff\';" onmouseout="this.style.backgroundColor=\'#22c55e\';">';
+                                inner += '<i class="fas fa-atom"></i> Enrich';
+                                inner += '</button>';
+                                @endif
 
                                 @if (!empty(get_role_custom()))
                                     @if (@get_role_custom()['client'] != 1)
@@ -1575,6 +1569,7 @@ select.c-tags {
                                 const buttonText = isPublished ? 'Published' : 'Unpublished';
                                 const buttonClass = isPublished ? 'btn-published' : 'btn-unpublished';
 
+                                @if (!empty(get_role_custom()) && @get_role_custom()['client'] != 1)
                                 inner +=  `
                                     <button
                                         class="m-t-xs m-t-xs btn btn-xs rss_new_id btn-toggle-status ${buttonClass}"
@@ -1585,6 +1580,7 @@ select.c-tags {
                                         ${buttonText}
                                     </button>
                                 `;
+                                @endif
                                 return inner;
                             }
 
@@ -1895,21 +1891,32 @@ select.c-tags {
                             render: function(data, type, row) {
                                 var inner = '';
                                 inner += '<div style="display:flex;flex-direction:column;">';
+                                
+                                @if (!empty(get_role_custom()) && @get_role_custom()['client'] != 1)
+                                inner += '<button class="btn btn-xs btn-ioc-enrichment" data-id="' + row.pulse_id + '" data-count="' + (row.attrCount || 0) + '" onclick="iocEnrichment(\'' + row.pulse_id + '\', \'' + (row.name || '').replace(/'/g, "\\'") + '\', ' + (row.attrCount || 0) + ')" style="cursor: pointer; max-width:83px; width:100%; background-color: #22c55e; border: 1px solid #22c55e; color: #fff;" onmouseover="this.style.backgroundColor=\'#17ae4eff\';" onmouseout="this.style.backgroundColor=\'#22c55e\';">';
+                                inner += '<i class="fas fa-atom"></i> Enrich';
+                                inner += '</button>';
+                                @endif
+
+                                @if (!empty(get_role_custom()))
+                                    @if (@get_role_custom()['client'] != 1)
+                                        inner +=
+                                            '<a style="max-width:83px;width:100%;" href="{{ route('indicators.modal_tag') }}' +
+                                            '?pulse_id=' + row.pulse_id +
+                                            '" data-toggle="ajaxModal" class="m-t-xs btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
+                                    @endif
+                                @endif
+
                                 inner +=
-                                    '<a style="max-width:83px;width:100%;" href="{{ route('indicators.modal_tag') }}' +
-                                    '?pulse_id=' + row.pulse_id +
-                                    '" data-toggle="ajaxModal" class="btn btn-xs btn-info"><i class="fas fa-plus"></i> Mapping</a>';
-                                inner +=
-                                    '<a style="max-width:83px;width:100%;" href="' + getDetailUrl(row.pulse_id) +
+                                    '<a style="max-width:83px;width:100%;" href="{{ route('indicators.events_detail') }}' +
+                                    '/' + row.pulse_id +
                                     '" class="m-t-xs btn btn-xs btn-info"><i class="far fa-eye"></i> View</a>';
                                 inner += '</div>';
-
-                           
                                 const isPublished = row.public == 1;
                                 const buttonText = isPublished ? 'Published' : 'Unpublished';
                                 const buttonClass = isPublished ? 'btn-published' : 'btn-unpublished';
 
-                              
+                                @if (!empty(get_role_custom()) && @get_role_custom()['client'] != 1)
                                 inner +=  `
                                     <button
                                         class="m-t-xs m-t-xs btn btn-xs rss_new_id btn-toggle-status ${buttonClass}"
@@ -1920,7 +1927,7 @@ select.c-tags {
                                         ${buttonText}
                                     </button>
                                 `;
-                            
+                                @endif
                                 return inner;
                             }
 
@@ -2165,13 +2172,20 @@ select.c-tags {
 
                 showSingleEnrichmentToast(displayName, indicatorCount);
                 
+                var reqData = { 
+                    pulse_id: pulseId,
+                    _token: '{{ csrf_token() }}'
+                };
+
+                if (typeof isDateSearch !== 'undefined' && isDateSearch == 1 && startDate && endDate) {
+                    reqData.startDate = startDate.format('YYYY-MM-DD HH:mm:ss');
+                    reqData.endDate = endDate.format('YYYY-MM-DD HH:mm:ss');
+                }
+
                 $.ajax({
                     type: "POST",
                     url: "{{ route('indicators.ioc_enrichment') }}",
-                    data: { 
-                        pulse_id: pulseId,
-                        _token: '{{ csrf_token() }}'
-                    },
+                    data: reqData,
                     success: function(res) {
                         if (res.job_id) {
                             pollSingleJob(res.job_id, btn, originalText, displayName, indicatorCount);
@@ -2268,16 +2282,20 @@ select.c-tags {
                                 
                                 setTimeout(function() {
                                     hideSingleEnrichmentToast();
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Enrichment Completed',
-                                        html: '<b>' + displayName + '</b><br>Processed: ' + (res.processed_count || 0) + ' indicators',
-                                        confirmButtonText: 'Refresh',
-                                        allowOutsideClick: false
-                                    }).then(() => {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Enrichment Completed',
+                                    html: '<b>' + displayName + '</b><br>Processed: ' + (res.processed_count || 0) + ' indicators',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Refresh',
+                                    cancelButtonText: 'Close',
+                                    allowOutsideClick: false
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
                                         location.reload();
-                                    });
-                                }, 1000);
+                                    }
+                                });
+                            }, 500);
                             } else if (res.status === 'failed') {
                                 $('#enrichment-toast .toast-title i').removeClass('fa-spin fa-sync').addClass('fa-exclamation-circle');
                                 $('#enrichment-toast').css('border-left-color', '#ef4444');
@@ -2441,13 +2459,20 @@ select.c-tags {
                     
                     console.log('Bulk: Starting job for pulse_id:', event.pulse_id);
                     
+                    var reqData = { 
+                        pulse_id: event.pulse_id,
+                        _token: '{{ csrf_token() }}'
+                    };
+
+                    if (typeof isDateSearch !== 'undefined' && isDateSearch == 1 && startDate && endDate) {
+                        reqData.startDate = startDate.format('YYYY-MM-DD HH:mm:ss');
+                        reqData.endDate = endDate.format('YYYY-MM-DD HH:mm:ss');
+                    }
+
                     $.ajax({
                         type: "POST",
                         url: "{{ route('indicators.ioc_enrichment') }}",
-                        data: { 
-                            pulse_id: event.pulse_id,
-                            _token: '{{ csrf_token() }}'
-                        },
+                        data: reqData,
                         success: function(res) {
                             if (res.success && res.job_id) {
                                 console.log('Job started:', res.job_id);
@@ -2589,10 +2614,14 @@ select.c-tags {
                                 icon: isAllSuccess ? 'success' : 'warning',
                                 title: isAllSuccess ? 'IOC Enrichment Completed!' : 'IOC Enrichment Finished',
                                 html: summaryHtml,
-                                confirmButtonText: 'Close & Refresh',
+                                showCancelButton: true,
+                                confirmButtonText: 'Refresh',
+                                cancelButtonText: 'Close',
                                 allowOutsideClick: false
-                            }).then(() => {
-                                location.reload();
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload();
+                                }
                             });
                         }, 300);
                     }, 1500);

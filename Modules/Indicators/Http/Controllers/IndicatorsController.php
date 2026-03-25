@@ -4935,12 +4935,17 @@ class IndicatorsController extends Controller
                 $phpBinary = 'php';
             }
             
+            $startDateParams = '';
+            if ($request->has('startDate') && $request->has('endDate')) {
+                $startDateParams = " --start-date=\"{$request->input('startDate')}\" --end-date=\"{$request->input('endDate')}\"";
+            }
+            
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                $command = "start /B \"bg_process\" \"{$phpBinary}\" \"{$artisanPath}\" app:indicatorscheck --event=\"{$pulseId}\" --job=\"{$jobId}\" --force > NUL 2>&1";
+                $command = "start /B \"bg_process\" \"{$phpBinary}\" \"{$artisanPath}\" app:indicatorscheck --event=\"{$pulseId}\" --job=\"{$jobId}\" --force{$startDateParams} > NUL 2>&1";
                 Log::info("[IOC Enrichment] Spawning Windows command: " . $command);
                 pclose(popen($command, 'r'));
             } else {
-                $command = "\"{$phpBinary}\" \"{$artisanPath}\" app:indicatorscheck --event=\"{$pulseId}\" --job=\"{$jobId}\" --force > /dev/null 2>&1 &";
+                $command = "\"{$phpBinary}\" \"{$artisanPath}\" app:indicatorscheck --event=\"{$pulseId}\" --job=\"{$jobId}\" --force{$startDateParams} > /dev/null 2>&1 &";
                 Log::info("[IOC Enrichment] Spawning Linux command: " . $command);
                 exec($command);
             }

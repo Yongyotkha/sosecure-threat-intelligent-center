@@ -14,7 +14,8 @@ class Kernel extends ConsoleKernel
    */
   protected $commands = [
     \App\Console\Commands\MakeApiToken::class,
-    \App\Console\Commands\SyncMispTagsFromInsight::class,
+    \App\Console\Commands\CredentialsLeak::class,
+    \App\Console\Commands\MDMISPFeedDaily_Database_Dev::class,
   ];
 
   /**
@@ -79,10 +80,26 @@ class Kernel extends ConsoleKernel
 
     $schedule->command('app:RSS_Feed')->cron('0 */1 * * *')->withoutOverlapping(5);
     $schedule->command('app:news_permission')->cron('0 */6 * * *')->withoutOverlapping(5);
-    $schedule->command('app:SendLog_Indicator')->dailyAt('10:22')->withoutOverlapping(5);
+    $schedule->command('app:SendLog_Indicator')->dailyAt('10:22')->timezone('Asia/Bangkok')->withoutOverlapping(5);
+    // $schedule->command('app:SendLog_Indicator')
+    // ->everyFiveMinutes()
+    // ->withoutOverlapping(5)
+    // ->appendOutputTo(storage_path('logs/Send_log.log'));
     $schedule->command('app:indicator_summary_type')->dailyAt('10:22')->withoutOverlapping(5);
-    $schedule->command('app:MDCVEDataYear')->dailyAt('03:00')->name('lang.progress')->withoutOverlapping(5);
-    $schedule->command('app:MDCVEBatchJob')->dailyAt('0 */8 * * *')->name('lang.progress')->withoutOverlapping(5);
+    // $schedule->command('app:MDCVEDataYear')->dailyAt('03:00')->name('lang.progress')->withoutOverlapping(5);
+    // $schedule->command('app:MDCVEBatchJob')->dailyAt('0 */8 * * *')->name('lang.progress')->withoutOverlapping(5);
+
+    $schedule->command('app:MDCVEDataYear')
+      ->dailyAt('03:00')
+      ->name('lang.progress')
+      ->withoutOverlapping(5)
+      ->sendOutputTo(storage_path('logs/MDCVEDataYear.log'));
+
+    $schedule->command('app:MDCVEBatchJob')
+      ->cron('0 */8 * * *') // ✅ แก้รูปแบบ cron ให้ถูก
+      ->name('lang.progress')
+      ->withoutOverlapping(5)
+      ->sendOutputTo(storage_path('logs/MDCVEBatchJob.log'));
 
     $schedule->command('app:OTXMDFeedIndicator')->cron('0 */12 * * *')->withoutOverlapping(5);
     $schedule->command('app:OTXMDFeedPulse')->cron('0 */12 * * *')->withoutOverlapping(5);
@@ -99,14 +116,16 @@ class Kernel extends ConsoleKernel
     $schedule->command('app:TransactionCenterReset')->cron('5 0 * * *')->withoutOverlapping(5);
     $schedule->command('app:MDAdversaries')->cron('0 */8 * * *')->withoutOverlapping(5);
     $schedule->command('app:MDMalware')->cron('0 */8 * * *')->withoutOverlapping(5);
-    $schedule->command('app:SendLog_Indicator')->dailyAt('18:00')->withoutOverlapping(5);
+    $schedule->command('app:SendLog_Indicator')->dailyAt('18:00')->timezone('Asia/Bangkok')->withoutOverlapping(5);
     $schedule->command('app:site_setpermission_log_transaction')->everyMinute()->withoutOverlapping(5);
-    $schedule->command('app:MDMISPFeedDaily_Database')->cron('0 */6 * * *')->withoutOverlapping(5);
+    $schedule->command('app:MDMISPFeedDaily_Database')->cron('0 */6 * * *')->withoutOverlapping();
+    $schedule->command('app:credentials-leak')->dailyAt('03:00')->timezone('Asia/Bangkok')->withoutOverlapping(5);
 
-    $schedule->command('app:credentials-leak')
-      ->dailyAt('03:00')
-      ->timezone('Asia/Bangkok')
-      ->withoutOverlapping(5);
+    $schedule->command('app:MDMISPFeedDaily_Database_Dev')
+      ->dailyAt('00:00')
+      // ->everyMinute()
+      ->withoutOverlapping()
+      ->appendOutputTo(storage_path('logs/misp_feed_daily.log'));
 
     $schedule->command('app:webdefacement_stat_daily')->dailyAt('00:05')->withoutOverlapping();
 
@@ -118,6 +137,11 @@ class Kernel extends ConsoleKernel
 
     $schedule->command('app:MDCVEFeedOnline')
       ->dailyAt('02:00')
+      ->timezone('Asia/Bangkok')
+      ->withoutOverlapping();
+
+    $schedule->command('app:IOCCleanup')
+      ->dailyAt('02:30')
       ->timezone('Asia/Bangkok')
       ->withoutOverlapping();
   }
