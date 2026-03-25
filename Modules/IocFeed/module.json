@@ -1,0 +1,14 @@
+{
+    "name": "IocFeed",
+    "alias": "iocfeed",
+    "description": "",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\IocFeed\\Providers\\IocFeedServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
