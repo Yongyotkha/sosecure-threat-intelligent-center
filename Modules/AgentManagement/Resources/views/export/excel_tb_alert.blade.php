@@ -21,7 +21,7 @@
             <td>{{ @$data->site_name }}</td>
             <td>{{ @$data->agent_alerts_rule }}</td>
             <td>{{ @$data->agent_alerts_description }}</td>
-            <td>{{ @$data->device_name }}</td>
+            <td>{{ @$data->path }}</td>
             <td>{{ @$data->last_scan }}</td>
             <td>{{ @$data->site_agents_ip_private }}</td>
             <td>{{ @$data->os_type_name }}</td>

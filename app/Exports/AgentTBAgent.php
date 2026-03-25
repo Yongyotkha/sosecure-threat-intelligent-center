@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\Exportable;
 
 use Maatwebsite\Excel\Concerns\WithTitle;
+use DB;
 
 use App\FXSiteAgents;
 
@@ -50,8 +51,8 @@ class AgentTBAgent implements FromView, WithTitle
         $start_date = @$this->data['start_date'];
         $end_date = @$this->data['end_date'];
 
-        $query = FXSiteAgents::
-            join('site', 'site_agents.site_id', 'site.id')
+        $query = DB::table('site_agents')
+            ->join('site', 'site_agents.site_id', 'site.id')
             ->join('os_type', 'site_agents.os_type', 'os_type.id')
             ->select(
                 'site.name as site_name',
@@ -80,12 +81,19 @@ class AgentTBAgent implements FromView, WithTitle
             ->where(function($query) use ($keyword_search){
                 if($keyword_search != null) 
                 {
-                    $query->where('site.name', 'like', '%'.$request->keyword_search.'%')
-                        ->orwhere('site_agents.device_name', 'like', '%'.$request->keyword_search.'%')
-                        ->orwhere('os_type.name', 'like', '%'.$request->keyword_search.'%')
-                        ->orwhere('site_agents.system_info', 'like', '%'.$request->keyword_search.'%')
-                        ->orwhere('site_agents.domain', 'like', '%'.$request->keyword_search.'%')
-                        ->orwhere('site_agents.ip_private', 'like', '%'.$request->keyword_search.'%');
+                    $query->where('site.name', 'like', '%'.$keyword_search.'%')
+                        ->orwhere('site_agents.device_name', 'like', '%'.$keyword_search.'%')
+                        ->orwhere('os_type.name', 'like', '%'.$keyword_search.'%')
+                        ->orwhere('site_agents.system_info', 'like', '%'.$keyword_search.'%')
+                        ->orwhere('site_agents.domain', 'like', '%'.$keyword_search.'%')
+                        ->orwhere('site_agents.ip_private', 'like', '%'.$keyword_search.'%');
+                }
+            })
+            ->where(function($query) {
+                $ids = @$this->data['ids'];
+                if ($ids) {
+                    $ids_array = explode(',', $ids);
+                    $query->whereIn('site_agents.id', $ids_array);
                 }
             })
             ->where(function($query) use ($start_date, $end_date){
@@ -118,6 +126,7 @@ class AgentTBAgent implements FromView, WithTitle
                     $query->where('site_agents.os_description', 'like', '%'.$filter_agent_os_des.'%');
                 }
             })
+            ->orderBy('site_agents.created_at', 'desc')
             ->get();
 
         return view('agentmanagement::export.excel_tb_agent', [

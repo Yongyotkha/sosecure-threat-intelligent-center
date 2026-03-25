@@ -134,28 +134,28 @@ function get_role_custom()
 function check_role_custom()
 {
     $arr = [];
+    $arr['dashboard'] = 0;
+    $arr['assets'] = 0;
+    $arr['news'] = 0;
+    $arr['indicators'] = 0;
+    $arr['vulnerabilities'] = 0;
+    $arr['compromised'] = 0;
+    $arr['data_leak'] = 0;
+    $arr['web_defacement'] = 0;
+    $arr['manage_users'] = 0;
+    $arr['settings'] = 0;
+    $arr['settings_categorys'] = 0;
+    $arr['settings_sites'] = 0;
+    $arr['settings_assets'] = 0;
+    $arr['settings_rss'] = 0;
+    $arr['settings_general'] = 0;
+    $arr['monitoring'] = 0;
+    $arr['monitoring_batch'] = 0;
+    $arr['application_logs'] = 0;
+    $arr['send_logs'] = 0;
+    $arr['role_center'] = 0;
+    $arr['role_site'] = 0;
     if (Auth::check()) {
-        $arr['dashboard'] = 0;
-        $arr['assets'] = 0;
-        $arr['news'] = 0;
-        $arr['indicators'] = 0;
-        $arr['vulnerabilities'] = 0;
-        $arr['compromised'] = 0;
-        $arr['data_leak'] = 0;
-        $arr['web_defacement'] = 0;
-        $arr['manage_users'] = 0;
-        $arr['settings'] = 0;
-        $arr['settings_categorys'] = 0;
-        $arr['settings_sites'] = 0;
-        $arr['settings_assets'] = 0;
-        $arr['settings_rss'] = 0;
-        $arr['settings_general'] = 0;
-        $arr['monitoring'] = 0;
-        $arr['monitoring_batch'] = 0;
-        $arr['application_logs'] = 0;
-        $arr['send_logs'] = 0;
-        $arr['role_center'] = 0;
-        $arr['role_site'] = 0;
         if (TYPE_WEB == 'center') {
             if (Gate::check('dashboard')) {
                 // var_dump(123);

@@ -592,9 +592,9 @@ class ApiAgentController extends ApiController
 
                     if($agentScanLog){
                         if($type == 'start'){
-                            $agentScanLog -> description = null;
+                            $agentScanLog -> description = $description;
                             $agentScanLog -> first_scan = Carbon::parse($time_stamp);
-                            $agentScanLog -> last_scan = null;
+                            $agentScanLog -> last_scan = Carbon::parse($time_stamp);
                             $agentScanLog -> save();
                         }else{
                             $agentScanLog -> description = $description;

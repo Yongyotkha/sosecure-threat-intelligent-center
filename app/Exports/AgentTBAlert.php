@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\Exportable;
 
 use Maatwebsite\Excel\Concerns\WithTitle;
+use DB;
 
 use App\YaraLog;
 
@@ -51,9 +52,10 @@ class AgentTBAlert implements FromView, WithTitle
         $start_date = @$this->data['start_date'];
         $end_date = @$this->data['end_date'];
 
-        $query = YaraLog::join('site', 'yara_log.site_id', 'site.id')
+        $query = DB::table('yara_log')
+            ->join('site', 'yara_log.site_id', 'site.id')
             ->join('site_agents', 'yara_log.agent_id', 'site_agents.id')
-            ->join('os_type', 'site_agents.os_type', 'os_type.id')
+            ->leftjoin('os_type', 'site_agents.os_type', 'os_type.id')
             ->leftjoin('rule_name', 'yara_log.rule', 'rule_name.rule_name')
             ->select(
                 'site.name as site_name',
@@ -63,78 +65,74 @@ class AgentTBAlert implements FromView, WithTitle
                 'yara_log.id as agent_alerts_id',
                 'yara_log.rule as agent_alerts_rule',
                 'yara_log.status as agent_alerts_status',
-                'yara_log.created_at as agent_alerts_created',
+                'yara_log.updated_at as agent_alerts_created',
                 'yara_log.device_name',
                 'yara_log.first_scan',
                 'yara_log.last_scan',
                 'yara_log.channel',
                 'yara_log.ignore_flag',
+                'yara_log.path',
                 'rule_name.description as agent_alerts_description',
                 'rule_name.severity as severity_status',
                 'os_type.name as os_type_name'
             )
             ->where('yara_log.status', 1)
-            // ->where(function($query) use ($site_id){
-            //     if($site_id != null)
-            //     {
-            //         $query->where('site_id', $site_id);
-            //     }
-            // })
-            // ->where(function($query) use ($keyword_search){
-            //     if($keyword_search != null) {
-            //         $query->where('site.name', 'like', '%'.$keyword_search.'%')
-            //             ->orwhere('yara_log.description', 'like', '%'.$keyword_search.'%');     
-            //     }
-            // })
-            // ->where(function($query) use ($start_date, $end_date){
-            //     if($start_date != null && $end_date != null)
-            //     {
-            //         $query->whereBetween('agent_alerts.created', [$start_date, $end_date]);
-            //     }
-            // })
-            // ->where(function($query) use ($filter_alert_rule){
-            //     if($filter_alert_rule)
-            //     {
-            //         $query->where('agent_alerts.rule', 'like', '%'.$request->filter_alert_rule.'%');
-            //     }
-            // })
-            // ->where(function($query) use ($filter_alert_des){
-            //     if($filter_alert_des)
-            //     {
-            //         $query->where('agent_alerts.description', 'like', '%'.$request->filter_alert_des.'%');
-            //     }
-            // })
-            // ->where(function($query) use ($check_alert){
-            //     if($check_alert)
-            //     {
-            //         $query->where('agent_alerts.incident', $request->check_alert);
-            //     }
-            // })
-            // ->where(function($query) use ($check_alert_severity){
-            //     if($check_alert_severity)
-            //     {
-            //         $query->where('agent_alerts.severity', $request->check_alert_severity);
-            //     }
-            // })
-            ->where(function($query) use ($check_alert_ignore){
-                if(@$check_alert_ignore == 'all' || @$check_alert_ignore == '1')
+            ->where(function($query) use ($site_id){
+                if($site_id != null && $site_id != '')
                 {
-                    if($check_alert_ignore == 'all')
-                    {
-                        $query->whereIn('yara_log.ignore_flag', ['Y','N']);
-                    }
-                    else if($check_alert_ignore == '1')
-                    {
-                        $query->where('yara_log.ignore_flag', 'N');
-                    }
-                }
-                else
-                {
-                    $query->where('yara_log.ignore_flag', 'Y');
+                    $query->where('yara_log.site_id', $site_id);
                 }
             })
-            ->orderBy('yara_log.last_scan', 'desc')
-            ->get();
+            ->where(function($query) use ($keyword_search){
+                if($keyword_search != null) {
+                    $query->where('site.name', 'like', '%'.$keyword_search.'%')
+                        ->orwhere('yara_log.description', 'like', '%'.$keyword_search.'%');     
+                }
+            });
+
+        $ids = @$this->data['ids'];
+        if ($ids) {
+            $ids_array = explode(',', $ids);
+            $query->whereIn('yara_log.id', $ids_array);
+        }
+
+        if($start_date != null && $end_date != null)
+        {
+            $query->whereBetween('yara_log.last_scan', [$start_date, $end_date]);
+        }
+
+        if($filter_alert_rule != null)
+        {
+            $query->where('yara_log.rule', 'like', '%'.$filter_alert_rule.'%');
+        }
+
+        if($filter_alert_des != null)
+        {
+            $query->where('rule_name.description', 'like', '%'.$filter_alert_des.'%');
+        }
+
+        if($check_alert_severity != null)
+        {
+            $query->where('rule_name.severity', $check_alert_severity);
+        }
+
+        if(@$check_alert_ignore == 'all' || @$check_alert_ignore == '1')
+        {
+            if($check_alert_ignore == 'all')
+            {
+                $query->whereIn('yara_log.ignore_flag', ['Y','N']);
+            }
+            else if($check_alert_ignore == '1')
+            {
+                $query->where('yara_log.ignore_flag', 'N');
+            }
+        }
+        else
+        {
+            $query->where('yara_log.ignore_flag', 'Y');
+        }
+
+        $query = $query->orderBy('yara_log.updated_at', 'desc')->get();
 
         return view('agentmanagement::export.excel_tb_alert', [
             'query' => $query

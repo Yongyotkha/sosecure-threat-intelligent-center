@@ -156,42 +156,27 @@ class AgentManagementController extends Controller
 
     public function data_chart_incident(Request $request)
     {
-        // $site_id = $request->site_id;
-        // $query_incident = FXAgentAlerts::
-        //                     select('incident')
-        //                     ->groupBy('incident')
-        //                     ->get();
+        $site_id = $request->site_id;
 
-        // $data = [];
-        // $count_all = 0;
-        // foreach($query_incident as $data_incident)
-        // {
-        //     $query_count = FXAgentAlerts::
-        //                     where(function ($query_site) use ($site_id) {
-        //                         if($site_id != null)
-        //                         {
-        //                             $query_site->where('site_id', $site_id);
-        //                         }
-        //                         else
-        //                         {
-        //                             $query_site->where('site_id', '!=', null);
-        //                         }
-        //                     })
-        //                     ->where('status', 'Y')
-        //                     ->where('incident',$data_incident->incident)
-        //                     ->get();
+        $count = YaraLog::
+                    where(function ($query_site) use ($site_id) {
+                        if($site_id != null)
+                        {
+                            $query_site->where('site_id', $site_id);
+                        }
+                        else
+                        {
+                            $query_site->where('site_id', '!=', null);
+                        }
+                    })
+                    ->where('status', 1)
+                    ->where('ignore_flag', 'Y')
+                    ->distinct()
+                    ->count('agent_id');
 
-        //     $count = count($query_count);
-
-        //     $count_all = $count_all + $count;
-
-        //     $data['chart'][] = [$data_incident->incident, $count];
-        // }
-        
-        // $data['count_all'] = $count_all;
-
-        $data['chart'][] = [0, 0];
-        $data['count_all'] = 0;
+        $data = [];
+        $data['chart'][] = ['Agent', $count];
+        $data['count_all'] = $count;
         
         return response()->json($data);
     }
@@ -586,7 +571,8 @@ class AgentManagementController extends Controller
                 'agent_scan_log.first_scan',
                 'agent_scan_log.last_scan',
                 'agent_scan_log.description',
-                'agent_scan_log.created_at'
+                'agent_scan_log.created_at',
+                'agent_scan_log.updated_at'
             )
             ->whereNotNull('site_agents.ip_private')
             ->limit(5)
@@ -609,8 +595,8 @@ class AgentManagementController extends Controller
 
         $site_id = $request->site_id;
         $keyword_search = $request->keyword_search;
-        $query = YaraLog::leftjoin('site', 'yara_log.site_id', 'site.id')
-            ->leftjoin('site_agents', 'yara_log.agent_id', 'site_agents.id')
+        $query = YaraLog::join('site', 'yara_log.site_id', 'site.id')
+            ->join('site_agents', 'yara_log.agent_id', 'site_agents.id')
             ->leftjoin('os_type', 'site_agents.os_type', 'os_type.id')
             ->leftjoin('rule_name', 'yara_log.rule', 'rule_name.rule_name')
             ->select(
@@ -622,6 +608,7 @@ class AgentManagementController extends Controller
                 'yara_log.rule as agent_alerts_rule',
                 'yara_log.status as agent_alerts_status',
                 'yara_log.created_at as agent_alerts_created',
+                'yara_log.updated_at as agent_alerts_updated',
                 'yara_log.device_name',
                 'yara_log.first_scan',
                 'yara_log.last_scan',
@@ -634,25 +621,31 @@ class AgentManagementController extends Controller
             )
             ->where('yara_log.status', 1)
             ->where(function($query) use ($site_id ){
-                if($site_id  != null){
+                if($site_id  != null && $site_id != ''){
                     $query->where('yara_log.site_id', $site_id );
                 }
             })
             ->where(function($query) use ($keyword_search){
                 if($keyword_search != null) {
                     $query->where('site.name', 'like', '%'.$keyword_search.'%')
-                        ->orwhere('yara_log.description', 'like', '%'.$keyword_search.'%');     
+                        ->orwhere('yara_log.description', 'like', '%'.$keyword_search.'%')
+                        ->orwhere('yara_log.device_name', 'like', '%'.$keyword_search.'%')
+                        ->orwhere('yara_log.path', 'like', '%'.$keyword_search.'%');     
                 }
             })
             // ->where('yara_log.ignore_flag', 'Y')
-            ->orderBy('yara_log.last_scan', 'desc');
+            ;
             // ->get();
           
         // dd($query);
 
         if($start_date_input != null && $end_date_input != null)
         {
-            $query->whereBetween('yara_log.last_scan', [$start_date_input, $end_date_input]);
+            $start_date = date('Y-m-d', strtotime($start_date_input));
+            $end_date = date('Y-m-d', strtotime($end_date_input));
+            
+            $query->whereDate('yara_log.last_scan', '>=', $start_date)
+                  ->whereDate('yara_log.last_scan', '<=', $end_date);
         }
 
         if($request->filter_alert_rule != null)
@@ -691,6 +684,7 @@ class AgentManagementController extends Controller
             $query->where('yara_log.ignore_flag', 'Y');
         }
         
+        // return response()->json(['sql' => $query->toSql(), 'bindings' => $query->getBindings()]);
 
         return DataTables::of($query)
         ->addColumn('chk', function($query) {
@@ -2571,23 +2565,17 @@ class AgentManagementController extends Controller
     }
 
     public function export_excel_tb_alert(Request $request){
-
-        // dd($request->all());
-        // dd(class_exists('DOMDocument'));
-
+        ini_set('memory_limit', '1024M');
+        set_time_limit(0);
         $data = $request->all();
-
-        return Excel::download(new AgentTBAlert(@$data), 'tb_alert.xls');
+        return Excel::download(new AgentTBAlert(@$data), 'tb_alert.xlsx');
     }
 
     public function export_excel_tb_agent(Request $request){
-
-        // dd($request->all());
-        // dd(class_exists('DOMDocument'));
-
+        ini_set('memory_limit', '1024M');
+        set_time_limit(0);
         $data = $request->all();
-
-        return Excel::download(new AgentTBAgent(@$data), 'tb_agent.xls');
+        return Excel::download(new AgentTBAgent(@$data), 'tb_agent.xlsx');
     }
 
 }

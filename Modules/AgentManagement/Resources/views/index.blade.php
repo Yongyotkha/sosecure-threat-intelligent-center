@@ -25,6 +25,16 @@
         white-space: nowrap;
     }
 
+    /* Hide DataTables sorting arrows */
+    table.dataTable thead th.sorting::before,
+    table.dataTable thead th.sorting::after,
+    table.dataTable thead th.sorting_asc::before,
+    table.dataTable thead th.sorting_asc::after,
+    table.dataTable thead th.sorting_desc::before,
+    table.dataTable thead th.sorting_desc::after {
+        display: none !important;
+    }
+
   
 </style>
 @section('content')
@@ -586,7 +596,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th>
-                                                                <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
+                                                                <label><input name="select_all_header" value="1" id="select-all" type="checkbox" class="select-chk-header">
                                                                     <span class="label-text"></span>
                                                                 </label>
                                                             </th>
@@ -610,6 +620,7 @@
                                                             <th>Date Last Scan</th> --}}
                                                             <th>Channel</th>
                                                             <th>Severity</th>
+                                                            <th style="display: none;">Last Scan</th>
                                                             <th style="width:140px; max-width: 140px;">Datetime</th>
                                                             <th>Ignore</th>
                                                         </tr>
@@ -743,6 +754,7 @@
                                                             <th>Last Online</th>
                                                             <th>Online Status</th>
                                                             <th>Status</th>
+                                                            <th style="display: none;">Created At</th>
                                                             <th class="text-center">Action</th>
                                                         </tr>
                                                     </thead>
@@ -937,6 +949,12 @@
 <link rel="stylesheet" href="{{ getAsset('plugins/daterangepicker/daterangepicker.css') }}" type="text/css" />
 
 @include('stacks.css.multitext')
+<style>
+    .c3-chart-arcs-title {
+        font-size: 18px !important;
+        font-weight: 600 !important;
+    }
+</style>
 @endpush
 
 @push('pagescript')
@@ -976,8 +994,14 @@
     var filter_agent_ip = null;
     var check_os_type = null;
     var filter_agent_os_des = null;
+    var isDateSearch = 0;
 
     $(document).ready(function(){
+        Highcharts.setOptions({
+            lang: {
+                thousandsSep: ','
+            }
+        });
         count_head();
         datachart_Incident();
         datachart_platform();
@@ -1013,135 +1037,97 @@
 
     function f_export_tb_alert()
     {
-        let html_site = '';
-        if($('#site').val()) 
-        {
-            html_site = '&site='+$('#site :selected').val();
+        let params = [];
+        let site_val = $('#site').val();
+        if(site_val) {
+            params.push('site=' + encodeURIComponent(site_val));
+        }
+        if(keyword_search) {
+            params.push('keyword_search=' + encodeURIComponent(keyword_search));
+        }
+        if(filter_alert_rule) {
+            params.push('filter_alert_rule=' + encodeURIComponent(filter_alert_rule));
+        }
+        if(filter_alert_des) {
+            params.push('filter_alert_des=' + encodeURIComponent(filter_alert_des));
+        }
+        if(check_alert) {
+            params.push('check_alert=' + encodeURIComponent(check_alert));
+        }
+        if(check_alert_severity) {
+            params.push('check_alert_severity=' + encodeURIComponent(check_alert_severity));
+        }
+        if(check_alert_ignore !== null) {
+            params.push('check_alert_ignore=' + encodeURIComponent(check_alert_ignore));
+        }
+        if(start_date) {
+            params.push('start_date=' + encodeURIComponent(start_date));
+        }
+        if(end_date) {
+            params.push('end_date=' + encodeURIComponent(end_date));
         }
 
-        let html_keyword_search = '';
-        if(keyword_search) 
-        {
-            html_keyword_search = '&keyword_search='+keyword_search;
+        let ids = [];
+        $('#table-activities-template .select-chk:checked').each(function() {
+            ids.push($(this).val());
+        });
+
+        if (ids.length > 0) {
+            params.push('ids=' + encodeURIComponent(ids.join(',')));
         }
 
-        let html_filter_alert_rule = '';
-        if(filter_alert_rule) 
-        {
-            html_filter_alert_rule = '&filter_alert_rule='+filter_alert_rule;
+        let url = "{{ route('agentmanagement.export_excel_tb_alert') }}";
+        if (params.length > 0) {
+            url += '?' + params.join('&');
         }
 
-        let html_filter_alert_des = '';
-        if(filter_alert_des) 
-        {
-            html_filter_alert_des = '&filter_alert_des='+filter_alert_des;
-        }
-
-        let html_check_alert = '';
-        if(check_alert) 
-        {
-            html_check_alert = '&check_alert='+check_alert;
-        }
-
-        let html_check_alert_severity = '';
-        if(check_alert_severity) 
-        {
-            html_check_alert_severity = '&check_alert_severity='+check_alert_severity;
-        }
-
-        let html_check_alert_ignore = '';
-        if(check_alert_ignore) 
-        {
-            html_check_alert_ignore = '&check_alert_ignore='+check_alert_ignore;
-        }
-
-        let html_start_date = '';
-        if(start_date) 
-        {
-            html_start_date = '&start_date='+start_date;
-        }
-
-        let html_end_date = '';
-        if(end_date) 
-        {
-            html_end_date = '&end_date='+end_date;
-        }
-
-        let html = "{{ route('agentmanagement.export_excel_tb_alert') }}"+'?'
-            +html_site
-            +html_keyword_search
-            +html_filter_alert_rule
-            +html_filter_alert_des
-            +html_check_alert
-            +html_check_alert_severity
-            +html_check_alert_ignore
-            +html_start_date
-            +html_end_date;
-
-        window.open(html,'_blank');
+        window.location.href = url;
     }
 
     function f_export_tb_agent()
     {
-        let html_site = '';
-        if($('#site').val()) 
-        {
-            html_site = '&site='+$('#site :selected').val();
+        let params = [];
+        let site_val = $('#site').val();
+        if(site_val) {
+            params.push('site=' + encodeURIComponent(site_val));
+        }
+        if(keyword_search) {
+            params.push('keyword_search=' + encodeURIComponent(keyword_search));
+        }
+        if(filter_agent_device) {
+            params.push('filter_agent_device=' + encodeURIComponent(filter_agent_device));
+        }
+        if(filter_agent_ip) {
+            params.push('filter_agent_ip=' + encodeURIComponent(filter_agent_ip));
+        }
+        if(filter_agent_os_des) {
+            params.push('filter_agent_os_des=' + encodeURIComponent(filter_agent_os_des));
+        }
+        if(check_os_type) {
+            params.push('check_os_type=' + encodeURIComponent(check_os_type));
+        }
+        if(start_date) {
+            params.push('start_date=' + encodeURIComponent(start_date));
+        }
+        if(end_date) {
+            params.push('end_date=' + encodeURIComponent(end_date));
         }
 
-        let html_keyword_search = '';
-        if(keyword_search) 
-        {
-            html_keyword_search = '&keyword_search='+keyword_search;
+        let ids = [];
+        $('#table-agent-template .select-chk:checked').each(function() {
+            ids.push($(this).val());
+        });
+
+        if (ids.length > 0) {
+            params.push('ids=' + encodeURIComponent(ids.join(',')));
         }
 
-        let html_filter_agent_device = '';
-        if(filter_agent_device) 
-        {
-            html_filter_agent_device = '&filter_agent_device='+filter_agent_device;
+        let url = "{{ route('agentmanagement.export_excel_tb_agent') }}";
+        if (params.length > 0) {
+            url += '?' + params.join('&');
         }
 
-        let html_filter_agent_ip = '';
-        if(filter_agent_ip) 
-        {
-            html_filter_agent_ip = '&filter_agent_ip='+filter_agent_ip;
-        }
-
-        let html_filter_agent_os_des = '';
-        if(filter_agent_os_des) 
-        {
-            html_filter_agent_os_des = '&filter_agent_os_des='+filter_agent_os_des;
-        }
-
-        let html_check_os_type = '';
-        if(check_os_type) 
-        {
-            html_check_os_type = '&check_os_type='+check_os_type;
-        }
-
-        let html_start_date = '';
-        if(start_date) 
-        {
-            html_start_date = '&start_date='+start_date;
-        }
-
-        let html_end_date = '';
-        if(end_date) 
-        {
-            html_end_date = '&end_date='+end_date;
-        }
-
-        let html = "{{ route('agentmanagement.export_excel_tb_agent') }}"+'?'
-            +html_site
-            +html_keyword_search
-            +html_filter_agent_device
-            +html_filter_agent_ip
-            +html_filter_agent_os_des
-            +html_check_os_type
-            +html_start_date
-            +html_end_date;
-
-        window.open(html,'_blank');
+        window.location.href = url;
     }
 
     active_btn('#groupby-btn .btn-grey');
@@ -1226,7 +1212,7 @@
         }
     });
 
-    cb(start, end);
+    $('#filter_date span').html('please select range date');
     cb_tl(start, end);
 
     $('#btngroup_sort_by .btn-grey').on('click',function(){
@@ -1266,8 +1252,14 @@
     {
         site_val = $('#site').val();
         keyword_search = $('#keyword_search').val();
-        start_date = $("#filter_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm:ss');
-        end_date = $("#filter_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm:ss');
+
+        if (isDateSearch == 1) {
+            start_date = $("#filter_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm:ss');
+            end_date = $("#filter_date").data('daterangepicker').endDate.format('YYYY-MM-DD hh:mm:ss');
+        } else {
+            start_date = null;
+            end_date = null;
+        }
 
         if(check_type == 'alert')
         {
@@ -1331,6 +1323,11 @@
         filter_agent_device = null;
         filter_agent_ip = null;
         filter_agent_os_des = null;
+        isDateSearch = 0;
+        start_date = null;
+        end_date = null;
+
+        $('#filter_date span').html('please select range date');
 
         $('.check_type').removeClass('active');
         $('.check_alert').removeClass('active');
@@ -1363,7 +1360,6 @@
 
     function count_head(site_val)
     {
-        {{-- console.log('count - '+site_val); --}}
         let site_log_id = site_val;
         $.ajax({
             url: "{{route('agentmanagement.count_head')}}",
@@ -1372,16 +1368,18 @@
                 site_log_id:site_log_id
             },
             success:function(response){
-                $('#text_agent').text(response.count_agent);
-                $('#text_alert').text(response.count_alert);
-                $('#text_rule').text(response.count_rule);
+                let count_agent = response.count_agent ? response.count_agent.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0;
+                let count_alert = response.count_alert ? response.count_alert.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0;
+                let count_rule = response.count_rule ? response.count_rule.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0;
+                $('#text_agent').text(count_agent);
+                $('#text_alert').text(count_alert);
+                $('#text_rule').text(count_rule);
             }
         });
     }
 
     function dudit_log_feed(site_val)
     {
-        {{-- console.log('log - '+site_val); --}}
         let site_log_id = site_val;
 
         $.ajax({
@@ -1402,24 +1400,6 @@
                     for(let rows in response.query)
                     {
                         const data_log = response.query[rows];
-                        {{-- html += `
-                                <li>
-                                    <div class="w-100per">
-                                        <div class="audit-log-time">
-                                            <span class="audit-by">
-                                                Site : ${data_log.site_name}
-                                            </span>
-                                            <span class="audit-time">
-                                                IP : ${data_log.agent_logs_ip_address ? data_log.agent_logs_ip_address : ' - '}
-                                            </span>
-                                        </div>
-                                        <span class="audit-log-header">
-                                            ${data_log.agent_logs_created ? data_log.agent_logs_created : ' - '} | ${data_log.agent_logs_description ? data_log.agent_logs_description : ' - '}
-                                        </span>
-                                    </div>
-                                </li>
-                            `; --}}
-
                         html += `
                                 <li>
                                     <div class="w-100per">
@@ -1432,7 +1412,7 @@
                                             </span>
                                         </div>
                                         <span class="audit-log-header">
-                                            ${data_log.mode ? data_log.mode : ' - '} : ${data_log.created_at ? data_log.created_at : ' - '}
+                                            ${data_log.mode ? data_log.mode : ' - '} : ${data_log.updated_at ? data_log.updated_at : ' - '}
                                         </span>
                                     </div>
                                 </li>
@@ -1470,7 +1450,6 @@
     function datachart_Incident(site_val)
     {
         let site_id = site_val;
-        {{-- console.log('inci - '+site_id); --}}
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1494,7 +1473,6 @@
     function datachart_platform(site_val)
     {
         let site_id = site_val;
-        {{-- console.log('plat - '+site_id); --}}
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1502,7 +1480,6 @@
             url: "{{route('agentmanagement.data_chart_platform')}}",
             type: "POST",
             data: {
-                {{-- keyword_search:keyword_search, --}}
                 site_id:site_id
             },
             beforesend:function(){
@@ -1519,20 +1496,13 @@
     function datachart_severity(site_val)
     {
         let site_id = site_val;
-        {{-- console.log('seve - '+site_id); --}}
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             url: "{{route('agentmanagement.data_chart_severity')}}",
             type: "POST",
-            {{-- data:function(d){
-                d.keyword_search = keyword_search;
-                d.site_id = site_id;
-                return d ;
-            },  --}}
             data: {
-                {{-- keyword_search:keyword_search, --}}
                 site_id:site_id
             },
             beforesend:function(){
@@ -1548,7 +1518,6 @@
     function datachart_rule(site_val)
     {
         let site_id = site_val;
-        {{-- console.log('rule - '+site_id); --}}
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1572,9 +1541,6 @@
     function datachart_timeline(site_val)
     {
         let site_id = site_val;
-        {{-- console.log('rule - '+site_id);
-        console.log('s - '+start_date_tl);
-        console.log('e - '+end_date_tl); --}}
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1582,7 +1548,6 @@
             url: "{{route('agentmanagement.data_chart_timeline')}}",
             type: "POST",
             data: {
-                {{-- keyword_search:keyword_search, --}}
                 site_id:site_id,
                 start_date:start_date_tl,
                 end_date:end_date_tl
@@ -1608,6 +1573,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
+            order: [[6, 'desc']],
             ajax: 
             {
                 url: "{{route('agentmanagement.tb_alert')}}",
@@ -1640,28 +1606,6 @@
                 {
                     data: 'detail_all',
                 },
-              
-                {{-- 
-                    {
-                        data: 'site_agents_ip_private',
-                    },
-                    {
-                        data: 'agent_alerts_rule',
-                    },
-                    {
-                        data: 'agent_alerts_description',
-                    },
-                    {
-                        data: 'device_name',
-                    },
-                    {
-                        data: 'first_scan',
-                    },
-                    {
-                        data: 'last_scan',
-                    },
-
-                --}}
                
                 {
                     data: 'channel',
@@ -1672,7 +1616,12 @@
                     className: 'text-center'
                 },
                 {
-                    data: 'agent_alerts_created'
+                    data: 'last_scan',
+                    visible: false,
+                    searchable: false
+                },
+                {
+                    data: 'agent_alerts_updated'
                 },
                 {
                     data: 'action',
@@ -1698,6 +1647,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
+            order: [[12, 'desc']],
             "fnDrawCallback": function( oSettings ) {
                 multi_readmore()
             },
@@ -1757,6 +1707,16 @@
                     data: 'chk_status',
                 },
                 {
+                    data: 'site_agents_created',
+                    visible: false,
+                    searchable: false
+                },
+                {
+                    data: 'site_agents_last_online',
+                    visible: false,
+                    searchable: false
+                },
+                {
                     data: 'action',
                     "orderable": false,
                     className: 'text-nowrap'
@@ -1785,6 +1745,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
+            ordering: false,
             ajax: 
             {
                 url: "{{route('agentmanagement.tb_schedule')}}",
@@ -1824,6 +1785,7 @@
     }
 
     function chart_c3(id,value,score_mid) {
+        let score_mid_format = score_mid ? score_mid.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : score_mid;
         const myc3 = c3.generate({
             bindto: id,
             data: {
@@ -1831,10 +1793,17 @@
                 type : 'donut',
             },
             donut: {
-                title: score_mid,
+                title: score_mid_format,
                 label: {
                 format: function(value, ratio, id) {
-                    return value;
+                    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }
+                }
+            },
+            tooltip: {
+                format: {
+                    value: function (value, ratio, id) {
+                        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     }
                 }
             },
@@ -1884,7 +1853,7 @@
             tooltip: {
                 headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
                 pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+                '<td style="padding:0"><b>{point.y:,.0f}</b></td></tr>',
                 footerFormat: '</table>',
                 shared: true,
                 useHTML: true
@@ -1913,7 +1882,7 @@
                     enabled: false,
                     color: '#333',
                     align: 'center',
-                    format: '{point.y{{--:.1f--}}}',
+                    format: '{point.y:,.0f}',
                     y: 0, 
                     style: {
                         fontSize: '13px',
@@ -1936,6 +1905,9 @@
                 title: {
                 text: ''
                 },
+                labels: {
+                    format: '{value:,.0f}'
+                },
                 plotLines: [{
                     color: '#FF0000',
                 }]
@@ -1953,6 +1925,11 @@
                 align: 'right',
                 verticalAlign: 'middle',
                 enabled: false,
+            },
+
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.y:,.0f}</b><br/>',
+                shared: true
             },
 
             plotOptions: {
