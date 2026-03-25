@@ -27,44 +27,53 @@ use Modules\Users\Entities\user_menu_sub_permission;
 use Modules\SiteSettings\Entities\site_menu_permission;
 use Modules\SiteSettings\Entities\site_menu_sub_permission;
 
+use Illuminate\Support\Facades\Log;
 class AuthController extends ApiController
 {
-    public function login(Request $request){
+    public function login(Request $request)
+    {
         $header = $request->bearerToken();
         $site = $this->AuthorizationLogin($header, $request->mode, $request->code);
-        if($site['status_code'] !== '200'){
+        if ($site['status_code'] !== '200') {
             return $this->AuthorizationLogin($header, $request->mode, $request->code);
         }
-        
-        $value = $request -> data;
+
+        $value = $request->data;
         // dd($value);
-        $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+        $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'], $site['data']['mac_address_key']);
         // dd($data);
-        if($data === false){
+        // Log::info('check_values', [
+        //     'value' => $value,
+        //     'header' => $header,
+        //     'ip_key' => $site['data']['ip_key'] ?? 'null',
+        //     'mac_key' => $site['data']['mac_address_key'] ?? 'null'
+        // ]);
+
+        if ($data === false) {
             return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
-        }else{
+        } else {
             $data_key = json_decode($data, true);
             // 
 
-            $user_check = User::where('email', $data_key['email'])->where('email_verified_at','!=',null)->where('banned',0)->where('deleted_at',null)->where('active',1)->where('verify',1)->first();
-            $UserSite = UserSite::where('user_id',@$user_check->id)->where('active',1)->get()->pluck('site_id')->toArray();
+            $user_check = User::where('email', $data_key['email'])->where('email_verified_at', '!=', null)->where('banned', 0)->where('deleted_at', null)->where('active', 1)->where('verify', 1)->first();
+            $UserSite = UserSite::where('user_id', @$user_check->id)->where('active', 1)->get()->pluck('site_id')->toArray();
 
             $role_status = 0;
-            $user = User::where('email', $data_key['email'])->where('site_id', $site['data']['id'])->where('email_verified_at','!=',null)->where('banned',0)->where('deleted_at',null)->where('active',1)->where('verify',1);
-            $user = $user->where(function($q) {
+            $user = User::where('email', $data_key['email'])->where('site_id', $site['data']['id'])->where('email_verified_at', '!=', null)->where('banned', 0)->where('deleted_at', null)->where('active', 1)->where('verify', 1);
+            $user = $user->where(function ($q) {
                 $q->whereNull('password_time_expire');
                 $q->orWhereDate('password_time_expire', '<=', date('Y-m-d H:i:s'));
             });
-            $user = $user->whereHas('get_user_site_many', function($q) use ($UserSite) {
+            $user = $user->whereHas('get_user_site_many', function ($q) use ($UserSite) {
                 $q->whereIn('site_id', $UserSite);
             });
 
             $user = $user->first();
-            $model_has_roles = model_has_roles::where('role_id',@$user->get_model_has_roles->role_id)->first();
-            if($model_has_roles) {
-                if($model_has_roles->role_id == 1 || $model_has_roles->role_id == 2) {
+            $model_has_roles = model_has_roles::where('role_id', @$user->get_model_has_roles->role_id)->first();
+            if ($model_has_roles) {
+                if ($model_has_roles->role_id == 1 || $model_has_roles->role_id == 2) {
                     $role_status = 0;
-                } else if($model_has_roles->role_id == 4 || $model_has_roles->role_id == 5 || $model_has_roles->role_id == 6 || $model_has_roles->role_id == 9 || $model_has_roles->role_id == 10) {
+                } else if ($model_has_roles->role_id == 4 || $model_has_roles->role_id == 5 || $model_has_roles->role_id == 6 || $model_has_roles->role_id == 9 || $model_has_roles->role_id == 10) {
                     $role_status = 1;
                 } else {
                     $role_status = 0;
@@ -74,29 +83,29 @@ class AuthController extends ApiController
 
             if ($user != null && @$role_status == 1) {
                 $passwordHasher = new PasswordHash(8, true);
-                $passwordMatch  = $passwordHasher->CheckPassword($data_key['password'], $user->password);
+                $passwordMatch = $passwordHasher->CheckPassword($data_key['password'], $user->password);
                 if ($passwordMatch) {
                     $token = $this->jwt($user);
-                    $user -> access_token = $token;
-                    $user -> save();
+                    $user->access_token = $token;
+                    $user->save();
 
 
-                    $menu = Menu::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
-                    $menu_sub = Menu_sub::where('deleted_at',null)->where('active',1)->orderBy('order','asc')->get();
-                    if($model_has_roles->role_id == 6) {
-                        $Menu_permission_site = Menu_permission_site::select('menu_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->pluck('menu_id')->toArray();
-                        $Menu_sub_permission_site = Menu_sub_permission_site::select('menu_sub_id')->where('site_id',$user->site_id)->where('deleted_at',null)->get()->pluck('menu_sub_id')->toArray();
+                    $menu = Menu::where('deleted_at', null)->where('active', 1)->orderBy('order', 'asc')->get();
+                    $menu_sub = Menu_sub::where('deleted_at', null)->where('active', 1)->orderBy('order', 'asc')->get();
+                    if ($model_has_roles->role_id == 6) {
+                        $Menu_permission_site = Menu_permission_site::select('menu_id')->where('site_id', $user->site_id)->where('deleted_at', null)->get()->pluck('menu_id')->toArray();
+                        $Menu_sub_permission_site = Menu_sub_permission_site::select('menu_sub_id')->where('site_id', $user->site_id)->where('deleted_at', null)->get()->pluck('menu_sub_id')->toArray();
                     } else {
                         $site_id_arr = UserSite::select('site_id')->where('user_id', @$user->id)->get();
                         $result_menu_permission = site_menu_permission::select('menu_code')->whereIn("site_id", @$site_id_arr)->where("deleted_at", null)->get()->pluck('menu_code')->toArray();
                         $result_menu_sub_permission = site_menu_sub_permission::select('menu_sub_code')->whereIn("site_id", @$site_id_arr)->where("deleted_at", null)->get()->pluck('menu_sub_code')->toArray();
-                        $Menu_permission_site = user_menu_permission::select('menu_id')->whereIn("site_id", @$site_id_arr)->where("user_id", @$user->id)->where("deleted_at", null)->whereIn('menu_code',$result_menu_permission)->get()->pluck('menu_id')->toArray();
-                        $Menu_sub_permission_site = user_menu_sub_permission::select('menu_sub_id')->where("site_id", @$site_id_arr)->where("user_id", @$user->id)->where("deleted_at", null)->whereIn('menu_sub_code',$result_menu_sub_permission)->get()->pluck('menu_sub_id')->toArray();
+                        $Menu_permission_site = user_menu_permission::select('menu_id')->whereIn("site_id", @$site_id_arr)->where("user_id", @$user->id)->where("deleted_at", null)->whereIn('menu_code', $result_menu_permission)->get()->pluck('menu_id')->toArray();
+                        $Menu_sub_permission_site = user_menu_sub_permission::select('menu_sub_id')->where("site_id", @$site_id_arr)->where("user_id", @$user->id)->where("deleted_at", null)->whereIn('menu_sub_code', $result_menu_sub_permission)->get()->pluck('menu_sub_id')->toArray();
                     }
-                    
+
 
                     $check_goto_menu = @check_goto_menu($Menu_permission_site);
-                    if(!$check_goto_menu) {
+                    if (!$check_goto_menu) {
                         return response()->json(['error' => 'User does not have permission to access.', 'status_code' => '400']);
                     }
 
@@ -111,81 +120,83 @@ class AuthController extends ApiController
                         'permission_custom' => $permission_custom,
                         'check_goto_menu' => $check_goto_menu
                     );
-        
+
                     $data_transcation = json_encode($response);
-                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $site['data']['ip_key'], $site['data']['mac_address_key']);
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
                     // return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $user , 'menu' => $menu , 'menu_sub' => $menu_sub , 'menu_sub_permission_site' => $Menu_sub_permission_site , 'menu_permission_site' => $Menu_permission_site , 'permission_custom' => $permission_custom, 'check_goto_menu' => $check_goto_menu]);
-                } else{
+                } else {
                     return response()->json(['error' => 'Username or password is incorrect ', 'status_code' => '400']);
                 }
             } else {
-                return response()->json(['error' => 'Username or password is incorrect ' , 'status_code' => '400', 'user' => $user_check]);
+                return response()->json(['error' => 'Username or password is incorrect ', 'status_code' => '400', 'user' => $user_check]);
             }
 
 
         }
-    } 
+    }
 
-    public function get_user(Request $request){
+    public function get_user(Request $request)
+    {
         $header = $request->bearerToken();
         $site = $this->AuthorizationLogin($header, $request->mode, $request->code);
-        if($site['status_code'] !== '200'){
+        if ($site['status_code'] !== '200') {
             return $this->AuthorizationLogin($header, $request->mode, $request->code);
         }
-        
-        $value = $request -> data;
-        $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
-        if($data === false){
+
+        $value = $request->data;
+        $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'], $site['data']['mac_address_key']);
+        if ($data === false) {
             return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
-        }else{
+        } else {
             $data_key = json_decode($data, true);
             $user = User::find($data_key['user_id']);
-        
+
             $response = array(
                 'data' => $user
             );
 
             $data_transcation = json_encode($response);
-            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $site['data']['ip_key'], $site['data']['mac_address_key']);
             return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
         }
     }
 
-    public function update_user(Request $request){
+    public function update_user(Request $request)
+    {
         $header = $request->bearerToken();
         $site = $this->AuthorizationLogin($header, $request->mode, $request->code);
-        if($site['status_code'] !== '200'){
+        if ($site['status_code'] !== '200') {
             return $this->AuthorizationLogin($header, $request->mode, $request->code);
         }
-        
-        $value = $request -> data;
-        $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
-        if($data === false){
+
+        $value = $request->data;
+        $data = encrypt_decrypt('decrypt', $value, $header, $site['data']['ip_key'], $site['data']['mac_address_key']);
+        if ($data === false) {
             return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
-        }else{
+        } else {
             $data_key = json_decode($data, true);
             $user = User::find($data_key['user_id']);
-            if(!Hash::check($data_key['current_password'], $user->password)){
+            if (!Hash::check($data_key['current_password'], $user->password)) {
                 return response()->json(['message' => '', 'error' => 'error current password', 'status_code' => '400']);
-            }else{
-                if(empty($user->password_days_expire)){
+            } else {
+                if (empty($user->password_days_expire)) {
                     $user->password_days_expire = '60';
-                    $user -> password_start_reset = Carbon::now()->addDays(60);
-                }else{
-                    $user -> password_start_reset = Carbon::now();
+                    $user->password_start_reset = Carbon::now()->addDays(60);
+                } else {
+                    $user->password_start_reset = Carbon::now();
                 }
                 $user->password = $data_key['password'];
-                $user -> save();
-    
+                $user->save();
+
                 event(new PasswordReset($user));
-                
+
                 $response = array(
                     'data' => $user
                 );
 
                 $data_transcation = json_encode($response);
-                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $site['data']['ip_key'],  $site['data']['mac_address_key']);
+                $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $site['data']['ip_key'], $site['data']['mac_address_key']);
                 return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
             }
         }

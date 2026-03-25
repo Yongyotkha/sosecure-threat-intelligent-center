@@ -1310,9 +1310,9 @@ class DashboardNewController extends Controller
                             ->whereBetween('data_leak_feed_temp.created_at', array($date_start_datetime_format, $date_end_datetime_format))
                              // Combine: Must be in requested site AND that site must be allowed
                              ->whereRaw("FIND_IN_SET(?, " . $prefix . "ref_temp.site_id)", [$SiteSettings->id])
-                             ->where(function($query) use ($site_id_arr) {
+                             ->where(function($query) use ($site_id_arr, $SiteSettings) {
                                  // Redundant if SiteSettings->id is already in site_id_arr (which it should be), but safe
-                                 if(!in_array($SiteSettings->id, $site_id_arr)) {
+                                 if(!in_array($SiteSettings->id, (array)$site_id_arr)) {
                                      // This case technically shouldn't happen in valid flow, but failsafe
                                       $query->whereRaw("0=1"); 
                                  }
@@ -1458,12 +1458,12 @@ class DashboardNewController extends Controller
                             ->where('data_leak_socail_ref.status', 1)
                             ->whereIn('data_leak_feed.feel_type', ['darkweb', 'webserver', 'compromise', 'compromised'])
                             ->whereBetween('data_leak_feed.created_at', array($date_start_datetime_format, $date_end_datetime_format))
-                            ->where(function($query) use ($site_id_arr, $SiteSettings) {
+                            ->where(function($query) use ($site_id_arr, $SiteSettings, $prefix) {
                                  foreach ($site_id_arr as $siteId) {
-                                     $query->orWhereRaw("FIND_IN_SET(?, data_leak_socail_ref.site_id)", [$siteId]);
+                                     $query->orWhereRaw("FIND_IN_SET(?, " . $prefix . "data_leak_socail_ref.site_id)", [$siteId]);
                                  }
                                   if (isset($SiteSettings->id)) {
-                                     $query->orWhereRaw("FIND_IN_SET(?, data_leak_socail_ref.site_id)", [$SiteSettings->id]);
+                                     $query->orWhereRaw("FIND_IN_SET(?, " . $prefix . "data_leak_socail_ref.site_id)", [$SiteSettings->id]);
                                  }
                             })
                             ->orderBy('data_leak_feed.created_at', 'desc')
@@ -1496,10 +1496,10 @@ class DashboardNewController extends Controller
                             ->where('data_leak_socail_ref.status', 1)
                             ->whereIn('data_leak_feed.feel_type', ['darkweb', 'webserver', 'compromise', 'compromised'])
                             ->whereBetween('data_leak_feed.created_at', array($date_start_datetime_format, $date_end_datetime_format))
-                            ->whereRaw("FIND_IN_SET(?, data_leak_socail_ref.site_id)", [$SiteSettings->id])
+                            ->whereRaw("FIND_IN_SET(?, " . $prefix . "data_leak_socail_ref.site_id)", [$SiteSettings->id])
                              ->where(function($query) use ($site_id_arr, $SiteSettings) {
                                  // Add extra safety check like before
-                                 if(!in_array($SiteSettings->id, $site_id_arr)) {
+                                 if(!in_array($SiteSettings->id, (array)$site_id_arr)) {
                                       $query->whereRaw("0=1"); 
                                  }
                             })

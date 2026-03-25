@@ -57,6 +57,8 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('indicator/load_malware_tb', 'Api\ApiIndicatorController@load_malware_tb');
     Route::post('indicator/table_summary', 'Api\ApiIndicatorController@table_summary');
     Route::post('indicator/table_summary_export', 'Api\ApiIndicatorController@table_summary_export');
+    Route::post('indicator/export_events_indicators', 'Api\ApiIndicatorController@export_events_indicators');
+    Route::post('indicator/export_event_indicators', 'Api\ApiIndicatorController@export_event_indicators');
     
     Route::post('dashboard/count_asset', 'Api\ApiDashboardController@count_asset');
     Route::post('dashboard/count_vulnerability', 'Api\ApiDashboardController@count_vulnerability');
@@ -132,6 +134,10 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('web_defacement/deface_now_detail', 'Api\ApiWebdefacementController@web_defacement_deface_now_detail');
     Route::post('web_defacement/update_image', 'Api\ApiWebdefacementController@web_defacement_update_image');
     Route::post('web_defacement/change_status', 'Api\ApiWebdefacementController@web_defacement_change_status');
+    Route::post('web_defacement/check_status', 'Api\ApiWebdefacementController@web_defacement_check_status');
+    Route::post('web_defacement/alert_to_customer', 'Api\ApiWebdefacementController@web_defacement_alert_to_customer');
+    Route::post('web_defacement/show_diff_hash', 'Api\ApiWebdefacementController@web_defacement_show_diff_hash');
+    Route::post('web_defacement/export_report', 'Api\ApiWebdefacementController@web_defacement_export_report');
 
     Route::post('monitor/monitor_system_save', 'Api\ApiMonitorController@monitor_system_save');
 
@@ -308,4 +314,13 @@ Route::group(['prefix' => 'v1/public', 'middleware' => 'api.token'], function ()
 // Service API - Receive Events & Indicators (with Service API Token Auth)
 Route::group(['prefix' => 'v1/service', 'middleware' => 'api.token.service'], function () {
     Route::post('events', 'Api\ServiceApiController@receiveEvent');
+});
+
+// IoC Feed (Graylog Integration)
+Route::group(['prefix' => 'v1/ioc-feed', 'namespace' => '\Modules\IocFeed\Http\Controllers'], function () {
+    Route::get('{category}.csv', 'IocFeedController@exportCsv');
+    Route::post('ioc', 'IocFeedController@store');
+    Route::put('ioc/{id}', 'IocFeedController@update');
+    Route::delete('ioc/{id}', 'IocFeedController@destroy');
+    Route::post('whitelist', 'IocFeedController@storeWhitelist');
 });

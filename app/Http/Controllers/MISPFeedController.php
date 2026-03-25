@@ -378,6 +378,28 @@ class MISPFeedController extends Controller
                                 $indicator_type = "email-src";
                             }
 
+                            // $indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail->findOne(['indicator_name' => trim($cursor_indicator_data['indicator'])]);
+                            // $indicator_score = '';
+                            // $indicator_severity = '';
+
+                            // if ($indicator_detail && isset($indicator_detail['allrow']['Score'])) {
+                            //     $indicator_score = $indicator_detail['allrow']['Score'];
+                            //     // Map score to severity
+                            //     if ($indicator_score >= 9) {
+                            //         $indicator_severity = 'Critical';
+                            //     } elseif ($indicator_score >= 7) {
+                            //         $indicator_severity = 'High';
+                            //     } elseif ($indicator_score >= 4) {
+                            //         $indicator_severity = 'Medium';
+                            //     } elseif ($indicator_score >= 2) {
+                            //         $indicator_severity = 'Low';
+                            //     } elseif ($indicator_score == 1) {
+                            //         $indicator_severity = 'Very Low';
+                            //     } else {
+                            //         $indicator_severity = 'Information';
+                            //     }
+                            // }
+
                             $Array_indicator[] = [
                                 'value' => trim($cursor_indicator_data['indicator']),
                                 'type' => $indicator_type,
@@ -385,6 +407,10 @@ class MISPFeedController extends Controller
                                 'relationship_type' => '',
                                 'category' => $indicator_category,
                                 'Tag' => $tagArray_indicator,
+                                // 'score' => $indicator_score,
+                                // 'severity' => $indicator_severity,
+                                'score' => isset($cursor_indicator_data['attribute_score']) ? $cursor_indicator_data['attribute_score'] : '',
+                                'severity' => isset($cursor_indicator_data['attribute_serverity']) ? $cursor_indicator_data['attribute_serverity'] : '',
                                 'to_ids' => true
                             ];
                         }
@@ -870,6 +896,27 @@ class MISPFeedController extends Controller
                     $indTagArray[] = ['name' => 'type:' . $it, 'colour' => '#004646', 'local' => false, 'relationship_type' => ''];
                 }
 
+                $indicator_detail = $client->sosecure_threatintelligent->fx_otx_indicator_detail->findOne(['indicator_name' => trim((string)($r['indicator'] ?? ''))]);
+                $indicator_score = '';
+                $indicator_severity = '';
+
+                if ($indicator_detail && isset($indicator_detail['allrow']['Score'])) {
+                    $indicator_score = $indicator_detail['allrow']['Score'];
+                    if ($indicator_score >= 9) {
+                        $indicator_severity = 'Critical';
+                    } elseif ($indicator_score >= 7) {
+                        $indicator_severity = 'High';
+                    } elseif ($indicator_score >= 4) {
+                        $indicator_severity = 'Medium';
+                    } elseif ($indicator_score >= 2) {
+                        $indicator_severity = 'Low';
+                    } elseif ($indicator_score == 1) {
+                        $indicator_severity = 'Very Low';
+                    } else {
+                        $indicator_severity = 'Information';
+                    }
+                }
+
                 $attributes[] = [
                     'value' => trim((string)($r['indicator'] ?? '')),
                     'type'  => $typ,
@@ -878,6 +925,8 @@ class MISPFeedController extends Controller
                     'local'  => false,
                     'relationship_type' => '',
                     'Tag'   => $indTagArray,
+                    'score' => $indicator_score,
+                    'severity' => $indicator_severity,
                 ];
             }
 

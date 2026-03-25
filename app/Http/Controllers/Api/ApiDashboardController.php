@@ -44,66 +44,57 @@ class ApiDashboardController extends ApiController
                     }
                     $get_role_custom = $data['data']['get_role_custom'];
                     $site = $request -> code;
-                    if (@$get_role_custom['superadmin'] == 1) {
-                        if (empty($site)) {
-                            $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
-                            $dataOut["countAssets"] = 0;
-                            $dataOut["assetLimit"] = 0;
-                            foreach ($datacountAssets as $key => $value) {
-                                $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
-                                $countfn = count($AssetsData_data);
-                                if ($countfn == 0) {
-                                    $dataOut["countAssets"]++;
-                                } else {
-                                    $dataOut["countAssets"] = $dataOut["countAssets"] + $countfn;
-                                }
-                            }
-                        } else {
-                            $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $site)->first();
-                            $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->where('assets.site_id', $SiteSettingsfor->id)->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
-                            $dataOut["countAssets"] = 0;
-                            $dataOut["assetLimit"] = $SiteSettingsfor -> asset_limit;
-                            foreach ($datacountAssets as $key => $value) {
-                                $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
-                                $countfn = count($AssetsData_data);
-                                if ($countfn == 0) {
-                                    $dataOut["countAssets"]++;
-                                } else {
-                                    $dataOut["countAssets"] = $dataOut["countAssets"] + $countfn;
-                                }
-                            }
-                        }
-                    } else {
-                        $site_id_arr = $data['data']['site_id_arr'];
-                        if (empty($site)) {
-                            $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id', $site_id_arr)->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
-                            $dataOut["countAssets"] = 0;
-                            $dataOut["assetLimit"] = 0;
-                            foreach ($datacountAssets as $key => $value) {
-                                $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
-                                $countfn = count($AssetsData_data);
-                                if ($countfn == 0) {
-                                    $dataOut["countAssets"]++;
-                                } else {
-                                    $dataOut["countAssets"] = $dataOut["countAssets"] + $countfn;
-                                }
-                            }
-                        } else {
-                            $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $site)->first();
-                            $datacountAssets = @Assets::select('assets.id', 'assets_datas.data_type_id', 'assets_datas.value')->leftJoin('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')->whereIn('assets.site_id', $site_id_arr)->where('assets.site_id', $SiteSettingsfor->id)->whereIn('assets_datas.data_type_id', [5, 6])->where('assets.status', 1)->get();
-                            $dataOut["countAssets"] = 0;
-                            $dataOut["assetLimit"] = $SiteSettingsfor -> asset_limit;
-                            foreach ($datacountAssets as $key => $value) {
-                                $AssetsData_data = AssetsData::where('asset_id', $value->id)->whereIn('assets_datas.data_type_id', [1, 4])->get()->toArray();
-                                $countfn = count($AssetsData_data);
-                                if ($countfn == 0) {
-                                    $dataOut["countAssets"]++;
-                                } else {
-                                    $dataOut["countAssets"] = $dataOut["countAssets"] + $countfn;
-                                }
-                            }
+                    
+                    $site_id_active = SiteSettings::select('id')->where('active', 1)->whereNull('deleted_at')->pluck('id')->toArray();
+                    $isSuperAdmin = @$get_role_custom['superadmin'] == 1;
+                    $site_id_arr = $isSuperAdmin ? null : $data['data']['site_id_arr'];
+                    $targetSiteId = null;
+                    
+                    $dataOut = ["countAssets" => 0, "assetLimit" => 0];
+
+                    if ($site) {
+                        $SiteSettingsfor = SiteSettings::withTrashed()->where('code', $site)->first();
+                        if ($SiteSettingsfor) {
+                            $targetSiteId = $SiteSettingsfor->id;
+                            $dataOut["assetLimit"] = $SiteSettingsfor->asset_limit;
                         }
                     }
+
+                    // Build optimized query - get assets with IP (data_type_id 5,6)
+                    $query = Assets::select('assets.id')
+                        ->join('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')
+                        ->whereIn('assets_datas.data_type_id', [5, 6])
+                        ->where('assets.status', 1)
+                        ->whereIn('assets_datas.site_id', $site_id_active);
+
+                    // Apply site filters based on role and request
+                    if ($targetSiteId) {
+                        $query->where('assets.site_id', $targetSiteId);
+                    }
+                    if (!$isSuperAdmin && $site_id_arr) {
+                        $query->whereIn('assets.site_id', $site_id_arr);
+                    }
+
+                    // Get distinct asset IDs with IP data (single query)
+                    $assetIds = $query->distinct()->pluck('assets.id')->toArray();
+
+                    if (count($assetIds) > 0) {
+                        // Count domain entries (data_type_id 1,4) for these assets in ONE query with GROUP BY
+                        $domainCounts = AssetsData::selectRaw('asset_id, COUNT(*) as domain_count')
+                            ->whereIn('asset_id', $assetIds)
+                            ->whereIn('site_id', $site_id_active)
+                            ->whereIn('data_type_id', [1, 4])
+                            ->groupBy('asset_id')
+                            ->pluck('domain_count', 'asset_id')
+                            ->toArray();
+
+                        // Calculate total: if asset has domains, add domain count; otherwise add 1
+                        foreach ($assetIds as $assetId) {
+                            $domainCount = $domainCounts[$assetId] ?? 0;
+                            $dataOut["countAssets"] += ($domainCount > 0) ? $domainCount : 1;
+                        }
+                    }
+                    
                     $assets = $dataOut;
 
                     $data_transcation = json_encode($assets);
@@ -147,24 +138,44 @@ class ApiDashboardController extends ApiController
                     $get_role_custom = $data['data']['get_role_custom'];
                     $site = $data['data']['site'];
                     $user_id = $data['data']['user_id'];
-                    $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
-                    if (@$get_role_custom['superadmin'] == 1) {
-                        if (!$site) {
-                            $CVEMapping = CVEMapping::select('id')->count();
-                        } else {
-                            $site_id_m = SiteSettings::select('id')->where('code', $site)->first();
+                    $site_id_arr = $data['data']['site_id_arr'];
+                    
+                    $isSuperAdmin = @$get_role_custom['superadmin'] == 1;
+                    $CVEMapping = 0;
 
-                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id',$site_id_m->id)->select('namecve')->get();
-                            $CVEMapping = CVEMapping::select('id')->whereIn('namecve', $CVEMappingAssets_name)->count();
+                    if ($isSuperAdmin) {
+                        if (!$site) {
+                            // Superadmin, no site filter - count all CVE
+                            $CVEMapping = CVEMapping::distinct()->count('namecve');
+                        } else {
+                            // Superadmin with specific site - use JOIN instead of whereIn for speed
+                            $site_id_m = SiteSettings::where('code', $site)->first();
+                            if ($site_id_m) {
+                                $CVEMapping = CVEMapping::join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve')
+                                    ->where('data_datacve_mapping_assets.site_id', $site_id_m->id)
+                                    ->distinct()
+                                    ->count('data_datacve_mapping.namecve');
+                            }
                         }
                     } else {
+                        // Non-superadmin - use JOIN for better performance
                         if (!$site) {
-                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
-                            $CVEMapping = CVEMapping::select('id')->whereIn('namecve', $CVEMappingAssets_name)->count();
+                            // All sites user has access to
+                            if (!empty($site_id_arr)) {
+                                $CVEMapping = CVEMapping::join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve')
+                                    ->whereIn('data_datacve_mapping_assets.site_id', $site_id_arr)
+                                    ->distinct()
+                                    ->count('data_datacve_mapping.namecve');
+                            }
                         } else {
-                            $site_id_m = SiteSettings::select('id')->where('code',$site)->first();
-                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id',$site_id_m->id)->select('namecve')->get();
-                            $CVEMapping = CVEMapping::select('id')->whereIn('namecve', $CVEMappingAssets_name)->count();
+                            // Specific site (must be in user's allowed sites)
+                            $site_id_m = SiteSettings::where('code', $site)->first();
+                            if ($site_id_m && in_array($site_id_m->id, $site_id_arr)) {
+                                $CVEMapping = CVEMapping::join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve')
+                                    ->where('data_datacve_mapping_assets.site_id', $site_id_m->id)
+                                    ->distinct()
+                                    ->count('data_datacve_mapping.namecve');
+                            }
                         }
                     }
 
@@ -210,8 +221,10 @@ class ApiDashboardController extends ApiController
                     $site = $data['data']['site'];
                     $user_id = $data['data']['user_id'];
 
+                    $is_superadmin = is_array($get_role_custom) ? (@$get_role_custom['superadmin'] == 1) : ($get_role_custom == 1);
+
                     $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
-                    if (@$get_role_custom['superadmin'] == 1) {
+                    if ($is_superadmin) {
                         if (!$site) {
                             $DataLeakSocialRef = DataLeakSocialRef::select('id')->whereNull('deleted_at')->where('status', 1)->whereIn('feel_type', ['darkweb', 'webserver', 'server', 'compromise', 'compromised'])->count();
                         } else {
@@ -327,79 +340,52 @@ class ApiDashboardController extends ApiController
                     $site = $data['data']['site'];
                     $user_id = $data['data']['user_id'];
 
-                    $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
-                    if (@$get_role_custom['superadmin'] == 1) {
-                        if (!$site) {
-                            $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->groupBy('vendor', 'title')->get();
-                        } else {
-                            $site_id_m = SiteSettings::select('id')->where('code', $site)->first();
-                            $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $site_id_m->id)->where("active", '=', 1)->groupBy('vendor', 'title')->get();
-                        }
+                $is_superadmin = is_array($get_role_custom) ? (@$get_role_custom['superadmin'] == 1) : ($get_role_custom == 1);
+
+                $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->where('active', 1)->get();
+
+                $total_critical = [];
+                $total_high = [];
+                $total_medium = [];
+                $total_low = [];
+                $total_infomation  = [];
+                $result = [];
+
+                if ($is_superadmin) {
+                    if (!$site) {
+                        $cve_host_name_summarys_data = DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM sosecure_insight.fx_cve_host_name_summarys where site_id = 0 group by title');
                     } else {
-                        if (!$site) {
-                            $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
-                        } else {
-                            $site_id_m = SiteSettings::select('id')->where('code', $site)->first();
-                            $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $site_id_m->id)->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
-                        }
+                        $site_id_m = SiteSettings::select('id')->where('code', $site)->first();
+                        $cve_host_name_summarys_data = DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM sosecure_insight.fx_cve_host_name_summarys where site_id = ' . $site_id_m->id . ' group by title');
                     }
-
-                    $vendor = [];
-                    $title = [];
-                    foreach ($CVEAssets as $item) {
-                        $vendor[] = $item->vendor;
-                        $title[] = $item->title;
-                    }
-                    $DataCveven = DataCveven::select('namecve', 'title', DB::raw('count(*) as total'))->whereIn('vendor', $vendor)->whereIn('title', $title)->groupBy('namecve')->get();
-                    $namecve = [];
-                    $check_total_namecve = array();
-                    $host_name = [];
-                    foreach ($DataCveven as $item) {
-                        $namecve[] = $item->namecve;
-                        $check_total_namecve[] = collect([
-                            'total' => $item->total,
-                            'namecve' => $item->namecve,
-                            'title' => $item->title,
-                        ]);
-                    }
-
-                    $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
-                    $site_id_m = SiteSettings::select('id')->where('code', $site)->first();
-                    if (@$get_role_custom['superadmin'] == 1) {
-                        if(!$site) {
-                            $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $CVEMappingAssets_name)->groupBy('severity', 'namecve')->get();
-                        } else {
-                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id',$site_id_m->id)->select('namecve')->get();
-                            $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $namecve)->groupBy('severity', 'namecve')->get();
-                        }
+                } else {
+                    if (!$site) {
+                        $site_id_List = '(' . implode(',', $site_id_arr->pluck('site_id')->toArray()) . ')';
+                        $cve_host_name_summarys_data = DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM sosecure_insight.fx_cve_host_name_summarys where site_id in ' . $site_id_List . ' group by title');
                     } else {
-                        if(!$site) {
-                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
-                            $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $CVEMappingAssets_name)->groupBy('severity','namecve')->get();
-                        } else {
-                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id',$site_id_m->id)->whereIn('site_id',$site_id_arr)->select('namecve')->get();
-                            $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $CVEMappingAssets_name)->groupBy('severity','namecve')->get();
-                        }
+                        $site_id_m = SiteSettings::select('id')->where('code', $site)->first();
+                        $cve_host_name_summarys_data = DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM sosecure_insight.fx_cve_host_name_summarys where site_id = ' . $site_id_m->id . ' group by title');
                     }
+                }
 
-                    foreach ($CVEMapping as $value) {
-                        foreach ($check_total_namecve as $item) {
-                            if ($value->namecve == $item['namecve']) {
-                                $value['total'] = $item['total'];
-                                $value['title'] = $item['title'];
-                                $host_name[] = $item['title'];
-                            }
-                        }
-                    }
-                    $result = array();
-                    foreach ($host_name as $element) {
-                        $result[$element] = $element;
-                    }
+                foreach ($cve_host_name_summarys_data as $host_name) {
+                    $result[] = $host_name->title;
+                    $total_high[] = ($host_name->status_high > 0) ? (int)$host_name->status_high : 0;
+                    $total_critical[] = ($host_name->status_critical > 0) ? (int)$host_name->status_critical : 0;
+                    $total_medium[] = ($host_name->status_medium > 0) ? (int)$host_name->status_medium : 0;
+                    $total_low[] = ($host_name->status_low > 0) ? (int)$host_name->status_low : 0;
+                    $total_infomation[] = ($host_name->status_infomation > 0) ? (int)$host_name->status_infomation : 0;
+                }
 
-                    $response = array(
-                        'data' => $CVEMapping,
-                        'host_name' => $result,
-                    );
+                $response = [
+                    'host_name' => $result,
+                    'total_critical' => $total_critical,
+                    'total_high' => $total_high,
+                    'total_medium' => $total_medium,
+                    'total_low' => $total_low,
+                    'total_infomation' => $total_infomation,
+                    'side_code' => $site
+                ];
 
                     $data_transcation = json_encode($response);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
@@ -598,95 +584,111 @@ class ApiDashboardController extends ApiController
                     //     }
                     // }
 
-                    $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
-                    if(@get_role_custom()['superadmin'] == 1) 
-                    {
-                        
-                        if(!$site)
-                        {
-                            // $model = new CVEMapping;
-                            // $model->get();
-                            // $high = $model->where('severity', '=', 'HIGH')->count();
-                            // $medium = $model->where('severity', '=', 'MEDIUM')->count();
-                            // $critical = $model->where('severity', '=', 'CRITICAL')->count();
-                            // $low = $model->where('severity', '=', 'LOW')->count();
-                            // $none = $model->where('severity', '=', 'NONE')->count();
+                $is_superadmin = is_array($get_role_custom) ? (@$get_role_custom['superadmin'] == 1) : ($get_role_custom == 1);
 
-                            $query = $none = DB::table('summary')
-                                        ->where('status', 'Y')
-                                        ->whereIn('data_text', ['Information','Low', 'medium', 'high', 'critical'])
-                                        ->where('data_key_2', 'Vulnerability')
-                                        ->select('data_text', DB::raw('sum(data_value) as data_value'))
-                                        ->groupBy('data_text')
-                                        ->orderBy('data_text')
-                                        ->get();
+                $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
+                if ($is_superadmin) {
+                    if (!$site) {
+                        $query = DB::table('summary')
+                            ->where('status', 'Y')
+                            ->whereIn('data_text', ['Information', 'Low', 'medium', 'high', 'critical'])
+                            ->where('data_key_2', 'Vulnerability')
+                            ->select('data_text', DB::raw('sum(data_value) as data_value'))
+                            ->groupBy('data_text')
+                            ->orderBy('data_text')
+                            ->get();
 
-                            $none = intval($query[2]->data_value);
-                            $low = intval($query[3]->data_value);
-                            $medium = intval($query[4]->data_value);
-                            $high = intval($query[1]->data_value);
-                            $critical = intval($query[0]->data_value); 
-
+                        $none = 0; $low = 0; $medium = 0; $high = 0; $critical = 0;
+                        foreach ($query as $item) {
+                            $text = strtolower($item->data_text);
+                            if ($text == 'information') $none = intval($item->data_value);
+                            if ($text == 'low') $low = intval($item->data_value);
+                            if ($text == 'medium') $medium = intval($item->data_value);
+                            if ($text == 'high') $high = intval($item->data_value);
+                            if ($text == 'critical') $critical = intval($item->data_value);
                         }
-                        else
-                        {
+                    } else {
+                        $count = DB::table('summary')->where('data_key', 'dashboardnew')->where('site', $site)->count();
+                        if ($count > 0) {
+                            $query = DB::table('summary')
+                                ->where('site', $site)
+                                ->where('status', 'Y')
+                                ->whereIn('data_text', ['Information', 'Low', 'medium', 'high', 'critical'])
+                                ->where('data_key_2', 'Vulnerability')
+                                ->select('data_text', 'data_value')
+                                ->orderBy('data_text')
+                                ->get();
 
-                            $count= DB::table('summary')->where('data_key', 'dashboardnew')->where('site', $site)->count();
-
-                            if($count > 0){
-
-                                $query =  $none = DB::table('summary')
-                                        ->where('site', $site)
-                                        ->where('status', 'Y')
-                                        ->whereIn('data_text', ['Information','Low', 'medium', 'high', 'critical'])
-                                        ->where('data_key_2', 'Vulnerability')
-                                        ->select('data_text','data_value')
-                                        ->orderBy('data_text')
-                                        ->get();
-                                    
-                                $none = intval($query[2]->data_value);
-                                $low = intval($query[3]->data_value);
-                                $medium = intval($query[4]->data_value);
-                                $high = intval($query[1]->data_value);
-                                $critical = intval($query[0]->data_value);
-                                
-                            } else{
-                                $none = 0;
-                                $low = 0;
-                                $medium = 0;
-                                $high = 0;
-                                $critical = 0;
+                            $none = 0; $low = 0; $medium = 0; $high = 0; $critical = 0;
+                            foreach ($query as $item) {
+                                $text = strtolower($item->data_text);
+                                if ($text == 'information') $none = intval($item->data_value);
+                                if ($text == 'low') $low = intval($item->data_value);
+                                if ($text == 'medium') $medium = intval($item->data_value);
+                                if ($text == 'high') $high = intval($item->data_value);
+                                if ($text == 'critical') $critical = intval($item->data_value);
                             }
-
-                        }
-
-                    } 
-                    else 
-                    {
-                        if(!$site)
-                        {
-                            $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_arr)->select('namecve')->get();
-                            $model = new CVEMapping;
-                            $model->get();
-                            $high = $model->where('severity', '=', 'HIGH')->whereIn('namecve', $CVEMappingAssets_name)->count();
-                            $medium = $model->where('severity', '=', 'MEDIUM')->whereIn('namecve', $CVEMappingAssets_name)->count();
-                            $critical = $model->where('severity', '=', 'CRITICAL')->whereIn('namecve', $CVEMappingAssets_name)->count();
-                            $low = $model->where('severity', '=', 'LOW')->whereIn('namecve', $CVEMappingAssets_name)->count();
-                            $none = $model->where('severity', '=', 'NONE')->whereIn('namecve', $CVEMappingAssets_name)->count();
-                        }
-                        else
-                        {
-                            $site_id_m = SiteSettings::select('id')->where('code',$site)->first();
-                            $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_id_m->id)->select('namecve')->get();
-                            $model = new CVEMapping;
-                            $model->get();
-                            $high = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'HIGH')->count();
-                            $medium = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'MEDIUM')->count();
-                            $critical = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'CRITICAL')->count();
-                            $low = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'LOW')->count();
-                            $none = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'NONE')->count();
+                        } else {
+                            $none = 0;
+                            $low = 0;
+                            $medium = 0;
+                            $high = 0;
+                            $critical = 0;
                         }
                     }
+                } else {
+                    if (!$site) {
+                        $sites = SiteSettings::whereIn('id', $site_id_arr->pluck('site_id'))->pluck('code');
+                        $query = DB::table('summary')
+                            ->whereIn('site', $sites)
+                            ->where('status', 'Y')
+                            ->whereIn('data_text', ['Information', 'Low', 'medium', 'high', 'critical'])
+                            ->where('data_key_2', 'Vulnerability')
+                            ->select('data_text', DB::raw('sum(data_value) as data_value'))
+                            ->groupBy('data_text')
+                            ->orderBy('data_text')
+                            ->get();
+
+                        $none = 0; $low = 0; $medium = 0; $high = 0; $critical = 0;
+                        foreach ($query as $item) {
+                            $text = strtolower($item->data_text);
+                            if ($text == 'information') $none = intval($item->data_value);
+                            if ($text == 'low') $low = intval($item->data_value);
+                            if ($text == 'medium') $medium = intval($item->data_value);
+                            if ($text == 'high') $high = intval($item->data_value);
+                            if ($text == 'critical') $critical = intval($item->data_value);
+                        }
+                    } else {
+                        $site_code = SiteSettings::where('code', $site)->value('code');
+                        $count = DB::table('summary')->where('data_key', 'dashboardnew')->where('site', $site_code)->count();
+                        if ($count > 0) {
+                            $query = DB::table('summary')
+                                ->where('site', $site_code)
+                                ->where('status', 'Y')
+                                ->whereIn('data_text', ['Information', 'Low', 'medium', 'high', 'critical'])
+                                ->where('data_key_2', 'Vulnerability')
+                                ->select('data_text', 'data_value')
+                                ->orderBy('data_text')
+                                ->get();
+
+                            $none = 0; $low = 0; $medium = 0; $high = 0; $critical = 0;
+                            foreach ($query as $item) {
+                                $text = strtolower($item->data_text);
+                                if ($text == 'information') $none = intval($item->data_value);
+                                if ($text == 'low') $low = intval($item->data_value);
+                                if ($text == 'medium') $medium = intval($item->data_value);
+                                if ($text == 'high') $high = intval($item->data_value);
+                                if ($text == 'critical') $critical = intval($item->data_value);
+                            }
+                        } else {
+                            $none = 0;
+                            $low = 0;
+                            $medium = 0;
+                            $high = 0;
+                            $critical = 0;
+                        }
+                    }
+                }
 
                     $response = [
                         "count_high" => $high,
@@ -739,10 +741,12 @@ class ApiDashboardController extends ApiController
                     $endDate = $data['data']['endDate'];
                     $sitecode = $data['data']['sitecode'];
                     $pagename = $data['data']['pagename'];
-                    $get_role_custom = $data['data']['get_role_custom'];
-                    $site_id_arr = $data['data']['site_id_arr'];
+                $get_role_custom = $data['data']['get_role_custom'];
+                $site_id_arr = $data['data']['site_id_arr'];
 
-                    $site_1 = null;
+                $is_superadmin = is_array($get_role_custom) ? (@$get_role_custom['superadmin'] == 1) : ($get_role_custom == 1);
+
+                $site_1 = null;
 
                     $model = '';
                     $html = '';
@@ -779,25 +783,43 @@ class ApiDashboardController extends ApiController
                     $WebdefacmentSetting = array();
                     $TransactionScans = array();
                     if (!$pagename || $pagename == 'Vulnerability') {
-                        if (!$sitecode) {
-                            if (@check_permission_site_custom_api($data['data']['user_id'], 'vulnerabilities')) {
-                                $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_arr)->select('namecve')->get();
-                                $dataCVEMapping = CVEMapping::select('data_datacve_mapping.namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))->whereIn('data_datacve_mapping.namecve', $CVEMappingAssets_name)->whereBetween('data_datacve_mapping.created_at',array($date_start_datetime_format,$date_end_datetime_format));
-                                // if(isset($SiteSettings->id)){
-                                $dataCVEMapping = $dataCVEMapping->whereIn("cve_asset.site_id",$site_id_arr);
-                                // }
-                                $dataCVEMapping = $dataCVEMapping->leftjoin('data_datacve_mapping_assets as cve_asset', 'data_datacve_mapping.namecve', '=', 'cve_asset.namecve');
-                                $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'cve_asset.site_id', '=', 'site.id')->groupby(['cve_asset.namecve','cve_asset.site_id'])->get()->toArray();
-                            }
-                        } else {
-                            if (@check_permission_site_custom_api($data['data']['user_id'], 'vulnerabilities')) {
-                                $CVEMappingAssets_name = CVEMappingAssets::where('site_id',$SiteSettings->id)->whereIn('site_id', $site_id_arr)->select('namecve')->get();
-                                $dataCVEMapping = CVEMapping::select('data_datacve_mapping.namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))->whereIn('data_datacve_mapping.namecve', $CVEMappingAssets_name)->whereBetween('data_datacve_mapping.created_at',array($date_start_datetime_format,$date_end_datetime_format));
-                                // if(isset($SiteSettings->id)){
-                                $dataCVEMapping = $dataCVEMapping->where("cve_asset.site_id",$SiteSettings->id);
-                                // }
-                                $dataCVEMapping = $dataCVEMapping->leftjoin('data_datacve_mapping_assets as cve_asset', 'data_datacve_mapping.namecve', '=', 'cve_asset.namecve');
-                                $dataCVEMapping = $dataCVEMapping->leftjoin('site', 'cve_asset.site_id', '=', 'site.id')->groupby(['cve_asset.namecve','cve_asset.site_id'])->get()->toArray();
+                        if (@check_permission_site_custom_api($data['data']['user_id'], 'vulnerabilities')) {
+                            if ($is_superadmin) {
+                                if (!$sitecode) {
+                                    $dataCVEMapping = CVEMapping::select('data_datacve_mapping.namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))
+                                        ->whereBetween('data_datacve_mapping.created_at', [$date_start_datetime_format, $date_end_datetime_format])
+                                        ->leftjoin('data_datacve_mapping_assets as cve_asset', 'data_datacve_mapping.namecve', '=', 'cve_asset.namecve')
+                                        ->leftjoin('site', 'cve_asset.site_id', '=', 'site.id')
+                                        ->groupby(['cve_asset.namecve', 'cve_asset.site_id'])
+                                        ->get()->toArray();
+                                } else {
+                                    $dataCVEMapping = CVEMapping::select('data_datacve_mapping.namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))
+                                        ->whereBetween('data_datacve_mapping.created_at', [$date_start_datetime_format, $date_end_datetime_format])
+                                        ->leftjoin('data_datacve_mapping_assets as cve_asset', 'data_datacve_mapping.namecve', '=', 'cve_asset.namecve')
+                                        ->where('cve_asset.site_id', $SiteSettings->id)
+                                        ->leftjoin('site', 'cve_asset.site_id', '=', 'site.id')
+                                        ->groupby(['cve_asset.namecve', 'cve_asset.site_id'])
+                                        ->get()->toArray();
+                                }
+                            } else {
+                                if (!$sitecode) {
+                                    $dataCVEMapping = CVEMapping::select('data_datacve_mapping.namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))
+                                        ->whereBetween('data_datacve_mapping.created_at', [$date_start_datetime_format, $date_end_datetime_format])
+                                        ->leftjoin('data_datacve_mapping_assets as cve_asset', 'data_datacve_mapping.namecve', '=', 'cve_asset.namecve')
+                                        ->whereIn('cve_asset.site_id', $site_id_arr)
+                                        ->leftjoin('site', 'cve_asset.site_id', '=', 'site.id')
+                                        ->groupby(['cve_asset.namecve', 'cve_asset.site_id'])
+                                        ->get()->toArray();
+                                } else {
+                                    $dataCVEMapping = CVEMapping::select('data_datacve_mapping.namecve as content', 'data_datacve_mapping.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/monitoringvulnerabilitys") AS link , "Vulnerabilities" AS pagename'))
+                                        ->whereBetween('data_datacve_mapping.created_at', [$date_start_datetime_format, $date_end_datetime_format])
+                                        ->leftjoin('data_datacve_mapping_assets as cve_asset', 'data_datacve_mapping.namecve', '=', 'cve_asset.namecve')
+                                        ->where('cve_asset.site_id', $SiteSettings->id)
+                                        ->whereIn('cve_asset.site_id', $site_id_arr)
+                                        ->leftjoin('site', 'cve_asset.site_id', '=', 'site.id')
+                                        ->groupby(['cve_asset.namecve', 'cve_asset.site_id'])
+                                        ->get()->toArray();
+                                }
                             }
                         }
                     }
@@ -820,19 +842,12 @@ class ApiDashboardController extends ApiController
 
                     if (!$pagename || $pagename == 'Data Leak') {
                         if (@check_permission_site_custom_api($data['data']['user_id'], 'data_leak')) {
-                            if ($get_role_custom['superadmin'] == 1) { //|| @get_role_custom()['site_admin'] == 1
+                            if ($is_superadmin) { //|| @get_role_custom()['site_admin'] == 1
                                 if (!$sitecode) {
-                                    $DataLeakFeed_social = DataLeakFeedTemp::select('id', 'feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('status', 1)->whereIn('feed_type', 'social', 'darkweb_public')->whereBetween('created_at', array($date_start_datetime_format, $date_end_datetime_format))->get()->toArray();
+                                    $DataLeakFeed_social = DataLeakFeedTemp::select('id', 'feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('status', 1)->whereIn('feed_type', ['social', 'darkweb_public'])->whereBetween('created_at', array($date_start_datetime_format, $date_end_datetime_format))->get()->toArray();
                                     foreach ($DataLeakFeed_social as $key => $value) {
                                         $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->whereNull('deleted_at')->where('status', 1)->where('data_leak_feed_id', $value["id"])->first();
                                         if ($leak_socail_ref_temps) {
-                                            if (isset($SiteSettings->id)) {
-                                                $pos = strpos($leak_socail_ref_temps->site_id, $SiteSettings->id . "");
-                                                if ($pos === false) {
-                                                    unset($DataLeakFeed_social[$key]);
-                                                    continue;
-                                                }
-                                            }
                                             $site = SiteSettings::select('name')->whereIn('id', explode(",", $leak_socail_ref_temps->site_id))->get();
                                             $name_site = '';
                                             foreach ($site as $val) {
@@ -845,9 +860,9 @@ class ApiDashboardController extends ApiController
                                         }
                                     }
                                 } else {
-                                    $DataLeakFeed_social = DataLeakFeedTemp::select('id', 'feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('status', 1)->whereIn('feed_type', 'social', 'darkweb_public')->whereBetween('created_at', array($date_start_datetime_format, $date_end_datetime_format))->get()->toArray();
+                                    $DataLeakFeed_social = DataLeakFeedTemp::select('id', 'feedcontent as content', 'created_at as datetime', DB::raw(' "" as sitename,CONCAT("/socialdatas") AS link , "Data Leak" AS pagename'))->whereNull('deleted_at')->where('status', 1)->whereIn('feed_type', ['social', 'darkweb_public'])->whereBetween('created_at', array($date_start_datetime_format, $date_end_datetime_format))->get()->toArray();
                                     foreach ($DataLeakFeed_social as $key => $value) {
-                                        $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->whereNull('deleted_at')->where('status', 1)->where('data_leak_feed_id', $value["id"])->where('site_id', $SiteSettings->id)->first();
+                                        $leak_socail_ref_temps = leak_socail_ref_temp::select('site_id')->whereNull('deleted_at')->where('status', 1)->where('data_leak_feed_id', $value["id"])->first();
                                         if ($leak_socail_ref_temps) {
                                             if (isset($SiteSettings->id)) {
                                                 $pos = strpos($leak_socail_ref_temps->site_id, $SiteSettings->id . "");
@@ -951,7 +966,7 @@ class ApiDashboardController extends ApiController
 
                     if (!$pagename || $pagename == 'Compromised') {
                         if (@check_permission_site_custom_api($data['data']['user_id'], 'compromised')) {
-                            if ($get_role_custom['superadmin'] == 1) { //|| @get_role_custom()['site_admin'] == 1
+                            if ($is_superadmin) { //|| @get_role_custom()['site_admin'] == 1
                                 if (!$sitecode) {
                                     $DataLeakFeed_compromised = DataLeakFeed::select('data_leak_feed.source_name as content', 'data_leak_feed.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/darkweb-datas") AS link , "Compromised" AS pagename'))->whereNull('data_leak_feed.deleted_at')->whereNull('data_leak_socail_ref.deleted_at')->where('data_leak_feed.status', 1)->where('data_leak_socail_ref.status', 1)->whereIn('data_leak_feed.feel_type', ['darkweb', 'webserver', 'compromise', 'compromised'])->whereBetween('data_leak_feed.created_at', array($date_start_datetime_format, $date_end_datetime_format));
                                     $DataLeakFeed_compromised = $DataLeakFeed_compromised->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id')->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
@@ -995,28 +1010,16 @@ class ApiDashboardController extends ApiController
 
                     if (!$pagename || $pagename == 'Web Defacement') {
                         if (@check_permission_site_custom_api($data['data']['user_id'], 'web_defacement')) {
-                            if ($get_role_custom['superadmin'] == 1) { //|| @get_role_custom()['site_admin'] == 1
+                            if ($is_superadmin) { //|| @get_role_custom()['site_admin'] == 1
                                 if (!$sitecode) {
                                     $WebdefacmentSetting = WebdefacmentSetting::select('webdefacment_setting.name as content', 'webdefacment_setting.last_check as datetime', 'site.name as sitename', 'site.id as site_id', DB::raw('CONCAT("/webdefacement") AS link , "Web Defacement" AS pagename, CONCAT(fx_webdefacment_setting.name,"||",fx_webdefacment_setting.url,"||",fx_webdefacment_setting.status_val) AS content'))->whereNull('webdefacment_setting.deleted_at')->where('webdefacment_setting.active', 1)->where('webdefacment_setting.status_add', 1)->whereBetween('webdefacment_setting.created_at', array($date_start_datetime_format, $date_end_datetime_format));
-                                    // $WebdefacmentSetting = $WebdefacmentSetting->leftjoin('data_leak_socail_ref', 'data_leak_feed.id', '=', 'data_leak_socail_ref.data_leak_feed_id');
-                                    $WebdefacmentSetting = $WebdefacmentSetting->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
-
-                                    // if(isset($SiteSettings->id)){
-                                    //     $WebdefacmentSetting = $WebdefacmentSetting->where('site.id', $SiteSettings->id);
-                                    // } else {
-                                    // $WebdefacmentSetting = $WebdefacmentSetting->whereIn('site_id', $site_id_arr);
+                                    $WebdefacmentSetting = $WebdefacmentSetting->leftjoin('site', 'webdefacment_setting.site_id', '=', 'site.id');
                                     $WebdefacmentSetting = $WebdefacmentSetting->get()->toArray();
-                                    // }
                                 } else {
                                     $WebdefacmentSetting = WebdefacmentSetting::select('webdefacment_setting.name as content', 'webdefacment_setting.last_check as datetime', 'site.name as sitename', 'site.id as site_id', DB::raw('CONCAT("/webdefacement") AS link , "Web Defacement" AS pagename, CONCAT(fx_webdefacment_setting.name,"||",fx_webdefacment_setting.url,"||",fx_webdefacment_setting.status_val) AS content'))->whereNull('webdefacment_setting.deleted_at')->where('webdefacment_setting.active', 1)->where('webdefacment_setting.status_add', 1)->whereBetween('webdefacment_setting.created_at', array($date_start_datetime_format, $date_end_datetime_format));
-                                    $WebdefacmentSetting = $WebdefacmentSetting->leftjoin('site', 'data_leak_socail_ref.site_id', '=', 'site.id');
-
-                                    // if(isset($SiteSettings->id)){
-                                    //     $DataLeakFeed_compromised = $DataLeakFeed_compromised->where('site.id', $SiteSettings->id);
-                                    // } else {
-                                    $DataLeakFeed_compromised = $DataLeakFeed_compromised->where('site.id', $SiteSettings->id);
-                                    $DataLeakFeed_compromised = $DataLeakFeed_compromised->get()->toArray();
-                                    // }
+                                    $WebdefacmentSetting = $WebdefacmentSetting->leftjoin('site', 'webdefacment_setting.site_id', '=', 'site.id');
+                                    $WebdefacmentSetting = $WebdefacmentSetting->where('site.id', $SiteSettings->id);
+                                    $WebdefacmentSetting = $WebdefacmentSetting->get()->toArray();
                                 }
                             } else {
                                 if (!$sitecode) {
@@ -1043,7 +1046,7 @@ class ApiDashboardController extends ApiController
 
                     if (!$pagename || $pagename == 'assets') {
                         if (@check_permission_site_custom_api($data['data']['user_id'], 'assets')) {
-                            if ($get_role_custom['superadmin'] == 1) { //|| @get_role_custom()['site_admin'] == 1
+                            if ($is_superadmin) { //|| @get_role_custom()['site_admin'] == 1
                                 if (!$sitecode) {
                                     // $TransactionTimeStampScans = TransactionTimeStampScans::where('code', $SiteSettings->code)->first();
 
@@ -1170,315 +1173,93 @@ class ApiDashboardController extends ApiController
                     $site = $data['data']['site'];
                     $user_id = $data['data']['user_id'];
 
-                    $site_id_active = SiteSettings::select('id')->where('active', 1)->whereNull('deleted_at')->get()->pluck('id')->toArray(); 
-                    $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->whereIn('site_id',$site_id_active)->where('active', 1)->get();
-                    if ($get_role_custom == 1) {
-                        if (!$site) {
-                            $assets = [];
-                            $Assets_data = Assets::where('status', 1)->get();
-                            foreach ($Assets_data as $key => $value) {
-                                $AssetsData_data = AssetsData::where('site_id', $value->site_id)->whereIn('site_id',$site_id_active)->where('asset_id', $value->id)->where('status', 1)->get();
-                                $Domain_list = [];
-                                $IP_List = [];
-                                foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
-                                    if ($AssetsData_datavalue->data_type_id == 1 || $AssetsData_datavalue->data_type_id == 4) {
-                                        //Domain
-                                        array_push($Domain_list, $AssetsData_datavalue);
-                                    } elseif ($AssetsData_datavalue->data_type_id == 5 || $AssetsData_datavalue->data_type_id == 6) {
-                                        //IP Asset
-                                        array_push($IP_List, $AssetsData_datavalue);
-                                    } else {
+                    $site_id_active = SiteSettings::select('id')->where('active', 1)->whereNull('deleted_at')->pluck('id')->toArray();
+                    
+                    $is_superadmin = is_array($get_role_custom) ? (@$get_role_custom['superadmin'] == 1) : ($get_role_custom == 1);
 
-                                    }
-                                }
-
-                                foreach ($IP_List as $IP_Listkey => $IP_Listvalue) {
-                                    $CPE_Data = CPE::where('asset_id', $IP_Listvalue->id)->get();
-                                    $CPE_List = array();
-                                    foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
-                                        array_push($CPE_List, $CPE_Datavalue->result . ' : ' . $CPE_Datavalue->os_type);
-
-                                    }
-                                    if (count($Domain_list) == 0) {
-                                        $Assets_data_list = array();
-                                        $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first();
-                                        // $Assets_data_list['site'] = $site->name;
-                                        $Assets_data_list['host'] = "None";
-                                        $Assets_data_list['value'] = $IP_Listvalue->value;
-                                        $Assets_data_list['port'] = "None";
-                                        array_push($assets, $Assets_data_list);
-                                    } else {
-                                        foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
-                                            $Assets_data_list = array();
-                                            $port = '';
-                                            $num_main = 1;
-                                            $port_all = FXAssetsPort::
-                                                            select('port')
-                                                            ->where('site_id', $IP_Listvalue->site_id)
-                                                            ->where('asset_name', $IP_Listvalue->value)
-                                                            ->get(); 
-                                            $count_port = count($port_all);
-                                            
-                                            if($count_port > 0)
-                                            {
-                                                foreach($port_all as $data_port)
-                                                {
-                                                    if($count_port == $num_main)
-                                                    {
-                                                        $port = $port.$data_port->port;
-                                                    }
-                                                    else
-                                                    {
-                                                        $port = $port.$data_port->port.',';
-                                                    }
-                                                    $num_main++;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                $port = " - ";
-                                            }
-
-                                            $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first();
-                                            // $Assets_data_list['site'] = $site->name;
-                                            $Assets_data_list['host'] = $Domain_listvalue->value;
-                                            $Assets_data_list['value'] = $IP_Listvalue->value;
-                                            $Assets_data_list['port'] = $port;
-                                            array_push($assets, $Assets_data_list);
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-                            $site_id_m = SiteSettings::select('id')->where('code', $site)->first();
-                            $assets = [];
-                            $Assets_data = Assets::where('status', 1)->get();
-                            foreach ($Assets_data as $key => $value) {
-                                $AssetsData_data = AssetsData::where('site_id', $site_id_m->id)->whereIn('site_id',$site_id_active)->where('asset_id', $value->id)->where('status', 1)->get();
-                                $Domain_list = [];
-                                $IP_List = [];
-                                foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
-                                    if ($AssetsData_datavalue->data_type_id == 1 || $AssetsData_datavalue->data_type_id == 4) {
-                                        //Domain
-                                        array_push($Domain_list, $AssetsData_datavalue);
-                                    } elseif ($AssetsData_datavalue->data_type_id == 5 || $AssetsData_datavalue->data_type_id == 6) {
-                                        //IP Asset
-                                        array_push($IP_List, $AssetsData_datavalue);
-                                    } else {
-
-                                    }
-                                }
-
-                                foreach ($IP_List as $IP_Listkey => $IP_Listvalue) {
-                                    $CPE_Data = CPE::where('asset_id', $IP_Listvalue->id)->get();
-                                    $CPE_List = array();
-                                    foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
-                                        array_push($CPE_List, $CPE_Datavalue->result . ' : ' . $CPE_Datavalue->os_type);
-
-                                    }
-                                    if (count($Domain_list) == 0) {
-                                        $Assets_data_list = array();
-                                        $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first();
-                                        // $Assets_data_list['site'] = $site->name;
-                                        $Assets_data_list['host'] = "None";
-                                        $Assets_data_list['value'] = $IP_Listvalue->value;
-                                        $Assets_data_list['port'] = "None";
-                                        array_push($assets, $Assets_data_list);
-                                    } else {
-                                        foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
-                                            $Assets_data_list = array();
-                                            $port = '';
-                                            $num_main = 1;
-                                            $port_all = FXAssetsPort::
-                                                            select('port')
-                                                            ->where('site_id', $IP_Listvalue->site_id)
-                                                            ->where('asset_name', $IP_Listvalue->value)
-                                                            ->get(); 
-                                            $count_port = count($port_all);
-                                            
-                                            if($count_port > 0)
-                                            {
-                                                foreach($port_all as $data_port)
-                                                {
-                                                    if($count_port == $num_main)
-                                                    {
-                                                        $port = $port.$data_port->port;
-                                                    }
-                                                    else
-                                                    {
-                                                        $port = $port.$data_port->port.',';
-                                                    }
-                                                    $num_main++;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                $port = " - ";
-                                            }
-
-                                            $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first();
-                                            // $Assets_data_list['site'] = $site->name;
-                                            $Assets_data_list['host'] = $Domain_listvalue->value;
-                                            $Assets_data_list['value'] = $IP_Listvalue->value;
-                                            $Assets_data_list['port'] = $port;
-                                            array_push($assets, $Assets_data_list);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
+                    // Determine accessible sites
+                    if ($is_superadmin) {
+                        $allowed_sites = $site ? SiteSettings::where('code', $site)->pluck('id')->toArray() : $site_id_active;
                     } else {
-                        if (!$site) {
-                            $assets = [];
+                        $user_sites = UserSite::where('user_id', $user_id)->where('active', 1)->pluck('site_id')->toArray();
+                        $user_active_sites = array_intersect($user_sites, $site_id_active);
+                        if ($site) {
+                            $target_site = SiteSettings::where('code', $site)->first();
+                            $allowed_sites = ($target_site && in_array($target_site->id, $user_active_sites)) ? [$target_site->id] : [];
+                        } else {
+                            $allowed_sites = $user_active_sites;
+                        }
+                    }
 
-                            $Assets_data = Assets::whereIn('site_id', $site_id_arr)->where('status', 1)->get();
-                            foreach ($Assets_data as $key => $value) {
-                                $AssetsData_data = AssetsData::where('site_id', $value->site_id)->whereIn('site_id',$site_id_active)->where('asset_id', $value->id)->where('status', 1)->get();
-                                $Domain_list = [];
-                                $IP_List = [];
-                                foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
-                                    if ($AssetsData_datavalue->data_type_id == 1 || $AssetsData_datavalue->data_type_id == 4) {
-                                        //Domain
-                                        array_push($Domain_list, $AssetsData_datavalue);
-                                    } elseif ($AssetsData_datavalue->data_type_id == 5 || $AssetsData_datavalue->data_type_id == 6) {
-                                        //IP Asset
-                                        array_push($IP_List, $AssetsData_datavalue);
-                                    } else {
+                    $assets = [];
 
-                                    }
-                                }
+                    if (!empty($allowed_sites)) {
+                        // Get all active assets for allowed sites
+                        $assets_list = Assets::where('status', 1)->whereIn('site_id', $allowed_sites)->pluck('id')->toArray();
 
-                                foreach ($IP_List as $IP_Listkey => $IP_Listvalue) {
-                                    $CPE_Data = CPE::where('asset_id', $IP_Listvalue->id)->get();
-                                    $CPE_List = array();
-                                    foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
-                                        array_push($CPE_List, $CPE_Datavalue->result . ' : ' . $CPE_Datavalue->os_type);
+                        if (!empty($assets_list)) {
+                            // Bulk fetch core data
+                            $assets_data = AssetsData::whereIn('asset_id', $assets_list)->where('status', 1)->get();
+                            
+                            $ip_assets = [];
+                            $domain_assets = [];
 
-                                    }
-                                    if (count($Domain_list) == 0) {
-                                        $Assets_data_list = array();
-                                        $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first();
-                                        // $Assets_data_list['site'] = $site->name;
-                                        $Assets_data_list['host'] = "None";
-                                        $Assets_data_list['value'] = $IP_Listvalue->value;
-                                        $Assets_data_list['port'] = "None";
-                                        array_push($assets, $Assets_data_list);
-                                    } else {
-                                        foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
-                                            $Assets_data_list = array();
-                                            $port = '';
-                                            $num_main = 1;
-                                            $port_all = FXAssetsPort::
-                                                            select('port')
-                                                            ->where('site_id', $IP_Listvalue->site_id)
-                                                            ->where('asset_name', $IP_Listvalue->value)
-                                                            ->get(); 
-                                            $count_port = count($port_all);
-                                            
-                                            if($count_port > 0)
-                                            {
-                                                foreach($port_all as $data_port)
-                                                {
-                                                    if($count_port == $num_main)
-                                                    {
-                                                        $port = $port.$data_port->port;
-                                                    }
-                                                    else
-                                                    {
-                                                        $port = $port.$data_port->port.',';
-                                                    }
-                                                    $num_main++;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                $port = " - ";
-                                            }
-
-                                            $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first();
-                                            // $Assets_data_list['site'] = $site->name;
-                                            $Assets_data_list['host'] = $Domain_listvalue->value;
-                                            $Assets_data_list['value'] = $IP_Listvalue->value;
-                                            $Assets_data_list['port'] = $port;
-                                            array_push($assets, $Assets_data_list);
-                                        }
-                                    }
+                            // Segregate data types
+                            foreach ($assets_data as $ad) {
+                                if (in_array($ad->data_type_id, [1, 4])) {
+                                    $domain_assets[$ad->asset_id][] = $ad;
+                                } elseif (in_array($ad->data_type_id, [5, 6])) {
+                                    $ip_assets[$ad->asset_id][] = $ad;
                                 }
                             }
-                        } else {
-                            $site_id_m = SiteSettings::select('id')->where('code', $site)->first();
-                            $assets = [];
-                            $Assets_data = Assets::whereIn('site_id', $site_id_arr)->where('site_id', $site_id_m->id)->where('status', 1)->get();
-                            foreach ($Assets_data as $key => $value) {
-                                $AssetsData_data = AssetsData::where('site_id', $site_id_m->id)->whereIn('site_id',$site_id_active)->where('asset_id', $value->id)->where('status', 1)->get();
-                                $Domain_list = [];
-                                $IP_List = [];
-                                foreach ($AssetsData_data as $AssetsData_datakey => $AssetsData_datavalue) {
-                                    if ($AssetsData_datavalue->data_type_id == 1 || $AssetsData_datavalue->data_type_id == 4) {
-                                        //Domain
-                                        array_push($Domain_list, $AssetsData_datavalue);
-                                    } elseif ($AssetsData_datavalue->data_type_id == 5 || $AssetsData_datavalue->data_type_id == 6) {
-                                        //IP Asset
-                                        array_push($IP_List, $AssetsData_datavalue);
-                                    } else {
 
-                                    }
+                            // Pre-fetch site names
+                            $siteNames = SiteSettings::whereIn('id', $allowed_sites)->pluck('name', 'id')->toArray();
+
+                            // Collect IP names/values for port fetching to do massive IN query
+                            $ip_values = [];
+                            foreach ($ip_assets as $ips) {
+                                foreach ($ips as $ip) {
+                                    $ip_values[] = $ip->value;
                                 }
+                            }
+                            
+                            // Bulk fetch Ports mapping
+                            $ports_map = [];
+                            if (!empty($ip_values)) {
+                                $ports = FXAssetsPort::whereIn('site_id', $allowed_sites)->whereIn('asset_name', $ip_values)->get();
+                                foreach ($ports as $p) {
+                                    $ports_map[$p->site_id][$p->asset_name][] = $p->port;
+                                }
+                            }
 
-                                foreach ($IP_List as $IP_Listkey => $IP_Listvalue) {
-                                    $CPE_Data = CPE::where('asset_id', $IP_Listvalue->id)->get();
-                                    $CPE_List = array();
-                                    foreach ($CPE_Data as $CPE_Datakey => $CPE_Datavalue) {
-                                        array_push($CPE_List, $CPE_Datavalue->result . ' : ' . $CPE_Datavalue->os_type);
-
-                                    }
-                                    if (count($Domain_list) == 0) {
-                                        $Assets_data_list = array();
-                                        $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first();
-                                        // $Assets_data_list['site'] = $site->name;
-                                        $Assets_data_list['host'] = "None";
-                                        $Assets_data_list['value'] = $IP_Listvalue->value;
-                                        $Assets_data_list['port'] = "None";
-                                        array_push($assets, $Assets_data_list);
+                            // Assemble Output
+                            foreach ($ip_assets as $asset_id => $ips) {
+                                foreach ($ips as $ip_data) {
+                                    $domains = $domain_assets[$asset_id] ?? [];
+                                    $site_name = $siteNames[$ip_data->site_id] ?? "Unknown";
+                                    
+                                    if (empty($domains)) {
+                                        $assets[] = [
+                                            // 'site' => $site_name,
+                                            'host' => 'None',
+                                            'value' => $ip_data->value,
+                                            'port' => 'None'
+                                        ];
                                     } else {
-                                        foreach ($Domain_list as $Domain_listkey => $Domain_listvalue) {
-                                            $Assets_data_list = array();
-                                            $port = '';
-                                            $num_main = 1;
-                                            $port_all = FXAssetsPort::
-                                                            select('port')
-                                                            ->where('site_id', $IP_Listvalue->site_id)
-                                                            ->where('asset_name', $IP_Listvalue->value)
-                                                            ->get(); 
-                                            $count_port = count($port_all);
-                                            
-                                            if($count_port > 0)
-                                            {
-                                                foreach($port_all as $data_port)
-                                                {
-                                                    if($count_port == $num_main)
-                                                    {
-                                                        $port = $port.$data_port->port;
-                                                    }
-                                                    else
-                                                    {
-                                                        $port = $port.$data_port->port.',';
-                                                    }
-                                                    $num_main++;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                $port = " - ";
+                                        foreach ($domains as $domain_data) {
+                                            $port_str = " - ";
+                                            $found_ports = $ports_map[$ip_data->site_id][$ip_data->value] ?? [];
+                                            if (!empty($found_ports)) {
+                                                $port_str = implode(',', $found_ports);
                                             }
 
-                                            $site = SiteSettings::select('name')->where('id', $IP_Listvalue->site_id)->withTrashed()->first();
-                                            // $Assets_data_list['site'] = $site->name;
-                                            $Assets_data_list['host'] = $Domain_listvalue->value;
-                                            $Assets_data_list['value'] = $IP_Listvalue->value;
-                                            $Assets_data_list['port'] = $port;
-                                            array_push($assets, $Assets_data_list);
+                                            $assets[] = [
+                                                // 'site' => $site_name,
+                                                'host' => $domain_data->value,
+                                                'value' => $ip_data->value,
+                                                'port' => $port_str
+                                            ];
                                         }
                                     }
                                 }

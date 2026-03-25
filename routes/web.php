@@ -97,6 +97,7 @@ Route::get('/feed/indicators.csv', 'SearchController@sslBlacklist')->name('searc
 
 Route::get('/feeds/manifest.json', [MISPFeedController::class, 'generateDirectoryManifest']);
 Route::get('/feeds/list/manifest.json', [MISPFeedController::class, 'listFeeds']);
+Route::get('/feeds/list/{uuid}.json', [MISPFeedController::class, 'generateJsonFeed']);
 Route::get('/feeds/{uuid}.json', [MISPFeedController::class, 'generateJsonFeed']);
 Route::get('/feeds/{uuid}/manifest.json', [MISPFeedController::class, 'generateManifest']);
 // // Route::get('/feeds/list', [MISPFeedController::class, 'listFeeds']);

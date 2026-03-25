@@ -39,6 +39,10 @@ use Modules\Users\Entities\User;
 use Modules\WebDefacement\Entities\WebdefacmentDataCheck;
 use Modules\WebDefacement\Entities\WebdefacmentDataOriginal;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
+use Modules\WebDefacement\Entities\WebdefacmentStatDaily;
+use App\Mail\DefacementAlertMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Symfony\Polyfill\Intl\Idn\Resources\unidata\Regex;
 use App\Console\Commands\compareImages;
 
@@ -248,12 +252,19 @@ class ApiWebdefacementController extends ApiController
                     }
                     $WebdefacmentSetting = $WebdefacmentSetting->first();
 
+                    if(!$WebdefacmentSetting){
+                        $response = ['error' => 'Web Defacement not found', 'status_code' => '404', 'debug_payload' => $data['data'], 'source' => 'web_defacement_detail'];
+                        $data_transcation = json_encode($response);
+                        $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
+                        return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                    }
+
                     $response = [
                         "code" => @$code,
                         "webdefacement" => $WebdefacmentSetting,
-                        "webdefacment_data_original" => $WebdefacmentSetting->get_webdefacment_data_original_detail[0],
-                        "webdefacment_data_check" =>$WebdefacmentSetting->get_webdefacment_data_check_detail[0],
-                        "webdefacment_data_log" => $WebdefacmentSetting->get_webdefacment_data_log_detail,
+                        "webdefacment_data_original" => @$WebdefacmentSetting->get_webdefacment_data_original_detail[0],
+                        "webdefacment_data_check" => @$WebdefacmentSetting->get_webdefacment_data_check_detail[0],
+                        "webdefacment_data_log" => @$WebdefacmentSetting->get_webdefacment_data_log_detail,
                         "site_code" => @$site_code,
                     ];
 
@@ -666,12 +677,15 @@ return $result_json_e;
                     $html_b = @$webdefacement->blacklist_keyword_content;
                     $html_l = $webdefacement_original->last_update;
 
+                    $html_h2 = $webdefacement->baseline_merkle;
+
                     $response = [
                         "html_h" => @$html_h,
                         "html_f" => $html_f,
                         "html_e" => @$html_e,
                         "html_b" => @$html_b,
                         "html_l" => @$html_l,
+                        "html_h2" => @$html_h2,
                     ];
 
                     $data_transcation = json_encode($response);
@@ -765,12 +779,14 @@ return $result_json_e;
                     $id = $data['data']['id'];
 
                     $webdefacement = WebdefacmentSetting::where('id', $id)->first();
-                    $webdefacement_check = WebdefacmentDataCheck::where('webdefacment_setting_id', $id)->first();
+                    $webdefacement_check = WebdefacmentDataCheck::where('webdefacment_setting_id', $id)->latest()->first();
                     $html_h = @$webdefacement_check->hash_new;
                     $html_f = @formatSizeUnits(@$webdefacement_check->filesize_new) . ' (Difference ' . @$webdefacement_check->filesize_percent . '%)';
                     $html_e = @$webdefacement_check->element_new;
                     $html_b = @$webdefacement->blacklist_keyword_current;
                     $html_l = @$webdefacement_check->last_update;
+
+                    $html_h2 = @$webdefacement_check->merkle_new;
 
                     $response = [
                         "html_h" => @$html_h,
@@ -778,6 +794,7 @@ return $result_json_e;
                         "html_e" => @$html_e,
                         "html_b" => @$html_b,
                         "html_l" => @$html_l,
+                        "html_h2" => @$html_h2,
                     ];
 
                     $data_transcation = json_encode($response);
@@ -900,8 +917,18 @@ return $result_json_e;
                     $data2 = WebdefacmentSetting::where('id', $webdefacment_id)->first();
                     $data2->webdeflacement_progress = 1;
                     $data2->status_val = 'Normal';
-                    
+                    $data2->is_alert_sent = 0;
                     $data2->save();
+
+                    $data_update = WebdefacmentDataCheck::where('webdefacment_setting_id', $webdefacment_id)->first();
+                    if($data_update) {
+                        $data_update->hash_percent = 0;
+                        $data_update->filesize_percent = 0;
+                        $data_update->element_percent = 0;
+                        $data_update->image_percent = 0;
+                        $data_update->keyword_percent = 0;
+                        $data_update->save();
+                    }
 
                     $webdefacement = WebdefacmentSetting::where('id', $webdefacment_id)->first();
 
@@ -928,6 +955,323 @@ return $result_json_e;
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
             );
+            return response()->json($response);
+        }
+    }
+
+    public function web_defacement_check_status(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'web_defacement'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $url = trim($data['data']['url']);
+                    $id = $data['data']['id'];
+
+                    if (empty($url)) {
+                        $response = ['status_code' => 0, 'status_text' => 'URL is empty'];
+                        $data_transcation = json_encode($response);
+                        $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+                        return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                    }
+
+                    if (!preg_match('/^https?:\/\//i', $url)) {
+                        $url = 'http://' . $url;
+                    }
+
+                    $ch = curl_init($url);
+                    curl_setopt($ch, CURLOPT_NOBODY, true);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_exec($ch);
+                    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+
+                    $web_chk = WebdefacmentSetting::where('url', $url)->where('id', $id)->first();
+
+                    if (!$web_chk) {
+                        $response = ['status_code' => $http_code, 'status_text' => 'Setting not found', 'url' => $url, 'id' => $id];
+                    } else {
+                        if ($http_code == 200) {
+                            $web_chk->webdeflacement_progress = 1;
+                            $web_chk->web_status = 'up';
+                            $web_chk->is_alert_sent = 0;
+                            $web_chk->updated_at = now();
+                        } else {
+                            $web_chk->webdeflacement_progress = 3;
+                            $web_chk->web_status = 'down';
+                        }
+                        $web_chk->save();
+
+                        $response = ['url' => $url, 'id' => $id, 'status_code' => $http_code, 'web_status' => $web_chk->web_status];
+                    }
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array('status_code' => 500, 'message' => $e->getMessage());
+            return response()->json($response);
+        }
+    }
+
+    public function web_defacement_alert_to_customer(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'web_defacement'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $setting_id = $data['data']['id'];
+                    $setting = WebdefacmentSetting::find($setting_id);
+                    if (!$setting) {
+                        $response = ['success' => false, 'message' => 'Setting not found.'];
+                        $data_transcation = json_encode($response);
+                        $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+                        return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                    }
+
+                    $table = (new WebdefacmentSetting)->getTable();
+                    $updated = DB::table($table)
+                        ->where('id', $setting->id)
+                        ->where(function ($q) {
+                            $q->whereNull('alert_sent_customer_at')
+                                ->orWhere('alert_sent_customer_at', '<=', DB::raw('DATE_SUB(NOW(), INTERVAL 1 HOUR)'));
+                        })
+                        ->update([
+                            'alert_sent_customer_at' => now(),
+                            'is_alert_sent_customer' => 1,
+                            'updated_at' => now(),
+                        ]);
+
+                    if ($updated === 0) {
+                        $retryAt = $setting->alert_sent_customer_at
+                            ? Carbon::parse($setting->alert_sent_customer_at)->addHour()->format('d-m-Y H:i:s')
+                            : null;
+                        $response = [
+                            'success' => false,
+                            'message' => $retryAt ? "This defacement was alerted recently. Try again after" : "This defacement was alerted recently. Try again later.",
+                            'retryAt' => $retryAt
+                        ];
+                    } else {
+                        $emails = DB::table('site_config_email_alert_defacement_customer')
+                            ->where('site_id', $setting->site_id)
+                            ->pluck('email')->filter()->unique()->values()->all();
+
+                        if (empty($emails)) {
+                            $response = ['success' => false, 'message' => 'No recipient email configured.'];
+                        } else {
+                            Mail::to($emails)->send(new DefacementAlertMail($setting));
+                            $setting->is_alert_sent_customer = true;
+                            $setting->alert_sent_customer_at = now();
+                            $setting->save();
+                            $response = ['success' => true, 'message' => 'Alert sent To Customer successfully.'];
+                        }
+                    }
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array('status_code' => 500, 'message' => $e->getMessage());
+            return response()->json($response);
+        }
+    }
+
+    public function web_defacement_show_diff_hash(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'web_defacement'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $w_id = $data['data']['id'];
+                    $chk_data = WebdefacmentDataCheck::where('webdefacment_setting_id', $w_id)->latest()->first();
+
+                    if($chk_data) {
+                        $response = [
+                            'success' => true,
+                            'merkle_old' => $chk_data->merkle_old,
+                            'merkle_new' => $chk_data->merkle_new,
+                            'simhash_bits' => $chk_data->simhash_bits,
+                            'section_diffs' => $chk_data->section_diffs,
+                            'assets_add' => $chk_data->assets_add ? $chk_data->assets_add : [],
+                            'assets_del' => $chk_data->assets_del ? $chk_data->assets_del : [],
+                            'outbound_new' => $chk_data->outbound_new_not_whitelisted ? $chk_data->outbound_new_not_whitelisted : [],
+                        ];
+                    } else {
+                        $response = ['success' => false, 'message' => 'No data found.'];
+                    }
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Exception $e) {
+            $response = array('status_code' => 500, 'message' => $e->getMessage());
+            return response()->json($response);
+        }
+    }
+
+    public function web_defacement_export_report(Request $request){
+        try{
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request -> data;
+            $data = $this -> dataFalse($header, $mode, $data_request);
+            if($data === false){
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }else{ 
+                if($data['data']['menu'] !== 'web_defacement'){
+                    return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+                }else{
+                    $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    if($auth_site['status_code'] !== '200'){
+                        return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+                    }
+
+                    $webdefacementId = $data['data']['webdefacement_id'] ?? $data['data']['id'] ?? null;
+                    $startDate = $data['data']['start_date'] ?? null;
+                    $endDate = $data['data']['end_date'] ?? null;
+
+                    if (empty($webdefacementId) || empty($startDate) || empty($endDate)) {
+                        $response = ['error' => 'Missing required parameters', 'status_code' => '400', 'received_keys' => array_keys($data['data'])];
+                        $data_transcation = json_encode($response);
+                        $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+                        return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                    }
+
+                    $webdefacement = WebdefacmentSetting::find($webdefacementId);
+                    if (!$webdefacement) {
+                        $response = ['error' => 'Web Defacement not found', 'status_code' => '404', 'debug_payload' => $data['data']];
+                        $data_transcation = json_encode($response);
+                        $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+                        return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                    }
+
+                    $stats = WebdefacmentStatDaily::where('webdefacement_id', $webdefacementId)
+                        ->whereBetween('date', [$startDate, $endDate])
+                        ->orderBy('date', 'asc')
+                        ->get();
+
+                    if ($stats->isEmpty()) {
+                        $response = ['error' => 'No data available for the selected date range.', 'status_code' => '404'];
+                        $data_transcation = json_encode($response);
+                        $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+                        return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                    }
+
+                    $filename = 'WebDefacement_Report_' . preg_replace('/[^a-zA-Z0-9]/', '_', $webdefacement->name) . '_' . $startDate . '_to_' . $endDate . '.csv';
+
+                    // Build CSV content in memory
+                    $handle = fopen('php://temp', 'r+');
+                    fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+                    $startDateFormatted = \Carbon\Carbon::parse($startDate)->format('d/m/Y');
+                    $endDateFormatted = \Carbon\Carbon::parse($endDate)->format('d/m/Y');
+
+                    fputcsv($handle, ['Name', $webdefacement->name]);
+                    fputcsv($handle, ['URL', $webdefacement->url]);
+                    fputcsv($handle, ['Domain', $webdefacement->domain]);
+                    fputcsv($handle, ['Site', $webdefacement->get_site->name ?? 'N/A']);
+                    fputcsv($handle, ['Report Period', $startDateFormatted . ' to ' . $endDateFormatted]);
+                    fputcsv($handle, ['Export At', now()->format('d/m/Y H:i:s')]);
+                    fputcsv($handle, ['']);
+                    fputcsv($handle, ['No', 'Date', 'Web Status', 'Status', 'Last Online', 'Last Check', 'Score']);
+
+                    $no = 1;
+                    foreach ($stats as $stat) {
+                        $dateFormatted = '';
+                        $dateWithTime = '';
+                        if (!empty($stat->date)) {
+                            $dateFormatted = \Carbon\Carbon::parse($stat->date)->format('d/m/Y');
+                            $dateWithTime = \Carbon\Carbon::parse($stat->date)->format('d/m/Y') . ' 23:59:59';
+                        }
+
+                        $webStatusDisplay = '';
+                        $rawStatus = strtolower($webdefacement->web_status ?? '');
+                        if ($rawStatus === 'up') {
+                            $webStatusDisplay = 'Online';
+                        } elseif ($rawStatus === 'down') {
+                            $webStatusDisplay = 'Offline';
+                        } else {
+                            $webStatusDisplay = $webdefacement->web_status ?? '';
+                        }
+
+                        fputcsv($handle, [
+                            $no++,
+                            $dateFormatted,
+                            $webStatusDisplay,
+                            $stat->max_status ?? '',
+                            $dateWithTime,
+                            $dateWithTime,
+                            isset($stat->avg_score) ? round($stat->avg_score) : ''
+                        ]);
+                    }
+
+                    fputcsv($handle, ['']);
+                    fputcsv($handle, ['Total Days', count($stats)]);
+
+                    rewind($handle);
+                    $csvContent = stream_get_contents($handle);
+                    fclose($handle);
+
+                    // Force CRLF line endings for strict Windows/Excel compatibility
+                    $csvContent = preg_replace("/\r\n|\n\r|\n|\r/", "\r\n", $csvContent);
+
+                    $response = [
+                        'success' => true,
+                        'filename' => $filename,
+                        'csv' => base64_encode($csvContent),
+                        'content_type' => 'text/csv',
+                    ];
+
+                    $data_transcation = json_encode($response);
+                    $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+                    return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::error('API Export Error: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
+            $response = array('status_code' => 500, 'message' => $e->getMessage());
             return response()->json($response);
         }
     }
