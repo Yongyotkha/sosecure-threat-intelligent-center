@@ -56,7 +56,42 @@ class IocFeedController extends Controller
         $cursor = $this->collection('feeds')->find($query);
         $results = $cursor->toArray();
 
-        // 4. สร้าง PSV (Pipe Separated Values) โดยเขียนลงไฟล์ temp
+        // 4. Batch lookup event names: indicator_id → ref(pulse_id) → event(name)
+        $sourceDb = 'sosecure_threatintelligent';
+        $refColl = $this->mongo->{$sourceDb}->selectCollection('fx_otx_events_indicator_ref');
+        $eventsColl = $this->mongo->{$sourceDb}->selectCollection('fx_otx_events');
+
+        // รวบรวม indicator_ids ที่ต้องหา
+        $indicatorIds = array_filter(array_map(function($r) {
+            return $r['indicator_id'] ?? null;
+        }, $results));
+
+        // Batch query: indicator_id → pulse_id
+        $refMap = [];
+        if (!empty($indicatorIds)) {
+            $refs = $refColl->find(
+                ['indicator_id' => ['$in' => array_values(array_unique((array) $indicatorIds))]],
+                ['projection' => ['indicator_id' => 1, 'pulse_id' => 1]]
+            );
+            foreach ($refs as $ref) {
+                $refMap[(string)$ref['indicator_id']] = $ref['pulse_id'] ?? '';
+            }
+        }
+
+        // Batch query: pulse_id → name
+        $pulseMap = [];
+        $pulseIds = array_filter(array_unique(array_values($refMap)));
+        if (!empty($pulseIds)) {
+            $events = $eventsColl->find(
+                ['pulse_id' => ['$in' => array_values($pulseIds)]],
+                ['projection' => ['pulse_id' => 1, 'name' => 1]]
+            );
+            foreach ($events as $ev) {
+                $pulseMap[$ev['pulse_id']] = $ev['name'] ?? '';
+            }
+        }
+
+        // 5. สร้าง PSV โดยเขียนลงไฟล์ temp
         $tmpFile = tempnam(sys_get_temp_dir(), 'ioc_');
         $handle = fopen($tmpFile, 'w');
 
@@ -64,7 +99,6 @@ class IocFeedController extends Controller
             $startTime = $this->formatToIso($row['ioc_timestamp'] ?? '');
             $endTime = $this->formatToIso($row['sending_timestamp'] ?? '');
 
-            // รูปแบบ: IP,score|start_time|end_time|category|severity|indicator_id|event_id
             $ip = trim($row['indicator']);
             $score = $row['score'] ?? 0;
             $cat = trim($row['category'] ?? '-');
@@ -72,15 +106,17 @@ class IocFeedController extends Controller
             $indId = trim($row['indicator_id'] ?? '');
             $evId = trim($row['event_id'] ?? '');
 
-            // สร้างบรรทัด: IP,score เป็นฟิลด์แรก (คั่นด้วย comma) ตามด้วย | คั่นฟิลด์ถัดไป
-            $line = "{$ip},{$score}|{$startTime}|{$endTime}|{$cat}|{$sev}|{$indId}|{$evId}";
+            // Lookup event name: indicator_id → pulse_id → event name
+            $pulseId = $refMap[$indId] ?? '';
+            $evName = str_replace(['|', "\r", "\n"], [' ', '', ''], $pulseMap[$pulseId] ?? '');
 
-            // ทำความสะอาด: ลบ newline ที่อาจติดมา
+            // รูปแบบ: IP,score|start_time|end_time|category|severity|indicator_id|event_id|event_name
+            $line = "{$ip},{$score}|{$startTime}|{$endTime}|{$cat}|{$sev}|{$indId}|{$evId}|{$evName}";
             $line = str_replace(["\r", "\n"], ["", ""], $line);
 
-            // เขียน 1 บรรทัด + ขึ้นบรรทัดใหม่
             fwrite($handle, $line . PHP_EOL);
         }
+
 
         fclose($handle);
 
