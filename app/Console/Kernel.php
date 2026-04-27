@@ -78,6 +78,9 @@ class Kernel extends ConsoleKernel
     $schedule->command('transaction:ssh')->everyMinute()->withoutOverlapping(5);
     $schedule->command('transaction:saveScan')->everyMinute()->withoutOverlapping(5);
 
+    // ✅ Near Real-time: Micro-Batching สำหรับดึง Threat Feed ลง CSV โดยกวาดเฉพาะของที่เพิ่งอัปเดต
+    $schedule->command('ioc-feed:update')->everyMinute()->withoutOverlapping(2);
+
     $schedule->command('app:RSS_Feed')->cron('0 */1 * * *')->withoutOverlapping(5);
     $schedule->command('app:news_permission')->cron('0 */6 * * *')->withoutOverlapping(5);
     $schedule->command('app:SendLog_Indicator')->dailyAt('10:22')->timezone('Asia/Bangkok')->withoutOverlapping(5);
@@ -144,6 +147,13 @@ class Kernel extends ConsoleKernel
       ->dailyAt('02:30')
       ->timezone('Asia/Bangkok')
       ->withoutOverlapping();
+
+    // IoC Feed: เคลียร์ + Log + Sync ข้อมูลวันนี้ ทุกวัน ตี 1
+    $schedule->command('ioc-feed:update')
+      ->dailyAt('01:00')
+      ->timezone('Asia/Bangkok')
+      ->withoutOverlapping()
+      ->appendOutputTo(storage_path('logs/ioc_feed_update.log'));
   }
 
   /**

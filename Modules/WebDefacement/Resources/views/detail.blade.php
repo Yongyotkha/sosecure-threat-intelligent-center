@@ -1156,16 +1156,17 @@ return (string)$v;
 
                     
               
-                        let data = JSON.parse(response);
+                        let data = response;
+                        if (typeof response === 'string') {
+                            try { data = JSON.parse(response); } catch (e) { console.error("JSON parse error", e); }
+                        }
         
-                        if(data.Result==1){
+                        if(data.Result == 1 || (data.command_result && data.command_result.Result == 1)){
                             toastr.success('Update Success', '@langapp('response_status')');
                             setTimeout(function() { location.reload(); }, 1000);
                         } else {
-                            toastr.error(data.message, '@langapp('response_status')');
+                            toastr.error(data.message || (data.command_result ? data.command_result.message : 'Update failed'), '@langapp('response_status')');
                         }
-                        
-                        {{--window.location.href = response.redirect;--}}
                     },
                     error: function (error){
                         $('#updateO').loading('stop');

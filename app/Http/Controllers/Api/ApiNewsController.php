@@ -32,6 +32,8 @@ use Modules\SiteSettings\Entities\Domain;
 use Modules\SiteSettings\Entities\SiteNewsRelated;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\Users\Entities\UserSite;
+use Modules\RSSFeedSettings\Entities\TransactionRssData;
+use Modules\RSSFeedSettings\Entities\RSSData;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
 use Yajra\DataTables\DataTables;
@@ -55,7 +57,7 @@ class ApiNewsController extends ApiController
                 $RSSNews_count = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->count();
                 // dd($news_all);
                 // $RSSNews_count = RSSNews::count("id");
-                $RSSNews_all = RSSNews::all();
+                $RSSNews_all = RSSNews::where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now())->orderBy('public_date', 'desc')->take(PAGINATE_NUM)->get();
         
                 //<><><div>
                 // if(Auth::check()) {
@@ -95,9 +97,13 @@ class ApiNewsController extends ApiController
         
             if(!empty($Category)){
                 foreach($Category as $item){
-                    $NewsCategory[] = RSSNewsCategory::where('news_category_id', @$item->id)->wherehas('news', function($q){
+                    $newsCat = RSSNewsCategory::where('news_category_id', @$item->id)->wherehas('news', function($q){
                         $q->where('save_draft', 0)->where('status', 1)->where('public_date', '<=', Carbon::now());
                     })->first();
+                    
+                    if ($newsCat) {
+                        $NewsCategory[] = $newsCat;
+                    }
                 }
             } 
             if(!empty($NewsCategory)){
@@ -867,6 +873,10 @@ class ApiNewsController extends ApiController
                     $lang = 'th';
                     $RSSNews = RSSNews::where("code",$code)->with('get_cate')->first();
 
+                    if (!$RSSNews) {
+                        return response()->json(['error' => 'News not found', 'status_code' => '404']);
+                    }
+
                     $cate_id_all = [];
                     if($RSSNews->get_cate) {
                         foreach($RSSNews->get_cate as $cate) {
@@ -1588,5 +1598,279 @@ class ApiNewsController extends ApiController
             $result = '';
         }
         return $result;
+    }
+    public function rss_news_table(Request $request)
+    {
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+
+            if ($data === false) {
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }
+
+            $input = $data['data'] ?? [];
+            $request->merge($input);
+            $model = new RSSNews();
+
+            if ($input['keywords'] ?? null) {
+                $kw = $input['keywords'];
+                $model = $model->where(function($q) use ($kw) {
+                    $q->where('title_en', 'LIKE', '%' . $kw . '%')
+                      ->orWhere('title_th', 'LIKE', '%' . $kw . '%');
+                });
+            }
+
+            if (($input['isDateSearch'] ?? null) == 1) {
+                $date_start = $input['startDate'];
+                $date_end = $input['endDate'];
+                $date_start_f = Carbon::parse($date_start)->format('Y-m-d H:i:s');
+                $date_end_f = Carbon::parse($date_end)->format('Y-m-d H:i:s');
+                $model = $model->whereBetween('created_at', [$date_start_f, $date_end_f]);
+            }
+
+            if (isset($input['status_news']) && ($input['status_news'] == 1 || $input['status_news'] == 2)) {
+                $model = $model->where('save_draft', ($input['status_news'] == 1 ? 0 : 1));
+            }
+
+            if ($input['news_source'] ?? null) {
+                $news_source_id = is_array($input['news_source']) ? $input['news_source'] : [$input['news_source']];
+                $news_source_id = array_filter($news_source_id);
+                if (!empty($news_source_id)) {
+                    $model = $model->whereIn('source', $news_source_id);
+                }
+            }
+
+            if ($input['news_category'] ?? null) {
+                $news_cate_id = is_array($input['news_category']) ? $input['news_category'] : [$input['news_category']];
+                $news_cate_id = array_filter($news_cate_id);
+                if (!empty($news_cate_id)) {
+                    $model = $model->whereHas('get_cate', function ($query) use ($news_cate_id) {
+                        $query->whereIn('news_category_id', $news_cate_id);
+                    });
+                }
+            }
+
+            if ($input['status_serverity'] ?? null) {
+                $model = $model->where('serverity', $input['status_serverity']);
+            }
+
+            $model = $model->select('id','code','title_th','detail_th','title_en','detail_en','source','save_draft','serverity','public_date','status','created_at')
+                           ->orderBy('public_date', 'desc');
+
+            $result = DataTables::of($model)
+                ->addColumn('content_detail', function ($model) {
+                    $html = '';
+                    $html .= '<div>';
+                    if ($model->title_th) {
+                        $html .= '<a style="font-size:16px;" href="' . route('news.public_detail_select', ['code' => $model->code, 'lang' => 'th']) . '" target="_blank" data-rel="tooltip" title="' . $model->title_th . '">' . $model->title_th . '</a>';
+                    } else if ($model->title_en) {
+                        $html .= '<a style="font-size:16px;" href="' . route('news.public_detail_select', ['code' => $model->code, 'lang' => 'en']) . '" target="_blank" data-rel="tooltip" title="' . $model->title_en . '">' . $model->title_en . '</a>';
+                    } else {
+                        $html .= '<span style="font-size:16px;">No Title</span>';
+                    }
+                    $html .= '</div>';
+
+                    if ($model->source) {
+                        // return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'"><a href="javascript:void(0);" onclick="find_source(\''.$model -> source.'\')">'.$model -> source.'</a></div>';
+                        $html .= '<span data-rel="tooltip" title="' . $model->source . '"><span class="m-r-5"><b>Source : </b>' . $model->source . '</span>';
+                    } else {
+                        $html .= '<span data-rel="tooltip" title="None"><span class="m-r-5"><b>Source : </b> None</span>';
+                    }
+
+                    $html .= '<span class="text-trucate-ovf"> <span class="m-r-5 m-l-xs"><b>Category : </b>';
+                    $html .= '<span style="word-break: break-all;display: inline;" class="showmore">';
+                    if ($model->get_cate == "[]") {
+                        $html .= 'None';
+                    } else {
+                        $catagory_name = "";
+                        $num = count($model->get_cate);
+                        $i = 0;
+                        foreach ($model->get_cate as $record) {
+                            if (++$i === $num) {
+                                $catagory_name .= @$record->get_cate_name->name;
+                            } else {
+                                $catagory_name .= @$record->get_cate_name->name . ",";
+                            }
+                        }
+                        $htmls = '';
+                        $htmls .= $catagory_name;
+                        if ($htmls == 'None-delete0') {
+                            $html .= str_replace('-delete0', '', $htmls);
+                        } else {
+                            $html .= str_replace('None-delete0', '', $htmls);
+                        }
+                    }
+                    $html .= '<button class="btn-showmore btn-link text-primary" style="padding:0;padding-left:1px;padding-right:1px;" onclick="showMore(this)">ดูเพิ่มเติม</button></span>';
+
+                    $html .= '</span>';
+
+                    $html .= '<div>';
+
+                    $html .= ' <span class="m-r-5"><b>Public Date : </b>' . $model->public_date . '</span>';
+
+                    if ($model->serverity == 'critical') {
+                        $html .= ' <span class="m-r-5"><b>Serverity : </b> <span class="badge" style="background-color: #b93624;">Critical</span></span>';
+                    } else if ($model->serverity == 'high') {
+                        $html .= ' <span class="m-r-5"><b>Serverity : </b> <span class="badge" style="background-color: #fcc838;">High</span></span>';
+                    } else if ($model->serverity == 'medium') {
+                        $html .= ' <span class="m-r-5"><b>Serverity : </b> <span class="badge" style="background-color: #f2ff15;color:#333;">Medium</span></span>';
+                    } else if ($model->serverity == 'low') {
+                        $html .= ' <span class="m-r-5"><b>Serverity : </b> <span class="badge" style="background-color: #88ce4f;">Low</span></span>';
+                    } else if ($model->serverity == 'information') {
+                        $html .= ' <span class="m-r-5"><b>Serverity : </b> <span class="badge" style="background-color: #00dcff;">Information</span></span>';
+                    } else {
+                        $html .= ' <span class="m-r-5"><b>Serverity : </b> - </span>';
+                    }
+
+                    if ($model->save_draft == 1) {
+                        $html .= ' <b class="m-r-5 m-l-xs">Data Status : </b> <span class="badge badge-danger" style="background-color: #ea2e49;">Darft</span>';
+                    } else if ($model->save_draft == 0) {
+                        $html .= ' <b class="m-r-5 m-l-xs">Data Status : </b> <span class="badge badge-success">Public</span>';
+                    } else {
+                        $html .= ' <b class="m-r-5 m-l-xs">Data Status : </b> <span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
+                    }
+                    
+                    $html .= '</div>';
+                    return $html;
+                })
+                ->addColumn('link', function ($model) {
+                    $html = '';
+                    $html_th = '';
+                    $html_en = '';
+                    $html_line = '';
+                    if ($model->title_th) {
+                        $html_th = '<a href="' . route('news.public_detail_select', ['code' => $model->code, 'lang' => 'th']) . '" target="_blank">TH</a>';
+                    }
+                    if ($model->title_en) {
+                        $html_en = '<a href="' . route('news.public_detail_select', ['code' => $model->code, 'lang' => 'en']) . '" target="_blank">EN</a>';
+                        $html_line = ' | ';
+                    }
+    
+                    $html .= $html_th . $html_line . $html_en;
+    
+                    return $html;
+                })
+                ->rawColumns(['content_detail', 'link'])
+                ->toJson();
+
+            $data_transcation = json_encode($result->getData());
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+
+        } catch (\Exception $e) {
+            return response()->json(['status_code' => 500, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function rss_data_table(Request $request)
+    {
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+
+            if ($data === false) {
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }
+
+            $input = $data['data'] ?? [];
+            $request->merge($input);
+            $model = TransactionRssData::with('get_rss_news')->with('get_rss_source');
+
+            if (($input['keywords'] ?? null || $input['startDate'] ?? null || $input['endDate'] ?? null || $input['status'] ?? null) && ($input['search_val'] ?? null) == true) {
+                if ($input['keywords'] ?? null) {
+                    $model->where('title', 'LIKE', '%' . $input['keywords'] . '%');
+                }
+                if ($input['isDateSearch'] ?? null) {
+                    $date_start_f = Carbon::parse($input['startDate'])->format('Y-m-d');
+                    $date_end_f = Carbon::parse($input['endDate'])->format('Y-m-d');
+                    $model->whereBetween('transcation_date', [$date_start_f, $date_end_f]);
+                }
+                if ($input['status'] ?? null) {
+                    if ($input['status'] == '1') {
+                        $model = $model->whereHas('get_rss_news', fn($q) => $q->whereNotNull('transaction_rss_id'));
+                    } else if ($input['status'] == '2') {
+                        $model = $model->whereDoesntHave('get_rss_news', fn($q) => $q->whereNotNull('transaction_rss_id'));
+                    }
+                }
+            }
+
+            $result = DataTables::of($model)
+                ->addColumn('chk', function ($data) {
+                    return '<label class="checkbox"><input type="checkbox" name="id[]" value="' . $data->id . '" class="chk-rss"><span></span></label>';
+                })
+                ->editColumn('title', function ($data) {
+                    return '<strong>' . $data->title . '</strong><br><small class="text-muted">' . $data->get_rss_source->name . '</small>';
+                })
+                ->editColumn('link', function ($data) {
+                    return '<a href="' . $data->link . '" target="_blank" class="text-info"><i class="fas fa-external-link-alt"></i> Original Link</a>';
+                })
+                ->addColumn('status', function ($data) {
+                    if ($data->get_rss_news) {
+                        return '<span class="badge badge-success">Migrated</span>';
+                    }
+                    return '<span class="badge badge-warning">Pending</span>';
+                })
+                ->addColumn('action', function ($data) {
+                    return '<div class="btn-group">
+                        <button class="btn btn-xs btn-info create-news-from-rss" data-code="' . $data->code . '"><i class="fas fa-plus"></i> Create News</button>
+                        <button class="btn btn-xs btn-danger delete-rss-data" data-code="' . $data->code . '"><i class="fas fa-trash"></i></button>
+                    </div>';
+                })
+                ->rawColumns(['chk', 'title', 'link', 'status', 'action'])
+                ->toJson();
+
+            $data_transcation = json_encode($result->getData());
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+
+        } catch (\Exception $e) {
+            return response()->json(['status_code' => 500, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function rss_setting_table(Request $request)
+    {
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+
+            if ($data === false) {
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }
+
+            $input = $data['data'] ?? [];
+            $request->merge($input);
+            $model = RSSData::whereNull('deleted_at');
+            $result = DataTables::of($model)
+                ->addColumn('chk', function ($data) {
+                    return '<label class="checkbox"><input type="checkbox" name="id[]" value="' . $data->id . '" class="chk-setting"><span></span></label>';
+                })
+                ->editColumn('status', function ($data) {
+                    $checked = $data->active == 1 ? 'checked' : '';
+                    return '<label class="switch"><input type="checkbox" class="setting-toggle" data-id="' . $data->id . '" ' . $checked . '><span class="slider round"></span></label>';
+                })
+                ->addColumn('action', function ($data) {
+                    return '<div class="btn-group">
+                        <button class="btn btn-xs btn-default edit-setting" data-code="' . $data->code . '"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-xs btn-danger delete-setting" data-code="' . $data->code . '"><i class="fas fa-trash"></i></button>
+                    </div>';
+                })
+                ->rawColumns(['chk', 'status', 'action'])
+                ->toJson();
+
+            $data_transcation = json_encode($result->getData());
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+
+        } catch (\Exception $e) {
+            return response()->json(['status_code' => 500, 'message' => $e->getMessage()]);
+        }
     }
 }

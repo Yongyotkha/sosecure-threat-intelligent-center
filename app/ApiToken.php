@@ -9,7 +9,7 @@ class ApiToken extends Model
 {
     protected $table = 'api_tokens';
 
-    protected $fillable = ['name', 'token', 'expires_at', 'last_used_at', 'site_id', 'type'];
+    protected $fillable = ['name', 'token', 'expires_at', 'last_used_at', 'last_ip', 'whitelist_ips', 'site_id', 'type'];
 
     protected $dates = ['expires_at', 'last_used_at', 'created_at', 'updated_at']; // รองรับ Laravel เก่า
 

@@ -125,7 +125,24 @@ class WebDefacementProccessbyWebdefacment_id extends Command
 
 
             $image_path_2 = "";
-            $response = $this->getHtml3($url);
+            
+            // 🟩 Screenshot Path Configuration (Standardized)
+            $site_id = $WebdefacmentSetting_data->site_id;
+            $url_id = isset($WebdefacmentDataOriginal_data->url_id) ? $WebdefacmentDataOriginal_data->url_id : null;
+            if (!$url_id) { $url_id = rand(10, 100); }
+
+            $image_name = $site_id . '_' . $url_id . '_' . 'Defacement_Now';
+            $screenshotPath = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
+            
+            $options = [
+              'screenshot_path' => $screenshotPath
+            ];
+
+            // 🟩 Assign Relative Path for DB early
+            $result["image_url"] = "/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
+            $result["image_path_original"] = $result["image_url"];
+
+            $response = $this->getHtml3($url, 0, $options);
 
             $htmlFetchFailed = !isset($response['content']) 
                             || $response['content'] === FALSE 
@@ -649,85 +666,59 @@ class WebDefacementProccessbyWebdefacment_id extends Command
               </div>
               </div>';
               }
-              if ($WebdefacmentSetting_data->image_check == 2) {
-                $totalConfig += 0.5;
-                $url_id = $WebdefacmentDataOriginal_data->url_id;
+
+              // 🟩 Image Check Logic (Standardized)
+              if ($WebdefacmentSetting_data->image_check == 2 || $WebdefacmentSetting_data->image_check == 1) {
+                $totalConfig += 1;
+                $url_id = $WebdefacmentDataOriginal_data->url_id ?: $url_id;
                 $site_id = $WebdefacmentSetting_data->site_id;
-                $delay = $WebdefacmentSetting_data->delay_screen_shot_val;
-                if (!$delay) {
-                  $delay = 2000;
-                }
-                if (!$url_id) {
-                  $url_id = rand(10, 100);
-                }
-
+                
                 $image_name =  $site_id . '_' . $url_id . '_' . 'Defacement_Now';
-                $result["image_url"] = "/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
-                $path_include = base_path() . '/public/screenshot/use/DownloadImage.php';
-                include_once($path_include);
-                $downloadImg = new \DownloadImage();
                 $Path_image = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
-                $downloadImg->download($url, $Path_image, $delay);
-                $result["image_path_original_full"] = $Path_image;
-                $result["image_path_original"] = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
-                $result["url_id"] = $url_id;
 
-                $WebdefacmentImageMark_check = WebdefacmentImageMark::where('webdefacment_data_original_id', $webdefacment_id)->get();
-                if (count($WebdefacmentImageMark_check) > 0) {
-                  $dir_folder_image_original = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/image_original.png";
-                  $image_original = imagecreatefrompng($dir_folder_image_original);
-                  $black_original = ImageColorAllocate($image_original, 242, 242, 242);
+                // Verify if file exists and is readable (captured by Puppeteer at start)
+                if (file_exists($Path_image) && filesize($Path_image) > 0) {
+                    $WebdefacmentImageMark_check = WebdefacmentImageMark::where('webdefacment_data_original_id', $webdefacment_id)->get();
+                    if (count($WebdefacmentImageMark_check) > 0) {
+                      $dir_folder_image_original = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/image_original.png";
+                      
+                      // Check if original image exists before processing marks
+                      if (file_exists($dir_folder_image_original)) {
+                          $image_original = imagecreatefrompng($dir_folder_image_original);
+                          $black_original = ImageColorAllocate($image_original, 242, 242, 242);
 
+                          $dir_folder_image_compare = $Path_image;
+                          $image_compare = imagecreatefrompng($dir_folder_image_compare);
+                          $black_compare = ImageColorAllocate($image_compare, 242, 242, 242);
 
-                  $dir_folder_image_compare = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
-                  $image_compare = imagecreatefrompng($dir_folder_image_compare);
-                  $black_compare = ImageColorAllocate($image_compare, 242, 242, 242);
+                          foreach ($WebdefacmentImageMark_check as $mark) {
+                            ImageFilledRectangle($image_original, $mark->left, $mark->top, $mark->width, $mark->hight, $black_original);
+                            ImageFilledRectangle($image_compare, $mark->left, $mark->top, $mark->width, $mark->hight, $black_compare);
+                          }
 
-                  foreach ($WebdefacmentImageMark_check as $WebdefacmentImageMark_checkkey => $WebdefacmentImageMark_checkvalue) {
-                    ImageFilledRectangle($image_original, $WebdefacmentImageMark_checkvalue->left, $WebdefacmentImageMark_checkvalue->top, $WebdefacmentImageMark_checkvalue->width, $WebdefacmentImageMark_checkvalue->hight, $black_original);
+                          $custom_original = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/image_original_custom.png";
+                          $custom_compare = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
+                          
+                          ImagePng($image_original, $custom_original);
+                          ImagePng($image_compare, $custom_compare);
 
-                    ImageFilledRectangle($image_compare, $WebdefacmentImageMark_checkvalue->left, $WebdefacmentImageMark_checkvalue->top, $WebdefacmentImageMark_checkvalue->width, $WebdefacmentImageMark_checkvalue->hight, $black_compare);
-                  }
-
-                  ImagePng($image_original, base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/image_original_custom.png");
-                  ImagePng($image_compare, base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png");
-                  // $compareImage = $this->compareImage2(base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/", 'image_original_custom.png', $image_name . "_custom.png");
-
-                  $imageOriginalPath = $dirPath . $imgSourcePath;
-                  $imageComparePath = $dirPath . $imgComparePath;
-
-                  try {
-                    if (file_exists($imageOriginalPath) && file_exists($imageComparePath)) {
-                      $comparer = new compareImages($imageOriginalPath);
-                      $imageDiffPercent = $comparer->compareBySlices($imageComparePath, 1000);
-
-                      $result['image_parcent'] = $imageDiffPercent;
-                      $result['image1Hash'] = $comparer->getHasString();
-                      $result['image2Hash'] = $comparer->hasString($imageComparePath);
-                      $result['image_diff'] = $imageDiffPercent;
+                          $compareImage = $this->compareImage2(base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/", 'image_original_custom.png', $image_name . "_custom.png");
+                          
+                          $result["image_url"] = "/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
+                          $result["image_path_original"] = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
+                          $image_path_2  = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
+                      } else {
+                          Log::warning("[DefaceNow] Original baseline not found for comparison at {$dir_folder_image_original}");
+                          $compareImage = ["diff" => 0, "image1Hash" => "", "image2Hash" => ""];
+                      }
                     } else {
-                      Log::warning("ไฟล์ภาพไม่พบ: $imageOriginalPath หรือ $imageComparePath");
-                      $result['image_parcent'] = 0;
-                      $result['image1Hash'] = '';
-                      $result['image2Hash'] = '';
-                      $result['image_diff'] = 0;
+                      $compareImage = $this->compareImage2(base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/", 'image_original.png', $image_name . ".png");
                     }
-                  } catch (\Throwable $e) {
-                    Log::error("เกิดข้อผิดพลาดในการเปรียบเทียบภาพ: " . $e->getMessage());
-                    $result['image_parcent'] = 0;
-                    $result['image1Hash'] = '';
-                    $result['image2Hash'] = '';
-                    $result['image_diff'] = 0;
-                  }
-
-                  $result["image_url"] = "/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
-                  $result["image_path_original"] = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
-                  $image_path_2  = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
                 } else {
-
-                  $compareImage = $this->compareImage2(base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/", 'image_original.png', $image_name . ".png");
+                    Log::warning("[DefaceNow] Screenshot missing or empty, skipping image comparison: {$Path_image}");
+                    $compareImage = ["diff" => 0, "image1Hash" => "", "image2Hash" => ""];
+                    $result['image_parcent'] = 0;
                 }
-
 
                 if ($compareImage["diff"]  == 0) {
                   $result['image_parcent']  = 0;
@@ -993,8 +984,14 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                 Log::error("บล็อคแจ้งเตือนล้มเหลว (outer): " . $e->getMessage());
               }
 
+              // 🟩 DO NOT overwrite image_original during a check. 
+              // Only image_last should be updated with the latest result.
+              // $WebdefacmentSetting_update->image_original = $result['image_url'];
+              
+              if (!empty($result['image_url'])) {
+                $WebdefacmentSetting_update->image_last = $result['image_url'];
+              }
 
-              $WebdefacmentSetting_update->image_original = $result['image_url'];
               $WebdefacmentSetting_update->blacklist_keyword_current = $WebdefacmentDataCheck_save->keyword;
               $WebdefacmentSetting_update->save();
 
@@ -1175,33 +1172,45 @@ class WebDefacementProccessbyWebdefacment_id extends Command
   }
   function checkDomainHeaders($url, $format = 0)
   {
-    $url = parse_url($url);
-    $end = "\r\n\r\n";
-    $fp = fsockopen($url['host'], (empty($url['port']) ? 80 : $url['port']), $errno, $errstr, 30);
-    if ($fp) {
-      $out  = "GET / HTTP/1.1\r\n";
-      $out .= "Host: " . $url['host'] . "\r\n";
-      $out .= "Connection: Close\r\n\r\n";
-      $var  = '';
-      fwrite($fp, $out);
-      while (!feof($fp)) {
-        $var .= fgets($fp, 1280);
-        if (strpos($var, $end))
-          break;
-      }
-      fclose($fp);
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_HEADER         => true,
+      CURLOPT_NOBODY         => true,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_MAXREDIRS      => 5,
+      CURLOPT_TIMEOUT        => 10,
+      CURLOPT_CONNECTTIMEOUT => 5,
+      CURLOPT_SSL_VERIFYPEER => false,
+      CURLOPT_SSL_VERIFYHOST => false,
+      CURLOPT_USERAGENT      => 'WebDefacementBot/1.0'
+    ]);
 
-      $var = preg_replace("/\r\n\r\n.*\$/", '', $var);
-      $var = explode("\r\n", $var);
-      if ($format) {
-        foreach ($var as $i) {
-          if (preg_match('/^([a-zA-Z -]+): +(.*)$/', $i, $parts))
-            $v[$parts[1]] = $parts[2];
-        }
-        return $v;
-      } else
-        return $var;
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    if ($response === false) {
+      return $format ? [] : [];
     }
+
+    // Split headers (handles multiple headers if redirected)
+    $parts = explode("\r\n\r\n", trim($response));
+    $headerContent = end($parts); // Get the last set of headers
+
+    $headers = explode("\r\n", $headerContent);
+    if ($format) {
+      $v = [];
+      foreach ($headers as $i) {
+        if (preg_match('/^([a-zA-Z0-9-]+): +(.*)$/', $i, $matches)) {
+          $v[$matches[1]] = $matches[2];
+        } else if (preg_match('/^HTTP\/\d\.\d +\d+/', $i)) {
+          $v[0] = $i;
+        }
+      }
+      return $v;
+    }
+
+    return $headers;
   }
   function URL_404($url)
   {

@@ -24,3 +24,5 @@ vendor/*
 /cache_log
 vendor/squizlabs
 /public/files/scans/
+drivers/*.exe
+mysql/data/*

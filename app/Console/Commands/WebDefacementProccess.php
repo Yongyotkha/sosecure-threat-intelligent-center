@@ -1871,33 +1871,45 @@ class WebDefacementProccess extends Command
   }
   function checkDomainHeaders($url, $format = 0)
   {
-    $url = parse_url($url);
-    $end = "\r\n\r\n";
-    $fp = fsockopen($url['host'], (empty($url['port']) ? 80 : $url['port']), $errno, $errstr, 30);
-    if ($fp) {
-      $out  = "GET / HTTP/1.1\r\n";
-      $out .= "Host: " . $url['host'] . "\r\n";
-      $out .= "Connection: Close\r\n\r\n";
-      $var  = '';
-      fwrite($fp, $out);
-      while (!feof($fp)) {
-        $var .= fgets($fp, 1280);
-        if (strpos($var, $end))
-          break;
-      }
-      fclose($fp);
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_HEADER         => true,
+      CURLOPT_NOBODY         => true,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_MAXREDIRS      => 5,
+      CURLOPT_TIMEOUT        => 10,
+      CURLOPT_CONNECTTIMEOUT => 5,
+      CURLOPT_SSL_VERIFYPEER => false,
+      CURLOPT_SSL_VERIFYHOST => false,
+      CURLOPT_USERAGENT      => 'WebDefacementBot/1.0'
+    ]);
 
-      $var = preg_replace("/\r\n\r\n.*\$/", '', $var);
-      $var = explode("\r\n", $var);
-      if ($format) {
-        foreach ($var as $i) {
-          if (preg_match('/^([a-zA-Z -]+): +(.*)$/', $i, $parts))
-            $v[$parts[1]] = $parts[2];
-        }
-        return $v;
-      } else
-        return $var;
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    if ($response === false) {
+      return $format ? [] : [];
     }
+
+    // Split headers (handles multiple headers if redirected)
+    $parts = explode("\r\n\r\n", trim($response));
+    $headerContent = end($parts); // Get the last set of headers
+
+    $headers = explode("\r\n", $headerContent);
+    if ($format) {
+      $v = [];
+      foreach ($headers as $i) {
+        if (preg_match('/^([a-zA-Z0-9-]+): +(.*)$/', $i, $matches)) {
+          $v[$matches[1]] = $matches[2];
+        } else if (preg_match('/^HTTP\/\d\.\d +\d+/', $i)) {
+          $v[0] = $i;
+        }
+      }
+      return $v;
+    }
+
+    return $headers;
   }
   function URL_404($url)
   {

@@ -78,6 +78,8 @@ class ApiWebdefacementController extends ApiController
                     $modal = WebdefacmentSetting::where("active", '=', 1)->where("deleted_at",null);
 
                     $site_id_arr = @$get_role_custom_first['site_id_arr'];
+                    \Log::info("WebDefacement API Load Card - Site ID Arr: " . json_encode($site_id_arr));
+                    \Log::info("WebDefacement API Load Card - Superadmin: " . (@$get_role_custom_first['superadmin']));
                     if(@$get_role_custom_first['superadmin'] == 1) {
                         
                     }else if(@$get_role_custom_first['client'] == 1) {
@@ -127,11 +129,17 @@ class ApiWebdefacementController extends ApiController
                     }
                         
                     $modal = $modal->get();
+                    \Log::info("WebDefacement API Load Card - Modal Count: " . count($modal));
 
+
+                    $id = [];
+                    $hash_data = [];
 
                     foreach ($modal as $key) {
+                        $data_chk = WebdefacmentDataCheck::getData($key->id);
+
                         $html .= 
-                        '<div class="item-wdfm wdfm-inner-4">
+                        '<div class="item-wdfm wdfm-inner-3">
                             <div class="wdfm-card">
                                 <div class="wdfm-header">
                                     <div class="wdfm-img">
@@ -150,11 +158,14 @@ class ApiWebdefacementController extends ApiController
                                     <p class="mdfm-text-muted">'.@$key->url.'</p>
                                 </div>
                                 <div class="wdfm-footer">
-                                    <div class="wdfm-ft-left flex">
+                                    <div class="wdfm-ft-left flex" style="width: 50%">
                                         <div><strong>Site </strong>: '.@$key->get_site->name.'</div>
                                         <div class="status-flex mr-2"><strong>Status</strong> : &nbsp; '.@get_webdefacment_status($key->status_val,'color').'</div>
                                         <div class="text-sm-date">Last Online: '.@$key->last_online.'</div>
                                         <div class="text-sm-date">Last Check: '.@$key->last_check.'</div>
+                                    </div>
+                                    <div class="wdfm-ft-left flex" style="width: 50%">
+                                        <div id="chart_wdfm_'.@$key->id.'" style="height: 180px"></div>
                                     </div>
                                 </div>
                                 <div class="wdfm-footer-action">
@@ -169,17 +180,39 @@ class ApiWebdefacementController extends ApiController
                                 ';
                             }
                     
-
+ 
                             $html .= '
                                     </div>
                                 </div>
                             </div>
                         </div>';                    
+
+                        $id[] = [
+                            'id' => $key->id,
+                            'detection_score_all' => $data_chk->percent_all ?? 0,
+                            'hash_percent' => $data_chk->hash_percent ?? 0,
+                            'filesize_percent' => $data_chk->filesize_percent ?? 0,
+                            'element_percent' => $data_chk->element_percent ?? 0,
+                            'image_percent' => $data_chk->image_percent ?? 0,
+                            'blacklist_percent' => $data_chk->keyword_percent ?? 0,
+                            'score' => ($data_chk->score ?? 0) * 100
+                        ];
+
+                        $hash_data[] = [
+                            'id' => $key->id,
+                            'status' => $key->status_val,
+                            'updated_at' => $key->updated_at,
+                            'image' => $key->image_last,
+                            'last_check' => $key->last_check
+                        ];
                     }
 
+                    $hash = md5(json_encode($hash_data));
 
                     $response = [
                         "html" => $html,
+                        "id" => $id,
+                        "hash" => $hash
                     ];
 
                     $data_transcation = json_encode($response);
@@ -187,7 +220,8 @@ class ApiWebdefacementController extends ApiController
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            \Log::error("Backend API Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
             $response = array(
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
@@ -197,7 +231,9 @@ class ApiWebdefacementController extends ApiController
             $mode = $request->mode;
             $data_request = $request -> data;
             $data = $this -> dataFalse($header, $mode, $data_request);
-            $this->saveLog($data['site']['data']['id'], json_encode($response));
+            if ($data && isset($data['site']['data']['id'])) {
+                $this->saveLog($data['site']['data']['id'], json_encode($response));
+            }
 
             return response()->json($response);
         }
@@ -273,7 +309,8 @@ class ApiWebdefacementController extends ApiController
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            \Log::error("Backend API Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
             $response = array(
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
@@ -283,7 +320,9 @@ class ApiWebdefacementController extends ApiController
             $mode = $request->mode;
             $data_request = $request -> data;
             $data = $this -> dataFalse($header, $mode, $data_request);
-            $this->saveLog($data['site']['data']['id'], json_encode($response));
+            if ($data && isset($data['site']['data']['id'])) {
+                $this->saveLog($data['site']['data']['id'], json_encode($response));
+            }
 
             return response()->json($response);
         }
@@ -312,23 +351,24 @@ class ApiWebdefacementController extends ApiController
                             'webdefacment_id' => $webdefacment_id,
                     ];
    
-                  //  Artisan::call($command,$params);
-                  //  $result = Artisan::output();
-                // $result = $this->WebDefacementUpdateOriginal_handle($webdefacment_id);
-                $WebdefacmentDataOriginal_data =    WebdefacmentDataOriginal::where('webdefacment_setting_id',$webdefacment_id)->first();
-                $WebdefacmentDataOriginal_data->last_update = date("Y-m-d H:i:s");
-                $WebdefacmentDataOriginal_data->updated_at = date("Y-m-d H:i:s");
-                $WebdefacmentDataOriginal_data->save();
-                 $response = [
-                        "data" =>   $WebdefacmentDataOriginal_data,
-                  ];
+                    Artisan::call($command, $params);
+                    $result_output = Artisan::output();
+                    file_put_contents(storage_path('logs/debug_artisan.log'), "[" . date('Y-m-d H:i:s') . "] Artisan output: " . $result_output . "\n", FILE_APPEND);
+                    $result = json_decode($result_output, true);
+
+                    $WebdefacmentDataOriginal_data = WebdefacmentDataOriginal::where('webdefacment_setting_id', $webdefacment_id)->first();
+                    $response = [
+                        "data" => $WebdefacmentDataOriginal_data,
+                        "command_result" => $result
+                    ];
 
                     $data_transcation = json_encode($response);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            \Log::error("Backend API Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
             $response = array(
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
@@ -338,7 +378,9 @@ class ApiWebdefacementController extends ApiController
             $mode = $request->mode;
             $data_request = $request -> data;
             $data = $this -> dataFalse($header, $mode, $data_request);
-            $this->saveLog($data['site']['data']['id'], json_encode($response));
+            if ($data && isset($data['site']['data']['id'])) {
+                $this->saveLog($data['site']['data']['id'], json_encode($response));
+            }
 
             return response()->json($response);
         }
@@ -593,42 +635,35 @@ return $result_json_e;
             }
             return $positions;
         }
-        function checkDomainHeaders($url,$format=0)
-        {
-            $url=parse_url($url);
-            $end = "\r\n\r\n";
-            $fp = fsockopen($url['host'], (empty($url['port'])?80:$url['port']), $errno, $errstr, 30);
-            if ($fp)
-            {
-                $out  = "GET / HTTP/1.1\r\n";
-                $out .= "Host: ".$url['host']."\r\n";
-                $out .= "Connection: Close\r\n\r\n";
-                $var  = '';
-                fwrite($fp, $out);
-                while (!feof($fp))
-                {
-                    $var.=fgets($fp, 1280);
-                    if(strpos($var,$end))
-                        break;
-                }
-                fclose($fp);
 
-                $var=preg_replace("/\r\n\r\n.*\$/",'',$var);
-                $var=explode("\r\n",$var);
-                if($format)
-                {
-                    foreach($var as $i)
-                    {
-                        if(preg_match('/^([a-zA-Z -]+): +(.*)$/',$i,$parts))
-                            $v[$parts[1]]=$parts[2];
-                    }
-                    return $v;
+    function checkDomainHeaders($url, $format = 0)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        $response = curl_exec($ch);
+        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $header = substr($response, 0, $header_size);
+        curl_close($ch);
+
+        $headers = explode("\r\n", $header);
+        if ($format) {
+            $v = [];
+            foreach ($headers as $i) {
+                if (preg_match('/^([a-zA-Z0-9-]+): +(.*)$/', $i, $parts)) {
+                    $v[$parts[1]] = $parts[2];
                 }
-                else
-                    return $var;
             }
-
+            return $v;
         }
+        return $headers;
+    }
     function URL_404($url) {
         $handle = curl_init($url);
         curl_setopt($handle,  CURLOPT_RETURNTRANSFER, TRUE);
@@ -693,7 +728,8 @@ return $result_json_e;
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            \Log::error("Backend API Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
             $response = array(
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
@@ -703,7 +739,9 @@ return $result_json_e;
             $mode = $request->mode;
             $data_request = $request -> data;
             $data = $this -> dataFalse($header, $mode, $data_request);
-            $this->saveLog($data['site']['data']['id'], json_encode($response));
+            if ($data && isset($data['site']['data']['id'])) {
+                $this->saveLog($data['site']['data']['id'], json_encode($response));
+            }
 
             return response()->json($response);
         }
@@ -727,12 +765,9 @@ return $result_json_e;
                     }
                     ini_set('max_execution_time', '1000');
                     $webdefacment_id = $data['data']['webdefacment_id'];
-                    $command = 'app:WebDefacementProccessbyWebdefacment_id '.$webdefacment_id;
-                    $params = [
+                    Artisan::call('app:WebDefacementProccessbyWebdefacment_id', [
                         'webdefacment_id' => $webdefacment_id,
-                    ];
-
-                    Artisan::call($command);
+                    ]);
                     
                     $response = [
                         "data" => 'success',
@@ -743,7 +778,8 @@ return $result_json_e;
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            \Log::error("Backend API Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
             $response = array(
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
@@ -753,7 +789,9 @@ return $result_json_e;
             $mode = $request->mode;
             $data_request = $request -> data;
             $data = $this -> dataFalse($header, $mode, $data_request);
-            $this->saveLog($data['site']['data']['id'], json_encode($response));
+            if ($data && isset($data['site']['data']['id'])) {
+                $this->saveLog($data['site']['data']['id'], json_encode($response));
+            }
 
             return response()->json($response);
         }
@@ -802,7 +840,8 @@ return $result_json_e;
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            \Log::error("Backend API Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
             $response = array(
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
@@ -812,7 +851,9 @@ return $result_json_e;
             $mode = $request->mode;
             $data_request = $request -> data;
             $data = $this -> dataFalse($header, $mode, $data_request);
-            $this->saveLog($data['site']['data']['id'], json_encode($response));
+            if ($data && isset($data['site']['data']['id'])) {
+                $this->saveLog($data['site']['data']['id'], json_encode($response));
+            }
 
             return response()->json($response);
         }
@@ -878,7 +919,8 @@ return $result_json_e;
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            \Log::error("Backend API Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
             $response = array(
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
@@ -888,7 +930,9 @@ return $result_json_e;
             $mode = $request->mode;
             $data_request = $request -> data;
             $data = $this -> dataFalse($header, $mode, $data_request);
-            $this->saveLog($data['site']['data']['id'], json_encode($response));
+            if ($data && isset($data['site']['data']['id'])) {
+                $this->saveLog($data['site']['data']['id'], json_encode($response));
+            }
 
             return response()->json($response);
         }
@@ -950,7 +994,8 @@ return $result_json_e;
                     return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            \Log::error("Backend API Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
             $response = array(
                 'status_code' => 500,
                 'message' => $e -> getMessage(),
@@ -1296,7 +1341,8 @@ return $result_json_e;
                 return $data_return;
             }
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            \Log::error("Backend API Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
             $response = array(
                 'status' => 0,
                 'message' => $e -> getMessage(),

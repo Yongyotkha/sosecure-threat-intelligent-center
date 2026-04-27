@@ -24,11 +24,16 @@ class ApiKeywordController extends ApiController
                 $message = '';
                 $status = 0;
 
-                $code_site = $data['data']['code_site'];
+                $code_site = $data['data']['code_site'] ?? null;
                 $site = SiteSettings::select('id')->where('code', $code_site)->first();
 
-                $site_keywords_main = site_keywords_main::where('site_id', $site->id)->where('status',1)->whereNull('deleted_at')->orderBy('order','asc')->get();
-                if(!$site_keywords_main) {
+                if ($site) {
+                    $site_keywords_main = site_keywords_main::where('site_id', $site->id)->where('status',1)->whereNull('deleted_at')->orderBy('order','asc')->get();
+                } else {
+                    $site_keywords_main = collect();
+                }
+
+                if($site_keywords_main->isEmpty()) {
                     $message = langapp('changes_saved_successful');
                     $status = 1;
                 } else {
@@ -56,7 +61,7 @@ class ApiKeywordController extends ApiController
             $mode = $request->mode;
             $data_request = $request -> data;
             $data = $this -> dataFalse($header, $mode, $data_request);
-            $this->saveLog($data['site']['data']['id'], json_encode($response));
+            $this->saveLog($data['site']['data']['id'] ?? 0, json_encode($response));
 
             return response()->json($response);
         }
@@ -76,13 +81,21 @@ class ApiKeywordController extends ApiController
                 $message = '';
                 $status = 0;
 
-                $type = $data['data']['type'];
-                $code_site = $data['data']['code_site'];
+                $type = $data['data']['type'] ?? null;
+                $code_site = $data['data']['code_site'] ?? null;
 
                 $site = SiteSettings::select('id')->where('code', $code_site)->first();
 
-                $Site_keywords = Site_keywords::select('id', 'name', 'keywords_main_id', 'site_id', 'status', 'deleted_at', 'type', 'order')->where('site_id', $site->id)->where('status',1)->whereNull('deleted_at')->where('type',$type)->orderBy('order','asc')->get();
-                if(!$Site_keywords) {
+                $Site_keywords = collect();
+                if ($site) {
+                    if (is_array($type)) {
+                        $Site_keywords = Site_keywords::select('id', 'name', 'keywords_main_id', 'site_id', 'status', 'deleted_at', 'type', 'order')->where('site_id', $site->id)->where('status', 1)->whereNull('deleted_at')->whereIn('type', $type)->orderBy('order', 'asc')->get();
+                    } else {
+                        $Site_keywords = Site_keywords::select('id', 'name', 'keywords_main_id', 'site_id', 'status', 'deleted_at', 'type', 'order')->where('site_id', $site->id)->where('status', 1)->whereNull('deleted_at')->where('type', $type)->orderBy('order', 'asc')->get();
+                    }
+                }
+                
+                if ($Site_keywords->isEmpty()) {
                     $message = langapp('changes_saved_successful');
                     $status = 1;
                 } else {

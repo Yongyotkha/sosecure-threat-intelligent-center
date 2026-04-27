@@ -13,6 +13,11 @@ use Illuminate\Http\Request;
 |
 */
 
+Route::group(['prefix' => 'v1'], function() {
+    // API สำหรับดึงข้อมูล IoC เป็นไฟล์ CSV
+    Route::get('/ioc-feed/{category}.csv', 'IocFeedController@exportCsv');
+});
+
 Route::middleware('auth:api')->get('/iocfeed', function (Request $request) {
     return $request->user();
 });

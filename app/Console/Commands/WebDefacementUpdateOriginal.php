@@ -76,7 +76,7 @@ class WebDefacementUpdateOriginal extends Command
         $webdefacment_id = $this->argument('webdefacment_id');
         if (!$webdefacment_id) {
             $result["message"] = "Missing argument: webdefacment_id";
-            echo json_encode($result);
+            $this->output->write(json_encode($result));
             return 0;
         }
 
@@ -84,7 +84,7 @@ class WebDefacementUpdateOriginal extends Command
             $WebdefacmentSetting = WebdefacmentSetting::find($webdefacment_id);
             if (!$WebdefacmentSetting) {
                 $result["message"] = "No WebdefacmentSetting found.";
-                echo json_encode($result);
+                $this->output->write(json_encode($result));
                 return 0;
             }
 
@@ -100,7 +100,7 @@ class WebDefacementUpdateOriginal extends Command
             $url = $WebdefacmentSetting->url;
             if (!$this->is_url($url)) {
                 $result["message"] = "The url is not formatted.";
-                echo json_encode($result);
+                $this->output->write(json_encode($result));
                 return 0;
             }
 
@@ -200,7 +200,7 @@ class WebDefacementUpdateOriginal extends Command
                  $result["Result"] = 0;
                  $result["message"] = "Puppeteer Error: " . ($response['error'] ?? 'Unknown');
                  Log::warning("[UpdateOriginal] Puppeteer failed for {$url}: " . ($response['error'] ?? 'Unknown'));
-                 echo json_encode($result);
+                 $this->output->write(json_encode($result));
                  return 0;
             }
 
@@ -440,7 +440,7 @@ class WebDefacementUpdateOriginal extends Command
             $result["message"] = $e->getMessage();
         }
 
-        echo json_encode($result);
+        $this->output->write(json_encode($result));
         Log::info('[UpdateOriginal] done: ' . date("Y-m-d H:i:s"));
         return 0;
     }
@@ -611,33 +611,31 @@ class WebDefacementUpdateOriginal extends Command
     }
     function checkDomainHeaders($url, $format = 0)
     {
-        $url = parse_url($url);
-        $end = "\r\n\r\n";
-        $fp = fsockopen($url['host'], (empty($url['port']) ? 80 : $url['port']), $errno, $errstr, 30);
-        if ($fp) {
-            $out  = "GET / HTTP/1.1\r\n";
-            $out .= "Host: " . $url['host'] . "\r\n";
-            $out .= "Connection: Close\r\n\r\n";
-            $var  = '';
-            fwrite($fp, $out);
-            while (!feof($fp)) {
-                $var .= fgets($fp, 1280);
-                if (strpos($var, $end))
-                    break;
-            }
-            fclose($fp);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        $response = curl_exec($ch);
+        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $header = substr($response, 0, $header_size);
+        curl_close($ch);
 
-            $var = preg_replace("/\r\n\r\n.*\$/", '', $var);
-            $var = explode("\r\n", $var);
-            if ($format) {
-                foreach ($var as $i) {
-                    if (preg_match('/^([a-zA-Z -]+): +(.*)$/', $i, $parts))
-                        $v[$parts[1]] = $parts[2];
+        $headers = explode("\r\n", $header);
+        if ($format) {
+            $v = [];
+            foreach ($headers as $i) {
+                if (preg_match('/^([a-zA-Z0-9-]+): +(.*)$/', $i, $parts)) {
+                    $v[$parts[1]] = $parts[2];
                 }
-                return $v;
-            } else
-                return $var;
+            }
+            return $v;
         }
+        return $headers;
     }
     function URL_404($url)
     {

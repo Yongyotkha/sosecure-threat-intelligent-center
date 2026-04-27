@@ -2136,13 +2136,7 @@ class ApiIndicatorController extends ApiController
             $val_arr = explode(",", $val);
             if ($val_arr) {
                 foreach ($val_arr as $tag) {
-                    if ($type == 'tags') {
-                        $result .=  '<a href="' . $url . '/indicators/tags/' . $tag . '">' . $tag . '</a> ,';
-                    } else if ($type == 'groups') {
-                        $result .=  '<a href="' . $url . '/indicators/groups/' . $tag . '">' . $tag . '</a> ,';
-                    } else {
-                        $result .=  '<a href="#">' . $tag . '</a> ,';
-                    }
+                    $result .= $tag . ' ,';
                 }
                 $result = rtrim($result, ',');
             }

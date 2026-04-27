@@ -49,7 +49,8 @@ class ApiTokenController extends Controller
             'token'      => $plain,
             'expires_at' => $expiresAt ?: null,
             'site_id'    => $siteId ?: null,
-            'type'       => $type ?: null,
+            'type'         => $type ?: null,
+            'whitelist_ips'=> $request->input('whitelist_ips') ?: null,
         ]);
 
         return response()->json([

@@ -435,16 +435,26 @@ class SiteSettingsController extends Controller
         }
         $SiteSettings->save();
 
-        try{
+        try {
+            // Update Feed token settings (expires_at and whitelist_ips)
             $chk_token = ApiToken::where('site_id', $SiteSettings->id)
+                     ->where('type', 'ioc_feed')
                      ->latest('id')
                      ->first();
             if($chk_token) {
+                $needsUpdate = false;
                 if($chk_token->expires_at != $SiteSettings->end_active) {
                     $chk_token->expires_at = $SiteSettings->end_active;
+                    $needsUpdate = true;
+                }
+                if($request->has('ioc_feed_whitelist_ips')) {
+                    $chk_token->whitelist_ips = $request->ioc_feed_whitelist_ips;
+                    $needsUpdate = true;
+                }
+                if ($needsUpdate) {
                     $chk_token->updated_at = Carbon::now();
                     $chk_token->save();
-                } 
+                }
             }
         }catch (\Exception $e) {
             
