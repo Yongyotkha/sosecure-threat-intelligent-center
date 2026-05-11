@@ -22,6 +22,7 @@ use Modules\SiteSettings\Entities\DataCveven;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\Users\Entities\UserSite;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
+use Illuminate\Support\Facades\Log;
 
 class ApiDashboardController extends ApiController
 {
@@ -736,6 +737,7 @@ class ApiDashboardController extends ApiController
     public function table_dashboard(Request $request)
     {
         try {
+
             $header = $request->bearerToken();
             $mode = $request->mode;
             $data_request = $request->data;
