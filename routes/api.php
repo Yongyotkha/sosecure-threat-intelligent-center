@@ -337,6 +337,7 @@ Route::group(['prefix' => 'v1/ioc-feed', 'namespace' => '\Modules\IocFeed\Http\C
     Route::get('whitelist', 'IocWhitelistController@index');
     Route::post('whitelist', 'IocWhitelistController@store');
     Route::post('whitelist/upload', 'IocWhitelistController@upload');
+    Route::delete('whitelist', 'IocWhitelistController@bulkDestroy');
     Route::delete('whitelist/{id}', 'IocWhitelistController@destroy');
 
     Route::get('{category}.csv', 'IocFeedController@exportCsv');
