@@ -1157,7 +1157,7 @@ return (string)$v;
                     
               
                         let data = response;
-                        if (typeof response === 'string') {
+                        if (typeof response === 'string') {e
                             try { data = JSON.parse(response); } catch (e) { console.error("JSON parse error", e); }
                         }
         
