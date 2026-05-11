@@ -18,7 +18,7 @@ class IocFeedController extends Controller
 
     public function __construct()
     {
-        $mongo_uri = config('app.DB_MONGO_DEV'); // ใช้ URI จาก .env เดิมของระบบ
+        $mongo_uri = config('app.DB_MONGO'); // ใช้ URI จาก .env เดิมของระบบ
         $this->mongo = new Client($mongo_uri);
         $this->database = config('iocfeed.mongodb.database');
     }
@@ -58,6 +58,40 @@ class IocFeedController extends Controller
      */
     public function exportCsv(Request $request, $category)
     {
+        // 0. ตรวจสอบ Token & IP Whitelist
+        $tokenStr = $request->input('token');
+        if (!$tokenStr) {
+            return response()->json(['error' => 'API Token is required'], 401);
+        }
+
+        $token = \App\ApiToken::where('token', $tokenStr)
+            ->where('type', 'ioc_feed')
+            ->first();
+
+        if (!$token) {
+            return response()->json(['error' => 'Invalid or expired API Token'], 401);
+        }
+
+        // ตรวจสอบ IP Whitelist (ต้องมีการระบุไว้เสมอ)
+        if (empty($token->whitelist_ips)) {
+            Log::channel('ioc_feed')->warning("IoC Feed Access Blocked: No IP Whitelist configured for token [{$token->name}]");
+            return response()->json(['error' => 'Forbidden: No Permission'], 403);
+        }
+
+        $allowedIps = array_filter(array_map('trim', explode(',', str_replace(["\r\n", "\n"], ',', $token->whitelist_ips))));
+        $clientIp = $request->ip();
+        
+        if (!in_array($clientIp, $allowedIps)) {
+            Log::channel('ioc_feed')->warning("IoC Feed Access Blocked: IP {$clientIp} not whitelisted for token [{$token->name}]");
+            return response()->json(['error' => 'Forbidden: No Permission'], 403);
+        }
+
+        // บันทึกข้อมูลการใช้งานล่าสุด
+        $token->update([
+            'last_used_at' => now(),
+            'last_ip' => $request->ip()
+        ]);
+
         // 1. ตรวจสอบหมวดหมู่ (IP, Domain, Hash, All)
         $validCategories = ['ip_address', 'domain', 'hashfile', 'all'];
         if (!in_array($category, $validCategories)) {
@@ -72,14 +106,14 @@ class IocFeedController extends Controller
         if (!$hasFilters) {
             $staticFile = base_path("Modules/IocFeed/Exports/{$category}.csv");
             if (file_exists($staticFile)) {
-                Log::info("IoC Feed Export: [{$category}] served from STATIC FILE. Client IP: " . $request->ip());
+                Log::channel('ioc_feed')->info("IoC Feed Export: [{$category}] served from STATIC FILE. Client IP: " . $request->ip());
                 return response()->download($staticFile, $category . '.csv', [
                     'Content-Type' => 'text/plain; charset=utf-8',
                 ]);
             }
         }
 
-        Log::info("IoC Feed Export: [{$category}] generated from DATABASE. Client IP: " . $request->ip());
+        Log::channel('ioc_feed')->info("IoC Feed Export: [{$category}] generated from DATABASE. Client IP: " . $request->ip());
 
         // 2. ดึงข้อมูลจาก MongoDB โดยใช้ Flag 'is_whitelisted' ในการกรองขยะออก (Fallback)
         $query = [
@@ -248,23 +282,88 @@ class IocFeedController extends Controller
      */
     public function storeWhitelist(Request $request)
     {
-        $request->validate([
-            'indicator' => 'required',
-            'type' => 'required|in:ip_address,domain,hashfile',
-        ]);
+        $hasItems = $request->has('items') && is_array($request->input('items'));
+        
+        if ($hasItems) {
+            $request->validate([
+                'items.*.indicator' => 'required',
+                'items.*.type' => 'required|in:ip_address,domain,hashfile',
+            ]);
+            $items = $request->input('items');
+        } else {
+            $request->validate([
+                'indicator' => 'required',
+                'type' => 'required|in:ip_address,domain,hashfile',
+            ]);
+            $items = [$request->only(['indicator', 'type'])];
+        }
 
-        $data = $request->only(['indicator', 'type']);
-        $data['created_at'] = new UTCDateTime();
+        $now = new UTCDateTime();
+        $insertedCount = 0;
+        $bulkOps = [];
 
-        $this->collection('whitelists')->updateOne(
-            ['indicator' => $data['indicator'], 'type' => $data['type']],
-            ['$set' => $data],
-            ['upsert' => true]
-        );
+        foreach ($items as $item) {
+            $item['created_at'] = $now;
+            
+            $bulkOps[] = [
+                'updateOne' => [
+                    ['indicator' => $item['indicator'], 'type' => $item['type']],
+                    ['$set' => $item],
+                    ['upsert' => true]
+                ]
+            ];
+            $insertedCount++;
+        }
 
-        $this->auditLog('ADD_WHITELIST', $data);
+        if (!empty($bulkOps)) {
+            $this->collection('whitelists')->bulkWrite($bulkOps);
+        }
 
-        return response()->json(['success' => true]);
+        $this->auditLog('ADD_WHITELIST', $hasItems ? ['count' => $insertedCount] : $items[0]);
+
+        return response()->json(['success' => true, 'message' => "Added/Updated {$insertedCount} items in whitelist."]);
+    }
+
+    /**
+     * Remove from Whitelist
+     */
+    public function destroyWhitelist(Request $request)
+    {
+        $hasItems = $request->has('items') && is_array($request->input('items'));
+        
+        if ($hasItems) {
+            $request->validate([
+                'items.*.indicator' => 'required',
+                'items.*.type' => 'required|in:ip_address,domain,hashfile',
+            ]);
+            $items = $request->input('items');
+        } else {
+            $request->validate([
+                'indicator' => 'required',
+                'type' => 'required|in:ip_address,domain,hashfile',
+            ]);
+            $items = [$request->only(['indicator', 'type'])];
+        }
+
+        $bulkOps = [];
+
+        foreach ($items as $item) {
+            $bulkOps[] = [
+                'deleteOne' => [
+                    ['indicator' => $item['indicator'], 'type' => $item['type']]
+                ]
+            ];
+        }
+
+        $deletedCount = 0;
+        if (!empty($bulkOps)) {
+            $result = $this->collection('whitelists')->bulkWrite($bulkOps);
+            $deletedCount = $result->getDeletedCount();
+        }
+
+        $this->auditLog('DELETE_WHITELIST', $hasItems ? ['count' => $deletedCount] : $items[0]);
+
+        return response()->json(['success' => true, 'message' => "Deleted {$deletedCount} items from whitelist."]);
     }
 
     /**

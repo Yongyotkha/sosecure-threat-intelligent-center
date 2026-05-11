@@ -6,31 +6,62 @@ use Illuminate\Console\Command;
 
 class UpdateIocFeed extends Command
 {
-    protected $signature = 'ioc-feed:update {--all : Sync all data instead of just recent} {--lookback=300 : Lookback window in seconds (default 5 mins)} {--days= : Sync data from the last X days} {--weeks= : Sync data from the last X weeks} {--months= : Sync data from the last X months} {--limit= : Limit the number of indicators to sync}';
+    protected $signature = 'ioc-feed:update {--all : Sync all data instead of just recent} {--lookback=18000 : Lookback window in seconds (default 5 hours)} {--days= : Sync data from the last X days} {--weeks= : Sync data from the last X weeks} {--months= : Sync data from the last X months} {--limit= : Limit the number of indicators to sync} {--export-only : Only regenerate static CSV files}';
     protected $description = 'Sync fresh IoCs with enriched scores via delta-sync (Micro-Batching)';
 
     protected $totalSynced = 0;
     protected $totalSkippedNoEvent = 0;
     protected $totalSkippedNoScore = 0;
 
+    public function info($string, $verbosity = null)
+    {
+        if (strpos($string, 'Starting IoC Feed') !== false || strpos($string, 'Successfully synced') !== false) {
+            $timestamp = '[' . date('Y-m-d H:i:s') . '] ';
+            parent::info($timestamp . $string, $verbosity);
+            @file_put_contents(storage_path('logs/ioc_feed_update.log'), $timestamp . $string . PHP_EOL, FILE_APPEND);
+        }
+    }
+
+    public function error($string, $verbosity = null)
+    {
+        $timestamp = '[' . date('Y-m-d H:i:s') . '] ';
+        parent::error($timestamp . $string, $verbosity);
+        @file_put_contents(storage_path('logs/ioc_feed_update.log'), $timestamp . $string . PHP_EOL, FILE_APPEND);
+    }
+
     public function handle()
     {
-        ini_set('memory_limit', '1024M');
-        $this->info('Starting IoC Feed Update...');
+        try {
+            ini_set('memory_limit', '1024M');
+            $this->info('Starting IoC Feed Update...');
 
-        $mongo_uri = config('app.DB_MONGO_DEV');
+        $mongo_uri = config('app.DB_MONGO');
         $client = new \MongoDB\Client($mongo_uri);
         
         $sourceDb = 'sosecure_threatintelligent';
-        $targetDb = config('iocfeed.mongodb.database', 'sosecure_threatintelligent_dev');
+        $targetDb = config('iocfeed.mongodb.database', 'sosecure_threatintelligent');
         
-        $sourceColl = $client->{$sourceDb}->fx_transaction_otx_indicators_data;
+        $isFullSync = $this->option('all');
+        $sourceColl = $isFullSync 
+            ? $client->{$sourceDb}->fx_otx_events_indicator_ref 
+            : $client->{$sourceDb}->fx_transaction_otx_indicators_data;
+            
         $refColl = $client->{$sourceDb}->fx_otx_events_indicator_ref;
         $detailColl = $client->{$sourceDb}->fx_otx_indicator_detail;
         $eventsColl = $client->{$sourceDb}->fx_otx_events;
         $targetColl = $client->{$targetDb}->fx_ioc_feeds;
         $logColl = $client->{$targetDb}->fx_ioc_export_logs;
         $progressColl = $client->{$targetDb}->job_progress;
+        $txColl = $client->{$targetDb}->fx_ioc_feed_transactions;
+
+        // สร้างตาราง Transaction ล่วงหน้าทันทีหากยังไม่มี (ลบออกเพราะ MongoDB จะสร้างให้อัตโนมัติเมื่อมีการ insert)
+        
+        if ($this->option('export-only')) {
+            $this->info("Export-only mode triggered. Regenerating static CSV feeds...");
+            $whitelistColl = $client->{$targetDb}->fx_ioc_whitelist;
+            $this->exportStaticFeeds($targetColl, $whitelistColl);
+            return;
+        }
 
         // ========== STEP 0: Manage Unique Index (Aggressive Cleanup for Dev) ==========
         $this->info("Refreshing unique index structure on target collection...");
@@ -60,7 +91,7 @@ class UpdateIocFeed extends Command
         }
 
         // ========== STEP 1: Manage Checkpoints (Resume Capability) ==========
-        $jobName = 'ioc_feed_sync_all';
+        $jobName = $this->option('all') ? 'ioc_feed_sync_from_ref' : 'ioc_feed_sync_delta';
         $checkpoint = null;
         if ($this->option('all')) {
             $checkpoint = $progressColl->findOne(['job_name' => $jobName]);
@@ -139,17 +170,15 @@ class UpdateIocFeed extends Command
                 ['enriched_at' => ['$gte' => clone $lookbackWindow]]
             ];
 
-            // 2. ตรวจสอบจากตาราง Detail (Enrichment Global) - ตารางนี้มักจะไม่ใหญ่มาก
-            $detailColl = $client->{$sourceDb}->fx_otx_indicator_detail;
-            $recentEnrichedDetail = $detailColl->find(
-                ['$or' => [
-                    ['updated_at' => ['$gte' => clone $lookbackWindow]],
-                    ['enriched_at' => ['$gte' => clone $lookbackWindow]]
-                ]],
-                ['projection' => ['indicator_id' => 1], 'limit' => 5000]
+            // 2. ตรวจสอบจากตาราง Temp (Enrichment Log) - ตารางเล็ก เร็วมาก
+            //    เมื่อผู้ใช้กด Enrich ระบบจะบันทึก indicator ไว้ที่นี่อัตโนมัติ
+            $tempColl = $client->{$sourceDb}->fx_indicators_temp;
+            $recentEnrichedTemp = $tempColl->find(
+                ['imported_at' => ['$gte' => date('Y-m-d H:i:s', time() - $lookbackSeconds)]],
+                ['projection' => ['attribute_id' => 1]]
             )->toArray();
 
-            $enrichedIds = array_filter(array_column($recentEnrichedDetail, 'indicator_id'));
+            $enrichedIds = array_filter(array_column($recentEnrichedTemp, 'attribute_id'));
             $uniqueEnrichedIds = array_values(array_unique($enrichedIds));
 
             if (!empty($uniqueEnrichedIds)) {
@@ -186,12 +215,12 @@ class UpdateIocFeed extends Command
         foreach ($cursor as $doc) {
             $chunk[] = $doc;
             if (count($chunk) >= 1000) {
-                $this->processChunk($chunk, $detailColl, $refColl, $eventsColl, $targetColl, $whitelistList, $progressColl, $jobName);
+                $this->processChunk($chunk, $detailColl, $refColl, $eventsColl, $targetColl, $whitelistList, $txColl, $progressColl, $jobName);
                 $chunk = [];
             }
         }
         if (!empty($chunk)) {
-            $this->processChunk($chunk, $detailColl, $refColl, $eventsColl, $targetColl, $whitelistList, $progressColl, $jobName);
+            $this->processChunk($chunk, $detailColl, $refColl, $eventsColl, $targetColl, $whitelistList, $txColl, $progressColl, $jobName);
         }
 
         // ========== STEP 5: บันทึก Log ข้อมูลใหม่ & Clear Checkpoint ==========
@@ -221,16 +250,27 @@ class UpdateIocFeed extends Command
         $this->info("Successfully synced {$this->totalSynced} indicators. Log saved.");
 
         // ========== STEP 6: Generate Static Feeds for Fast Export ==========
-        $this->exportStaticFeeds($targetColl);
+        $this->exportStaticFeeds($targetColl, $whitelistColl);
+        } catch (\Exception $e) {
+            $this->error("Error in IoC Feed Update: " . $e->getMessage());
+        }
     }
 
     /**
      * Generate pre-formatted CSV files for fast API serving
      */
-    private function exportStaticFeeds($targetColl)
+    private function exportStaticFeeds($targetColl, $whitelistColl)
     {
         $categories = ['all', 'ip_address', 'domain', 'hashfile'];
         $baseDir = base_path('Modules/IocFeed/Exports/');
+
+        // Load current whitelist directly from DB for dynamic filtering
+        $whitelistDocs = $whitelistColl->find([], ['projection' => ['indicator' => 1]])->toArray();
+        $whitelistList = [];
+        foreach ($whitelistDocs as $wd) {
+            $whitelistList[$wd['indicator']] = true;
+        }
+        $this->info("Loaded " . count($whitelistList) . " whitelist records for CSV generation.");
 
         foreach ($categories as $cat) {
             $this->info("Generating static feed for category: $cat...");
@@ -255,6 +295,12 @@ class UpdateIocFeed extends Command
             
             foreach ($cursor as $row) {
                 $ip = trim($row['indicator'] ?? '');
+                
+                // 🔥 Dynamic Whitelist Filtering
+                if (isset($whitelistList[$ip])) {
+                    continue;
+                }
+
                 $score = $row['score'] ?? 0;
                 $startTime = $row['ioc_timestamp'] ?? date('d/m/Y H:i');
                 $endTime = $row['sending_timestamp'] ?? date('d/m/Y H:i');
@@ -276,7 +322,7 @@ class UpdateIocFeed extends Command
         }
     }
 
-    private function processChunk($sourceData, $detailColl, $refColl, $eventsColl, $targetColl, $whitelistList, $progressColl = null, $jobName = null)
+    private function processChunk($sourceData, $detailColl, $refColl, $eventsColl, $targetColl, $whitelistList, $txColl = null, $progressColl = null, $jobName = null)
     {
         $indicatorIds = [];
         foreach ($sourceData as $doc) {
@@ -403,12 +449,18 @@ class UpdateIocFeed extends Command
             $latestRefData = null;
             $maxTs = 0;
 
-            foreach ($eventsForInd as $pulseId => $refData) {
-                $ts = $this->getLatestTimestamp($doc, $refData, $detailMap[$indId] ?? null);
-                if ($ts >= $maxTs) {
-                    $maxTs = $ts;
-                    $latestPulseId = $pulseId;
-                    $latestRefData = $refData;
+            if ($this->option('all') && !empty($doc['pulse_id'])) {
+                // ถ้ามาจากการกวาด Ref โดยตรง ให้ใช้ข้อมูลในตัวมันเองเลย
+                $latestPulseId = (string)$doc['pulse_id'];
+                $latestRefData = $doc;
+            } else {
+                foreach ($eventsForInd as $pulseId => $refData) {
+                    $ts = $this->getLatestTimestamp($doc, $refData, $detailMap[$indId] ?? null);
+                    if ($ts >= $maxTs) {
+                        $maxTs = $ts;
+                        $latestPulseId = $pulseId;
+                        $latestRefData = $refData;
+                    }
                 }
             }
 
@@ -424,8 +476,20 @@ class UpdateIocFeed extends Command
             }
 
             // 🚩 ตรวจสอบว่ามีข้อมูล Score หรือ Severity หรือไม่ (ถ้าเป็น 0 เอามา แต่ถ้าเป็น null ทั้งคู่ไม่เอา)
-            $rawScore = $latestRefData['score'] ?? ($detail['score'] ?? ($doc['score'] ?? null));
-            $rawSeverity = $latestRefData['severity'] ?? ($detail['severity'] ?? null);
+            $detailInfo = $detailMap[$indId] ?? [];
+            $rawScore = $latestRefData['score'] ?? ($detailInfo['score'] ?? ($doc['score'] ?? ($doc['attribute_score'] ?? null)));
+            $rawSeverity = $latestRefData['severity'] ?? ($detailInfo['severity'] ?? ($doc['attribute_serverity'] ?? null));
+
+            // ถ้า pulse ล่าสุดไม่มี score ให้ค้นหา pulse อื่นที่มี score (กรณี enriched คนละ pulse)
+            if ($rawScore === null && $rawSeverity === null && !empty($eventsForInd)) {
+                foreach ($eventsForInd as $pId => $rData) {
+                    if (!empty($rData['score']) || !empty($rData['severity'])) {
+                        $rawScore = $rData['score'] ?? null;
+                        $rawSeverity = $rData['severity'] ?? null;
+                        break;
+                    }
+                }
+            }
 
             // ต้องมี Score (จะ 0 ก็ได้) หรือมี Severity
             if ($rawScore === null && $rawSeverity === null) {
@@ -476,9 +540,54 @@ class UpdateIocFeed extends Command
 
         if (!empty($batch)) {
             try {
+                // ค้นหาตัวที่มีอยู่แล้วในตารางหลัก สำหรับ chunk นี้ เพื่อแยกแยะ ADD และ UPDATE
+                $txBatch = [];
+                $indicatorsInChunk = array_keys($batch);
+                $existingIndicators = [];
+                $existingDocs = $targetColl->find(['indicator' => ['$in' => $indicatorsInChunk]], ['projection' => ['indicator' => 1, 'score' => 1]])->toArray();
+                foreach ($existingDocs as $ed) {
+                    // เก็บข้อมูลคะแนนเก่าเอาไว้
+                    $existingIndicators[$ed['indicator']] = (int)($ed['score'] ?? 0);
+                }
+
                 $targetColl->bulkWrite(array_values($batch));
                 $this->totalSynced += count($batch);
                 $this->info("Synced " . count($batch) . " unique indicators (Total: {$this->totalSynced})");
+
+                // 📝 บันทึกประวัติความเคลื่อนไหว (ADD / UPDATE)
+                if ($txColl) {
+                    foreach ($batch as $indicator => $op) {
+                        $type = $op['updateOne'][1]['$set']['type'] ?? 'ip_address';
+                        $newScore = (int)($op['updateOne'][1]['$set']['score'] ?? 0);
+                        
+                        if (!isset($existingIndicators[$indicator])) {
+                            // กรณีที่ 1: ตัวใหม่เพิ่งเคยตรวจเจอ (ADD)
+                            $txBatch[] = [
+                                'indicator' => $indicator,
+                                'type' => $type,
+                                'action' => 'ADD',
+                                'reason' => 'New threat detected',
+                                'created_at' => new \MongoDB\BSON\UTCDateTime()
+                            ];
+                        } else {
+                            // กรณีที่ 2: มีตัวอยู่แล้ว ให้เช็คว่าคะแนนเปลี่ยนไหม (UPDATE)
+                            $oldScore = $existingIndicators[$indicator];
+                            if ($oldScore !== $newScore) {
+                                $txBatch[] = [
+                                    'indicator' => $indicator,
+                                    'type' => $type,
+                                    'action' => 'UPDATE',
+                                    'reason' => 'Score changed from ' . $oldScore . ' to ' . $newScore,
+                                    'created_at' => new \MongoDB\BSON\UTCDateTime()
+                                ];
+                            }
+                        }
+                    }
+                    
+                    if (!empty($txBatch)) {
+                        $txColl->insertMany($txBatch);
+                    }
+                }
                 
                 // 💾 บันทึก Checkpoint ทันทีที่ Sync แต่ละ Chunk สำเร็จ (เฉพาะเคส --all)
                 if ($progressColl && $jobName) {

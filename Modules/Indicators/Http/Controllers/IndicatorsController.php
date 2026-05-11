@@ -3159,7 +3159,6 @@ class IndicatorsController extends Controller
     }
     public function indicator_public(Request $request)
     {
-
         try {
             $input = $request->all();
             // dd($input);
@@ -3260,7 +3259,7 @@ class IndicatorsController extends Controller
                 $color = "#ffffff";
 
                 //ลบก่อน
-                DB::connection('mysql_misp')->table('event_tags')
+                DB::connection('mysql_misp')->table('bgs')
                     ->where('event_id', '=', $pulseId)
                     ->delete();
 

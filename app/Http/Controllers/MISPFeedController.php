@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use App\ApiToken;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
 
 class MISPFeedController extends Controller
 {
@@ -212,8 +213,11 @@ class MISPFeedController extends Controller
             ];
 
             $query = array(
-                'status' => 1,
-                'deleted_at' => null,
+                'status' => ['$in' => [1, "1", true]],
+                '$or' => [
+                    ['deleted_at' => null],
+                    ['deleted_at' => ['$exists' => false]],
+                ],
             );
             // วันที่เริ่มต้น: เวลา 00:00 ของวันนี้
             $start = strtotime(date('Y-m-d 00:00:00')) * 1000;
@@ -229,7 +233,7 @@ class MISPFeedController extends Controller
                 '$lte' => new UTCDateTime($end)
             ];
             $query['mips_uuid'] = $uuid;
-            $query['public'] = 1;
+            $query['public'] = ['$in' => [1, "1", true]];
             $query['indicator_count'] = ['$ne' => 0];
             $cursor = $col_fx_otx_events->find($query, $options);
             $cursor = $cursor->toArray();
@@ -421,11 +425,33 @@ class MISPFeedController extends Controller
 
                     $event['Attribute'] = $Array_indicator;
 
+                    // --- START LOGGING OUTBOUND DATA ---
+                    try {
+                $logCol = $clientMD->sosecure_threatintelligent->fx_feed_access_logs;
+
+                        $logCol->insertOne([
+                            'timestamp' => new UTCDateTime(strtotime(now()) * 1000),
+                            'request_time' => date('Y-m-d H:i:s'),
+                            'client_ip' => request()->ip(),
+                            'mips_uuid' => $mips_uuid,
+                            'pulse_id' => $document["pulse_id"] ?? null,
+                            'event_name' => $document["name"] ?? '',
+                            'indicator_count' => count($Array_indicator),
+                            'indicators' => array_column($Array_indicator, 'value'),
+                            'api_endpoint' => 'generateJsonFeed',
+                            'status' => 'success'
+                        ]);
+                    } catch (\Exception $e) {
+                        \Log::error("Failed to log feed access: " . $e->getMessage());
+                    }
+                    // --- END LOGGING OUTBOUND DATA ---
+
                     return response()->json([
                         'Event' => $event
                     ], 200, [], JSON_PRETTY_PRINT);
                 }
             }
+
         } catch (\Throwable $e) {
 
             return response()->json(['error' => 'Unable to load feed data'], 500);
@@ -454,7 +480,8 @@ class MISPFeedController extends Controller
 
     public function listFeeds()
     {
-
+        Artisan::call('app:AuditPublishedFeeds');
+        
         // $siteId = (int) $request->attributes->get('site_id'); // 👈 ได้จาก token อัตโนมัติ
         // if (!$siteId) abort(403, 'Site context required');
 
@@ -487,8 +514,11 @@ class MISPFeedController extends Controller
             ];
 
             $query = array(
-                'status' => 1,
-                'deleted_at' => null,
+                'status' => ['$in' => [1, "1", true]],
+                '$or' => [
+                    ['deleted_at' => null],
+                    ['deleted_at' => ['$exists' => false]],
+                ],
             );
             // วันที่เริ่มต้น: เวลา 00:00 ของวันนี้
             $start = strtotime(date('Y-m-d 00:00:00')) * 1000;
@@ -504,7 +534,7 @@ class MISPFeedController extends Controller
                 '$lte' => new UTCDateTime($end)
             ];
             // $query['mips_uuid'] = 'f066e3b3-faca-4600-8ff4-c84f1c7d8e40';
-            $query['public'] = 1;
+            $query['public'] = ['$in' => [1, "1", true]];
             $query['creator_org'] = "OTX";
             $query['indicator_count'] = ['$ne' => 0];
             $cursor = $col_fx_otx_events->find($query, $options);
@@ -707,6 +737,8 @@ class MISPFeedController extends Controller
 
     public function manifest(Request $request)
     {
+        Artisan::call('app:AuditPublishedFeeds');
+        
         try {
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             if (empty($DB_MONGO_KEY)) {
@@ -723,9 +755,9 @@ class MISPFeedController extends Controller
 
             // เงื่อนไขยืดหยุ่นกัน type (1/true) และ deleted_at ไม่มีฟิลด์
             $query = [
-                'status'          => ['$in' => [1, true]],
+                'status'          => ['$in' => [1, "1", true]],
                 '$or'             => [['deleted_at' => null], ['deleted_at' => ['$exists' => false]]],
-                'public'          => ['$in' => [1, true]],
+                'public'          => ['$in' => [1, "1", true]],
                 'indicator_count' => ['$gt' => 0],
                 'modified'        => [
                     '$gte' => new \MongoDB\BSON\UTCDateTime($startMs),
@@ -932,7 +964,29 @@ class MISPFeedController extends Controller
 
             $event['Attribute'] = $attributes;
 
+            // --- START LOGGING OUTBOUND DATA ---
+            try {
+                $logCol = $client->sosecure_threatintelligent->fx_feed_access_logs;
+
+                $logCol->insertOne([
+                    'timestamp' => new \MongoDB\BSON\UTCDateTime(strtotime(now()) * 1000),
+                    'request_time' => date('Y-m-d H:i:s'),
+                    'client_ip' => request()->ip(),
+                    'mips_uuid' => $uuid,
+                    'pulse_id' => $doc['pulse_id'] ?? null,
+                    'event_name' => $doc['name'] ?? '',
+                    'indicator_count' => count($attributes),
+                    'indicators' => array_column($attributes, 'value'),
+                    'api_endpoint' => 'event',
+                    'status' => 'success'
+                ]);
+            } catch (\Exception $e) {
+                \Log::error("Failed to log feed access (event): " . $e->getMessage());
+            }
+            // --- END LOGGING OUTBOUND DATA ---
+
             return response()->json(['Event' => $event], 200, [], JSON_PRETTY_PRINT);
+
         } catch (\Throwable $e) {
             Log::error('FEED event failed', ['uuid' => $uuid, 'msg' => $e->getMessage(), 'line' => $e->getLine()]);
             return response()->json(['error' => 'Unable to load feed data'], 500);

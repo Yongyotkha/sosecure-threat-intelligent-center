@@ -9,6 +9,8 @@ use Artisan;
 
 class OTXMDFeedIndicator extends Command
 {
+    protected $totalIndicatorsFromApi = 0;
+    protected $totalIndicatorsProcessed = 0;
     /**
      * The name and signature of the console command.
      *
@@ -40,6 +42,9 @@ class OTXMDFeedIndicator extends Command
      */
     public function handle()
     {
+        $this->totalIndicatorsFromApi = 0;
+        $this->totalIndicatorsProcessed = 0;
+
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
         $urlLimit = 3;
         $retryLimit = 1;
@@ -77,6 +82,8 @@ class OTXMDFeedIndicator extends Command
                 //$reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/indicators/?type=CVE&include_inactive=0&sort=-modified&q=modified:""&page=1&limit=100', $urlLimit);
                 if ($reconCall["success"]) {
                     $otxFeedData = json_decode($reconCall["result"], true);
+                    $this->totalIndicatorsFromApi = $otxFeedData['count'] ?? 0;
+                    $this->info("Total indicators from OTX API: " . $this->totalIndicatorsFromApi);
                 } else {
                     $otxFeedDataCheck = false;
                     $otxSuccessCheck = false;
@@ -86,6 +93,7 @@ class OTXMDFeedIndicator extends Command
                 while ($otxFeedDataCheck) {
                     if (!empty($otxFeedData["results"])) {
                         foreach ($otxFeedData["results"] as $value) {
+                            $this->totalIndicatorsProcessed++;
                             try {
 
                                 print_r($value);
@@ -159,8 +167,17 @@ class OTXMDFeedIndicator extends Command
             if ($otxSuccessCheck && isset($insertOneResult)) {
                 $updateResult2 = $collectionStamp->updateOne(
                     ['_id' => $insertOneResult->getInsertedId()],
-                    ['$set' => ['status' => 2]]
+                    ['$set' => [
+                        'status' => 2,
+                        'api_total_indicators' => $this->totalIndicatorsFromApi,
+                        'processed_indicators' => $this->totalIndicatorsProcessed,
+                    ]]
                 );
+                $this->info("=========================================");
+                $this->info("SUMMARY REPORT (OTX INDICATOR FEED)");
+                $this->info("=========================================");
+                $this->info("INDICATORS : " . $this->totalIndicatorsProcessed . " / " . $this->totalIndicatorsFromApi . " (" . ($this->totalIndicatorsFromApi > 0 ? round(($this->totalIndicatorsProcessed/$this->totalIndicatorsFromApi)*100, 2) : 0) . "%)");
+                $this->info("=========================================");
                 $this->info("app:OTXMDFeedIndicator SUCCESS ALL CONTENT");
             } else {
                 $this->info("app:OTXMDFeedIndicator FAIL SOME CONTENT");
