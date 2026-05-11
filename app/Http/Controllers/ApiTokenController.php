@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\ApiToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class ApiTokenController extends Controller
 {
