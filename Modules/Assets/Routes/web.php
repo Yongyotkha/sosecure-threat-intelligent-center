@@ -28,6 +28,8 @@ Route::group(
         Route::get('selectData', 'AssetsController@get_selected_filter')->name('assets.get_selected_filter');
         Route::post('assets_add_user', 'AssetsController@web_server_add_user')->name('assets.assets_add_user');
         Route::post('assets_add_data', 'AssetsController@assets_add_data')->name('assets.assets_add_data');
+        Route::get('assets_delete_port/{id}/{menu}', 'AssetsController@assets_delete_port')->name('assets.assets_delete_port');
+        Route::delete('methot_delete_port/{id}/{page}', 'AssetsController@methot_delete_port')->name('assets.methot_delete_port');
         Route::delete('methot_delete_cpe/{cpecode}/{page}', 'AssetsController@methot_delete_cpe')->name('assets.methot_delete_cpe');
 
         Route::get('selectCPE_by', 'AssetsController@selectCPE_by')->name('assets.selectCPE_by')->middleware('can:menu_items');

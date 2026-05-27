@@ -5384,6 +5384,17 @@ section#av-detection .main-int-card.active .av-container.border-success {
     display: flex;
 }
 
+.st-dt-leak {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+.st-dt.crit {
+    background-color: #8b0000;
+    color: #fff;
+}
+
 .st-dt.vrh {
     background-color: #b93624;
     color: #fff;
@@ -5395,8 +5406,13 @@ section#av-detection .main-int-card.active .av-container.border-success {
 }
 
 .st-dt.md {
-    background-color: #f2ff15;
-    color: #000;
+    background-color: #ffb000;
+    color: #333;
+}
+
+.st-dt.info {
+    background-color: #22b9ff;
+    color: #fff;
 }
 
 .st-dt.low {
@@ -5416,6 +5432,11 @@ section#av-detection .main-int-card.active .av-container.border-success {
     justify-content: center;
 }
 
+.box-st-tooltip.crit {
+    background-color: #8b0000;
+    color: #fff;
+}
+
 .box-st-tooltip.vrh {
     background-color: #b93624;
     color: #fff;
@@ -5426,7 +5447,12 @@ section#av-detection .main-int-card.active .av-container.border-success {
 }
 
 .box-st-tooltip.md {
-    background-color: #f2ff15;
+    background-color: #ffb000;
+}
+
+.box-st-tooltip.info {
+    background-color: #22b9ff;
+    color: #fff;
 }
 
 .box-st-tooltip.low {

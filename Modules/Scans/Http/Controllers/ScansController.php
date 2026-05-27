@@ -98,7 +98,12 @@ class ScansController extends Controller
             $query = TransactionScans::where('site_id', $data['site_id'])
                 ->where('domain_id', $data['domain_id']);
 
-            if (count($roots) > 0) {
+            if (!empty($data['ids'])) {
+                // If specific IDs are provided (from a grouped table row), use them strictly
+                // This ensures the modal only shows data that was actually in the selected row
+                $ids = is_array($data['ids']) ? $data['ids'] : explode(',', $data['ids']);
+                $query->whereIn('id', $ids);
+            } else if (count($roots) > 0) {
                 $query->where(function ($q) use ($roots) {
                     $q->whereIn('raw_data', $roots)
                       ->orWhereIn('referent', $roots)
@@ -163,6 +168,9 @@ class ScansController extends Controller
 
             foreach ($request->assets_data as $item) {
                 if (!$item || !isset($item['raw_data_base'])) continue;
+                
+                // Fix: Only process data belonging to the current asset in the loop
+                if ($item['raw_data_base'] != $data['raw_data']) continue;
 
                 // If we are saving an IP Address in this request, update our assetIP
                 if ($item['data_type'] == $ipTypeId) {
@@ -313,7 +321,8 @@ class ScansController extends Controller
                         }
                     }
                     $cve_assets_ref->IP = $assetIP;
-                    $cve_assets_ref->Hostname = $domain ? $domain->name : '';
+                    // Fix: Use raw_data_base as the hostname if it's not an IP, otherwise fallback to domain
+                    $cve_assets_ref->Hostname = (!filter_var($item['raw_data_base'], FILTER_VALIDATE_IP)) ? $item['raw_data_base'] : ($domain ? $domain->domain : '');
                     $cve_assets_ref->site_id = $data['site_id'];
                     $cve_assets_ref->active = 1;
                     $cve_assets_ref->ref_cpe = $newCPE->id;
@@ -332,7 +341,7 @@ class ScansController extends Controller
                         ->where(function ($query) use ($parentValue, $domain) {
                             $query->where('target', $parentValue);
                             if ($domain) {
-                                $query->orWhere('target', $domain->name);
+                                $query->orWhere('target', $domain->domain);
                             }
                         })
                         ->where(function ($query) use ($vendor_name, $product_name) {
@@ -426,7 +435,6 @@ class ScansController extends Controller
                         $TransactionScans->save();
                     }
                 }
-
                 // Restore immediate mapping for Direct CVE (Datatype 16)
                 if ($AssetsData && $item['data_type'] == 16) {
                     $mappingTarget = (!empty($item['ip_address'])) ? $item['ip_address'] : $item['raw_data_base'];
@@ -449,6 +457,12 @@ class ScansController extends Controller
                     }
                 }
             }
+        }
+
+        // --- NEW: STRICT STATUS UPDATE BY IDs ---
+        // If specific record IDs were passed from the table rows, mark them all as used
+        if ($request->has('ids') && is_array($request->ids)) {
+            TransactionScans::whereIn('id', $request->ids)->update(['status_asset_use' => 1]);
         }
 
         // Catch-all Smart Sweep (moved outside all loops for performance)
@@ -549,13 +563,17 @@ class ScansController extends Controller
             foreach ($request->assets_data as $item) {
                 if (!$item || !isset($item['raw_data_base'])) continue;
 
+                // Fix: Only process data belonging to the current asset based on index
+                if ($item['raw_data_base'] != $data['raw_data_base']) continue;
+
                 // If we are saving an IP Address in this request, update our assetIP
                 if ($item['data_type'] == $ipTypeId) {
                     $assetIP = $item['raw_data'];
                 }
+                
                 // --- SMART ASSET LINKING ---
-                // If ip_address is provided, use it instead of the domain as the base for ports and other findings
-                $mappingBase = (!empty($item['ip_address'])) ? $item['ip_address'] : $item['raw_data_base'];
+                // For manual add, we use the asset hostname as the primary base
+                $mappingBase = $data['raw_data']; 
                 $currentAsset = Assets::where('raw_data', $mappingBase)->where('site_id', $data['site_id'])->where('domain_id', $data['domain_id'])->first();
                 if (!$currentAsset) {
                     $currentAsset = new Assets;
@@ -693,7 +711,8 @@ class ScansController extends Controller
                         }
                     }
                     $cve_assets_ref->IP = $assetIP;
-                    $cve_assets_ref->Hostname = $domain ? $domain->name : '';
+                    // Fix: Use raw_data_base as the hostname if it's not an IP, otherwise fallback to domain
+                    $cve_assets_ref->Hostname = (!filter_var($item['raw_data_base'], FILTER_VALIDATE_IP)) ? $item['raw_data_base'] : ($domain ? $domain->domain : '');
                     $cve_assets_ref->site_id = $data['site_id'];
                     $cve_assets_ref->active = 1;
                     $cve_assets_ref->ref_cpe = $newCPE->id;
@@ -702,16 +721,17 @@ class ScansController extends Controller
                     $newCPE->ref_cve_assets = $cve_assets_ref->id;
                     $newCPE->save();
 
-                    // Track this cve_asset_id for internal mapping
+                    // Track this cve_asset_id for future mappings (like Direct CVEs)
                     $cveAssetIdMap[$parentValue] = $cve_assets_ref->id;
 
                     // 🔥 IMMEDIATE MAPPING for this new CPE 🔥
+                    // Find CVEs in CveTemp that match this CPE's vendor and title and target IP/Host
                     $matchingCVEs = \App\TransactionScansCveTemp::where('site_id', $data['site_id'])
                         ->where('is_mapped', '!=', 1)
                         ->where(function ($query) use ($parentValue, $domain) {
                             $query->where('target', $parentValue);
                             if ($domain) {
-                                $query->orWhere('target', $domain->name);
+                                $query->orWhere('target', $domain->domain);
                             }
                         })
                         ->where(function ($query) use ($vendor_name, $product_name) {
@@ -738,72 +758,6 @@ class ScansController extends Controller
                         $transaction_client_cpe->transaction_data_status = 1;
                         $transaction_client_cpe->status = 1;
                         $transaction_client_cpe->save();
-                    }
-                }
-
-
-
-
-
-
-                if ($AssetsData) {
-                    $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $data['site_id'])->where('transaction_id', $AssetsData->id)->first();
-                    if($transaction_client_asset_data){
-                        $transaction_client_asset_data -> transaction_mode = 'insert';
-                        $transaction_client_asset_data -> transaction_data_status = 1;
-                        $transaction_client_asset_data -> status = 1;
-                        $transaction_client_asset_data -> save();
-                    }else{
-                        $transaction_client_asset_data = new transaction_client_asset_data();
-                        $transaction_client_asset_data -> site_id = $data['site_id'];
-                        $transaction_client_asset_data -> transaction_id = $AssetsData->id;
-                        $transaction_client_asset_data -> transaction_mode = 'insert';
-                        $transaction_client_asset_data -> transaction_data_status = 1;
-                        $transaction_client_asset_data -> status = 1;
-                        $transaction_client_asset_data -> save();
-                    }
-                }
-
-                // ALWAYS update TransactionScans if the user submits it, recovering any stuck states
-                $dataTypeValue = null;
-                if ($AssetsData && $AssetsData->get_data_type) {
-                    $dataTypeValue = $AssetsData->get_data_type->value;
-                } else {
-                    // Fallback lookup if not loaded or saving fresh
-                    $dataTypeValue = \App\DataTypes::where('id', $item['data_type'])->value('value');
-                }
-
-                if ($dataTypeValue) {
-                    $TransactionScans = TransactionScans::where('site_id', $data['site_id'])
-                        ->where('domain_id', $data['domain_id'])
-                        ->where('raw_data', $item['raw_data'])
-                        ->whereRaw('LOWER(data_type) = LOWER(?)', [$dataTypeValue])
-                        ->first();
-                    
-                    if ($TransactionScans && $TransactionScans->status_asset_use != 1) {
-                        $TransactionScans->status_asset_use = 1;
-                        $TransactionScans->save();
-                    }
-                }
-
-                // Restore immediate mapping for Direct CVE (Datatype 16)
-                if ($AssetsData && $item['data_type'] == 16) {
-                    $mappingTarget = $item['raw_data_base'];
-                    $cve_asset_id = isset($cveAssetIdMap[$mappingTarget]) ? $cveAssetIdMap[$mappingTarget] : null;
-
-                    if (!$cve_asset_id) {
-                        $existingCveAsset = \Modules\SiteSettings\Entities\cve_assets::where('site_id', $data['site_id'])
-                            ->where(function($q) use ($mappingTarget) {
-                                $q->where('IP', $mappingTarget)->orWhere('Hostname', $mappingTarget);
-                            })
-                            ->first();
-                        $cve_asset_id = $existingCveAsset ? $existingCveAsset->id : null;
-                    }
-
-                    if ($cve_asset_id) {
-                        $this->save_cve_mapping($item['raw_data'], $data['site_id'], $cve_asset_id);
-                    } else {
-                        \Log::warning("[MAPPING-NEW] Could not find cve_assets record for Direct CVE: " . $item['raw_data'] . " on target: " . $mappingTarget);
                     }
                 }
             }
@@ -861,120 +815,6 @@ class ScansController extends Controller
         }
 
         return response()->json(['message' => langapp('changes_saved_successful'), 'error' => '', 'status_code' => '200', 'data' => '']);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     * @return Response
-     */
-    public function create()
-    {
-        return view('scans::create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Response
-     */
-    public function show($id)
-    {
-        return view('scans::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Response
-     */
-    public function edit($id)
-    {
-        return view('scans::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
-
-    public function scan_command(Request $request)
-    {
-        $TransactionTimeStampScans = TransactionTimeStampScans::where('progress', 2)->where('status', 1)->get();
-        foreach ($TransactionTimeStampScans as $TransactionTimeStampScan) {
-            $path = public_path() . '/files/scans/' . $TransactionTimeStampScan->get_site->code . '/' . $TransactionTimeStampScan->get_domain->code;
-            $array = explode("\n", file_get_contents($path . '/looking_for_subdomain.txt'));
-            $arrays = [];
-            $arrays_final = [];
-            $arrays_last_final = [];
-            foreach ($array as $item) {
-                $arrays[] = explode("\t", $item);
-            }
-            foreach ($arrays as $data) {
-                $arrays_final[] = $data;
-            }
-            foreach ($arrays_final as $item) {
-                $arrays = [];
-                foreach ($item as $data) {
-                    if (!empty($data)) {
-                        $arrays[] = trim($data);
-                    }
-                }
-                $arrays_last_final[] = $arrays;
-            }
-            $arrays_last_final = array_filter($arrays_last_final);
-            array_pop($arrays_last_final);
-            foreach ($arrays_last_final as $item) {
-                $TransactionScans = TransactionScans::where('site_id', $TransactionTimeStampScan->site_id)
-                    ->where('domain_id', $TransactionTimeStampScan->domain_id)
-                    ->where('module', $item[0])
-                    ->where('data_type', $item[1])
-                    ->where('raw_data', $item[2])
-                    ->first();
-                if (!empty($TransactionScans)) {
-                    $TransactionScans->updated_at = Carbon::now();
-                } else {
-                    $CreateTransactionScans = new TransactionScans();
-                    $CreateTransactionScans->code = Str::uuid()->toString();
-                    $CreateTransactionScans->created_by = $TransactionTimeStampScan->created_by;
-                    $CreateTransactionScans->site_id = $TransactionTimeStampScan->site_id;
-                    $CreateTransactionScans->domain_id = $TransactionTimeStampScan->domain_id;
-                    $CreateTransactionScans->module = $item[0];
-                    $CreateTransactionScans->data_type = $item[1];
-                    $CreateTransactionScans->raw_data = $item[2];
-                    $CreateTransactionScans->status = 1;
-                    $CreateTransactionScans->save();
-                }
-            }
-
-            $TransactionTimeStampScan->progress = 3;
-            $TransactionTimeStampScan->save();
-        }
     }
 
     public function save_scan()
@@ -1052,7 +892,7 @@ class ScansController extends Controller
                 if (@$model->progress !== 3) {
                     $html .= "<a href='#' class='btn btn-" . get_option('theme_color') . " btn-xs' disabled>
                                     <i class='fas fa-redo'></i>
-                                </a>";
+                                 </a>";
                 } else {
                     $html .= "<a href='" . route('get.scans.redo_process', ['id' => $model->code]) . "' class='btn btn-" . get_option('theme_color') . " btn-xs' data-toggle='ajaxModal'>
                                     <i class='fas fa-redo'></i>
@@ -1085,276 +925,467 @@ class ScansController extends Controller
     public function tableDataScans(Request $request)
     {
         $SiteSettings = TransactionTimeStampScans::where('code', $request->code)->first();
-        $TransactionScans = TransactionScans::where('site_id', $SiteSettings->site_id)
-            ->where('domain_id', $SiteSettings->domain_id)
-            ->where('module','!=','sfp_citadel')
-            ->orderBy('updated_at', 'desc') // Show latest first
-            ->get();
-        return DataTables::of($TransactionScans)
-            ->editColumn('chk', function (TransactionScans $data) {
-                $res = '';
-                if ($data->status_asset_use == 1) {
-                    $res .= '';
-                } else {
-                    $res .= '<label>
-                        <input name="select[]" value="' . $data->raw_data . '" data-id="' . $data->id . '" data-domain="' . $data->domain_id . '" data-site="' . $data->site_id . '" data-type="' . $data->data_type . '" data-ip="' . ($data->ip_address ?? '') . '" data-referent="' . $data->referent . '" class="select-chk" type="checkbox" />
-                        <span class="label-text"></span>
-                    </label>';
-                }
-                return $res;
-            })
-            ->editColumn('raw_data', function (TransactionScans $data) {
-                $fullText = $data->raw_data;
-                if (strlen($fullText) > 50) {
-                    $truncated = substr($fullText, 0, 47) . '...';
-                    return '<span title="' . htmlspecialchars($fullText) . '" style="cursor: default;">' . htmlspecialchars($truncated) . '</span>';
-                }
-                return htmlspecialchars($fullText);
-            })
-            ->addColumn('source', function (TransactionScans $data) {
-            return $data->source ?? '-';
-        })
-        ->addColumn('use', function (TransactionScans $data) {
-                $res = '';
-                if ($data->status_asset_use == 1) {
-                    $res .= '<span class="badge badge-success">Used</span>';
-                } else if ($data->status == 0) {
-                    $res .= '<span class="badge badge-danger">Not Found</span>';
-                } else if ($data->status == 1) {
-                    $res .= '<span class="badge badge-warning" style="background-color: #ffc107;">Discovered</span>';
-                } else if ($data->status == 2) {
-                    $res .= '<span class="badge badge-primary" style="background-color: #3869d4;">New</span>&nbsp;';
-                }
+        if (!$SiteSettings) return DataTables::of(collect([]))->toJson();
 
-                if ($data->data_type == 'CVE') {
-                    $res .= ' <button class="btn btn-xs btn-info" onclick="view_cve_details(\''.$data->domain_id.'\', \''.$data->site_id.'\')" title="View CVE Details"><i class="fas fa-search"></i></button>';
+        $allScans = TransactionScans::where('site_id', $SiteSettings->site_id)
+            ->where('domain_id', $SiteSettings->domain_id)
+            ->where('module', '!=', 'sfp_citadel')
+            ->get();
+
+        // --- Group by referent, then sub-group by IP ---
+
+        // Step 1: Group all records by referent
+        $byReferent = [];
+        $noReferent = [];
+        foreach ($allScans as $scan) {
+            if ($scan->referent) {
+                $byReferent[$scan->referent][] = $scan;
+            } else {
+                $noReferent[] = $scan;
+            }
+        }
+
+        // Step 2: Find natural anchors (a record whose raw_data is a referent key)
+        $anchorMap = [];
+        foreach ($allScans as $scan) {
+            if (isset($byReferent[$scan->raw_data]) && !isset($anchorMap[$scan->raw_data])) {
+                $anchorMap[$scan->raw_data] = $scan;
+            }
+        }
+        // Preload CVE -> CPE mappings for the scans in this request
+        $cveNames = [];
+        foreach ($allScans as $s) {
+            if (in_array($s->data_type, ['CVE', 'Vulnerability'])) {
+                $cveNames[] = $s->raw_data;
+            }
+        }
+        $cveToCpe = [];
+        if (!empty($cveNames)) {
+            $cveTemps = \App\TransactionScansCveTemp::whereIn('namecve', array_unique($cveNames))->get();
+            foreach ($cveTemps as $ct) {
+                $cpe = $ct->cpe_uri ?: $ct->affected_cpe;
+                if ($cpe) {
+                    $cveToCpe[$ct->namecve][] = $cpe;
                 }
-                return $res;
+            }
+        }
+
+        // Step 3: Process each referent group → build rows
+        $rows = collect();
+        $processedReferents = [];
+        $processedIds = [];
+
+        foreach ($byReferent as $ref => $records) {
+            if (in_array($ref, $processedReferents)) continue;
+            $processedReferents[] = $ref;
+
+            // Find all records that "are" this domain (raw_data == ref)
+            $rootRecords = $allScans->where('raw_data', $ref)->all();
+            foreach ($rootRecords as $rr) $processedIds[] = $rr->id;
+            
+            // Primary anchor for ID/Site references
+            $anchor = $anchorMap[$ref] ?? (reset($rootRecords) ?: null);
+            $domainName = $ref;
+            $parentReferent = $anchor ? ($anchor->referent ?: $ref) : $ref;
+            $groupKey = $parentReferent . '||' . $domainName;
+
+            // Sub-group children by IP
+            $byIp = [];
+            $noIp = [];
+            foreach ($records as $child) {
+                $processedIds[] = $child->id;
+                $ip = $child->ip_address;
+                if (!$ip && stripos($child->data_type, 'IP') !== false) {
+                    $ip = $child->raw_data;
+                }
+                if ($ip) {
+                    $byIp[$ip][] = $child;
+                } else {
+                    $noIp[] = $child;
+                }
+            }
+
+            // Also pull records that reference each IP as their referent (CPE/CVE → IP)
+            // And track all records in this family for the absolute latest date
+            $allFamilyRecords = array_merge($rootRecords, $noIp);
+            foreach ($byIp as $ip => $ipChildren) {
+                $allFamilyRecords = array_merge($allFamilyRecords, $ipChildren);
+            }
+
+            foreach (array_keys($byIp) as $ip) {
+                if (isset($byReferent[$ip]) && !in_array($ip, $processedReferents)) {
+                    foreach ($byReferent[$ip] as $ipChild) {
+                        $byIp[$ip][] = $ipChild;
+                        $allFamilyRecords[] = $ipChild;
+                        $processedIds[] = $ipChild->id;
+                    }
+                    $processedReferents[] = $ip;
+                }
+            }
+
+            // Distribute $noIp CVEs to IPs if they match CPE
+            $ipCpes = [];
+            foreach ($byIp as $ip => $ipChildren) {
+                foreach ($ipChildren as $child) {
+                    if ($child->data_type == 'CPE') {
+                        $ipCpes[$ip][] = $child->raw_data;
+                    }
+                }
+            }
+
+            $distributedNoIpIds = [];
+            foreach ($noIp as $idx => $child) {
+                if (in_array($child->data_type, ['CVE', 'Vulnerability'])) {
+                    $cveName = $child->raw_data;
+                    if (isset($cveToCpe[$cveName])) {
+                        $reqCpes = $cveToCpe[$cveName];
+                        foreach ($byIp as $ip => $ipChildren) {
+                            $myCpes = $ipCpes[$ip] ?? [];
+                            if (!empty(array_intersect($reqCpes, $myCpes))) {
+                                $byIp[$ip][] = $child;
+                                $distributedNoIpIds[] = $child->id;
+                            }
+                        }
+                    }
+                }
+            }
+
+            $finalNoIp = [];
+            foreach ($noIp as $child) {
+                if (!in_array($child->id, $distributedNoIpIds)) {
+                    $finalNoIp[] = $child;
+                }
+            }
+
+            // Calculate absolute latest date for the whole family
+            $overallLatest = null;
+            foreach ($allFamilyRecords as $fr) {
+                if ($fr->updated_at && (!$overallLatest || $fr->updated_at > $overallLatest)) {
+                    $overallLatest = $fr->updated_at;
+                }
+            }
+            $overallLatestStr = $overallLatest ? $overallLatest->format('Y-m-d H:i:s') : '-';
+
+            // Determine "best" Data Type for the group (Identity only)
+            $identityPriority = ['Domain Name', 'Internet Domain Name', 'Domain', 'Subdomain', 'Sub Domain', 'Host', 'Internet Name'];
+            
+            $bestType = '-';
+            foreach ($allFamilyRecords as $fr) {
+                $currentFrType = $fr->data_type;
+                if (in_array($currentFrType, $identityPriority)) {
+                    if ($bestType == '-' || array_search($currentFrType, $identityPriority) < array_search($bestType, $identityPriority)) {
+                        $bestType = $currentFrType;
+                    }
+                }
+            }
+
+            // Map results to standard display names
+            if ($bestType == 'Internet Name' || ($bestType == '-' && $domainName != '-')) {
+                $dataType = 'Domain';
+            } else {
+                $dataType = ($bestType != '-') ? $bestType : 'Domain';
+            }
+
+            // Build rows
+            $fam = ['data_type' => $dataType, 'referent' => $parentReferent];
+
+            if (empty($byIp)) {
+                $r = $this->buildRow($anchor, $domainName, '-', $finalNoIp, $fam, $groupKey);
+                $r['updated_at_str'] = $overallLatestStr;
+                $r['source_str'] = !empty($r['source']) ? implode(', ', $r['source']) : '-';
+                $rows->push((object)$r);
+            } else {
+                foreach ($byIp as $ip => $ipChildren) {
+                    $r = $this->buildRow($anchor, $domainName, $ip, $ipChildren, $fam, $groupKey);
+                    $r['updated_at_str'] = $overallLatestStr;
+                    $r['source_str'] = !empty($r['source']) ? implode(', ', $r['source']) : '-';
+                    $rows->push((object)$r);
+                }
+                if (!empty($finalNoIp)) {
+                    $r = $this->buildRow($anchor, $domainName, '-', $finalNoIp, $fam, $groupKey);
+                    $r['updated_at_str'] = $overallLatestStr;
+                    $r['source_str'] = !empty($r['source']) ? implode(', ', $r['source']) : '-';
+                    $rows->push((object)$r);
+                }
+            }
+        }
+
+        // Step 4: Orphan records (no referent at all)
+        foreach ($noReferent as $scan) {
+            if (in_array($scan->id, $processedIds)) continue;
+            $ip = $scan->ip_address ?: (stripos($scan->data_type, 'IP') !== false ? $scan->raw_data : '-');
+            $r = [
+                'id' => $scan->id, 'ids' => [$scan->id],
+                'domain' => $scan->raw_data, 'ip' => $ip,
+                'ports' => [], 'networks' => [], 'cpes' => [], 'cves' => [],
+                'data_type' => $scan->data_type,
+                'referent' => '-',
+                'updated_at' => $scan->updated_at,
+                'updated_at_str' => $scan->updated_at ? $scan->updated_at->format('Y-m-d H:i:s') : '-',
+                'source' => $scan->source ? [$scan->source] : [],
+                'source_str' => $scan->source ?: '-',
+                'status' => $scan->status,
+                'status_asset_use' => $scan->status_asset_use,
+                'site_id' => $scan->site_id, 'domain_id' => $scan->domain_id,
+                'raw_data' => $scan->raw_data,
+                'group_key' => 'orphan_' . $scan->id,
+            ];
+            $rows->push((object)$r);
+        }
+
+        // --- Sort by date (Newest to Oldest) ---
+        $rows = $rows->sortByDesc('updated_at')->values();
+
+        // --- DataTables Response ---
+        return DataTables::of($rows)
+            ->editColumn('chk', function ($data) {
+                if ($data->status_asset_use == 1) return '';
+                $ids_json = htmlspecialchars(json_encode($data->ids), ENT_QUOTES, 'UTF-8');
+                return '<label><input name="select[]" value="'.$data->raw_data.'" data-ids=\''.$ids_json.'\' data-id="'.$data->id.'" data-domain="'.$data->domain_id.'" data-site="'.$data->site_id.'" data-type="'.$data->data_type.'" data-ip="'.($data->ip != '-' ? $data->ip : '').'" data-referent="'.$data->referent.'" class="select-chk" type="checkbox" /><span class="label-text"></span></label>';
             })
-            ->rawColumns(['chk', 'use', 'raw_data'])
-            ->toJson();
+            ->addColumn('asset_html', function ($data) {
+                $html = '<div class="asset-info-group" style="font-size:13px;line-height:1.7;">';
+                $row = function($label, $value, $extra = '') {
+                    return '<div style="margin-bottom:2px;"><span style="width:100px;display:inline-block;font-weight:700;color:#333;">'.$label.' : </span><span style="font-weight:400;color:#555;">'.$value.'</span>'.$extra.'</div>';
+                };
+                if ($data->domain != '-') {
+                    $html .= $row('Domain', htmlspecialchars($data->domain));
+                }
+                if ($data->ip != '-') {
+                    $html .= $row('IP', htmlspecialchars($data->ip));
+                }
+                if (!empty($data->ports)) {
+                    sort($data->ports, SORT_NUMERIC);
+                    $portsStr = htmlspecialchars(implode(', ', $data->ports));
+                    $html .= '<div style="margin-bottom:2px; white-space: normal;"><span style="width:100px;display:inline-block;font-weight:700;color:#333;vertical-align:top;">Port : </span><span style="font-weight:400; color:#555; display:inline-block; width:calc(100% - 105px); word-wrap: break-word;">'.$portsStr.'</span></div>';
+                }
+                if (!empty($data->networks)) {
+                    $html .= $row('Network', htmlspecialchars(implode(', ', array_unique($data->networks))));
+                }
+                foreach ($data->cpes as $cpe) {
+                    $html .= $row('CPE', htmlspecialchars($cpe));
+                }
+                if (!empty($data->cves)) {
+                    $cveList = htmlspecialchars(implode(', ', $data->cves));
+                    $cveArrayJson = htmlspecialchars(json_encode(array_values(array_unique($data->cves))), ENT_QUOTES, 'UTF-8');
+                    $btn = ' <button class="btn btn-xs btn-info" style="margin-left:10px; padding: 1px 8px;" onclick="view_cve_details(\''.$data->domain_id.'\', \''.$data->site_id.'\', this)" data-cves="'.$cveArrayJson.'" data-ip="'.$data->ip.'" data-domain="'.$data->domain.'" title="View CVE Details"><i class="fas fa-search"></i> View Detail</button>';
+                    $html .= $row('CVE', $data->domain != '-' ? htmlspecialchars($data->domain) : $cveList, $btn);
+                }
+                $html .= '</div>';
+                return $html;
+            })
+            ->editColumn('status', function ($data) {
+                if ($data->status_asset_use == 1) {
+                    return '<span class="badge badge-success">Used</span>';
+                } else if ($data->status == 0) {
+                    return '<span class="badge badge-danger">Not Found</span>';
+                } else if ($data->status == 1) {
+                    return '<span class="badge badge-warning" style="background-color:#ffc107;">Discovered</span>';
+                } else if ($data->status == 2) {
+                    return '<span class="badge badge-primary" style="background-color:#3869d4;">New</span>';
+                }
+                return '<span class="badge badge-secondary">Unknown</span>';
+            })
+            ->addColumn('data_type', function ($data) {
+                return $data->data_type ?: '-';
+            })
+            ->addColumn('referent', function ($data) {
+                return $data->referent ?: '-';
+            })
+            ->editColumn('updated_at', function ($data) {
+                return $data->updated_at_str ?? '-';
+            })
+            ->addColumn('source', function ($data) {
+                return $data->source_str ?? '-';
+            })
+            ->addColumn('group_key', function ($data) {
+                return $data->group_key;
+            })
+            ->rawColumns(['chk', 'asset_html', 'status'])
+            ->make(true);
+    }
+
+    /**
+     * Build a row array for a domain+IP combination.
+     */
+    private function buildRow($anchor, $domainName, $ip, $ipChildren, $fam, $groupKey)
+    {
+        $ports = []; $networks = []; $cpes = []; $cves = [];
+        // Use anchor if available, otherwise use first child as base
+        $base = $anchor ?? ($ipChildren[0] ?? null);
+        $sources = ($base && $base->source) ? [$base->source] : [];
+        $latestUpdate = $base ? $base->updated_at : null;
+        $status = $base ? $base->status : 0;
+        $statusUse = $base ? $base->status_asset_use : 0;
+        $ids = $base ? [$base->id] : [];
+
+        foreach ($ipChildren as $child) {
+            if ($base && $child->id == $base->id && !$anchor) continue; // skip if already used as base
+            $ids[] = $child->id;
+            $this->classifyChild($child, $ports, $networks, $cpes, $cves);
+            if ($child->source && !in_array($child->source, $sources)) $sources[] = $child->source;
+            if ($child->updated_at > $latestUpdate) $latestUpdate = $child->updated_at;
+            if ($child->status_asset_use != 1) $statusUse = 0;
+            if ($child->status > $status) $status = $child->status;
+        }
+
+        return [
+            'id' => $base ? $base->id : 0, 'ids' => $ids,
+            'domain' => $domainName, 'ip' => $ip,
+            'ports' => array_values(array_unique($ports)),
+            'networks' => array_values(array_unique($networks)),
+            'cpes' => array_values(array_unique($cpes)),
+            'cves' => array_values(array_unique($cves)),
+            'data_type' => $fam['data_type'],
+            'referent' => $fam['referent'],
+            'updated_at' => $latestUpdate,
+            'source' => $sources,
+            'status' => $status,
+            'status_asset_use' => $statusUse,
+            'site_id' => $base ? $base->site_id : 0,
+            'domain_id' => $base ? $base->domain_id : 0,
+            'raw_data' => $base ? $base->raw_data : $domainName,
+            'group_key' => $groupKey,
+        ];
+    }
+
+    /**
+     * Classify a child record into the correct bucket.
+     */
+    private function classifyChild($child, &$ports, &$networks, &$cpes, &$cves)
+    {
+        $type = strtolower($child->data_type);
+        if ($type == 'port') { $ports[] = $child->raw_data; }
+        elseif ($type == 'network') { $networks[] = $child->raw_data; }
+        elseif ($type == 'cpe') { $cpes[] = $child->raw_data; }
+        elseif (in_array($type, ['cve', 'vulnerability'])) { $cves[] = $child->raw_data; }
+    }
+
+    /**
+     * Merge a child record into an existing row array.
+     */
+    private function mergeChild(&$row, $child)
+    {
+        $row['ids'][] = $child->id;
+        $ports = $row['ports']; $networks = $row['networks'];
+        $cpes = $row['cpes']; $cves = $row['cves'];
+        $this->classifyChild($child, $ports, $networks, $cpes, $cves);
+        $row['ports'] = $ports; $row['networks'] = $networks;
+        $row['cpes'] = $cpes; $row['cves'] = $cves;
+        if ($child->source && !in_array($child->source, $row['source'])) $row['source'][] = $child->source;
+        if ($child->updated_at > $row['updated_at']) $row['updated_at'] = $child->updated_at;
+        if ($child->status_asset_use != 1) $row['status_asset_use'] = 0;
+        if ($child->status > $row['status']) $row['status'] = $child->status;
     }
 
     public function tableDataScanAssets(Request $request)
     {
-        if($request -> menu == 'scan'){
-            $SiteSettings = TransactionTimeStampScans::where('code', $request->code)->first();
-            if($SiteSettings){
-                $Assets = Assets::where('site_id', $SiteSettings->site_id)->where('domain_id', $SiteSettings->domain_id)->get();
-            }else{
-                $Assets = [];
-            }
-        }else if($request -> menu == 'site'){
-            $site = SiteSettings::select('id')->where('code', $request->code)->first();
-            $SiteSettings = TransactionTimeStampScans::select('domain_id')->where('site_id', $site->id)->get();
-            if($SiteSettings){
-                $domain_id = [];
-                foreach($SiteSettings as $data){
-                    $domain_id[] = $data -> domain_id;
-                }
-                $Assets = Assets::where('site_id', $site -> id)->whereIn('domain_id', $domain_id)->get();
-            }else{
-                $Assets = [];
-            }
-        }else if($request -> menu == 'system'){
-            if($request -> site_id == 0){
-                $Assets = Assets::all();
-            }else{
-                $Assets = Assets::where('site_id', $request -> site_id)->get();
-            }
-            
+        $site_id = '';
+        $code = $request->code;
+        $SiteSettings = TransactionTimeStampScans::where('code', $code)->first();
+        if ($code) {
+            $site_id = $SiteSettings->site_id;
         }
-        $menu = $request -> menu;
-        
-        return DataTables::of($Assets)
-        ->addColumn('chk', function (Assets $data) {
-            return '<label><input type="checkbox" name="checked" class="select-chk asset_id" value="' . $data->code . '"><span class="label-text"></span></label>';
-        })
-        ->addColumn('site', function (Assets $data) {
-            if($data->get_site){
-                return $data->get_site->name;
-            }else{
-                return 'No Data';
-            }
-            
-        })
-        ->addColumn('assets', function (Assets $data) {
-            return $data->raw_data;
-        })
-        ->addColumn('referent', function (Assets $data) {
-            $res = '';
-            $res .= '<ul class="asset-list-tb">';
-            foreach ($data->get_assets_data as $item) {
-                $res .= '<li>' . $item->value . '</li>';
-            }
-            $res .= '</ul>';
-            return $res;
-        })
-        ->addColumn('os', function (Assets $data) {
-            $res = '';
-            return $res;
-        })
-        ->addColumn('cpe', function (Assets $data) {
-            $res = '';
-            $res .= '<a href="'.route("assets.assets_add_cpe",['id'=>$data->code]).'" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">Add </a>';
-            return $res;
-        })
-        ->addColumn('status', function (Assets $data) {
-            $res = '';
-            if ($data->status == 1) {
-                $res .= '<span class="badge badge-success">Active</span>';
-            } else {
-                $res .= '<span class="badge badge-danger">Inactive</span>';
-            }
-            return $res;
-        })
-        ->addColumn('action', function (Assets $data) use ($menu) {
-            $SiteSettings = TransactionTimeStampScans::select('code')->where('site_id', $data->site_id)->where('domain_id', $data->domain_id)->first();
-            return '<a href="' . route("scans_assets.scans_assets_edit_modal", ["id" => $data->code, "code" => @$SiteSettings->code, "page" => $menu]) . '" class="btn btn-xs btn-' . get_option("theme_color") . ' m-xs" data-toggle="ajaxModal">
-            <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
-                </a>
-                <a href="' . route("scans_assets.delete", ["id" => $data->code, "code" => @$SiteSettings->code, "page" => $menu]) . '" class="btn btn-xs btn-danger m-xs" data-toggle="ajaxModal">
-                    <svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z"></path></svg>
-                </a>';
+
+        $model = Assets::query();
+        if ($site_id) {
+            $model->where('site_id', $site_id)->where('domain_id', $SiteSettings->domain_id);
+        }
+
+        return DataTables::eloquent($model)
+            ->editColumn('chk', function (Assets $model) {
+                return '<label><input type="checkbox" name="checked" value="' . $model->code . '"><span class="label-text"></span></label>';
             })
-        ->rawColumns(['chk', 'site', 'assets', 'referent','os','cpe', 'status', 'action'])
-        ->toJson();
+            ->addColumn('asset_html', function (Assets $model) {
+                $html = '<div class="asset-info-container" style="font-size: 12px; line-height: 1.5;">';
+                
+                $row = function($label, $value, $isBold = false) {
+                    $boldClass = $isBold ? 'font-bold' : '';
+                    return '
+                    <div style="display: flex; margin-bottom: 4px;">
+                        <span class="text-muted font-bold" style="width: 110px; flex-shrink: 0; display: inline-block;">'.htmlspecialchars($label).':</span>
+                        <span class="'.$boldClass.'" style="word-break: break-all;">'.$value.'</span>
+                    </div>';
+                };
+
+                // Use Master record data
+                $html .= $row('Asset', htmlspecialchars($model->raw_data), true);
+
+                // Get details from AssetsData
+                $details = AssetsData::where('asset_id', $model->id)->get();
+                foreach ($details as $detail) {
+                    $typeName = $detail->get_data_type ? $detail->get_data_type->value : 'Detail';
+                    $html .= $row($typeName, htmlspecialchars($detail->value));
+                }
+
+                $html .= '</div>';
+                return $html;
+            })
+            ->addColumn('action', function (Assets $model) use ($code) {
+                $html = '<div style="display: flex;">';
+                $html .= '<a href="' . route('scans_assets.scans_assets_edit_modal', ['id' => $model->code, 'code' => $code, 'page' => 'scan']) . '" class="btn btn-' . get_option('theme_color') . ' btn-xs" data-toggle="ajaxModal"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg></a>';
+                $html .= '<a href="' . route('scans_assets.delete', ['id' => $model->code, 'code' => $code, 'page' => 'scan']) . '" class="btn btn-danger btn-xs" data-toggle="ajaxModal"><svg class="svg-inline--fa" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 84V56c0-13.3 10.7-24 24-24h112l9.4-18.7c4-8.2 12.3-13.3 21.4-13.3h114.3c9.1 0 17.4 5.1 21.5 13.3L312 32h112c13.3 0 24 10.7 24 24v28c0 6.6-5.4 12-12 12H12C5.4 96 0 90.6 0 84zm416 56v324c0 26.5-21.5 48-48 48H80c-26.5 0-48-21.5-48-48V140c0-6.6 5.4-12 12-12h360c6.6 0 12 5.4 12 12zm-272 68c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208zm96 0c0-8.8-7.2-16-16-16s-16 7.2-16 16v224c0 8.8 7.2 16 16 16s16-7.2 16-16V208z"></path></svg></a>';
+                $html .= '</div>';
+                return $html;
+            })
+            ->rawColumns(['chk', 'asset_html', 'action'])
+            ->toJson();
     }
 
     public function scans_assets_delete($id, $code, $page)
     {
-        $Assets = Assets::where('code', $id)->first();
-        $data['scans'] = $Assets;
+        $data['id'] = $id;
         $data['code'] = $code;
         $data['page'] = $page;
-        return view('scans::modal.delete')->with($data);
+        return view('scans::modal.delete_asset')->with($data);
     }
 
-    public function f_scans_assets_delete($id = null, $code, $page)
+    public function f_scans_assets_delete(Request $request)
     {
-        $Assets = Assets::find($id);
-        $transaction_client_asset = transaction_client_asset::where('site_id', $Assets -> site_id)->where('transaction_id', $Assets->id)->first();
-        if($transaction_client_asset){
-            $transaction_client_asset -> transaction_mode = 'delete';
-            $transaction_client_asset -> transaction_data_status = 1;
-            $transaction_client_asset -> status = 1;
-            $transaction_client_asset -> save();
-        }else{
-            $transaction_client_asset = new transaction_client_asset();
-            $transaction_client_asset -> site_id = $Assets -> site_id;
-            $transaction_client_asset -> transaction_id = $Assets->id;
-            $transaction_client_asset -> transaction_mode = 'delete';
-            $transaction_client_asset -> transaction_data_status = 1;
-            $transaction_client_asset -> status = 1;
-            $transaction_client_asset -> save();
-        }
-        $site = SiteSettings::select('code')->where('id', $Assets -> site_id)->first()->code;
-        $AssetsData = AssetsData::where('asset_id', $id)->get();
+        $Assets = Assets::where('code', $request->id)->first();
+        $Assets_id = $Assets->id;
+        $AssetsData = AssetsData::where('asset_id', $Assets_id)->get();
         foreach ($AssetsData as $data) {
             $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $data->site_id)->where('transaction_id', $data->id)->first();
-            if($transaction_client_asset_data){
-                $transaction_client_asset_data -> transaction_mode = 'delete';
-                $transaction_client_asset_data -> transaction_data_status = 1;
-                $transaction_client_asset_data -> status = 1;
-                $transaction_client_asset_data -> save();
-            }else{
+            if ($transaction_client_asset_data) {
+                $transaction_client_asset_data->transaction_mode = 'delete';
+                $transaction_client_asset_data->transaction_data_status = 1;
+                $transaction_client_asset_data->status = 1;
+                $transaction_client_asset_data->save();
+            } else {
                 $transaction_client_asset_data = new transaction_client_asset_data();
-                $transaction_client_asset_data -> site_id = $data->site_id;
-                $transaction_client_asset_data -> transaction_id = $data->id;
-                $transaction_client_asset_data -> transaction_mode = 'delete';
-                $transaction_client_asset_data -> transaction_data_status = 1;
-                $transaction_client_asset_data -> status = 1;
-                $transaction_client_asset_data -> save();
-            }
-            $TransactionScans = TransactionScans::where('site_id', $data->site_id)->where('domain_id', $data->domain_id)->where('raw_data', $data->value)
-                ->where('data_type', $data->get_data_type->value)->first();
-            if ($TransactionScans) {
-                $TransactionScans->status_asset_use = 0;
-                $TransactionScans->save();
+                $transaction_client_asset_data->site_id = $data->site_id;
+                $transaction_client_asset_data->transaction_id = $data->id;
+                $transaction_client_asset_data->transaction_mode = 'delete';
+                $transaction_client_asset_data->transaction_data_status = 1;
+                $transaction_client_asset_data->status = 1;
+                $transaction_client_asset_data->save();
             }
             $data->delete();
         }
+        $transaction_client_asset = transaction_client_asset::where('site_id', $Assets->site_id)->where('transaction_id', $Assets->id)->first();
+        if ($transaction_client_asset) {
+            $transaction_client_asset->transaction_mode = 'delete';
+            $transaction_client_asset->transaction_data_status = 1;
+            $transaction_client_asset->status = 1;
+            $transaction_client_asset->save();
+        } else {
+            $transaction_client_asset = new transaction_client_asset();
+            $transaction_client_asset->site_id = $Assets->site_id;
+            $transaction_client_asset->transaction_id = $Assets->id;
+            $transaction_client_asset->transaction_mode = 'delete';
+            $transaction_client_asset->transaction_data_status = 1;
+            $transaction_client_asset->status = 1;
+            $transaction_client_asset->save();
+        }
         $Assets->delete();
-
-        if($page == 'site'){
-            return ajaxResponse(
-                [
-                    'message' => langapp('changes_saved_successful'),
-                    'redirect' => route('assetssite.index', ['id' => $site]),
-                ],
-                true,
-                Response::HTTP_OK
-            );
-        }else if($page == 'scan'){
+        $SiteSettings = TransactionTimeStampScans::where('code', $request->code)->first();
+        if($request -> page == 'site'){
+            $site = SiteSettings::select('code')->withTrashed()->where('id', $Assets -> site_id)->first();
             return ajaxResponse(
                 [
                     'message' => langapp('deleted_successfully'),
-                    'redirect' => route('scans.index', ['tab' => 'asset', 'site_code' => $code]),
-                ],
-                true,
-                Response::HTTP_OK
-            );
-        }
-    }
-
-    public function delete_assets_select(Request $request){
-        $site = null;
-        $SiteSettings = null;
-        foreach($request -> asset_id as $key => $id){
-            $Assets = Assets::where('code', $id)->first();
-            $transaction_client_asset = transaction_client_asset::where('site_id', $Assets -> site_id)->where('transaction_id', $Assets->id)->first();
-            if($transaction_client_asset){
-                $transaction_client_asset -> transaction_mode = 'delete';
-                $transaction_client_asset -> transaction_data_status = 1;
-                $transaction_client_asset -> status = 1;
-                $transaction_client_asset -> save();
-            }else{
-                $transaction_client_asset = new transaction_client_asset();
-                $transaction_client_asset -> site_id = $Assets -> site_id;
-                $transaction_client_asset -> transaction_id = $Assets->id;
-                $transaction_client_asset -> transaction_mode = 'delete';
-                $transaction_client_asset -> transaction_data_status = 1;
-                $transaction_client_asset -> status = 1;
-                $transaction_client_asset -> save();
-            }
-            if($key == 0){
-                $site = SiteSettings::select('code')->where('id', $Assets -> site_id)->first();
-            }
-            $AssetsData = AssetsData::where('asset_id', $Assets -> id)->get();
-            foreach ($AssetsData as $key_2 => $data) {
-                $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $data->site_id)->where('transaction_id', $data->id)->first();
-                if($transaction_client_asset_data){
-                    $transaction_client_asset_data -> transaction_mode = 'delete';
-                    $transaction_client_asset_data -> transaction_data_status = 1;
-                    $transaction_client_asset_data -> status = 1;
-                    $transaction_client_asset_data -> save();
-                }else{
-                    $transaction_client_asset_data = new transaction_client_asset_data();
-                    $transaction_client_asset_data -> site_id = $data->site_id;
-                    $transaction_client_asset_data -> transaction_id = $data->id;
-                    $transaction_client_asset_data -> transaction_mode = 'delete';
-                    $transaction_client_asset_data -> transaction_data_status = 1;
-                    $transaction_client_asset_data -> status = 1;
-                    $transaction_client_asset_data -> save();
-                }
-                if($key_2 == 0){
-                    $SiteSettings = TransactionTimeStampScans::select('code')->where('site_id', $data->site_id)->where('domain_id', $data->domain_id)->first();
-                }
-                $TransactionScans = TransactionScans::where('site_id', $data->site_id)->where('domain_id', $data->domain_id)->where('raw_data', $data->value)
-                    ->where('data_type', $data->get_data_type->value)->first();
-                if ($TransactionScans) {
-                    $TransactionScans->status_asset_use = 0;
-                    $TransactionScans->save();
-                }
-                $data->delete();
-            }
-            $Assets->delete();
-        }
-        if($request -> page == 'site'){
-            return ajaxResponse(
-                [
-                    'message' => langapp('changes_saved_successful'),
-                    'redirect' => route('assetssite.index', ['id' => $site->code]),
+                    'redirect' => route('assetssite.index', ['id' => $site -> code]),
                 ],
                 true,
                 Response::HTTP_OK
@@ -1440,7 +1471,7 @@ class ScansController extends Controller
     public function scans_assets_edit_modal($id, $code, $page)
     {
         $Assets = Assets::where('code', $id)->first();
-        $data['AssetsData'] = AssetsData::where('asset_id', $Assets->id)->get();
+        $data['AssetsData'] = AssetsData::where('asset_id', $Assets->id)->where('data_type_id', '!=', 16)->get();
         $data['scans'] = $Assets;
         $data['code'] = $code;
         $data['code_asset'] = $id;
@@ -1548,7 +1579,7 @@ class ScansController extends Controller
 
         
         
-        $AssetsDataIsNot = AssetsData::where('asset_id', $Assets_id)->whereNotIn('id',$arr)->get();
+        $AssetsDataIsNot = AssetsData::where('asset_id', $Assets_id)->whereNotIn('id',$arr)->where('data_type_id', '!=', 16)->get();
 
         foreach($AssetsDataIsNot as $AssetsData){
             $transaction_client_asset_data = transaction_client_asset_data::where('site_id', $AssetsData->site_id)->where('transaction_id', $AssetsData->id)->first();
@@ -1614,9 +1645,69 @@ class ScansController extends Controller
         $site_id = $request->site_id;
         $domain_id = $request->domain_id;
 
-        $cve_details = \App\TransactionScansCveTemp::where('site_id', $site_id)
+        $query = \App\TransactionScansCveTemp::where('site_id', $site_id)
+            ->where('domain_id', $domain_id);
+
+        if ($request->has('cves') && is_array($request->cves) && count($request->cves) > 0) {
+            $query->whereIn('namecve', $request->cves);
+        }
+
+        $cve_details = $query->get();
+
+        // Optimization: Fetch all relevant records once to build maps
+        $allSiteScans = \App\TransactionScans::where('site_id', $site_id)
             ->where('domain_id', $domain_id)
+            ->whereIn('data_type', ['CVE', 'Vulnerability', 'CPE', 'Internet Name', 'Subdomain', 'Domain Name', 'Host'])
             ->get();
+
+        $cpeToIps = [];
+        $cveToIps = [];
+        $cveToHosts = [];
+        
+        foreach ($allSiteScans as $scan) {
+            $ip = $scan->ip_address;
+            $host = $scan->referent;
+            
+            if ($scan->data_type == 'CPE') {
+                $cpe = $scan->raw_data;
+                if ($ip && $cpe) $cpeToIps[$cpe][] = $ip;
+            }
+            
+            if (in_array($scan->data_type, ['CVE', 'Vulnerability'])) {
+                $cveName = $scan->raw_data;
+                if ($ip) $cveToIps[$cveName][] = $ip;
+                if ($host) $cveToHosts[$cveName][] = $host;
+            }
+        }
+
+        $reqIp = $request->ip;
+        $reqDomain = $request->domain;
+
+        // Enrich with asset info using the maps
+        foreach ($cve_details as $cve) {
+            $ips = $cveToIps[$cve->namecve] ?? [];
+            $hosts = $cveToHosts[$cve->namecve] ?? [];
+            
+            // If the CVE temp record has a CPE, find all IPs that have that CPE
+            $cpeUri = $cve->cpe_uri ?: $cve->affected_cpe;
+            if ($cpeUri && isset($cpeToIps[$cpeUri])) {
+                $ips = array_merge($ips, $cpeToIps[$cpeUri]);
+            }
+
+            $finalIps = array_unique($ips);
+            $finalHosts = array_unique($hosts);
+
+            // Context filtering: Only show the IP and Host of the row that was clicked
+            if ($reqIp && $reqIp != '-') {
+                $finalIps = [$reqIp];
+            }
+            if ($reqDomain && $reqDomain != '-') {
+                $finalHosts = [$reqDomain];
+            }
+
+            $cve->aggregated_ips = implode(', ', $finalIps) ?: '-';
+            $cve->aggregated_hosts = implode(', ', $finalHosts) ?: ($cve->target ?: '-');
+        }
 
         return response()->json(['status' => 'success', 'data' => $cve_details]);
     }

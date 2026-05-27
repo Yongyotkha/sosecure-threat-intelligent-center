@@ -13,18 +13,16 @@
                     </div>
     
                     <div class="ml-2 text-right">
-                        <div class="text-left pull-left max-w-select {{ count($SiteSettings) == 1 ? 'd-none' : '' }}">
+                        <div class="text-left pull-left max-w-select {{ (is_countable($SiteSettings) || is_array($SiteSettings)) && count($SiteSettings) == 1 ? 'd-none' : '' }}">
                             <select name="" id="select-site" class="select2-option select-site" onchange="changeSite(value)">
 
-                                @if(count($SiteSettings) == 1)
-                                    @if ($SiteSettings)
-                                        @foreach ($SiteSettings as $SiteSettings_val)
-                                            <option value="{{$SiteSettings_val->code}}" selected data-site_code="{{ $SiteSettings_val->code }}">{{$SiteSettings_val->name}}</option>
-                                        @endforeach
-                                    @endif
+                                @if((is_countable($SiteSettings) || is_array($SiteSettings)) && count($SiteSettings) == 1)
+                                    @foreach ($SiteSettings as $SiteSettings_val)
+                                        <option value="{{$SiteSettings_val->code}}" selected data-site_code="{{ $SiteSettings_val->code }}">{{$SiteSettings_val->name}}</option>
+                                    @endforeach
                                 @else
                                     <option value="" selected>All Site</option>
-                                    @if ($SiteSettings)
+                                    @if ($SiteSettings && (is_countable($SiteSettings) || is_array($SiteSettings)))
                                         @foreach ($SiteSettings as $SiteSettings_val)
                                             <option value="{{$SiteSettings_val->code}}">{{$SiteSettings_val->name}}</option>
                                         @endforeach
@@ -205,7 +203,7 @@
                 </div>
 
                 <section class="panel panel-default" id="hide-advance-search" style="display: none;">
-                    <header class="panel-heading font-bold panel-header-blue">
+                    <header class="panel-heading font-bold panel-header-naviblue">
                         <div class="row">
                             <div class="col-md-12">
                                 <div style="margin-top:5px;">
@@ -293,7 +291,7 @@
                 </section>
 
                 <section class="panel panel-default">
-                    <header class="panel-heading font-bold panel-header-blue">
+                    <header class="panel-heading font-bold panel-header-naviblue">
                         <div class="row">
                             <div class="col-xs-12">
                                 <i class="fas fa-table"></i> Table Assets
@@ -301,6 +299,7 @@
                         </div>
                     </header>
                     <div class="panel-body">
+                        <div id="custom-asset-list-container"></div>
                         <div class="table-responsive">
 
                             <!-- id table อันเดิม table-assets-template table-assets-template-test ส่วนปัจจุบันเป็นแค่หน้าบ้านแสดงตัวอย่าง ถ้าเปลี่ยน id กลับแล้ว อย่าลืม ลบ script ด้านล่างออกด้วยนะครับ-->
@@ -499,6 +498,187 @@
 @push('pagestyle')
 @include('stacks.css.datatables')
 @include('stacks.css.form')
+<style>
+    .host-group-wrapper {
+        margin-bottom: 0;
+        border: none;
+        border-bottom: 1px solid #e8e8e8;
+        border-radius: 0;
+        background: #fff;
+        box-shadow: none;
+        overflow: visible;
+    }
+    .host-header-item {
+        background: #fff;
+        padding: 12px 18px;
+        border-bottom: none;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background 0.2s;
+    }
+    .host-header-item:hover {
+        background: #f5f7fa;
+    }
+    .host-header-item .host-info {
+        display: flex;
+        flex-direction: column;
+    }
+    .host-header-item .host-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: #26478D;
+    }
+    .host-header-item .site-name {
+        font-size: 11px;
+        color: #95a5a6;
+        margin-top: 2px;
+    }
+    .host-chevron {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        background-color: #26478D;
+        border-radius: 50%;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        text-align: center;
+        transition: background-color 0.2s, transform 0.3s;
+    }
+    .host-chevron::before {
+        color: #fff !important;
+        font-size: 12px;
+        line-height: 28px;
+    }
+    .host-chevron:hover {
+        background: #325DC4;
+    }
+    .ip-container-wrapper {
+        padding: 8px 12px;
+        background: #fff;
+    }
+    .ip-box-item {
+        margin-bottom: 6px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .ip-box-header {
+        background: #26478D; /* Blue from Monitoring */
+        color: #fff;
+        padding: 7px 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        font-size: 14px;
+        transition: background 0.2s;
+    }
+    .ip-box-header:hover {
+        background: #325DC4;
+    }
+    .ip-box-header i {
+        margin-right: 10px;
+        font-size: 12px;
+        transition: transform 0.2s;
+    }
+    .ip-box-header.expanded i {
+        transform: rotate(90deg);
+    }
+    .ip-details-area {
+        background: #fff;
+        border: 1px solid #26478D;
+        border-top: none;
+        padding: 0;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+        overflow: hidden;
+    }
+    .cpe-text-content {
+        font-size: 12px;
+        color: #2f3640;
+        flex: 1;
+        margin-right: 12px;
+        word-break: break-all;
+    }
+    .status-action-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .badge-status {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .badge-active { background: #2ecc71; color: #fff; }
+    .badge-inactive { background: #e74c3c; color: #fff; }
+    
+    .btn-delete-cpe { background: #e74c3c; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; }
+    .btn-add-cpe-custom { background: #3498db; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; }
+    .btn-edit-asset-custom { background: #3498db; color: #fff; border: none; padding: 4px 10px; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; }
+
+    .mapping-detail-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+        background: #fff;
+    }
+    .mapping-detail-table th {
+        background: #f8f9fa;
+        color: #555;
+        font-weight: 600;
+        font-size: 12px;
+        padding: 8px 12px;
+        text-align: left;
+        border-bottom: 2px solid #dee2e6;
+    }
+    .mapping-detail-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+        font-size: 13px;
+    }
+    .mapping-detail-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    .mapping-type-tag {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        background: #e9ecef;
+        color: #495057;
+        border: 1px solid #ced4da;
+    }
+    .type-port { background: #e3f2fd; color: #0d47a1; border-color: #bbdefb; }
+    .type-cpe { background: #f3e5f5; color: #4a148c; border-color: #e1bee7; }
+    
+    .port-item-box {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-right: 15px;
+        margin-bottom: 5px;
+    }
+    .bg-port {
+        background: #3056d3 !important;
+        color: #fff !important;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-weight: 700;
+        display: inline-block;
+        min-width: 45px;
+        text-align: center;
+        font-size: 12px;
+        box-shadow: 0 2px 4px rgba(48, 86, 211, 0.2);
+    }
+</style>
 @endpush
 
 @push('pagescript')
@@ -649,8 +829,9 @@
             }
         }
 
+        let selectedSiteCode = $('#select-site').val();
         let selectedSiteName = '';
-        if($('#select-site').children("option:selected").val()!=0){
+        if(selectedSiteCode != 0 && selectedSiteCode != ''){
             selectedSiteName = $('#select-site').children("option:selected").text();
         }
 
@@ -698,7 +879,7 @@
                 let w = 0, l = 0, o = 0, total = 0;
                 
                 allData.forEach(function(row) {
-                    let matchSite = (selectedSiteName === '') || (row.site_name && row.site_name.includes(selectedSiteName));
+                    let matchSite = (selectedSiteCode === '' || selectedSiteCode == 0) || (row.site_code && row.site_code === selectedSiteCode);
                     let statusText = row.status == 1 ? 'Active' : 'Inactive';
                     let matchStatus = (active_tb === '') || (new RegExp(active_tb).test(statusText));
 
@@ -721,11 +902,11 @@
                 $('#count_other').html(o);
             }
             
-            let siteCol = t.column('site_name:name');
+            let siteCol = t.column('site_code:name');
             let searchCol = columnSearch ? t.column(columnSearch) : null;
             let statusCol = t.column('status:name');
 
-            if(siteCol.length) siteCol.search(selectedSiteName, false, true, false);
+            if(siteCol.length) siteCol.search(selectedSiteCode ? '^' + $.fn.dataTable.util.escapeRegex(selectedSiteCode) + '$' : '', true, false, false);
             if(searchCol && searchCol.length) {
                 if(columnSearch == 'domain:name' || columnSearch == 'ip_asset_id:name'){
                     searchCol.search(selectedValue, true, false);
@@ -784,8 +965,11 @@
             serverSide: false,
             "searching": true,
             destroy: true,
-            "dom": '<"btnaction"><"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"f<"m-l-10"B>>>rt<"bottom"ip><"clear">',
+            "dom": '<"btnaction"><"column-xs-flex d-flex justify-content-between m-t-10"l<"d-flex"<"m-l-10"B>>>rt<"bottom"ip><"clear">',
             order: [[ 0, "asc" ]],
+            "drawCallback": function( settings ) {
+                renderCustomUI(this.api());
+            },
             ajax: {
                 type: "POST",
                 url: '{!! route('assets.table_asset')!!}',
@@ -826,6 +1010,11 @@
                     data: 'site_name',
                     name: 'site_name',
                     className: 'no-wrap'
+                },
+                {
+                    data: 'site_code',
+                    name: 'site_code',
+                    visible: false,
                 },
                 {
                     data: 'data_type',
@@ -991,6 +1180,383 @@
         $("div.btnaction").html('<button id="btn_view_1" class="btn btn-info" onclick="btn_view(1)" >Host Info</button>');
     }
 
+    function formatCPE(row) {
+        let parts = [];
+        if (row.CPE_Vendor) parts.push(stripTags(row.CPE_Vendor).trim());
+        if (row.CPE_Title) parts.push(stripTags(row.CPE_Title).trim());
+        if (row.CPE_Version) parts.push(stripTags(row.CPE_Version).trim());
+        if (row.CPE_Edition) parts.push(stripTags(row.CPE_Edition).trim());
+        if (row.CPE_Remark) parts.push(stripTags(row.CPE_Remark).trim());
+        if (row.CPE_Ostype) parts.push(stripTags(row.CPE_Ostype).trim());
+        
+        return parts.filter(p => p !== '' && p !== '-' && p !== '&nbsp;').join(' | ');
+    }
+
+    function stripTags(html) {
+        if (!html) return "";
+        let tmp = document.createElement("DIV");
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || "";
+    }
+
+    function unzipCPE(row) {
+        try {
+            let delimiter = '<hr class="m-0" style="border: 1px solid #efefef;">';
+            
+            let getArr = (val) => {
+                if (!val) return [];
+                if (Array.isArray(val)) return val;
+                if (typeof val === 'string') return val.split(delimiter);
+                return [val];
+            };
+
+            let vendors = getArr(row.CPE_Vendor);
+            let titles = getArr(row.CPE_Title);
+            let versions = getArr(row.CPE_Version);
+            let editions = getArr(row.CPE_Edition);
+            let remarks = getArr(row.CPE_Remark);
+            let ostypes = getArr(row.CPE_Ostype);
+            let deletes = getArr(row.CPE_Del);
+            
+            let cpes = [];
+            let maxLen = Math.max(vendors.length, titles.length, versions.length);
+            
+            for (let i = 0; i < maxLen; i++) {
+                let v = stripTags(vendors[i] || '').trim();
+                let t = stripTags(titles[i] || '').trim();
+                if (v || t) {
+                    cpes.push({
+                        vendor: v,
+                        title: t,
+                        version: stripTags(versions[i] || '').trim(),
+                        edition: stripTags(editions[i] || '').trim(),
+                        remark: stripTags(remarks[i] || '').trim(),
+                        ostype: stripTags(ostypes[i] || '').trim(),
+                        del_btn: deletes[i] || ''
+                    });
+                }
+            }
+            return cpes;
+        } catch (e) {
+            console.error("Error in unzipCPE:", e);
+            return [];
+        }
+    }
+
+    function isIP(str) {
+        return /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(str);
+    }
+
+    function generateCustomPagination(currentPage, totalPages) {
+        if (totalPages <= 1) return '';
+        let html = '<div class="dataTables_paginate paging_simple_numbers"><ul class="pagination" style="margin: 0;">';
+        
+        let prevClass = currentPage === 1 ? 'disabled' : '';
+        html += `<li class="paginate_button previous ${prevClass}"><a href="javascript:void(0);" ${currentPage !== 1 ? 'onclick="goToCustomPage(' + (currentPage - 1) + ')"' : ''}>Previous</a></li>`;
+        
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, currentPage + 2);
+        
+        if (startPage > 1) {
+            html += `<li class="paginate_button"><a href="javascript:void(0);" onclick="goToCustomPage(1)">1</a></li>`;
+            if (startPage > 2) html += `<li class="paginate_button disabled"><a href="javascript:void(0);">...</a></li>`;
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            let activeClass = i === currentPage ? 'active' : '';
+            html += `<li class="paginate_button ${activeClass}"><a href="javascript:void(0);" ${i !== currentPage ? 'onclick="goToCustomPage(' + i + ')"' : ''}>${i}</a></li>`;
+        }
+        
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) html += `<li class="paginate_button disabled"><a href="javascript:void(0);">...</a></li>`;
+            html += `<li class="paginate_button"><a href="javascript:void(0);" onclick="goToCustomPage(${totalPages})">${totalPages}</a></li>`;
+        }
+        
+        let nextClass = currentPage === totalPages || totalPages === 0 ? 'disabled' : '';
+        html += `<li class="paginate_button next ${nextClass}"><a href="javascript:void(0);" ${currentPage !== totalPages && totalPages !== 0 ? 'onclick="goToCustomPage(' + (currentPage + 1) + ')"' : ''}>Next</a></li>`;
+        
+        html += '</ul></div>';
+        return html;
+    }
+
+    function goToCustomPage(page) {
+        let api = $('#table-assets-template').DataTable();
+        renderCustomUI(api, page);
+    }
+
+    var customCurrentPage = 1;
+    function renderCustomUI(apiInstance, pageOverride) {
+        try {
+            let api = apiInstance || t;
+            if (!api || typeof api.rows !== 'function') return;
+            
+            let rows = api.rows({ filter: 'applied' }).data().toArray();
+            let container = $('#custom-asset-list-container');
+            
+            if (rows.length === 0) {
+                container.empty().hide();
+                $('.table-responsive').show();
+                $('#table-assets-template').show();
+                return;
+            }
+            $('#table-assets-template').hide();
+            $('.table-responsive').hide();
+            $('#table-assets-template_processing').hide();
+            container.empty().show();
+
+            let length = $('#table-assets-template_length').clone(true);
+            if (length.length || search.length) {
+                container.append(`
+                    <div class="custom-top-controls" style="padding: 12px 15px; background: #fff; border-radius: 8px 8px 0 0; border-bottom: 1px solid #eee; margin-bottom: 10px;">
+                        <div style="margin-bottom: 12px;">
+                            <button class="btn btn-primary" style="background-color: #3056d3; border-color: #3056d3; border-radius: 20px; padding: 6px 20px; font-weight: 500; font-size: 14px; box-shadow: 0 4px 10px rgba(48, 86, 211, 0.3);">Host Info</button>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div class="custom-length-area"></div>
+                        </div>
+                    </div>
+                `);
+                container.find('.custom-length-area').append(length);
+                
+                let lengthSelect = container.find('.dataTables_length select');
+                lengthSelect.addClass('form-control input-sm').css({'width': 'auto', 'display': 'inline-block', 'margin': '0 5px'});
+                
+                lengthSelect.on('change', function() {
+                    let val = $(this).val();
+                    $('#table-assets-template_length select').val(val).trigger('change');
+                });
+            }
+
+            let groups = {};
+            rows.forEach(function(row) {
+                let host = row.domain || '-';
+                let site = row.site_name || '-';
+                let groupKey = host + '@@@' + site;
+                
+                if (!groups[groupKey]) {
+                    groups[groupKey] = {
+                        host: host,
+                        site: site,
+                        assetGroups: {} 
+                    };
+                }
+                
+                let assetId = row.ip_asset_id || row.id;
+                if (!groups[groupKey].assetGroups[assetId]) {
+                    groups[groupKey].assetGroups[assetId] = [];
+                }
+                groups[groupKey].assetGroups[assetId].push(row);
+            });
+
+    
+            let groupKeys = Object.keys(groups);
+            let pageLength = api.page.len();
+            if (pageLength === -1) pageLength = groupKeys.length;
+            
+            let totalHosts = groupKeys.length;
+            let totalPages = Math.ceil(totalHosts / pageLength);
+            
+            if (pageOverride !== undefined) {
+                customCurrentPage = pageOverride;
+            } else {
+                customCurrentPage = 1; 
+            }
+            if (customCurrentPage > totalPages) customCurrentPage = totalPages || 1;
+            
+            let startIndex = (customCurrentPage - 1) * pageLength;
+            let endIndex = startIndex + pageLength;
+            let paginatedKeys = groupKeys.slice(startIndex, endIndex);
+
+            paginatedKeys.forEach(function(key) {
+                let group = groups[key];
+                let hostId = 'host-' + Math.random().toString(36).substr(2, 9);
+                
+                let ipBoxesHtml = Object.keys(group.assetGroups).map(assetId => {
+                    let assetRows = group.assetGroups[assetId].filter(r => {
+                        let dt = (r.data_type || '').toString().toLowerCase();
+                        return dt !== 'cve' && dt !== '16';
+                    });
+                    if (assetRows.length === 0) return '';
+
+                    let ipId = 'ip-' + Math.random().toString(36).substr(2, 9);
+                    
+                    let displayLabel = '';
+                    assetRows.forEach(r => {
+                        if (isIP(r.ip)) displayLabel = r.ip;
+                    });
+                    if (!displayLabel) displayLabel = assetRows[0].ip;
+
+                    return `
+                    <div class="ip-box-item">
+                        <div class="ip-box-header" onclick="$('#${ipId}').slideToggle(250); $(this).toggleClass('expanded');">
+                            <i class="fas fa-chevron-right"></i>
+                            <span>${displayLabel}</span>
+                        </div>
+                        <div class="ip-details-area" id="${ipId}" style="display:none; padding: 0;">
+                            <table class="mapping-detail-table">
+                                <thead>
+                                    <tr>
+                                        <th width="15%">Type</th>
+                                        <th width="50%">Information</th>
+                                        <th width="15%" style="text-align: center;">Status</th>
+                                        <th width="20%" style="text-align: center;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${(() => {
+                                        if (assetRows.length === 0) return '';
+                                        
+                                        let globalHtml = '';
+                                        let firstRow = assetRows[0];
+                                        
+                                        let cpes = [];
+                                        try {
+                                            cpes = unzipCPE(firstRow) || [];
+                                        } catch (e) {
+                                            console.error('Error in unzipCPE:', e);
+                                        }
+                                        
+                                        let hasRealPort = firstRow.port && 
+                                                        firstRow.port.trim() !== '' && 
+                                                        firstRow.port.indexOf('>-<') === -1 && 
+                                                        firstRow.port !== '-';
+                                        
+                                        if (hasRealPort) {
+                                            const ports = firstRow.port.split('<div>').filter(p => p.trim());
+                                            globalHtml += ports.map((p, idx) => `
+                                            <tr>
+                                                ${idx === 0 ? `<td rowspan="${ports.length}" style="vertical-align: middle;"><span class="mapping-type-tag">Network Port</span></td>` : ''}
+                                                <td>${p}</td>
+                                                <td style="text-align: center;"><span class="badge-status badge-active">Open</span></td>
+                                                <td style="vertical-align: middle; text-align: center;">
+                                                    ${firstRow.action || ''}
+                                                </td>
+                                            </tr>`).join('');
+                                        }
+
+                    
+                                        if (cpes.length > 0) {
+                                            globalHtml += cpes.map((cpe, idx) => `
+                                            <tr>
+                                                ${idx === 0 ? `
+                                                <td rowspan="${cpes.length}" style="vertical-align: middle;">
+                                                    <span class="mapping-type-tag">CPE</span>
+                                                </td>` : ''}
+                                                <td style="vertical-align: middle;">
+                                                    <strong>${cpe.vendor}</strong> | ${cpe.title} | ${cpe.version} 
+                                                    ${cpe.edition ? '| ' + cpe.edition : ''} 
+                                                    ${cpe.ostype ? '<br><small class="text-muted"><i class="fas fa-desktop"></i> <strong> OS :</strong> ' + cpe.ostype + '</small>' : ''}
+                                                    ${cpe.remark && cpe.remark !== '-' ? '<br><small class="text-muted"><i class="fas fa-sticky-note"></i> <strong> Remark :</strong> ' + cpe.remark + '</small>' : ''}
+                                                </td>
+                                                <td style="vertical-align: middle; text-align: center;">
+                                                    ${firstRow.status == 1 ? '<span class="badge-status badge-active">Active</span>' : '<span class="badge-status badge-inactive">Inactive</span>'}
+                                                </td>
+                                                <td style="vertical-align: middle; text-align: center;">
+                                                    ${cpe.del_btn}
+                                                </td>
+                                            </tr>`).join('');
+                                        }
+
+                                  
+                                        let hasRenderedFallback = false;
+                                        assetRows.forEach((rowData, rIdx) => {
+                                            let dtStr = (rowData.data_type || '').toString().toLowerCase();
+                                            let isIPAddressType = (dtStr === '5' || dtStr === 'ip address');
+                                            let isNetworkType = (dtStr === '18' || dtStr === 'network' || dtStr.includes('fddd3fd7'));
+
+                                            if (isNetworkType || (dtStr !== '' && !isIPAddressType)) {
+                                                let metaTag = rowData.data_type || '';
+                                                if (isNetworkType) metaTag = 'Network';
+                                                
+                                                if (!metaTag) {
+                                                    if (rowData.ip && rowData.ip.toUpperCase().startsWith('AS')) metaTag = 'ASN';
+                                                    else if (rowData.ip && rowData.ip.indexOf(' ') > -1) metaTag = 'Network Info';
+                                                    else metaTag = 'Metadata';
+                                                }
+
+                                                let showAddCpe = !hasRealPort && rIdx === 0;
+
+                                                globalHtml += `
+                                                <tr>
+                                                    <td><span class="mapping-type-tag">${metaTag}</span></td>
+                                                    <td class="text-muted">${rowData.ip}</td>
+                                                    <td>-</td>
+                                                    <td style="vertical-align: middle; text-align: center;">
+                                                        ${showAddCpe ? (firstRow.cpe || '') : ''}
+                                                        ${rowData.action || ''}
+                                                    </td>
+                                                </tr>`;
+                                                hasRenderedFallback = true;
+                                            }
+                                        });
+
+                                        if (globalHtml === '' && !hasRenderedFallback && assetRows.length > 0) {
+                                            let rowData = firstRow;
+                                            let metaTag = rowData.data_type || 'Metadata';
+                                            globalHtml += `
+                                            <tr>
+                                                <td><span class="mapping-type-tag">${metaTag}</span></td>
+                                                <td class="text-muted">${rowData.ip}</td>
+                                                <td style="text-align: center;">-</td>
+                                                <td style="vertical-align: middle; text-align: center;">
+                                                    ${!hasRealPort ? (firstRow.cpe || '') : ''}
+                                                    ${rowData.action || ''}
+                                                </td>
+                                            </tr>`;
+                                        }
+
+                                        return globalHtml;
+                                    })()}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                if (ipBoxesHtml.trim() === '') return;
+
+                let groupHtml = `
+                    <div class="host-group-wrapper">
+                        <div class="host-header-item" onclick="$('#${hostId}').slideToggle(300); $(this).find('.host-chevron').toggleClass('fa-chevron-right fa-chevron-down');">
+                            <div class="host-info">
+                                <span class="host-name">${group.host}</span>
+                                <span class="site-name">Site : ${group.site}</span>
+                            </div>
+                            <i class="fas fa-chevron-right host-chevron"></i>
+                        </div>
+                        <div class="ip-container-wrapper" id="${hostId}" style="display:none;">
+                            ${ipBoxesHtml}
+                        </div>
+                    </div>
+                `;
+                container.append(groupHtml);
+            });
+            
+          
+            let controlsHtml = `
+                <div class="custom-table-controls" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #fff; border-radius: 0 0 8px 8px; border-top: 1px solid #eee; margin-top: -10px; margin-bottom: 20px;">
+                    <div class="custom-info-area">
+                        <div class="dataTables_info" style="padding-top: 5px; font-size: 13px; color: #666;">
+                            Showing ${totalHosts === 0 ? 0 : startIndex + 1} to ${Math.min(endIndex, totalHosts)} of ${totalHosts} hosts
+                        </div>
+                    </div>
+                    <div class="custom-pagination-area">
+                        ${generateCustomPagination(customCurrentPage, totalPages)}
+                    </div>
+                </div>
+            `;
+            container.append(controlsHtml);
+
+        } catch (e) {
+            console.error("Error in renderCustomUI:", e);
+            $('.table-responsive').show();
+            $('#table-assets-template').show();
+        } finally {
+            if (typeof window.loading === "function") {
+                window.loading('stop_load');
+            }
+        }
+    }
 
     function data_table_host(){
         t = $('#table-assets-template').DataTable({
@@ -1043,6 +1609,11 @@
                     data: 'site_name',
                     name: 'site_name',
                     className: 'no-wrap'
+                },
+                {
+                    data: 'site_code',
+                    name: 'site_code',
+                    visible: false,
                 },
                 {
                     data: 'data_type',
@@ -1203,6 +1774,9 @@
     }
     function btn_view(mode){
             if(mode == 2){
+                $('#custom-asset-list-container').hide();
+                $('.table-responsive').show();
+                $('#table-assets-template').show();
                 data_table_host();
                 $('#btn_view_1').removeClass( "btn-info" );
                 $('#btn_view_2').addClass( "btn-info" );

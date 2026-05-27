@@ -110,12 +110,12 @@
                                     <span class="label-text"></span>
                                 </label>
                             </th>
+                            <th style="min-width: 320px;">Asset</th>
+                            <th class="text-center">Status</th>
                             <th>Data Type</th>
-                            <th>Asset</th>
                             <th>Referent</th>
                             <th class="text-center">Last Update</th>
                             <th class="text-center">Source</th>
-                            <th class="text-center">Status</th>
                             {{-- <th>Module</th> --}}
                         </tr>
                     </thead>
@@ -171,6 +171,31 @@
 @push('pagestyle')
 @include('stacks.css.datatables')
 @include('stacks.css.form')
+<style>
+    .asset-info-group div { margin-bottom: 2px; white-space: nowrap; }
+    .asset-info-group .text-muted { font-size: 11px; color: #999; width: 60px; display: inline-block; }
+    .asset-info-group .font-bold { color: #333; font-weight: 600; }
+    .asset-info-group .text-info { color: #17a2b8; }
+    #table-scans-data td { vertical-align: middle !important; }
+    .merged-cell { border-bottom: none !important; }
+    .asset-table-unified > tbody > tr > td {
+        vertical-align: top !important;
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+    }
+    .cve-list-container {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: max-height 0.25s ease-in-out, opacity 0.2s ease-in-out;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .cve-list-container.open {
+        max-height: 150px;
+        opacity: 1;
+    }
+</style>
 @endpush
 
 @push('pagescript')
@@ -203,40 +228,45 @@
             },
             
             columns: [
-                {
-                    data: 'chk',
-                    orderable: false,
-                    searchable: false,
-                    sortable: false,
-                    className: 'w-10'
-                },
-                {
-                    data: 'data_type',
-                    name: 'data_type'
-                },
-                {
-                    data: 'raw_data',
-                    name: 'raw_data'
-                },
-                {
-                    data: 'referent',
-                    name: 'referent',
-                },
-                {
-                    data: 'updated_at',
-                    name: 'updated_at',
-                    className: 'text-center'
-                },
-                {
-                    data: 'source',
-                    name: 'source',
-                    className: 'text-center'
-                },
-                {
-                    data: 'use',
-                    name: 'use',
-                },        
+                { data: 'chk', orderable: false, searchable: false, sortable: false, className: 'w-10' },
+                { data: 'asset_html', name: 'asset_html' },
+                { data: 'status', name: 'status', className: 'text-center' },
+                { data: 'data_type', name: 'data_type' },
+                { data: 'referent', name: 'referent' },
+                { data: 'updated_at', name: 'updated_at', className: 'text-center' },
+                { data: 'source', name: 'source', className: 'text-center' },
             ],
+            "drawCallback": function(settings) {
+                var api = this.api();
+                var rows = api.rows({ page: 'current' }).nodes();
+                var last = null;
+                var columnsToMerge = [3, 4, 5, 6]; 
+
+                api.rows({ page: 'current' }).data().each(function(rowData, i) {
+                    var group = rowData.group_key;
+                    if (last === group && group !== null && !group.startsWith('orphan_')) {
+                        columnsToMerge.forEach(function(colIdx) {
+                            var cell = $(rows).eq(i).find('td').eq(colIdx);
+                            cell.css('display', 'none');
+                            
+                            var prevIdx = i - 1;
+                            while(prevIdx >= 0) {
+                                var prevRowData = api.row(prevIdx).data();
+                                if (prevRowData.group_key !== group) break;
+                                
+                                var prevCell = $(rows).eq(prevIdx).find('td').eq(colIdx);
+                                if (prevCell.css('display') !== 'none') {
+                                    var currentSpan = prevCell.attr('rowspan') ? parseInt(prevCell.attr('rowspan')) : 1;
+                                    prevCell.attr('rowspan', currentSpan + 1);
+                                    break;
+                                }
+                                prevIdx--;
+                            }
+                        });
+                    }
+                    last = group;
+                });
+            }
         });
         $('#table-scans-data').on('click', '.select-chk', function () {
             if ($(this).is(':checked')) {
@@ -323,7 +353,7 @@
             var values = $("input[name='select[]']:checked").map(function(){
                 return {
                     'raw_data' : $(this).val(), 
-                    'id' : $(this).data('id'),
+                    'ids' : $(this).data('ids'),
                     'domain_id' : $(this).data('domain'), 
                     'site_id' : $(this).data('site'), 
                     'data_type' : $(this).data('type'),
@@ -381,44 +411,123 @@
                         });
 
                         if (data_transaction && data_transaction.length > 0) {
+                            let firstCveRowId = null;
+                            let uniqueCves = [];
+                            let cveFindings = [];
+                            data_transaction.forEach(val => {
+                                let label = '';
+                                for(let b in result.data_type){
+                                    const dt = result.data_type[b];
+                                    if (val.data_type && dt.value && dt.value.trim().toLowerCase() == val.data_type.trim().toLowerCase()) {
+                                        label = dt.value.trim().toLowerCase();
+                                        break;
+                                    }
+                                }
+                                if (label === 'cve' || label === 'direct cve') {
+                                    cveFindings.push(val.raw_data);
+                                }
+                            });
+                            uniqueCves = [...new Set(cveFindings)];
+
+                            let cveListHtml = '';
+                            uniqueCves.forEach(cve => {
+                                cveListHtml += `<li style="border-bottom: 1px solid #f5f5f5;">
+                                    <a href="https://nvd.nist.gov/vuln/detail/${cve}" target="_blank" style="padding: 8px 15px; color: #337ab7; font-weight: bold; text-decoration: none; display: block; font-size: 13px; transition: background 0.15s;" onmouseover="this.style.background='#f5f5f5';" onmouseout="this.style.background='transparent';">${cve}</a>
+                                </li>`;
+                            });
+
                             for(let c in data_transaction){
                                 const data_transaction_val = data_transaction[c];
-                                if (checkSubAssetDplicate.indexOf(`${data_transaction_val.data_type}${data_transaction_val.raw_data}`) == -1) {
-                                    checkSubAssetDplicate.push(`${data_transaction_val.data_type}${data_transaction_val.raw_data}`);
-                                    number_rows++;
-                                    count++;
-                                    let row_parent_asset = (String(data_transaction_val.raw_data).trim() == String(raw_data).trim()) ? parent_asset : (data_transaction_val.referent ? data_transaction_val.referent : parent_asset);
-
-                                    html += `<tr id="rows_${number_rows}">
-                                        <td style="vertical-align: middle;">
-                                            <strong>${row_parent_asset}</strong>
-                                            <input type="hidden" name="assets[]" value="${row_parent_asset}" data-domain_id="${data_transaction_val.domain_id || ''}" data-site_id="${data_transaction_val.site_id || ''}">
-                                        </td>
-                                        <td>
-                                            <select name="data_type[]" class="select2 form-control">`;
-                                            for(let b in result.data_type){
-                                                base_datatype = result.data_type;
-                                                const data_type = result.data_type[b];
-                                                let isSelected = false;
-                                                if (selected_type && data_transaction_val.raw_data == raw_data) {
-                                                    isSelected = (data_type.value && data_type.value.trim().toLowerCase() == selected_type.trim().toLowerCase());
-                                                } else if (data_transaction_val.data_type) {
-                                                    isSelected = (data_type.value && data_type.value.trim().toLowerCase() == data_transaction_val.data_type.trim().toLowerCase());
-                                                }
-                                                html += `<option value="${data_type.id}" ${isSelected ? 'selected' : ''} data-raw_data="${row_parent_asset}">${data_type.value}</option>`;
-                                            }
-                                            html += `</select>
-                                        </td>
-                                        <td>
-                                            <input type="text" name="raw_data[]" class="form-control" value="${data_transaction_val.raw_data}" data-raw_data="${row_parent_asset}" data-ip="${data_referent.ip_address || ''}">
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_tr(${number_rows})">
-                                                <span>@icon('solid/trash-alt')
-                                            </button>
-                                        </td>
-                                    </tr>`;
+                                
+                                let matchedTypeId = null;
+                                let typeLabel = '';
+                                for(let b in result.data_type){
+                                    const dt = result.data_type[b];
+                                    if (data_transaction_val.data_type && dt.value && dt.value.trim().toLowerCase() == data_transaction_val.data_type.trim().toLowerCase()) {
+                                        matchedTypeId = dt.id;
+                                        typeLabel = dt.value.trim().toLowerCase();
+                                        break;
+                                    }
                                 }
+                                if (!matchedTypeId && selected_type && data_transaction_val.raw_data == raw_data) {
+                                    for(let b in result.data_type){
+                                        const dt = result.data_type[b];
+                                        if (dt.value && dt.value.trim().toLowerCase() == selected_type.trim().toLowerCase()) {
+                                            matchedTypeId = dt.id;
+                                            typeLabel = dt.value.trim().toLowerCase();
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                let nameTypes = ['domain name', 'subdomain', 'internet name', 'affiliate - internet name', 'affiliate - domain name', 'host'];
+                                let isNameType = nameTypes.indexOf(typeLabel) !== -1;
+                                
+                                let uniqueKey = isNameType ? `NAME_GROUP|${data_transaction_val.raw_data}` : `${matchedTypeId || 'Other'}|${data_transaction_val.raw_data}`;
+                                if (checkSubAssetDplicate.indexOf(uniqueKey) !== -1) continue;
+                                checkSubAssetDplicate.push(uniqueKey);
+
+                                number_rows++;
+                                count++;
+                                let row_parent_asset = (String(data_transaction_val.raw_data).trim() == String(raw_data).trim()) ? parent_asset : (data_transaction_val.referent ? data_transaction_val.referent : parent_asset);
+
+                                let isCve = (typeLabel === 'cve' || typeLabel === 'direct cve');
+                                let trAttrs = '';
+                                if (isCve) {
+                                    if (firstCveRowId === null) {
+                                        firstCveRowId = number_rows;
+                                        trAttrs = `data-cve-group="${firstCveRowId}"`;
+                                    } else {
+                                        trAttrs = `data-cve-group="${firstCveRowId}" style="display: none;"`;
+                                    }
+                                }
+
+                                html += `<tr id="rows_${number_rows}" ${trAttrs}>
+                                    <td style="vertical-align: middle;">
+                                        <strong>${row_parent_asset}</strong>
+                                        <input type="hidden" name="assets[]" value="${row_parent_asset}" data-domain_id="${data_transaction_val.domain_id || ''}" data-site_id="${data_transaction_val.site_id || ''}">
+                                    </td>
+                                    <td>
+                                        <select name="data_type[]" class="select2 form-control">`;
+                                        for(let b in result.data_type){
+                                            base_datatype = result.data_type;
+                                            const data_type = result.data_type[b];
+                                            let isSelected = (data_type.id == matchedTypeId);
+
+                                            html += `<option value="${data_type.id}" ${isSelected ? 'selected' : ''} data-raw_data="${row_parent_asset}">${data_type.value}</option>`;
+                                        }
+                                        html += `</select>
+                                    </td>
+                                    <td>`;
+                                    if (isCve && firstCveRowId === number_rows) {
+                                        let cvesJson = JSON.stringify(uniqueCves).replace(/'/g, "&#39;");
+                                        html += `<div style="display:flex; align-items:flex-start; width: 100%;">
+                                            <div style="flex-grow:1; margin-right: 5px; position: relative;">
+                                                <div class="btn btn-default btn-block text-left" onclick="toggleCveList(this)" style="display: flex; justify-content: space-between; align-items: center; border: 1px solid #ccc; text-align: left; padding: 6px 12px; background: #fff; width: 100%; border-radius: 4px; box-shadow: none; height: 34px; cursor: pointer; user-select: none;">
+                                                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: #555;">Select Detail</span>
+                                                    <span class="caret-icon" style="transition: transform 0.2s; display: inline-block; line-height: 1;"><span class="caret"></span></span>
+                                                </div>
+                                                <div class="cve-list-container">
+                                                    <div class="cve-list-inner" style="max-height: 150px; overflow-y: auto; border: 1px solid #ccc; border-top: none; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; background: #fff; margin-top: -1px; box-sizing: border-box;">
+                                                        <ul style="list-style: none; padding: 0; margin: 0;">
+                                                            ${cveListHtml}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <input type="hidden" name="raw_data[]" value="${data_transaction_val.raw_data}" data-raw_data="${row_parent_asset}" data-ip="${data_referent.ip_address || ''}">
+                                            <button type="button" class="btn btn-xs btn-info" onclick="view_cve_details('${data_transaction_val.domain_id || ''}', '${data_transaction_val.site_id || ''}', this)" data-cves='${cvesJson}' data-ip="${data_referent.ip_address || ''}" data-domain="${parent_asset}" title="View CVE Details" style="padding: 6px 12px; white-space: nowrap; height: 34px; display: inline-flex; align-items: center; justify-content: center;"><i class="fas fa-search" style="margin-right: 5px;"></i> View Detail</button>
+                                        </div>`;
+                                    } else {
+                                        html += `<input type="text" name="raw_data[]" class="form-control" value="${data_transaction_val.raw_data}" data-raw_data="${row_parent_asset}" data-ip="${data_referent.ip_address || ''}">`;
+                                    }
+                                    html += `</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger m-xs delete-row" value="bulk-delete" onclick="delete_tr(${number_rows})">
+                                            <span>@icon('solid/trash-alt')
+                                        </button>
+                                    </td>
+                                </tr>`;
                             }
                         } else {
                             number_rows++;
@@ -628,8 +737,39 @@
         });
     }
 
-    function delete_tr(c){
-        $('#rows_' + c).remove();
+    function toggleCveList(btn) {
+        let container = $(btn).siblings('.cve-list-container');
+        let caret = $(btn).find('.caret-icon');
+        let isOpen = container.hasClass('open');
+        if (isOpen) {
+            container.removeClass('open');
+            setTimeout(function() {
+                if (!container.hasClass('open')) {
+                    $(btn).css({
+                        'border-bottom-left-radius': '4px',
+                        'border-bottom-right-radius': '4px'
+                    });
+                }
+            }, 250);
+            caret.css('transform', 'rotate(0deg)');
+        } else {
+            $(btn).css({
+                'border-bottom-left-radius': '0',
+                'border-bottom-right-radius': '0'
+            });
+            container.addClass('open');
+            caret.css('transform', 'rotate(180deg)');
+        }
+    }
+
+                                    function delete_tr(c){
+        let row = $('#rows_' + c);
+        let group = row.attr('data-cve-group');
+        if (group) {
+            $(`tr[data-cve-group="${group}"]`).remove();
+        } else {
+            row.remove();
+        }
     }
 
     function delete_assets_manual_main(c){
@@ -659,9 +799,30 @@
 
     function save_assets(){
         loading('load');
-        var values = $("input[name='assets[]']").map(function(){
-            return {'raw_data' : $(this).val(), 'domain_id' : $(this).data('domain_id') , 'site_id' : $(this).data('site_id')};
-        }).get();
+        var values = [];
+        var seenAssets = {};
+        $("input[name='assets[]']").each(function(){
+            var val = $(this).val();
+            if (!seenAssets[val]) {
+                values.push({
+                    'raw_data' : val, 
+                    'domain_id' : $(this).data('domain_id'), 
+                    'site_id' : $(this).data('site_id')
+                });
+                seenAssets[val] = true;
+            }
+        });
+
+        var sourceIds = [];
+        $("input[name='select[]']:checked").each(function(){
+            var ids = $(this).data('ids');
+            if (Array.isArray(ids)) {
+                sourceIds = sourceIds.concat(ids);
+            } else if (ids) {
+                sourceIds.push(ids);
+            }
+        });
+
         var raw_data = $("input[name='raw_data[]']").map(function(){
             return {
                 'raw_data' : $(this).val(), 
@@ -681,11 +842,12 @@
                     ip_address: v.ip_address
                 };
             }
-        });
+        }).filter(item => item !== undefined); 
 
         axios.post('/scans/save_assets', {
             assets: values,
-            assets_data: res
+            assets_data: res,
+            ids: sourceIds
         }).then(function (response) {
             
             
