@@ -50,6 +50,7 @@ class SearchController extends Controller
     }
 
     public function searchAPI(){
+        set_time_limit(120);
      
         $type = $this->request->type;
         $keyword = $this->request->keyword;
@@ -211,7 +212,7 @@ class SearchController extends Controller
            
             if(@$role_custom['indicators']) {
                 if($type == 'events'){
-                    $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                    $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
                     $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                     $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
             
@@ -317,7 +318,7 @@ class SearchController extends Controller
                 if($type == 'events'){
                     
                     $dataWait = null;
-                    $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+                    $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
                     $pipeLine = array('indicator_name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                     $dataWait['count'] = $col_fx_transaction_otx_indicators_data->count($pipeLine);
                   
@@ -370,7 +371,7 @@ class SearchController extends Controller
                                             }
                                            
                                             if(!empty($indicator_id)){
-                                                $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+                                                $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
                                                 $options = [
                                                     'allowDiskUse' => TRUE
                                                 ];
@@ -412,7 +413,7 @@ class SearchController extends Controller
     
     
        
-                                            //     $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+                                            //     $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
                                          
                                         
                                             //     $query = [
@@ -449,7 +450,7 @@ class SearchController extends Controller
                                      
                                           
                                             if(!empty($event_ids)){
-                                                $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                                                $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
                                                 $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
                                                 $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
                                                 
@@ -516,7 +517,7 @@ class SearchController extends Controller
                 //Malware
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_malware_related;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_malware_related;
                 $pipeLine = array('malware_name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
                 if($dataWait['count']>0){
@@ -565,7 +566,7 @@ class SearchController extends Controller
 
 
                                      
-                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
                                         $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
                                         $dataWait['count'] =count($event_ids);
                                        
@@ -626,7 +627,7 @@ class SearchController extends Controller
               
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
                 $pipeLine = array('adversary_name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
              
@@ -676,7 +677,7 @@ class SearchController extends Controller
 
 
                                      
-                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
                                         $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
                                         $dataWait['count'] =count($event_ids);
                                        
@@ -738,7 +739,7 @@ class SearchController extends Controller
                 //Malware
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_malware;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_malware;
                 $pipeLine = array('malware_uuid' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
                 if($dataWait['count']>0){
@@ -787,7 +788,7 @@ class SearchController extends Controller
               
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
                 $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
                 
@@ -836,7 +837,7 @@ class SearchController extends Controller
 
     public function search(Request $mode)
     {
-      
+        set_time_limit(120);
         // $this->request->validate(['keyword' => 'required']);
         $data['dataSearch'] = array();
         $limit = 100;//->take($limit)
@@ -994,7 +995,7 @@ class SearchController extends Controller
             }
 
 
-            // $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;//indicator_name
+            // $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;//indicator_name
             // $pipeLine = array('indicator_name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
             // $dataWait['count'] = $col_fx_otx_indicator_detail->count($pipeLine);
             // if($dataWait['count']>0){
@@ -1032,7 +1033,7 @@ class SearchController extends Controller
             // }
 
             if(@$role_custom['indicators']) {
-                $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
                 $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
 
@@ -1137,7 +1138,7 @@ class SearchController extends Controller
 
             if(@$role_custom['indicators']) {
                 $dataWait = null;
-                $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
+                $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent_dev->fx_transaction_otx_indicators_data;
                 $pipeLine = array('indicator' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_transaction_otx_indicators_data->count($pipeLine);
                 if($dataWait['count']>0){
@@ -1181,7 +1182,7 @@ class SearchController extends Controller
 
 
    
-                                            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+                                            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
                                      
                                     
                                             $query = [
@@ -1215,7 +1216,7 @@ class SearchController extends Controller
 
                                         }
                                      
-                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
                                         $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
                                         $dataWait['count'] =count($event_ids);
                                        
@@ -1285,7 +1286,7 @@ class SearchController extends Controller
                 //Malware
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_malware_related;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_malware_related;
                 $pipeLine = array('malware_name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
                 if($dataWait['count']>0){
@@ -1334,7 +1335,7 @@ class SearchController extends Controller
 
 
                                      
-                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
                                         $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
                                         $dataWait['count'] =count($event_ids);
                                        
@@ -1393,7 +1394,7 @@ class SearchController extends Controller
               
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
                 $pipeLine = array('adversary_name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
              
@@ -1443,7 +1444,7 @@ class SearchController extends Controller
 
 
                                      
-                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
                                         $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
                                         $dataWait['count'] =count($event_ids);
                                        
@@ -1504,7 +1505,7 @@ class SearchController extends Controller
                 //Malware
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_malware;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_malware;
                 $pipeLine = array('malware_uuid' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
                 if($dataWait['count']>0){
@@ -1551,7 +1552,7 @@ class SearchController extends Controller
               
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
                 $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
                 
@@ -1622,17 +1623,90 @@ class SearchController extends Controller
 
     public function loadSearchAPI(Request $request)
     {
+        set_time_limit(120); // Increase max execution time for multiple API calls
+        if ($request->hasSession()) {
+            $request->session()->save(); // Release session lock to allow concurrent AJAX requests
+        }
 
-      
         $role_custom = @check_role_custom();
         $source = $request->source;
+        $original_keyword = $request->keyword;
         $keyword = $request->keyword;
+        
+        // Strip port from IPv4 if present (e.g. 1.2.3.4:80 -> 1.2.3.4)
+        if (preg_match('/^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):\d+$/', $keyword, $matches)) {
+            if (filter_var($matches[1], FILTER_VALIDATE_IP)) {
+                $keyword = $matches[1]; // Use IP without port for most feeds
+            }
+        }
+
         $site_code = $request->code;
         $site_id = 0;
         $site = null;
     
        //format
        $type = $this->check_keyword_type($keyword);
+
+        if($source == 'internal_events') {
+            try {
+                $clientMD = new \MongoDB\Client(env("DB_MONGO_STOREDATAB"));
+                $db = $clientMD->sosecure_threatintelligent_dev;
+                
+                $eventsList = [];
+                $otxRefs = $db->fx_otx_events_indicator_ref->find(['indicator' => ['$regex' => $keyword, '$options' => 'i']])->toArray();
+                
+                $pulseIds = [];
+                foreach ($otxRefs as $ref) {
+                    if (isset($ref['pulse_id'])) {
+                        $pulseIds[] = $ref['pulse_id'];
+                    }
+                }
+                
+                if (!empty($pulseIds)) {
+                    $pulseIds = array_unique($pulseIds);
+                    $otxEvents = $db->fx_otx_events->find(['pulse_id' => ['$in' => $pulseIds]])->toArray();
+                    
+                    foreach ($otxEvents as $event) {
+                        $pulseId = $event['pulse_id'] ?? 'Unknown';
+                        $sourceName = strpos($pulseId, 'misp.') === 0 ? 'MISP' : 'AlienVault OTX';
+                        
+                        $dateStr = 'N/A';
+                        if (isset($event['created'])) {
+                            if ($event['created'] instanceof \MongoDB\BSON\UTCDateTime) {
+                                $dateStr = $event['created']->toDateTime()->setTimezone(new \DateTimeZone('Asia/Bangkok'))->format('Y-m-d H:i:s');
+                            } else {
+                                $dateStr = (string)$event['created'];
+                            }
+                        }
+                        
+                        $tags = '';
+                        if (isset($event['tags']) && is_array($event['tags'])) {
+                            $tags = implode(', ', $event['tags']);
+                        }
+                        
+                        $eventsList[] = [
+                            'source' => $sourceName,
+                            'event_id' => $pulseId,
+                            'event_name' => $event['name'] ?? 'Unknown',
+                            'tags' => $tags,
+                            'date' => $dateStr
+                        ];
+                    }
+                }
+                
+                return response()->json([
+                    'status_code' => 200,
+                    'data' => $eventsList,
+                    'type' => $type
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status_code' => 500,
+                    'error' => $e->getMessage(),
+                    'type' => $type
+                ]);
+            }
+        }
 
         if($site_code){
             $site = SiteSettings::where('code', $site_code)->first();
@@ -1750,6 +1824,7 @@ class SearchController extends Controller
         $response3 = '{}';
 
         if($source =="ibmcloud"){
+            return response()->json(['status_code' => 400, 'message' => 'IBM Cloud is disabled']);
             $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
          
             if($log_search){
@@ -1842,52 +1917,52 @@ class SearchController extends Controller
             }
             
         }else if($source =="virustotal"){
-            $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
+            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
+            if($log_search && !File::exists(storage_path() .'/app/public/'.$log_search -> path)){
+                $log_search->delete();
+                $log_search = null;
+            }
             if($log_search){
                 $url = storage_path() .'/app/public/'.$log_search -> path;
-                if(!File::exists($url)){
-                    $response = null;
-                }else{
-                    $response3 = file_get_contents($url); 
-                    if($response3 == '[]' || $response3 == null || $response3 == '')
-                    {
-                        if(File::exists($url))
-                        {File::delete($url);}
+                $response3 = file_get_contents($url); 
+                if($response3 == '[]' || $response3 == null || $response3 == '')
+                {
+                    if(File::exists($url))
+                    {File::delete($url);}
 
-                        $virustotal_API_Key = "8ed71053d254aa99c9a79b73c6f3223cac762c2c77628d075e62ec506a538267";
-                        if($type == 'IP'){
-                            $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/" . $keyword;
-                        }else if($type == 'Domain'){
-                            $virustotal_url='https://www.virustotal.com/api/v3/domains/' . $keyword;
-                        }else if($type == 'URL'){
-                            $virustotal_url='https://www.virustotal.com/api/v3/url/' . $keyword;
-                        }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
-                            $virustotal_url='https://www.virustotal.com/api/v3/files/' . $keyword;
-                        }
-
-                        $headers = array(
-                            'X-Apikey: '.$virustotal_API_Key
-                        );
-                        // Send request to Server
-                        $ch = curl_init($virustotal_url);
-                        // To save response in a variable from server, set headers;
-                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                        // Get response
-                        $response = curl_exec($ch);
-                        curl_close($ch);  
-
-                        $path = 'search_file/'.time().'.json';
-                        if( Storage::disk('public')->put($path, $response)) {
-                            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
-                            $log_search -> path = $path;
-                            $log_search -> save();
-                        }
+                    $virustotal_API_Key = "8ed71053d254aa99c9a79b73c6f3223cac762c2c77628d075e62ec506a538267";
+                    if($type == 'IP'){
+                        $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/" . $keyword;
+                    }else if($type == 'Domain'){
+                        $virustotal_url='https://www.virustotal.com/api/v3/domains/' . $keyword;
+                    }else if($type == 'URL'){
+                        $virustotal_url='https://www.virustotal.com/api/v3/url/' . $keyword;
+                    }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
+                        $virustotal_url='https://www.virustotal.com/api/v3/files/' . $keyword;
                     }
-                    else
-                    {
-                        $response = file_get_contents($url); 
+
+                    $headers = array(
+                        'X-Apikey: '.$virustotal_API_Key
+                    );
+                    // Send request to Server
+                    $ch = curl_init($virustotal_url);
+                    // To save response in a variable from server, set headers;
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    // Get response
+                    $response = curl_exec($ch);
+                    curl_close($ch);  
+
+                    $path = 'search_file/'.time().'.json';
+                    if( Storage::disk('public')->put($path, $response)) {
+                        $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
+                        $log_search -> path = $path;
+                        $log_search -> save();
                     }
+                }
+                else
+                {
+                    $response = file_get_contents($url); 
                 }
             }else{
                 $check_limit_search = $this->check_limit_search($site_id, $source);
@@ -1938,79 +2013,79 @@ class SearchController extends Controller
             }
 
         }else if($source =="hybrid"){
-            $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
+            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
+            if($log_search && !File::exists(storage_path() .'/app/public/'.$log_search -> path)){
+                $log_search->delete();
+                $log_search = null;
+            }
             if($log_search){
                 $url = storage_path() .'/app/public/'.$log_search -> path;
-                if(!File::exists($url)){
-                    $response = null;
-                }else{
-                    $response3 = file_get_contents($url); 
-                    if($response3 == '[]' || $response3 == null || $response3 == '')
-                    {
-                        if(File::exists($url))
-                        {File::delete($url);}
-                        $hybrid_API_Key = "kpy0ibau846587b1lnemkw4k082be03bncw1bkz140a16b6cs64sk6uzf0498e3f";
+                $response3 = file_get_contents($url); 
+                if($response3 == '[]' || $response3 == null || $response3 == '')
+                {
+                    if(File::exists($url))
+                    {File::delete($url);}
+                    $hybrid_API_Key = "kpy0ibau846587b1lnemkw4k082be03bncw1bkz140a16b6cs64sk6uzf0498e3f";
 
-                        //$virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
-                        $headers = array(
-                            'api-key: '.$hybrid_API_Key,
-                            'accept: '.'application/json',
-                            'Content-Type: '.'application/x-www-form-urlencoded',
-                            'user-agent: '.'Falcon Sandbox',
-                        );
-                        //'host'=>'151.101.2.110','domain'=>'151.101.2.110','url'=>'151.101.2.110','url'=>'151.101.2.110','similar_to'=>'151.101.2.110','context'=>'151.101.2.110'
-                        
-                        if($type == 'IP'){
-                            $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
-                            $fields = array('host'=>$keyword);
-                            $postvars = '';
-                            foreach($fields as $key=>$value) {
-                                $postvars .= $key . "=" . $value . "&";
-                            }
-                        }else if($type == 'Domain'){
-                            $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
-                            $fields = array('domain'=>$keyword);
-                            $postvars = '';
-                            foreach($fields as $key=>$value) {
-                                $postvars .= $key . "=" . $value . "&";
-                            }
-                        }else if($type == 'URL'){
-                            $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
-                            $fields = array('domain'=>$keyword);
-                            $postvars = '';
-                            foreach($fields as $key=>$value) {
-                                $postvars .= $key . "=" . $value . "&";
-                            }
-                        }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
-                            $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/hash";
-                            $fields = array('hash'=>$keyword);
-                            $postvars = '';
-                            foreach($fields as $key=>$value) {
-                                $postvars .= $key . "=" . $value . "&";
-                            }
+                    //$virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
+                    $headers = array(
+                        'api-key: '.$hybrid_API_Key,
+                        'accept: '.'application/json',
+                        'Content-Type: '.'application/x-www-form-urlencoded',
+                        'user-agent: '.'Falcon Sandbox',
+                    );
+                    //'host'=>'151.101.2.110','domain'=>'151.101.2.110','url'=>'151.101.2.110','url'=>'151.101.2.110','similar_to'=>'151.101.2.110','context'=>'151.101.2.110'
+                    
+                    if($type == 'IP'){
+                        $hybrid_url = "https://hybrid-analysis.com/api/v2/search/terms";
+                        $fields = array('host'=>$keyword);
+                        $postvars = '';
+                        foreach($fields as $key=>$value) {
+                            $postvars .= $key . "=" . $value . "&";
                         }
-                        
-                        // Send request to Server
-                        $ch = curl_init($hybrid_url);
-                        // To save response in a variable from server, set headers;
-                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                        curl_setopt($ch, CURLOPT_POSTFIELDS,$postvars);
-                        // Get response
-                        $response = curl_exec($ch);
-                        curl_close($ch);  
-
-                        $path = 'search_file/'.time().'.json';
-                        if( Storage::disk('public')->put($path, $response)) {
-                            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
-                            $log_search -> path = $path;
-                            $log_search -> save();
+                    }else if($type == 'Domain'){
+                        $hybrid_url = "https://hybrid-analysis.com/api/v2/search/terms";
+                        $fields = array('domain'=>$keyword);
+                        $postvars = '';
+                        foreach($fields as $key=>$value) {
+                            $postvars .= $key . "=" . $value . "&";
+                        }
+                    }else if($type == 'URL'){
+                        $hybrid_url = "https://hybrid-analysis.com/api/v2/search/terms";
+                        $fields = array('domain'=>$keyword);
+                        $postvars = '';
+                        foreach($fields as $key=>$value) {
+                            $postvars .= $key . "=" . $value . "&";
+                        }
+                    }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
+                        $hybrid_url = "https://hybrid-analysis.com/api/v2/search/hash";
+                        $fields = array('hash'=>$keyword);
+                        $postvars = '';
+                        foreach($fields as $key=>$value) {
+                            $postvars .= $key . "=" . $value . "&";
                         }
                     }
-                    else
-                    {
-                        $response = file_get_contents($url); 
+                    
+                    // Send request to Server
+                    $ch = curl_init($hybrid_url);
+                    // To save response in a variable from server, set headers;
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS,$postvars);
+                    // Get response
+                    $response = curl_exec($ch);
+                    curl_close($ch);  
+
+                    $path = 'search_file/'.time().'.json';
+                    if( Storage::disk('public')->put($path, $response)) {
+                        $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
+                        $log_search -> path = $path;
+                        $log_search -> save();
                     }
+                }
+                else
+                {
+                    $response = file_get_contents($url); 
                 }
             }else{
                 $check_limit_search = $this->check_limit_search($site_id, $source);
@@ -2035,28 +2110,28 @@ class SearchController extends Controller
                 //'host'=>'151.101.2.110','domain'=>'151.101.2.110','url'=>'151.101.2.110','url'=>'151.101.2.110','similar_to'=>'151.101.2.110','context'=>'151.101.2.110'
                 
                 if($type == 'IP'){
-                    $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
+                    $hybrid_url = "https://hybrid-analysis.com/api/v2/search/terms";
                     $fields = array('host'=>$keyword);
                     $postvars = '';
                     foreach($fields as $key=>$value) {
                         $postvars .= $key . "=" . $value . "&";
                     }
                 }else if($type == 'Domain'){
-                    $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
+                    $hybrid_url = "https://hybrid-analysis.com/api/v2/search/terms";
                     $fields = array('domain'=>$keyword);
                     $postvars = '';
                     foreach($fields as $key=>$value) {
                         $postvars .= $key . "=" . $value . "&";
                     }
                 }else if($type == 'URL'){
-                    $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
+                    $hybrid_url = "https://hybrid-analysis.com/api/v2/search/terms";
                     $fields = array('domain'=>$keyword);
                     $postvars = '';
                     foreach($fields as $key=>$value) {
                         $postvars .= $key . "=" . $value . "&";
                     }
                 }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
-                    $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/hash";
+                    $hybrid_url = "https://hybrid-analysis.com/api/v2/search/hash";
                     $fields = array('hash'=>$keyword);
                     $postvars = '';
                     foreach($fields as $key=>$value) {
@@ -2127,6 +2202,7 @@ class SearchController extends Controller
             // To save response in a variable from server, set headers;
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
             // Get response
             $response = curl_exec($ch);
             curl_close($ch);  
@@ -2143,6 +2219,7 @@ class SearchController extends Controller
                     // To save response in a variable from server, set headers;
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
                     // Get response
                     $response2 = curl_exec($ch);
                     curl_close($ch);  
@@ -2167,6 +2244,7 @@ class SearchController extends Controller
             // To save response in a variable from server, set headers;
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
             // Get response
             $response = curl_exec($ch);
             curl_close($ch);  
@@ -2188,6 +2266,7 @@ class SearchController extends Controller
             // To save response in a variable from server, set headers;
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
             // Get response
             $response = curl_exec($ch);
             curl_close($ch);  
@@ -2215,11 +2294,118 @@ class SearchController extends Controller
             // To save response in a variable from server, set headers;
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
             // Get response
             $response = curl_exec($ch);
             curl_close($ch);  
 
         
+        }else if($source =="abuseipdb"){
+            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
+            if($log_search && !File::exists(storage_path() .'/app/public/'.$log_search -> path)){
+                $log_search->delete();
+                $log_search = null;
+            }
+            if($log_search){
+                $url = storage_path() .'/app/public/'.$log_search -> path;
+                $response3 = file_get_contents($url); 
+                if($response3 == '[]' || $response3 == null || $response3 == '') {
+                    if(File::exists($url)) { File::delete($url); }
+                    $response = $this->fetchAbuseIPDB($keyword);
+                    $path = 'search_file/'.time().'.json';
+                    if( Storage::disk('public')->put($path, $response)) {
+                        $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
+                        $log_search -> path = $path;
+                        $log_search -> save();
+                    }
+                } else {
+                    $response = file_get_contents($url); 
+                }
+            }else{
+                $response = $this->fetchAbuseIPDB($keyword);
+                $path = 'search_file/'.time().'.json';
+                if( Storage::disk('public')->put($path, $response)) {
+                    $log_search = new LogSearch();
+                    $log_search -> path = $path;
+                    $log_search -> keyword = $keyword;
+                    $log_search -> type = $type;
+                    $log_search -> source = $source;
+                    $log_search -> save();
+                }
+            }
+        }else if($source =="threatfox"){
+            \Log::info('[ThreatFox Debug] keyword='.$keyword.', original_keyword='.$original_keyword);
+            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
+            if($log_search && !File::exists(storage_path() .'/app/public/'.$log_search -> path)){
+                $log_search->delete();
+                $log_search = null;
+            }
+            // Also clear stale cache that contains 'no_result' from previous searches without port
+            if($log_search){
+                $url = storage_path() .'/app/public/'.$log_search -> path;
+                $cachedContent = File::exists($url) ? file_get_contents($url) : '';
+                $cachedData = json_decode($cachedContent, true);
+                \Log::info('[ThreatFox Debug] Cache found, query_status=' . ($cachedData['query_status'] ?? 'N/A') . ', content_len=' . strlen($cachedContent));
+                if(empty($cachedContent) || $cachedContent == '[]' || 
+                   (is_array($cachedData) && isset($cachedData['query_status']) && $cachedData['query_status'] !== 'ok')){
+                    // Stale or no_result cache — delete and re-fetch
+                    \Log::info('[ThreatFox Debug] Clearing stale cache');
+                    if(File::exists($url)) { File::delete($url); }
+                    $log_search->delete();
+                    $log_search = null;
+                }
+            }
+            if($log_search){
+                $url = storage_path() .'/app/public/'.$log_search -> path;
+                $response = file_get_contents($url); 
+                \Log::info('[ThreatFox Debug] Using cached response');
+            }else{
+                \Log::info('[ThreatFox Debug] Fetching fresh with keyword: ' . $original_keyword);
+                $response = $this->fetchThreatFox($original_keyword);
+                \Log::info('[ThreatFox Debug] API response: ' . substr($response, 0, 500));
+                $path = 'search_file/'.time().'.json';
+                if( Storage::disk('public')->put($path, $response)) {
+                    $log_search = new LogSearch();
+                    $log_search -> path = $path;
+                    $log_search -> keyword = $keyword;
+                    $log_search -> type = $type;
+                    $log_search -> source = $source;
+                    $log_search -> save();
+                }
+            }
+        }else if($source =="rstcloud"){
+            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
+            if($log_search && !File::exists(storage_path() .'/app/public/'.$log_search -> path)){
+                $log_search->delete();
+                $log_search = null;
+            }
+            if($log_search){
+                $url = storage_path() .'/app/public/'.$log_search -> path;
+                $response3 = file_get_contents($url); 
+                if($response3 == '[]' || $response3 == null || $response3 == '') {
+                    if(File::exists($url)) { File::delete($url); }
+                    $response = $this->fetchRSTCloud($keyword);
+                    $path = 'search_file/'.time().'.json';
+                    if( Storage::disk('public')->put($path, $response)) {
+                        $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
+                        $log_search -> path = $path;
+                        $log_search -> save();
+                    }
+                } else {
+                    $response = file_get_contents($url); 
+                }
+            }else{
+                $response = $this->fetchRSTCloud($keyword);
+                $path = 'search_file/'.time().'.json';
+                if( Storage::disk('public')->put($path, $response)) {
+                    $log_search = new LogSearch();
+                    $log_search -> path = $path;
+                    $log_search -> keyword = $keyword;
+                    $log_search -> type = $type;
+                    $log_search -> source = $source;
+                    $log_search -> save();
+                }
+            }
         }else if($source =="check_api_search_limit"){
             // if($site_code){
             //     $center_search_api_loookup_limit =$site->search_api_loookup_limit;
@@ -2593,5 +2779,89 @@ class SearchController extends Controller
             'Content-Type' => 'text/plain',
             'Content-Disposition' => 'inline; filename="Md5.csv"',
         ]);
+    }
+
+    private function fetchAbuseIPDB($ip)
+    {
+        $keys = \App\Services\IndicatorCheckService::ABUSE_KEYS;
+        $key = $keys[array_rand($keys)];
+        
+        $url = "https://api.abuseipdb.com/api/v2/check?ipAddress=" . urlencode($ip) . "&maxAgeInDays=120";
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Key: ' . $key,
+            'Accept: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        return $response;
+    }
+
+    private function fetchThreatFox($keyword)
+    {
+        $postData = json_encode([
+            'query' => 'search_ioc',
+            'search_term' => $keyword
+        ]);
+
+        // Try without Auth-Key first (anonymous — avoids key-level blacklist)
+        $url = "https://threatfox-api.abuse.ch/api/v1/";
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $decoded = json_decode($response, true);
+        if (isset($decoded['query_status']) && $decoded['query_status'] !== 'user_blacklisted') {
+            return $response;
+        }
+
+        // Fallback: try with Auth-Key
+        \Log::info('[ThreatFox Debug] Anonymous request blacklisted, trying with Auth-Key');
+        $keys = \App\Services\IndicatorCheckService::TF_KEYS;
+        $key = $keys[array_rand($keys)];
+        
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Auth-Key: ' . $key,
+            'Content-Type: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        return $response;
+    }
+
+    private function fetchRSTCloud($keyword)
+    {
+        $keys = \App\Services\IndicatorCheckService::RST_KEYS;
+        $key = $keys[array_rand($keys)];
+        
+        $url = "https://api.rstcloud.net/v1/ioc?value=" . urlencode($keyword);
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'x-api-key: ' . $key,
+            'Accept: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        return $response;
     }
 }    

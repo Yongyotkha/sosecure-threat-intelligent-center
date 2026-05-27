@@ -95,23 +95,25 @@
                 <div class="back-int">
                     <section id="overall-int">
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-md-5">
                                 <h3 class="page-header">
                                 Information <span id="l_api_limit"></span>
                                 </h3>
                             </div>
-                            <div class="col-md-4 text-right">
+                            <div class="col-md-7 text-right">
                                 <span class="st-dt-leak">
+                                    <span class="st-dt crit" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip crit'>Critical</div><div class='text-st-tooltip'> ภัยคุกคามระดับวิกฤต มีความรุนแรงและผลกระทบสูงสุด จำเป็นต้องตอบสนองหรือจัดการทันที</div></div>">Critical</span>
                                     <span class="st-dt vrh" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip vrh'>High</div><div class='text-st-tooltip'> เป็นข้อมูลภัยคุกคามที่อยู่ในรูปแบบของ Malicious Code หรือเป็น C&C Server หรือเป็นข้อมูลที่มีความสอดคล้องกับภัยคุกคามอย่างชัดเจนจากแหล่งข้อมูลต่าง ๆ และอยู่ในระดับรุนแรง</div></div>">High</span>
                                     {{-- <span class="st-dt high" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip high'>High</div><div class='text-st-tooltip'>ข้อมูลรั่วไหลและเป็นที่รับรู้อย่างแพร่หลาย เช่น <br> ออกข่าว หรือมีการแชร์ข้อมูลจากแหล่งข้อมูลที่น่าเชื่อถือและเป็นที่แพร่หลาย <br> และข้อมูลที่รั่วไหลเป็นข้อมูลสำคัญของระบบเช่นข้อมูล Username ,Password ของลูกค้าหรือเจ้าหน้าที่ดูแลระบบภายในองค์กรซึ่งเป็นข้อมูลที่สามารถนำมาใช้ได้จริง</div></div>">High</span> --}}
                                     <span class="st-dt md" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip md'>Medium</div><div class='text-st-tooltip'> เป็นข้อมูลภัยคุกคามที่อยู่ในรูปแบบของ Malicious Code หรือเป็น C&C Server หรือเป็นข้อมูลที่มีความสอดคล้องกับภัยคุกคามอย่างชัดเจนแต่อยู่ในระดับปานกลาง</div></div>">Medium</span>
                                     <span class="st-dt low" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip low'>Low</div><div class='text-st-tooltip'>เป็นข้อมูลภัยคุกคามที่มีความสอดคล้องกับภัยคุกคามอยู่ในระดับต่ำและมีความสอดคล้องบางแหล่งข้อมูลเท่านั้น ซึ่งอาจจะเป็นข้อมูลที่ไม่ใช่ภัยคุกคาม</div></div>">Low</span>
+                                    <span class="st-dt info" data-toggle="tooltip" data-placement="left" data-html="true" title="<div class='st-flex'><div class='box-st-tooltip info'>Informational</div><div class='text-st-tooltip'>เป็นข้อมูลทั่วไปที่ไม่จัดเป็นภัยคุกคาม หรือเป็นเพียงข้อมูลที่ให้รายละเอียดเพิ่มเติมเท่านั้น</div></div>">Informational</span>
                                 </span>
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-md-5">
                                 <div class="ovr-text">
                                     <p>Analysis</p>
                                     <p>{{ request()-> keyword }}</p>
@@ -121,7 +123,7 @@
                                     <p id="type_search"></p>
                                 </div>
                             </div>
-                            <div class="col-md-4 text-right">
+                            <div class="col-md-7 text-right">
                                 <div id="text_status_risk"></div>
                             </div>
                         </div>
@@ -190,81 +192,122 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div id="card-search-int3" class="main-int-card active">
+                            <div class="col-xs-12 col-sm-6 col-md-4" id="container-abuseipdb">
+                                <div id="card-search-abuseipdb" class="main-int-card active">
                                     <div class="text-center av-container border-success" data-chart="chart-cs-ml">
                                         <div class="title">
-                                            <img src="{{asset('images/ibm.png')}}" alt="" class="icon">
-
-                                            IBM X-Force
+                                            <span class="text-title-logo title-abuseipdb">AbuseIPDB</span>
                                         </div>
                                         <div class="main-frame">
 
-                                            <div class="load-ibmcloud loadfixed backdrop-loader white">
+                                            <div class="load-abuseipdb loadfixed backdrop-loader white">
                                                 <div class="loader4 centerloader"></div>
                                                 <div class="loadding-text">Loading ...</div>
                                             </div>
 
-                                            {{-- <div id="chart-md3" style="height: 300px"></div> --}}
-
-                                            <div class="loadfixed backdrop-loader white" id="not-ibmcloud" style="display: none">
+                                            <div class="loadfixed backdrop-loader white" id="not-abuseipdb" style="display: none">
                                                 <h1>No threat found</h1>
                                             </div>
 
-                                            <div class="circle-score" id="circle-ibmcloud">
+                                            <div class="circle-score" id="circle-abuseipdb">
                                                 <div class="circle-score-inner">
                                                     <div class="circle-text-score">
-                                                        <span id="text_ibmcloud">0</span> <span>/ 10</span>
+                                                        <span id="text_abuseipdb">0</span> <span id="text_abuseipdb_sum">/ 100</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4" id="container-threatfox">
+                                <div id="card-search-threatfox" class="main-int-card active">
+                                    <div class="text-center av-container border-success" data-chart="chart-cs-ml">
+                                        <div class="title">
+                                            <span class="text-title-logo title-threatfox">ThreatFox</span>
+                                        </div>
+                                        <div class="main-frame">
 
+                                            <div class="load-threatfox loadfixed backdrop-loader white">
+                                                <div class="loader4 centerloader"></div>
+                                                <div class="loadding-text">Loading ...</div>
+                                            </div>
+
+                                            <div class="loadfixed backdrop-loader white" id="not-threatfox" style="display: none">
+                                                <h1>No threat found</h1>
+                                            </div>
+
+                                            <div class="circle-score" id="circle-threatfox">
+                                                <div class="circle-score-inner">
+                                                    <div class="circle-text-score">
+                                                        <span id="text_threatfox">0</span> <span id="text_threatfox_sum">/ 100</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4" id="container-rstcloud">
+                                <div id="card-search-rstcloud" class="main-int-card active">
+                                    <div class="text-center av-container border-success" data-chart="chart-cs-ml">
+                                        <div class="title">
+                                            <span class="text-title-logo title-rstcloud">RST Cloud</span>
+                                        </div>
+                                        <div class="main-frame">
+
+                                            <div class="load-rstcloud loadfixed backdrop-loader white">
+                                                <div class="loader4 centerloader"></div>
+                                                <div class="loadding-text">Loading ...</div>
+                                            </div>
+
+                                            <div class="loadfixed backdrop-loader white" id="not-rstcloud" style="display: none">
+                                                <h1>No threat found</h1>
+                                            </div>
+
+                                            <div class="circle-score" id="circle-rstcloud">
+                                                <div class="circle-score-inner">
+                                                    <div class="circle-text-score">
+                                                        <span id="text_rstcloud">0</span> <span id="text_rstcloud_sum">/ 100</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-4" id="container-otx">
+                                <div id="card-search-otx" class="main-int-card active">
+                                    <div class="text-center av-container border-success" data-chart="chart-cs-ml">
+                                        <div class="title">
+                                            <span class="text-title-logo title-otx">AlienVault OTX</span>
+                                        </div>
+                                        <div class="main-frame">
+
+                                            <div class="load-otx_indicators loadfixed backdrop-loader white">
+                                                <div class="loader4 centerloader"></div>
+                                                <div class="loadding-text">Loading ...</div>
+                                            </div>
+
+                                            <div class="loadfixed backdrop-loader white" id="not-otx" style="display: none">
+                                                <h1>No threat found</h1>
+                                            </div>
+
+                                            <div class="circle-score" id="circle-otx">
+                                                <div class="circle-score-inner">
+                                                    <div class="circle-text-score">
+                                                        <span id="text_otx_indicators">0</span> <span id="text_otx_indicators_sum">/ 50</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </section>
                     
-                    <section class="table-ibmcloud" style="display: none">
-                        <h3 class="text-primary-head">IBM X-Force</h1>
-                        <table id="table-ibmcloud" class="table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 5px;padding:0;"></th>
-                                    <th>Category</th>
-                                    <th>Reason</th>
-                                    <th>Location</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-ibmcloud"></tbody>
-                        </table>
-                        <table id="table-ibmcloud-malware" class="table" style="display: none">
-                            <thead>
-                                <tr>
-                                    <th>Hash Type</th>
-                                    <th>First Seen</th>
-                                    <th>Last Seen</th>
-                                    <th>Family Name</th>
-                                    <th>Type</th>
-                                    <th>Community Coverage</th>
-                                    <th>Platform</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-ibmcloud-malware"></tbody>
-                        </table>
-                        <table id="table-ibmcloud-url" class="table" style="display: none">
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>URL</th>
-                                    <th>Category DesCriptions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-ibmcloud-url"></tbody>
-                        </table>
-                    </section>
+
 
                     <section class="table-virustotal" style="display: none">
                         <h3 class="text-primary-head">VirusTotal</h1>
@@ -307,6 +350,80 @@
                             </thead>
                             <tbody id="tbody-hybrid-url"></tbody>
                         </table>
+                    </section>
+
+                    <section class="table-abuseipdb" style="display: none">
+                        <h3 class="text-primary-head">AbuseIPDB Details</h3>
+                        <table id="table-abuseipdb" class="table">
+                            <thead>
+                                <tr>
+                                    <th>IP Address</th>
+                                    <th>Abuse Confidence Score</th>
+                                    <th>ISP</th>
+                                    <th>Country</th>
+                                    <th>Usage Type</th>
+                                    <th>Domain</th>
+                                    <th>Total Reports</th>
+                                    <th>Last Reported At</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-abuseipdb"></tbody>
+                        </table>
+                    </section>
+
+                    <section class="table-threatfox" style="display: none">
+                        <h3 class="text-primary-head">ThreatFox Details</h3>
+                        <table id="table-threatfox" class="table">
+                            <thead>
+                                <tr>
+                                    <th>IOC</th>
+                                    <th>Threat Type</th>
+                                    <th>IOC Type</th>
+                                    <th>Malware</th>
+                                    <th>Confidence Level</th>
+                                    <th>First Seen</th>
+                                    <th>Reporter</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-threatfox"></tbody>
+                        </table>
+                    </section>
+
+                    <section class="table-rstcloud" style="display: none">
+                        <h3 class="text-primary-head">RST Cloud Details</h3>
+                        <table id="table-rstcloud" class="table">
+                            <thead>
+                                <tr>
+                                    <th>IOC</th>
+                                    <th>Type</th>
+                                    <th>Total Score</th>
+                                    <th>Severity</th>
+                                    <th>Threats</th>
+                                    <th>Category</th>
+                                    <th>First Seen</th>
+                                    <th>Last Seen</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-rstcloud"></tbody>
+                        </table>
+                    </section>
+
+                    <section class="table-internal-events" style="display: none; margin-top: 2rem;">
+                        <h3 class="text-primary-head">Internal Events Found</h3>
+                        <div class="table-responsive">
+                            <table id="table-internal-events" class="table table-striped dataTable no-footer" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Source</th>
+                                        <th>Event ID</th>
+                                        <th>Event Name</th>
+                                        <th>Tags</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-internal-events"></tbody>
+                            </table>
+                        </div>
                     </section>
 
                     <section class="bg-white otx_indicators" style="margin-top: 1.5rem">
@@ -568,7 +685,7 @@
                     </div>
                 </div>
             </header>
-            <iframe id="iframe_source" onload="load_frame()" name="iframe_source" frameborder="0" width="100%" height="100%" allowfullscreen></iframe>
+            <iframe id="iframe_source" onload="typeof load_frame === 'function' && load_frame()" name="iframe_source" frameborder="0" width="100%" height="100%" allowfullscreen></iframe>
         </div>
     </div>
 </div>
@@ -576,6 +693,70 @@
 @include('stacks.css.highchart')
 @include('stacks.css.datatables')
 @include('stacks.css.multitext')
+<style>
+    /* Flexbox grid layout to prevent float-wrap layout bugs */
+    .av-results-wrapper {
+        display: flex !important;
+        flex-wrap: wrap !important;
+    }
+    
+    .av-results-wrapper > [class*="col-"] {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    .av-results-wrapper .main-int-card {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        margin-bottom: 25px !important;
+    }
+    
+    .av-results-wrapper .av-container {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+    }
+    
+    /* Ensure uniform title container heights so all content lines up vertically */
+    section#av-detection .av-container .title {
+        height: 50px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 10px 0 !important;
+    }
+    
+    /* Text-based titles styling to make them look premium and consistent with logos */
+    .text-title-logo {
+        font-family: 'Outfit', 'Inter', sans-serif;
+        font-weight: 800 !important;
+        font-size: 22px !important;
+        letter-spacing: -0.5px;
+        margin: 0 !important;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .title-abuseipdb {
+        color: #d35400 !important; /* Premium dark orange */
+    }
+    
+    .title-threatfox {
+        color: #2c3e50 !important; /* Premium deep slate */
+    }
+    
+    .title-rstcloud {
+        color: #2980b9 !important; /* Premium deep sky blue */
+    }
+    
+    .title-otx {
+        color: #16a085 !important; /* Premium teal/green */
+    }
+</style>
 @endpush
 @push('pagescript')
 @include('stacks.js.activebutton')
@@ -737,9 +918,56 @@ $(function(){
                 if(res.search_api_loookup_allow ==1){
                     $('#table-container').hide();
                         $('.int-lookup-main').toggle();
-                         loadSearchAPI('ibmcloud');
+                            resetRiskCalculation(res.type);
+
+                            if (res.type && res.type.toLowerCase() === 'ip') {
+                                if ($('.load-abuseipdb').length === 0) {
+                                    $('#circle-abuseipdb').before('<div class="load-abuseipdb loadfixed backdrop-loader white"><div class="loader4 centerloader"></div><div class="loadding-text">Loading ...</div></div>');
+                                }
+                                $('.load-abuseipdb').show();
+                                $('#not-abuseipdb').hide();
+                                loadSearchAPI('abuseipdb');
+                            } else {
+                                $('.load-abuseipdb').remove();
+                                $('#not-abuseipdb').show();
+                            }
+
+                            if ($('.load-virustotal').length === 0) {
+                                $('#circle-virustotal').before('<div class="load-virustotal loadfixed backdrop-loader white"><div class="loader4 centerloader"></div><div class="loadding-text">Loading ...</div></div>');
+                            }
+                            $('.load-virustotal').show();
+                            $('#not-virustotal').hide();
+
+                            if ($('.load-hybrid').length === 0) {
+                                $('#circle-hybrid').before('<div class="load-hybrid loadfixed backdrop-loader white"><div class="loader4 centerloader"></div><div class="loadding-text">Loading ...</div></div>');
+                            }
+                            $('.load-hybrid').show();
+                            $('#not-hybrid').hide();
+
+                            if ($('.load-threatfox').length === 0) {
+                                $('#circle-threatfox').before('<div class="load-threatfox loadfixed backdrop-loader white"><div class="loader4 centerloader"></div><div class="loadding-text">Loading ...</div></div>');
+                            }
+                            $('.load-threatfox').show();
+                            $('#not-threatfox').hide();
+
+                            if ($('.load-rstcloud').length === 0) {
+                                $('#circle-rstcloud').before('<div class="load-rstcloud loadfixed backdrop-loader white"><div class="loader4 centerloader"></div><div class="loadding-text">Loading ...</div></div>');
+                            }
+                            $('.load-rstcloud').show();
+                            $('#not-rstcloud').hide();
+
+                            if ($('.load-otx_indicators').length === 0) {
+                                $('#circle-otx').before('<div class="load-otx_indicators loadfixed backdrop-loader white"><div class="loader4 centerloader"></div><div class="loadding-text">Loading ...</div></div>');
+                            }
+                            $('.load-otx_indicators').show();
+                            $('#not-otx').hide();
+
                             loadSearchAPI('virustotal');
                             loadSearchAPI('hybrid');
+                            loadSearchAPI('threatfox');
+                            loadSearchAPI('rstcloud');
+                            loadSearchAPI('internal_events');
+
                             $('#otx_indicators_loadspinner_basic_info').show();
                             $('#otx_indicators_loadspinner_basic_info_table').show();
                             $("#table-related-event").hide();
@@ -1417,9 +1645,55 @@ function loadMalware(){
                 if(res.search_api_loookup_allow ==1){
                     $('#table-container').hide();
                 $('.int-lookup-main').toggle();
-                         loadSearchAPI('ibmcloud');
+                            resetRiskCalculation(res.type);
+                            if (res.type && res.type.toLowerCase() === 'ip') {
+                                if ($('.load-abuseipdb').length === 0) {
+                                    $('#circle-abuseipdb').before('<div class="load-abuseipdb loadfixed backdrop-loader white"><div class="loader4 centerloader"></div><div class="loadding-text">Loading ...</div></div>');
+                                }
+                                $('.load-abuseipdb').show();
+                                $('#not-abuseipdb').hide();
+                                loadSearchAPI('abuseipdb');
+                            } else {
+                                $('.load-abuseipdb').remove();
+                                $('#not-abuseipdb').show();
+                            }
+
+                            if ($('.load-virustotal').length === 0) {
+                                $('#circle-virustotal').before('<div class="load-virustotal loadfixed backdrop-loader white"><div class="loader4 centerloader"></div><div class="loadding-text">Loading ...</div></div>');
+                            }
+                            $('.load-virustotal').show();
+                            $('#not-virustotal').hide();
+
+                            if ($('.load-hybrid').length === 0) {
+                                $('#circle-hybrid').before('<div class="load-hybrid loadfixed backdrop-loader white"><div class="loader4 centerloader"></div><div class="loadding-text">Loading ...</div></div>');
+                            }
+                            $('.load-hybrid').show();
+                            $('#not-hybrid').hide();
+
+                            if ($('.load-threatfox').length === 0) {
+                                $('#circle-threatfox').before('<div class="load-threatfox loadfixed backdrop-loader white"><div class="loader4 centerloader"></div><div class="loadding-text">Loading ...</div></div>');
+                            }
+                            $('.load-threatfox').show();
+                            $('#not-threatfox').hide();
+
+                            if ($('.load-rstcloud').length === 0) {
+                                $('#circle-rstcloud').before('<div class="load-rstcloud loadfixed backdrop-loader white"><div class="loader4 centerloader"></div><div class="loadding-text">Loading ...</div></div>');
+                            }
+                            $('.load-rstcloud').show();
+                            $('#not-rstcloud').hide();
+
+                            if ($('.load-otx_indicators').length === 0) {
+                                $('#circle-otx').before('<div class="load-otx_indicators loadfixed backdrop-loader white"><div class="loader4 centerloader"></div><div class="loadding-text">Loading ...</div></div>');
+                            }
+                            $('.load-otx_indicators').show();
+                            $('#not-otx').hide();
+
                             loadSearchAPI('virustotal');
                             loadSearchAPI('hybrid');
+                            loadSearchAPI('threatfox');
+                            loadSearchAPI('rstcloud');
+                            loadSearchAPI('internal_events');
+
                             $('#otx_indicators_loadspinner_basic_info').show();
                             $('#otx_indicators_loadspinner_basic_info_table').show();
                             $("#table-related-event").hide();
@@ -1471,18 +1745,229 @@ function loadMalware(){
  
         });      
     }
-    function click_ibmcloud(){
-        $('#card-search-int3').on('click',function(){
+
+    function click_abuseipdb(){
+        $('#card-search-abuseipdb').off('click').on('click',function(){
             $(this).toggleClass('active');
-            if($('#card-search-int3').hasClass('active')){
-                $('.table-ibmcloud').show();
+            if($(this).hasClass('active')){
+                $('.table-abuseipdb').show();
             }else{
-                $('.table-ibmcloud').hide();
+                $('.table-abuseipdb').hide();
             }
-        });      
+        });
     }
 
-    let status_value_ibmcloud = 0;
+    function click_threatfox(){
+        $('#card-search-threatfox').off('click').on('click',function(){
+            $(this).toggleClass('active');
+            if($(this).hasClass('active')){
+                $('.table-threatfox').show();
+            }else{
+                $('.table-threatfox').hide();
+            }
+        });
+    }
+
+    function click_rstcloud(){
+        $('#card-search-rstcloud').off('click').on('click',function(){
+            $(this).toggleClass('active');
+            if($(this).hasClass('active')){
+                $('.table-rstcloud').show();
+            }else{
+                $('.table-rstcloud').hide();
+            }
+        });
+    }
+
+    function click_otx(){
+        $('#card-search-otx').off('click').on('click',function(){
+            $(this).toggleClass('active');
+            if($(this).hasClass('active')){
+                $('.otx_indicators').show();
+            }else{
+                $('.otx_indicators').hide();
+            }
+        });
+    }
+
+    let threatScores = {};
+    let expectedSources = [];
+    let completedSources = [];
+
+    const THRESHOLDS_JS = {
+        vt: [
+            [10, 10], [7, 8], [4, 6], [2, 4], [1, 2]
+        ],
+        abuse_score: [
+            [80, 5], [40, 4], [25, 2], [15, 1]
+        ],
+        abuse_reports: [
+            [50, 5], [20, 3], [10, 2], [5, 1]
+        ],
+        tf: [
+            [95, 10], [85, 8], [75, 6], [50, 4], [25, 2]
+        ],
+        otx: [
+            [50, 10], [30, 8], [20, 6], [10, 4], [5, 2], [1, 1]
+        ]
+    };
+
+    const WEIGHTS_JS = {
+        vt: 0.35, abuse: 0.20, tf: 0.10, otx: 0.25, rst: 0.10
+    };
+
+    function mapScoreJS(val, thresholds) {
+        for (let i = 0; i < thresholds.length; i++) {
+            if (val >= thresholds[i][0]) {
+                return thresholds[i][1];
+            }
+        }
+        return 0;
+    }
+
+    function resetRiskCalculation(type) {
+        threatScores = {
+            virustotal: 0,
+            abuseipdb: 0,
+            threatfox: 0,
+            otx_indicators: 0,
+            rstcloud: 0,
+            hybrid: 0
+        };
+        completedSources = [];
+        expectedSources = ['virustotal', 'hybrid', 'threatfox', 'rstcloud', 'otx_indicators'];
+        
+        let typeLower = type ? type.toLowerCase() : '';
+        if (typeLower === 'ip') {
+            expectedSources.push('abuseipdb');
+        }
+        
+        $('.table-virustotal').hide();
+        $('.table-hybrid').hide();
+        $('.table-abuseipdb').hide();
+        $('.table-threatfox').hide();
+        $('.table-rstcloud').hide();
+        $('.otx_indicators').hide();
+
+        $('#card-search-int1').removeClass('active');
+        $('#card-search-int2').removeClass('active');
+        $('#card-search-abuseipdb').removeClass('active');
+        $('#card-search-threatfox').removeClass('active');
+        $('#card-search-rstcloud').removeClass('active');
+        $('#card-search-otx').removeClass('active');
+
+        $('#not-virustotal').hide();
+        $('#not-hybrid').hide();
+        $('#not-abuseipdb').hide();
+        $('#not-threatfox').hide();
+        $('#not-rstcloud').hide();
+        $('#not-otx').hide();
+
+        $('#text_status_risk').html('<span class="label label-secondary">Analyzing...</span>');
+    }
+
+    function checkAndCalculateRisk(source, value) {
+        if (!completedSources.includes(source)) {
+            completedSources.push(source);
+        }
+        if (value !== undefined) {
+            threatScores[source] = value;
+        }
+
+        let allFinished = true;
+        for (let i = 0; i < expectedSources.length; i++) {
+            if (!completedSources.includes(expectedSources[i])) {
+                allFinished = false;
+                break;
+            }
+        }
+
+        if (allFinished) {
+            calculateWeightedScore();
+        }
+    }
+
+    function calculateWeightedScore() {
+        let typeLower = $('#type_search').text() ? $('#type_search').text().toLowerCase() : '';
+        
+        let activeWeights = {
+            vt: WEIGHTS_JS.vt,
+            tf: WEIGHTS_JS.tf,
+            otx: WEIGHTS_JS.otx,
+            rst: WEIGHTS_JS.rst
+        };
+        
+        if (typeLower === 'ip') {
+            activeWeights.abuse = WEIGHTS_JS.abuse;
+        } else {
+            activeWeights.vt += WEIGHTS_JS.abuse;
+        }
+
+        let scores = {
+            vt: threatScores.virustotal || 0,
+            tf: threatScores.threatfox || 0,
+            otx: threatScores.otx_indicators || 0,
+            rst: threatScores.rstcloud || 0
+        };
+        if (typeLower === 'ip') {
+            scores.abuse = threatScores.abuseipdb || 0;
+        }
+
+        let totalWeight = 0;
+        let weightedSum = 0;
+
+        for (let key in activeWeights) {
+            let score = scores[key];
+            if (score === -1 || score === undefined) {
+                continue;
+            }
+            if (key === 'rst' && score === 0) {
+                continue; 
+            }
+            totalWeight += activeWeights[key];
+            weightedSum += score * activeWeights[key];
+        }
+
+        let finalScore = 0;
+        if (totalWeight > 0) {
+            finalScore = Math.round(weightedSum / totalWeight);
+        }
+
+        renderOverallStatus(finalScore);
+    }
+
+    function renderOverallStatus(finalScore) {
+        let level = "Informational";
+        let colorClass = "info";
+        let bgColor = "#22b9ff";
+
+        if (finalScore >= 9) {
+            level = "Critical";
+            colorClass = "danger";
+            bgColor = "#8b0000";
+        } else if (finalScore >= 7) {
+            level = "High";
+            colorClass = "danger";
+            bgColor = "#b93624";
+        } else if (finalScore >= 4) {
+            level = "Medium";
+            colorClass = "warning";
+            bgColor = "#ffb000";
+        } else if (finalScore >= 2) {
+            level = "Low";
+            colorClass = "success";
+            bgColor = "#409967";
+        } else if (finalScore >= 1) {
+            level = "Very Low";
+            colorClass = "success";
+            bgColor = "#409967";
+        }
+
+        let labelStyle = `background-color: ${bgColor} !important; color: ${bgColor === '#ffb000' ? '#333' : '#fff'} !important; font-weight: bold; padding: 10px 20px; border-radius: 6px; display: inline-block; font-size: 22px;`;
+        let html_status = `<span style="${labelStyle}">${level} (${finalScore}/10)</span>`;
+        $('#text_status_risk').html(html_status);
+    }
+
     let status_value_virustotal = 0;
     let status_value_hybrid = 0;
     let number_risk = 0;
@@ -1507,304 +1992,130 @@ $.ajax({
     let data = res.data;
     $('#type_search').text(res.type);
 
-    if(source == 'ibmcloud'){
-        if(res.status_code == 400){
-            $('.load-ibmcloud').remove();
-        }else{
-            if(data){
-                if(data.error){
-                    $('#not-ibmcloud').show();
-                    $('#table-ibmcloud').DataTable({
-                        "dom": 'tp',
-                        "searching": false,
-                        "bPaginate": true,
-                        "bLengthChange": false,
-                        "bFilter": false,
-                        "bInfo": false,
-                        "bAutoWidth": false ,
-                    });
-                }else{
-                    number_new_row++;
-                    let num_total = 0;
-                    if(data.score && data.score > 0){
-                        num_total = data.score;
-                    }else if(data.malware){
-                        const malware = data.malware;
-                        num_total = malware.origins.external.detectionCoverage == 0 ? 0 : malware.origins.external.detectionCoverage / 10;
-                    }else if(data.result.score > 0){
-                        num_total = data.result.score;
-                    }
-                    
-                    $('#text_' + source).text(num_total);
-                    const elem = $("#circle-ibmcloud");
-                    if(num_total <= 3.9){
-                        status_value_ibmcloud = 1;
-                    }else if(num_total <= 6.9){
-                        status_value_ibmcloud = 2;
-                        elem[0].style.removeProperty('background-color');
-                        elem[0].style.setProperty('background-color', '#f2ff15', 'important');
-                        $('#text_' + source).css('color', '#f2ff15');
-                    }else if(num_total >= 7.0){
-                        status_value_ibmcloud = 3;
-                        elem[0].style.removeProperty('background-color');
-                        elem[0].style.setProperty('background-color', '#fcc838', 'important');
-                        $('#text_' + source).css('color', '#fcc838');
-                    }
-                }
-
-                
-            
-            
-            let html = ``;
-            let historyByCats = [];
-            if(data.history){
-                for(let i in data.history){
-                    const history = data.history[i];
-                    html += `
-                    <tr>`;
-                        if(history.cats && history.cats.length != 0){
-                            html += `<td style="padding:0;line-height: 0;">`;
-                            for(let [key, value] of Object.entries(history.cats)){
-                               var percent = value;
-                               if(percent <= 39){
-                                    html += `<div class="risk-status low-risk"></div>`; 
-                               }else if(percent <= 69){
-                                    html += `<div class="risk-status medium-risk"></div>`; 
-                               }else if(percent <= 100){
-                                    html += `<div class="risk-status high-risk"></div>`; 
-                               }else{
-                                   html += `<div class="risk-status low-risk"></div>`; 
-                               }
-                            }
-                           html += ` </td>`;
-                        }else{
-                            html += `<td style="padding:0;line-height: 0;">
-                                        <div class="risk-status low-risk"></div>
-                                    </td>`;
-                        }
-
-                       
-                        
-                        if(history.cats){
-                            html += `<td>`;
-                            for(const [key, value] of Object.entries(history.cats)){
-                                html += ` ${key} (${value}%)`;
-                            }
-                            html += `</td>`;
-                        }else{
-                            html += `<td></td>`;
-                        }
-                        
-                        html += `<td>${history.reason}</td>`;
-                       
-                        if(history.geo){
-                            html += `<td>${history.geo.country} ${history.geo.countrycode}</td>`;
-                        }else{
-                            html += `<td></td>`;
-                        }
-                        
-                        if(history.created){
-                        html += `<td>
-                                ${moment(new Date(history.created)).format('YYYY-MM-DD HH:MM:SS')}
-                            </td>`;
-                        }else{
-                            html += `<td></td>`;
-                        }
-                        html += `</tr> `;
-                }
-                document.getElementById("tbody-ibmcloud").innerHTML = html;
-                $('#table-ibmcloud').DataTable({
-                    "dom": 'tp',
-                    "searching": false,
-                    "bPaginate": true,
-                    "bLengthChange": false,
-                    "bFilter": false,
-                    "bInfo": false,
-                    "bAutoWidth": false ,
-                    "order" : [[4,"desc"]],
-                    "columnDefs": [{
-                        "targets" : 0,
-                        "orderable" : false
-                    }]
-                });
-            }else if(data.malware){
-                $('#table-ibmcloud').hide();
-                $('#table-ibmcloud-malware').show();
-                const malware = data.malware;
-                html += `
-                <tr>
-                    <td>${malware.type}</td>
-                    <td>${moment(new Date(malware.origins.external.firstSeen)).format('DD-MM-YYYY HH:MM:SS')}</td>
-                    <td>${moment(new Date(malware.origins.external.lastSeen)).format('DD-MM-YYYY HH:MM:SS')}</td>
-                    <td>${malware.origins.external.family ? malware.origins.external.family[0] : '-'}</td>
-                    <td>${malware.origins.external.malwareType ? malware.origins.external.malwareType : '-'}</td>
-                    <td>${malware.origins.external.detectionCoverage ? malware.origins.external.detectionCoverage : '-'}</td>
-                    <td>${malware.origins.external.platform ? malware.origins.external.platform : '-'}</td>
-                </tr>
-                `;
-                document.getElementById("tbody-ibmcloud-malware").innerHTML = html;
-                $('#table-ibmcloud-malware').DataTable({
-                    "dom": 'tp',
-                    "searching": false,
-                    "bPaginate": true,
-                    "bLengthChange": false,
-                    "bFilter": false,
-                    "bInfo": false,
-                    "bAutoWidth": false ,
-                });
-            }else if(res.type == 'Domain'){
-                $('#table-ibmcloud').hide();
-                $('#table-ibmcloud-url').show();
-                const domain = data.result;
-                html += `
-                <tr>
-                    <td>${res.type}</td>
-                    <td>${domain.url}</td>`;
-                        if(domain.categoryDescriptions){
-                            html += `<td>`;
-                            for(const [key, value] of Object.entries(domain.categoryDescriptions)){
-                                html += `${value}`;
-                            }
-                            html += `</td>`;
-                        }
-                        
-                html += `</tr>
-                `;
-                document.getElementById("tbody-ibmcloud-url").innerHTML = html;
-                $('#table-ibmcloud-url').DataTable({
-                    "dom": 'tp',
-                    "searching": false,
-                    "bPaginate": true,
-                    "bLengthChange": false,
-                    "bFilter": false,
-                    "bInfo": false,
-                    "bAutoWidth": false ,
-                });
-            }else{
-                $('#not-ibmcloud').show();
+    if(source == 'virustotal'){
+        let vtScore = 0;
+        if(res.status_code == 400 || !data || data.error){
+            $('#not-virustotal').show();
+            if ($.fn.DataTable.isDataTable('#table-virustotal')) {
+                $('#table-virustotal').DataTable().destroy();
             }
-            
-            $('.load-ibmcloud').remove();
-            click_ibmcloud();
-            }else{
-                $('.load-ibmcloud').remove();
-            }
-        }
-    }else if(source == 'virustotal'){
-        if(res.status_code == 400){
+            $('#table-virustotal').DataTable({
+                "dom": 'tp',
+                "searching": false,
+                "bPaginate": true,
+                "bLengthChange": false,
+                "bFilter": false,
+                "bInfo": false,
+                "bAutoWidth": false ,
+            });
             $('.load-virustotal').remove();
+            checkAndCalculateRisk('virustotal', -1);
         }else{
-            if(data){
-                if(data.error){
-                    $('#not-virustotal').show();
-                    $('#table-virustotal').DataTable({
-                        "dom": 'tp',
-                        "searching": false,
-                        "bPaginate": true,
-                        "bLengthChange": false,
-                        "bFilter": false,
-                        "bInfo": false,
-                        "bAutoWidth": false ,
-                    });
-                }else{
-                    number_new_row++;
-                    if(data.data){
-                        var last_analysis_stats = data.data.attributes.last_analysis_stats;
-                        if(data.data.attributes.last_analysis_stats.malicious && data.data.attributes.last_analysis_stats.malicious > 0){
-                            $('#text_' + source).text(data.data.attributes.last_analysis_stats.malicious);
-                            const elem = $("#circle-virustotal");
-                            if(last_analysis_stats.malicious > 0 && last_analysis_stats.malicious <= 3){
-                                status_value_virustotal = 1;
-                                elem[0].style.removeProperty('background-color');
-                                elem[0].style.setProperty('background-color', '#b93624', 'important');
-                                $('#text_' + source).css('color', '#b93624');
-                            }else if(last_analysis_stats.malicious <= 5){
-                                status_value_virustotal = 2;
-                                elem[0].style.removeProperty('background-color');
-                                elem[0].style.setProperty('background-color', '#b93624', 'important');
-                                $('#text_' + source).css('color', '#b93624');
-                            }else if(last_analysis_stats.malicious <= 7){
-                                status_value_virustotal = 3;
-                                elem[0].style.removeProperty('background-color');
-                                elem[0].style.setProperty('background-color', '#b93624', 'important');
-                                $('#text_' + source).css('color', '#b93624');
-                            }else if(last_analysis_stats.malicious >= 10){
-                                status_value_virustotal = 4;
-                                elem[0].style.removeProperty('background-color');
-                                elem[0].style.setProperty('background-color', '#b93624', 'important');
-                                $('#text_' + source).css('color', '#b93624');
-                            }
+            number_new_row++;
+            if(data.data){
+                var last_analysis_stats = data.data.attributes.last_analysis_stats;
+                if(last_analysis_stats){
+                    var malicious = parseInt(last_analysis_stats.malicious || 0);
+                    var suspicious = parseInt(last_analysis_stats.suspicious || 0);
+                    vtScore = mapScoreJS(malicious, THRESHOLDS_JS.vt) + (suspicious >= 5 ? 2 : (suspicious >= 3 ? 1 : 0));
+                    if(vtScore > 10) vtScore = 10;
+                    
+                    if(malicious > 0){
+                        $('#text_' + source).text(malicious);
+                        const elem = $("#circle-virustotal");
+                        if(malicious > 0 && malicious <= 3){
+                            status_value_virustotal = 1;
+                            elem[0].style.removeProperty('background-color');
+                            elem[0].style.setProperty('background-color', '#b93624', 'important');
+                            $('#text_' + source).css('color', '#b93624');
+                        }else if(malicious <= 5){
+                            status_value_virustotal = 2;
+                            elem[0].style.removeProperty('background-color');
+                            elem[0].style.setProperty('background-color', '#b93624', 'important');
+                            $('#text_' + source).css('color', '#b93624');
+                        }else if(malicious <= 7){
+                            status_value_virustotal = 3;
+                            elem[0].style.removeProperty('background-color');
+                            elem[0].style.setProperty('background-color', '#b93624', 'important');
+                            $('#text_' + source).css('color', '#b93624');
+                        }else if(malicious >= 10){
+                            status_value_virustotal = 4;
+                            elem[0].style.removeProperty('background-color');
+                            elem[0].style.setProperty('background-color', '#b93624', 'important');
+                            $('#text_' + source).css('color', '#b93624');
                         }
-                        let total = (parseInt(last_analysis_stats.harmless) + parseInt(last_analysis_stats.malicious) + parseInt(last_analysis_stats.suspicious) + parseInt(last_analysis_stats.timeout) + parseInt(last_analysis_stats.undetected));
-                        $('#text_virustotal_sum').text('/ '+total);
-                        
-                        
-                        let html = ``;
-                        let count_data_virus = 0;
-                        for(let i in data.data.attributes.last_analysis_results){
-                            count_data_virus++;
-                            const last_analysis_results = data.data.attributes.last_analysis_results[i];
-                            html += `
-                            <tr>
-                                <td>${last_analysis_results.engine_name}</td>
-                                <td>${last_analysis_results.category}</td>
-                                <td>
-                                    ${last_analysis_results.method} 
-                                </td>
-                                <td>`;
-                                    if(last_analysis_results.result == 'malicious' || last_analysis_results.result == 'phishing' || last_analysis_results.result == 'malware'){
-                                        html += `<span class="label label-danger">
-                                            ${last_analysis_results.result}
-                                        </span>`; 
-                                    }else if(last_analysis_results.result == 'suspicious'){
-                                        html += `<span class="label label-warning">
-                                            ${last_analysis_results.result}
-                                        </span>`;
-                                    }else if(last_analysis_results.result == 'clean'){
-                                        html += `<span class="label label-success">
-                                            ${last_analysis_results.result}
-                                        </span>`;
-                                    }else if(last_analysis_results.result == 'unrated'){
-                                        html += `<span class="label label-secondary">
-                                            ${last_analysis_results.result}
-                                        </span>`;
-                                    }else if(last_analysis_results.result == null){
-                                        html += `<span class="label label-success">
-                                            undetected
-                                        </span>`;
-                                    }else{
-                                        html += `<span class="label label-danger">
-                                            ${last_analysis_results.result}
-                                        </span>`; 
-                                    }
-                                html += `</td>
-                            </tr>
-                            `;
-                        }
-                        if(count_data_virus == 0){
-                            $('#not-virustotal').show();
-                        }
-                        document.getElementById("tbody-virustotal").innerHTML = html;
-                        $('#table-virustotal').DataTable({
-                            "dom": 'tp',
-                            "searching": false,
-                            "bPaginate": true,
-                            "bLengthChange": false,
-                            "bFilter": false,
-                            "bInfo": false,
-                            "bAutoWidth": false ,
-                        });
                     }
+                    let total = (parseInt(last_analysis_stats.harmless || 0) + parseInt(last_analysis_stats.malicious || 0) + parseInt(last_analysis_stats.suspicious || 0) + parseInt(last_analysis_stats.timeout || 0) + parseInt(last_analysis_stats.undetected || 0));
+                    $('#text_virustotal_sum').text('/ '+total);
                 }
-                $('.load-virustotal').remove();
-                click_virustotal();
-            }else{
-                $('.load-virustotal').remove();
+                
+                let html = ``;
+                let count_data_virus = 0;
+                for(let i in data.data.attributes.last_analysis_results){
+                    count_data_virus++;
+                    const last_analysis_results = data.data.attributes.last_analysis_results[i];
+                    html += `
+                    <tr>
+                        <td>${last_analysis_results.engine_name}</td>
+                        <td>${last_analysis_results.category}</td>
+                        <td>
+                            ${last_analysis_results.method} 
+                        </td>
+                        <td>`;
+                            if(last_analysis_results.result == 'malicious' || last_analysis_results.result == 'phishing' || last_analysis_results.result == 'malware'){
+                                html += `<span class="label label-danger">
+                                    ${last_analysis_results.result}
+                                </span>`; 
+                            }else if(last_analysis_results.result == 'suspicious'){
+                                html += `<span class="label label-warning">
+                                    ${last_analysis_results.result}
+                                </span>`;
+                            }else if(last_analysis_results.result == 'clean'){
+                                html += `<span class="label label-success">
+                                    ${last_analysis_results.result}
+                                </span>`;
+                            }else if(last_analysis_results.result == 'unrated'){
+                                html += `<span class="label label-secondary">
+                                    ${last_analysis_results.result}
+                                </span>`;
+                            }else if(last_analysis_results.result == null){
+                                html += `<span class="label label-success">
+                                    undetected
+                                </span>`;
+                            }else{
+                                html += `<span class="label label-danger">
+                                    ${last_analysis_results.result}
+                                </span>`; 
+                            }
+                        html += `</td>
+                    </tr>
+                    `;
+                }
+                if(count_data_virus == 0){
+                    $('#not-virustotal').show();
+                }
+                document.getElementById("tbody-virustotal").innerHTML = html;
+                if ($.fn.DataTable.isDataTable('#table-virustotal')) {
+                    $('#table-virustotal').DataTable().destroy();
+                }
+                $('#table-virustotal').DataTable({
+                    "dom": 'tp',
+                    "searching": false,
+                    "bPaginate": true,
+                    "bLengthChange": false,
+                    "bFilter": false,
+                    "bInfo": false,
+                    "bAutoWidth": false ,
+                });
             }
+            $('.load-virustotal').remove();
+            click_virustotal();
+            checkAndCalculateRisk('virustotal', vtScore);
         }
     }else if(source == 'hybrid'){
         if(res.status_code == 400){
             $('.load-hybrid').remove();
+            checkAndCalculateRisk('hybrid', -1);
         }else{
             if(res && data){
                 let html = ``;
@@ -1853,8 +2164,8 @@ $.ajax({
                         </tr>
                         `;
                     }
-                    if(data.count == 0 || (total / data.count) == 0 || data.validation_errors){
-                        
+                    if(data.count == 0 || (total / data.count) == 0 || data.validation_errors || !data.result || data.result.length === 0){
+                        $('#not-hybrid').show();
                     }
                     let total_number = (total / (100 * data.count)).toFixed(2);
                     if(data.count && data.count > 0){
@@ -1908,14 +2219,14 @@ $.ajax({
                         </tr>
                         `;
                     }
-                    if(count == 0 || (total / count) == 0 || data.validation_errors){
-
+                    if(count == 0 || (total / count) == 0 || data.validation_errors || !data.result || data.result.length === 0){
+                        $('#not-hybrid').show();
                     }
                     let total_number = (total / (100 * count)).toFixed(2);
                     if(count && count > 0){
                         $('#text_' + source).text(total_number);
                     }
-
+ 
                     const elem = $("#circle-hybrid");
                     if(total_number <= 0.39){
                         status_value_hybrid = 1;
@@ -1947,28 +2258,34 @@ $.ajax({
                 
                 $('.load-hybrid').remove();
                 click_hybrid();
+                checkAndCalculateRisk('hybrid', 0);
             }else{
                 $('.load-hybrid').remove();
+                checkAndCalculateRisk('hybrid', -1);
             }
         }
     }else if(source == 'otx_indicators'){
-        if(res.status_code == 400){
-
+        if(res.status_code == 400 || !data || data.error || data.detail){
+            $('#otx_indicators_loadspinner_basic_info').hide();
+            $('#otx_indicators_loadspinner_basic_info_table').hide();
+            $('.load-otx_indicators').remove();
+            $('#not-otx').show();
+            checkAndCalculateRisk('otx_indicators', -1);
         }else{
             $('#otx_indicators_loadspinner_basic_info').show();
                 var html ="";
                 if(res.type == 'IP'){
-                    var header = res.data;
-                    var header2 = res.data2;
+                    var header = res.data || {};
+                    var header2 = res.data2 || {};
 
-                    html+='<div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> ASN:</b></div> <div class="col-xl-10 col-lg-10 col-md-9">'+header.asn+'</div></div></div>';
+                    html+='<div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> ASN:</b></div> <div class="col-xl-10 col-lg-10 col-md-9">'+(header.asn || '')+'</div></div></div>';
                     html+='<div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Indicator Facts:</b></div> <div class="col-xl-10 col-lg-10 col-md-9">'+''+'</div></div></div>';
-                    html+='<div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Country:</b></div> <div class="col-xl-10 col-lg-10 col-md-9">'+header.country_name+'</div></div></div>';
+                    html+='<div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Country:</b></div> <div class="col-xl-10 col-lg-10 col-md-9">'+(header.country_name || '')+'</div></div></div>';
                     var open_ports="";
                     var issuer = [];
                     var subject =[];
                     var reverse_dns ="";
-                    if(header2.facts){
+                    if(header2 && header2.facts){
                         if(header2.facts.open_ports){
                             open_ports = header2.facts.open_ports.join(", ")
                         }
@@ -2076,8 +2393,8 @@ $.ajax({
 
                 }else if(res.type == 'Domain'){
 
-                    var header = res.data;
-                    var header2 = res.data2;
+                    var header = res.data || {};
+                    var header2 = res.data2 || {};
                     var IP ="";
                     var country_name ="";
                     if(header2.indicators){
@@ -2184,11 +2501,11 @@ $.ajax({
 
                 }else if(res.type == 'URL'){
 
-                    var header = res.data;
-                    var header2 = res.data2;
+                    var header = res.data || {};
+                    var header2 = res.data2 || {};
 
-                    html+=' <div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Hostname:</b></div> <div class="col-xl-10 col-lg-10 col-md-9">'+header.hostname+'</div></div></div>';
-                    html+=' <div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Domain:</b></div> <div class="col-xl-10 col-lg-10 col-md-9">'+header.domain+'</div></div>';
+                    html+=' <div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Hostname:</b></div> <div class="col-xl-10 col-lg-10 col-md-9">'+(header.hostname || '')+'</div></div></div>';
+                    html+=' <div class="col-md-12 m-b-md"><div class="row"><div class="col-xl-2 col-lg-2 col-md-3"><b> Domain:</b></div> <div class="col-xl-10 col-lg-10 col-md-9">'+(header.domain || '')+'</div></div>';
 
                     var WHOIS ="";
                     if(header.whois){
@@ -2202,7 +2519,7 @@ $.ajax({
                     var issuer = [];
                     var subject =[];
                     var reverse_dns ="";
-                    if(header2.facts){
+                    if(header2 && header2.facts){
                         if(header2.facts.open_ports){
                             open_ports = header2.facts.open_ports.join(", ")
                         }
@@ -2301,8 +2618,8 @@ $.ajax({
 
                 }else if(res.type== 'SHA256' || res.type== 'MD5' || res.type== 'SHA1'){
                     $("#table-related-event tbody").empty();
-                    var header_analysis = res.data.analysis;
-                    var header = res.data2;
+                    var header_analysis = (res.data && res.data.analysis) ? res.data.analysis : {};
+                    var header = res.data2 || {};
                     if(!jQuery.isEmptyObject(header_analysis)){
                         
                                 if(header_analysis){
@@ -2551,15 +2868,296 @@ $.ajax({
                 $('#otx_indicators_loadspinner_basic_info_table').hide();
                 $("#table-related-event").show();
                 $('#otx_indicators_general').html(html);
+
+                let pulseCount = 0;
+                let otxHeader = res.data;
+                if (otxHeader && otxHeader.pulse_info) {
+                    if (otxHeader.pulse_info.count !== undefined) {
+                        pulseCount = parseInt(otxHeader.pulse_info.count || 0);
+                    } else if (otxHeader.pulse_info.pulses) {
+                        pulseCount = otxHeader.pulse_info.pulses.length;
+                    }
+                }
+                $('.load-otx_indicators').remove();
+                $('#text_otx_indicators').text(pulseCount);
+                const elemOTX = $("#circle-otx");
+                if (elemOTX && elemOTX[0]) {
+                    elemOTX[0].style.removeProperty('background-color');
+                    if (pulseCount === 0) {
+                        $('#not-otx').show();
+                    } else if (pulseCount >= 30) {
+                        elemOTX[0].style.setProperty('background-color', '#b93624', 'important');
+                        $('#text_otx_indicators').css('color', '#b93624');
+                    } else if (pulseCount >= 10) {
+                        elemOTX[0].style.setProperty('background-color', '#ffb000', 'important');
+                        $('#text_otx_indicators').css('color', '#ffb000');
+                    } else {
+                        elemOTX[0].style.setProperty('background-color', '#409967', 'important');
+                        $('#text_otx_indicators').css('color', '#409967');
+                    }
+                }
+                click_otx();
+                $('#card-search-otx').addClass('active');
+                $('.otx_indicators').show();
+                let otxScore = mapScoreJS(pulseCount, THRESHOLDS_JS.otx);
+                checkAndCalculateRisk('otx_indicators', otxScore);
         }
         multi_readmore_text();
-    }
+    }else if(source == 'abuseipdb'){
+        $('.load-abuseipdb').remove();
+        if(res.status_code == 400 || res.status_code == 401 || res.status_code == 429 || res.status_code == 500 || !data || data.error || data.errors){
+            $('#not-abuseipdb').show();
+            checkAndCalculateRisk('abuseipdb', -1);
+        }else{
+            let item = data.data;
+            let abuseScore = 0;
+            let confidence = 0;
+            let reports = 0;
+            if(item){
+                confidence = parseInt(item.abuseConfidenceScore || 0);
+                reports = parseInt(item.totalReports || 0);
+                abuseScore = mapScoreJS(confidence, THRESHOLDS_JS.abuse_score) + mapScoreJS(reports, THRESHOLDS_JS.abuse_reports);
+                if (abuseScore > 10) abuseScore = 10;
+            }
+            
+            $('#text_abuseipdb').text(confidence);
+            const elem = $("#circle-abuseipdb");
+            elem[0].style.removeProperty('background-color');
+            if (confidence >= 50) {
+                elem[0].style.setProperty('background-color', '#b93624', 'important');
+                $('#text_abuseipdb').css('color', '#b93624');
+            } else if (confidence >= 25) {
+                elem[0].style.setProperty('background-color', '#ffb000', 'important');
+                $('#text_abuseipdb').css('color', '#ffb000');
+            } else {
+                elem[0].style.setProperty('background-color', '#409967', 'important');
+                $('#text_abuseipdb').css('color', '#409967');
+            }
 
-    if(number_risk == 3){
-        search_risk();
+            if(item){
+                let html = `
+                <tr>
+                    <td>${item.ipAddress || ''}</td>
+                    <td>${item.abuseConfidenceScore || 0}%</td>
+                    <td>${item.isp || ''}</td>
+                    <td>${item.countryName || ''}</td>
+                    <td>${item.usageType || ''}</td>
+                    <td>${item.domain || ''}</td>
+                    <td>${item.totalReports || 0}</td>
+                    <td>${item.lastReportedAt ? moment(new Date(item.lastReportedAt)).format('DD-MM-YYYY HH:mm:ss') : 'N/A'}</td>
+                </tr>`;
+                document.getElementById("tbody-abuseipdb").innerHTML = html;
+            }else{
+                $('#not-abuseipdb').show();
+            }
+
+            $('#table-abuseipdb').DataTable({
+                "dom": 'tp',
+                "searching": false,
+                "bPaginate": true,
+                "bLengthChange": false,
+                "bFilter": false,
+                "bInfo": false,
+                "bAutoWidth": false
+            });
+            click_abuseipdb();
+            checkAndCalculateRisk('abuseipdb', abuseScore);
+        }
+    }else if(source == 'threatfox'){
+        $('.load-threatfox').remove();
+        if(res.status_code == 400 || !data || data.query_status !== 'ok' || !data.data || data.data.length === 0){
+            if (data && data.query_status === 'user_blacklisted') {
+                $('#not-threatfox h1').text('API Blacklisted').css('color', '#b93624');
+            } else {
+                $('#not-threatfox h1').text('No threat found').css('color', '');
+            }
+            $('#not-threatfox').show();
+            checkAndCalculateRisk('threatfox', -1);
+        }else{
+            let maxConf = 0;
+            let html = '';
+            data.data.forEach(item => {
+                let conf = parseInt(item.confidence_level || 0);
+                if (conf > maxConf) maxConf = conf;
+                
+                html += `
+                <tr>
+                    <td>${item.ioc || ''}</td>
+                    <td>${item.threat_type || ''}</td>
+                    <td>${item.ioc_type || ''}</td>
+                    <td>${item.malware || ''}</td>
+                    <td>${item.confidence_level || 0}%</td>
+                    <td>${item.first_seen || ''}</td>
+                    <td>${item.reporter || ''}</td>
+                </tr>`;
+            });
+
+            let tfScore = mapScoreJS(maxConf, THRESHOLDS_JS.tf);
+
+            $('#text_threatfox').text(maxConf);
+            const elemTF = $("#circle-threatfox");
+            elemTF[0].style.removeProperty('background-color');
+            if (maxConf >= 75) {
+                elemTF[0].style.setProperty('background-color', '#b93624', 'important');
+                $('#text_threatfox').css('color', '#b93624');
+            } else if (maxConf >= 50) {
+                elemTF[0].style.setProperty('background-color', '#ffb000', 'important');
+                $('#text_threatfox').css('color', '#ffb000');
+            } else {
+                elemTF[0].style.setProperty('background-color', '#409967', 'important');
+                $('#text_threatfox').css('color', '#409967');
+            }
+
+            document.getElementById("tbody-threatfox").innerHTML = html;
+            $('#table-threatfox').DataTable({
+                "dom": 'tp',
+                "searching": false,
+                "bPaginate": true,
+                "bLengthChange": false,
+                "bFilter": false,
+                "bInfo": false,
+                "bAutoWidth": false
+            });
+            click_threatfox();
+            checkAndCalculateRisk('threatfox', tfScore);
+        }
+    }else if(source == 'rstcloud'){
+        $('.load-rstcloud').remove();
+        if(res.status_code == 400 || !data || data.error){
+            $('#not-rstcloud').show();
+            checkAndCalculateRisk('rstcloud', -1);
+        }else{
+            let rstScore = 0;
+            let rstTotal = 0;
+            if (data.score && data.score.total !== undefined) {
+                rstTotal = parseFloat(data.score.total || 0);
+                rstScore = Math.min(rstTotal / 10.0, 10);
+            }
+
+            $('#text_rstcloud').text(rstTotal);
+            const elemRST = $("#circle-rstcloud");
+            elemRST[0].style.removeProperty('background-color');
+            if (rstTotal >= 70) {
+                elemRST[0].style.setProperty('background-color', '#b93624', 'important');
+                $('#text_rstcloud').css('color', '#b93624');
+            } else if (rstTotal >= 40) {
+                elemRST[0].style.setProperty('background-color', '#ffb000', 'important');
+                $('#text_rstcloud').css('color', '#ffb000');
+            } else {
+                elemRST[0].style.setProperty('background-color', '#409967', 'important');
+                $('#text_rstcloud').css('color', '#409967');
+            }
+
+            let threat_types = '';
+            if (data.threat && Array.isArray(data.threat) && data.threat.length > 0) {
+                threat_types = data.threat.join(', ');
+            } else if (data.tags && data.tags.str && Array.isArray(data.tags.str)) {
+                threat_types = data.tags.str.join(', ');
+            }
+            
+            let category = '';
+            if (data.industry && Array.isArray(data.industry) && data.industry.length > 0) {
+                category = data.industry.join(', ');
+            } else if (data.asn && data.asn.org) {
+                category = data.asn.org;
+            }
+            
+            let first_seen = '';
+            if (data.fseen) {
+                first_seen = moment(data.fseen * 1000).format('YYYY-MM-DD HH:mm:ss');
+            }
+            let last_seen = '';
+            if (data.lseen) {
+                last_seen = moment(data.lseen * 1000).format('YYYY-MM-DD HH:mm:ss');
+            }
+            
+            let severity = '';
+            if (rstTotal >= 70) severity = 'High';
+            else if (rstTotal >= 40) severity = 'Medium';
+            else if (rstTotal > 0) severity = 'Low';
+
+            let resolved_ips = '';
+            if (data.resolved && data.resolved.ip) {
+                resolved_ips = data.resolved.ip.map(ipObj => ipObj.ip).join(', ');
+            }
+
+            let html = `
+            <tr>
+                <td>${data.ioc_value || data.ioc || ''}</td>
+                <td>${data.ioc_type || ''}</td>
+                <td>${data.score && data.score.total !== undefined ? data.score.total : 0}</td>
+                <td>${severity}</td>
+                <td>${threat_types}</td>
+                <td>${category}</td>
+                <td>${first_seen}</td>
+                <td>${last_seen}</td>
+            </tr>`;
+
+            document.getElementById("tbody-rstcloud").innerHTML = html;
+            $('#table-rstcloud').DataTable({
+                "dom": 'tp',
+                "searching": false,
+                "bPaginate": true,
+                "bLengthChange": false,
+                "bFilter": false,
+                "bInfo": false,
+                "bAutoWidth": false
+            });
+            click_rstcloud();
+            checkAndCalculateRisk('rstcloud', rstScore);
+        }
+    }else if(source == 'internal_events'){
+        if(res.status_code == 200 && res.data && res.data.length > 0) {
+            $('.table-internal-events').show();
+            let html = '';
+            for(let i=0; i<res.data.length; i++) {
+                let item = res.data[i];
+                let eventLink = `/indicators/events/events_detail/${item.event_id}`;
+                html += `<tr>
+                    <td>${item.source}</td>
+                    <td><a href="${eventLink}" target="_blank" style="text-decoration: underline; color: #0b96c5;">${item.event_id}</a></td>
+                    <td>${item.event_name}</td>
+                    <td>${item.tags}</td>
+                    <td>${item.date}</td>
+                </tr>`;
+            }
+            if ($.fn.DataTable.isDataTable('#table-internal-events')) {
+                $('#table-internal-events').DataTable().destroy();
+            }
+            $('#tbody-internal-events').html(html);
+            $('#table-internal-events').DataTable({
+                pageLength: 10,
+                responsive: true,
+                order: [[4, 'desc']]
+            });
+        } else {
+            $('.table-internal-events').show();
+            if ($.fn.DataTable.isDataTable('#table-internal-events')) {
+                $('#table-internal-events').DataTable().clear().draw();
+            } else {
+                $('#tbody-internal-events').html('');
+                $('#table-internal-events').DataTable({
+                    pageLength: 10,
+                    responsive: true,
+                    order: [[4, 'desc']]
+                });
+            }
+        }
     }
     }).fail(function(jqXHR, ajaxOptions, thrownError){
         console.log("No response from server");
+        if (source === 'virustotal') $('.load-virustotal').remove();
+        if (source === 'hybrid') $('.load-hybrid').remove();
+        if (source === 'abuseipdb') $('.load-abuseipdb').remove();
+        if (source === 'threatfox') $('.load-threatfox').remove();
+        if (source === 'rstcloud') $('.load-rstcloud').remove();
+        if (source === 'otx_indicators') {
+            $('.load-otx_indicators').remove();
+            $('#not-otx').show();
+            $('#otx_indicators_loadspinner_basic_info').hide();
+            $('#otx_indicators_general').html('<p class="text-danger text-center">No response from server</p>');
+        }
+        checkAndCalculateRisk(source, -1);
     });
 }
 function hasName(prop, value, data) {
@@ -2875,7 +3473,7 @@ text_search_new = indicator_id;
 loadSearchAPI('otx_indicators');
 }
 function search_risk(){
-let summary_total = (status_value_ibmcloud + status_value_virustotal + status_value_hybrid) / number_new_row;
+    let summary_total = (status_value_virustotal + status_value_hybrid) / number_new_row;
 let html_status = ``;
 if(summary_total <= 1.9){
 html_status += `<div class="status-risk success" style="color: #fff;color: #fff !important;">
@@ -2901,7 +3499,7 @@ $('#text_status_risk').html(html_status);
 
 $('.table-hybrid').show();
 $('.table-virustotal').show();
-$('.table-ibmcloud').show();
+
 
 $('');
 
