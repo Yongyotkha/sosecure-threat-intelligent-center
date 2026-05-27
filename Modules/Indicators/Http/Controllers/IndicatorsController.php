@@ -2200,6 +2200,7 @@ class IndicatorsController extends Controller
                         ['source' => ['$regex' => $request->keyword_search, '$options' => 'i']],
                         ['creator_org' => ['$regex' => $request->keyword_search, '$options' => 'i']],
                         ['tags' => ['$regex' => $request->keyword_search, '$options' => 'i']],
+                        ['pulse_id' => ['$regex' => $request->keyword_search, '$options' => 'i']],
                     ];
                 }
 
@@ -2246,6 +2247,12 @@ class IndicatorsController extends Controller
                 //         ],
                 //         [
                 //             'tags' => [
+                //                 '$regex'   => $pattern,
+                //                 '$options' => 'i'
+                //             ]
+                //         ],
+                //         [
+                //             'pulse_id' => [
                 //                 '$regex'   => $pattern,
                 //                 '$options' => 'i'
                 //             ]

@@ -36,15 +36,18 @@ class IndicatorCheckService
     ];
 
     const TF_KEYS = [
-        "d349c3c727f4beb4077dc31bac1fad81c0fd283749e5d0ff",
-        "909914accb7ab0d1ac0536e2146535262dbda1bee66aa601",
-        "f79a27568e2c280ac98e5ab17eaa46c50dc90164c30fa4d7",
+        "ed5c5980f1e0b88bfdfc912f45acdc82a3b97a3219d4cf09",
+        "932a37690b7f6f1a39c29675c2eee4dc0fb86913360c3ab9",
+        "6c44203485b123913f60e902b81f9dc03bca7b8bd01f4299",
+        "d638e195a1a37458a40e3cf110c803a5daba44abe7facc77",
+        "a8ce014d6960be3266247c80d6a5a6c850dfa0d4ae50aaf8",
+        "d06bbafbb431ff8af56a210e54cc6f6838e4c21baa16cb42",
     ];
 
     const RST_KEYS = [
-        "dRe8o8bAfInJ5Bne6NtPmjR8UF1HCsNKESF5s-XBB_LOVZOOcHrgxw",
-        "9TllfBoGN9b6Oy96e9RKqGWU5k3VAUh2KJiEO4unV7uCTlMbLbbN1A",
-        "U-fmKoXw7tT-m85-4cnO_qcXAE8iYYwaDve3PF4yuke6DSFoZD78Xw",
+        "gIqKxF3-lTH9OuRplv6UESoZIhZElNlVkdlKfCg7bDoA23PJEYNeKQ",
+        "zExywxiGIVUlorRQ2Fw-mvUkig4IGROV_QYSKUmcPqYTePODKPRBCA",
+        "sBSKMkusXwL9pFXLrYFZLWOUiweu4dtFzZiyv671Snwc7t-OaJMp7Q",
     ];
 
     // Risk Scoring Configuration
@@ -168,7 +171,7 @@ class IndicatorCheckService
             },
             function ($exception) use ($ioc) {
                 Log::warning("VT API Error for {$ioc}: " . $exception->getMessage());
-                return ["malicious" => 0, "unique_results" => [], "suspicious" => 0];
+                return ["error" => true, "unique_results" => []];
             }
         );
     }
@@ -191,7 +194,7 @@ class IndicatorCheckService
             },
             function ($exception) use ($ip) {
                 Log::warning("AbuseIPDB Error for {$ip}: " . $exception->getMessage());
-                return ["score" => "-", "total_reports" => 0];
+                return ["error" => true];
             }
         );
     }
@@ -217,10 +220,14 @@ class IndicatorCheckService
         return $client->getAsync($url, ['headers' => ['X-OTX-API-KEY' => $key], 'timeout' => 30, 'connect_timeout' => 15])->then(
             function ($response) {
                 $data = json_decode($response->getBody(), true);
-                return ["pulse_count" => $data['pulse_info']['count'] ?? 0];
+                $count = $data['pulse_info']['count'] ?? 0;
+                if ($count > 0) {
+                    return ["pulse_count" => $count];
+                }
+                return ["error" => true];
             },
             function ($exception) {
-                return ["pulse_count" => 0];
+                return ["error" => true];
             }
         );
     }
@@ -260,10 +267,10 @@ class IndicatorCheckService
                         "tags" => array_unique($tags)
                     ];
                 }
-                return ["confidence_level" => 0];
+                return ["error" => true];
             },
             function ($exception) use ($ioc) {
-                return ["confidence_level" => 0];
+                return ["error" => true];
             }
         );
     }
