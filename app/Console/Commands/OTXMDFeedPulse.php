@@ -17,6 +17,7 @@ class OTXMDFeedPulse extends Command
     protected $totalIndicatorsSkipped = 0;
     protected $totalExpectedIndicators = 0;
     private $failedPulses = [];
+    private $processedPulseIds = [];
 
     private function logToFile($message, $level = 'info')
     {
@@ -73,6 +74,7 @@ class OTXMDFeedPulse extends Command
         $this->totalPulsesProcessed = 0;
         $this->totalIndicatorsProcessed = 0;
         $this->totalExpectedIndicators = 0;
+        $this->processedPulseIds = [];
 
         $urlLimit = 3;
         $retryLimit = 1;
@@ -107,7 +109,7 @@ class OTXMDFeedPulse extends Command
                         'source' => "otx.alienvault",
                     ]);
                 }//modified:%3C1d
-                $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/?limit=10&page=1&sort=-modified&q=modified:<12h', $urlLimit);
+                $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/?limit=100&page=1&sort=-modified&q=modified:<12h', $urlLimit);
                 if ($reconCall["success"]) {
                     $otxFeedData = json_decode($reconCall["result"], true);
                     $this->totalPulsesFromApi = $otxFeedData['count'] ?? 0;
@@ -124,7 +126,7 @@ class OTXMDFeedPulse extends Command
                     if (!empty($otxFeedData["results"])) {
                         $checkSuccessDummy = $this->savePulseRef($otxFeedData["results"],$insertOneResult->getInsertedId(), $urlLimit)["success"];
                         if(!$checkSuccessDummy){
-                            $checkSuccess = false;
+                            $otxSuccessCheck = false;
                         }
                     }
 
@@ -163,14 +165,14 @@ class OTXMDFeedPulse extends Command
             $updateResult2 = $collectionStamp->updateOne(
                 ['_id' => $insertOneResult->getInsertedId()],
                 ['$set' => [
-                    'status' => ($otxSuccessCheck && ($this->totalPulsesFromApi == $totalPulseVerified || ($limitPulses && $totalPulseVerified >= $limitPulses))) ? 2 : 3,
+                    'status' => ($otxSuccessCheck && ($totalPulseVerified >= $this->totalPulsesFromApi || ($limitPulses && $totalPulseVerified >= $limitPulses))) ? 2 : 3,
                     'api_total_pulses' => $this->totalPulsesFromApi,
                     'processed_pulses' => $this->totalPulsesProcessed,
                     'processed_indicators' => $this->totalIndicatorsProcessed,
                     'skipped_indicators' => $this->totalIndicatorsSkipped,
                     'api_expected_indicators' => $this->totalExpectedIndicators,
                     'failed_pulses' => $this->failedPulses,
-                    'error_msg' => ($otxSuccessCheck && ($this->totalPulsesFromApi == $totalPulseVerified || ($limitPulses && $totalPulseVerified >= $limitPulses))) ? '' : ($error["Exception"] ?? 'Partial Failure during sync'),
+                    'error_msg' => ($otxSuccessCheck && ($totalPulseVerified >= $this->totalPulsesFromApi || ($limitPulses && $totalPulseVerified >= $limitPulses))) ? '' : ($error["Exception"] ?? 'Partial Failure during sync'),
                 ]]
             );
         }
@@ -199,7 +201,7 @@ class OTXMDFeedPulse extends Command
         $this->info("  - Total Verified     : " . number_format($totalIndiVerified) . " / " . number_format($this->totalExpectedIndicators) . " (" . ($this->totalExpectedIndicators > 0 ? round(($totalIndiVerified/$this->totalExpectedIndicators)*100, 2) : 0) . "%)");
         $this->info("=========================================");
 
-        $isAllProcessed = ($this->totalPulsesFromApi == $totalPulseVerified);
+        $isAllProcessed = ($totalPulseVerified >= $this->totalPulsesFromApi);
         $isLimitReached = ($limitPulses && $totalPulseVerified >= $limitPulses);
         
         if ($otxSuccessCheck && ($isAllProcessed || $isLimitReached)) {
@@ -236,7 +238,7 @@ class OTXMDFeedPulse extends Command
                             'X-OTX-API-KEY' => $_OTX_KEY,
                         ],
                         'delay' => $_sleeptime, //millisec == 1sec
-                        'timeout' => 59, //sec == 100sec
+                        'timeout' => 120, //sec == 100sec (เพิ่มเป็น 120 เพราะ OTX API บางตัวตอบกลับช้ามาก)
                     ]
                 )->getBody();
                 $_dataOut["result"] = $_bodyData;
@@ -266,6 +268,13 @@ class OTXMDFeedPulse extends Command
                     break;
                 }
 
+                if (isset($value["id"]) && in_array($value["id"], $this->processedPulseIds)) {
+                    continue; // Skip if already processed in previous pages
+                }
+                if (isset($value["id"])) {
+                    $this->processedPulseIds[] = $value["id"];
+                }
+
                 if (isset($value["indicator_count"])) {
                     $this->totalExpectedIndicators += (int) $value["indicator_count"];
                 }
@@ -278,7 +287,7 @@ class OTXMDFeedPulse extends Command
                 }else{
                     $this->totalPulsesProcessed++;
                //  $this->info("created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
-                   if (explode("T", $modified)[0] == date('Y-m-d') || explode("T", $created)[0] == date('Y-m-d') || 1==1) {
+                   if (true) { // Process all pulses returned by the API (filtered by <12h)
                     $this->info("Insert created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
 
 
@@ -343,7 +352,7 @@ class OTXMDFeedPulse extends Command
                     $dateModified = isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null;
                     
                     if (!$this->option('quick')) {
-                        $checkSuccessIndi = $this->saveIndicator_ref($value["id"],$urlLimit,$dateModified)["success"];
+                        $checkSuccessIndi = $this->saveIndicator_ref($value["id"],$urlLimit,$dateModified, ($value["indicator_count"] ?? 0))["success"];
                         $this->countAttr($value["id"],$clientMD);
                         if(!$checkSuccessIndi){
                             // Don't set checkSuccess = false for indicator/related failures to allow partial success
@@ -473,7 +482,7 @@ public function countAttr($pulseID_,$clientMD){
     }
 }
 
-public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
+public function saveIndicator_ref($pulseID,$urlLimit,$dateModified, $expectedCount = 0)
 {
     $allRow = (object) array();
     $dayMoreThan = 6;
@@ -582,8 +591,7 @@ public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
 
 
                     }else{
-                       $totalInPulse = $otxFeedData['count'] ?? 0;
-                       $remaining = $totalInPulse - $pulseIndicatorProcessed;
+                       $remaining = $expectedCount - $pulseIndicatorProcessed;
                        if ($remaining > 0) {
                            $this->totalIndicatorsSkipped += $remaining;
                        }

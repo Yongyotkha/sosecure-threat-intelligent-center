@@ -64,7 +64,7 @@ class OTXMDFeedIndicator extends Command
                 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
 
                 if (!isset($insertOneResult)) {
-                    $collectionStamp = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicator_stamp;
+                    $collectionStamp = $clientMD->sosecure_threatintelligent_dev->fx_transaction_otx_indicator_stamp;
                     $insertOneResult = $collectionStamp->insertOne([
                         'code' => generator_uuid(),
                         'transaction_date' => date("Y-m-d"),
@@ -99,7 +99,7 @@ class OTXMDFeedIndicator extends Command
                                 print_r($value);
 
 
-                                $collectionData = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
+                                $collectionData = $clientMD->sosecure_threatintelligent_dev->fx_transaction_otx_indicators_data;
                                 $updateResult = $collectionData->updateOne(
                                     ['indicator_id' => $value["id"].""],
                                     ['$set' => [
@@ -231,7 +231,7 @@ class OTXMDFeedIndicator extends Command
             $checkSuccess = true;
 
             try {
-                $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+                $collectionBasic = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
                 $document = $collectionBasic->findOne(['indicator_id' => $indicatorID.""], [
                     'projection' => [
                         "updated_at" => 1,
@@ -500,7 +500,7 @@ class OTXMDFeedIndicator extends Command
                 $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
                 $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
                 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-                $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+                $collectionBasic = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
                 $updateResult = $collectionBasic->updateOne(
                     ['indicator_id' => $indicatorID.""],
                     ['$set' => [
@@ -536,7 +536,7 @@ class OTXMDFeedIndicator extends Command
                 $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
                 $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
                 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-                $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+                $collectionBasic = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
                 $updateResult = $collectionBasic->updateOne(
                     ['indicator_id' => $indicatorID.""],
                     ['$set' => [
@@ -574,10 +574,10 @@ class OTXMDFeedIndicator extends Command
             $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
             $checkSuccess = true;
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
 
-        //$col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
+        //$col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_event_ref;
             if (!empty($pulses)) {
                 foreach ($pulses as $value) {
                     try {

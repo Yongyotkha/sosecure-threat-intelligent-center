@@ -14,7 +14,9 @@ class AuditPublishedFeeds extends Command
      *
      * @var string
      */
-    protected $signature = 'app:AuditPublishedFeeds {--source= : Filter by source (otx.alienvault or misp)}';
+    protected $signature = 'app:AuditPublishedFeeds 
+                            {--source= : Filter by source (otx.alienvault or misp)}
+                            {--mode=list : Audit mode (list or manifest)}';
 
     /**
      * The console command description.
@@ -40,13 +42,11 @@ class AuditPublishedFeeds extends Command
      */
     public function handle()
     {
-        $this->info("🚀 Starting Feed Audit Sweep...");
+        $mode = $this->option('mode') ?: 'list';
+        $this->info("🚀 Starting Feed Audit Sweep [Mode: $mode]...");
         
         try {
-            $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
-            if (empty($DB_MONGO_KEY)) {
-                $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
-            }
+            $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             
             $client = new MongoClient($DB_MONGO_KEY);
             $db = $client->sosecure_threatintelligent;
@@ -55,25 +55,34 @@ class AuditPublishedFeeds extends Command
             
             $sourceFilter = $this->option('source');
             
-            $todayStart = new UTCDateTime(strtotime(date('Y-m-d 00:00:00')) * 1000);
-            $todayEnd = new UTCDateTime(strtotime(date('Y-m-d 23:59:59')) * 1000);
+            // ── กำหนดช่วงเวลาตาม Mode ── 
+            // ใช้เกณฑ์ 24 ชม. ย้อนหลัง (Rolling 24 Hours) ให้เท่ากันทั้งระบบเพื่อความแม่นยำในการ Compare
+            $start = strtotime('-1 day') * 1000;
+            $end = round(microtime(true) * 1000);
 
+            // ── Query ──
             $query = [
-                'public' => ['$in' => [1, "1"]],
-                'modified' => ['$gte' => $todayStart, '$lte' => $todayEnd],
-                'indicator_count' => ['$ne' => 0],
-                'creator_org' => 'OTX',
+                'status'          => ['$in' => [1, "1", true]],
+                'public'          => ['$in' => [1, "1", true]],
+                'modified'        => [
+                    '$gte' => new UTCDateTime($start),
+                    '$lte' => new UTCDateTime($end),
+                ],
+                'indicator_count' => ['$gt' => 0],
                 '$or' => [
                     ['deleted_at' => null],
                     ['deleted_at' => ['$exists' => false]],
                 ],
             ];
             
+            // กรองเฉพาะ OTX เป็นหลักตามนโยบายการส่งออก
+            $query['creator_org'] = 'OTX';
+            
             if ($sourceFilter) {
                 $query['source'] = $sourceFilter;
             }
             
-            $this->info("🔍 Searching for public events" . ($sourceFilter ? " from source: $sourceFilter" : "") . "...");
+            $this->info("🔍 Searching for events [Start: " . date('Y-m-d H:i:s', $start/1000) . "]...");
             
             $publicEvents = $colEvents->find($query, [
                 'projection' => [
@@ -81,13 +90,14 @@ class AuditPublishedFeeds extends Command
                     'attrCount' => 1,
                     'indicator_count' => 1,
                     'source' => 1,
-                    'name' => 1
+                    'name' => 1,
+                    'mips_uuid' => 1
                 ]
             ]);
             
             $count = 0;
             $totalIndicators = 0;
-            $eventList = []; // เก็บรายชื่อเพื่อใส่ใน summary log
+            $eventList = []; 
             $now = now();
             $timestamp = new UTCDateTime(strtotime($now) * 1000);
             $actionTime = $now->format('Y-m-d H:i:s');
@@ -100,6 +110,7 @@ class AuditPublishedFeeds extends Command
                 $eventName = $event['name'] ?? 'No Name';
                 $eventList[] = [
                     'pulse_id' => $event['pulse_id'],
+                    'mips_uuid' => $event['mips_uuid'] ?? null,
                     'name' => $eventName,
                     'count' => $indicatorCount
                 ];
@@ -108,28 +119,61 @@ class AuditPublishedFeeds extends Command
             }
             
             $this->info("✅ Sweep Completed!");
-            $this->info("📊 Total Public Events: " . number_format($count));
-            $this->info("💎 Total Indicators: " . number_format($totalIndicators));
             
-            // บันทึก Summary ลง Log ของวันนี้ด้วย (ใช้ updateOne + upsert เพื่อไม่ให้เกิด record ซ้ำถ้าเรียกหลายครั้งในวันเดียวกัน)
+            // บันทึก Summary แยกตาม Mode
+            $logType = ($mode === 'manifest') ? 'manifest_report' : 'summary_report';
             $todayRegex = '^' . date('Y-m-d');
+            
+            // ค้นหา log ของวันนี้ที่มีอยู่แล้ว เพื่อนำมารวมกัน (Merge) ไม่ให้โดนทับ
+            $existingLog = $colLogs->findOne(['type' => $logType, 'action_time' => ['$regex' => $todayRegex]]);
+            
+            $mergedEvents = [];
+            if ($existingLog && isset($existingLog['events'])) {
+                foreach ($existingLog['events'] as $e) {
+                    $mergedEvents[(string)$e['pulse_id']] = [
+                        'pulse_id' => $e['pulse_id'],
+                        'mips_uuid' => $e['mips_uuid'] ?? null,
+                        'name' => $e['name'] ?? 'No Name',
+                        'count' => (int)($e['count'] ?? 0)
+                    ];
+                }
+            }
+            
+            // นำ events ของรอบล่าสุดเข้าไปรวม (ถ้ามี pulse_id ซ้ำ จะใช้ข้อมูลล่าสุด)
+            foreach ($eventList as $e) {
+                $mergedEvents[(string)$e['pulse_id']] = $e;
+            }
+            
+            $finalEvents = array_values($mergedEvents);
+            
+            // คำนวณยอดรวมใหม่ เพื่อป้องกันการบวกซ้ำซ้อน (เนื่องจาก query ดึงย้อนหลัง 24 ชม.)
+            $finalTotalEvents = count($finalEvents);
+            $finalTotalIndicators = 0;
+            foreach ($finalEvents as $e) {
+                $finalTotalIndicators += (int)($e['count'] ?? 0);
+            }
+
+            $this->info("📊 Events in this run: " . number_format($count) . " | Total today: " . number_format($finalTotalEvents));
+            $this->info("💎 Indicators in this run: " . number_format($totalIndicators) . " | Total today: " . number_format($finalTotalIndicators));
+            
             $colLogs->updateOne(
-                ['type' => 'summary_report', 'action_time' => ['$regex' => $todayRegex]],
+                ['type' => $logType, 'action_time' => ['$regex' => $todayRegex]],
                 ['$set' => [
                     'timestamp' => $timestamp,
                     'action_time' => $actionTime,
-                    'type' => 'summary_report',
-                    'total_public_events' => $count,
-                    'total_indicators' => $totalIndicators,
-                    'events' => $eventList,
-                    'source' => 'audit_sweep_summary'
+                    'type' => $logType,
+                    'mode' => $mode,
+                    'total_public_events' => $finalTotalEvents,
+                    'total_indicators' => $finalTotalIndicators,
+                    'events' => $finalEvents,
+                    'source' => 'audit_sweep_' . $mode
                 ]],
                 ['upsert' => true]
             );
 
         } catch (\Exception $e) {
             $this->error("❌ Error during sweep: " . $e->getMessage());
-            Log::error("Audit Sweep Failed: " . $e->getMessage());
+            Log::error("Audit Sweep Failed [$mode]: " . $e->getMessage());
             return 1;
         }
 
