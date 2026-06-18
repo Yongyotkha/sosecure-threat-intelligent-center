@@ -285,6 +285,9 @@ class MDCVEBatchJob extends Command
             $this->generateSummary($conn, $site->id, $site->code);
         }
         $this->generateSummary($conn, 0, 0); // Overall
+
+        // Reset progress on successful completion so the next scheduled run starts fresh from 0
+        CveAssetsProgress::query()->update(['last_asset_id' => 0, 'updated_at' => now()]);
     }
 
     private function generateSummary($conn, $site_id, $site_code)

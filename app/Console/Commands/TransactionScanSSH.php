@@ -57,6 +57,19 @@ class TransactionScanSSH extends Command
                 $TransactionTimeStampScan->save();
 
                 $domain = $TransactionTimeStampScan->get_domain->domain;
+                
+                // --- เรียกใช้ Scanner ตัวใหม่ (แทนที่ SSH เดิม) ---
+                try {
+                    $this->call('app:DomainScan', [
+                        'domain_id' => $TransactionTimeStampScan->domain_id,
+                        '--save' => true
+                    ]);
+                } catch (\Throwable $th) {
+                    $this->error("DomainScan Error: " . $th->getMessage());
+                }
+
+                /*
+                // --- ของเดิม (Comment) ---
                 $current_looking_for_subdomain = '';
                 $current_looking_for_domain_name = '';
                 $current_full_DNS_recon_all_detail = '';
@@ -331,6 +344,7 @@ class TransactionScanSSH extends Command
 
                 $TransactionTimeStampScan->progress = 2;
                 $TransactionTimeStampScan->save();
+                */
             }
         } catch (\Throwable $th) {
             //throw $th;

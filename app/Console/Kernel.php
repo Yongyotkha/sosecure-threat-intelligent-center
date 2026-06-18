@@ -149,6 +149,11 @@ class Kernel extends ConsoleKernel
       ->cron('0 */4 * * *')
       ->timezone('Asia/Bangkok')
       ->withoutOverlapping(10)->runInBackground();
+
+    $schedule->command('phishing:scan')
+      ->cron('0 */4 * * *')
+      ->timezone('Asia/Bangkok')
+      ->withoutOverlapping(60)->runInBackground();
   }
 
   /**
