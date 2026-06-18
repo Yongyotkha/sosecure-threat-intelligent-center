@@ -1,0 +1,23 @@
+{
+    "name": "nwidart/apikey",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\ApiKey\\Providers\\ApiKeyServiceProvider"
+            ],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\ApiKey\\": ""
+        }
+    }
+}
