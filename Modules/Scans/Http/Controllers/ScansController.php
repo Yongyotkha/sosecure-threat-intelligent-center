@@ -128,6 +128,17 @@ class ScansController extends Controller
 
     public function save_assets(Request $request)
     {
+        $assetsData = collect($request->assets_data ?? [])->filter(function ($item) {
+            return $item && isset($item['raw_data']) && trim((string) $item['raw_data']) !== '';
+        });
+
+        if ($assetsData->isEmpty()) {
+            return response()->json([
+                'message' => 'No assets to save',
+                'error' => 'No assets to save',
+                'status_code' => '400',
+            ], 400);
+        }
 
         foreach ($request->assets as $data) {
             $Assets = Assets::where('raw_data', $data['raw_data'])->where('site_id', $data['site_id'])->where('domain_id', $data['domain_id'])->first();
@@ -460,8 +471,8 @@ class ScansController extends Controller
         }
 
         // --- NEW: STRICT STATUS UPDATE BY IDs ---
-        // If specific record IDs were passed from the table rows, mark them all as used
-        if ($request->has('ids') && is_array($request->ids)) {
+        // Mark selected scan records as used only when asset data was actually saved
+        if ($request->has('ids') && is_array($request->ids) && !empty($request->ids) && $assetsData->isNotEmpty()) {
             TransactionScans::whereIn('id', $request->ids)->update(['status_asset_use' => 1]);
         }
 

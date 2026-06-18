@@ -798,6 +798,11 @@
     });
 
     function save_assets(){
+        if ($("input[name='raw_data[]']").length === 0) {
+            toastr.warning('Please add at least one asset before saving.', '@langapp('response_status')');
+            return;
+        }
+
         loading('load');
         var values = [];
         var seenAssets = {};

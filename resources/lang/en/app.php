@@ -980,6 +980,7 @@ return [
     'delete_all'                                 => 'Delete All',
     'remark'                                     => 'Remark',
     'api_indicators'                             => 'API Indicators',
+    'api_key'                                    => 'API Key',
     'news_detail'                                => 'News Detail',
     'assets_vulnerability'                       => 'Assets Vulnerability',
     'assets_compromised'                         => 'Assets Compromised',
