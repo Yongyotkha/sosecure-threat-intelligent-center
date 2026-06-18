@@ -131,7 +131,7 @@
 
                     <section id="av-detection">
                         <h3 class="page-header">
-                            Anti-Virus Results
+                            Threat Detections
                         </h3>
                         <div id="show-chart-int" class="row av-results-wrapper has-falcon-button">
                             <div class="col-xs-12 col-sm-6 col-md-4">

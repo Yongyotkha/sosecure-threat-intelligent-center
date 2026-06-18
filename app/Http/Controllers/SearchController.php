@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DataLeakFeed;
+use App\Services\IndicatorCheckService;
 use App\LogSearch;
 use App\R_s_s_news;
 use App\SiteLimitApi;
@@ -1787,7 +1788,7 @@ class SearchController extends Controller
         //     $center_search_api_loookup_allow = 1;
 
         // }else{
-                if((int)$center_search_api_loookup_limit > $site_request_limit_api_count){
+                if(app()->environment('local') || (int)$center_search_api_loookup_limit > $site_request_limit_api_count){
                     $center_search_api_loookup_allow = 1;
                   
                     if($source == 'check_api_search_limit'){
@@ -1807,8 +1808,12 @@ class SearchController extends Controller
 
 
                 }else{
-
-                
+                    $response_data = array(
+                        'status_code' => 400,
+                        'search_api_loookup_allow' => 0,
+                        'message' => 'Search API lookup limit exceeded. Please contact your system administrator.',
+                    );
+                    return response()->json($response_data);
                 }
 
         // }
@@ -1842,8 +1847,7 @@ class SearchController extends Controller
                       //  $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
                       //  $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
                 
-                      $ibmcloud_API_Key = "b477bcdc-90ed-4b62-ba5a-080efa2564ff";
-                      $ibmcloud_API_Key_Password = "15ee88df-635a-4f47-afc7-c856e4eb4578";
+                      list($ibmcloud_API_Key, $ibmcloud_API_Key_Password) = IndicatorCheckService::getBasicAuthCredentials('IBMCLOUD');
                         if($type == 'IP'){
                             $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/" . $keyword;
                         }else if($type == 'Domain' || $type == 'URL'){
@@ -1886,8 +1890,7 @@ class SearchController extends Controller
            
                // $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
                // $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
-               $ibmcloud_API_Key = "b477bcdc-90ed-4b62-ba5a-080efa2564ff";
-               $ibmcloud_API_Key_Password = "15ee88df-635a-4f47-afc7-c856e4eb4578";
+               list($ibmcloud_API_Key, $ibmcloud_API_Key_Password) = IndicatorCheckService::getBasicAuthCredentials('IBMCLOUD');
                 if($type == 'IP'){
                     $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/" . $keyword;
                 }else if($type == 'Domain' || $type == 'URL'){
@@ -1930,7 +1933,7 @@ class SearchController extends Controller
                     if(File::exists($url))
                     {File::delete($url);}
 
-                    $virustotal_API_Key = "8ed71053d254aa99c9a79b73c6f3223cac762c2c77628d075e62ec506a538267";
+                    $virustotal_API_Key = IndicatorCheckService::getRandomKey('VT');
                     if($type == 'IP'){
                         $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/" . $keyword;
                     }else if($type == 'Domain'){
@@ -1974,7 +1977,7 @@ class SearchController extends Controller
                     );
                     return response()->json($response_data);
                 }
-                $virustotal_API_Key = "8ed71053d254aa99c9a79b73c6f3223cac762c2c77628d075e62ec506a538267";
+                $virustotal_API_Key = IndicatorCheckService::getRandomKey('VT');
                 if($type == 'IP'){
                     $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/" . $keyword;
                 }else if($type == 'Domain'){
@@ -2025,7 +2028,7 @@ class SearchController extends Controller
                 {
                     if(File::exists($url))
                     {File::delete($url);}
-                    $hybrid_API_Key = "kpy0ibau846587b1lnemkw4k082be03bncw1bkz140a16b6cs64sk6uzf0498e3f";
+                    $hybrid_API_Key = IndicatorCheckService::getRandomKey('HYBRID');
 
                     //$virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
                     $headers = array(
@@ -2098,7 +2101,7 @@ class SearchController extends Controller
                     return response()->json($response_data);
                 }
 
-                $hybrid_API_Key = "kpy0ibau846587b1lnemkw4k082be03bncw1bkz140a16b6cs64sk6uzf0498e3f";
+                $hybrid_API_Key = IndicatorCheckService::getRandomKey('HYBRID');
 
                 //$virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
                 $headers = array(
@@ -2162,7 +2165,7 @@ class SearchController extends Controller
         }else if($source =="otx_indicators"){
 
 
-            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";
+            $otx_API_Key = IndicatorCheckService::getRandomKey('OTX');
             $otx_general_url ="";
             $otx_analysis_url ="";
             if($type == 'IP'){
@@ -2230,7 +2233,7 @@ class SearchController extends Controller
 
         }else if($source =="otx_puls"){
         
-            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
+            $otx_API_Key = IndicatorCheckService::getRandomKey('OTX');  
             $otx_url = "https://otx.alienvault.com/api/v1/pulses/".$keyword;
            
             $ch = curl_init();
@@ -2252,7 +2255,7 @@ class SearchController extends Controller
         
         }else if($source =="otx_puls_indicator"){
         
-            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
+            $otx_API_Key = IndicatorCheckService::getRandomKey('OTX');  
             $otx_url = "https://otx.alienvault.com/api/v1/pulses/".$keyword.'/indicators';
            
             $ch = curl_init();
@@ -2275,7 +2278,7 @@ class SearchController extends Controller
         }else if($source =="otx_puls_tag"){
             $keyword =str_replace(' ', '%20', trim($keyword));
 
-            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
+            $otx_API_Key = IndicatorCheckService::getRandomKey('OTX');  
             if(!$request->nextpage){
                 $otx_url = "https://otx.alienvault.com/otxapi/pulses/?limit=20&page=1&sort=-modified&q=tag:".$keyword;
             }else{
@@ -2783,8 +2786,7 @@ class SearchController extends Controller
 
     private function fetchAbuseIPDB($ip)
     {
-        $keys = \App\Services\IndicatorCheckService::ABUSE_KEYS;
-        $key = $keys[array_rand($keys)];
+        $key = IndicatorCheckService::getRandomKey('ABUSE');
         
         $url = "https://api.abuseipdb.com/api/v2/check?ipAddress=" . urlencode($ip) . "&maxAgeInDays=120";
         $ch = curl_init($url);
@@ -2828,8 +2830,7 @@ class SearchController extends Controller
 
         // Fallback: try with Auth-Key
         \Log::info('[ThreatFox Debug] Anonymous request blacklisted, trying with Auth-Key');
-        $keys = \App\Services\IndicatorCheckService::TF_KEYS;
-        $key = $keys[array_rand($keys)];
+        $key = IndicatorCheckService::getRandomKey('TF');
         
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -2848,8 +2849,7 @@ class SearchController extends Controller
 
     private function fetchRSTCloud($keyword)
     {
-        $keys = \App\Services\IndicatorCheckService::RST_KEYS;
-        $key = $keys[array_rand($keys)];
+        $key = IndicatorCheckService::getRandomKey('RST');
         
         $url = "https://api.rstcloud.net/v1/ioc?value=" . urlencode($keyword);
         $ch = curl_init($url);
