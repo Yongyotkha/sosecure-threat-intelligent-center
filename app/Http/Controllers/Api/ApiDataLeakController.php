@@ -4063,4 +4063,60 @@ class ApiDataLeakController extends ApiController
             return response()->json(['status_code' => 500, 'message' => $e->getMessage()]);
         }
     }
+
+    public function change_status_monitoring(Request $request)
+    {
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+
+            if ($data === false) {
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }
+
+            if (($data['data']['menu'] ?? null) !== 'data_leak') {
+                return response()->json(['error' => "You don't have permission to access", 'status_code' => '403']);
+            }
+
+            $auth_site = $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
+            if (($auth_site['status_code'] ?? null) !== '200') {
+                return $auth_site;
+            }
+
+            $refId = $data['data']['code'] ?? null;
+            $type = $data['data']['type'] ?? 'credential';
+            $statusMonitoring = strtolower(trim($data['data']['status_monitoring'] ?? 'close'));
+
+            if (!in_array($statusMonitoring, ['close', 'in_progress', 'reported'], true)) {
+                return response()->json(['error' => 'Invalid status_monitoring value', 'status_code' => '400']);
+            }
+
+            if ($type === 'credential') {
+                $ref = CredentialLeakRef::where('id', $refId)->whereNull('deleted_at')->first();
+            } else {
+                $ref = DataLeakSocialRef::where('id', $refId)->whereNull('deleted_at')->first();
+            }
+
+            if (!$ref) {
+                return response()->json(['error' => 'Record not found', 'status_code' => '404']);
+            }
+
+            $ref->status_monitoring = $statusMonitoring;
+            $ref->save();
+
+            $response = [
+                'ref_id' => $ref->id,
+                'status_monitoring' => $ref->status_monitoring,
+            ];
+
+            $data_transcation = json_encode($response);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+        } catch (\Exception $e) {
+            return response()->json(['status_code' => 500, 'message' => $e->getMessage()]);
+        }
+    }
 }
