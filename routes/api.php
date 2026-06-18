@@ -103,6 +103,9 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('vulnerabilitys/load_cpe_by_asset', 'Api\ApiCVEController@vulnerabilitys_load_cpe_by_asset');
     Route::post('vulnerabilitys/get_sites_by_cve', 'Api\ApiCVEController@vulnerabilitys_get_sites_by_cve');
     Route::post('vulnerabilitys/get_assets_by_site', 'Api\ApiCVEController@vulnerabilitys_get_assets_by_site');
+    Route::post('vulnerabilitys/change_isFix', 'Api\ApiCVEController@vulnerabilitys_change_isFix');
+    Route::post('vulnerabilitys/change_isFix_detail', 'Api\ApiCVEController@vulnerabilitys_change_isFix_detail');
+    Route::post('vulnerabilitys/export', 'Api\ApiCVEController@vulnerabilitys_export');
 
 
     Route::post('compromised/count_val', 'Api\ApiCompromisedController@compromised_count_val');
@@ -127,6 +130,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('data_leak/delete', 'Api\ApiDataLeakController@data_leak_delete');
     Route::post('data_leak/delete_select', 'Api\ApiDataLeakController@data_leak_delete_select');
     Route::post('data_leak/delete_change', 'Api\ApiDataLeakController@data_leak_delete_change');
+    Route::post('data_leak/change_status_monitoring', 'Api\ApiDataLeakController@change_status_monitoring');
     Route::post('data_leak/getDataLeakSocial', 'Api\ApiDataLeakController@getDataLeakSocial');
 
     Route::post('data_leak/activity_dataleak_modal', 'Api\ApiDataLeakController@activity_dataleak_modal');

@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use MongoDB\Client as MongoClient;
 use MongoDB\BSON\UTCDateTime;
 use Illuminate\Support\Facades\Log;
+use App\Services\PublishedFeedsService;
 
 class AuditPublishedFeeds extends Command
 {
@@ -49,38 +50,16 @@ class AuditPublishedFeeds extends Command
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             
             $client = new MongoClient($DB_MONGO_KEY);
-            $db = $client->sosecure_threatintelligent;
+            $db = PublishedFeedsService::database($client);
             $colEvents = $db->fx_otx_events;
             $colLogs = $db->fx_feed_published_logs;
             
             $sourceFilter = $this->option('source');
             
-            // ── กำหนดช่วงเวลาตาม Mode ── 
-            // ใช้เกณฑ์ 24 ชม. ย้อนหลัง (Rolling 24 Hours) ให้เท่ากันทั้งระบบเพื่อความแม่นยำในการ Compare
-            $start = strtotime('-1 day') * 1000;
-            $end = round(microtime(true) * 1000);
-
-            // ── Query ──
-            $query = [
-                'status'          => ['$in' => [1, "1", true]],
-                'public'          => ['$in' => [1, "1", true]],
-                'modified'        => [
-                    '$gte' => new UTCDateTime($start),
-                    '$lte' => new UTCDateTime($end),
-                ],
-                'indicator_count' => ['$gt' => 0],
-                '$or' => [
-                    ['deleted_at' => null],
-                    ['deleted_at' => ['$exists' => false]],
-                ],
-            ];
-            
-            // กรองเฉพาะ OTX เป็นหลักตามนโยบายการส่งออก
-            $query['creator_org'] = 'OTX';
-            
-            if ($sourceFilter) {
-                $query['source'] = $sourceFilter;
-            }
+            $window = PublishedFeedsService::rollingWindow();
+            $start = $window['start'];
+            $end = $window['end'];
+            $query = PublishedFeedsService::buildQuery($start, $end, $sourceFilter);
             
             $this->info("🔍 Searching for events [Start: " . date('Y-m-d H:i:s', $start/1000) . "]...");
             
@@ -107,69 +86,26 @@ class AuditPublishedFeeds extends Command
                 $indicatorCount = (int) ($event['attrCount'] ?? $event['indicator_count'] ?? 0);
                 $totalIndicators += $indicatorCount;
                 
-                $eventName = $event['name'] ?? 'No Name';
-                $eventList[] = [
-                    'pulse_id' => $event['pulse_id'],
-                    'mips_uuid' => $event['mips_uuid'] ?? null,
-                    'name' => $eventName,
-                    'count' => $indicatorCount
-                ];
+                $eventEntry = PublishedFeedsService::eventFromDocument((array) $event);
+                $eventList[] = $eventEntry;
 
-                $this->line("   - [{$event['pulse_id']}] $eventName ($indicatorCount indicators)");
+                $this->line("   - [{$eventEntry['pulse_id']}] {$eventEntry['name']} ($indicatorCount indicators)");
             }
             
             $this->info("✅ Sweep Completed!");
             
-            // บันทึก Summary แยกตาม Mode
+            // บันทึก Summary แยกตาม Mode (นับ events ที่ "พร้อมส่ง" ไม่ใช่ events ที่ MISP save จริง)
             $logType = ($mode === 'manifest') ? 'manifest_report' : 'summary_report';
-            $todayRegex = '^' . date('Y-m-d');
-            
-            // ค้นหา log ของวันนี้ที่มีอยู่แล้ว เพื่อนำมารวมกัน (Merge) ไม่ให้โดนทับ
-            $existingLog = $colLogs->findOne(['type' => $logType, 'action_time' => ['$regex' => $todayRegex]]);
-            
-            $mergedEvents = [];
-            if ($existingLog && isset($existingLog['events'])) {
-                foreach ($existingLog['events'] as $e) {
-                    $mergedEvents[(string)$e['pulse_id']] = [
-                        'pulse_id' => $e['pulse_id'],
-                        'mips_uuid' => $e['mips_uuid'] ?? null,
-                        'name' => $e['name'] ?? 'No Name',
-                        'count' => (int)($e['count'] ?? 0)
-                    ];
-                }
-            }
-            
-            // นำ events ของรอบล่าสุดเข้าไปรวม (ถ้ามี pulse_id ซ้ำ จะใช้ข้อมูลล่าสุด)
-            foreach ($eventList as $e) {
-                $mergedEvents[(string)$e['pulse_id']] = $e;
-            }
-            
-            $finalEvents = array_values($mergedEvents);
-            
-            // คำนวณยอดรวมใหม่ เพื่อป้องกันการบวกซ้ำซ้อน (เนื่องจาก query ดึงย้อนหลัง 24 ชม.)
-            $finalTotalEvents = count($finalEvents);
-            $finalTotalIndicators = 0;
-            foreach ($finalEvents as $e) {
-                $finalTotalIndicators += (int)($e['count'] ?? 0);
-            }
-
-            $this->info("📊 Events in this run: " . number_format($count) . " | Total today: " . number_format($finalTotalEvents));
-            $this->info("💎 Indicators in this run: " . number_format($totalIndicators) . " | Total today: " . number_format($finalTotalIndicators));
-            
-            $colLogs->updateOne(
-                ['type' => $logType, 'action_time' => ['$regex' => $todayRegex]],
-                ['$set' => [
-                    'timestamp' => $timestamp,
-                    'action_time' => $actionTime,
-                    'type' => $logType,
-                    'mode' => $mode,
-                    'total_public_events' => $finalTotalEvents,
-                    'total_indicators' => $finalTotalIndicators,
-                    'events' => $finalEvents,
-                    'source' => 'audit_sweep_' . $mode
-                ]],
-                ['upsert' => true]
+            $merged = PublishedFeedsService::persistLog(
+                $colLogs,
+                $logType,
+                $eventList,
+                'audit_sweep_' . $mode,
+                ['mode' => $mode]
             );
+
+            $this->info("📊 Events in this run: " . number_format($count) . " | Total today: " . number_format($merged['total_public_events']));
+            $this->info("💎 Indicators in this run: " . number_format($totalIndicators) . " | Total today: " . number_format($merged['total_indicators']));
 
         } catch (\Exception $e) {
             $this->error("❌ Error during sweep: " . $e->getMessage());
