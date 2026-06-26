@@ -1021,6 +1021,7 @@ return [
     'phishing_detection'                        => 'Phishing Detection',
     'agent_rule'                                => 'Agent Rule',
     'host'                                      => 'Hosts',
+    'honeypot'                                  => 'Honeypot',
     'brand_abuse'                               => 'Brand Abuse',
     'brand_abuse_feed'                          => 'Brand Abuse Feed',
     'save_successful'                           => 'Save | successfully',

@@ -15,7 +15,27 @@ db.fx_otx_events_indicator_ref.getIndexes();
 
 
 // ========================================
-// 2. สร้าง Index สำหรับ pulse_id (สำคัญที่สุด!)
+// 2. สร้าง Index สำหรับ indicator (ใช้ Search internal_events)
+// ========================================
+db.fx_otx_events_indicator_ref.createIndex(
+  { "indicator": 1 },
+  {
+    name: "idx_indicator",
+    background: true
+  }
+);
+
+db.fx_otx_indicator_detail.createIndex(
+  { "indicator_name": 1 },
+  {
+    name: "idx_indicator_name",
+    background: true
+  }
+);
+
+
+// ========================================
+// 3. สร้าง Index สำหรับ pulse_id (สำคัญที่สุด!)
 // ========================================
 db.fx_otx_events_indicator_ref.createIndex(
   { "pulse_id": 1 }, 
