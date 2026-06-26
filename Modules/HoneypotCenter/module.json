@@ -1,0 +1,14 @@
+{
+    "name": "HoneypotCenter",
+    "alias": "honeypotcenter",
+    "description": "Honeypot ingestion API and SOC dashboard",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\HoneypotCenter\\Providers\\HoneypotCenterServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
