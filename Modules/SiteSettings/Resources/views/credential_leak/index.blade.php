@@ -1482,6 +1482,15 @@
                 });
             }
 
+            function refreshDataLeakView() {
+                if ($.fn.DataTable.isDataTable('#table_social_datas')) {
+                    table.ajax.reload(null, false);
+                }
+                get_count();
+                count_icon();
+            }
+            window.refreshDataLeakView = refreshDataLeakView;
+
             $('#btn-export-excel').click(function() {
                 var params = new URLSearchParams();
                 var selectedIds = [];
@@ -1556,9 +1565,10 @@
                         $('.delete-all').prop('disabled', false).html('<i class="fas fa-paper-plane"></i> OK');
                         
                         if (response.success) {
-                            setTimeout(function() {
-                                window.location.href = '{!! route('credentialleak.index') !!}';
-                            }, 500);
+                            toastr.success(response.message || 'Deleted successfully');
+                            $('#btn-change-status').prop('disabled', true);
+                            $('.select-chk').prop('checked', false);
+                            refreshDataLeakView();
                         } else {
                             toastr.error(response.message || 'Failed to delete records.');
                         }

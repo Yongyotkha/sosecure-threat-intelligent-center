@@ -204,17 +204,17 @@
                                                     <span> Information </span>
                                                 </button>
                                             </div>
-                                            <h5 class="font-weight-bold">Status</h5>
+                                            <h5 class="font-weight-bold">Data Status</h5>
                                             <div id="groupby-status" class="btn-group special">
                                                 <button class="btn btn-grey check_status active" id="all"
                                                     value="">
                                                     <span> All </span>
                                                 </button>
                                                 <button class="btn btn-grey check_status" value="1">
-                                                    <span> Active </span>
+                                                    <span> Public </span>
                                                 </button>
                                                 <button class="btn btn-grey check_status" value="2">
-                                                    <span> Inactive </span>
+                                                    <span> Draft </span>
                                                 </button>
                                             </div>
 

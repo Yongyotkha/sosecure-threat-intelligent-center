@@ -106,6 +106,16 @@ class Kernel extends ConsoleKernel
     $schedule->command('app:OTXMDFeedType')->cron('0 0 1 * *')->withoutOverlapping(120)->runInBackground();
     $schedule->command('app:OTXFeedType')->cron('0 */1 * * *')->withoutOverlapping(120)->runInBackground();
     $schedule->command('app:OTXFeedData')->cron('0 */1 * * *')->withoutOverlapping(120)->runInBackground();
+
+    // Staging pipeline Pulse (Fetch auto-imports). Enable after prod cutover.
+    // $schedule->command('app:OTXMDFetchPulse')->cron('0 */12 * * *')->withoutOverlapping(180)->runInBackground()
+    //     ->appendOutputTo(storage_path('logs/otx_fetch_pulse.log'));
+    // $schedule->command('app:OTXMDFetchPulseHeavy --limit=1')->cron('0 */6 * * *')->withoutOverlapping(180)->runInBackground()
+    //     ->appendOutputTo(storage_path('logs/otx_fetch_pulse_heavy.log'));
+    // Staging pipeline Indicator (Fetch+Import in one command). Enable after verify.
+    // $schedule->command('app:OTXMDFetchIndicator')->cron('0 */12 * * *')->withoutOverlapping(180)->runInBackground()
+    //     ->appendOutputTo(storage_path('logs/otx_fetch_indicator.log'));
+    // (Import no longer scheduled separately — Fetch/Heavy call Import automatically.)
     //      $schedule->command('app:MDMISPFeedDaily')->cron('0 */12 * * *')->withoutOverlapping(5);
     $schedule->command('app:data_leak_social')->hourly()->withoutOverlapping(60)->runInBackground();
     //      $schedule->command('app:MDMISPFeedDaily')->hourly()->withoutOverlapping(5);

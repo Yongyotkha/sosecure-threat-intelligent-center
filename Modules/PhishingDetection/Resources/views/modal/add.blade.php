@@ -105,6 +105,118 @@
             </div>
 
             </form>
+
+            @if(@$view && !empty($query_edit->analysis_data))
+                @php
+                    $analysis = json_decode($query_edit->analysis_data, true);
+                @endphp
+                @if($analysis)
+                <hr>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4 class="text-uppercase text-blue font-bold" style="margin-top:0"><i class="fas fa-shield-alt"></i> OSINT Analysis Results</h4>
+                        
+                        <ul class="nav nav-tabs" style="margin-top: 15px;">
+                            <li class="active"><a data-toggle="tab" href="#tab-overview" style="color:#333;font-weight:bold;">Overview</a></li>
+                            <li><a data-toggle="tab" href="#tab-ssl" style="color:#333;font-weight:bold;">SSL</a></li>
+                            <li><a data-toggle="tab" href="#tab-whois" style="color:#333;font-weight:bold;">WHOIS</a></li>
+                            <li><a data-toggle="tab" href="#tab-detections" style="color:#d9534f;font-weight:bold;">Detections <span class="badge" style="background-color:#d9534f">{{ $analysis['total_phishing_detections'] ?? 0 }}</span></a></li>
+                        </ul>
+
+                        <div class="tab-content" style="padding: 15px; border: 1px solid #ddd; border-top: none; background: #fff;">
+                            <div id="tab-overview" class="tab-pane fade in active">
+                                <p><strong>URL Analyzed:</strong> <a href="{{ $analysis['url'] ?? '#' }}" target="_blank">{{ $analysis['url'] ?? '-' }}</a></p>
+                                <p><strong>Risk Level:</strong> 
+                                    @if(($analysis['risk_level'] ?? '') == 'HIGH') <span class="badge" style="background-color: #b93624;">HIGH</span>
+                                    @elseif(($analysis['risk_level'] ?? '') == 'MEDIUM') <span class="badge" style="background-color: #fcc838;">MEDIUM</span>
+                                    @else <span class="badge" style="background-color: #88ce4f;">LOW / CLEAN</span> @endif
+                                </p>
+                                <p><strong>Total Scanners:</strong> {{ $analysis['total_engines'] ?? 0 }}</p>
+                                
+                                @if(!empty($analysis['suspicion_reasons']))
+                                    <div class="alert alert-warning" style="margin-top: 10px;">
+                                        <strong><i class="fas fa-exclamation-triangle"></i> Suspicious Patterns Found:</strong>
+                                        <ul style="margin-top: 5px; margin-bottom: 0;">
+                                        @foreach($analysis['suspicion_reasons'] as $reason)
+                                            <li>{{ $reason }}</li>
+                                        @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div id="tab-ssl" class="tab-pane fade">
+                                @php $ssl = $analysis['ssl_certificate'] ?? []; @endphp
+                                @if(!empty($ssl))
+                                    <table class="table table-bordered table-striped" style="margin-bottom:0">
+                                        <tbody>
+                                            <tr><th width="30%">Has SSL</th><td>{!! $ssl['has_ssl'] ? '<i class="fas fa-check text-success"></i> Yes' : '<i class="fas fa-times text-danger"></i> No' !!}</td></tr>
+                                            <tr><th>Is Valid</th><td>{!! $ssl['is_valid'] ? '<i class="fas fa-check text-success"></i> Valid' : '<i class="fas fa-times text-danger"></i> Invalid' !!}</td></tr>
+                                            <tr><th>Issuer</th><td>{{ $ssl['issuer'] ?? 'N/A' }}</td></tr>
+                                            <tr><th>Expiry Date</th><td>{{ $ssl['expiry_date'] ?? 'N/A' }}</td></tr>
+                                            <tr><th>Days Until Expiry</th><td>{{ $ssl['days_until_expiry'] ?? 'N/A' }} days</td></tr>
+                                        </tbody>
+                                    </table>
+                                @else
+                                    <p class="text-muted" style="margin:0">No SSL information available.</p>
+                                @endif
+                            </div>
+
+                            <div id="tab-whois" class="tab-pane fade">
+                                @php $whois = $analysis['whois_information'] ?? []; @endphp
+                                @if(!empty($whois))
+                                    <table class="table table-bordered table-striped" style="margin-bottom:0">
+                                        <tbody>
+                                            <tr><th width="30%">Registrar</th><td>{{ $whois['registrar'] ?? 'N/A' }}</td></tr>
+                                            <tr><th>Creation Date</th><td>{{ $whois['creation_date'] ?? 'N/A' }}</td></tr>
+                                            
+                                            @if(!empty($whois['whois_warnings']))
+                                            <tr><th>Warnings</th>
+                                                <td>
+                                                    <ul class="text-danger" style="margin-bottom:0; padding-left:15px;">
+                                                    @foreach($whois['whois_warnings'] as $warning)
+                                                        <li>{{ $warning }}</li>
+                                                    @endforeach
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                            @endif
+                                        </tbody>
+                                    </table>
+                                @else
+                                    <p class="text-muted" style="margin:0">No WHOIS information available.</p>
+                                @endif
+                            </div>
+
+                            <div id="tab-detections" class="tab-pane fade">
+                                @if(!empty($analysis['phishing_detections']))
+                                    <table class="table table-bordered table-hover" style="margin-bottom:0">
+                                        <thead>
+                                            <tr style="background:#f9f9f9">
+                                                <th>Engine</th>
+                                                <th>Category</th>
+                                                <th>Result</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($analysis['phishing_detections'] as $det)
+                                            <tr>
+                                                <td><strong>{{ $det['engine'] }}</strong></td>
+                                                <td><span class="badge" style="background-color: #b93624;">{{ $det['category'] }}</span></td>
+                                                <td>{{ $det['result'] }}</td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                @else
+                                    <p class="text-success" style="margin:0"><i class="fas fa-check-circle"></i> No phishing engines flagged this URL.</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+            @endif
         </div>
         <div class="modal-footer">
             {!! closeModalButton() !!}

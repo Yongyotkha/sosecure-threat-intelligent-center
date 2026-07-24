@@ -9,6 +9,7 @@ use Illuminate\Console\Command;
 use Modules\SiteSettings\Entities\SiteSettings;
 use MongoDB\BSON\UTCDateTime;
 use App\Entities\IndicatorSummaryYear;
+use App\Services\IndicatorMongoService;
 
 class MDCountIndicator extends Command
 {
@@ -41,12 +42,14 @@ class MDCountIndicator extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(IndicatorMongoService $mongo)
     {
-        $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
-        $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $profile = $mongo->getProfile();
+        $this->info('MongoDB: ' . $profile['database']);
+
+        $col_fx_otx_indicator_detail = $mongo->collection('fx_otx_indicator_detail');
+        $col_fx_otx_events = $mongo->collection('fx_otx_events');
+        $activeEventsFilter = IndicatorMongoService::activeEventsFilter();
         $options = [
             'allowDiskUse' => TRUE
         ];
@@ -134,9 +137,15 @@ class MDCountIndicator extends Command
          //  $countEvents = $countEvents->toArray();
          $countEvents = array();
         
-           $countIndustries = $col_fx_otx_events->aggregate($pipelineIndustries);
+           $countIndustries = $col_fx_otx_events->aggregate([
+               ['$match' => $activeEventsFilter],
+               ...$pipelineIndustries,
+           ]);
            $countIndustries = $countIndustries->toArray();
-           $countpipelineGroup = $col_fx_otx_events->aggregate($pipelineGroup);
+           $countpipelineGroup = $col_fx_otx_events->aggregate([
+               ['$match' => $activeEventsFilter],
+               ...$pipelineGroup,
+           ]);
            $countpipelineGroup = $countpipelineGroup->toArray();
 
            foreach ( $countAttr as $value) {
@@ -271,9 +280,9 @@ class MDCountIndicator extends Command
             'created_at' => ['$gt' =>  $date_now_sub1],
         );
 
-        $query2 = array(
+        $query2 = IndicatorMongoService::mergeActiveEventsFilter([
             'created_at' => ['$gt' =>  $date_now_sub1],
-        );
+        ]);
         $Attr_count_current = (int)$col_fx_otx_indicator_detail->count($query);
         $Event_count_current = (int)$col_fx_otx_events->count($query2);
         $IndicatorSummaryYear = IndicatorSummaryYear::where('type',  'summary_current')->first();
@@ -297,9 +306,7 @@ class MDCountIndicator extends Command
 
         );
 
-        $query2 = array( 
-
-        );
+        $query2 = $activeEventsFilter;
 
         $Attr_count_all = (int)$col_fx_otx_indicator_detail->count($query);
         $Event_count_all = (int)$col_fx_otx_events->count($query2);
@@ -359,9 +366,9 @@ class MDCountIndicator extends Command
 
         $pipeline2 = [
             [
-                '$match' => [
+                '$match' => IndicatorMongoService::mergeActiveEventsFilter([
                     'created_at'  => ['$gt' =>  $date_now_sub1],
-                ]
+                ]),
             ],
             [
                 '$group' => [

@@ -3766,7 +3766,7 @@ class DataLeakController extends Controller
             // $model = DataLeakFeed::where($where);
             $model = DataLeakSocialRef::where('deleted_at', null)
                 ->whereHas('get_data_leak_feed_one', function ($query) {
-                    $query->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server']);
+                    $query->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server', 'agent', 'network']);
                 })
                 ->with('get_site')
                 ->with('get_data_leak_feed_one');
@@ -3902,7 +3902,7 @@ class DataLeakController extends Controller
             //                         $q->where($orwhere);
             //                     })->orderBy('id', 'desc')->with('get_social_ref');
 
-            $model = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server'])
+            $model = DataLeakSocialRef::where('deleted_at', null)->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server', 'agent', 'network'])
                 ->whereHas('get_data_leak_feed_one', function ($q) use ($where1, $orwhere, $orwhere2, $orwhere3) {
                     // $q->where($where1);
                     // $q->orwhere($orwhere);

@@ -514,14 +514,14 @@ class DarkWebController extends Controller
 
             $model = DataLeakSocialRef::where('deleted_at', null)
             ->whereHas('get_data_leak_feed_one', function ($query) {
-                $query->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server']);
+                $query->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server', 'agent', 'network']);
             })
             ->with('get_site')
             ->with('get_data_leak_feed_one');
 
             $countGroupBy = DataLeakSocialRef::where('deleted_at', null)
             ->whereHas('get_data_leak_feed_one', function ($query) {
-                $query->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server']);
+                $query->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server', 'agent', 'network']);
             })
             ->with('get_site')
             ->with('get_data_leak_feed_one');
@@ -641,9 +641,9 @@ class DarkWebController extends Controller
             $countGroupBy = $countGroupBy->select( 'feel_type',DB::raw('count(*) as total'))->groupBy('feel_type')->get();
             $model = $model->with('get_data_leak_feed_one')->orderBy('id','desc')->paginate(PAGINATE_NUM);
         }else{
-            $Data_leak_feed_all = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->where('feel_type', 'darkweb')->orWhere('feel_type', 'compromise')->orWhere('feel_type', 'webserver')->orWhere('feel_type', 'server')->count();
-            $news = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise','webserver','server']);//->get()
-            $countGroupBy = DataLeakSocialRef::select( 'feel_type',DB::raw('count(*) as total'))->where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise','webserver','server'])->groupBy('feel_type');
+            $Data_leak_feed_all = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server', 'agent', 'network'])->count();
+            $news = DataLeakSocialRef::where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise','webserver','server','agent','network']);//->get()
+            $countGroupBy = DataLeakSocialRef::select( 'feel_type',DB::raw('count(*) as total'))->where('deleted_at', null)->where('status', 1)->whereIn('feel_type', ['darkweb', 'compromise','webserver','server','agent','network'])->groupBy('feel_type');
            
 
             if(Auth::check()) {
@@ -792,6 +792,8 @@ class DarkWebController extends Controller
         $count_sub_type["webserver"] = 0;
         $count_sub_type["darkweb"] = 0;
         $count_sub_type["compromise"] = 0;
+        $count_sub_type["agent"] = 0;
+        $count_sub_type["network"] = 0;
         
         foreach ($countGroupBy as $countGroup) {
             $count_sub_type[$countGroup->feel_type] = $countGroup->total;
@@ -803,6 +805,8 @@ class DarkWebController extends Controller
                 "webserver" => $count_sub_type["webserver"],
                 "darkweb" => $count_sub_type["darkweb"],
                 "compromise" => $count_sub_type["compromise"],
+                "agent" => $count_sub_type["agent"],
+                "network" => $count_sub_type["network"],
             ];
             return response()->json($data); 
         }

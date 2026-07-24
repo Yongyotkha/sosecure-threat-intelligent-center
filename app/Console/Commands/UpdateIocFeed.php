@@ -15,9 +15,9 @@ class UpdateIocFeed extends Command
 
     public function info($string, $verbosity = null)
     {
+        parent::info($string, $verbosity);
         if (strpos($string, 'Starting IoC Feed') !== false || strpos($string, 'Successfully synced') !== false) {
             $timestamp = '[' . date('Y-m-d H:i:s') . '] ';
-            parent::info($timestamp . $string, $verbosity);
             @file_put_contents(storage_path('logs/ioc_feed_update.log'), $timestamp . $string . PHP_EOL, FILE_APPEND);
         }
     }
@@ -63,7 +63,7 @@ class UpdateIocFeed extends Command
             return;
         }
 
-        // ========== STEP 0: Manage Unique Index (Aggressive Cleanup for Dev) ==========
+        // ========== STEP 0: Ensure required indexes ==========
         $this->info("Refreshing unique index structure on target collection...");
         try {
             $indexes = iterator_to_array($targetColl->listIndexes());
@@ -72,22 +72,16 @@ class UpdateIocFeed extends Command
                 $name = $index->getName();
                 if ($name === 'indicator_unique') {
                     $hasUnique = true;
-                } else if ($name !== '_id_') {
-                    $targetColl->dropIndex($name);
-                    $this->info("Dropped old index: $name");
                 }
             }
 
             if (!$hasUnique) {
-                $this->warn("Unique rule not found. Cleaning up all records to enforce uniqueness on 'indicator'...");
-                $targetColl->deleteMany([]); // Clear for a fresh start with the new structure
+                $this->warn("Unique index not found. Creating unique rule on 'indicator'...");
                 $targetColl->createIndex(['indicator' => 1], ['unique' => true, 'name' => 'indicator_unique']);
-                $this->info("Unique index created and collection cleared successfully.");
+                $this->info("Unique index created successfully.");
             }
         } catch (\Exception $e) {
-            $this->warn("Index check failed, attempting fresh start: " . $e->getMessage());
-            $targetColl->deleteMany([]);
-            $targetColl->createIndex(['indicator' => 1], ['unique' => true, 'name' => 'indicator_unique']);
+            $this->warn("Index check failed: " . $e->getMessage());
         }
 
         // ========== STEP 1: Manage Checkpoints (Resume Capability) ==========
@@ -200,6 +194,11 @@ class UpdateIocFeed extends Command
         }
         
         $this->info("Syncing indicators updated since " . ($this->option('all') ? 'All Time' : $label) . "...");
+        $matchedDocuments = $sourceColl->countDocuments($query);
+        $this->info("Source records matched by query: {$matchedDocuments}");
+        if ($matchedDocuments === 0 && !$this->option('all')) {
+            $this->warn('No recent indicators found in delta window. Try: php artisan ioc-feed:update --days=7 or --all');
+        }
 
         $limit = (int) $this->option('limit');
         $options = [
@@ -263,6 +262,7 @@ class UpdateIocFeed extends Command
     {
         $categories = ['all', 'ip_address', 'domain', 'hashfile'];
         $baseDir = base_path('Modules/IocFeed/Exports/');
+        $this->ensureFeedExportIndexes($targetColl);
 
         // Load current whitelist directly from DB for dynamic filtering
         $whitelistDocs = $whitelistColl->find([], ['projection' => ['indicator' => 1]])->toArray();
@@ -277,8 +277,8 @@ class UpdateIocFeed extends Command
             $filename = "{$cat}.csv";
             $filepath = $baseDir . $filename;
             
-            // Default condition: Active and not whitelisted
-            $query = ['status' => 1, 'is_whitelisted' => ['$ne' => true]];
+            // Query only active indicators; whitelist is filtered dynamically below.
+            $query = ['status' => 1];
             if ($cat !== 'all') {
                 $query['type'] = $cat;
             }
@@ -290,7 +290,13 @@ class UpdateIocFeed extends Command
             }
 
             // Get all indicators sorted by latest activity
-            $cursor = $targetColl->find($query, ['sort' => ['timestamp_val' => -1]]);
+            $findOptions = ['sort' => ['timestamp_val' => -1]];
+            if ($cat !== 'all') {
+                $findOptions['hint'] = 'ioc_feed_export_status_type_ts';
+            } else {
+                $findOptions['hint'] = 'ioc_feed_export_status_ts';
+            }
+            $cursor = $targetColl->find($query, $findOptions);
             $count = 1;
             
             foreach ($cursor as $row) {
@@ -319,6 +325,29 @@ class UpdateIocFeed extends Command
             }
             fclose($handle);
             $this->info("Created $filename with " . ($count - 1) . " rows.");
+        }
+    }
+
+    /**
+     * Ensure indexes that match export query + sort pattern to avoid MongoDB sort RAM limit.
+     */
+    private function ensureFeedExportIndexes($targetColl): void
+    {
+        try {
+            // For category-specific export: status + type + sort(timestamp_val desc)
+            $targetColl->createIndex(
+                ['status' => 1, 'type' => 1, 'timestamp_val' => -1],
+                ['name' => 'ioc_feed_export_status_type_ts']
+            );
+
+            // For "all" export (no type filter): status + sort(timestamp_val desc)
+            $targetColl->createIndex(
+                ['status' => 1, 'timestamp_val' => -1],
+                ['name' => 'ioc_feed_export_status_ts']
+            );
+        } catch (\Throwable $e) {
+            // Non-fatal: export can continue, but may still hit sort memory error if index creation fails.
+            $this->warn('Unable to ensure IoC export indexes: ' . $e->getMessage());
         }
     }
 

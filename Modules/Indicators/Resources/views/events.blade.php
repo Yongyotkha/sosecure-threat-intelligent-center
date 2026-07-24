@@ -436,6 +436,37 @@ select.c-tags {
     .dataTables_processing {
         display: none !important;
     }
+
+    #dashboard-stats-area {
+        position: relative;
+    }
+
+    #dashboard-stats-area.is-loading .ev-number,
+    #dashboard-stats-area.is-loading #chart-pack {
+        opacity: 0.35;
+    }
+
+    #dashboard-stats-overlay {
+        display: none;
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.55);
+        font-size: 14px;
+        color: #6b7280;
+        font-weight: 600;
+    }
+
+    #dashboard-stats-area.is-loading #dashboard-stats-overlay {
+        display: flex;
+    }
+
+    #dashboard-stats-overlay .fa-spinner {
+        margin-right: 8px;
+        color: #22c55e;
+    }
     
 
 </style>
@@ -565,7 +596,10 @@ select.c-tags {
                     </div>
                 </section>
 
-                <div class="container-fluid" style="margin-bottom:10px;">
+                <div class="container-fluid is-loading" id="dashboard-stats-area" style="margin-bottom:10px;">
+                    <div id="dashboard-stats-overlay">
+                        <i class="fas fa-spinner fa-spin"></i> Loading statistics...
+                    </div>
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="row">
@@ -576,11 +610,11 @@ select.c-tags {
                                         </div>
                                         <div class="card-ev-body-custom">
                                             <div class="ev-stat-box">
-                                                <span class="ev-number cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->event_count : $attr_current['event_count']) }}</span>
+                                                <span id="stat_new_event" class="ev-number cl-orange">—</span>
                                                 <span class="ev-label">New Event</span>
                                             </div>
                                             <div class="ev-stat-box">
-                                                <span class="ev-number">{{ @number_format(TYPE_WEB == 'center' ? $attr_all->event_count : $attr_all['event_count']) }}</span>
+                                                <span id="stat_all_event" class="ev-number">—</span>
                                                 <span class="ev-label">All</span>
                                             </div>
                                         </div>
@@ -593,11 +627,11 @@ select.c-tags {
                                         </div>
                                         <div class="card-ev-body-custom">
                                             <div class="ev-stat-box">
-                                                <span class="ev-number cl-orange">{{ @number_format(TYPE_WEB == 'center' ? $attr_current->attribute_count : $attr_current['attribute_count']) }}</span>
+                                                <span id="stat_new_attribute" class="ev-number cl-orange">—</span>
                                                 <span class="ev-label">New Attribute</span>
                                             </div>
                                             <div class="ev-stat-box">
-                                                <span class="ev-number">{{ @number_format(TYPE_WEB == 'center' ? $attr_all->attribute_count : $attr_all['attribute_count']) }}</span>
+                                                <span id="stat_all_attribute" class="ev-number">—</span>
                                                 <span class="ev-label">All</span>
                                             </div>
                                         </div>
@@ -918,12 +952,98 @@ select.c-tags {
             var end_date = '';
             var f_search = 1;
             var event_name = '';
+            var keyword_search = '';
             var count_page = -1;
             var isDateSearch = 0;
             var datatable = [];
             var check_published = null;
             var industries = "";
             var group = "";
+            var dashboardChart = null;
+
+            function formatDashboardNumber(value) {
+                if (value === null || value === undefined || value === '') {
+                    return '—';
+                }
+                return Number(value).toLocaleString();
+            }
+
+            function setDashboardLoading(isLoading) {
+                $('#dashboard-stats-area').toggleClass('is-loading', !!isLoading);
+            }
+
+            function renderDashboardStats(payload) {
+                if (!payload) {
+                    return;
+                }
+
+                var attrAll = payload.attr_all || {};
+                var attrCurrent = payload.attr_current || {};
+
+                $('#stat_new_event').text(formatDashboardNumber(attrCurrent.event_count));
+                $('#stat_all_event').text(formatDashboardNumber(attrAll.event_count));
+                $('#stat_new_attribute').text(formatDashboardNumber(attrCurrent.attribute_count));
+                $('#stat_all_attribute').text(formatDashboardNumber(attrAll.attribute_count));
+
+                if (dashboardChart) {
+                    dashboardChart.update({
+                        series: payload.attr_type || []
+                    }, true, true);
+                }
+            }
+
+            function getDashboardFilterParams() {
+                var params = {};
+                var keywords = $('#event_name').val();
+                var keywordSearch = $('#keyword_search').val();
+
+                if (keywords) {
+                    params.keywords = keywords;
+                }
+                if (keywordSearch) {
+                    params.keyword_search = keywordSearch;
+                }
+                if (industries) {
+                    params.industries = industries;
+                }
+                if (group) {
+                    params.groups = group;
+                }
+                if (check_published) {
+                    params.check_published = check_published;
+                }
+                if (isDateSearch) {
+                    var picker = $('#event_date').data('daterangepicker');
+                    if (picker && picker.startDate && picker.endDate) {
+                        params.isDateSearch = 1;
+                        params.startDate = picker.startDate.format('YYYY-MM-DD hh:mm A');
+                        params.endDate = picker.endDate.format('YYYY-MM-DD hh:mm A');
+                    }
+                }
+
+                return params;
+            }
+
+            function load_dashboard_stats() {
+                setDashboardLoading(true);
+
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{{ route('indicators.dashboard_stats') }}",
+                    type: 'get',
+                    data: getDashboardFilterParams(),
+                }).done(function(response) {
+                    if (response.status_code === '00') {
+                        renderDashboardStats(response.data);
+                    }
+                }).fail(function() {
+                    console.log('Failed to load dashboard statistics');
+                }).always(function() {
+                    setDashboardLoading(false);
+                });
+            }
 
             $(".check_published").click(function() {
                 check_published = $(this).val();
@@ -933,7 +1053,8 @@ select.c-tags {
             $(function() {
                 load_industries();
                 load_group();
-                var chart = new Highcharts.chart('chart-pack', {
+                load_dashboard_stats();
+                dashboardChart = new Highcharts.chart('chart-pack', {
                     chart: {
                         type: 'bar',
                         height: '251px'
@@ -959,7 +1080,7 @@ select.c-tags {
                             stacking: 'normal'
                         }
                     },
-                    series: load_graph()
+                    series: []
                 });
 
                 var start = moment().startOf('day'); 
@@ -1017,7 +1138,10 @@ select.c-tags {
                 $("#btn_search_data").click(function() {
                     {{-- console.log(startDate.format('YYYY-MM-DD hh:mm A')); --}}
 
-
+                    const dateLabel = $('#event_date span').text().trim();
+                    if (dateLabel !== 'Please select date range' && dateLabel !== 'Select date range') {
+                        isDateSearch = 1;
+                    }
 
                     start_date = startDate;
                     end_date = endDate;
@@ -1035,7 +1159,13 @@ select.c-tags {
                     $(".btn-grey").removeClass("active");
                     $("#all").addClass("active");
                     $("#keyword_search").val('');
+                    industries = "";
+                    group = "";
+                    isDateSearch = 0;
+                    event_name = '';
+                    keyword_search = '';
                      clearDateToEmpty();
+                    load_dashboard_stats();
                     load_table(1);
                 });
                 
@@ -1592,6 +1722,7 @@ select.c-tags {
             }
 
             function search_table(page = 1) {
+                load_dashboard_stats();
                 loading('load');
                 
                 let startDate = $("#event_date").data('daterangepicker').startDate.format('YYYY-MM-DD hh:mm A');
@@ -1938,11 +2069,8 @@ select.c-tags {
 
             }
 
-            function load_graph() {
-
-                var graph = {!! json_encode(@$attr_type) !!};
-                return graph;
-
+            function load_graph(series) {
+                return series || [];
             }
 
             function load_industries() {

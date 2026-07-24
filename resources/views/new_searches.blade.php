@@ -967,6 +967,7 @@ $(function(){
                             loadSearchAPI('threatfox');
                             loadSearchAPI('rstcloud');
                             loadSearchAPI('internal_events');
+                            loadSearchAPI('calculate_risk');
 
                             $('#otx_indicators_loadspinner_basic_info').show();
                             $('#otx_indicators_loadspinner_basic_info_table').show();
@@ -1693,6 +1694,7 @@ function loadMalware(){
                             loadSearchAPI('threatfox');
                             loadSearchAPI('rstcloud');
                             loadSearchAPI('internal_events');
+                            loadSearchAPI('calculate_risk');
 
                             $('#otx_indicators_loadspinner_basic_info').show();
                             $('#otx_indicators_loadspinner_basic_info_table').show();
@@ -1873,67 +1875,6 @@ function loadMalware(){
         if (value !== undefined) {
             threatScores[source] = value;
         }
-
-        let allFinished = true;
-        for (let i = 0; i < expectedSources.length; i++) {
-            if (!completedSources.includes(expectedSources[i])) {
-                allFinished = false;
-                break;
-            }
-        }
-
-        if (allFinished) {
-            calculateWeightedScore();
-        }
-    }
-
-    function calculateWeightedScore() {
-        let typeLower = $('#type_search').text() ? $('#type_search').text().toLowerCase() : '';
-        
-        let activeWeights = {
-            vt: WEIGHTS_JS.vt,
-            tf: WEIGHTS_JS.tf,
-            otx: WEIGHTS_JS.otx,
-            rst: WEIGHTS_JS.rst
-        };
-        
-        if (typeLower === 'ip') {
-            activeWeights.abuse = WEIGHTS_JS.abuse;
-        } else {
-            activeWeights.vt += WEIGHTS_JS.abuse;
-        }
-
-        let scores = {
-            vt: threatScores.virustotal || 0,
-            tf: threatScores.threatfox || 0,
-            otx: threatScores.otx_indicators || 0,
-            rst: threatScores.rstcloud || 0
-        };
-        if (typeLower === 'ip') {
-            scores.abuse = threatScores.abuseipdb || 0;
-        }
-
-        let totalWeight = 0;
-        let weightedSum = 0;
-
-        for (let key in activeWeights) {
-            let score = scores[key];
-            if (score === -1 || score === undefined) {
-                continue;
-            }
-            if (key === 'rst' && score === 0) {
-                continue; 
-            }
-            totalWeight += activeWeights[key];
-            weightedSum += score * activeWeights[key];
-        }
-
-        let finalScore = 0;
-        if (totalWeight > 0) {
-            finalScore = Math.round(weightedSum / totalWeight);
-        }
-
-        renderOverallStatus(finalScore);
     }
 
     function renderOverallStatus(finalScore) {
@@ -3106,6 +3047,12 @@ $.ajax({
             click_rstcloud();
             checkAndCalculateRisk('rstcloud', rstScore);
         }
+    }else if(source == 'calculate_risk'){
+        if(res.status_code == 200 && res.data && res.data.total_score !== undefined){
+            renderOverallStatus(res.data.total_score);
+        } else {
+            $('#text_status_risk').html('<span class="label label-secondary">Unable to calculate risk</span>');
+        }
     }else if(source == 'internal_events'){
         if(res.status_code == 200 && res.data && res.data.length > 0) {
             $('.table-internal-events').show();
@@ -3151,6 +3098,9 @@ $.ajax({
         if (source === 'abuseipdb') $('.load-abuseipdb').remove();
         if (source === 'threatfox') $('.load-threatfox').remove();
         if (source === 'rstcloud') $('.load-rstcloud').remove();
+        if (source === 'calculate_risk') {
+            $('#text_status_risk').html('<span class="label label-secondary">Unable to calculate risk</span>');
+        }
         if (source === 'otx_indicators') {
             $('.load-otx_indicators').remove();
             $('#not-otx').show();

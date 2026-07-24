@@ -67,6 +67,10 @@
 .hp-globe-loader.backdrop-loader { background: rgba(2, 6, 23, 0.72); }
 .hp-globe-loader .loadding-text { color: #cbd5e1; }
 .hp-time { font-size: 13px; color: #777; }
+.hp-table-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 8px 15px 12px; }
+.hp-table-footer #hp-recent-logs-showing { margin: 0; line-height: 34px; white-space: nowrap; }
+.hp-table-footer #hp-recent-logs-pagination { margin: 0; }
+.hp-table-footer #hp-recent-logs-pagination .pagination { margin: 0; }
 </style>
 @endpush
 
@@ -309,7 +313,7 @@
 
             <div class="hp-card" style="padding:0;overflow:hidden;">
                 <div style="padding:16px 24px;border-bottom:1px solid #f1f5f9;background:#fafafa;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                    <h3 class="hp-card-title" style="margin:0;">Recent Event Logs (Last 10)</h3>
+                    <h3 class="hp-card-title" style="margin:0;">Event Logs</h3>
                     <span class="hp-note" id="hp-recent-meta">Site: {{ e($selectedSiteLabel) }} · Agent: {{ e($selected_agent_label ?? 'All Agents') }} · Window: —</span>
                 </div>
                 <div class="hp-table-wrap hp-load-wrap" style="overflow-x:auto;">
@@ -333,6 +337,10 @@
                             <tr><td colspan="5" class="hp-empty">—</td></tr>
                         </tbody>
                     </table>
+                </div>
+                <div class="hp-table-footer clearfix">
+                    <div id="hp-recent-logs-showing"></div>
+                    <div id="hp-recent-logs-pagination"></div>
                 </div>
             </div>
 
@@ -367,6 +375,8 @@
     var typesChart = null;
     var currentWindowLabel = 'Today';
     var loadToken = 0;
+    var recentLogsPage = 1;
+    var recentLogsPagination = { page: 1, per_page: 25, total: 0, total_pages: 0 };
     var tickFont = { size: 12, weight: 'normal' };
     var chartDefaults = {
         responsive: true,
@@ -459,8 +469,13 @@
         return params;
     }
 
-    function sectionUrl(section) {
+    function sectionUrl(section, extraParams) {
         var params = buildFilterParams();
+        if (extraParams) {
+            Object.keys(extraParams).forEach(function (key) {
+                params.set(key, String(extraParams[key]));
+            });
+        }
         return sectionUrlTemplate.replace('__SECTION__', encodeURIComponent(section)) + '?' + params.toString();
     }
 
@@ -519,8 +534,8 @@
         });
     }
 
-    async function fetchSection(section) {
-        var response = await fetch(sectionUrl(section), { credentials: 'same-origin' });
+    async function fetchSection(section, extraParams) {
+        var response = await fetch(sectionUrl(section, extraParams), { credentials: 'same-origin' });
         if (!response.ok) {
             throw new Error('Failed to load ' + section);
         }
@@ -775,6 +790,153 @@
         }).join('');
     }
 
+    function buildRecentLogsPaginationHtml(page, totalPages) {
+        if (totalPages <= 1) {
+            return '';
+        }
+
+        var previousPage = page - 1;
+        var nextPage = page + 1;
+        var secondLast = totalPages - 1;
+        var adjacents = 2;
+        var counter;
+        var html = '<nav><ul class="pagination">';
+
+        if (page > 1) {
+            html += '<li onclick="hpRecentLogsGoto(1)" data-page="1"><a href="#">First Page</a></li>';
+        }
+
+        html += '<li onclick="hpRecentLogsGoto(' + previousPage + ')" data-page="' + previousPage + '"';
+        if (page <= 1) {
+            html += ' class="disabled"';
+        }
+        html += '><a';
+        if (page > 1) {
+            html += ' href="#"';
+        }
+        html += '>Previous</a></li>';
+
+        if (totalPages <= 10) {
+            for (counter = 1; counter <= totalPages; counter++) {
+                if (counter === page) {
+                    html += '<li class="active"><a>' + counter + '</a></li>';
+                } else {
+                    html += '<li onclick="hpRecentLogsGoto(' + counter + ')" data-page="' + counter + '"><a href="#">' + counter + '</a></li>';
+                }
+            }
+        } else if (page <= 4) {
+            for (counter = 1; counter < 8; counter++) {
+                if (counter === page) {
+                    html += '<li class="active"><a>' + counter + '</a></li>';
+                } else {
+                    html += '<li onclick="hpRecentLogsGoto(' + counter + ')" data-page="' + counter + '"><a href="#">' + counter + '</a></li>';
+                }
+            }
+            html += '<li><a>...</a></li>';
+            html += '<li onclick="hpRecentLogsGoto(' + secondLast + ')" data-page="' + secondLast + '"><a href="#">' + secondLast + '</a></li>';
+            html += '<li onclick="hpRecentLogsGoto(' + totalPages + ')" data-page="' + totalPages + '"><a href="#">' + totalPages + '</a></li>';
+        } else if (page > 4 && page < totalPages - 4) {
+            html += '<li onclick="hpRecentLogsGoto(1)" data-page="1"><a href="#">1</a></li>';
+            html += '<li onclick="hpRecentLogsGoto(2)" data-page="2"><a href="#">2</a></li>';
+            html += '<li><a>...</a></li>';
+            for (counter = page - adjacents; counter <= page + adjacents; counter++) {
+                if (counter === page) {
+                    html += '<li class="active"><a>' + counter + '</a></li>';
+                } else {
+                    html += '<li onclick="hpRecentLogsGoto(' + counter + ')" data-page="' + counter + '"><a href="#">' + counter + '</a></li>';
+                }
+            }
+            html += '<li><a>...</a></li>';
+            html += '<li onclick="hpRecentLogsGoto(' + secondLast + ')" data-page="' + secondLast + '"><a href="#">' + secondLast + '</a></li>';
+            html += '<li onclick="hpRecentLogsGoto(' + totalPages + ')" data-page="' + totalPages + '"><a href="#">' + totalPages + '</a></li>';
+        } else {
+            html += '<li onclick="hpRecentLogsGoto(1)" data-page="1"><a href="#">1</a></li>';
+            html += '<li onclick="hpRecentLogsGoto(2)" data-page="2"><a href="#">2</a></li>';
+            html += '<li><a>...</a></li>';
+            for (counter = totalPages - 6; counter <= totalPages; counter++) {
+                if (counter === page) {
+                    html += '<li class="active"><a>' + counter + '</a></li>';
+                } else {
+                    html += '<li onclick="hpRecentLogsGoto(' + counter + ')" data-page="' + counter + '"><a href="#">' + counter + '</a></li>';
+                }
+            }
+        }
+
+        html += '<li onclick="hpRecentLogsGoto(' + nextPage + ')" data-page="' + nextPage + '"';
+        if (page >= totalPages) {
+            html += ' class="disabled"';
+        }
+        html += '><a';
+        if (page < totalPages) {
+            html += ' href="#"';
+        }
+        html += '>Next</a></li>';
+
+        if (page < totalPages) {
+            html += '<li onclick="hpRecentLogsGoto(' + totalPages + ')" data-page="' + totalPages + '"><a href="#">Last &rsaquo;&rsaquo;</a></li>';
+        }
+
+        html += '</ul></nav>';
+        return html;
+    }
+
+    function renderRecentLogsPagination(pagination) {
+        var showingEl = document.getElementById('hp-recent-logs-showing');
+        var paginationEl = document.getElementById('hp-recent-logs-pagination');
+        if (!showingEl || !paginationEl) {
+            return;
+        }
+
+        recentLogsPagination = pagination || { page: 1, per_page: 25, total: 0, total_pages: 0 };
+        recentLogsPage = recentLogsPagination.page || 1;
+
+        var total = recentLogsPagination.total || 0;
+        if (total <= 0) {
+            showingEl.textContent = '';
+            paginationEl.innerHTML = '';
+            return;
+        }
+
+        var page = recentLogsPagination.page || 1;
+        var perPage = recentLogsPagination.per_page || 25;
+        var totalPages = recentLogsPagination.total_pages || 1;
+        var from = ((page - 1) * perPage) + 1;
+        var to = Math.min(page * perPage, total);
+
+        showingEl.textContent = 'Showing ' + formatNumber(from) + ' to ' + formatNumber(to) + ' of ' + formatNumber(total) + ' entries';
+        paginationEl.innerHTML = buildRecentLogsPaginationHtml(page, totalPages);
+    }
+
+    function loadRecentLogs(page, requestToken, finishApplyLoading) {
+        var token = requestToken !== undefined ? requestToken : loadToken;
+        recentLogsPage = Math.max(1, page || 1);
+        showSectionLoader('recent-logs');
+
+        return fetchSection('recent-logs', { page: recentLogsPage }).then(function (data) {
+            if (token !== loadToken) {
+                return;
+            }
+            if (data.window_label) {
+                updateWindowTags(data.window_label);
+            }
+            renderRecentLogs(data.recent_logs || []);
+            renderRecentLogsPagination(data.pagination || null);
+        }).catch(function () {
+            if (token !== loadToken) {
+                return;
+            }
+            renderRecentLogs([]);
+            renderRecentLogsPagination(null);
+        }).finally(function () {
+            if (token === loadToken) {
+                hideSectionLoader('recent-logs');
+                if (finishApplyLoading) {
+                    setApplyLoading(false);
+                }
+            }
+        });
+    }
+
     function updateWindowTags(windowLabel) {
         currentWindowLabel = windowLabel || currentWindowLabel;
         var windowTag = document.getElementById('hp-window-tag');
@@ -804,6 +966,7 @@
 
     function loadDashboardSections() {
         var token = ++loadToken;
+        recentLogsPage = 1;
         setApplyLoading(true);
         setStatsLoading();
         showAllSectionLoaders();
@@ -896,21 +1059,7 @@
             }
         });
 
-        fetchSection('recent-logs').then(function (data) {
-            if (token !== loadToken) return;
-            if (data.window_label) {
-                updateWindowTags(data.window_label);
-            }
-            renderRecentLogs(data.recent_logs || []);
-        }).catch(function () {
-            if (token !== loadToken) return;
-            renderRecentLogs([]);
-        }).finally(function () {
-            if (token === loadToken) {
-                hideSectionLoader('recent-logs');
-                setApplyLoading(false);
-            }
-        });
+        loadRecentLogs(1, token, true);
     }
 
     function geoUrl(ip) {
@@ -1000,6 +1149,17 @@
             hideSectionLoader('globe');
         }
     }
+
+    window.hpRecentLogsGoto = function (page) {
+        page = parseInt(page, 10);
+        if (!page || page < 1) {
+            return;
+        }
+        if (page > (recentLogsPagination.total_pages || 1)) {
+            return;
+        }
+        loadRecentLogs(page, loadToken, false);
+    };
 
     if (filterForm) {
         filterForm.addEventListener('submit', function (event) {

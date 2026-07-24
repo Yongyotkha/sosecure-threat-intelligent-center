@@ -353,79 +353,75 @@ class PhishingDetectionController extends Controller
 
     public function data_chart_timeline(Request $request)
     {
-        $input = $request->all();
         $site_id = $request->site_id;
         $filter_url = @$request->filter_url;
         $filter_ip = @$request->filter_ip;
         $filter_serverity = @$request->filter_serverity;
         $filter_type = @$request->filter_type;
-        // $start_date_input = $request->start_date;
-        // $end_date_input = $request->end_date;
-        $data = [];
+        $displayType = @$request->displayType ?: 'day';
+        $data = ['day' => [], 'date' => [], 'count' => []];
 
-        // dd($input);
-
-        // // $start_date_input = date("Y-m-d", strtotime("+1 day", strtotime($start_date_input)));
-        // if($start_date_input == null && $end_date_input == null)
-        // {
-            $end_date_input = date('Y-m-d');
-            $start_date_input = date("Y-m-d", strtotime("-30 day", strtotime($end_date_input)));
-        // }
-
-        $start_date = date('Y-m-d', strtotime($start_date_input));
-        $end_date = date('Y-m-d', strtotime($end_date_input));
-        
-        $Variable1 = strtotime($start_date);
-        $Variable2 = strtotime($end_date);
-        
-        for ($currentDate = $Variable1; $currentDate <= $Variable2; $currentDate += (86400)) {
-                                            
-            $Store = date('Y-m-d', $currentDate);
-            $Store2 = date("Y-m-d", strtotime("+1 day", strtotime($Store)));
-            
-            $day = explode('-', $Store);
-
-            $query_timeline = LogPhishing::
-                // where('status', '1')
-                where(function ($query) use ($site_id){
-                    if($site_id)
-                    {
+        $applyFilters = function ($query) use ($site_id, $filter_url, $filter_ip, $filter_serverity, $filter_type) {
+            return $query
+                ->where(function ($query) use ($site_id) {
+                    if ($site_id) {
                         $query->where('site_id', $site_id);
                     }
                 })
-                ->where(function ($query) use ($filter_url){
-                    if($filter_url)
-                    {
+                ->where(function ($query) use ($filter_url) {
+                    if ($filter_url) {
                         $query->where('url', 'like', '%'.$filter_url.'%');
                     }
                 })
-                ->where(function ($query) use ($filter_ip){
-                    if($filter_ip)
-                    {
+                ->where(function ($query) use ($filter_ip) {
+                    if ($filter_ip) {
                         $query->where('ip', 'like', '%'.$filter_ip.'%');
                     }
                 })
-                ->where(function ($query) use ($filter_serverity){
-                    if($filter_serverity)
-                    {
+                ->where(function ($query) use ($filter_serverity) {
+                    if ($filter_serverity) {
                         $query->where('serverity', $filter_serverity);
                     }
                 })
-                ->where(function ($query) use ($filter_type){
-                    if($filter_type)
-                    {
+                ->where(function ($query) use ($filter_type) {
+                    if ($filter_type) {
                         $query->where('type', $filter_type);
                     }
                 })
-                ->whereNull('deleted_at')
-                ->whereBetween('created_at', [$Store.' 00:00:00', $Store.' 23:59:59'])
-                ->get();
+                ->whereNull('deleted_at');
+        };
 
-            $count = count($query_timeline);
+        if ($displayType === 'month') {
+            for ($i = 11; $i >= 0; $i--) {
+                $monthStart = date('Y-m-01', strtotime("-$i months"));
+                $monthEnd = date('Y-m-t', strtotime($monthStart));
 
-            $data['day'][] = $day[2];
-            $data['date'][] = $Store;
-            $data['count'][] = $count;
+                $count = $applyFilters(LogPhishing::query())
+                    ->whereBetween('created_at', [$monthStart.' 00:00:00', $monthEnd.' 23:59:59'])
+                    ->count();
+
+                $data['day'][] = date('M Y', strtotime($monthStart));
+                $data['date'][] = $monthStart;
+                $data['count'][] = $count;
+            }
+        } else {
+            $end_date_input = date('Y-m-d');
+            $start_date_input = date('Y-m-d', strtotime('-30 day', strtotime($end_date_input)));
+            $start_date = date('Y-m-d', strtotime($start_date_input));
+            $end_date = date('Y-m-d', strtotime($end_date_input));
+
+            for ($currentDate = strtotime($start_date); $currentDate <= strtotime($end_date); $currentDate += 86400) {
+                $store = date('Y-m-d', $currentDate);
+                $day = explode('-', $store);
+
+                $count = $applyFilters(LogPhishing::query())
+                    ->whereBetween('created_at', [$store.' 00:00:00', $store.' 23:59:59'])
+                    ->count();
+
+                $data['day'][] = $day[2];
+                $data['date'][] = $store;
+                $data['count'][] = $count;
+            }
         }
 
         return response()->json($data);

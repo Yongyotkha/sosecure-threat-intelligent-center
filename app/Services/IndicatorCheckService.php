@@ -44,6 +44,26 @@ class IndicatorCheckService
         "vt" => 0.35, "abuse" => 0.20, "tf" => 0.10, "otx" => 0.25, "rst" => 0.10
     ];
 
+    public static function normalizeIocType($type)
+    {
+        $map = [
+            'IP' => 'ip',
+            'Domain' => 'domain',
+            'URL' => 'url',
+            'MD5' => 'md5',
+            'SHA1' => 'sha1',
+            'SHA256' => 'sha256',
+        ];
+
+        if (isset($map[$type])) {
+            return $map[$type];
+        }
+
+        $normalized = strtolower((string) $type);
+
+        return $normalized !== '' ? $normalized : 'unknown';
+    }
+
     /**
      * Check a single IOC asynchronously
      * Returns a Promise that resolves to the result array

@@ -19,11 +19,11 @@
 
                     @endif
                     @else
-                    {{-- <option value="0" selected>All Site</option> --}}
+                    <option value="0" selected data-site_id="0">All Site</option>
                     @if ($site_settings)
 
                     @foreach ($site_settings as $site_settings)
-                    <option value="{{$site_settings->code}}">{{$site_settings->name}}
+                    <option value="{{$site_settings->code}}" data-site_id="{{ $site_settings->code }}">{{$site_settings->name}}
                     </option>
                     @endforeach
 

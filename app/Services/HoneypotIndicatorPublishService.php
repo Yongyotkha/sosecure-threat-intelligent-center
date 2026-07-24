@@ -98,10 +98,11 @@ class HoneypotIndicatorPublishService
         $timezone = new \DateTimeZone('Asia/Bangkok');
         $start = new \DateTimeImmutable($date . ' 00:00:00', $timezone);
         $end = new \DateTimeImmutable($date . ' 23:59:59', $timezone);
+        [$queryStart, $queryEnd] = HoneypotTimestamp::queryBoundsForLegacyStorage($start, $end);
 
         return [
-            'start' => new UTCDateTime($start->getTimestamp() * 1000),
-            'end' => new UTCDateTime($end->getTimestamp() * 1000),
+            'start' => new UTCDateTime($queryStart->getTimestamp() * 1000),
+            'end' => new UTCDateTime($queryEnd->getTimestamp() * 1000),
             'start_dt' => $start,
             'end_dt' => $end,
         ];
@@ -127,6 +128,9 @@ class HoneypotIndicatorPublishService
                     'threats' => ['$addToSet' => '$threat_name'],
                     'severities' => ['$addToSet' => '$severity'],
                     'site_ids' => ['$addToSet' => '$site_id'],
+                    'header_user_agents' => ['$addToSet' => '$raw_details.header_user_agent'],
+                    'detail_user_agents' => ['$addToSet' => '$raw_details.user_agent'],
+                    'attacker_types' => ['$addToSet' => '$raw_details.attacker_type'],
                     'first_seen' => ['$min' => '$timestamp'],
                     'last_seen' => ['$max' => '$timestamp'],
                 ],
@@ -145,12 +149,26 @@ class HoneypotIndicatorPublishService
                 continue;
             }
 
+            $severities = $this->normalizeStringList($document['severities'] ?? []);
+            $maxSeverity = $this->resolveMaxSeverity($severities);
+            $scoreMap = $this->severityToAttribute($maxSeverity);
+            $userAgents = array_values(array_unique(array_merge(
+                $this->normalizeStringList($document['header_user_agents'] ?? []),
+                $this->normalizeStringList($document['detail_user_agents'] ?? [])
+            )));
+            $attackerTypes = $this->normalizeStringList($document['attacker_types'] ?? []);
+            $attributeTags = $this->deriveAttributeTags($userAgents, $attackerTypes);
+
             $rows[] = [
                 'ip' => $ip,
                 'type' => $this->resolveIpType($ip),
                 'hit_count' => (int) ($document['hit_count'] ?? 0),
                 'threats' => $this->normalizeStringList($document['threats'] ?? []),
-                'severities' => $this->normalizeStringList($document['severities'] ?? []),
+                'severities' => $severities,
+                'max_severity' => $maxSeverity,
+                'attribute_score' => $scoreMap['score'],
+                'attribute_serverity' => $scoreMap['severity'],
+                'attribute_tags' => $attributeTags,
                 'site_ids' => $this->normalizeIntList($document['site_ids'] ?? []),
                 'first_seen' => $document['first_seen'] ?? null,
                 'last_seen' => $document['last_seen'] ?? null,
@@ -222,12 +240,12 @@ class HoneypotIndicatorPublishService
 
     protected function buildEventTags(): string
     {
-        return 'honeypot';
+        return 'honeypot,TXEC';
     }
 
     protected function creatorOrg(): string
     {
-        return (string) config('honeypot.indicator_publish.creator_org', 'Threat inSights');
+        return (string) config('honeypot.indicator_publish.creator_org', 'TXEC');
     }
 
     protected function indicatorIsPublic(): int
@@ -341,6 +359,25 @@ class HoneypotIndicatorPublishService
                 ],
             ];
 
+            $refSet = [
+                'pulse_modified' => $row['last_seen'] instanceof UTCDateTime ? $row['last_seen'] : $dateNow,
+                'role' => 'attacker',
+                'created' => $row['first_seen'] instanceof UTCDateTime ? $row['first_seen'] : $dateNow,
+                'expiration' => null,
+                'is_active' => 1,
+                'status' => 1,
+                'attribute_score' => (string) ($row['attribute_score'] ?? '0'),
+                'attribute_serverity' => (string) ($row['attribute_serverity'] ?? 'Informational'),
+                'updated_at' => $dateNow,
+                'updated_by' => 'system',
+            ];
+
+            // Attribute tags only when derived (human/automated/tool); omit field if unknown.
+            $attributeTags = trim((string) ($row['attribute_tags'] ?? ''));
+            if ($attributeTags !== '') {
+                $refSet['tags'] = $attributeTags;
+            }
+
             $opsRef[] = [
                 'updateOne' => [
                     [
@@ -348,17 +385,8 @@ class HoneypotIndicatorPublishService
                         'pulse_id' => $pulseId,
                     ],
                     [
-                        '$set' => [
-                            'pulse_modified' => $row['last_seen'] instanceof UTCDateTime ? $row['last_seen'] : $dateNow,
-                            'role' => 'attacker',
-                            'created' => $row['first_seen'] instanceof UTCDateTime ? $row['first_seen'] : $dateNow,
-                            'expiration' => null,
-                            'is_active' => 1,
-                            'updated_at' => $dateNow,
-                            'updated_by' => 'system',
-                        ],
+                        '$set' => $refSet,
                         '$setOnInsert' => [
-                            'status' => 1,
                             'created_at' => $dateNow,
                             'created_by' => 'system',
                             'deleted_at' => null,
@@ -408,7 +436,7 @@ class HoneypotIndicatorPublishService
             ['pulse_id' => $pulseId],
             [
                 '$set' => [
-                    'name' => 'Honeypot Threat Intelligence - ' . $displayDate,
+                    'name' => 'Honeypot Thailand TXEC - ' . $displayDate,
                     'description' => 'Daily aggregated honeypot attacker IPs for ' . $displayDate . '. Customer site details are not disclosed.',
                     'modified' => $activity['modified'],
                     'created' => $activity['created'],
@@ -501,17 +529,14 @@ class HoneypotIndicatorPublishService
 
     protected function normalizeStringList($values): array
     {
-        if ($values instanceof \Traversable) {
-            $values = iterator_to_array($values);
-        }
-
-        if (!is_array($values)) {
+        $values = $this->mongoListToArray($values);
+        if ($values === []) {
             return [];
         }
 
         $normalized = [];
         foreach ($values as $value) {
-            $value = trim((string) $value);
+            $value = $this->mongoValueToString($value);
             if ($value !== '') {
                 $normalized[] = $value;
             }
@@ -522,16 +547,16 @@ class HoneypotIndicatorPublishService
 
     protected function normalizeIntList($values): array
     {
-        if ($values instanceof \Traversable) {
-            $values = iterator_to_array($values);
-        }
-
-        if (!is_array($values)) {
+        $values = $this->mongoListToArray($values);
+        if ($values === []) {
             return [];
         }
 
         $normalized = [];
         foreach ($values as $value) {
+            if (is_object($value) && !($value instanceof \Stringable)) {
+                continue;
+            }
             $value = (int) $value;
             if ($value > 0) {
                 $normalized[] = $value;
@@ -541,6 +566,49 @@ class HoneypotIndicatorPublishService
         return array_values(array_unique($normalized));
     }
 
+    /**
+     * Flatten Mongo aggregation $addToSet results (BSONArray / nested lists) into a plain PHP array.
+     */
+    protected function mongoListToArray($values): array
+    {
+        if ($values instanceof \MongoDB\Model\BSONArray || $values instanceof \MongoDB\Model\BSONDocument) {
+            $values = $values->getArrayCopy();
+        } elseif ($values instanceof \Traversable) {
+            $values = iterator_to_array($values);
+        }
+
+        if (!is_array($values)) {
+            return [];
+        }
+
+        return $values;
+    }
+
+    /**
+     * Safely stringify Mongo scalar-ish values; skip BSONArray/Document to avoid cast fatals.
+     */
+    protected function mongoValueToString($value): string
+    {
+        if ($value === null) {
+            return '';
+        }
+
+        if (is_string($value)) {
+            return trim($value);
+        }
+
+        if (is_int($value) || is_float($value) || is_bool($value)) {
+            return trim((string) $value);
+        }
+
+        if ($value instanceof \Stringable) {
+            return trim((string) $value);
+        }
+
+        // Nested BSONArray / object from aggregation — not a usable tag/UA scalar.
+        return '';
+    }
+
     protected function formatMongoDate($value): string
     {
         if ($value instanceof UTCDateTime) {
@@ -548,5 +616,163 @@ class HoneypotIndicatorPublishService
         }
 
         return '';
+    }
+
+    /**
+     * Pick the highest alert severity from a day's set for one IP.
+     * Order: Critical > High > Medium > Low > Info/Informational.
+     */
+    protected function resolveMaxSeverity(array $severities): string
+    {
+        $max = 'informational';
+        $maxRank = -1;
+
+        foreach ($severities as $severity) {
+            $normalized = $this->normalizeSeverity($this->mongoValueToString($severity));
+            $rank = $this->severityRank($normalized);
+            if ($rank > $maxRank) {
+                $maxRank = $rank;
+                $max = $normalized;
+            }
+        }
+
+        return $max;
+    }
+
+    protected function normalizeSeverity(string $severity): string
+    {
+        $value = strtolower(trim($severity));
+
+        if (in_array($value, ['critical', 'crit'], true)) {
+            return 'critical';
+        }
+        if (in_array($value, ['high'], true)) {
+            return 'high';
+        }
+        if (in_array($value, ['medium', 'med'], true)) {
+            return 'medium';
+        }
+        if (in_array($value, ['low'], true)) {
+            return 'low';
+        }
+        if (in_array($value, ['very low', 'verylow', 'very_low'], true)) {
+            return 'very_low';
+        }
+
+        // Info / Informational / unknown → informational
+        return 'informational';
+    }
+
+    protected function severityRank(string $normalized): int
+    {
+        return [
+            'critical' => 5,
+            'high' => 4,
+            'medium' => 3,
+            'low' => 2,
+            'very_low' => 1,
+            'informational' => 0,
+        ][$normalized] ?? 0;
+    }
+
+    /**
+     * Map honeypot/alert severity onto OTX indicator bands (0-10 / 6 levels).
+     * Uses representative scores inside each IndicatorCheckService band.
+     *
+     * @return array{score: string, severity: string}
+     */
+    protected function severityToAttribute(string $normalized): array
+    {
+        $map = [
+            'critical' => ['score' => '9', 'severity' => 'Critical'],
+            'high' => ['score' => '7', 'severity' => 'High'],
+            'medium' => ['score' => '4', 'severity' => 'Medium'],
+            'low' => ['score' => '2', 'severity' => 'Low'],
+            'very_low' => ['score' => '1', 'severity' => 'Very Low'],
+            'informational' => ['score' => '0', 'severity' => 'Informational'],
+        ];
+
+        return $map[$normalized] ?? $map['informational'];
+    }
+
+    /**
+     * Build attribute tags only from evidence we already have.
+     * - explicit raw_details.attacker_type → actor:human / actor:automated
+     * - known tool / scanner UA → actor:automated + tool:<name>
+     * Returns empty string when nothing can be inferred (caller omits tags field).
+     */
+    protected function deriveAttributeTags(array $userAgents, array $attackerTypes): string
+    {
+        $tags = [];
+
+        foreach ($attackerTypes as $type) {
+            $normalized = strtolower(trim((string) $type));
+            if (in_array($normalized, ['human'], true)) {
+                $tags['actor:human'] = true;
+            }
+            if (in_array($normalized, ['automated', 'bot', 'machine', 'scanner'], true)) {
+                $tags['actor:automated'] = true;
+            }
+        }
+
+        foreach ($userAgents as $ua) {
+            $tool = $this->matchToolFromUa((string) $ua);
+            if ($tool === null) {
+                continue;
+            }
+            $tags['actor:automated'] = true;
+            $tags['tool:' . $tool] = true;
+        }
+
+        if (empty($tags)) {
+            return '';
+        }
+
+        return implode(', ', array_keys($tags));
+    }
+
+    protected function matchToolFromUa(string $ua): ?string
+    {
+        $ua = trim($ua);
+        if ($ua === '') {
+            return null;
+        }
+
+        // Patterns aligned with agent automated_tool detector + common internet scanners.
+        $patterns = [
+            'sqlmap' => '/sqlmap/i',
+            'nikto' => '/nikto/i',
+            'acunetix' => '/acunetix/i',
+            'wpscan' => '/wpscan/i',
+            'nessus' => '/nessus/i',
+            'netsparker' => '/netsparker/i',
+            'arachni' => '/arachni/i',
+            'nmap' => '/nmap scripting engine|nmap/i',
+            'hydra' => '/hydra/i',
+            'ffuf' => '/ffuf/i',
+            'gobuster' => '/gobuster/i',
+            'dirbuster' => '/dirbuster/i',
+            'curl' => '/\bcurl\b/i',
+            'wget' => '/\bwget\b/i',
+            'python-requests' => '/python-requests/i',
+            'libwww-perl' => '/libwww-perl/i',
+            'go-http-client' => '/go-http-client/i',
+            'java' => '/java\/\d+/i',
+            'censys' => '/censys/i',
+            'shodan' => '/shodan/i',
+            'masscan' => '/masscan/i',
+            'zgrab' => '/zgrab/i',
+            'zmap' => '/zmap/i',
+            'httpx' => '/\bhttpx\b/i',
+            'nuclei' => '/nuclei/i',
+        ];
+
+        foreach ($patterns as $tool => $pattern) {
+            if (preg_match($pattern, $ua)) {
+                return $tool;
+            }
+        }
+
+        return null;
     }
 }

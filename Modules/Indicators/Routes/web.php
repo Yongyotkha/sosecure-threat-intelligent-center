@@ -20,6 +20,7 @@ Route::group(
         Route::get('/detail', 'IndicatorsController@show_detail_indicator')->name('indicators.detail_indicator')->middleware('can:menu_items');
 
         Route::get('/events', 'IndicatorsController@events')->name('indicators.events')->middleware('can:menu_items');
+        Route::get('/events/dashboard_stats', 'IndicatorsController@dashboardStats')->name('indicators.dashboard_stats')->middleware('can:menu_items');
         Route::get('/events/events_detail', 'IndicatorsController@events_detail')->name('indicators.events_detail')->middleware('can:menu_items');
         Route::get('/events/events_detail/{id}', 'IndicatorsController@events_detail_select')->name('indicators.events_detail_select')->middleware('can:menu_items');
 

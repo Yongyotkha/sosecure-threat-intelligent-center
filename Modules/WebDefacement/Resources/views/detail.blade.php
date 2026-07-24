@@ -998,13 +998,20 @@ return (string)$v;
                     },
                     error: function (error){
                         $('#load_status').loading('stop');
-                        var errors = error.response.data.errors;
-                        var errorsHtml = '';
-                        $.each(errors, function (key, value) {
-                            errorsHtml += '<li>' + value[0] + '</li>';
-                        });
                         stopLoader();
-                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                        var errorMsg = 'An error occurred';
+                        if (error.responseJSON && error.responseJSON.errors) {
+                            var errorsHtml = '';
+                            $.each(error.responseJSON.errors, function (key, value) {
+                                errorsHtml += '<li>' + value[0] + '</li>';
+                            });
+                            errorMsg = errorsHtml;
+                        } else if (error.responseJSON && error.responseJSON.message) {
+                            errorMsg = error.responseJSON.message;
+                        } else if (error.statusText) {
+                            errorMsg = error.statusText;
+                        }
+                        toastr.error(errorMsg, '@langapp('response_status') ');
                     }
       
                 });
@@ -1067,24 +1074,38 @@ return (string)$v;
                             },
                             error: function (error){
                                 $('#updateO').loading('stop');
-                                var errors = error.response.data.errors;
-                                var errorsHtml = '';
-                                $.each(errors, function (key, value) {
-                                    errorsHtml += '<li>' + value[0] + '</li>';
-                                });
-                                toastr.error(errorsHtml, '@langapp('response_status') ');
+                                var errorMsg = 'An error occurred';
+                                if (error.responseJSON && error.responseJSON.errors) {
+                                    var errorsHtml = '';
+                                    $.each(error.responseJSON.errors, function (key, value) {
+                                        errorsHtml += '<li>' + value[0] + '</li>';
+                                    });
+                                    errorMsg = errorsHtml;
+                                } else if (error.responseJSON && error.responseJSON.message) {
+                                    errorMsg = error.responseJSON.message;
+                                } else if (error.statusText) {
+                                    errorMsg = error.statusText;
+                                }
+                                toastr.error(errorMsg, '@langapp('response_status') ');
                             }
             
                         });
                     },
                     error: function (error){
                         $('#updateO').loading('stop');
-                        var errors = error.response.data.errors;
-                        var errorsHtml = '';
-                        $.each(errors, function (key, value) {
-                            errorsHtml += '<li>' + value[0] + '</li>';
-                        });
-                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                        var errorMsg = 'An error occurred';
+                        if (error.responseJSON && error.responseJSON.errors) {
+                            var errorsHtml = '';
+                            $.each(error.responseJSON.errors, function (key, value) {
+                                errorsHtml += '<li>' + value[0] + '</li>';
+                            });
+                            errorMsg = errorsHtml;
+                        } else if (error.responseJSON && error.responseJSON.message) {
+                            errorMsg = error.responseJSON.message;
+                        } else if (error.statusText) {
+                            errorMsg = error.statusText;
+                        }
+                        toastr.error(errorMsg, '@langapp('response_status') ');
                     }
     
                 });
@@ -1143,12 +1164,19 @@ return (string)$v;
                             },
                             error: function (error){
                                 $('#updateO').loading('stop');
-                                var errors = error.response.data.errors;
-                                var errorsHtml = '';
-                                $.each(errors, function (key, value) {
-                                    errorsHtml += '<li>' + value[0] + '</li>';
-                                });
-                                toastr.error(errorsHtml, '@langapp('response_status') ');
+                                var errorMsg = 'An error occurred';
+                                if (error.responseJSON && error.responseJSON.errors) {
+                                    var errorsHtml = '';
+                                    $.each(error.responseJSON.errors, function (key, value) {
+                                        errorsHtml += '<li>' + value[0] + '</li>';
+                                    });
+                                    errorMsg = errorsHtml;
+                                } else if (error.responseJSON && error.responseJSON.message) {
+                                    errorMsg = error.responseJSON.message;
+                                } else if (error.statusText) {
+                                    errorMsg = error.statusText;
+                                }
+                                toastr.error(errorMsg, '@langapp('response_status') ');
                             }
             
                         });
@@ -1157,7 +1185,7 @@ return (string)$v;
                     
               
                         let data = response;
-                        if (typeof response === 'string') {e
+                        if (typeof response === 'string') {
                             try { data = JSON.parse(response); } catch (e) { console.error("JSON parse error", e); }
                         }
         
@@ -1170,12 +1198,19 @@ return (string)$v;
                     },
                     error: function (error){
                         $('#updateO').loading('stop');
-                        var errors = error.response.data.errors;
-                        var errorsHtml = '';
-                        $.each(errors, function (key, value) {
-                            errorsHtml += '<li>' + value[0] + '</li>';
-                        });
-                        toastr.error(errorsHtml, '@langapp('response_status') ');
+                        var errorMsg = 'An error occurred';
+                        if (error.responseJSON && error.responseJSON.errors) {
+                            var errorsHtml = '';
+                            $.each(error.responseJSON.errors, function (key, value) {
+                                errorsHtml += '<li>' + value[0] + '</li>';
+                            });
+                            errorMsg = errorsHtml;
+                        } else if (error.responseJSON && error.responseJSON.message) {
+                            errorMsg = error.responseJSON.message;
+                        } else if (error.statusText) {
+                            errorMsg = error.statusText;
+                        }
+                        toastr.error(errorMsg, '@langapp('response_status') ');
                     }
     
                 });

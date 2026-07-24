@@ -469,7 +469,8 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                     ->latest()
                     ->first();
 
-                  $outNotWhitelisted = json_decode($outChk->outbound_new_not_whitelisted ?? '[]', true);
+                  $raw = $outChk->outbound_new_not_whitelisted ?? [];
+                  $outNotWhitelisted = is_string($raw) ? json_decode($raw, true) : $raw;
                   if (!is_array($outNotWhitelisted)) {
                     $outNotWhitelisted = [];
                   }
@@ -861,7 +862,8 @@ class WebDefacementProccessbyWebdefacment_id extends Command
 
               $WebdefacmentDataCheck_save->save();
 
-
+              \Log::info("[DefaceResult] Setting ID: {$webdefacment_id}, Status: {$status}, Score: {$pointAlert}%, outbound: " . count($result['_outbound_new_not_wl'] ?? []));
+              $this->info("[DefaceResult] Setting ID: {$webdefacment_id}, Status: {$status}, Score: {$pointAlert}%, outbound: " . count($result['_outbound_new_not_wl'] ?? []));
 
               $WebdefacmentSetting_update =   WebdefacmentSetting::find($webdefacment_id);
 
@@ -1583,236 +1585,118 @@ class WebDefacementProccessbyWebdefacment_id extends Command
   // ===== getHtml3: Puppeteer-based HTML fetch (synced from WebDefacementProccess) =====
   private function getHtml3($url, $retryCount = 0, $options = [])
   {
-    $browser = null;
     $maxRetries = 10;
-
-    try {
-      ini_set('max_execution_time', 300);
-      ini_set('default_socket_timeout', 300);
-      set_time_limit(0);
-
-      putenv('NODE_PATH=' . base_path('puphpeteer_env/node_modules'));
-      $_ENV['NODE_PATH'] = base_path('puphpeteer_env/node_modules');
-
-      // 🟩 ปิด Chrome ที่ค้างไว้
-      @exec("pkill -f 'chrome --headless' >/dev/null 2>&1");
-
-      $puppeteer = new \Nesk\Puphpeteer\Puppeteer([
-        'read_timeout' => 300,
-        'idle_timeout' => 300,
-      ]);
-
-      $browser = $puppeteer->launch([
-        'executablePath' => '/usr/bin/google-chrome',
-        'headless' => true,
-        'args' => [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-gpu',
-          '--single-process',
-          '--no-zygote',
-          '--disable-background-timer-throttling',
-          '--disable-renderer-backgrounding',
-          '--disable-background-networking',
-          '--disable-features=IsolateOrigins,site-per-process',
-          '--window-size=1920,1080',
-        ],
-      ]);
-
-      $page = $browser->newPage();
-      $page->setDefaultNavigationTimeout(90000);
-
-      // 🟩 Set User-Agent
-      if (!empty($options['userAgent'])) {
-          $page->setUserAgent($options['userAgent']);
-      } else {
-          $page->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-      }
-
-      $page->setJavaScriptEnabled(true);
-
-      // ✅ waitUntil strategy
-      $waitStrategies = [
-          ['load', 'domcontentloaded', 'networkidle2'],
-          ['load', 'domcontentloaded'],
-          ['load'],
-      ];
-      $strategyIdx = min($retryCount, count($waitStrategies) - 1);
-      $waitUntil = $waitStrategies[$strategyIdx];
-      $timeout = $retryCount === 0 ? 90000 : 60000;
-      
-      \Log::info("[getHtml3] Attempt " . ($retryCount + 1) . " for {$url} (waitUntil: " . implode(',', $waitUntil) . ")");
-
-      $response = $page->goto($url, [
-        'timeout' => $timeout,
-        'waitUntil' => $waitUntil,
-      ]);
-
-      $httpStatus = $response ? $response->status() : 0;
-      sleep(1);
-
-      // 🟩 SCROLL เพื่อ TRIGGER LAZY LOADING
-      $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
-            return (async () => {
-                const scrollStep = 800; 
-                const scrollDelay = 100; 
-                
-                const totalHeight = Math.max(
-                    document.body.scrollHeight,
-                    document.documentElement.scrollHeight
-                );
-                
-                for (let scrolled = 0; scrolled < totalHeight; scrolled += scrollStep) {
-                    window.scrollTo(0, scrolled);
-                    await new Promise(resolve => setTimeout(resolve, scrollDelay));
-                }
-                
-                window.scrollTo(0, 0);
-                await new Promise(resolve => setTimeout(resolve, 200));
-            })();
-        "));
-
-      sleep(2);
-
-      // 🟩 WAIT UNTIL DOM STABLE
-      $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
-            () => {
-                return new Promise(resolve => {
-                    let last = document.body.innerHTML.length;
-                    let stableCount = 0;
-                    let attempts = 0;
-                    const maxAttempts = 60;
-
-                    const check = () => {
-                        attempts++;
-                        const now = document.body.innerHTML.length;
-
-                        if (now === last) {
-                            stableCount++;
-                            if (stableCount >= 4) return resolve(true);
-                        } else {
-                            stableCount = 0;
-                        }
-
-                        last = now;
-
-                        if (attempts >= maxAttempts) {
-                            console.log('DOM stability timeout, proceeding anyway');
-                            return resolve(true);
-                        }
-
-                        setTimeout(check, 500);
-                    };
-
-                    check();
-                });
-            }
-        "));
-
-      sleep(1);
-
-      $content = $page->content();
-
-      if (strlen($content) < 500) {
-        $title = $page->title();
-        $msg = "Content too short. Len: " . strlen($content) . ", Status: {$httpStatus}, Title: {$title}";
-        \Log::warning("getHtml3: {$msg} ({$url})");
-        throw new \Exception($msg);
-      }
-
-      // 🟩 Screenshot Capture (Optional)
-      $screenshotBase64 = null;
-      $screenshotSaved = false;
-
-      if (!empty($options['screenshot_path'])) {
-          try {
-              $dir = dirname($options['screenshot_path']);
-              if (!is_dir($dir)) {
-                  $mkdirResult = @mkdir($dir, 0775, true);
-                  if ($mkdirResult) {
-                      @chmod($dir, 0775);
-                  } else {
-                      \Log::warning("[getHtml3] Failed to create directory: {$dir}");
-                  }
-              }
-              
-              $page->screenshot([
-                  'path' => $options['screenshot_path'],
-                  'fullPage' => true
-              ]);
-              
-              if (file_exists($options['screenshot_path'])) {
-                  $screenshotSaved = true;
-              } else {
-                  \Log::warning("[getHtml3] Screenshot command ran but file not created at {$options['screenshot_path']}");
-              }
-          } catch (\Throwable $e) {
-              \Log::warning("[getHtml3] Screenshot save failed ({$url}) - " . $e->getMessage());
-          }
-      } 
-      elseif (!empty($options['screenshot'])) {
-          try {
-              $screenshotBase64 = $page->screenshot([
-                  'encoding' => 'base64',
-                  'fullPage' => true
-              ]);
-          } catch (\Throwable $e) {
-              \Log::warning("getHtml3: Screenshot base64 failed ({$url}) - " . $e->getMessage());
-          }
-      }
-
-      return [
-          'content' => $content, 
-          'success' => true, 
-          'screenshot_base64' => $screenshotBase64,
-          'screenshot_saved' => $screenshotSaved
-      ];
-    } catch (\Throwable $e) {
-      $errorMsg = $e->getMessage();
-
-      $isNetworkError = (
-        stripos($errorMsg, 'ERR_SOCKET_NOT_CONNECTED') !== false ||
-        stripos($errorMsg, 'ERR_CONNECTION') !== false ||
-        stripos($errorMsg, 'ERR_NETWORK') !== false ||
-        stripos($errorMsg, 'ERR_TIMED_OUT') !== false ||
-        stripos($errorMsg, 'Navigation timeout') !== false ||
-        stripos($errorMsg, 'Content too short') !== false
-      );
-
-      \Log::error("Puphpeteer Error (attempt " . ($retryCount + 1) . "/{$maxRetries}): {$errorMsg} at {$url}");
-
-      if ($isNetworkError && $retryCount < $maxRetries) {
-        \Log::info("Retrying {$url} (attempt " . ($retryCount + 2) . "/{$maxRetries})");
-
-        if ($browser) {
-          try {
-            $browser->close();
-          } catch (\Throwable $ex) {
-            // ignore
-          }
+    
+    $chromeHome = storage_path('app/chrome_home');
+    if (!file_exists($chromeHome)) {
+        @mkdir($chromeHome, 0777, true);
+    }
+    putenv('HOME=' . $chromeHome);
+    $_ENV['HOME'] = $chromeHome;
+    
+    putenv('NODE_PATH=' . base_path('puphpeteer_env/node_modules'));
+    $_ENV['NODE_PATH'] = base_path('puphpeteer_env/node_modules');
+    
+    // We will run the scraper.js using node command line.
+    // To ensure everything is clean, we write the HTML output to a temp file,
+    // and then read it from PHP.
+    $tempHtmlFile = tempnam(sys_get_temp_dir(), 'deface_html_');
+    $screenshotPath = isset($options['screenshot_path']) ? $options['screenshot_path'] : '';
+    $userAgent = isset($options['userAgent']) ? $options['userAgent'] : '';
+    
+    // Select waitUntil strategies based on retryCount
+    $waitStrategies = [
+        'load,domcontentloaded,networkidle2', // retry 0
+        'load,domcontentloaded',              // retry 1
+        'load',                               // retry 2+
+    ];
+    $strategyIdx = min($retryCount, count($waitStrategies) - 1);
+    $waitUntil = $waitStrategies[$strategyIdx];
+    
+    // Build node execution command
+    $nodeScript = public_path('js/scraper.js');
+    
+    $executablePath = env('PUPPETEER_EXECUTABLE_PATH', '/usr/bin/google-chrome');
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && $executablePath === '/usr/bin/google-chrome') {
+        $executablePath = '';
+    }
+    
+    // Build command with properly escaped shell arguments
+    $command = 'node ' . escapeshellarg($nodeScript) . ' ' . escapeshellarg($url) . ' ' . escapeshellarg($tempHtmlFile) . ' ' . escapeshellarg($screenshotPath) . ' ' . escapeshellarg($userAgent) . ' ' . escapeshellarg($waitUntil) . ' ' . escapeshellarg($executablePath);
+    
+    \Log::info("[getHtml3] Executing standalone scraper (Attempt " . ($retryCount + 1) . "): " . $command);
+    $this->info("[getHtml3] Executing standalone scraper (Attempt " . ($retryCount + 1) . ")...");
+    
+    $output = [];
+    $exitCode = -1;
+    
+    exec($command . ' 2>&1', $output, $exitCode);
+    
+    $logLines = [];
+    if ($exitCode === 0) {
+        $msg = "[getHtml3] Scraper finished successfully (Exit Code: 0).";
+        $logLines[] = $msg;
+        $this->info($msg);
+    } else {
+        $msg = "[getHtml3] Scraper failed (Exit Code: $exitCode).";
+        $logLines[] = $msg;
+        $this->error($msg);
+    }
+    
+    if (count($output) > 0) {
+        $logLines[] = "--- Scraper Logs ---";
+        $this->line("--- Scraper Logs ---");
+        foreach ($output as $line) {
+            $logLines[] = "  " . $line;
+            $this->line("  " . $line);
         }
-
-        sleep(2 + $retryCount);
-
-        return $this->getHtml3($url, $retryCount + 1, $options);
-      }
-
-      // 🟩 fallback disabled
-      $fallbackResult = [];
-      $fallbackResult['content'] = ''; 
-      $fallbackResult['success'] = false;
-      $fallbackResult['error'] = $errorMsg;
-
-      return $fallbackResult;
-    } finally {
-      if ($browser) {
-        try {
-          $browser->close();
-        } catch (\Throwable $ex) {
-          \Log::warning("Browser close failed: " . $ex->getMessage());
+        $logLines[] = "--------------------";
+        $this->line("--------------------");
+    }
+    
+    \Log::info(implode("\n", $logLines));
+    
+    if ($exitCode === 0 && file_exists($tempHtmlFile) && filesize($tempHtmlFile) > 0) {
+        $content = file_get_contents($tempHtmlFile);
+        @unlink($tempHtmlFile); // clean up
+        
+        $screenshotSaved = !empty($screenshotPath) && file_exists($screenshotPath) && filesize($screenshotPath) > 0;
+        
+        return [
+            'content' => $content,
+            'success' => true,
+            'screenshot_base64' => null,
+            'screenshot_saved' => $screenshotSaved
+        ];
+    } else {
+        // Log failure details
+        $errorMsg = "Node scraper failed. Exit code: " . $exitCode . ". Logs: " . implode(" ", $output);
+        \Log::error("Scraper Error (attempt " . ($retryCount + 1) . "/{$maxRetries}): {$errorMsg} at {$url}");
+        
+        @unlink($tempHtmlFile); // clean up
+        
+        // Handle retries
+        $isNetworkError = (
+            stripos($errorMsg, 'ERR_SOCKET_NOT_CONNECTED') !== false ||
+            stripos($errorMsg, 'ERR_CONNECTION') !== false ||
+            stripos($errorMsg, 'ERR_NETWORK') !== false ||
+            stripos($errorMsg, 'ERR_TIMED_OUT') !== false ||
+            stripos($errorMsg, 'timeout') !== false ||
+            stripos($errorMsg, 'detached') !== false ||
+            stripos($errorMsg, 'destroyed') !== false
+        );
+        
+        if ($isNetworkError && $retryCount < $maxRetries) {
+            \Log::info("Retrying {$url} (attempt " . ($retryCount + 2) . "/{$maxRetries}) in " . (2 + $retryCount) . " seconds");
+            sleep(2 + $retryCount);
+            return $this->getHtml3($url, $retryCount + 1, $options);
         }
-      }
+        
+        return [
+            'content' => '',
+            'success' => false,
+            'error' => $errorMsg
+        ];
     }
   }
 

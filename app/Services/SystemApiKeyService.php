@@ -12,6 +12,9 @@ class SystemApiKeyService
     private static $envMap = [
         'virustotal' => 'VIRUSTOTAL_API_KEYS',
         'serpapi' => 'SERPAPI_API_KEYS',
+        'otx' => 'OTX_API_KEYS',
+        'safe_browsing' => 'SAFE_BROWSING_API_KEYS',
+        'urlscan' => 'URLSCAN_API_KEYS',
     ];
 
     public function getKeys(string $provider): array
@@ -68,6 +71,18 @@ class SystemApiKeyService
         if ($value === '') {
             if ($provider === 'virustotal') {
                 $single = trim((string) env('VIRUSTOTAL_API_KEY', ''));
+                return $single !== '' ? [$single] : [];
+            }
+            if ($provider === 'otx') {
+                $single = trim((string) env('OTX_API_KEY', ''));
+                return $single !== '' ? [$single] : [];
+            }
+            if ($provider === 'safe_browsing') {
+                $single = trim((string) env('SAFE_BROWSING_API_KEY', ''));
+                return $single !== '' ? [$single] : [];
+            }
+            if ($provider === 'urlscan') {
+                $single = trim((string) env('URLSCAN_API_KEY', ''));
                 return $single !== '' ? [$single] : [];
             }
 

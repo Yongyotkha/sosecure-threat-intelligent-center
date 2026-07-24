@@ -1109,6 +1109,10 @@ function get_word_leak_compromise($val, $type)
             $html = 'DARK WEB';
         } else if ($val == 'webserver') {
             $html = 'WEB SERVER';
+        } else if ($val == 'agent') {
+            $html = 'AGENT';
+        } else if ($val == 'network') {
+            $html = 'NETWORK';
         }
     } else {
         $html = '';

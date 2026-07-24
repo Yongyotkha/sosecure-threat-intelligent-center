@@ -1553,6 +1553,15 @@
                 });
             }
 
+            function refreshDataLeakView() {
+                if ($.fn.DataTable.isDataTable('#table_social_datas')) {
+                    table.ajax.reload(null, false);
+                }
+                get_count();
+                count_icon();
+            }
+            window.refreshDataLeakView = refreshDataLeakView;
+
 
             $('#table_social_datas').on('click', '.social_id', function() {
                 if ($('.social_id:checked').length > 0) {
@@ -1609,7 +1618,9 @@
                         $('#delete_all').modal('hide');
                         if (response.success) {
                             toastr.success(response.message || 'Items deleted successfully');
-                            window.location.href = '{!! route("socialdatas.index_all_site") !!}';
+                            $('#btn-change-status').prop('disabled', true);
+                            $('.select-chk').prop('checked', false);
+                            refreshDataLeakView();
                         } else {
                             toastr.error(response.message || 'Failed to delete items');
                         }

@@ -74,9 +74,9 @@ class ApiIndicatorController extends ApiController
 
                 $start =  $row;
 
-                $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
-                $clientMD = new MongoClient($DB_MONGO_KEY);
-                $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                $mongo = app(\App\Services\IndicatorMongoService::class);
+                $clientMD = $mongo->getClient();
+                $col_fx_otx_events = $mongo->collection('fx_otx_events');
 
                 $dirStr = strtolower($dirRaw ?? 'desc');
                 $dir    = ($dirStr === 'asc' || $dirStr === '1') ? 1 : -1;
@@ -109,12 +109,7 @@ class ApiIndicatorController extends ApiController
                     'limit' => $rowperpage,
                 ];
 
-                $query = [
-                    '$or' => [
-                        ['deleted_at' => null],
-                        ['deleted_at' => ['$exists' => false]],
-                    ],
-                ];
+                $query = \App\Services\IndicatorMongoService::activeEventsFilter();
 
                 if (isset($data['data']['count_page']) && $data['data']['count_page'] == -1) {
                     $cursor_count = $col_fx_otx_events->count($query);
@@ -190,7 +185,7 @@ class ApiIndicatorController extends ApiController
                         
                         if (isset($data['data']['startDate']) && isset($data['data']['endDate']) && $data['data']['startDate'] && $data['data']['endDate']) {
                             try {
-                                $indicatorRefCol = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+                                $indicatorRefCol = $mongo->collection('fx_otx_events_indicator_ref');
                                 $attrQuery = [
                                     'pulse_id' => $document_2['pulse_id'],
                                     'updated_at' => [
@@ -1279,14 +1274,6 @@ class ApiIndicatorController extends ApiController
                     $SiteSettings = @$get_role_custom_first['SiteSettings'];
                 }
 
-                $data_send["attr_all"] = IndicatorSummaryYear::where("type", 'summary_all')->first();
-                $data_send["attr_current"] = IndicatorSummaryYear::where("type", 'summary_current')->first();
-                // DB::raw('CONCAT("[",attribute_count, "]") as data2')
-                $dataForloop = IndicatorSummaryYear::select('type_name AS name', 'attribute_count AS data')->where("type", 'summary_attr_type')->orderBy('attribute_count', 'desc')->take(10)->get();
-                $data_send["attr_type"] = array();
-                foreach ($dataForloop as $document) {
-                    array_push($data_send["attr_type"], array('name' => ucwords($document->name), 'data' => [$document->data]));
-                }
                 $data_send['SiteSettings'] = $SiteSettings;
                 $data_send['page'] = langapp('indicators');
                 if (isset($data_send['data']['Search_Link_All'])) {
@@ -1315,6 +1302,97 @@ class ApiIndicatorController extends ApiController
         }
     }
 
+    public function dashboard_stats(Request $request)
+    {
+        try {
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            if ($data === false) {
+                return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
+            }
+
+            $filters = $data['data']['filters'] ?? [];
+            $payload = $this->buildDashboardStatsPayload($filters);
+            $data_transcation = json_encode($payload);
+            $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'], $data['site']['data']['mac_address_key']);
+
+            return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
+        } catch (\Exception $e) {
+            $response = [
+                'status_code' => 500,
+                'message' => $e->getMessage(),
+            ];
+
+            $header = $request->bearerToken();
+            $mode = $request->mode;
+            $data_request = $request->data;
+            $data = $this->dataFalse($header, $mode, $data_request);
+            $this->saveLog($data['site']['data']['id'], json_encode($response));
+
+            return response()->json($response);
+        }
+    }
+
+    protected function buildDashboardStatsPayload(array $filters = []): array
+    {
+        try {
+            $dashboardStats = app(\App\Services\IndicatorMongoService::class)->getDashboardStats($filters);
+
+            return [
+                'message' => '',
+                'status_code' => '00',
+                'data' => [
+                    'attr_all' => json_decode(json_encode($dashboardStats['attr_all']), true),
+                    'attr_current' => json_decode(json_encode($dashboardStats['attr_current']), true),
+                    'attr_type' => $dashboardStats['attr_type'],
+                    'filtered' => $dashboardStats['filtered'] ?? false,
+                ],
+            ];
+        } catch (\Throwable $e) {
+            \Log::warning('Indicators API dashboard live stats failed, using cached summary', [
+                'error' => $e->getMessage(),
+            ]);
+
+            if (\App\Services\IndicatorMongoService::hasEventFilters($filters)) {
+                return [
+                    'message' => $e->getMessage(),
+                    'status_code' => '01',
+                    'data' => [
+                        'attr_all' => ['event_count' => 0, 'attribute_count' => 0],
+                        'attr_current' => ['event_count' => 0, 'attribute_count' => 0],
+                        'attr_type' => [],
+                        'filtered' => true,
+                    ],
+                ];
+            }
+
+            $attrAll = IndicatorSummaryYear::where('type', 'summary_all')->first();
+            $attrCurrent = IndicatorSummaryYear::where('type', 'summary_current')->first();
+            $dataForloop = IndicatorSummaryYear::select('type_name AS name', 'attribute_count AS data')
+                ->where('type', 'summary_attr_type')
+                ->orderBy('attribute_count', 'desc')
+                ->take(10)
+                ->get();
+            $attrType = [];
+            foreach ($dataForloop as $document) {
+                $attrType[] = ['name' => ucwords($document->name), 'data' => [$document->data]];
+            }
+
+            return [
+                'message' => '',
+                'status_code' => '00',
+                'data' => [
+                    'attr_all' => $attrAll ? $attrAll->toArray() : ['event_count' => 0, 'attribute_count' => 0],
+                    'attr_current' => $attrCurrent ? $attrCurrent->toArray() : ['event_count' => 0, 'attribute_count' => 0],
+                    'attr_type' => $attrType,
+                    'filtered' => false,
+                ],
+            ];
+        }
+    }
+
     public function events_detail_select(Request $request)
     {
         try {
@@ -1325,78 +1403,27 @@ class ApiIndicatorController extends ApiController
             if ($data === false) {
                 return response()->json(['error' => 'The request parameters are invalid', 'status_code' => '400']);
             } else {
-                $client = new MongoClient(DB_MONGO_01);
-                $collection = $client->sosecure_threatintelligent->fx_otx_events;
                 $id = $data['data']['id'];
-                $query = [
-                    'pulse_id' => $id
-                ];
+                $startDate = $data['data']['startDate'] ?? null;
+                $endDate = $data['data']['endDate'] ?? null;
 
-                $options = [
-                    'limit' => 1
-                ];
+                $mongo = app(\App\Services\IndicatorMongoService::class);
+                $detail = $mongo->resolveEventDetailPayload($id, $startDate, $endDate);
+                $cursorData = $detail['otx_events'];
 
-                $cursor = $collection->find($query, $options)->toArray();
-
-                // --- Process indicator_type_counts (เหมือน Center) ---
-                if (!empty($cursor)) {
-                    // แปลง cursor เป็น array ธรรมดาเพื่อให้แก้ไขค่าได้
-                    $cursorData = json_decode(json_encode($cursor), true);
-
-                    $typeCounts = $cursorData[0]['indicator_type_counts'] ?? null;
-                    $hasValidKeys = false;
-
-                    if (!empty($typeCounts) && is_array($typeCounts)) {
-                        $firstKey = array_key_first($typeCounts);
-                        $hasValidKeys = !is_numeric($firstKey);
-                    }
-
-                    // รับค่า date filter จาก request (ถ้ามี)
-                    $startDate = $data['data']['startDate'] ?? null;
-                    $endDate = $data['data']['endDate'] ?? null;
-                    $hasDateFilter = $startDate && $endDate;
-
-                    // Fallback: Aggregate จาก fx_otx_events_indicator_ref ถ้า key เป็นตัวเลข หรือมี date filter
-                    if (!$hasValidKeys || $hasDateFilter) {
-                        $indicatorRefCol = $client->sosecure_threatintelligent->fx_otx_events_indicator_ref;
-
-                        $matchQuery = ['pulse_id' => $id, 'status' => 1];
-
-                        if ($hasDateFilter) {
-                            $matchQuery['updated_at'] = [
-                                '$gte' => new \MongoDB\BSON\UTCDateTime(strtotime($startDate) * 1000),
-                                '$lte' => new \MongoDB\BSON\UTCDateTime(strtotime($endDate) * 1000)
-                            ];
-                        }
-
-                        $pipeline = [
-                            ['$match' => $matchQuery],
-                            ['$group' => ['_id' => '$type', 'count' => ['$sum' => 1]]],
-                            ['$sort' => ['count' => -1]]
-                        ];
-                        $aggregateResult = $indicatorRefCol->aggregate($pipeline)->toArray();
-
-                        // สร้าง indicator_type_counts ใหม่เป็น associative array (type name => count)
-                        $processedTypeCounts = [];
-                        foreach ($aggregateResult as $item) {
-                            if (!empty($item['_id'])) {
-                                $processedTypeCounts[$item['_id']] = $item['count'];
-                            }
-                        }
-
-                        // อัปเดตค่า indicator_type_counts กลับเข้า cursor data
-                        $cursorData[0]['indicator_type_counts'] = $processedTypeCounts;
-
-                        // เพิ่ม actual_indicator_count (ผลรวมจริงจาก aggregation)
-                        if (!empty($processedTypeCounts)) {
-                            $cursorData[0]['actual_indicator_count'] = array_sum($processedTypeCounts);
-                        }
-                    }
-
-                    $data_transcation = json_encode($cursorData);
-                } else {
-                    $data_transcation = json_encode($cursor);
+                if (!empty($cursorData) && !empty($detail['actual_indicator_count'])) {
+                    $cursorData[0]['actual_indicator_count'] = $detail['actual_indicator_count'];
                 }
+
+                if (!empty($cursorData) && !empty($detail['countKey']) && !empty($detail['countVal'])) {
+                    $processedTypeCounts = [];
+                    foreach ($detail['countKey'] as $index => $typeName) {
+                        $processedTypeCounts[$typeName] = $detail['countVal'][$index] ?? 0;
+                    }
+                    $cursorData[0]['indicator_type_counts'] = $processedTypeCounts;
+                }
+
+                $data_transcation = json_encode($cursorData);
 
                 $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
                 return response()->json(['message' => 'Successful', 'error' => '', 'status_code' => '200', 'data' => $datas]);
@@ -1473,6 +1500,7 @@ class ApiIndicatorController extends ApiController
                         'type' => 1,
                         'pulse_id' => 1,
                         'updated_at' => 1,
+                        'pulse_modified' => 1,
                         'tags' => 1,
                         'name' => 1,
                         'attribute_serverity' => 1,
@@ -1481,6 +1509,7 @@ class ApiIndicatorController extends ApiController
                         'is_active' => 1,
                         'role' => 1,
                         'title' => 1,
+                        'created' => 1,
                         'created_at' => 1
                     ],
                     'skip' => $start,

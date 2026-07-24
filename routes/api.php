@@ -41,6 +41,7 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('indicator/events_table', 'Api\ApiIndicatorController@events_table');
     Route::post('indicator/events_detail_select', 'Api\ApiIndicatorController@events_detail_select');
     Route::post('indicator/events', 'Api\ApiIndicatorController@events');
+    Route::post('indicator/dashboard_stats', 'Api\ApiIndicatorController@dashboard_stats');
     Route::post('indicator/events_load_attributes_tb', 'Api\ApiIndicatorController@events_load_attributes_tb');
     Route::post('indicator/events_load_pulse_tb', 'Api\ApiIndicatorController@events_load_pulse_tb');
     Route::post('indicator/events_count_view', 'Api\ApiIndicatorController@events_count_view');
@@ -176,6 +177,12 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('agentCenter/downloadRule', 'Api\ApiAgentController@downloadRule');
     Route::post('agentCenter/downloadRuleComplete', 'Api\ApiAgentController@downloadRuleComplete');
     Route::post('agentCenter/sendLogYara', 'Api\ApiAgentController@sendLogYara');
+    Route::post('agentCenter/sendLogSsdeep', 'Api\ApiAgentSsdeepController@sendLogSsdeep');
+    Route::post('agentCenter/getSsdeep', 'Api\ApiAgentSsdeepController@getSsdeep');
+    Route::post('agentCenter/downloadSsdeepSite', 'Api\ApiAgentSsdeepController@downloadSsdeepSite');
+    Route::post('agentCenter/downloadSsdeepSiteComplete', 'Api\ApiAgentSsdeepController@downloadSsdeepSiteComplete');
+    Route::post('agentCenter/updateSsdeepDownload', 'Api\ApiAgentSsdeepController@updateSsdeepDownload');
+    Route::post('agentCenter/sendSsdeepCandidate', 'Api\ApiAgentSsdeepController@sendSsdeepCandidate');
     Route::post('agentCenter/sendAgentScanLog', 'Api\ApiAgentController@sendAgentScanLog');
 
     Route::post('agentCenter/downloadRuleSite', 'Api\ApiAgentController@downloadRuleSite');

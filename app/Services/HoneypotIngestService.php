@@ -43,12 +43,14 @@ class HoneypotIngestService
 
         foreach ($alerts as $alert) {
             $alertId = (string) $alert['alert_id'];
-            $timestamp = $this->toUtcDateTime($alert['timestamp']);
+            $legacyCorrected = false;
+            $timestamp = HoneypotTimestamp::toUtcDateTime($alert['timestamp'], $legacyCorrected);
 
             $document = [
                 'site_id' => $siteId,
                 'alert_id' => $alertId,
                 'timestamp' => $timestamp,
+                'timestamp_legacy_corrected' => $legacyCorrected,
                 'attacker_ip' => (string) $alert['attacker_ip'],
                 'severity' => (string) $alert['severity'],
                 'threat_name' => (string) $alert['threat_name'],
@@ -95,8 +97,13 @@ class HoneypotIngestService
     protected function storeSummary(int $siteId, array $summary, array $sensor = []): bool
     {
         $collection = $this->mongo->collection('summaries');
-        $periodStart = $this->toUtcDateTime($summary['period_start']);
-        $timestamp = $this->toUtcDateTime($summary['timestamp'] ?? $summary['period_start']);
+        $periodLegacyCorrected = false;
+        $timestampLegacyCorrected = false;
+        $periodStart = HoneypotTimestamp::toUtcDateTime($summary['period_start'], $periodLegacyCorrected);
+        $timestamp = HoneypotTimestamp::toUtcDateTime(
+            $summary['timestamp'] ?? $summary['period_start'],
+            $timestampLegacyCorrected
+        );
         $sensorTokenId = (int) ($sensor['sensor_token_id'] ?? 0);
         $sensorName = (string) ($sensor['sensor_name'] ?? '');
 
@@ -104,6 +111,7 @@ class HoneypotIngestService
             'site_id' => $siteId,
             'period_start' => $periodStart,
             'timestamp' => $timestamp,
+            'timestamp_legacy_corrected' => $periodLegacyCorrected || $timestampLegacyCorrected,
             'total_hits' => (int) ($summary['total_hits'] ?? 0),
             'unique_ips' => (int) ($summary['unique_ips'] ?? 0),
             'by_severity' => (array) ($summary['by_severity'] ?? []),
@@ -126,26 +134,5 @@ class HoneypotIngestService
         );
 
         return true;
-    }
-
-    protected function toUtcDateTime($value): UTCDateTime
-    {
-        if ($value instanceof UTCDateTime) {
-            return $value;
-        }
-
-        if (is_numeric($value)) {
-            $seconds = (int) $value;
-
-            if ($seconds > 9999999999) {
-                return new UTCDateTime($seconds);
-            }
-
-            return new UTCDateTime($seconds * 1000);
-        }
-
-        $date = new \DateTimeImmutable((string) $value);
-
-        return new UTCDateTime($date->getTimestamp() * 1000);
     }
 }

@@ -541,7 +541,6 @@ class DashboardNewController extends Controller
     public function count_asset(Request $request)
     {
         $dataOut = ["countAssets" => 0];
-        $site_id_active = SiteSettings::select('id')->where('active', 1)->whereNull('deleted_at')->pluck('id')->toArray();
 
         if (Auth::check()) {
             $isSuperAdmin = @get_role_custom()['superadmin'] == 1;
@@ -568,12 +567,10 @@ class DashboardNewController extends Controller
                 }
             }
 
-            // Build optimized query - get assets with IP (data_type_id 5,6)
+            // Build base query from Assets page logic:
+            // count uses expanded rows (IP list x host/domain combinations).
             $query = Assets::select('assets.id')
-                ->join('assets_datas', 'assets.id', '=', 'assets_datas.asset_id')
-                ->whereIn('assets_datas.data_type_id', [5, 6])
-                ->where('assets.status', 1)
-                ->whereIn('assets_datas.site_id', $site_id_active);
+                ->where('assets.status', 1);
 
             // Apply site filters based on role and request
             if ($targetSiteId) {
@@ -583,23 +580,41 @@ class DashboardNewController extends Controller
                 $query->whereIn('assets.site_id', $site_id_arr);
             }
 
-            // Get distinct asset IDs with IP data (single query)
             $assetIds = $query->distinct()->pluck('assets.id')->toArray();
 
             if (count($assetIds) > 0) {
-                // Count domain entries (data_type_id 1,4) for these assets in ONE query with GROUP BY
+                // Domain list on Assets page uses [1,4,14].
                 $domainCounts = AssetsData::selectRaw('asset_id, COUNT(*) as domain_count')
                     ->whereIn('asset_id', $assetIds)
-                    ->whereIn('site_id', $site_id_active)
-                    ->whereIn('data_type_id', [1, 4])
+                    ->whereIn('data_type_id', [1, 4, 14])
                     ->groupBy('asset_id')
                     ->pluck('domain_count', 'asset_id')
                     ->toArray();
 
-                // Calculate total: if asset has domains, add domain count; otherwise add 1
+                // IP list on Assets page includes:
+                // - data_type_id in [5,6]
+                // - OR any other datatype except [1,4,14,5,6,17,13,12]
+                $ipCounts = AssetsData::selectRaw('asset_id, COUNT(*) as ip_count')
+                    ->whereIn('asset_id', $assetIds)
+                    ->where(function ($q) {
+                        $q->whereIn('data_type_id', [5, 6])
+                            ->orWhereNotIn('data_type_id', [1, 4, 14, 5, 6, 17, 13, 12]);
+                    })
+                    ->groupBy('asset_id')
+                    ->pluck('ip_count', 'asset_id')
+                    ->toArray();
+
+                // Same row expansion as Assets page:
+                // each IP row is duplicated by number of domains (or 1 when none).
                 foreach ($assetIds as $assetId) {
+                    $ipCount = (int) ($ipCounts[$assetId] ?? 0);
+                    if ($ipCount === 0) {
+                        continue;
+                    }
+
                     $domainCount = $domainCounts[$assetId] ?? 0;
-                    $dataOut["countAssets"] += ($domainCount > 0) ? $domainCount : 1;
+                    $multiplier = ($domainCount > 0) ? (int) $domainCount : 1;
+                    $dataOut["countAssets"] += ($ipCount * $multiplier);
                 }
             }
         }
@@ -612,59 +627,65 @@ class DashboardNewController extends Controller
         return response()->json($response);
     }
 
+    /**
+     * Resolve dashboard site filter (code or numeric id) to site_id.
+     */
+    private function resolveDashboardSiteId($siteParam): ?int
+    {
+        if ($siteParam === null || $siteParam === '' || $siteParam === '0' || $siteParam === 0) {
+            return null;
+        }
+
+        if (is_numeric($siteParam)) {
+            return (int) $siteParam;
+        }
+
+        $site = SiteSettings::where('code', $siteParam)->whereNull('deleted_at')->first();
+
+        return $site ? $site->id : null;
+    }
+
+    /**
+     * Base vulnerability query aligned with MonitoringVulnerabilitys chartVulnerabilitys().
+     */
+    private function buildDashboardVulnerabilityQuery(Request $request)
+    {
+        $siteId = $this->resolveDashboardSiteId($request->site);
+
+        $model = CVEMapping::query()
+            ->join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve')
+            ->join('cve_assets', 'cve_assets.id', '=', 'data_datacve_mapping_assets.cve_asset_id')
+            ->where('cve_assets.active', 1)
+            ->where('data_datacve_mapping_assets.is_fix', 0);
+
+        $get_role_custom_first = @get_role_custom();
+        if (@$get_role_custom_first['superadmin'] != 1) {
+            $site_id_arr = @$get_role_custom_first['site_id_arr'] ?? [];
+            if (!empty($site_id_arr)) {
+                $model->whereIn('data_datacve_mapping_assets.site_id', $site_id_arr);
+            }
+        }
+
+        if ($siteId) {
+            $model->where('data_datacve_mapping_assets.site_id', $siteId);
+        }
+
+        return $model;
+    }
+
     public function count_vulnerability(Request $request)
     {
         $CVEMapping = 0;
-        
+
         if (Auth::check()) {
             $role_custom = @check_role_custom();
-            
-            // If no vulnerabilities permission, return empty
-            if (!($role_custom['vulnerabilities'] ?? false)) {
-                return response()->json([
-                    'error' => '',
-                    'status_code' => '200',
-                    'data' => $CVEMapping
-                ]);
-            }
 
-            $isSuperAdmin = @get_role_custom()['superadmin'] == 1;
-            $site_id_arr = @get_role_custom()['site_id_arr'] ?? [];
-
-            if ($isSuperAdmin) {
-                if (!$request->site) {
-                    // Superadmin, no site filter - count all CVE
-                    $CVEMapping = CVEMapping::distinct()->count('namecve');
-                } else {
-                    // Superadmin with specific site - use JOIN instead of whereIn for speed
-                    $site_id_m = SiteSettings::where('code', $request->site)->first();
-                    if ($site_id_m) {
-                        $CVEMapping = CVEMapping::join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve')
-                            ->where('data_datacve_mapping_assets.site_id', $site_id_m->id)
-                            ->distinct()
-                            ->count('data_datacve_mapping.namecve');
-                    }
-                }
-            } else {
-                // Non-superadmin - use JOIN for better performance
-                if (!$request->site) {
-                    // All sites user has access to
-                    if (!empty($site_id_arr)) {
-                        $CVEMapping = CVEMapping::join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve')
-                            ->whereIn('data_datacve_mapping_assets.site_id', $site_id_arr)
-                            ->distinct()
-                            ->count('data_datacve_mapping.namecve');
-                    }
-                } else {
-                    // Specific site (must be in user's allowed sites)
-                    $site_id_m = SiteSettings::where('code', $request->site)->first();
-                    if ($site_id_m && in_array($site_id_m->id, $site_id_arr)) {
-                        $CVEMapping = CVEMapping::join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve')
-                            ->where('data_datacve_mapping_assets.site_id', $site_id_m->id)
-                            ->distinct()
-                            ->count('data_datacve_mapping.namecve');
-                    }
-                }
+            if ($role_custom['vulnerabilities'] ?? false) {
+                $prefix = DB::getTablePrefix();
+                $stats = $this->buildDashboardVulnerabilityQuery($request)
+                    ->selectRaw("COUNT(DISTINCT {$prefix}data_datacve_mapping.namecve) as total")
+                    ->first();
+                $CVEMapping = (int) ($stats->total ?? 0);
             }
         }
 
@@ -709,194 +730,121 @@ class DashboardNewController extends Controller
         return response()->json($response);
     }
 
+    /**
+     * Base data leak count query aligned with social-datas_all_site page.
+     */
+    private function buildDataLeakCountQuery(Request $request)
+    {
+        $siteId = $this->resolveDashboardSiteId($request->site);
+        $get_role = @get_role_custom();
+
+        $site_ids = collect(@$get_role['site_id_arr'])->pluck('site_id')->filter()->values()->toArray();
+        $isClientOrSiteClient = (
+            (isset($get_role['client']) && (int) $get_role['client'] == 1) ||
+            (isset($get_role['site_client']) && (int) $get_role['site_client'] == 1)
+        );
+
+        $query = DataLeakSocialRef::query()
+            ->whereNull('deleted_at')
+            ->whereHas('get_data_leak_feed', function ($q) use ($isClientOrSiteClient) {
+                $q->whereNull('deleted_at')
+                    ->whereIn('feel_type', ['social', 'darkweb_public', 'surface_web', 'darkweb']);
+
+                if ($isClientOrSiteClient) {
+                    $q->where('status', 1);
+                }
+            });
+
+        if (@$get_role['superadmin'] != 1 && !empty($site_ids)) {
+            $query->whereIn('site_id', $site_ids);
+        }
+
+        if ($siteId) {
+            $query->where('site_id', $siteId);
+        }
+
+        return $query;
+    }
+
     public function count_data_leak(Request $request)
     {
+        $count = 0;
+
         if (Auth::check()) {
             $role_custom = @check_role_custom();
-            if ($role_custom['data_leak']) {
-                $site_id_arr = @get_role_custom()['site_id_arr'];
-                // $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-                if (@get_role_custom()['superadmin'] == 1) {
-                    if (!$request->site) {
-                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereNull('deleted_at')->whereIn('feel_type', ['social', 'darkweb_public'])->count();
-                    } else {
-                        $site_id_m = SiteSettings::select('id')->where('code', $request->site)->first();
-                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereNull('deleted_at')->where('site_id', $site_id_m->id)->whereIn('feel_type', ['social', 'darkweb_public'])->count();
-                    }
-                } else {
-                    if (!$request->site) {
-                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereNull('deleted_at')->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->count();
-                    } else {
-                        $site_id_m = SiteSettings::select('id')->where('code', $request->site)->first();
-                        $DataLeakSocialRef = DataLeakSocialRef::select('id')->where('status', 1)->whereNull('deleted_at')->where('site_id', $site_id_m->id)->whereIn('site_id', $site_id_arr)->whereIn('feel_type', ['social', 'darkweb_public'])->count();
-                    }
-                }
+            if ($role_custom['data_leak'] ?? false) {
+                $count = $this->buildDataLeakCountQuery($request)->count();
             }
         }
 
-        $response = array(
+        return response()->json([
             'error' => '',
             'status_code' => '200',
-            'data' => @$DataLeakSocialRef
-        );
-        return response()->json($response);
+            'data' => $count,
+        ]);
     }
 
     public function count_vulnerability_host(Request $request)
     {
-        /*
-            if(Auth::check()) {
-                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-                if(@get_role_custom()['superadmin'] == 1) {
-                    if(!$request -> site){
-                        $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->groupBy('vendor', 'title')->get();
-                    }else{
-                        $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                        $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $site_id_m->id)->where("active", '=', 1)->groupBy('vendor', 'title')->get();
-                    }
-                } else {
-                    if(!$request -> site){
-                        $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
-                    }else{
-                        $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                        $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $site_id_m->id)->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
-                    }
-                }
-            }
-
-
-
-            $vendor = [];
-            $title = [];
-            foreach($CVEAssets as $data){
-                $vendor[] = $data -> vendor;
-                $title[] = $data -> title;
-            }
-            $DataCveven = DataCveven::select('namecve', 'title', DB::raw('count(*) as total'))->whereIn('vendor', $vendor)->whereIn('title', $title)->groupBy('namecve')->get();
-            $namecve = [];
-            $check_total_namecve = array();
-            $host_name = [];
-            foreach($DataCveven as $data){
-                $namecve[] = $data -> namecve;
-                $check_total_namecve[] = collect([
-                    'total' => $data -> total,
-                    'namecve' => $data -> namecve,
-                    'title' => $data -> title
-                ]);
-            }
-
-            if(Auth::check()) {
-                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-                $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                if(@get_role_custom()['superadmin'] == 1) {
-                    if(!$request -> site) {
-                        $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $namecve)->groupBy('severity','namecve')->get();
-                    } else {
-
-                    $CVEMappingAssets_name = CVEMappingAssets::where('site_id',$site_id_m->id)->select('namecve')->get();
-
-                    $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $CVEMappingAssets_name)->groupBy('severity','namecve')->get();
-                } 
-            } else {
-                if(!$request -> site) {
-                $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
-                $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $CVEMappingAssets_name)->groupBy('severity','namecve')->get();
-            } else {
-            $CVEMappingAssets_name = CVEMappingAssets::where('site_id',$site_id_m->id)->select('namecve')->get();
-            $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $CVEMappingAssets_name)->groupBy('severity','namecve')->get();
-            }
-
-            }
-            }
-            // dd($check_total_namecve);
-            // $CVEMapping = CVEMapping::select('namecve', 'severity')->groupBy('severity','namecve')->get();
-            foreach($CVEMapping as $data){
-                foreach($check_total_namecve as $item){
-                    if($data -> namecve == $item['namecve']){
-                        $data['total'] = $item['total'];
-                        $data['title'] = $item['title'];
-                        $host_name[] = $item['title'];
-                    }
-                }
-            }
-
-        */
-        $result = array();
-        $CVEMapping = array();
-        //foreach ($host_name as $element) {
-        //  $result[$element] = $element;
-        //}
+        $result = [];
+        $total_critical = [];
+        $total_high = [];
+        $total_medium = [];
+        $total_low = [];
+        $total_infomation = [];
 
         $role_custom = @check_role_custom();
-        if (!$role_custom['vulnerabilities']) {
-            $CVEMapping = [];
-            $result = [];
+        if (!($role_custom['vulnerabilities'] ?? false)) {
+            return response()->json([
+                'error' => '',
+                'status_code' => '200',
+                'data' => [
+                    'data' => [],
+                    'host_name' => [],
+                    'total_critical' => [],
+                    'total_high' => [],
+                    'total_medium' => [],
+                    'total_low' => [],
+                    'total_infomation' => [],
+                    'user_id' => @Auth::user()->id,
+                    'side_code' => $request->site,
+                ],
+            ]);
         }
-
-        //============ปรับรูปแบบใหม่=====================
-        $total_critical = array();
-        $total_high = array();
-        $total_medium = array();
-        $total_low = array();
-        $total_infomation  = array();
 
         if (Auth::check()) {
-            $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-            if (@get_role_custom()['superadmin'] == 1) {
-                if (!$request->site) {
-                    $cve_host_name_summarys_data =  DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM sosecure_insight.fx_cve_host_name_summarys where site_id = 0 group by title');
-                } else {
-                    $site_id_m = SiteSettings::select('id')->where('code', $request->site)->first();
-                    $cve_host_name_summarys_data =  DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM sosecure_insight.fx_cve_host_name_summarys where site_id = ' . $site_id_m->id . ' group by title');
-                }
-            } else {
-                if (!$request->site) {
-                    //  $CVEAssets = CVEAssets::select('vendor', 'title')->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
-                    $site_id_List = '(' . implode(',', $site_id_arr) . ')';
-                    $cve_host_name_summarys_data =  DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM sosecure_insight.fx_cve_host_name_summarys where site_id in ' . $site_id_List . ' group by title');
-                } else {
-                    $site_id_m = SiteSettings::select('id')->where('code', $request->site)->first();
-                    //  $CVEAssets = CVEAssets::select('vendor', 'title')->where('site_id', $site_id_m->id)->where("active", '=', 1)->whereIn('site_id', $site_id_arr)->groupBy('vendor', 'title')->get();
-                    $cve_host_name_summarys_data =  DB::select('SELECT title,sum(status_critical) as status_critical,sum(status_high) as status_high,sum(status_medium) as status_medium,sum(status_low) as status_low,sum(status_infomation) as status_infomation FROM sosecure_insight.fx_cve_host_name_summarys where site_id = ' . $site_id_m->id . ' group by title');
-                }
+            $prefix = DB::getTablePrefix();
+            $query = $this->buildDashboardVulnerabilityQuery($request);
+
+            $rows = $query
+                ->selectRaw("
+                    {$prefix}cve_assets.title AS title,
+                    COUNT(DISTINCT CASE WHEN {$prefix}data_datacve_mapping.severity = 'CRITICAL' THEN {$prefix}data_datacve_mapping.namecve END) AS status_critical,
+                    COUNT(DISTINCT CASE WHEN {$prefix}data_datacve_mapping.severity = 'HIGH' THEN {$prefix}data_datacve_mapping.namecve END) AS status_high,
+                    COUNT(DISTINCT CASE WHEN {$prefix}data_datacve_mapping.severity = 'MEDIUM' THEN {$prefix}data_datacve_mapping.namecve END) AS status_medium,
+                    COUNT(DISTINCT CASE WHEN {$prefix}data_datacve_mapping.severity = 'LOW' THEN {$prefix}data_datacve_mapping.namecve END) AS status_low,
+                    COUNT(DISTINCT CASE WHEN {$prefix}data_datacve_mapping.severity = 'NONE' OR {$prefix}data_datacve_mapping.severity = '' OR {$prefix}data_datacve_mapping.severity IS NULL THEN {$prefix}data_datacve_mapping.namecve END) AS status_infomation
+                ")
+                ->groupBy('cve_assets.vendor', 'cve_assets.title')
+                ->orderByRaw("COUNT(DISTINCT {$prefix}data_datacve_mapping.namecve) DESC")
+                ->limit(10)
+                ->get();
+
+            foreach ($rows as $host_name) {
+                $result[] = $host_name->title;
+                $total_critical[] = (int) $host_name->status_critical;
+                $total_high[] = (int) $host_name->status_high;
+                $total_medium[] = (int) $host_name->status_medium;
+                $total_low[] = (int) $host_name->status_low;
+                $total_infomation[] = (int) $host_name->status_infomation;
             }
         }
 
-        foreach ($cve_host_name_summarys_data as $host_name) {
-
-            array_push($result, $host_name->title);
-            if ($host_name->status_high > 0) {
-                array_push($total_high, (int)$host_name->status_high);
-            } else {
-                array_push($total_high, 0);
-            }
-            if ($host_name->status_critical > 0) {
-                array_push($total_critical, (int)$host_name->status_critical);
-            } else {
-                array_push($total_critical, 0);
-            }
-            if ($host_name->status_medium > 0) {
-                array_push($total_medium, (int)$host_name->status_medium);
-            } else {
-                array_push($total_medium, 0);
-            }
-            if ($host_name->status_low > 0) {
-                array_push($total_low, (int)$host_name->status_low);
-            } else {
-                array_push($total_low, 0);
-            }
-            if ($host_name->status_infomation > 0) {
-                array_push($total_infomation, (int)$host_name->status_infomation);
-            } else {
-                array_push($total_infomation, 0);
-            }
-        }
-
-        $response = array(
+        return response()->json([
             'error' => '',
             'status_code' => '200',
             'data' => [
-                'data' => $CVEMapping,
+                'data' => [],
                 'host_name' => $result,
                 'total_critical' => $total_critical,
                 'total_high' => $total_high,
@@ -904,11 +852,9 @@ class DashboardNewController extends Controller
                 'total_low' => $total_low,
                 'total_infomation' => $total_infomation,
                 'user_id' => @Auth::user()->id,
-                'side_code' => $request->site
-
-            ]
-        );
-        return response()->json($response);
+                'side_code' => $request->site,
+            ],
+        ]);
     }
 
     public function chart_indicators(Request $request)
@@ -1723,214 +1669,38 @@ class DashboardNewController extends Controller
 
     public function load_chart(Request $request)
     {
-        //   $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id',$site_id_arr)->select('namecve')->get();
-
+        $high = $medium = $critical = $low = $none = 0;
 
         if (Auth::check()) {
-
             $role_custom = @check_role_custom();
-            // if (!$request->pagename || $request->pagename == 'Vulnerability') {
-            // $role_custom = @check_role_custom();
-            if ($role_custom['vulnerabilities']) {
-                $site_id_arr = UserSite::select('site_id')->where('user_id', @Auth::user()->id)->get();
-                if (@get_role_custom()['superadmin'] == 1) {
+            if ($role_custom['vulnerabilities'] ?? false) {
+                $prefix = DB::getTablePrefix();
+                $stats = $this->buildDashboardVulnerabilityQuery($request)
+                    ->selectRaw("
+                        COUNT(DISTINCT CASE WHEN {$prefix}data_datacve_mapping.severity = 'HIGH' THEN {$prefix}data_datacve_mapping.namecve END) as high,
+                        COUNT(DISTINCT CASE WHEN {$prefix}data_datacve_mapping.severity = 'MEDIUM' THEN {$prefix}data_datacve_mapping.namecve END) as medium,
+                        COUNT(DISTINCT CASE WHEN {$prefix}data_datacve_mapping.severity = 'CRITICAL' THEN {$prefix}data_datacve_mapping.namecve END) as critical,
+                        COUNT(DISTINCT CASE WHEN {$prefix}data_datacve_mapping.severity = 'LOW' THEN {$prefix}data_datacve_mapping.namecve END) as low,
+                        COUNT(DISTINCT CASE WHEN {$prefix}data_datacve_mapping.severity = 'NONE' OR {$prefix}data_datacve_mapping.severity = '' OR {$prefix}data_datacve_mapping.severity IS NULL THEN {$prefix}data_datacve_mapping.namecve END) as none
+                    ")
+                    ->first();
 
-                    if (!$request->site) {
-                        // $model = new CVEMapping;
-                        // $model->get();
-                        // $high = $model->where('severity', '=', 'HIGH')->count();
-                        // $medium = $model->where('severity', '=', 'MEDIUM')->count();
-                        // $critical = $model->where('severity', '=', 'CRITICAL')->count();
-                        // $low = $model->where('severity', '=', 'LOW')->count();
-                        // $none = $model->where('severity', '=', 'NONE')->count();
-
-                        $query = $none = DB::table('summary')
-                            ->where('status', 'Y')
-                            ->whereIn('data_text', ['Information', 'Low', 'medium', 'high', 'critical'])
-                            ->where('data_key_2', 'Vulnerability')
-                            ->select('data_text', DB::raw('sum(data_value) as data_value'))
-                            ->groupBy('data_text')
-                            ->orderBy('data_text')
-                            ->get();
-
-                        $none = intval($query[2]->data_value);
-                        $low = intval($query[3]->data_value);
-                        $medium = intval($query[4]->data_value);
-                        $high = intval($query[1]->data_value);
-                        $critical = intval($query[0]->data_value);
-
-
-                        // $none = DB::table('summary')
-                        //     ->where('status', 'Y')
-                        //     ->where('data_text', 'Information')
-                        //     ->where('data_key_2', 'Vulnerability')
-                        //     ->select( DB::raw('sum(data_value) as sum'))
-                        //     ->first()
-                        //     ->sum;
-                        // $none = intval($none);
-
-                        // $low = DB::table('summary')
-                        //     ->where('status', 'Y')
-                        //     ->where('data_text', 'Low')
-                        //     ->where('data_key_2', 'Vulnerability')
-                        //     ->select( DB::raw('sum(data_value) as sum'))
-                        //     ->first()
-                        //     ->sum;
-                        // $low = intval($low);
-
-                        // $medium = DB::table('summary')
-                        //     ->where('status', 'Y')
-                        //     ->where('data_text', 'Medium')
-                        //     ->where('data_key_2', 'Vulnerability')
-                        //     ->select( DB::raw('sum(data_value) as sum'))
-                        //     ->first()
-                        //     ->sum;
-                        // $medium = intval($medium);
-
-                        // $high = DB::table('summary')
-                        //     ->where('status', 'Y')
-                        //     ->where('data_text', 'High')
-                        //     ->where('data_key_2', 'Vulnerability')
-                        //     ->select( DB::raw('sum(data_value) as sum'))
-                        //     ->first()
-                        //     ->sum;
-                        // $high = intval($high);
-
-                        // $critical = DB::table('summary')
-                        //     ->where('status', 'Y')
-                        //     ->where('data_text', 'Critical')
-                        //     ->where('data_key_2', 'Vulnerability')
-                        //     ->select( DB::raw('sum(data_value) as sum'))
-                        //     ->first()
-                        //     ->sum;
-                        // $critical = intval($critical);
-
-
-                    } else {
-                        // $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-                        // $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_id_m->id)->select('namecve')->get();
-                        // $model = new CVEMapping;
-                        // $model->get();
-                        // $site_id_m = SiteSettings::select('id')->where('code',$request -> site)->first();
-
-                        // $high = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'HIGH')->count();
-                        // $medium = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'MEDIUM')->count();
-                        // $critical = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'CRITICAL')->count();
-                        // $low = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'LOW')->count();
-                        // $none = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'NONE')->count();
-
-                        $count = DB::table('summary')->where('data_key', 'dashboardnew')->where('site', $request->site)->count();
-                        if ($count > 0) {
-
-                            $query =  $none = DB::table('summary')
-                                ->where('site', $request->site)
-                                ->where('status', 'Y')
-                                ->whereIn('data_text', ['Information', 'Low', 'medium', 'high', 'critical'])
-                                ->where('data_key_2', 'Vulnerability')
-                                ->select('data_text', 'data_value')
-                                ->orderBy('data_text')
-                                ->get();
-
-                            $none = intval($query[2]->data_value);
-                            $low = intval($query[3]->data_value);
-                            $medium = intval($query[4]->data_value);
-                            $high = intval($query[1]->data_value);
-                            $critical = intval($query[0]->data_value);
-
-                            // $none = DB::table('summary')
-                            //     ->where('site', $request->site)
-                            //     ->where('status', 'Y')
-                            //     ->where('data_text', 'Information')
-                            //     ->where('data_key_2', 'Vulnerability')
-                            //     ->select('data_value')
-                            //     ->first()
-                            //     ->data_value;
-                            // $none = intval($none);
-
-
-
-                            // $low = DB::table('summary')
-                            //     ->where('site', $request->site)
-                            //     ->where('status', 'Y')
-                            //     ->where('data_text', 'Low')
-                            //     ->where('data_key_2', 'Vulnerability')
-                            //     ->select('data_value')
-                            //     ->first()
-                            //     ->data_value;
-                            // $low = intval($low);
-
-                            // $medium = DB::table('summary')
-                            //     ->where('site', $request->site)
-                            //     ->where('status', 'Y')
-                            //     ->where('data_text', 'Medium')
-                            //     ->where('data_key_2', 'Vulnerability')
-                            //     ->select('data_value')
-                            //     ->first()
-                            //     ->data_value;
-                            // $medium = intval($medium);   
-
-                            // $high = DB::table('summary')
-                            //     ->where('site', $request->site)
-                            //     ->where('status', 'Y')
-                            //     ->where('data_text', 'High')
-                            //     ->where('data_key_2', 'Vulnerability')
-                            //     ->select('data_value')
-                            //     ->first()
-                            //     ->data_value;
-                            // $high = intval($high);
-
-                            // $critical = DB::table('summary')
-                            //     ->where('site', $request->site)
-                            //     ->where('status', 'Y')
-                            //     ->where('data_text', 'Critical')
-                            //     ->where('data_key_2', 'Vulnerability')
-                            //     ->select('data_value')
-                            //     ->first()
-                            //     ->data_value;
-                            // $critical = intval($critical);
-                        } else {
-                            $none = 0;
-                            $low = 0;
-                            $medium = 0;
-                            $high = 0;
-                            $critical = 0;
-                        }
-                    }
-                } else {
-                    if (!$request->site) {
-                        $CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_arr)->select('namecve')->get();
-                        $model = new CVEMapping;
-                        $model->get();
-                        $high = $model->where('severity', '=', 'HIGH')->whereIn('namecve', $CVEMappingAssets_name)->count();
-                        $medium = $model->where('severity', '=', 'MEDIUM')->whereIn('namecve', $CVEMappingAssets_name)->count();
-                        $critical = $model->where('severity', '=', 'CRITICAL')->whereIn('namecve', $CVEMappingAssets_name)->count();
-                        $low = $model->where('severity', '=', 'LOW')->whereIn('namecve', $CVEMappingAssets_name)->count();
-                        $none = $model->where('severity', '=', 'NONE')->whereIn('namecve', $CVEMappingAssets_name)->count();
-                    } else {
-                        $site_id_m = SiteSettings::select('id')->where('code', $request->site)->first();
-                        $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_id_m->id)->select('namecve')->get();
-                        $model = new CVEMapping;
-                        $model->get();
-                        $high = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'HIGH')->count();
-                        $medium = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'MEDIUM')->count();
-                        $critical = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'CRITICAL')->count();
-                        $low = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'LOW')->count();
-                        $none = $model->whereIn('namecve', $CVEMappingAssets_name)->where('severity', '=', 'NONE')->count();
-                    }
-                }
+                $high = (int) ($stats->high ?? 0);
+                $medium = (int) ($stats->medium ?? 0);
+                $critical = (int) ($stats->critical ?? 0);
+                $low = (int) ($stats->low ?? 0);
+                $none = (int) ($stats->none ?? 0);
             }
         }
 
         if ($request->ajax()) {
-            $data = [
-                "count_high" => @$high,
-                "count_medium" => @$medium,
-                "count_critical" => @$critical,
-                "count_low" => @$low,
-                "count_none" => @$none,
-            ];
-
-            return response()->json($data);
+            return response()->json([
+                'count_high' => $high,
+                'count_medium' => $medium,
+                'count_critical' => $critical,
+                'count_low' => $low,
+                'count_none' => $none,
+            ]);
         }
     }
 }

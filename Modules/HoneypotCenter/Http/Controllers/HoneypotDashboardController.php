@@ -68,13 +68,18 @@ class HoneypotDashboardController extends Controller
         $filters = $this->resolveFilters($request);
 
         try {
+            $page = max(1, (int) $request->query('page', 1));
+            $perPage = (int) $request->query('per_page', 0);
+
             return response()->json(
                 $this->dashboard->getSectionData(
                     $section,
                     $filters['site_id'],
                     $filters['window'],
                     $filters['sensor_token_id'],
-                    $filters['allowed_site_ids']
+                    $filters['allowed_site_ids'],
+                    $page,
+                    $perPage
                 )
             );
         } catch (\InvalidArgumentException $e) {

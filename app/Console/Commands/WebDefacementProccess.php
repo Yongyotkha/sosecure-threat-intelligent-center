@@ -1370,7 +1370,8 @@ class WebDefacementProccess extends Command
 
               $WebdefacmentDataCheck_save->save();
 
-
+              \Log::info("[DefaceResult] Setting ID: {$webdefacment_id}, Status: {$status}, Score: {$pointAlert}%, outbound: " . count($result['_outbound_new_not_wl'] ?? []));
+              $this->info("[DefaceResult] Setting ID: {$webdefacment_id}, Status: {$status}, Score: {$pointAlert}%, outbound: " . count($result['_outbound_new_not_wl'] ?? []));
 
               $WebdefacmentSetting_update =   WebdefacmentSetting::find($webdefacment_id);
 
@@ -2388,327 +2389,118 @@ class WebDefacementProccess extends Command
 
   private function getHtml3($url, $retryCount = 0, $options = [])
   {
-    $browser = null;
     $maxRetries = 10;
-
-    try {
-      ini_set('max_execution_time', 300);
-      ini_set('default_socket_timeout', 300);
-      set_time_limit(0);
-
-      putenv('NODE_PATH=' . base_path('puphpeteer_env/node_modules'));
-      $_ENV['NODE_PATH'] = base_path('puphpeteer_env/node_modules');
-
-      // 🟩 ปิด Chrome ที่ค้างไว้
-      @exec("pkill -f 'chrome --headless' >/dev/null 2>&1");
-
-      $puppeteer = new \Nesk\Puphpeteer\Puppeteer([
-        'read_timeout' => 300,
-        'idle_timeout' => 300,
-      ]);
-
-      $browser = $puppeteer->launch([
-        'executablePath' => '/usr/bin/google-chrome',
-        'headless' => true,
-        'args' => [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-gpu',
-          '--single-process',
-          '--no-zygote',
-          '--disable-background-timer-throttling',
-          '--disable-renderer-backgrounding',
-          '--disable-background-networking',
-          '--disable-features=IsolateOrigins,site-per-process',
-          '--window-size=1920,1080',
-        ],
-      ]);
-
-      $page = $browser->newPage();
-      $page->setDefaultNavigationTimeout(90000); // เพิ่มเป็น 90 วินาที
-
-      // 🟩 Set User-Agent to bypass basic blocking
-      if (!empty($options['userAgent'])) {
-          $page->setUserAgent($options['userAgent']);
-      } else {
-          $page->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-      }
-
-      // 🟩 เปิด JavaScript
-      $page->setJavaScriptEnabled(true);
-
-      // ✅ ใช้ waitUntil strategy ที่ต่างกันตาม retry count
-      // - retry 0: networkidle2 (ผ่อนปรนกว่า networkidle0)
-      // - retry 1+: load + domcontentloaded (เร็วขึ้น)
-      $waitStrategies = [
-          ['load', 'domcontentloaded', 'networkidle2'],  // retry 0
-          ['load', 'domcontentloaded'],                   // retry 1
-          ['load'],                                        // retry 2+
-      ];
-      $strategyIdx = min($retryCount, count($waitStrategies) - 1);
-      $waitUntil = $waitStrategies[$strategyIdx];
-      $timeout = $retryCount === 0 ? 90000 : 60000; // ลด timeout ใน retry
-      
-      \Log::info("[getHtml3] Attempt " . ($retryCount + 1) . " for {$url} (waitUntil: " . implode(',', $waitUntil) . ")");
-
-      // 🟩 จับ "frame was detached" ที่เกิดจากเว็บ redirect ข้าม origin ระหว่าง goto
-      //    เฉพาะ site ที่ redirect แบบนี้เท่านั้นจะเข้า path นี้ — site อื่นไม่ได้รับผลกระทบ
-      $response = null;
-      $httpStatus = 0;
-
-      try {
-          $response = $page->goto($url, [
-            'timeout' => $timeout,
-            'waitUntil' => $waitUntil,
-          ]);
-          $httpStatus = $response ? $response->status() : 0;
-      } catch (\Throwable $gotoEx) {
-          if (stripos($gotoEx->getMessage(), 'frame was detached') !== false ||
-              stripos($gotoEx->getMessage(), 'Execution context was destroyed') !== false) {
-              // 🟩 Frame เดิมหลุดเพราะ page redirect ข้าม origin
-              //    page object เดิมใช้ไม่ได้แล้ว → ดึง page ใหม่จาก browser
-              \Log::info("[getHtml3] Frame detached for {$url} — recovering via browser.pages()...");
-              sleep(5); // รอให้ page หลัง redirect โหลดเสร็จ
-
-              try {
-                  // ดึง page ล่าสุดจาก browser (page ที่ redirect ไปแล้ว)
-                  $allPages = $browser->pages();
-                  $newPage = end($allPages);
-
-                  // รอ body โหลด
-                  try {
-                      $newPage->waitForSelector('body', ['timeout' => 15000]);
-                  } catch (\Throwable $ignore) {
-                      // ถ้า timeout ก็ไม่เป็นไร ลองดึง content ต่อ
-                  }
-
-                  sleep(2);
-                  $content = $newPage->content();
-
-                  if (strlen($content) < 500) {
-                      \Log::warning("[getHtml3] Frame-detach recovery: content too short (" . strlen($content) . " bytes) for {$url}");
-                      throw new \Exception("Frame-detach recovery: content too short");
-                  }
-
-                  \Log::info("[getHtml3] Frame-detach recovery SUCCESS for {$url} — got " . strlen($content) . " bytes");
-
-                  // 🟩 Screenshot จาก page ใหม่
-                  $screenshotBase64 = null;
-                  $screenshotSaved = false;
-                  if (!empty($options['screenshot_path'])) {
-                      try {
-                          $dir = dirname($options['screenshot_path']);
-                          if (!is_dir($dir)) { @mkdir($dir, 0775, true); }
-                          $newPage->screenshot(['path' => $options['screenshot_path'], 'fullPage' => true]);
-                          $screenshotSaved = file_exists($options['screenshot_path']);
-                      } catch (\Throwable $ssEx) {
-                          \Log::warning("[getHtml3] Screenshot after frame-detach failed: " . $ssEx->getMessage());
-                      }
-                  }
-
-                  return [
-                      'content' => $content,
-                      'success' => true,
-                      'screenshot_base64' => $screenshotBase64,
-                      'screenshot_saved' => $screenshotSaved,
-                  ];
-              } catch (\Throwable $recoveryEx) {
-                  \Log::warning("[getHtml3] Frame-detach recovery FAILED for {$url}: " . $recoveryEx->getMessage());
-                  // ถ้า recovery ไม่สำเร็จ → throw ต่อให้ retry logic จัดการ
-                  throw $recoveryEx;
-              }
-          } else {
-              throw $gotoEx;
-          }
-      }
-
-      // 🟩 รอให้หน้าเว็บโหลดเสร็จ (สำหรับ site ที่ goto สำเร็จปกติ)
-      sleep(1);
-
-      // 🟩 SCROLL เพื่อ TRIGGER LAZY LOADING (Optimized)
-      $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
-            return (async () => {
-                const scrollStep = 800; 
-                const scrollDelay = 100; 
-                
-                const totalHeight = Math.max(
-                    document.body.scrollHeight,
-                    document.documentElement.scrollHeight
-                );
-                
-                for (let scrolled = 0; scrolled < totalHeight; scrolled += scrollStep) {
-                    window.scrollTo(0, scrolled);
-                    await new Promise(resolve => setTimeout(resolve, scrollDelay));
-                }
-                
-                // Scroll กลับขึ้นบน
-                window.scrollTo(0, 0);
-                await new Promise(resolve => setTimeout(resolve, 200));
-            })();
-        "));
-
-      // 🟩 รอ network requests ที่เกิดจาก scroll
-      sleep(2); // ลดเวลาลงเล็กน้อย
-
-      // 🟩 WAIT UNTIL DOM STABLE (เพิ่มเวลารอ)
-      $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
-            () => {
-                return new Promise(resolve => {
-                    let last = document.body.innerHTML.length;
-                    let stableCount = 0;
-                    let attempts = 0;
-                    const maxAttempts = 60;   // 30 seconds (60 × 500ms) - เพิ่มจาก 20
-
-                    const check = () => {
-                        attempts++;
-                        const now = document.body.innerHTML.length;
-
-                        if (now === last) {
-                            stableCount++;
-                            if (stableCount >= 4) return resolve(true); // stable 2s (เพิ่มจาก 3)
-                        } else {
-                            stableCount = 0;
-                        }
-
-                        last = now;
-
-                        // Fallback → do not wait forever
-                        if (attempts >= maxAttempts) {
-                            console.log('DOM stability timeout, proceeding anyway');
-                            return resolve(true);
-                        }
-
-                        setTimeout(check, 500);
-                    };
-
-                    check();
-                });
-            }
-        "));
-
-      // 🟩 รอเพิ่มอีกนิดเพื่อให้แน่ใจว่า dynamic content โหลดเสร็จ
-      sleep(1);
-
-      // 🟩 Pull final HTML snapshot
-      $content = $page->content();
-
-      // 🟩 ตรวจสอบว่า content ที่ได้มามีความสมบูรณ์หรือไม่
-      if (strlen($content) < 500) {
-        $title = $page->title();
-        $msg = "Content too short. Len: " . strlen($content) . ", Status: {$httpStatus}, Title: {$title}";
-        \Log::warning("getHtml3: {$msg} ({$url})");
-        throw new \Exception($msg);
-      }
-
-      // 🟩 Screenshot Capture (Optional)
-      $screenshotBase64 = null;
-      $screenshotSaved = false;
-
-      // 1. ถ้ามี Path ให้ Save ลงไฟล์เลย (ประหยัด memory)
-      if (!empty($options['screenshot_path'])) {
-          try {
-              $dir = dirname($options['screenshot_path']);
-              
-              // สร้าง directory ถ้ายังไม่มี
-              if (!is_dir($dir)) {
-                  $mkdirResult = @mkdir($dir, 0775, true);
-                  if ($mkdirResult) {
-                      @chmod($dir, 0775);
-                  } else {
-                      \Log::warning("[getHtml3] Failed to create directory: {$dir}");
-                  }
-              }
-              
-              // ถ่ายภาพ
-              $page->screenshot([
-                  'path' => $options['screenshot_path'],
-                  'fullPage' => true
-              ]);
-              
-              // Verify ว่าไฟล์ถูกสร้างจริง
-              if (file_exists($options['screenshot_path'])) {
-                  $screenshotSaved = true;
-              } else {
-                  \Log::warning("[getHtml3] Screenshot command ran but file not created at {$options['screenshot_path']}");
-              }
-          } catch (\Throwable $e) {
-              \Log::warning("[getHtml3] Screenshot save failed ({$url}) - " . $e->getMessage());
-          }
-      } 
-      // 2. ถ้าไม่มี Path แต่ขอ Screenshot ให้ส่ง Base64 กลับไป
-      elseif (!empty($options['screenshot'])) {
-          try {
-              $screenshotBase64 = $page->screenshot([
-                  'encoding' => 'base64',
-                  'fullPage' => true
-              ]);
-          } catch (\Throwable $e) {
-              \Log::warning("getHtml3: Screenshot base64 failed ({$url}) - " . $e->getMessage());
-          }
-      }
-
-      return [
-          'content' => $content, 
-          'success' => true, 
-          'screenshot_base64' => $screenshotBase64,
-          'screenshot_saved' => $screenshotSaved
-      ];
-    } catch (\Throwable $e) {
-      $errorMsg = $e->getMessage();
-
-      // 🟩 ตรวจสอบว่าเป็น network error หรือไม่
-      $isNetworkError = (
-        stripos($errorMsg, 'ERR_SOCKET_NOT_CONNECTED') !== false ||
-        stripos($errorMsg, 'ERR_CONNECTION') !== false ||
-        stripos($errorMsg, 'ERR_NETWORK') !== false ||
-        stripos($errorMsg, 'ERR_TIMED_OUT') !== false ||
-        stripos($errorMsg, 'Navigation timeout') !== false ||
-        stripos($errorMsg, 'Content too short') !== false ||
-        stripos($errorMsg, 'frame was detached') !== false ||
-        stripos($errorMsg, 'Execution context was destroyed') !== false ||
-        stripos($errorMsg, 'Session closed') !== false ||
-        stripos($errorMsg, 'Target closed') !== false
-      );
-
-      \Log::error("Puphpeteer Error (attempt " . ($retryCount + 1) . "/{$maxRetries}): {$errorMsg} at {$url}");
-
-      // 🟩 ถ้าเป็น network error และยังลองไม่ถึง max retries ให้ลองใหม่
-      if ($isNetworkError && $retryCount < $maxRetries) {
-        \Log::info("Retrying {$url} (attempt " . ($retryCount + 2) . "/{$maxRetries})");
-
-        // ปิด browser ก่อน retry
-        if ($browser) {
-          try {
-            $browser->close();
-          } catch (\Throwable $ex) {
-            // ignore
-          }
+    
+    $chromeHome = storage_path('app/chrome_home');
+    if (!file_exists($chromeHome)) {
+        @mkdir($chromeHome, 0777, true);
+    }
+    putenv('HOME=' . $chromeHome);
+    $_ENV['HOME'] = $chromeHome;
+    
+    putenv('NODE_PATH=' . base_path('puphpeteer_env/node_modules'));
+    $_ENV['NODE_PATH'] = base_path('puphpeteer_env/node_modules');
+    
+    // We will run the scraper.js using node command line.
+    // To ensure everything is clean, we write the HTML output to a temp file,
+    // and then read it from PHP.
+    $tempHtmlFile = tempnam(sys_get_temp_dir(), 'deface_html_');
+    $screenshotPath = isset($options['screenshot_path']) ? $options['screenshot_path'] : '';
+    $userAgent = isset($options['userAgent']) ? $options['userAgent'] : '';
+    
+    // Select waitUntil strategies based on retryCount
+    $waitStrategies = [
+        'load,domcontentloaded,networkidle2', // retry 0
+        'load,domcontentloaded',              // retry 1
+        'load',                               // retry 2+
+    ];
+    $strategyIdx = min($retryCount, count($waitStrategies) - 1);
+    $waitUntil = $waitStrategies[$strategyIdx];
+    
+    // Build node execution command
+    $nodeScript = public_path('js/scraper.js');
+    
+    $executablePath = env('PUPPETEER_EXECUTABLE_PATH', '/usr/bin/google-chrome');
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && $executablePath === '/usr/bin/google-chrome') {
+        $executablePath = '';
+    }
+    
+    // Build command with properly escaped shell arguments
+    $command = 'node ' . escapeshellarg($nodeScript) . ' ' . escapeshellarg($url) . ' ' . escapeshellarg($tempHtmlFile) . ' ' . escapeshellarg($screenshotPath) . ' ' . escapeshellarg($userAgent) . ' ' . escapeshellarg($waitUntil) . ' ' . escapeshellarg($executablePath);
+    
+    \Log::info("[getHtml3] Executing standalone scraper (Attempt " . ($retryCount + 1) . "): " . $command);
+    $this->info("[getHtml3] Executing standalone scraper (Attempt " . ($retryCount + 1) . ")...");
+    
+    $output = [];
+    $exitCode = -1;
+    
+    exec($command . ' 2>&1', $output, $exitCode);
+    
+    $logLines = [];
+    if ($exitCode === 0) {
+        $msg = "[getHtml3] Scraper finished successfully (Exit Code: 0).";
+        $logLines[] = $msg;
+        $this->info($msg);
+    } else {
+        $msg = "[getHtml3] Scraper failed (Exit Code: $exitCode).";
+        $logLines[] = $msg;
+        $this->error($msg);
+    }
+    
+    if (count($output) > 0) {
+        $logLines[] = "--- Scraper Logs ---";
+        $this->line("--- Scraper Logs ---");
+        foreach ($output as $line) {
+            $logLines[] = "  " . $line;
+            $this->line("  " . $line);
         }
-
-        // รอสักครู่ก่อน retry
-        sleep(2 + $retryCount); // รอนานขึ้นทุกครั้งที่ retry
-
-        return $this->getHtml3($url, $retryCount + 1, $options);
-      }
-
-      // 🟩 ถ้า retry หมดแล้วหรือไม่ใช่ network error ให้ใช้ fallback
-      // แต่ return พร้อม error flag เพื่อไม่ให้ diff
-      // $fallbackResult = $this->getHtmlFallback($url); // DISABLE FALLBACK
-      $fallbackResult = [];
-      $fallbackResult['content'] = ''; 
-      $fallbackResult['success'] = false;
-      $fallbackResult['error'] = $errorMsg;
-
-      return $fallbackResult;
-    } finally {
-      if ($browser) {
-        try {
-          $browser->close();
-        } catch (\Throwable $ex) {
-          \Log::warning("Browser close failed: " . $ex->getMessage());
+        $logLines[] = "--------------------";
+        $this->line("--------------------");
+    }
+    
+    \Log::info(implode("\n", $logLines));
+    
+    if ($exitCode === 0 && file_exists($tempHtmlFile) && filesize($tempHtmlFile) > 0) {
+        $content = file_get_contents($tempHtmlFile);
+        @unlink($tempHtmlFile); // clean up
+        
+        $screenshotSaved = !empty($screenshotPath) && file_exists($screenshotPath) && filesize($screenshotPath) > 0;
+        
+        return [
+            'content' => $content,
+            'success' => true,
+            'screenshot_base64' => null,
+            'screenshot_saved' => $screenshotSaved
+        ];
+    } else {
+        // Log failure details
+        $errorMsg = "Node scraper failed. Exit code: " . $exitCode . ". Logs: " . implode(" ", $output);
+        \Log::error("Scraper Error (attempt " . ($retryCount + 1) . "/{$maxRetries}): {$errorMsg} at {$url}");
+        
+        @unlink($tempHtmlFile); // clean up
+        
+        // Handle retries
+        $isNetworkError = (
+            stripos($errorMsg, 'ERR_SOCKET_NOT_CONNECTED') !== false ||
+            stripos($errorMsg, 'ERR_CONNECTION') !== false ||
+            stripos($errorMsg, 'ERR_NETWORK') !== false ||
+            stripos($errorMsg, 'ERR_TIMED_OUT') !== false ||
+            stripos($errorMsg, 'timeout') !== false ||
+            stripos($errorMsg, 'detached') !== false ||
+            stripos($errorMsg, 'destroyed') !== false
+        );
+        
+        if ($isNetworkError && $retryCount < $maxRetries) {
+            \Log::info("Retrying {$url} (attempt " . ($retryCount + 2) . "/{$maxRetries}) in " . (2 + $retryCount) . " seconds");
+            sleep(2 + $retryCount);
+            return $this->getHtml3($url, $retryCount + 1, $options);
         }
-      }
+        
+        return [
+            'content' => '',
+            'success' => false,
+            'error' => $errorMsg
+        ];
     }
   }
 

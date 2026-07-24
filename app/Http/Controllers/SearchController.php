@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\DataLeakFeed;
 use App\Services\IndicatorCheckService;
+use App\Services\PublishedFeedsService;
 use App\LogSearch;
 use App\R_s_s_news;
 use App\SiteLimitApi;
@@ -11,6 +12,7 @@ use App\SiteRequestLimitApi;
 use App\SystemLimitApi;
 use App\Traits\Taggable;
 use DB;
+use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Http\Request;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMappingAssets;
@@ -213,7 +215,7 @@ class SearchController extends Controller
            
             if(@$role_custom['indicators']) {
                 if($type == 'events'){
-                    $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+                    $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
                     $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                     $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
             
@@ -319,7 +321,7 @@ class SearchController extends Controller
                 if($type == 'events'){
                     
                     $dataWait = null;
-                    $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
+                    $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
                     $pipeLine = array('indicator_name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                     $dataWait['count'] = $col_fx_transaction_otx_indicators_data->count($pipeLine);
                   
@@ -372,7 +374,7 @@ class SearchController extends Controller
                                             }
                                            
                                             if(!empty($indicator_id)){
-                                                $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
+                                                $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
                                                 $options = [
                                                     'allowDiskUse' => TRUE
                                                 ];
@@ -414,7 +416,7 @@ class SearchController extends Controller
     
     
        
-                                            //     $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
+                                            //     $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
                                          
                                         
                                             //     $query = [
@@ -451,7 +453,7 @@ class SearchController extends Controller
                                      
                                           
                                             if(!empty($event_ids)){
-                                                $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+                                                $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
                                                 $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
                                                 $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
                                                 
@@ -518,7 +520,7 @@ class SearchController extends Controller
                 //Malware
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_malware_related;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_malware_related;
                 $pipeLine = array('malware_name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
                 if($dataWait['count']>0){
@@ -567,7 +569,7 @@ class SearchController extends Controller
 
 
                                      
-                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
                                         $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
                                         $dataWait['count'] =count($event_ids);
                                        
@@ -628,7 +630,7 @@ class SearchController extends Controller
               
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
                 $pipeLine = array('adversary_name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
              
@@ -678,7 +680,7 @@ class SearchController extends Controller
 
 
                                      
-                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
                                         $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
                                         $dataWait['count'] =count($event_ids);
                                        
@@ -740,7 +742,7 @@ class SearchController extends Controller
                 //Malware
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_malware;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_malware;
                 $pipeLine = array('malware_uuid' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
                 if($dataWait['count']>0){
@@ -789,7 +791,7 @@ class SearchController extends Controller
               
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
                 $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
                 
@@ -996,7 +998,7 @@ class SearchController extends Controller
             }
 
 
-            // $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;//indicator_name
+            // $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;//indicator_name
             // $pipeLine = array('indicator_name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
             // $dataWait['count'] = $col_fx_otx_indicator_detail->count($pipeLine);
             // if($dataWait['count']>0){
@@ -1034,7 +1036,7 @@ class SearchController extends Controller
             // }
 
             if(@$role_custom['indicators']) {
-                $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+                $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
                 $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_events->count($pipeLine);
 
@@ -1139,7 +1141,7 @@ class SearchController extends Controller
 
             if(@$role_custom['indicators']) {
                 $dataWait = null;
-                $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent_dev->fx_transaction_otx_indicators_data;
+                $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
                 $pipeLine = array('indicator' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_transaction_otx_indicators_data->count($pipeLine);
                 if($dataWait['count']>0){
@@ -1183,7 +1185,7 @@ class SearchController extends Controller
 
 
    
-                                            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
+                                            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
                                      
                                     
                                             $query = [
@@ -1217,7 +1219,7 @@ class SearchController extends Controller
 
                                         }
                                      
-                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
                                         $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
                                         $dataWait['count'] =count($event_ids);
                                        
@@ -1287,7 +1289,7 @@ class SearchController extends Controller
                 //Malware
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_malware_related;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_malware_related;
                 $pipeLine = array('malware_name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
                 if($dataWait['count']>0){
@@ -1336,7 +1338,7 @@ class SearchController extends Controller
 
 
                                      
-                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
                                         $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
                                         $dataWait['count'] =count($event_ids);
                                        
@@ -1395,7 +1397,7 @@ class SearchController extends Controller
               
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
                 $pipeLine = array('adversary_name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
              
@@ -1445,7 +1447,7 @@ class SearchController extends Controller
 
 
                                      
-                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+                                        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
                                         $pipeLine = array('pulse_id' => ['$in'=>$event_ids]);
                                         $dataWait['count'] =count($event_ids);
                                        
@@ -1506,7 +1508,7 @@ class SearchController extends Controller
                 //Malware
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_malware;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_malware;
                 $pipeLine = array('malware_uuid' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
                 if($dataWait['count']>0){
@@ -1553,7 +1555,7 @@ class SearchController extends Controller
               
                 $this->request->keyword = trim($this->request->keyword);
                 $dataWait = null;
-                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
+                $col_fx_otx_malware_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
                 $pipeLine = array('name' => ['$regex'=>$this->request->keyword, '$options' => 'i']);
                 $dataWait['count'] = $col_fx_otx_malware_related->count($pipeLine);
                 
@@ -1648,24 +1650,109 @@ class SearchController extends Controller
        //format
        $type = $this->check_keyword_type($keyword);
 
+        if ($source === 'calculate_risk') {
+            if ($type === '') {
+                return response()->json([
+                    'status_code' => 401,
+                    'message' => 'allow only type ( IP,Domain,URL,MD5, SHA1 or SHA256 ) Please contact the system administrator.',
+                    'type' => $type,
+                ]);
+            }
+
+            try {
+                $iocType = IndicatorCheckService::normalizeIocType($type);
+                $service = new IndicatorCheckService();
+                $client = new GuzzleClient(['verify' => false, 'timeout' => 30]);
+                $result = $service->checkIocAsync($client, $keyword, $iocType, null)->wait();
+
+                return response()->json([
+                    'status_code' => 200,
+                    'data' => [
+                        'total_score' => $result['total_score'],
+                        'risk_level' => $result['risk_level'],
+                        'debug_scores' => $result['debug_scores'] ?? [],
+                        'debug_weights' => $result['debug_weights'] ?? [],
+                    ],
+                    'type' => $type,
+                ]);
+            } catch (\Exception $e) {
+                \Log::warning('Search calculate_risk failed: ' . $e->getMessage());
+
+                return response()->json([
+                    'status_code' => 500,
+                    'error' => $e->getMessage(),
+                    'type' => $type,
+                ]);
+            }
+        }
+
         if($source == 'internal_events') {
             try {
                 $clientMD = new \MongoDB\Client(env("DB_MONGO_STOREDATAB"));
-                $db = $clientMD->sosecure_threatintelligent_dev;
-                
+                $db = PublishedFeedsService::database($clientMD);
+                $queryOptions = [
+                    'maxTimeMS' => 15000,
+                    'typeMap' => ['root' => 'array', 'document' => 'array'],
+                    'hint' => ['indicator' => 1],
+                ];
+
+                $indicatorVariants = array_values(array_unique(array_filter([
+                    $keyword,
+                    $original_keyword !== $keyword ? $original_keyword : null,
+                    strtolower($keyword),
+                    strtoupper($keyword),
+                ], function ($value) {
+                    return $value !== null && $value !== '';
+                })));
+
                 $eventsList = [];
-                $otxRefs = $db->fx_otx_events_indicator_ref->find(['indicator' => ['$regex' => $keyword, '$options' => 'i']])->toArray();
+                $refQuery = count($indicatorVariants) === 1
+                    ? ['indicator' => $indicatorVariants[0]]
+                    : ['indicator' => ['$in' => $indicatorVariants]];
+
+                $otxRefs = $db->fx_otx_events_indicator_ref->find(
+                    $refQuery,
+                    array_merge($queryOptions, [
+                        'limit' => 500,
+                        'projection' => ['pulse_id' => 1],
+                    ])
+                )->toArray();
                 
                 $pulseIds = [];
                 foreach ($otxRefs as $ref) {
-                    if (isset($ref['pulse_id'])) {
-                        $pulseIds[] = $ref['pulse_id'];
+                    if (!isset($ref['pulse_id'])) {
+                        continue;
+                    }
+
+                    $rawPulseId = $ref['pulse_id'];
+                    if (is_array($rawPulseId) || $rawPulseId instanceof \Traversable) {
+                        foreach ($rawPulseId as $pid) {
+                            if (is_scalar($pid) && (string) $pid !== '') {
+                                $pulseIds[] = (string) $pid;
+                            }
+                        }
+                        continue;
+                    }
+
+                    if (is_scalar($rawPulseId) && (string) $rawPulseId !== '') {
+                        $pulseIds[] = (string) $rawPulseId;
                     }
                 }
-                
-                if (!empty($pulseIds)) {
-                    $pulseIds = array_unique($pulseIds);
-                    $otxEvents = $db->fx_otx_events->find(['pulse_id' => ['$in' => $pulseIds]])->toArray();
+
+                $pulseIds = array_values(array_unique($pulseIds));
+
+                if (count($pulseIds) > 100) {
+                    $pulseIds = array_slice($pulseIds, 0, 100);
+                }
+
+                if (count($pulseIds) > 0) {
+                    $otxEvents = $db->fx_otx_events->find(
+                        ['pulse_id' => ['$in' => $pulseIds]],
+                        array_merge($queryOptions, [
+                            'limit' => 100,
+                            'projection' => ['pulse_id' => 1, 'name' => 1, 'tags' => 1, 'created' => 1],
+                        ])
+                    )->toArray();
                     
                     foreach ($otxEvents as $event) {
                         $pulseId = $event['pulse_id'] ?? 'Unknown';
@@ -1700,7 +1787,31 @@ class SearchController extends Controller
                     'data' => $eventsList,
                     'type' => $type
                 ]);
+            } catch (\MongoDB\Driver\Exception\ExecutionTimeoutException $e) {
+                \Log::warning('internal_events MongoDB timeout: ' . $e->getMessage(), [
+                    'keyword' => $keyword,
+                ]);
+
+                return response()->json([
+                    'status_code' => 200,
+                    'data' => [],
+                    'message' => 'Internal events search timed out. Use the exact IOC value from Indicators.',
+                    'type' => $type,
+                ]);
             } catch (\Exception $e) {
+                if (stripos($e->getMessage(), 'exceeded time limit') !== false) {
+                    \Log::warning('internal_events MongoDB timeout: ' . $e->getMessage(), [
+                        'keyword' => $keyword,
+                    ]);
+
+                    return response()->json([
+                        'status_code' => 200,
+                        'data' => [],
+                        'message' => 'Internal events search timed out. Use the exact IOC value from Indicators.',
+                        'type' => $type,
+                    ]);
+                }
+
                 return response()->json([
                     'status_code' => 500,
                     'error' => $e->getMessage(),
@@ -2311,29 +2422,33 @@ class SearchController extends Controller
             }
             if($log_search){
                 $url = storage_path() .'/app/public/'.$log_search -> path;
-                $response3 = file_get_contents($url); 
-                if($response3 == '[]' || $response3 == null || $response3 == '') {
+                $response3 = file_get_contents($url);
+                if(!$this->isValidAbuseIPDBResponse($response3)) {
                     if(File::exists($url)) { File::delete($url); }
                     $response = $this->fetchAbuseIPDB($keyword);
-                    $path = 'search_file/'.time().'.json';
-                    if( Storage::disk('public')->put($path, $response)) {
-                        $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
-                        $log_search -> path = $path;
-                        $log_search -> save();
+                    if($this->isValidAbuseIPDBResponse($response)) {
+                        $path = 'search_file/'.time().'.json';
+                        if( Storage::disk('public')->put($path, $response)) {
+                            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
+                            $log_search -> path = $path;
+                            $log_search -> save();
+                        }
                     }
                 } else {
-                    $response = file_get_contents($url); 
+                    $response = $response3;
                 }
             }else{
                 $response = $this->fetchAbuseIPDB($keyword);
-                $path = 'search_file/'.time().'.json';
-                if( Storage::disk('public')->put($path, $response)) {
-                    $log_search = new LogSearch();
-                    $log_search -> path = $path;
-                    $log_search -> keyword = $keyword;
-                    $log_search -> type = $type;
-                    $log_search -> source = $source;
-                    $log_search -> save();
+                if($this->isValidAbuseIPDBResponse($response)) {
+                    $path = 'search_file/'.time().'.json';
+                    if( Storage::disk('public')->put($path, $response)) {
+                        $log_search = new LogSearch();
+                        $log_search -> path = $path;
+                        $log_search -> keyword = $keyword;
+                        $log_search -> type = $type;
+                        $log_search -> source = $source;
+                        $log_search -> save();
+                    }
                 }
             }
         }else if($source =="threatfox"){
@@ -2424,10 +2539,20 @@ class SearchController extends Controller
    
 
     
+        $decodedResponse = json_decode($response, true);
+        $statusCode = Response::HTTP_OK;
+        if ($source === 'abuseipdb' && is_array($decodedResponse)) {
+            if (!empty($decodedResponse['errors'][0]['status'])) {
+                $statusCode = (int) $decodedResponse['errors'][0]['status'];
+            } elseif (!isset($decodedResponse['data'])) {
+                $statusCode = Response::HTTP_BAD_GATEWAY;
+            }
+        }
+
         $response_data = array(
-            'status_code' => Response::HTTP_OK,
+            'status_code' => $statusCode,
             'message' => '',
-            'data' => json_decode($response, true),
+            'data' => $decodedResponse,
             'data2' => json_decode($response2, true),
             'type' => $type,
             'source' => $source,
@@ -2784,22 +2909,72 @@ class SearchController extends Controller
         ]);
     }
 
+    private function isValidAbuseIPDBResponse($response)
+    {
+        if ($response === null || $response === '' || $response === '[]') {
+            return false;
+        }
+
+        $decoded = json_decode($response, true);
+        if (!is_array($decoded) || isset($decoded['errors']) || !isset($decoded['data'])) {
+            return false;
+        }
+
+        return true;
+    }
+
     private function fetchAbuseIPDB($ip)
     {
-        $key = IndicatorCheckService::getRandomKey('ABUSE');
-        
+        $keys = IndicatorCheckService::getProviderKeys('ABUSE');
+        if (empty($keys)) {
+            \Log::warning('AbuseIPDB: no system API keys configured');
+            return json_encode([
+                'errors' => [[
+                    'detail' => 'No AbuseIPDB API key configured. Add an APIv2 key in System API Keys.',
+                    'status' => 401,
+                ]],
+            ]);
+        }
+
         $url = "https://api.abuseipdb.com/api/v2/check?ipAddress=" . urlencode($ip) . "&maxAgeInDays=120";
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Key: ' . $key,
-            'Accept: application/json'
+        $lastResponse = null;
+
+        foreach ($keys as $key) {
+            $key = trim((string) $key);
+            if ($key === '') {
+                continue;
+            }
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Key: ' . $key,
+                'Accept: application/json',
+            ]);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+            $response = curl_exec($ch);
+            $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            $lastResponse = $response;
+            if ($this->isValidAbuseIPDBResponse($response)) {
+                return $response;
+            }
+
+            if ($httpCode === 429) {
+                \Log::warning("AbuseIPDB rate limited for IP {$ip}");
+                return $response;
+            }
+        }
+
+        \Log::warning("AbuseIPDB: all configured API keys failed for IP {$ip}");
+        return $lastResponse ?: json_encode([
+            'errors' => [[
+                'detail' => 'Authentication failed. Your API key is either missing, incorrect, or revoked. Note: The APIv2 key differs from the APIv1 key.',
+                'status' => 401,
+            ]],
         ]);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        $response = curl_exec($ch);
-        curl_close($ch);
-        return $response;
     }
 
     private function fetchThreatFox($keyword)

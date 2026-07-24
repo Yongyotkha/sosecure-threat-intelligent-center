@@ -26,6 +26,8 @@ class HoneypotDashboardService
         $context = $this->buildQueryContext($siteId, $window, $sensorTokenId, $allowedSiteIds);
         $windowLabel = $this->buildWindowLabel($context['window']);
 
+        $recentLogs = $this->getRecentAlertsPage($context['match']);
+
         return [
             'window' => $context['window'],
             'window_label' => $windowLabel,
@@ -37,11 +39,12 @@ class HoneypotDashboardService
             'threat_types_chart' => $this->getThreatTypesChart($context['match']),
             'top_paths' => $this->getTopPaths($context['match'], 10),
             'top_attackers' => $this->getTopAttackers($context['match'], 10),
-            'recent_logs' => $this->getRecentAlerts($context['match'], 10),
+            'recent_logs' => $recentLogs['items'],
+            'recent_logs_pagination' => $recentLogs['pagination'],
         ];
     }
 
-    public function getSectionData(string $section, ?int $siteId = null, array $window = [], ?int $sensorTokenId = null, ?array $allowedSiteIds = null): array
+    public function getSectionData(string $section, ?int $siteId = null, array $window = [], ?int $sensorTokenId = null, ?array $allowedSiteIds = null, int $page = 1, int $perPage = 0): array
     {
         $context = $this->buildQueryContext($siteId, $window, $sensorTokenId, $allowedSiteIds);
         $windowLabel = $this->buildWindowLabel($context['window']);
@@ -67,9 +70,12 @@ class HoneypotDashboardService
             case 'top-attackers':
                 return ['top_attackers' => $this->getTopAttackers($match, 10)];
             case 'recent-logs':
+                $recent = $this->getRecentAlertsPage($match, $page, $perPage);
+
                 return [
                     'window_label' => $windowLabel,
-                    'recent_logs' => $this->getRecentAlerts($match, 10),
+                    'recent_logs' => $recent['items'],
+                    'pagination' => $recent['pagination'],
                 ];
             default:
                 throw new \InvalidArgumentException('Unknown dashboard section: ' . $section);
@@ -146,19 +152,27 @@ class HoneypotDashboardService
         $timezone = new \DateTimeZone('Asia/Bangkok');
 
         if (($window['mode'] ?? '') === 'today') {
-            $start = (new \DateTimeImmutable('now', $timezone))->setTime(0, 0, 0);
+            $now = new \DateTimeImmutable('now', $timezone);
+            $start = $now->setTime(0, 0, 0);
+            [$queryStart, $queryEnd] = HoneypotTimestamp::queryBoundsForLegacyStorage($start, $now);
 
-            return ['timestamp' => ['$gte' => new UTCDateTime($start->getTimestamp() * 1000)]];
+            return [
+                'timestamp' => [
+                    '$gte' => new UTCDateTime($queryStart->getTimestamp() * 1000),
+                    '$lte' => new UTCDateTime($queryEnd->getTimestamp() * 1000),
+                ],
+            ];
         }
 
         if (($window['mode'] ?? '') === 'custom') {
             $from = new \DateTimeImmutable($window['from'] . ' 00:00:00', $timezone);
             $to = new \DateTimeImmutable($window['to'] . ' 23:59:59', $timezone);
+            [$queryStart, $queryEnd] = HoneypotTimestamp::queryBoundsForLegacyStorage($from, $to);
 
             return [
                 'timestamp' => [
-                    '$gte' => new UTCDateTime($from->getTimestamp() * 1000),
-                    '$lte' => new UTCDateTime($to->getTimestamp() * 1000),
+                    '$gte' => new UTCDateTime($queryStart->getTimestamp() * 1000),
+                    '$lte' => new UTCDateTime($queryEnd->getTimestamp() * 1000),
                 ],
             ];
         }
@@ -246,7 +260,11 @@ class HoneypotDashboardService
             $agents[] = [
                 'sensor_token_id' => (int) ($row['_id'] ?? 0),
                 'sensor_name' => (string) ($row['sensor_name'] ?? ''),
-                'last_seen' => $this->formatMongoDate($row['last_seen'] ?? null),
+                'last_seen' => $this->formatMongoDate(
+                    $row['last_seen'] ?? null,
+                    'Y-m-d H:i:s',
+                    (bool) ($row['timestamp_legacy_corrected'] ?? false)
+                ),
             ];
         }
 
@@ -255,9 +273,13 @@ class HoneypotDashboardService
 
     protected function sinceFilter(int $hours): array
     {
-        $since = new UTCDateTime((time() - ($hours * 3600)) * 1000);
+        $sinceSeconds = time() - ($hours * 3600);
 
-        return ['timestamp' => ['$gte' => $since]];
+        if (HoneypotTimestamp::legacyCorrectionEnabled()) {
+            $sinceSeconds += abs(HoneypotTimestamp::legacyCorrectionHours()) * 3600;
+        }
+
+        return ['timestamp' => ['$gte' => new UTCDateTime($sinceSeconds * 1000)]];
     }
 
     protected function getStats(array $match): array
@@ -339,6 +361,9 @@ class HoneypotDashboardService
         $hourCounts = array_fill(0, 24, 0);
         foreach ($collection->aggregate($pipeline) as $row) {
             $hour = (int) ($row['_id'] ?? 0);
+            if (HoneypotTimestamp::legacyCorrectionEnabled()) {
+                $hour = ($hour + HoneypotTimestamp::legacyCorrectionHours() + 24) % 24;
+            }
             if ($hour >= 0 && $hour < 24) {
                 $hourCounts[$hour] = (int) ($row['count'] ?? 0);
             }
@@ -375,7 +400,11 @@ class HoneypotDashboardService
                 continue;
             }
 
-            $key = $timestamp->toDateTime()
+            $normalized = HoneypotTimestamp::normalizeStoredUtc(
+                $timestamp,
+                (bool) ($doc['timestamp_legacy_corrected'] ?? false)
+            );
+            $key = $normalized->toDateTime()
                 ->setTimezone(new \DateTimeZone('Asia/Bangkok'))
                 ->format('Y-m-d');
 
@@ -528,12 +557,53 @@ class HoneypotDashboardService
         return array_slice($attackers, 0, $limit);
     }
 
-    protected function getRecentAlerts(array $match, int $limit = 10): array
+    public function getRecentAlertsPage(array $match, int $page = 1, int $perPage = 0): array
+    {
+        $perPage = $this->resolveRecentLogsPerPage($perPage);
+        $page = max(1, $page);
+        $total = $this->countAlerts($match);
+        $totalPages = $total > 0 ? (int) ceil($total / $perPage) : 0;
+
+        if ($totalPages > 0 && $page > $totalPages) {
+            $page = $totalPages;
+        }
+
+        return [
+            'items' => $this->getRecentAlerts($match, $page, $perPage),
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'total_pages' => $totalPages,
+            ],
+        ];
+    }
+
+    protected function resolveRecentLogsPerPage(int $perPage): int
+    {
+        if ($perPage <= 0) {
+            $perPage = (int) config('honeypot.dashboard.recent_logs_per_page', 25);
+        }
+
+        return max(1, min($perPage, 100));
+    }
+
+    protected function countAlerts(array $match): int
     {
         $collection = $this->mongo->collection('alerts');
+
+        return (int) $collection->countDocuments(!empty($match) ? $match : []);
+    }
+
+    protected function getRecentAlerts(array $match, int $page = 1, int $perPage = 0): array
+    {
+        $collection = $this->mongo->collection('alerts');
+        $perPage = $this->resolveRecentLogsPerPage($perPage);
+        $page = max(1, $page);
         $options = [
             'sort' => ['timestamp' => -1],
-            'limit' => $limit,
+            'limit' => $perPage,
+            'skip' => ($page - 1) * $perPage,
         ];
 
         $cursor = !empty($match)
@@ -556,8 +626,16 @@ class HoneypotDashboardService
 
         return [
             'alert_id' => (string) ($document['alert_id'] ?? ''),
-            'timestamp' => $this->formatMongoDate($document['timestamp'] ?? null),
-            'time_display' => $this->formatMongoDate($document['timestamp'] ?? null, 'g:i:s A'),
+            'timestamp' => $this->formatMongoDate(
+                $document['timestamp'] ?? null,
+                'Y-m-d H:i:s',
+                (bool) ($document['timestamp_legacy_corrected'] ?? false)
+            ),
+            'time_display' => $this->formatMongoDate(
+                $document['timestamp'] ?? null,
+                'g:i:s A',
+                (bool) ($document['timestamp_legacy_corrected'] ?? false)
+            ),
             'attacker_ip' => (string) ($document['attacker_ip'] ?? ''),
             'severity' => strtoupper((string) ($document['severity'] ?? '')),
             'threat_level' => strtoupper((string) ($document['threat_level'] ?? '')),
@@ -575,12 +653,8 @@ class HoneypotDashboardService
         ];
     }
 
-    protected function formatMongoDate($value, string $format = 'Y-m-d H:i:s'): string
+    protected function formatMongoDate($value, string $format = 'Y-m-d H:i:s', bool $legacyCorrected = false): string
     {
-        if ($value instanceof UTCDateTime) {
-            return $value->toDateTime()->setTimezone(new \DateTimeZone('Asia/Bangkok'))->format($format);
-        }
-
-        return '';
+        return HoneypotTimestamp::formatBangkok($value, $format, $legacyCorrected);
     }
 }

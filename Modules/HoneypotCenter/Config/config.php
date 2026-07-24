@@ -42,7 +42,20 @@ return [
     ],
 
     'indicator_publish' => [
-        'creator_org' => env('HONEYPOT_INDICATOR_CREATOR_ORG', 'Threat inSights'),
+        'creator_org' => env('HONEYPOT_INDICATOR_CREATOR_ORG', 'TXEC'),
         'public' => (int) env('HONEYPOT_INDICATOR_PUBLIC', 0),
+    ],
+
+    'dashboard' => [
+        'recent_logs_per_page' => (int) env('HONEYPOT_RECENT_LOGS_PER_PAGE', 25),
+    ],
+
+    /*
+    | Legacy Python agent emits +07:00 timestamps that are 7 hours ahead of real
+    | Thailand local time. Correct on ingest and when displaying old Mongo rows.
+    */
+    'ingest' => [
+        'legacy_timestamp_correction' => (bool) env('HONEYPOT_LEGACY_TIMESTAMP_FIX', true),
+        'legacy_timestamp_offset_hours' => (int) env('HONEYPOT_LEGACY_TIMESTAMP_OFFSET_HOURS', -7),
     ],
 ];

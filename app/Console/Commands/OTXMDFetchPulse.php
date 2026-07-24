@@ -1,0 +1,516 @@
+<?php
+
+namespace App\Console\Commands;
+
+use App\Services\OtxHeavyPulseQueue;
+use App\Services\OtxHttpClient;
+use App\Services\OtxPulseStagingStore;
+use Artisan;
+use Exception;
+use Illuminate\Console\Command;
+
+class OTXMDFetchPulse extends Command
+{
+    protected $signature = 'app:OTXMDFetchPulse
+                            {--limit= : Limit number of pulses to fetch (for testing)}
+                            {--max-indicators=5000 : Skip pulses with indicator_count above this (0 = no skip)}
+                            {--resume : Resume latest incomplete run}
+                            {--run= : Resume a specific run_id}
+                            {--timeout=180 : HTTP timeout seconds}
+                            {--retries=5 : Max HTTP retries per URL}
+                            {--skip-import : Fetch only; do not auto-import to Mongo}';
+
+    protected $description = 'Fetch OTX pulses into staging, then auto-import to Mongo (unless --skip-import)';
+
+    /** @var OtxHttpClient */
+    protected $http;
+
+    public function handle()
+    {
+        $this->http = new OtxHttpClient(
+            (int) $this->option('timeout'),
+            (int) $this->option('retries')
+        );
+
+        $query = 'modified:<12h';
+        $runId = $this->option('run');
+        if (!$runId && $this->option('resume')) {
+            $runId = OtxPulseStagingStore::latestRunId(true);
+        }
+        if ($runId) {
+            $manifest = OtxPulseStagingStore::loadManifest($runId);
+            if (!$manifest) {
+                $this->error("Run not found: {$runId}");
+                return 1;
+            }
+            $this->info("Resuming run: {$runId}");
+        } else {
+            $runId = OtxPulseStagingStore::createRun($query);
+            $manifest = OtxPulseStagingStore::loadManifest($runId);
+            $this->info("Created run: {$runId}");
+        }
+
+        $limit = $this->option('limit') !== null && $this->option('limit') !== ''
+            ? (int) $this->option('limit')
+            : null;
+        $maxIndicators = (int) $this->option('max-indicators');
+
+        try {
+            $this->fetchListPages($runId, $manifest, $query, $limit, $maxIndicators);
+            $this->fetchPulseDetails($runId, $manifest, $limit);
+        } catch (Exception $e) {
+            $manifest['status'] = 'partial';
+            $manifest['last_error'] = $e->getMessage();
+            OtxPulseStagingStore::saveManifest($runId, $manifest);
+            $this->error('Fetch aborted: ' . $e->getMessage());
+            return 1;
+        }
+
+        // Recount from pulse statuses so resume/retry does not leave stale failed counters.
+        $fetched = 0;
+        $skipped = 0;
+        $failed = 0;
+        $pending = 0;
+        foreach ($manifest['pulses'] ?? [] as $meta) {
+            $st = $meta['status'] ?? 'pending';
+            if ($st === 'fetched') {
+                $fetched++;
+            } elseif ($st === 'skipped') {
+                $skipped++;
+            } elseif ($st === 'failed') {
+                $failed++;
+            } else {
+                $pending++;
+            }
+        }
+        $manifest['pulses_fetched'] = $fetched;
+        $manifest['pulses_skipped'] = $skipped;
+        $manifest['pulses_failed'] = $failed;
+
+        $apiTotal = (int) ($manifest['api_total_pulses'] ?? 0);
+        $inScope = $fetched + $skipped + $failed + $pending;
+        $verified = $fetched + $skipped + $failed;
+
+        // Limited / partial list runs: expect = pulses registered in this run, not full API total.
+        $isPartialList = !empty($manifest['checkpoint']['list_done']) && $inScope < $apiTotal;
+        if ($limit !== null) {
+            $expected = max($inScope, $limit);
+        } elseif ($isPartialList || $inScope > 0 && $inScope < $apiTotal) {
+            $expected = $inScope;
+        } else {
+            $expected = $apiTotal > 0 ? $apiTotal : $inScope;
+        }
+
+        $pct = $expected > 0 ? round(($verified / $expected) * 100, 2) : 0;
+        $complete = $failed === 0 && $pending === 0 && $verified >= $expected;
+
+        $manifest['status'] = ($failed > 0 || $pending > 0) ? 'partial' : 'fetched';
+        $manifest['stats'] = [
+            'api_total' => $apiTotal,
+            'expected' => $expected,
+            'fetched' => $fetched,
+            'skipped' => $skipped,
+            'failed' => $failed,
+            'pending' => $pending,
+            'verified' => $verified,
+            'percent' => $pct,
+            'complete' => $complete,
+        ];
+        OtxPulseStagingStore::saveManifest($runId, $manifest);
+
+        $this->info('=========================================');
+        $this->info('FETCH SUMMARY');
+        $this->info('=========================================');
+        $this->info("Run ID              : {$runId}");
+        $this->info('API total pulses    : ' . number_format($apiTotal));
+        $this->info('Expected (this run) : ' . number_format($expected) . ($limit !== null ? " (limit={$limit})" : ($isPartialList ? ' (scoped run)' : '')));
+        $this->info('Successfully fetched: ' . number_format($fetched));
+        $this->info('Skipped (filter)    : ' . number_format($skipped));
+        $this->info('Failed              : ' . number_format($failed));
+        $this->info('Pending             : ' . number_format($pending));
+        $this->info('Verified            : ' . number_format($verified) . ' / ' . number_format($expected) . " ({$pct}%)");
+        $this->info('Complete            : ' . ($complete ? 'YES' : 'NO'));
+        $this->info('Status              : ' . $manifest['status']);
+        $this->info('Path                : ' . OtxPulseStagingStore::runPath($runId));
+        $heavyPending = OtxHeavyPulseQueue::countByStatus('pending');
+        if ($heavyPending > 0) {
+            $this->info('Heavy queue pending : ' . $heavyPending);
+            $this->info('Heavy next          : php artisan app:OTXMDFetchPulseHeavy --limit=1');
+        }
+
+        $fetchExit = $failed > 0 ? 2 : 0;
+        if ($fetched > 0) {
+            $importExit = $this->runImportAfterFetch($runId);
+            if ($importExit !== 0 && $fetchExit === 0) {
+                $fetchExit = $importExit;
+            }
+        } else {
+            $this->info('Skip auto-import    : no fetched pulses');
+        }
+
+        return $fetchExit;
+    }
+
+    /**
+     * Import this run immediately after fetch (default). Use --skip-import to disable.
+     */
+    protected function runImportAfterFetch($runId)
+    {
+        if ($this->option('skip-import')) {
+            $this->info('Next                : php artisan app:OTXMDImportPulse --run=' . $runId);
+            $this->info('(auto-import skipped via --skip-import)');
+            return 0;
+        }
+
+        $this->info('=========================================');
+        $this->info('AUTO IMPORT after fetch: ' . $runId);
+        $this->info('=========================================');
+
+        // Pass $this->output so Import streams live (and nested MDCount does not
+        // wipe Artisan::output() buffer — previously only END---- was visible).
+        $exit = (int) Artisan::call('app:OTXMDImportPulse', [
+            '--run' => $runId,
+        ], $this->output);
+
+        if ($exit === 0) {
+            $this->info('AUTO IMPORT complete : OK');
+        } else {
+            $this->error('AUTO IMPORT complete : FAILED (exit=' . $exit . ')');
+            $this->warn('Retry: php artisan app:OTXMDImportPulse --run=' . $runId);
+        }
+
+        return $exit;
+    }
+
+    protected function fetchListPages($runId, array &$manifest, $query, $limit, $maxIndicators)
+    {
+        if (!empty($manifest['checkpoint']['list_done'])) {
+            $this->info('List pages already complete, skipping.');
+            return;
+        }
+
+        $page = (int) ($manifest['checkpoint']['list_page'] ?? 0);
+        $nextUrl = $manifest['checkpoint']['list_next_url'] ?? null;
+        $pageSize = ($limit !== null && $limit > 0 && $limit < 100) ? max($limit, 10) : 100;
+
+        if (!$nextUrl && $page === 0) {
+            $nextUrl = 'https://otx.alienvault.com/otxapi/pulses/?limit=' . $pageSize
+                . '&page=1&sort=-modified&q=' . rawurlencode($query);
+        }
+
+        while ($nextUrl) {
+            $page++;
+            $t0 = microtime(true);
+            $this->info("Fetching list page {$page} ...");
+            $resp = $this->http->get($nextUrl);
+            $this->info(sprintf('  list page %d done in %.1fs', $page, microtime(true) - $t0));
+
+            if (!$resp['success']) {
+                $manifest['checkpoint']['list_next_url'] = $nextUrl;
+                $manifest['checkpoint']['list_page'] = $page - 1;
+                $manifest['status'] = 'partial';
+                $manifest['last_error'] = 'List page failed: ' . ($resp['error'] ?? 'unknown');
+                OtxPulseStagingStore::saveManifest($runId, $manifest);
+                throw new Exception($manifest['last_error']);
+            }
+
+            $payload = json_decode($resp['result'], true);
+            if (!is_array($payload)) {
+                throw new Exception("Invalid JSON on list page {$page}");
+            }
+
+            if ($page === 1 || empty($manifest['api_total_pulses'])) {
+                $manifest['api_total_pulses'] = $payload['count'] ?? 0;
+            }
+
+            OtxPulseStagingStore::writeJson(
+                OtxPulseStagingStore::runPath($runId) . '/list/page-' . str_pad((string) $page, 4, '0', STR_PAD_LEFT) . '.json',
+                $payload
+            );
+
+            $stopList = false;
+            foreach ($payload['results'] ?? [] as $item) {
+                $pulseId = $item['id'] ?? null;
+                if (!$pulseId || isset($manifest['pulses'][$pulseId])) {
+                    continue;
+                }
+
+                $indicatorCount = (int) ($item['indicator_count'] ?? 0);
+                $isPublicDns = isset($item['name']) && strpos($item['name'], 'Public DNS') !== false;
+                $isTooHeavy = $maxIndicators > 0 && $indicatorCount > $maxIndicators;
+
+                if ($isPublicDns || $isTooHeavy) {
+                    $reason = $isPublicDns
+                        ? 'Public DNS'
+                        : "indicator_count {$indicatorCount} > max-indicators {$maxIndicators}";
+                    $manifest['pulses'][$pulseId] = [
+                        'status' => 'skipped',
+                        'skip_reason' => $reason,
+                        'indicator_count' => $indicatorCount,
+                        'name' => $item['name'] ?? '',
+                        'modified' => $item['modified'] ?? null,
+                        'created' => $item['created'] ?? null,
+                    ];
+                    $manifest['pulses_skipped'] = ($manifest['pulses_skipped'] ?? 0) + 1;
+                    $this->warn("  skip {$pulseId}: {$reason}");
+
+                    // Heavy pulses go to slow-lane queue (Public DNS stays skipped only).
+                    if ($isTooHeavy && !$isPublicDns) {
+                        if (OtxHeavyPulseQueue::enqueue($item, $runId, $reason)) {
+                            $this->info("  → queued for heavy: {$pulseId}");
+                        }
+                    }
+                } else {
+                    if ($limit !== null && $this->countPendingPulses($manifest) >= $limit) {
+                        $stopList = true;
+                        break;
+                    }
+                    $manifest['pulses'][$pulseId] = [
+                        'status' => 'pending',
+                        'skip_reason' => null,
+                        'indicator_count' => $indicatorCount,
+                        'name' => $item['name'] ?? '',
+                        'modified' => $item['modified'] ?? null,
+                        'created' => $item['created'] ?? null,
+                    ];
+                }
+
+                $pulseDir = OtxPulseStagingStore::pulsePath($runId, $pulseId);
+                OtxPulseStagingStore::writeJson($pulseDir . '/list_item.json', $item);
+            }
+
+            $manifest['pages_fetched'] = $page;
+            $manifest['checkpoint']['list_page'] = $page;
+            $manifest['checkpoint']['list_next_url'] = $payload['next'] ?? null;
+            OtxPulseStagingStore::saveManifest($runId, $manifest);
+
+            if ($stopList || ($limit !== null && $this->countPendingPulses($manifest) >= $limit)) {
+                $this->info("Limit reached for pending pulses ({$limit}). Stopping list fetch.");
+                break;
+            }
+
+            $nextUrl = $payload['next'] ?? null;
+        }
+
+        // Limited runs are complete for list purposes; full runs keep next URL only if unfinished.
+        if ($limit !== null) {
+            $manifest['checkpoint']['list_done'] = true;
+            $manifest['checkpoint']['list_next_url'] = null;
+        } else {
+            $manifest['checkpoint']['list_done'] = empty($manifest['checkpoint']['list_next_url']);
+            if ($manifest['checkpoint']['list_done']) {
+                $manifest['checkpoint']['list_next_url'] = null;
+            }
+        }
+        OtxPulseStagingStore::saveManifest($runId, $manifest);
+    }
+
+    protected function fetchPulseDetails($runId, array &$manifest, $limit)
+    {
+        $fetchedThisRun = 0;
+
+        foreach ($manifest['pulses'] as $pulseId => $meta) {
+            $status = $meta['status'] ?? 'pending';
+            if ($status === 'skipped' || $status === 'fetched') {
+                continue;
+            }
+            if ($limit !== null && $fetchedThisRun >= $limit) {
+                $this->info("Pulse detail limit reached ({$limit}).");
+                break;
+            }
+
+            $name = $meta['name'] ?? '';
+            $count = $meta['indicator_count'] ?? 0;
+            $this->info("Fetching pulse: {$pulseId} | indicators~{$count} | {$name}");
+            $ok = $this->fetchOnePulse($runId, $pulseId, $manifest);
+            if ($ok) {
+                $fetchedThisRun++;
+                $manifest['pulses'][$pulseId]['status'] = 'fetched';
+                unset($manifest['pulses'][$pulseId]['error']);
+            } else {
+                $manifest['pulses'][$pulseId]['status'] = 'failed';
+            }
+            OtxPulseStagingStore::saveManifest($runId, $manifest);
+        }
+    }
+
+    protected function fetchOnePulse($runId, $pulseId, array &$manifest)
+    {
+        $pulseDir = OtxPulseStagingStore::pulsePath($runId, $pulseId);
+
+        try {
+            if (!file_exists($pulseDir . '/detail.json')) {
+                $t0 = microtime(true);
+                $this->info('  → detail ...');
+                $detailResp = $this->http->get('https://otx.alienvault.com/otxapi/pulses/' . $pulseId . '/');
+                $this->info(sprintf('  → detail done in %.1fs', microtime(true) - $t0));
+                if (!$detailResp['success']) {
+                    // Non-fatal: list_item.json is enough for import; groups may be empty.
+                    $this->warn("  detail failed (non-fatal): {$pulseId} — saving empty detail");
+                    $manifest['pulses'][$pulseId]['detail_warning'] = 'detail fetch failed: ' . ($detailResp['error'] ?? 'fail');
+                    OtxPulseStagingStore::writeJson($pulseDir . '/detail.json', [
+                        'groups' => [],
+                        'fetch_failed' => true,
+                    ]);
+                } else {
+                    OtxPulseStagingStore::writeJson($pulseDir . '/detail.json', json_decode($detailResp['result'], true));
+                }
+            } else {
+                $this->info('  → detail (cached)');
+            }
+
+            // Only indicators created today (same rule as OTXMDFeedPulse) — do NOT download entire history.
+            if (!file_exists($pulseDir . '/indicators.json')) {
+                $t0 = microtime(true);
+                $this->info('  → indicators (today only) ...');
+                $indicators = $this->fetchPagesUntil(
+                    'https://otx.alienvault.com/otxapi/pulses/' . $pulseId . '/indicators/?sort=-created&limit=100&page=1',
+                    function ($row) {
+                        $created = $row['created'] ?? null;
+                        if (!$created) {
+                            return false;
+                        }
+                        return explode('T', $created)[0] === date('Y-m-d');
+                    },
+                    'indicators'
+                );
+                if ($indicators === null) {
+                    // Non-fatal: pulse may be deleted/404 on OTX; still import event from list_item.
+                    $this->warn("  indicators failed (non-fatal): {$pulseId} — saving empty indicators");
+                    $indicators = ['count' => 0, 'results' => [], 'truncated_mode' => 'today_only', 'fetch_failed' => true];
+                    $manifest['pulses'][$pulseId]['indicators_warning'] = 'indicators fetch failed';
+                }
+                $this->info(sprintf(
+                    '  → indicators done in %.1fs (%d rows)',
+                    microtime(true) - $t0,
+                    count($indicators['results'] ?? [])
+                ));
+                OtxPulseStagingStore::writeJson($pulseDir . '/indicators.json', $indicators);
+            } else {
+                $this->info('  → indicators (cached)');
+            }
+
+            // Related (today only). Non-fatal like original OTXMDFeedPulse — empty on failure.
+            // Heavy queue can skip related (--skip-related) because OTX often 504s on large pulses.
+            if (!file_exists($pulseDir . '/related.json')) {
+                $skipRelated = $this->hasOption('skip-related') && $this->option('skip-related');
+                if ($skipRelated) {
+                    $this->info('  → related skipped (--skip-related)');
+                    OtxPulseStagingStore::writeJson($pulseDir . '/related.json', [
+                        'count' => 0,
+                        'results' => [],
+                        'truncated_mode' => 'today_only',
+                        'skipped' => true,
+                    ]);
+                } else {
+                    $t0 = microtime(true);
+                    $this->info('  → related (today only) ...');
+                    $related = $this->fetchPagesUntil(
+                        'https://otx.alienvault.com/otxapi/pulses/' . $pulseId . '/related?limit=100&sort=-modified',
+                        function ($row) {
+                            $modified = $row['modified'] ?? null;
+                            if (!$modified) {
+                                return false;
+                            }
+                            return explode('T', $modified)[0] === date('Y-m-d');
+                        },
+                        'related'
+                    );
+                    if ($related === null) {
+                        $this->warn("  related failed (non-fatal): {$pulseId} — saving empty related");
+                        $related = ['count' => 0, 'results' => [], 'truncated_mode' => 'today_only', 'fetch_failed' => true];
+                        $manifest['pulses'][$pulseId]['related_warning'] = 'related fetch failed';
+                    }
+                    $this->info(sprintf(
+                        '  → related done in %.1fs (%d rows)',
+                        microtime(true) - $t0,
+                        count($related['results'] ?? [])
+                    ));
+                    OtxPulseStagingStore::writeJson($pulseDir . '/related.json', $related);
+                }
+            } else {
+                $this->info('  → related (cached)');
+            }
+
+            unset($manifest['pulses'][$pulseId]['error']);
+            $this->info("  OK: {$pulseId}");
+            return true;
+        } catch (Exception $e) {
+            $manifest['pulses'][$pulseId]['error'] = $e->getMessage();
+            $this->error("  exception {$pulseId}: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Paginate while keepRow(row) is true. Stop at first row that fails the predicate
+     * (API is sorted newest-first, same as original feed command).
+     *
+     * @return array|null
+     */
+    protected function fetchPagesUntil($startUrl, callable $keepRow, $label = 'page')
+    {
+        $all = [];
+        $count = 0;
+        $url = $startUrl;
+        $page = 0;
+
+        while ($url) {
+            $page++;
+            $t0 = microtime(true);
+            $resp = $this->http->get($url);
+            if (!$resp['success']) {
+                $this->error("  {$label} page {$page} failed: " . ($resp['error'] ?? ''));
+                return null;
+            }
+            $payload = json_decode($resp['result'], true);
+            if (!is_array($payload)) {
+                return null;
+            }
+            if ($page === 1) {
+                $count = $payload['count'] ?? 0;
+            }
+
+            $stop = false;
+            $kept = 0;
+            foreach ($payload['results'] ?? [] as $row) {
+                if (!$keepRow($row)) {
+                    $stop = true;
+                    break;
+                }
+                $all[] = $row;
+                $kept++;
+            }
+
+            $this->info(sprintf(
+                '    %s page %d: kept %d (%.1fs)',
+                $label,
+                $page,
+                $kept,
+                microtime(true) - $t0
+            ));
+
+            if ($stop) {
+                break;
+            }
+            $url = $payload['next'] ?? null;
+        }
+
+        return [
+            'count' => $count,
+            'results' => $all,
+            'truncated_mode' => 'today_only',
+        ];
+    }
+
+    protected function countPendingPulses(array $manifest)
+    {
+        $n = 0;
+        foreach ($manifest['pulses'] ?? [] as $meta) {
+            if (($meta['status'] ?? '') === 'pending') {
+                $n++;
+            }
+        }
+        return $n;
+    }
+}
