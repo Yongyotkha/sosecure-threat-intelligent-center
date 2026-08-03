@@ -79,6 +79,8 @@ class Kernel extends ConsoleKernel
     $schedule->command('transaction:saveScan')->everyMinute()->withoutOverlapping(30)->runInBackground();
 
     $schedule->command('app:RSS_Feed')->cron('0 */1 * * *')->withoutOverlapping(60)->runInBackground();
+    $schedule->command('app:AI_Intel_News')->cron('0 */2 * * *')->withoutOverlapping(120)->runInBackground()
+      ->appendOutputTo(storage_path('logs/AI_Intel_News.log'));
     $schedule->command('app:news_permission')->cron('0 */6 * * *')->withoutOverlapping(5);
     $schedule->command('app:SendLog_Indicator')->dailyAt('10:22')->timezone('Asia/Bangkok')->withoutOverlapping(5);
     // $schedule->command('app:SendLog_Indicator')

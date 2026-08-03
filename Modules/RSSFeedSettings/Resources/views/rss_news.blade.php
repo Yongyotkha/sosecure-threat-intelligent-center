@@ -30,6 +30,12 @@
                                         RSS Data
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="{{ route('rssfeedsettings.ai_intel') }}">
+                                        @icon('solid/angle-right', 'text-' . get_option('theme_color'))
+                                        AI Intel
+                                    </a>
+                                </li>
                                 {{-- <li>
                                 <a href="{{route('rssfeedsettings.index')}}">
                             @icon('solid/angle-right', 'text-'.get_option('theme_color'))
@@ -78,6 +84,9 @@
                                                         </a>
                                                         <a href="{{ route('rssfeedsettings.rss_data') }}" id="">
                                                             RSS Data
+                                                        </a>
+                                                        <a href="{{ route('rssfeedsettings.ai_intel') }}" id="">
+                                                            AI Intel
                                                         </a>
                                                     </li>
                                                 </ul>
