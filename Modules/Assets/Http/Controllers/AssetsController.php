@@ -799,39 +799,36 @@ class AssetsController extends Controller
 
     public function select_cpe(Request $request)
     {
-        $input = $request->all();
-
         $os_id = $request->get('os_type');
         $term = $request->get('term');
 
-        if($term){
-
-            $search = $term;
-
-            if($os_id == 4) {
-                // $CPEData = data_cveven::select('rawtext as cpe')->where('rawtext','!=',null)->get();
-                $CPEData = data_cveven::
-                    select('rawtext as cpe')
-                    ->where('rawtext', 'like', '%'.$search.'%')
-                    ->distinct()
-                    ->get();
-            }else{
-                $OSType = OSType::
-                    select('name')
-                    ->where('id', $os_id)
-                    ->first();
-
-                $os_name = $OSType->name;
-
-                $CPEData = CPEData::
-                    select('cpe')
-                    ->where('os_type', $os_name)
-                    ->where('cpe', 'like', '%'.$search.'%')
-                    ->get();
-            }
-
-            return response()->json($CPEData);
+        if(!$term || !$os_id){
+            return response()->json([]);
         }
+
+        $search = $term;
+        $OSType = OSType::select('id', 'name')->where('id', $os_id)->first();
+
+        if(!$OSType){
+            return response()->json([]);
+        }
+
+        // Other: search data_cveven (support id=4 and name match if ids differ across envs)
+        if($OSType->id == 4 || strcasecmp($OSType->name, 'Other') === 0) {
+            $CPEData = data_cveven::
+                select('rawtext as cpe')
+                ->where('rawtext', 'like', '%'.$search.'%')
+                ->distinct()
+                ->get();
+        }else{
+            $CPEData = CPEData::
+                select('cpe')
+                ->where('os_type', $OSType->name)
+                ->where('cpe', 'like', '%'.$search.'%')
+                ->get();
+        }
+
+        return response()->json($CPEData);
     }
 
 

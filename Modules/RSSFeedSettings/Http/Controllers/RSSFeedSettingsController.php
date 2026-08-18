@@ -91,6 +91,260 @@ class RSSFeedSettingsController extends Controller
         return view('rssfeedsettings::rss_data')->with($data);
     }
 
+    public function ai_intel()
+    {
+        $role_custom = @check_role_custom();
+        if (!$role_custom['news']) {
+            check_permission403();
+        }
+        $data['page'] = langapp('news');
+        return view('rssfeedsettings::ai_intel')->with($data);
+    }
+
+    public function tableAiIntel(Request $request)
+    {
+        $role_custom = @check_role_custom();
+        if (!$role_custom['news']) {
+            check_permission403();
+        }
+
+        $model = AiIntelNewsLog::with('get_rss_news');
+
+        if (($request->keywords || $request->isDateSearch || $request->status) && $request->search_val == true) {
+            if ($request->keywords) {
+                $model->where(function ($q) use ($request) {
+                    $q->where('title', 'LIKE', '%' . $request->keywords . '%')
+                        ->orWhere('source', 'LIKE', '%' . $request->keywords . '%')
+                        ->orWhere('executive_summary', 'LIKE', '%' . $request->keywords . '%');
+                });
+            }
+            if ($request->isDateSearch) {
+                $date_start = $request->startDate;
+                $date_end = $request->endDate;
+                $date_start_date_format = date('Y-m-d', strtotime(@explode(' ', $date_start)[0]));
+                $date_end_date_format = date('Y-m-d', strtotime(@explode(' ', $date_end)[0]));
+                $model->whereBetween('published_at', [$date_start_date_format . ' 00:00:00', $date_end_date_format . ' 23:59:59']);
+            }
+            if ($request->status) {
+                if ($request->status == '1') {
+                    $model->where(function ($q) {
+                        $q->where('status', 'promoted')
+                            ->orWhereHas('get_rss_news');
+                    });
+                } else if ($request->status == '2') {
+                    $model->where(function ($q) {
+                        $q->where('status', '!=', 'promoted')
+                            ->whereDoesntHave('get_rss_news');
+                    });
+                }
+            }
+        }
+
+        return DataTables::of($model)->toJson();
+    }
+
+    public function ai_intel_create_news($code)
+    {
+        $role_custom = @check_role_custom();
+        if (!$role_custom['news']) {
+            check_permission403();
+        }
+
+        $ai = AiIntelNewsLog::where('code', $code)->first();
+        if (!$ai) {
+            abort(404);
+        }
+
+        $transaction = null;
+        if ($ai->transaction_rss_id) {
+            $transaction = TransactionRssData::find($ai->transaction_rss_id);
+        }
+
+        if (!$transaction) {
+            $published = $ai->published_at ? Carbon::parse($ai->published_at) : Carbon::now();
+            $transaction = new TransactionRssData();
+            $transaction->code = generator_uuid();
+            $transaction->transaction_id = 2;
+            $transaction->rss_id = null;
+            $transaction->status = 1;
+            $transaction->title = $ai->title;
+            $transaction->link = $ai->source_url;
+            $transaction->description = $this->buildAiIntelPlainSummary($ai);
+            $transaction->enclosure = '';
+            $transaction->isPermaLink = $ai->source_url;
+            $transaction->pubDate = $published->format('Y-m-d');
+            $transaction->transcation_date = $published->format('Y-m-d');
+            $transaction->transcation_datetime = $published->format('Y-m-d H:i:s');
+            $transaction->save();
+
+            $ai->transaction_rss_id = $transaction->id;
+            $ai->status = $ai->status === 'new' ? 'reviewed' : $ai->status;
+            $ai->save();
+        }
+
+        $data['rss'] = $transaction;
+        $data['RSSNews'] = '';
+        $data['category'] = CategorySettings::where('active', 1)->get();
+        $data['detail_default'] = $this->buildAiIntelDetailHtml($ai);
+        $data['ai_intel_code'] = $ai->code;
+
+        return view('rssfeedsettings::modal.create_news')->with($data);
+    }
+
+    protected function buildAiIntelPlainSummary(AiIntelNewsLog $ai)
+    {
+        $summary = $ai->executive_summary;
+        if ($summary) {
+            $decoded = json_decode($summary, true);
+            if (is_array($decoded)) {
+                return implode(' ', $decoded);
+            }
+            return strip_tags($summary);
+        }
+        return $ai->title;
+    }
+
+    protected function buildAiIntelDetailHtml(AiIntelNewsLog $ai)
+    {
+        $parts = [];
+
+        $summary = $ai->executive_summary;
+        $summaryItems = json_decode($summary, true);
+        if (is_array($summaryItems)) {
+            $parts[] = '<p><strong>สรุปข่าว (AI)</strong></p><ul>';
+            foreach ($summaryItems as $item) {
+                $parts[] = '<li>' . e($item) . '</li>';
+            }
+            $parts[] = '</ul>';
+        } elseif (!empty($summary)) {
+            $parts[] = '<p><strong>สรุปข่าว (AI)</strong></p><p>' . nl2br(e($summary)) . '</p>';
+        }
+
+        $context = $ai->intelligence_context;
+        $contextData = json_decode($context, true);
+        if (is_array($contextData)) {
+            if (!empty($contextData['attacker_group'])) {
+                $parts[] = '<p><strong>Threat Actor:</strong> ' . e($contextData['attacker_group']) . '</p>';
+            }
+            if (!empty($contextData['historical_narrative'])) {
+                $parts[] = '<p><strong>บริบท:</strong> ' . e($contextData['historical_narrative']) . '</p>';
+            }
+        } elseif (!empty($context)) {
+            $parts[] = '<p><strong>บริบท:</strong> ' . nl2br(e($context)) . '</p>';
+        }
+
+        $vulns = json_decode($ai->vulnerabilities_json, true);
+        if (is_array($vulns) && count($vulns) > 0) {
+            $parts[] = '<p><strong>CVE / Vulnerabilities</strong></p><ul>';
+            foreach ($vulns as $v) {
+                $cve = e(@$v['cve'] ?: @$v['id'] ?: '-');
+                $product = e(@$v['product'] ?: '');
+                $severity = e(@$v['severity'] ?: '');
+                $parts[] = '<li>' . $cve . ($product ? ' — ' . $product : '') . ($severity ? ' (' . $severity . ')' : '') . '</li>';
+            }
+            $parts[] = '</ul>';
+        }
+
+        $iocs = json_decode($ai->indicators_json, true);
+        if (is_array($iocs) && count($iocs) > 0) {
+            $parts[] = '<p><strong>Indicators (IOC)</strong></p><ul>';
+            foreach ($iocs as $ioc) {
+                $type = e(@$ioc['type'] ?: '-');
+                $value = e(@$ioc['value'] ?: '');
+                $parts[] = '<li>[' . $type . '] ' . $value . '</li>';
+            }
+            $parts[] = '</ul>';
+        }
+
+        if ($ai->source_url) {
+            $parts[] = '<p><strong>Source:</strong> <a href="' . e($ai->source_url) . '" target="_blank">' . e($ai->source_url) . '</a></p>';
+        }
+
+        return implode('', $parts);
+    }
+
+    public function ai_intel_delete(Request $request, $id)
+    {
+        $role_custom = @check_role_custom();
+        if (!$role_custom['news']) {
+            check_permission403();
+        }
+        $model = AiIntelNewsLog::where('code', $id)->first();
+        $data['ai_intel'] = $model;
+        return view('rssfeedsettings::modal.ai_intel_delete')->with($data);
+    }
+
+    public function ai_intel_delete_process($id = null)
+    {
+        $role_custom = @check_role_custom();
+        if (!$role_custom['news']) {
+            check_permission403();
+        }
+        AiIntelNewsLog::where('code', $id)->delete();
+        return ajaxResponse(
+            [
+                'message'  => langapp('deleted_successfully'),
+                'redirect' => route('rssfeedsettings.ai_intel'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function ai_intel_delete_checked(Request $request)
+    {
+        $role_custom = @check_role_custom();
+        if (!$role_custom['news']) {
+            check_permission403();
+        }
+        if (!empty($request->id)) {
+            foreach ($request->id as $ai_id) {
+                AiIntelNewsLog::where('id', $ai_id)->delete();
+            }
+        }
+        return ajaxResponse(
+            [
+                'message'  => langapp('deleted_successfully'),
+                'redirect' => route('rssfeedsettings.ai_intel'),
+            ],
+            true,
+            Response::HTTP_OK
+        );
+    }
+
+    public function ai_intel_sync(Request $request)
+    {
+        $role_custom = @check_role_custom();
+        if (!$role_custom['news']) {
+            check_permission403();
+        }
+
+        try {
+            $exitCode = Artisan::call('app:AI_Intel_News');
+            $output = trim(Artisan::output());
+
+            if ($exitCode !== 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Sync failed. Check OPENAI_API_KEY and network access to RSS/OpenAI.',
+                    'output' => $output,
+                ], 500);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Sync Intel completed.',
+                'output' => $output,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('ai_intel_sync: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function tableRssData(Request $request)
     {
         $role_custom = @check_role_custom();

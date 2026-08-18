@@ -698,28 +698,29 @@ function getSeverityFromScore($score)
 function get_webdefacment_status($status_id, $color = '')
 {
     $html = '';
+    $key = strtolower((string) $status_id);
+
     if ($color == 'color') {
-        if (strtolower($status_id) == strtolower("critical")) {
-            $html = '<span class="dot critical"></span> Critical';
-        } else if (strtolower($status_id) == strtolower("high")) {
+        if ($key === 'critical' || $key === 'high') {
             $html = '<span class="dot " style="background: #e64732 !important;"></span> High';
-        } else if (strtolower($status_id) == strtolower("medium")) {
+            if ($key === 'critical') {
+                $html = '<span class="dot critical"></span> Critical';
+            }
+        } else if ($key === 'medium') {
             $html = '<span class="dot " style="background: #fcc838 !important;"></span> Medium';
-        } else if (strtolower($status_id) == strtolower("normal")) {
+        } else if ($key === 'normal') {
             $html = '<span class="dot low"></span> Normal';
-        } else if (strtolower($status_id) == strtolower("none")) {
+        } else if ($key === 'down') {
+            $html = '<span class="dot " style="background: #6c757d !important;"></span> Down';
+        } else if ($key === 'error') {
+            $html = '<span class="dot " style="background: #dc3545 !important;"></span> Error';
+        } else if ($key === 'skipped') {
+            $html = '<span class="dot " style="background: #adb5bd !important;"></span> Skipped';
+        } else if ($key === 'none') {
             $html = '<span class="dot none"></span> None';
         }
     } else {
-        if (strtolower($status_id) == strtolower("critical")) {
-            $html = $status_id;
-        } else if (strtolower($status_id) == strtolower("high")) {
-            $html = $status_id;
-        } else if (strtolower($status_id) == strtolower("medium")) {
-            $html = $status_id;
-        } else if (strtolower($status_id) == strtolower("normal")) {
-            $html = $status_id;
-        } else if (strtolower($status_id) == strtolower("none")) {
+        if (in_array($key, ['critical', 'high', 'medium', 'normal', 'down', 'error', 'skipped', 'none'], true)) {
             $html = $status_id;
         }
     }
@@ -1125,4 +1126,90 @@ function check_permission403()
 {
     Auth::logout();
     abort(403, 'Unauthorized action.');
+}
+
+/**
+ * Remove leftover Chrome/Puppeteer temp profiles under the system temp dir.
+ * Puppeteer creates puppeteer_dev_profile-* when userDataDir is not set;
+ * scraper.js uses wdfm_chrome_* for controlled profiles.
+ * Only removes dirs older than $maxAgeSeconds to avoid races with concurrent jobs.
+ *
+ * @param int $maxAgeSeconds
+ * @param int $maxRemove Max directories to remove per call (keeps job latency bounded)
+ * @return int Number of directories removed
+ */
+function cleanup_stale_chrome_tmp_profiles($maxAgeSeconds = 3600, $maxRemove = 50)
+{
+    $tmp = sys_get_temp_dir();
+    $patterns = [
+        $tmp . DIRECTORY_SEPARATOR . 'puppeteer_dev_profile-*',
+        $tmp . DIRECTORY_SEPARATOR . 'wdfm_chrome_*',
+    ];
+
+    $now = time();
+    $removed = 0;
+
+    foreach ($patterns as $pattern) {
+        $dirs = glob($pattern);
+        if ($dirs === false) {
+            continue;
+        }
+
+        foreach ($dirs as $dir) {
+            if ($removed >= $maxRemove) {
+                return $removed;
+            }
+            if (!is_dir($dir)) {
+                continue;
+            }
+
+            $mtime = @filemtime($dir);
+            if ($mtime === false || ($now - $mtime) < (int) $maxAgeSeconds) {
+                continue;
+            }
+
+            if (remove_directory_recursive($dir)) {
+                $removed++;
+            }
+        }
+    }
+
+    return $removed;
+}
+
+/**
+ * Recursively delete a directory (best-effort).
+ */
+function remove_directory_recursive($dir)
+{
+    if (!is_dir($dir)) {
+        return false;
+    }
+
+    // Prefer OS rm for large Chrome profile trees
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        @exec('rm -rf ' . escapeshellarg($dir));
+        return !is_dir($dir);
+    }
+
+    try {
+        $items = @scandir($dir);
+        if ($items === false) {
+            return false;
+        }
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+            $path = $dir . DIRECTORY_SEPARATOR . $item;
+            if (is_dir($path)) {
+                remove_directory_recursive($path);
+            } else {
+                @unlink($path);
+            }
+        }
+        return @rmdir($dir);
+    } catch (\Throwable $e) {
+        return false;
+    }
 }

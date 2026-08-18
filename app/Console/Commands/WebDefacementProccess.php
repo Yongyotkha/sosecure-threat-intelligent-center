@@ -71,6 +71,16 @@ class WebDefacementProccess extends Command
     Log:
     info('Webdefacement process started: ' . date("Y-m-d H:i:s"));
     ini_set('memory_limit', '2048M');
+
+    // Reclaim leftover Puppeteer/Chrome profiles under /tmp (bounded batch)
+    if (function_exists('cleanup_stale_chrome_tmp_profiles')) {
+      $cleaned = cleanup_stale_chrome_tmp_profiles(1800, 200);
+      if ($cleaned > 0) {
+        Log::info("[WebDefacementProccess] Cleaned {$cleaned} stale Chrome temp profile(s)");
+        $this->info("Cleaned {$cleaned} stale Chrome temp profile(s)");
+      }
+    }
+
     $TransactionBatchjob_Update = TransactionBatchjob::where('mode', 'WebDefacement_scan')->first();
     $TransactionBatchjob_Update->progress = 2;
     $TransactionBatchjob_Update->transcation_date_start = date("Y-m-d H:i:s");
@@ -78,7 +88,7 @@ class WebDefacementProccess extends Command
     $TransactionBatchjob_Update->save();
 
     $WebdefacmentSetting_datas_reset =  WebdefacmentSetting::where('active', 1)->where('webdeflacement_progress', 2)->whereNull('deleted_at')->get();
-    $newTime = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . " -5 minutes"));
+    $newTime = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . " -2 minutes"));
     foreach ($WebdefacmentSetting_datas_reset as $key => $value) {
       if ($newTime >= $value->last_check) {
         $WebdefacmentSetting_update =   WebdefacmentSetting::find($value->id);
@@ -90,11 +100,24 @@ class WebDefacementProccess extends Command
     }
 
 
-    $WebdefacmentSetting_datas =  WebdefacmentSetting::where('active', 1)->where('webdeflacement_progress', 1)->whereNull('deleted_at')->get();
+    // เดิม: ดึงทุกเว็บ progress=1 แล้วไล่ยาว → รอบเดียวกินหลายนาที / overlapping ขวาง
+    // ใหม่: เอาเฉพาะที่รอสแกน นานสุดก่อน จำกัดจำนวนต่อรอบ ให้จบเร็วแล้วเริ่มรอบถัดไปได้ทุกนาที
+    $batchSize = (int) env('WEBDEFACEMENT_BATCH_SIZE', 2);
+    if ($batchSize < 1) {
+      $batchSize = 1;
+    }
+
+    $WebdefacmentSetting_datas = WebdefacmentSetting::where('active', 1)
+      ->where('webdeflacement_progress', 1)
+      ->whereNull('deleted_at')
+      ->orderByRaw('last_check IS NULL DESC')
+      ->orderBy('last_check', 'asc')
+      ->limit($batchSize)
+      ->get();
+
+    Log::info('[WebDefacementProccess] batch size=' . $WebdefacmentSetting_datas->count() . '/' . $batchSize);
+
     foreach ($WebdefacmentSetting_datas as $key => $value) {
-      // Log::info('id: ' . $value->id . ' - ' . $value->url);
-
-
 
       $WebdefacmentSetting_update =   WebdefacmentSetting::find($value->id);
       $WebdefacmentSetting_update->webdeflacement_progress = 2;
@@ -145,26 +168,13 @@ class WebDefacementProccess extends Command
               // $TransactionBatchjob_Update->transcation_date = now();
               // $TransactionBatchjob_Update->save();
 
-              // บันทึก stat_log สำหรับ Web Down
-              try {
-                DB::table('webdefacement_stat_log')->insert([
-                  'site_id' => $WebdefacmentSetting_update->site_id,
-                  'webdefacement_setting_id' => $value->id,
-                  'result_id' => null,
-                  'status' => 'Down',
-                  'score' => 0,
-                  'diff_percent' => 0,
-                  'hash_changed' => 0,
-                  'image_changed' => 0,
-                  'alert_sent' => 1,
-                  'reason' => 'web_down',
-                  'checked_at' => now(),
-                  'created_at' => now(),
-                  'updated_at' => now(),
-                ]);
-              } catch (\Throwable $e) {
-                Log::error("[STAT_LOG] Failed for web down: " . $e->getMessage());
-              }
+              $this->writeStatLog([
+                'site_id' => $WebdefacmentSetting_update->site_id,
+                'webdefacement_setting_id' => $value->id,
+                'status' => WebDefacementService::STATUS_DOWN,
+                'alert_sent' => 1,
+                'reason' => 'web_down',
+              ]);
 
               // เปลี่ยนจาก return (จบงาน) เป็น continue (ไปเว็บถัดไป)
               continue;
@@ -185,26 +195,13 @@ class WebDefacementProccess extends Command
               // $TransactionBatchjob_Update->transcation_date = now();
               // $TransactionBatchjob_Update->save();
 
-              // บันทึก stat_log สำหรับ Web Down
-              try {
-                DB::table('webdefacement_stat_log')->insert([
-                  'site_id' => $WebdefacmentSetting_update->site_id,
-                  'webdefacement_setting_id' => $value->id,
-                  'result_id' => null,
-                  'status' => 'Down',
-                  'score' => 0,
-                  'diff_percent' => 0,
-                  'hash_changed' => 0,
-                  'image_changed' => 0,
-                  'alert_sent' => 1,
-                  'reason' => 'web_down_email_failed',
-                  'checked_at' => now(),
-                  'created_at' => now(),
-                  'updated_at' => now(),
-                ]);
-              } catch (\Throwable $e) {
-                Log::error("[STAT_LOG] Failed for web down: " . $e->getMessage());
-              }
+              $this->writeStatLog([
+                'site_id' => $WebdefacmentSetting_update->site_id,
+                'webdefacement_setting_id' => $value->id,
+                'status' => WebDefacementService::STATUS_DOWN,
+                'alert_sent' => 1,
+                'reason' => 'web_down_email_failed',
+              ]);
 
               // จบการทำงาน command ทันที
               return;
@@ -219,26 +216,13 @@ class WebDefacementProccess extends Command
           $TransactionBatchjob_Update->transcation_date = now();
           $TransactionBatchjob_Update->save();
 
-          // บันทึก stat_log สำหรับ Web Down (no email)
-          try {
-            DB::table('webdefacement_stat_log')->insert([
-              'site_id' => $WebdefacmentSetting_update->site_id,
-              'webdefacement_setting_id' => $value->id,
-              'result_id' => null,
-              'status' => 'Down',
-              'score' => 0,
-              'diff_percent' => 0,
-              'hash_changed' => 0,
-              'image_changed' => 0,
-              'alert_sent' => 0,
-              'reason' => 'web_down_no_email',
-              'checked_at' => now(),
-              'created_at' => now(),
-              'updated_at' => now(),
-            ]);
-          } catch (\Throwable $e) {
-            Log::error("[STAT_LOG] Failed for web down: " . $e->getMessage());
-          }
+          $this->writeStatLog([
+            'site_id' => $WebdefacmentSetting_update->site_id,
+            'webdefacement_setting_id' => $value->id,
+            'status' => WebDefacementService::STATUS_DOWN,
+            'alert_sent' => 0,
+            'reason' => 'web_down_no_email',
+          ]);
 
           // จบการทำงาน command ทันที
           return;
@@ -304,25 +288,12 @@ class WebDefacementProccess extends Command
         Log::error("[WebDefacement] Error processing id={$value->id}: " . $e->getMessage());
         
         // บันทึก stat_log แม้เกิด error เพื่อให้ summary ไม่ขาด
-        try {
-          DB::table('webdefacement_stat_log')->insert([
-            'site_id' => $value->site_id,
-            'webdefacement_setting_id' => $value->id,
-            'result_id' => null,
-            'status' => 'Error',
-            'score' => 0,
-            'diff_percent' => 0,
-            'hash_changed' => 0,
-            'image_changed' => 0,
-            'alert_sent' => 0,
-            'reason' => 'process_error: ' . substr($e->getMessage(), 0, 100),
-            'checked_at' => now(),
-            'created_at' => now(),
-            'updated_at' => now(),
-          ]);
-        } catch (\Throwable $statEx) {
-          Log::error("[STAT_LOG] Failed to save error stat: " . $statEx->getMessage());
-        }
+        $this->writeStatLog([
+          'site_id' => $value->site_id,
+          'webdefacement_setting_id' => $value->id,
+          'status' => WebDefacementService::STATUS_ERROR,
+          'reason' => 'process_error: ' . substr($e->getMessage(), 0, 100),
+        ]);
       }
       $WebdefacmentSetting_update->save();
 
@@ -424,26 +395,12 @@ class WebDefacementProccess extends Command
               $WebdefacmentSetting_update->save();
 
               // 🟩 [UPDATED] ไม่ส่ง error email เพราะเป็นแค่ปัญหาการเชื่อมต่อชั่วคราว
-              //    ถ้าต้องการ track ให้บันทึก stat_log เฉย ๆ โดยไม่ trigger alert
-              try {
-                DB::table('webdefacement_stat_log')->insert([
-                  'site_id' => $WebdefacmentSetting_update->site_id,
-                  'webdefacement_setting_id' => $value->id,
-                  'result_id' => null,
-                  'status' => 'Skipped',
-                  'score' => 0,
-                  'diff_percent' => 0,
-                  'hash_changed' => 0,
-                  'image_changed' => 0,
-                  'alert_sent' => 0,
-                  'reason' => 'network_error_retry_next: ' . substr($response['error'] ?? 'unknown', 0, 100),
-                  'checked_at' => now(),
-                  'created_at' => now(),
-                  'updated_at' => now(),
-                ]);
-              } catch (\Throwable $statEx) {
-                Log::error("[STAT_LOG] Failed to save network error stat: " . $statEx->getMessage());
-              }
+              $this->writeStatLog([
+                'site_id' => $WebdefacmentSetting_update->site_id,
+                'webdefacement_setting_id' => $value->id,
+                'status' => WebDefacementService::STATUS_SKIPPED,
+                'reason' => 'network_error_retry_next: ' . substr($response['error'] ?? 'unknown', 0, 100),
+              ]);
 
               continue; // ข้ามไปเว็บถัดไป ลองใหม่รอบหน้า
             }
@@ -504,25 +461,12 @@ class WebDefacementProccess extends Command
                 $WebdefacmentSetting_update->last_check = date("Y-m-d H:i:s");
                 $WebdefacmentSetting_update->save();
 
-                try {
-                    DB::table('webdefacement_stat_log')->insert([
-                      'site_id' => $WebdefacmentSetting_update->site_id,
-                      'webdefacement_setting_id' => $value->id,
-                      'result_id' => null,
-                      'status' => 'Skipped',
-                      'score' => 0,
-                      'diff_percent' => 0,
-                      'hash_changed' => 0,
-                      'image_changed' => 0,
-                      'alert_sent' => 0,
-                      'reason' => 'soft_error_retry_next: ' . substr($softErrorReason, 0, 100),
-                      'checked_at' => now(),
-                      'created_at' => now(),
-                      'updated_at' => now(),
-                    ]);
-                  } catch (\Throwable $statEx) {
-                    // ignore
-                  }
+                $this->writeStatLog([
+                  'site_id' => $WebdefacmentSetting_update->site_id,
+                  'webdefacement_setting_id' => $value->id,
+                  'status' => WebDefacementService::STATUS_SKIPPED,
+                  'reason' => 'soft_error_retry_next: ' . substr($softErrorReason, 0, 100),
+                ]);
 
                 continue; // Skip processing
             }
@@ -1153,8 +1097,8 @@ class WebDefacementProccess extends Command
               </div>
               </div>';
               }
-              if ($WebdefacmentSetting_data->image_check == 2) {
-                // $totalConfig += 0.5;
+              // Image check: UI uses 1, some records use 2 — support both (same as Deface Now)
+              if ($WebdefacmentSetting_data->image_check == 2 || $WebdefacmentSetting_data->image_check == 1) {
                 $url_id = $WebdefacmentDataOriginal_data->url_id;
                 $site_id = $WebdefacmentSetting_data->site_id;
                 $delay = $WebdefacmentSetting_data->delay_screen_shot_val;
@@ -1169,11 +1113,7 @@ class WebDefacementProccess extends Command
                 $result["image_url"] = "/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
                 
                 // [FIX] Removed legacy DownloadImage (curl based). Rely on Puppeteer screenshot saved in getHtml3 above.
-                // $path_include = base_path() . '/public/screenshot/use/DownloadImage.php';
-                // include_once($path_include);
-                // $downloadImg = new \DownloadImage();
                 $Path_image = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
-                // $downloadImg->download($url, $Path_image, $delay);
 
                 // Verify if file exists (captured by Puppeteer)
                 if (!file_exists($Path_image)) {
@@ -1183,62 +1123,51 @@ class WebDefacementProccess extends Command
                 $result["image_path_original"] = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
                 $result["url_id"] = $url_id;
 
-                $WebdefacmentImageMark_check = WebdefacmentImageMark::where('webdefacment_data_original_id', $webdefacment_id)->get();
-                if (count($WebdefacmentImageMark_check) > 0) {
-                  $dir_folder_image_original = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/image_original.png";
-                  $image_original = imagecreatefrompng($dir_folder_image_original);
-                  $black_original = ImageColorAllocate($image_original, 242, 242, 242);
+                $compareImage = ["diff" => 0, "image1Hash" => "", "image2Hash" => "", "highlight_path" => null];
+                $dirCompare = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/";
+                $baselineName = $this->resolveBaselineImageName($WebdefacmentSetting_data, $dirCompare);
 
-
-                  $dir_folder_image_compare = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
-                  $image_compare = imagecreatefrompng($dir_folder_image_compare);
-                  $black_compare = ImageColorAllocate($image_compare, 242, 242, 242);
-
-                  foreach ($WebdefacmentImageMark_check as $WebdefacmentImageMark_checkkey => $WebdefacmentImageMark_checkvalue) {
-                    ImageFilledRectangle($image_original, $WebdefacmentImageMark_checkvalue->left, $WebdefacmentImageMark_checkvalue->top, $WebdefacmentImageMark_checkvalue->width, $WebdefacmentImageMark_checkvalue->hight, $black_original);
-
-                    ImageFilledRectangle($image_compare, $WebdefacmentImageMark_checkvalue->left, $WebdefacmentImageMark_checkvalue->top, $WebdefacmentImageMark_checkvalue->width, $WebdefacmentImageMark_checkvalue->hight, $black_compare);
-                  }
-
-                  ImagePng($image_original, base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/image_original_custom.png");
-                  ImagePng($image_compare, base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png");
-                  // $compareImage = $this->compareImage2(base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/", 'image_original_custom.png', $image_name . "_custom.png");
-
-                  $imageOriginalPath = $dirPath . $imgSourcePath;
-                  $imageComparePath = $dirPath . $imgComparePath;
-
-                  try {
-                    if (file_exists($imageOriginalPath) && file_exists($imageComparePath)) {
-                      $comparer = new compareImages($imageOriginalPath);
-                      $imageDiffPercent = $comparer->compareBySlices($imageComparePath, 1000);
-
-                      $result['image_parcent'] = $imageDiffPercent;
-                      $result['image1Hash'] = $comparer->getHasString();
-                      $result['image2Hash'] = $comparer->hasString($imageComparePath);
-                      $result['image_diff'] = $imageDiffPercent;
-                    } else {
-                      Log::warning("ไฟล์ภาพไม่พบ: $imageOriginalPath หรือ $imageComparePath");
-                      $result['image_parcent'] = 0;
-                      $result['image1Hash'] = '';
-                      $result['image2Hash'] = '';
-                      $result['image_diff'] = 0;
-                    }
-                  } catch (\Throwable $e) {
-                    Log::error("เกิดข้อผิดพลาดในการเปรียบเทียบภาพ: " . $e->getMessage());
+                if (file_exists($Path_image) && filesize($Path_image) > 0) {
+                  if (!$baselineName) {
+                    Log::warning("Baseline screenshot missing for image compare: {$dirCompare} (image_original.png or DB image_original)");
                     $result['image_parcent'] = 0;
-                    $result['image1Hash'] = '';
-                    $result['image2Hash'] = '';
-                    $result['image_diff'] = 0;
+                  } else {
+                  $WebdefacmentImageMark_check = WebdefacmentImageMark::where('webdefacment_data_original_id', $webdefacment_id)->get();
+                  if (count($WebdefacmentImageMark_check) > 0) {
+                    $dir_folder_image_original = $dirCompare . $baselineName;
+                    if (file_exists($dir_folder_image_original)) {
+                      $image_original = imagecreatefrompng($dir_folder_image_original);
+                      $black_original = ImageColorAllocate($image_original, 242, 242, 242);
+
+                      $image_compare = imagecreatefrompng($Path_image);
+                      $black_compare = ImageColorAllocate($image_compare, 242, 242, 242);
+
+                      foreach ($WebdefacmentImageMark_check as $WebdefacmentImageMark_checkkey => $WebdefacmentImageMark_checkvalue) {
+                        ImageFilledRectangle($image_original, $WebdefacmentImageMark_checkvalue->left, $WebdefacmentImageMark_checkvalue->top, $WebdefacmentImageMark_checkvalue->width, $WebdefacmentImageMark_checkvalue->hight, $black_original);
+                        ImageFilledRectangle($image_compare, $WebdefacmentImageMark_checkvalue->left, $WebdefacmentImageMark_checkvalue->top, $WebdefacmentImageMark_checkvalue->width, $WebdefacmentImageMark_checkvalue->hight, $black_compare);
+                      }
+
+                      ImagePng($image_original, $dirCompare . "image_original_custom.png");
+                      ImagePng($image_compare, $dirCompare . $image_name . "_custom.png");
+                      imagedestroy($image_original);
+                      imagedestroy($image_compare);
+
+                      $compareImage = $this->compareImage2($dirCompare, 'image_original_custom.png', $image_name . "_custom.png");
+
+                      $result["image_url"] = "/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
+                      $result["image_path_original"] = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
+                      $image_path_2  = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
+                    } else {
+                      Log::warning("Original baseline not found for comparison at {$dir_folder_image_original}");
+                    }
+                  } else {
+                    $compareImage = $this->compareImage2($dirCompare, $baselineName, $image_name . ".png");
                   }
-
-                  $result["image_url"] = "/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
-                  $result["image_path_original"] = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
-                  $image_path_2  = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
+                  }
                 } else {
-
-                  $compareImage = $this->compareImage2(base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/", 'image_original.png', $image_name . ".png");
+                  Log::warning("Screenshot missing or empty, skipping image comparison: {$Path_image}");
+                  $result['image_parcent'] = 0;
                 }
-
 
                 if ($compareImage["diff"]  == 0) {
                   $result['image_parcent']  = 0;
@@ -1270,6 +1199,7 @@ class WebDefacementProccess extends Command
                 $result['image1Hash']  = $compareImage["image1Hash"];
                 $result['image2Hash']  = $compareImage["image2Hash"];
                 $result['image_diff']  =  $compareImage["diff"];
+                $result['image_highlight'] = $this->highlightPublicPath($compareImage['highlight_path'] ?? null);
 
                 $message = $message . '
             <div class="card-log">
@@ -1314,13 +1244,7 @@ class WebDefacementProccess extends Command
               // $totalConfig += 1;
 
               $pointAlert = $this->calculatePoint2($result, $totalConfig);
-
-              $status = 'Normal';
-              if ($pointAlert >= 50 && $pointAlert < 74) {
-                $status = 'Medium';
-              } else if ($pointAlert >= 75) {
-                $status = 'High';
-              }
+              $status = WebDefacementService::statusFromScore($pointAlert);
 
               \Log::info('Webdefacement process finished: ' . now());
               $WebdefacmentDataCheck_save = new WebdefacmentDataCheck;
@@ -1370,16 +1294,17 @@ class WebDefacementProccess extends Command
 
               $WebdefacmentDataCheck_save->save();
 
-
+              \Log::info("[DefaceResult] Setting ID: {$webdefacment_id}, Status: {$status}, Score: {$pointAlert}%, outbound: " . count($result['_outbound_new_not_wl'] ?? []));
+              $this->info("[DefaceResult] Setting ID: {$webdefacment_id}, Status: {$status}, Score: {$pointAlert}%, outbound: " . count($result['_outbound_new_not_wl'] ?? []));
 
               $WebdefacmentSetting_update =   WebdefacmentSetting::find($webdefacment_id);
 
 
               $color = "#88ce4f  !important";
-              if ($status == "High") {
+              if ($status == WebDefacementService::STATUS_HIGH) {
                 $color = "#e64732 !important";
               }
-              if ($status == "Medium") {
+              if ($status == WebDefacementService::STATUS_MEDIUM) {
                 $color = "#fcc838 !important";
               }
 
@@ -1391,10 +1316,10 @@ class WebDefacementProccess extends Command
          </div>';
 
 
-              if ($status == 'Normal' || $status == 'Medium') {
+              if ($status == WebDefacementService::STATUS_NORMAL || $status == WebDefacementService::STATUS_MEDIUM) {
                 $WebdefacmentSetting_update->webdeflacement_progress = 1;
 
-                if ($status == 'Medium') {
+                if ($status == WebDefacementService::STATUS_MEDIUM) {
                   $WebdefacmentDataLog_save = new WebdefacmentDataLog;
                   $WebdefacmentDataLog_save->webdefacment_setting_id  = $webdefacment_id;
                   $WebdefacmentDataLog_save->webdefacment_data_check_id  = $WebdefacmentDataCheck_save->id;
@@ -1463,6 +1388,7 @@ class WebDefacementProccess extends Command
                   // ถ้ายังไม่มี image_original หรือต้องการ update ให้ใส่ logic เพิ่มตรงนี้ได้
                   // $WebdefacmentSetting_update->image_original = $result['image_url']; 
               }
+              $WebdefacmentSetting_update->image_highlight = $result['image_highlight'] ?? null;
 
               if (in_array($WebdefacmentSetting_update->id, [173, 174])) {
                 // Legacy check kept primarily to avoid logic breakage if relying on side effects, 
@@ -1516,7 +1442,7 @@ class WebDefacementProccess extends Command
               if ($webdefacment_id  != 173) {
                 try {
                   // หากสถานะเป็น High และยังไม่เคยส่งแจ้งเตือน
-                  if ($status === 'High' && !$WebdefacmentSetting_update->is_alert_sent) {
+                  if ($status === WebDefacementService::STATUS_HIGH && !$WebdefacmentSetting_update->is_alert_sent) {
 
                     // Log::info($status); 
 
@@ -1637,27 +1563,18 @@ class WebDefacementProccess extends Command
               WebdefacmentDataCheck::whereNotIn('id', $WebdefacmentDataCheck_delete_list)->where('webdefacment_setting_id', $webdefacment_id)->delete();
 
 
-              try {
-                DB::table('webdefacement_stat_log')->insert([
-                  'site_id' => $WebdefacmentSetting_data->site_id,
-                  'webdefacement_setting_id' => $webdefacment_id,
-                  'result_id' => $WebdefacmentDataCheck_save->id ?? null,
-                  'status' => $status,
-                  'score' => intval($pointAlert ?? 0),
-                  'diff_percent' => intval($pointAlert ?? 0),
-                  'hash_changed' => ($result['hash_parcent'] ?? 0) > 0 ? 1 : 0,
-                  'image_changed' => ($result['image_parcent'] ?? 0) > 0 ? 1 : 0,
-                  'alert_sent' => ($status === 'High') ? 1 : 0,
-                  'reason' => $result['_reason'] ?? null,
-                  'checked_at' => now(),
-                  'created_at' => now(),
-                  'updated_at' => now(),
-                ]);
-
-                // Log::info("[STAT_LOG] Saved for webdefacement_setting_id={$webdefacment_id}, status={$status}");
-              } catch (\Throwable $e) {
-                Log::error("[STAT_LOG] Failed for webdefacement_setting_id={$webdefacment_id}: " . $e->getMessage());
-              }
+              $this->writeStatLog([
+                'site_id' => $WebdefacmentSetting_data->site_id,
+                'webdefacement_setting_id' => $webdefacment_id,
+                'result_id' => $WebdefacmentDataCheck_save->id ?? null,
+                'status' => $status,
+                'score' => intval($pointAlert ?? 0),
+                'diff_percent' => intval($pointAlert ?? 0),
+                'hash_changed' => ($result['hash_parcent'] ?? 0) > 0 ? 1 : 0,
+                'image_changed' => ($result['image_parcent'] ?? 0) > 0 ? 1 : 0,
+                'alert_sent' => ($status === WebDefacementService::STATUS_HIGH) ? 1 : 0,
+                'reason' => $result['_reason'] ?? null,
+              ]);
 
               print_r($webdefacment_id);
             }
@@ -1688,6 +1605,35 @@ class WebDefacementProccess extends Command
   }
 
 
+  /**
+   * Persist one scan outcome to webdefacement_stat_log with canonical Title Case status.
+   */
+  private function writeStatLog(array $data): void
+  {
+    try {
+      $settingId = $data['webdefacement_setting_id'] ?? null;
+      $status = WebDefacementService::normalizeStatus($data['status'] ?? WebDefacementService::STATUS_NORMAL);
+
+      DB::table('webdefacement_stat_log')->insert([
+        'site_id' => $data['site_id'] ?? null,
+        'webdefacement_setting_id' => $settingId,
+        'result_id' => $data['result_id'] ?? null,
+        'status' => $status,
+        'score' => $data['score'] ?? 0,
+        'diff_percent' => $data['diff_percent'] ?? 0,
+        'hash_changed' => $data['hash_changed'] ?? 0,
+        'image_changed' => $data['image_changed'] ?? 0,
+        'alert_sent' => $data['alert_sent'] ?? 0,
+        'reason' => isset($data['reason']) ? substr((string) $data['reason'], 0, 500) : null,
+        'checked_at' => $data['checked_at'] ?? now(),
+        'created_at' => now(),
+        'updated_at' => now(),
+      ]);
+    } catch (\Throwable $e) {
+      Log::error('[STAT_LOG] Failed for webdefacement_setting_id=' . ($data['webdefacement_setting_id'] ?? 'n/a') . ': ' . $e->getMessage());
+    }
+  }
+
   private function calculatePoint2($trackList, $totalConfig)
   {
     // Reverted: Removed _score_percent from calculation as requested
@@ -1708,28 +1654,91 @@ class WebDefacementProccess extends Command
 
   private function compareImage2($dirPath, $imgSourcePath, $imgComparePath)
   {
-    $compareImage = array();
-    // $imgSourcePath = PATH_CAPTURE_SCREEN.'/'.$imgSourcePath;
-    // $imgComparePath = PATH_CAPTURE_SCREEN.'/'.$imgComparePath;
+    $compareImage = array(
+      "image1Hash" => "",
+      "image2Hash" => "",
+      "diff" => 0,
+      "similarity_percent" => null,
+      "has_diff" => false,
+      "diff_boxes_count" => 0,
+      "highlight_path" => null,
+    );
 
-    $imgSourcePath = $dirPath . $imgSourcePath;
-    $imgComparePath = $dirPath . $imgComparePath;
+    $imgSourceFull = $dirPath . $imgSourcePath;
+    $imgCompareFull = $dirPath . $imgComparePath;
 
-    // $imgSourcePath = "D:\ทดสอบรูปภาพ\\2017-06-14-02-43-01408692.jpg";
-    //$imgComparePath =  "D:\ทดสอบรูปภาพ\\2017-06-15-20-37-12458813.jpg";
+    if (!file_exists($imgSourceFull) || !is_readable($imgSourceFull)) {
+      Log::warning("compareImage2 skipped: baseline missing: {$imgSourceFull}");
+      return $compareImage;
+    }
+    if (!file_exists($imgCompareFull) || !is_readable($imgCompareFull)) {
+      Log::warning("compareImage2 skipped: current screenshot missing: {$imgCompareFull}");
+      return $compareImage;
+    }
 
-    $image1 = $imgSourcePath;
-    $compareMachine = new compareImages($image1);
-    $image1Hash = $compareMachine->getHasString();
-    $compareImage["image1Hash"] = $image1Hash;
+    try {
+      $image1 = $imgSourceFull;
+      $compareMachine = new compareImages($image1);
+      $image1Hash = $compareMachine->getHasString();
+      $compareImage["image1Hash"] = $image1Hash;
 
+      $image2 = $imgCompareFull;
+      $image2Hash = $compareMachine->hasStringImage($image2);
+      $diff = $compareMachine->compareHash($image2Hash);
+      $compareImage["image2Hash"] = $image2Hash;
+      $compareImage["diff"] = $diff;
 
-    $image2 = $imgComparePath;
-    $image2Hash = $compareMachine->hasStringImage($image2);
-    $diff = $compareMachine->compareHash($image2Hash);
-    $compareImage["image2Hash"] = $image2Hash;
-    $compareImage["diff"] = $diff;
+      // Visual highlight (red boxes) — same as Deface Now path
+      $highlightFilename = pathinfo($imgCompareFull, PATHINFO_FILENAME) . '_highlight.png';
+      $highlightFile = $dirPath . $highlightFilename;
+      $res = $compareMachine->compareAndHighlight($image2, $highlightFile);
+      $compareImage['similarity_percent'] = $res['similarity'] ?? null;
+      $compareImage['has_diff'] = $res['has_diff'] ?? false;
+      $compareImage['diff_boxes_count'] = $res['diff_boxes_count'] ?? 0;
+      $compareImage['highlight_path'] = $res['diff_image'] ?? null;
+    } catch (\Throwable $e) {
+      Log::error("compareImage2 failed: " . $e->getMessage(), [
+        'source' => $imgSourceFull,
+        'compare' => $imgCompareFull,
+      ]);
+    }
+
     return $compareImage;
+  }
+
+  /**
+   * Resolve baseline screenshot filename inside the site/url folder.
+   * Prefer DB image_original path; fall back to image_original.png.
+   */
+  private function resolveBaselineImageName($setting, $dirCompare)
+  {
+    $candidates = [];
+
+    $fromDb = $setting->image_original ?? null;
+    if (is_string($fromDb) && $fromDb !== '') {
+      $candidates[] = basename(str_replace('\\', '/', $fromDb));
+    }
+
+    $candidates[] = 'image_original.png';
+
+    foreach ($candidates as $name) {
+      if ($name && file_exists($dirCompare . $name)) {
+        return $name;
+      }
+    }
+
+    return null;
+  }
+
+  private function highlightPublicPath($absolutePath)
+  {
+    if (!$absolutePath || !is_string($absolutePath) || !file_exists($absolutePath)) {
+      return null;
+    }
+
+    $normalized = str_replace('\\', '/', $absolutePath);
+    $pos = strpos($normalized, '/images/');
+    return $pos === false ? null : substr($normalized, $pos);
   }
   function is_url($uri)
   {
@@ -1871,33 +1880,45 @@ class WebDefacementProccess extends Command
   }
   function checkDomainHeaders($url, $format = 0)
   {
-    $url = parse_url($url);
-    $end = "\r\n\r\n";
-    $fp = fsockopen($url['host'], (empty($url['port']) ? 80 : $url['port']), $errno, $errstr, 30);
-    if ($fp) {
-      $out  = "GET / HTTP/1.1\r\n";
-      $out .= "Host: " . $url['host'] . "\r\n";
-      $out .= "Connection: Close\r\n\r\n";
-      $var  = '';
-      fwrite($fp, $out);
-      while (!feof($fp)) {
-        $var .= fgets($fp, 1280);
-        if (strpos($var, $end))
-          break;
-      }
-      fclose($fp);
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_HEADER         => true,
+      CURLOPT_NOBODY         => true,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_MAXREDIRS      => 5,
+      CURLOPT_TIMEOUT        => 10,
+      CURLOPT_CONNECTTIMEOUT => 5,
+      CURLOPT_SSL_VERIFYPEER => false,
+      CURLOPT_SSL_VERIFYHOST => false,
+      CURLOPT_USERAGENT      => 'WebDefacementBot/1.0'
+    ]);
 
-      $var = preg_replace("/\r\n\r\n.*\$/", '', $var);
-      $var = explode("\r\n", $var);
-      if ($format) {
-        foreach ($var as $i) {
-          if (preg_match('/^([a-zA-Z -]+): +(.*)$/', $i, $parts))
-            $v[$parts[1]] = $parts[2];
-        }
-        return $v;
-      } else
-        return $var;
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    if ($response === false) {
+      return $format ? [] : [];
     }
+
+    // Split headers (handles multiple headers if redirected)
+    $parts = explode("\r\n\r\n", trim($response));
+    $headerContent = end($parts); // Get the last set of headers
+
+    $headers = explode("\r\n", $headerContent);
+    if ($format) {
+      $v = [];
+      foreach ($headers as $i) {
+        if (preg_match('/^([a-zA-Z0-9-]+): +(.*)$/', $i, $matches)) {
+          $v[$matches[1]] = $matches[2];
+        } else if (preg_match('/^HTTP\/\d\.\d +\d+/', $i)) {
+          $v[0] = $i;
+        }
+      }
+      return $v;
+    }
+
+    return $headers;
   }
   function URL_404($url)
   {
@@ -2376,327 +2397,127 @@ class WebDefacementProccess extends Command
 
   private function getHtml3($url, $retryCount = 0, $options = [])
   {
-    $browser = null;
-    $maxRetries = 10;
+    $maxRetries = 2;
 
-    try {
-      ini_set('max_execution_time', 300);
-      ini_set('default_socket_timeout', 300);
-      set_time_limit(0);
-
-      putenv('NODE_PATH=' . base_path('puphpeteer_env/node_modules'));
-      $_ENV['NODE_PATH'] = base_path('puphpeteer_env/node_modules');
-
-      // 🟩 ปิด Chrome ที่ค้างไว้
-      @exec("pkill -f 'chrome --headless' >/dev/null 2>&1");
-
-      $puppeteer = new \Nesk\Puphpeteer\Puppeteer([
-        'read_timeout' => 300,
-        'idle_timeout' => 300,
-      ]);
-
-      $browser = $puppeteer->launch([
-        'executablePath' => '/usr/bin/google-chrome',
-        'headless' => true,
-        'args' => [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-gpu',
-          '--single-process',
-          '--no-zygote',
-          '--disable-background-timer-throttling',
-          '--disable-renderer-backgrounding',
-          '--disable-background-networking',
-          '--disable-features=IsolateOrigins,site-per-process',
-          '--window-size=1920,1080',
-        ],
-      ]);
-
-      $page = $browser->newPage();
-      $page->setDefaultNavigationTimeout(90000); // เพิ่มเป็น 90 วินาที
-
-      // 🟩 Set User-Agent to bypass basic blocking
-      if (!empty($options['userAgent'])) {
-          $page->setUserAgent($options['userAgent']);
-      } else {
-          $page->setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-      }
-
-      // 🟩 เปิด JavaScript
-      $page->setJavaScriptEnabled(true);
-
-      // ✅ ใช้ waitUntil strategy ที่ต่างกันตาม retry count
-      // - retry 0: networkidle2 (ผ่อนปรนกว่า networkidle0)
-      // - retry 1+: load + domcontentloaded (เร็วขึ้น)
-      $waitStrategies = [
-          ['load', 'domcontentloaded', 'networkidle2'],  // retry 0
-          ['load', 'domcontentloaded'],                   // retry 1
-          ['load'],                                        // retry 2+
-      ];
-      $strategyIdx = min($retryCount, count($waitStrategies) - 1);
-      $waitUntil = $waitStrategies[$strategyIdx];
-      $timeout = $retryCount === 0 ? 90000 : 60000; // ลด timeout ใน retry
-      
-      \Log::info("[getHtml3] Attempt " . ($retryCount + 1) . " for {$url} (waitUntil: " . implode(',', $waitUntil) . ")");
-
-      // 🟩 จับ "frame was detached" ที่เกิดจากเว็บ redirect ข้าม origin ระหว่าง goto
-      //    เฉพาะ site ที่ redirect แบบนี้เท่านั้นจะเข้า path นี้ — site อื่นไม่ได้รับผลกระทบ
-      $response = null;
-      $httpStatus = 0;
-
-      try {
-          $response = $page->goto($url, [
-            'timeout' => $timeout,
-            'waitUntil' => $waitUntil,
-          ]);
-          $httpStatus = $response ? $response->status() : 0;
-      } catch (\Throwable $gotoEx) {
-          if (stripos($gotoEx->getMessage(), 'frame was detached') !== false ||
-              stripos($gotoEx->getMessage(), 'Execution context was destroyed') !== false) {
-              // 🟩 Frame เดิมหลุดเพราะ page redirect ข้าม origin
-              //    page object เดิมใช้ไม่ได้แล้ว → ดึง page ใหม่จาก browser
-              \Log::info("[getHtml3] Frame detached for {$url} — recovering via browser.pages()...");
-              sleep(5); // รอให้ page หลัง redirect โหลดเสร็จ
-
-              try {
-                  // ดึง page ล่าสุดจาก browser (page ที่ redirect ไปแล้ว)
-                  $allPages = $browser->pages();
-                  $newPage = end($allPages);
-
-                  // รอ body โหลด
-                  try {
-                      $newPage->waitForSelector('body', ['timeout' => 15000]);
-                  } catch (\Throwable $ignore) {
-                      // ถ้า timeout ก็ไม่เป็นไร ลองดึง content ต่อ
-                  }
-
-                  sleep(2);
-                  $content = $newPage->content();
-
-                  if (strlen($content) < 500) {
-                      \Log::warning("[getHtml3] Frame-detach recovery: content too short (" . strlen($content) . " bytes) for {$url}");
-                      throw new \Exception("Frame-detach recovery: content too short");
-                  }
-
-                  \Log::info("[getHtml3] Frame-detach recovery SUCCESS for {$url} — got " . strlen($content) . " bytes");
-
-                  // 🟩 Screenshot จาก page ใหม่
-                  $screenshotBase64 = null;
-                  $screenshotSaved = false;
-                  if (!empty($options['screenshot_path'])) {
-                      try {
-                          $dir = dirname($options['screenshot_path']);
-                          if (!is_dir($dir)) { @mkdir($dir, 0775, true); }
-                          $newPage->screenshot(['path' => $options['screenshot_path'], 'fullPage' => true]);
-                          $screenshotSaved = file_exists($options['screenshot_path']);
-                      } catch (\Throwable $ssEx) {
-                          \Log::warning("[getHtml3] Screenshot after frame-detach failed: " . $ssEx->getMessage());
-                      }
-                  }
-
-                  return [
-                      'content' => $content,
-                      'success' => true,
-                      'screenshot_base64' => $screenshotBase64,
-                      'screenshot_saved' => $screenshotSaved,
-                  ];
-              } catch (\Throwable $recoveryEx) {
-                  \Log::warning("[getHtml3] Frame-detach recovery FAILED for {$url}: " . $recoveryEx->getMessage());
-                  // ถ้า recovery ไม่สำเร็จ → throw ต่อให้ retry logic จัดการ
-                  throw $recoveryEx;
-              }
-          } else {
-              throw $gotoEx;
-          }
-      }
-
-      // 🟩 รอให้หน้าเว็บโหลดเสร็จ (สำหรับ site ที่ goto สำเร็จปกติ)
-      sleep(1);
-
-      // 🟩 SCROLL เพื่อ TRIGGER LAZY LOADING (Optimized)
-      $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
-            return (async () => {
-                const scrollStep = 800; 
-                const scrollDelay = 100; 
-                
-                const totalHeight = Math.max(
-                    document.body.scrollHeight,
-                    document.documentElement.scrollHeight
-                );
-                
-                for (let scrolled = 0; scrolled < totalHeight; scrolled += scrollStep) {
-                    window.scrollTo(0, scrolled);
-                    await new Promise(resolve => setTimeout(resolve, scrollDelay));
-                }
-                
-                // Scroll กลับขึ้นบน
-                window.scrollTo(0, 0);
-                await new Promise(resolve => setTimeout(resolve, 200));
-            })();
-        "));
-
-      // 🟩 รอ network requests ที่เกิดจาก scroll
-      sleep(2); // ลดเวลาลงเล็กน้อย
-
-      // 🟩 WAIT UNTIL DOM STABLE (เพิ่มเวลารอ)
-      $page->evaluate(\Nesk\Rialto\Data\JsFunction::createWithBody("
-            () => {
-                return new Promise(resolve => {
-                    let last = document.body.innerHTML.length;
-                    let stableCount = 0;
-                    let attempts = 0;
-                    const maxAttempts = 60;   // 30 seconds (60 × 500ms) - เพิ่มจาก 20
-
-                    const check = () => {
-                        attempts++;
-                        const now = document.body.innerHTML.length;
-
-                        if (now === last) {
-                            stableCount++;
-                            if (stableCount >= 4) return resolve(true); // stable 2s (เพิ่มจาก 3)
-                        } else {
-                            stableCount = 0;
-                        }
-
-                        last = now;
-
-                        // Fallback → do not wait forever
-                        if (attempts >= maxAttempts) {
-                            console.log('DOM stability timeout, proceeding anyway');
-                            return resolve(true);
-                        }
-
-                        setTimeout(check, 500);
-                    };
-
-                    check();
-                });
-            }
-        "));
-
-      // 🟩 รอเพิ่มอีกนิดเพื่อให้แน่ใจว่า dynamic content โหลดเสร็จ
-      sleep(1);
-
-      // 🟩 Pull final HTML snapshot
-      $content = $page->content();
-
-      // 🟩 ตรวจสอบว่า content ที่ได้มามีความสมบูรณ์หรือไม่
-      if (strlen($content) < 500) {
-        $title = $page->title();
-        $msg = "Content too short. Len: " . strlen($content) . ", Status: {$httpStatus}, Title: {$title}";
-        \Log::warning("getHtml3: {$msg} ({$url})");
-        throw new \Exception($msg);
-      }
-
-      // 🟩 Screenshot Capture (Optional)
-      $screenshotBase64 = null;
-      $screenshotSaved = false;
-
-      // 1. ถ้ามี Path ให้ Save ลงไฟล์เลย (ประหยัด memory)
-      if (!empty($options['screenshot_path'])) {
-          try {
-              $dir = dirname($options['screenshot_path']);
-              
-              // สร้าง directory ถ้ายังไม่มี
-              if (!is_dir($dir)) {
-                  $mkdirResult = @mkdir($dir, 0775, true);
-                  if ($mkdirResult) {
-                      @chmod($dir, 0775);
-                  } else {
-                      \Log::warning("[getHtml3] Failed to create directory: {$dir}");
-                  }
-              }
-              
-              // ถ่ายภาพ
-              $page->screenshot([
-                  'path' => $options['screenshot_path'],
-                  'fullPage' => true
-              ]);
-              
-              // Verify ว่าไฟล์ถูกสร้างจริง
-              if (file_exists($options['screenshot_path'])) {
-                  $screenshotSaved = true;
-              } else {
-                  \Log::warning("[getHtml3] Screenshot command ran but file not created at {$options['screenshot_path']}");
-              }
-          } catch (\Throwable $e) {
-              \Log::warning("[getHtml3] Screenshot save failed ({$url}) - " . $e->getMessage());
-          }
-      } 
-      // 2. ถ้าไม่มี Path แต่ขอ Screenshot ให้ส่ง Base64 กลับไป
-      elseif (!empty($options['screenshot'])) {
-          try {
-              $screenshotBase64 = $page->screenshot([
-                  'encoding' => 'base64',
-                  'fullPage' => true
-              ]);
-          } catch (\Throwable $e) {
-              \Log::warning("getHtml3: Screenshot base64 failed ({$url}) - " . $e->getMessage());
-          }
-      }
-
-      return [
-          'content' => $content, 
-          'success' => true, 
-          'screenshot_base64' => $screenshotBase64,
-          'screenshot_saved' => $screenshotSaved
-      ];
-    } catch (\Throwable $e) {
-      $errorMsg = $e->getMessage();
-
-      // 🟩 ตรวจสอบว่าเป็น network error หรือไม่
-      $isNetworkError = (
-        stripos($errorMsg, 'ERR_SOCKET_NOT_CONNECTED') !== false ||
-        stripos($errorMsg, 'ERR_CONNECTION') !== false ||
-        stripos($errorMsg, 'ERR_NETWORK') !== false ||
-        stripos($errorMsg, 'ERR_TIMED_OUT') !== false ||
-        stripos($errorMsg, 'Navigation timeout') !== false ||
-        stripos($errorMsg, 'Content too short') !== false ||
-        stripos($errorMsg, 'frame was detached') !== false ||
-        stripos($errorMsg, 'Execution context was destroyed') !== false ||
-        stripos($errorMsg, 'Session closed') !== false ||
-        stripos($errorMsg, 'Target closed') !== false
-      );
-
-      \Log::error("Puphpeteer Error (attempt " . ($retryCount + 1) . "/{$maxRetries}): {$errorMsg} at {$url}");
-
-      // 🟩 ถ้าเป็น network error และยังลองไม่ถึง max retries ให้ลองใหม่
-      if ($isNetworkError && $retryCount < $maxRetries) {
-        \Log::info("Retrying {$url} (attempt " . ($retryCount + 2) . "/{$maxRetries})");
-
-        // ปิด browser ก่อน retry
-        if ($browser) {
-          try {
-            $browser->close();
-          } catch (\Throwable $ex) {
-            // ignore
-          }
+    // Reclaim disk space from leftover Puppeteer/Chrome temp profiles (bounded per call)
+    if (function_exists('cleanup_stale_chrome_tmp_profiles') && $retryCount === 0) {
+        $cleaned = cleanup_stale_chrome_tmp_profiles(3600, 50);
+        if ($cleaned > 0) {
+            \Log::info("[getHtml3] Cleaned {$cleaned} stale Chrome temp profile(s) under " . sys_get_temp_dir());
         }
-
-        // รอสักครู่ก่อน retry
-        sleep(2 + $retryCount); // รอนานขึ้นทุกครั้งที่ retry
-
-        return $this->getHtml3($url, $retryCount + 1, $options);
-      }
-
-      // 🟩 ถ้า retry หมดแล้วหรือไม่ใช่ network error ให้ใช้ fallback
-      // แต่ return พร้อม error flag เพื่อไม่ให้ diff
-      // $fallbackResult = $this->getHtmlFallback($url); // DISABLE FALLBACK
-      $fallbackResult = [];
-      $fallbackResult['content'] = ''; 
-      $fallbackResult['success'] = false;
-      $fallbackResult['error'] = $errorMsg;
-
-      return $fallbackResult;
-    } finally {
-      if ($browser) {
-        try {
-          $browser->close();
-        } catch (\Throwable $ex) {
-          \Log::warning("Browser close failed: " . $ex->getMessage());
+    }
+    
+    $chromeHome = storage_path('app/chrome_home');
+    if (!file_exists($chromeHome)) {
+        @mkdir($chromeHome, 0777, true);
+    }
+    putenv('HOME=' . $chromeHome);
+    $_ENV['HOME'] = $chromeHome;
+    
+    putenv('NODE_PATH=' . base_path('puphpeteer_env/node_modules'));
+    $_ENV['NODE_PATH'] = base_path('puphpeteer_env/node_modules');
+    
+    // We will run the scraper.js using node command line.
+    // To ensure everything is clean, we write the HTML output to a temp file,
+    // and then read it from PHP.
+    $tempHtmlFile = tempnam(sys_get_temp_dir(), 'deface_html_');
+    $screenshotPath = isset($options['screenshot_path']) ? $options['screenshot_path'] : '';
+    $userAgent = isset($options['userAgent']) ? $options['userAgent'] : '';
+    
+    // Select waitUntil strategies based on retryCount
+    // Fast first: networkidle2 often waits until ~90s timeout and blocks the schedule lock
+    $waitStrategies = [
+        'load,domcontentloaded',              // retry 0 (fast)
+        'load,domcontentloaded,networkidle2', // retry 1 (stricter)
+        'load',                               // retry 2+
+    ];
+    $strategyIdx = min($retryCount, count($waitStrategies) - 1);
+    $waitUntil = $waitStrategies[$strategyIdx];
+    
+    // Build node execution command
+    $nodeScript = public_path('js/scraper.js');
+    
+    $executablePath = env('PUPPETEER_EXECUTABLE_PATH', '/usr/bin/google-chrome');
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && $executablePath === '/usr/bin/google-chrome') {
+        $executablePath = '';
+    }
+    
+    // Build command with properly escaped shell arguments
+    $command = 'node ' . escapeshellarg($nodeScript) . ' ' . escapeshellarg($url) . ' ' . escapeshellarg($tempHtmlFile) . ' ' . escapeshellarg($screenshotPath) . ' ' . escapeshellarg($userAgent) . ' ' . escapeshellarg($waitUntil) . ' ' . escapeshellarg($executablePath);
+    
+    \Log::info("[getHtml3] Executing standalone scraper (Attempt " . ($retryCount + 1) . "): " . $command);
+    $this->info("[getHtml3] Executing standalone scraper (Attempt " . ($retryCount + 1) . ")...");
+    
+    $output = [];
+    $exitCode = -1;
+    
+    exec($command . ' 2>&1', $output, $exitCode);
+    
+    $logLines = [];
+    if ($exitCode === 0) {
+        $msg = "[getHtml3] Scraper finished successfully (Exit Code: 0).";
+        $logLines[] = $msg;
+        $this->info($msg);
+    } else {
+        $msg = "[getHtml3] Scraper failed (Exit Code: $exitCode).";
+        $logLines[] = $msg;
+        $this->error($msg);
+    }
+    
+    if (count($output) > 0) {
+        $logLines[] = "--- Scraper Logs ---";
+        $this->line("--- Scraper Logs ---");
+        foreach ($output as $line) {
+            $logLines[] = "  " . $line;
+            $this->line("  " . $line);
         }
-      }
+        $logLines[] = "--------------------";
+        $this->line("--------------------");
+    }
+    
+    \Log::info(implode("\n", $logLines));
+    
+    if ($exitCode === 0 && file_exists($tempHtmlFile) && filesize($tempHtmlFile) > 0) {
+        $content = file_get_contents($tempHtmlFile);
+        @unlink($tempHtmlFile); // clean up
+        
+        $screenshotSaved = !empty($screenshotPath) && file_exists($screenshotPath) && filesize($screenshotPath) > 0;
+        
+        return [
+            'content' => $content,
+            'success' => true,
+            'screenshot_base64' => null,
+            'screenshot_saved' => $screenshotSaved
+        ];
+    } else {
+        // Log failure details
+        $errorMsg = "Node scraper failed. Exit code: " . $exitCode . ". Logs: " . implode(" ", $output);
+        \Log::error("Scraper Error (attempt " . ($retryCount + 1) . "/{$maxRetries}): {$errorMsg} at {$url}");
+        
+        @unlink($tempHtmlFile); // clean up
+        
+        // Handle retries
+        $isNetworkError = (
+            stripos($errorMsg, 'ERR_SOCKET_NOT_CONNECTED') !== false ||
+            stripos($errorMsg, 'ERR_CONNECTION') !== false ||
+            stripos($errorMsg, 'ERR_NETWORK') !== false ||
+            stripos($errorMsg, 'ERR_TIMED_OUT') !== false ||
+            stripos($errorMsg, 'timeout') !== false ||
+            stripos($errorMsg, 'detached') !== false ||
+            stripos($errorMsg, 'destroyed') !== false
+        );
+        
+        if ($isNetworkError && $retryCount < $maxRetries) {
+            \Log::info("Retrying {$url} (attempt " . ($retryCount + 2) . "/{$maxRetries}) in " . (2 + $retryCount) . " seconds");
+            sleep(2 + $retryCount);
+            return $this->getHtml3($url, $retryCount + 1, $options);
+        }
+        
+        return [
+            'content' => '',
+            'success' => false,
+            'error' => $errorMsg
+        ];
     }
   }
 

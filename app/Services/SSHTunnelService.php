@@ -48,6 +48,11 @@ class SSHTunnelService
         // 'D:/xampp/htdocs/threat-intelligent-center/vendor/PuTTY/plink.exe';
         
         $plinkPath = base_path('vendor/PuTTY/plink.exe');
+        if (!is_file($plinkPath)) {
+            Log::warning("[SSH TUNNEL] plink.exe not found at {$plinkPath}; skip createTunnel");
+            return false;
+        }
+
         $sshUser = env('sshUser');
         $sshHost = env('sshHost');
         $localPort = env('localPort');
@@ -62,6 +67,7 @@ class SSHTunnelService
 
         // ✅ Log เพื่อ debug
         Log::info("🚀 [SSH TUNNEL] Executing: {$cmd}");
+        return true;
     }
 
     public function disconnect()

@@ -73,10 +73,17 @@ class Kernel extends ConsoleKernel
     // $schedule->command('app:reset-demo')->cron('0 */3 * * *')->name('demo.reset')->withoutOverlapping(5);
     // $schedule->command('inspire')
     //          ->hourly();
-    $delay_WebDefacementProccess = rand(1, 55);
-    $schedule->command('app:WebDefacementProccess')->everyMinute();
-    $schedule->command('transaction:ssh')->everyMinute()->withoutOverlapping(5);
-    $schedule->command('transaction:saveScan')->everyMinute()->withoutOverlapping(5);
+    // everyMinute = พยายามเริ่มทุกนาที
+    // withoutOverlapping(2) = กันรันซ้อน; N = อายุ lock กันกรณีพัง
+    // สำคัญ: ห้าม runInBackground กับ withoutOverlapping
+    // เพราะบน Laravel รุ่นนี้ lock มักไม่ถูกปล่อยหลัง background จบ → ต้องรอครบ N นาทีทุกครั้ง
+    // Process รอบละ ~30–40 วินาที (batch เล็ก) รัน foreground ใน schedule:run ได้
+    $schedule->command('app:WebDefacementProccess')
+      ->everyMinute()
+      ->name('webdefacement.process')
+      ->withoutOverlapping(2);
+    $schedule->command('transaction:ssh')->everyMinute()->withoutOverlapping(30)->runInBackground();
+    $schedule->command('transaction:saveScan')->everyMinute()->withoutOverlapping(30)->runInBackground();
 
     $schedule->command('app:RSS_Feed')->cron('0 */1 * * *')->withoutOverlapping(5);
     $schedule->command('app:news_permission')->cron('0 */6 * * *')->withoutOverlapping(5);

@@ -291,10 +291,45 @@ class WebDefacementController extends Controller
         $data['webdefacment_data_check'] = @$data['webdefacement']->get_webdefacment_data_check_detail[0];
         $data['webdefacment_data_log'] = @$data['webdefacement']->get_webdefacment_data_log_detail;
         $data['site_code'] = @$request->site_code;
+        $data['image_highlight'] = $this->resolveImageHighlight($WebdefacmentSetting);
 
         // dd( $data);
 
         return view('webdefacement::detail')->with($data);
+    }
+
+    /**
+     * Prefer DB path; fall back to *_highlight.png next to image_last if file exists.
+     */
+    protected function resolveImageHighlight($webdefacement)
+    {
+        if (!$webdefacement) {
+            return null;
+        }
+
+        $stored = $webdefacement->image_highlight ?? null;
+        if (is_string($stored) && $stored !== '' && file_exists(public_path(ltrim($stored, '/')))) {
+            return $stored;
+        }
+
+        $imageLast = $webdefacement->image_last ?? null;
+        if (!is_string($imageLast) || $imageLast === '') {
+            return null;
+        }
+
+        $info = pathinfo($imageLast);
+        $dirname = $info['dirname'] ?? '';
+        $filename = $info['filename'] ?? '';
+        if ($dirname === '' || $filename === '') {
+            return null;
+        }
+
+        $candidate = rtrim($dirname, '/') . '/' . $filename . '_highlight.png';
+        if (file_exists(public_path(ltrim($candidate, '/')))) {
+            return $candidate;
+        }
+
+        return null;
     }
 
     /**
