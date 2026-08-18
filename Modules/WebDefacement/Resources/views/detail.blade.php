@@ -554,6 +554,9 @@ return (string)$v;
                             <i class="fas fa-globe-europe"></i> Defacement Screen
                         </div>
                         <div class="col-xs-6 text-right">
+                            <button type="button" class="btn btn-xs btn-warning" data-toggle="modal" data-target="#highlightModal" style="margin-left:5px;">
+                                <i class="fas fa-exchange-alt"></i> View Diff
+                            </button>
                             <button id="togglecollapse" style="margin-left:5px;" class="btn btn-xs text-dark" onclick="collpase_chart('#Defacement','#togglecollapse')">
                                 <i class="fas fa-minus-square"></i>Collapse
                             </button>
@@ -704,9 +707,59 @@ return (string)$v;
     </div>
 </div>
 
-
-
-
+@php
+    $highlightUrl = !empty($image_highlight) ? asset(ltrim($image_highlight, '/')) : null;
+@endphp
+<div class="modal fade" id="highlightModal" tabindex="-1" role="dialog" aria-labelledby="highlightModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document" style="width:90%; max-width:1100px;">
+        <div class="modal-content" style="display:flex; flex-direction:column; max-height:90vh;">
+            <div class="modal-header" style="flex:0 0 auto;">
+                <h5 class="modal-title" id="highlightModalLabel">
+                    <i class="fas fa-exchange-alt"></i> View Diff — <b>{{ $webdefacement->name }}</b>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center" style="flex:1 1 auto; overflow:auto; max-height:calc(90vh - 140px);">
+                @if($highlightUrl)
+                    {{-- Do not use lightbox here — it overlays and blocks modal buttons --}}
+                    <img src="{{ $highlightUrl }}"
+                         alt="Highlight differences"
+                         style="max-width:100%; max-height:65vh; width:auto; height:auto; object-fit:contain;"
+                         onerror="this.onerror=null;this.style.display='none';document.getElementById('highlight-empty').style.display='block';">
+                    <div id="highlight-empty" style="display:none; padding:30px 10px;">
+                        <i class="fas fa-exclamation-triangle text-warning" style="font-size:28px;"></i>
+                        <p class="text-muted" style="margin-top:10px; margin-bottom:0;">
+                            Highlight file not found on disk. Run <b>Defacement Now</b> again after a visual change.
+                        </p>
+                    </div>
+                    <p class="text-muted" style="margin-top:10px; margin-bottom:0;">
+                        Red boxes mark areas that differ from the Original screenshot.
+                    </p>
+                @else
+                    <div style="padding:30px 10px;">
+                        <i class="fas fa-info-circle text-info" style="font-size:28px;"></i>
+                        <p class="text-muted" style="margin-top:10px; margin-bottom:0;">
+                            No highlight image yet. Run <b>Defacement Now</b> when the page has visual changes —
+                            the system will save a highlighted screenshot and show it here.
+                        </p>
+                    </div>
+                @endif
+            </div>
+            <div class="modal-footer" style="flex:0 0 auto; background:#fff; position:relative; z-index:2;">
+                @if($highlightUrl)
+                <a class="btn btn-info" href="{{ $highlightUrl }}" target="_blank" rel="noopener">
+                    <i class="fas fa-external-link-alt"></i> Open full size
+                </a>
+                @endif
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 @push('pagestyle')

@@ -71,6 +71,16 @@ class WebDefacementProccess extends Command
     Log:
     info('Webdefacement process started: ' . date("Y-m-d H:i:s"));
     ini_set('memory_limit', '2048M');
+
+    // Reclaim leftover Puppeteer/Chrome profiles under /tmp (bounded batch)
+    if (function_exists('cleanup_stale_chrome_tmp_profiles')) {
+      $cleaned = cleanup_stale_chrome_tmp_profiles(1800, 200);
+      if ($cleaned > 0) {
+        Log::info("[WebDefacementProccess] Cleaned {$cleaned} stale Chrome temp profile(s)");
+        $this->info("Cleaned {$cleaned} stale Chrome temp profile(s)");
+      }
+    }
+
     $TransactionBatchjob_Update = TransactionBatchjob::where('mode', 'WebDefacement_scan')->first();
     $TransactionBatchjob_Update->progress = 2;
     $TransactionBatchjob_Update->transcation_date_start = date("Y-m-d H:i:s");
@@ -78,7 +88,7 @@ class WebDefacementProccess extends Command
     $TransactionBatchjob_Update->save();
 
     $WebdefacmentSetting_datas_reset =  WebdefacmentSetting::where('active', 1)->where('webdeflacement_progress', 2)->whereNull('deleted_at')->get();
-    $newTime = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . " -5 minutes"));
+    $newTime = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s") . " -2 minutes"));
     foreach ($WebdefacmentSetting_datas_reset as $key => $value) {
       if ($newTime >= $value->last_check) {
         $WebdefacmentSetting_update =   WebdefacmentSetting::find($value->id);
@@ -90,11 +100,24 @@ class WebDefacementProccess extends Command
     }
 
 
-    $WebdefacmentSetting_datas =  WebdefacmentSetting::where('active', 1)->where('webdeflacement_progress', 1)->whereNull('deleted_at')->get();
+    // เดิม: ดึงทุกเว็บ progress=1 แล้วไล่ยาว → รอบเดียวกินหลายนาที / overlapping ขวาง
+    // ใหม่: เอาเฉพาะที่รอสแกน นานสุดก่อน จำกัดจำนวนต่อรอบ ให้จบเร็วแล้วเริ่มรอบถัดไปได้ทุกนาที
+    $batchSize = (int) env('WEBDEFACEMENT_BATCH_SIZE', 2);
+    if ($batchSize < 1) {
+      $batchSize = 1;
+    }
+
+    $WebdefacmentSetting_datas = WebdefacmentSetting::where('active', 1)
+      ->where('webdeflacement_progress', 1)
+      ->whereNull('deleted_at')
+      ->orderByRaw('last_check IS NULL DESC')
+      ->orderBy('last_check', 'asc')
+      ->limit($batchSize)
+      ->get();
+
+    Log::info('[WebDefacementProccess] batch size=' . $WebdefacmentSetting_datas->count() . '/' . $batchSize);
+
     foreach ($WebdefacmentSetting_datas as $key => $value) {
-      // Log::info('id: ' . $value->id . ' - ' . $value->url);
-
-
 
       $WebdefacmentSetting_update =   WebdefacmentSetting::find($value->id);
       $WebdefacmentSetting_update->webdeflacement_progress = 2;
@@ -145,26 +168,13 @@ class WebDefacementProccess extends Command
               // $TransactionBatchjob_Update->transcation_date = now();
               // $TransactionBatchjob_Update->save();
 
-              // บันทึก stat_log สำหรับ Web Down
-              try {
-                DB::table('webdefacement_stat_log')->insert([
-                  'site_id' => $WebdefacmentSetting_update->site_id,
-                  'webdefacement_setting_id' => $value->id,
-                  'result_id' => null,
-                  'status' => 'Down',
-                  'score' => 0,
-                  'diff_percent' => 0,
-                  'hash_changed' => 0,
-                  'image_changed' => 0,
-                  'alert_sent' => 1,
-                  'reason' => 'web_down',
-                  'checked_at' => now(),
-                  'created_at' => now(),
-                  'updated_at' => now(),
-                ]);
-              } catch (\Throwable $e) {
-                Log::error("[STAT_LOG] Failed for web down: " . $e->getMessage());
-              }
+              $this->writeStatLog([
+                'site_id' => $WebdefacmentSetting_update->site_id,
+                'webdefacement_setting_id' => $value->id,
+                'status' => WebDefacementService::STATUS_DOWN,
+                'alert_sent' => 1,
+                'reason' => 'web_down',
+              ]);
 
               // เปลี่ยนจาก return (จบงาน) เป็น continue (ไปเว็บถัดไป)
               continue;
@@ -185,26 +195,13 @@ class WebDefacementProccess extends Command
               // $TransactionBatchjob_Update->transcation_date = now();
               // $TransactionBatchjob_Update->save();
 
-              // บันทึก stat_log สำหรับ Web Down
-              try {
-                DB::table('webdefacement_stat_log')->insert([
-                  'site_id' => $WebdefacmentSetting_update->site_id,
-                  'webdefacement_setting_id' => $value->id,
-                  'result_id' => null,
-                  'status' => 'Down',
-                  'score' => 0,
-                  'diff_percent' => 0,
-                  'hash_changed' => 0,
-                  'image_changed' => 0,
-                  'alert_sent' => 1,
-                  'reason' => 'web_down_email_failed',
-                  'checked_at' => now(),
-                  'created_at' => now(),
-                  'updated_at' => now(),
-                ]);
-              } catch (\Throwable $e) {
-                Log::error("[STAT_LOG] Failed for web down: " . $e->getMessage());
-              }
+              $this->writeStatLog([
+                'site_id' => $WebdefacmentSetting_update->site_id,
+                'webdefacement_setting_id' => $value->id,
+                'status' => WebDefacementService::STATUS_DOWN,
+                'alert_sent' => 1,
+                'reason' => 'web_down_email_failed',
+              ]);
 
               // จบการทำงาน command ทันที
               return;
@@ -219,26 +216,13 @@ class WebDefacementProccess extends Command
           $TransactionBatchjob_Update->transcation_date = now();
           $TransactionBatchjob_Update->save();
 
-          // บันทึก stat_log สำหรับ Web Down (no email)
-          try {
-            DB::table('webdefacement_stat_log')->insert([
-              'site_id' => $WebdefacmentSetting_update->site_id,
-              'webdefacement_setting_id' => $value->id,
-              'result_id' => null,
-              'status' => 'Down',
-              'score' => 0,
-              'diff_percent' => 0,
-              'hash_changed' => 0,
-              'image_changed' => 0,
-              'alert_sent' => 0,
-              'reason' => 'web_down_no_email',
-              'checked_at' => now(),
-              'created_at' => now(),
-              'updated_at' => now(),
-            ]);
-          } catch (\Throwable $e) {
-            Log::error("[STAT_LOG] Failed for web down: " . $e->getMessage());
-          }
+          $this->writeStatLog([
+            'site_id' => $WebdefacmentSetting_update->site_id,
+            'webdefacement_setting_id' => $value->id,
+            'status' => WebDefacementService::STATUS_DOWN,
+            'alert_sent' => 0,
+            'reason' => 'web_down_no_email',
+          ]);
 
           // จบการทำงาน command ทันที
           return;
@@ -304,25 +288,12 @@ class WebDefacementProccess extends Command
         Log::error("[WebDefacement] Error processing id={$value->id}: " . $e->getMessage());
         
         // บันทึก stat_log แม้เกิด error เพื่อให้ summary ไม่ขาด
-        try {
-          DB::table('webdefacement_stat_log')->insert([
-            'site_id' => $value->site_id,
-            'webdefacement_setting_id' => $value->id,
-            'result_id' => null,
-            'status' => 'Error',
-            'score' => 0,
-            'diff_percent' => 0,
-            'hash_changed' => 0,
-            'image_changed' => 0,
-            'alert_sent' => 0,
-            'reason' => 'process_error: ' . substr($e->getMessage(), 0, 100),
-            'checked_at' => now(),
-            'created_at' => now(),
-            'updated_at' => now(),
-          ]);
-        } catch (\Throwable $statEx) {
-          Log::error("[STAT_LOG] Failed to save error stat: " . $statEx->getMessage());
-        }
+        $this->writeStatLog([
+          'site_id' => $value->site_id,
+          'webdefacement_setting_id' => $value->id,
+          'status' => WebDefacementService::STATUS_ERROR,
+          'reason' => 'process_error: ' . substr($e->getMessage(), 0, 100),
+        ]);
       }
       $WebdefacmentSetting_update->save();
 
@@ -424,26 +395,12 @@ class WebDefacementProccess extends Command
               $WebdefacmentSetting_update->save();
 
               // 🟩 [UPDATED] ไม่ส่ง error email เพราะเป็นแค่ปัญหาการเชื่อมต่อชั่วคราว
-              //    ถ้าต้องการ track ให้บันทึก stat_log เฉย ๆ โดยไม่ trigger alert
-              try {
-                DB::table('webdefacement_stat_log')->insert([
-                  'site_id' => $WebdefacmentSetting_update->site_id,
-                  'webdefacement_setting_id' => $value->id,
-                  'result_id' => null,
-                  'status' => 'Skipped',
-                  'score' => 0,
-                  'diff_percent' => 0,
-                  'hash_changed' => 0,
-                  'image_changed' => 0,
-                  'alert_sent' => 0,
-                  'reason' => 'network_error_retry_next: ' . substr($response['error'] ?? 'unknown', 0, 100),
-                  'checked_at' => now(),
-                  'created_at' => now(),
-                  'updated_at' => now(),
-                ]);
-              } catch (\Throwable $statEx) {
-                Log::error("[STAT_LOG] Failed to save network error stat: " . $statEx->getMessage());
-              }
+              $this->writeStatLog([
+                'site_id' => $WebdefacmentSetting_update->site_id,
+                'webdefacement_setting_id' => $value->id,
+                'status' => WebDefacementService::STATUS_SKIPPED,
+                'reason' => 'network_error_retry_next: ' . substr($response['error'] ?? 'unknown', 0, 100),
+              ]);
 
               continue; // ข้ามไปเว็บถัดไป ลองใหม่รอบหน้า
             }
@@ -504,25 +461,12 @@ class WebDefacementProccess extends Command
                 $WebdefacmentSetting_update->last_check = date("Y-m-d H:i:s");
                 $WebdefacmentSetting_update->save();
 
-                try {
-                    DB::table('webdefacement_stat_log')->insert([
-                      'site_id' => $WebdefacmentSetting_update->site_id,
-                      'webdefacement_setting_id' => $value->id,
-                      'result_id' => null,
-                      'status' => 'Skipped',
-                      'score' => 0,
-                      'diff_percent' => 0,
-                      'hash_changed' => 0,
-                      'image_changed' => 0,
-                      'alert_sent' => 0,
-                      'reason' => 'soft_error_retry_next: ' . substr($softErrorReason, 0, 100),
-                      'checked_at' => now(),
-                      'created_at' => now(),
-                      'updated_at' => now(),
-                    ]);
-                  } catch (\Throwable $statEx) {
-                    // ignore
-                  }
+                $this->writeStatLog([
+                  'site_id' => $WebdefacmentSetting_update->site_id,
+                  'webdefacement_setting_id' => $value->id,
+                  'status' => WebDefacementService::STATUS_SKIPPED,
+                  'reason' => 'soft_error_retry_next: ' . substr($softErrorReason, 0, 100),
+                ]);
 
                 continue; // Skip processing
             }
@@ -1153,8 +1097,8 @@ class WebDefacementProccess extends Command
               </div>
               </div>';
               }
-              if ($WebdefacmentSetting_data->image_check == 2) {
-                // $totalConfig += 0.5;
+              // Image check: UI uses 1, some records use 2 — support both (same as Deface Now)
+              if ($WebdefacmentSetting_data->image_check == 2 || $WebdefacmentSetting_data->image_check == 1) {
                 $url_id = $WebdefacmentDataOriginal_data->url_id;
                 $site_id = $WebdefacmentSetting_data->site_id;
                 $delay = $WebdefacmentSetting_data->delay_screen_shot_val;
@@ -1169,11 +1113,7 @@ class WebDefacementProccess extends Command
                 $result["image_url"] = "/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
                 
                 // [FIX] Removed legacy DownloadImage (curl based). Rely on Puppeteer screenshot saved in getHtml3 above.
-                // $path_include = base_path() . '/public/screenshot/use/DownloadImage.php';
-                // include_once($path_include);
-                // $downloadImg = new \DownloadImage();
                 $Path_image = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
-                // $downloadImg->download($url, $Path_image, $delay);
 
                 // Verify if file exists (captured by Puppeteer)
                 if (!file_exists($Path_image)) {
@@ -1183,62 +1123,51 @@ class WebDefacementProccess extends Command
                 $result["image_path_original"] = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
                 $result["url_id"] = $url_id;
 
-                $WebdefacmentImageMark_check = WebdefacmentImageMark::where('webdefacment_data_original_id', $webdefacment_id)->get();
-                if (count($WebdefacmentImageMark_check) > 0) {
-                  $dir_folder_image_original = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/image_original.png";
-                  $image_original = imagecreatefrompng($dir_folder_image_original);
-                  $black_original = ImageColorAllocate($image_original, 242, 242, 242);
+                $compareImage = ["diff" => 0, "image1Hash" => "", "image2Hash" => "", "highlight_path" => null];
+                $dirCompare = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/";
+                $baselineName = $this->resolveBaselineImageName($WebdefacmentSetting_data, $dirCompare);
 
-
-                  $dir_folder_image_compare = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
-                  $image_compare = imagecreatefrompng($dir_folder_image_compare);
-                  $black_compare = ImageColorAllocate($image_compare, 242, 242, 242);
-
-                  foreach ($WebdefacmentImageMark_check as $WebdefacmentImageMark_checkkey => $WebdefacmentImageMark_checkvalue) {
-                    ImageFilledRectangle($image_original, $WebdefacmentImageMark_checkvalue->left, $WebdefacmentImageMark_checkvalue->top, $WebdefacmentImageMark_checkvalue->width, $WebdefacmentImageMark_checkvalue->hight, $black_original);
-
-                    ImageFilledRectangle($image_compare, $WebdefacmentImageMark_checkvalue->left, $WebdefacmentImageMark_checkvalue->top, $WebdefacmentImageMark_checkvalue->width, $WebdefacmentImageMark_checkvalue->hight, $black_compare);
-                  }
-
-                  ImagePng($image_original, base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/image_original_custom.png");
-                  ImagePng($image_compare, base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png");
-                  // $compareImage = $this->compareImage2(base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/", 'image_original_custom.png', $image_name . "_custom.png");
-
-                  $imageOriginalPath = $dirPath . $imgSourcePath;
-                  $imageComparePath = $dirPath . $imgComparePath;
-
-                  try {
-                    if (file_exists($imageOriginalPath) && file_exists($imageComparePath)) {
-                      $comparer = new compareImages($imageOriginalPath);
-                      $imageDiffPercent = $comparer->compareBySlices($imageComparePath, 1000);
-
-                      $result['image_parcent'] = $imageDiffPercent;
-                      $result['image1Hash'] = $comparer->getHasString();
-                      $result['image2Hash'] = $comparer->hasString($imageComparePath);
-                      $result['image_diff'] = $imageDiffPercent;
-                    } else {
-                      Log::warning("ไฟล์ภาพไม่พบ: $imageOriginalPath หรือ $imageComparePath");
-                      $result['image_parcent'] = 0;
-                      $result['image1Hash'] = '';
-                      $result['image2Hash'] = '';
-                      $result['image_diff'] = 0;
-                    }
-                  } catch (\Throwable $e) {
-                    Log::error("เกิดข้อผิดพลาดในการเปรียบเทียบภาพ: " . $e->getMessage());
+                if (file_exists($Path_image) && filesize($Path_image) > 0) {
+                  if (!$baselineName) {
+                    Log::warning("Baseline screenshot missing for image compare: {$dirCompare} (image_original.png or DB image_original)");
                     $result['image_parcent'] = 0;
-                    $result['image1Hash'] = '';
-                    $result['image2Hash'] = '';
-                    $result['image_diff'] = 0;
+                  } else {
+                  $WebdefacmentImageMark_check = WebdefacmentImageMark::where('webdefacment_data_original_id', $webdefacment_id)->get();
+                  if (count($WebdefacmentImageMark_check) > 0) {
+                    $dir_folder_image_original = $dirCompare . $baselineName;
+                    if (file_exists($dir_folder_image_original)) {
+                      $image_original = imagecreatefrompng($dir_folder_image_original);
+                      $black_original = ImageColorAllocate($image_original, 242, 242, 242);
+
+                      $image_compare = imagecreatefrompng($Path_image);
+                      $black_compare = ImageColorAllocate($image_compare, 242, 242, 242);
+
+                      foreach ($WebdefacmentImageMark_check as $WebdefacmentImageMark_checkkey => $WebdefacmentImageMark_checkvalue) {
+                        ImageFilledRectangle($image_original, $WebdefacmentImageMark_checkvalue->left, $WebdefacmentImageMark_checkvalue->top, $WebdefacmentImageMark_checkvalue->width, $WebdefacmentImageMark_checkvalue->hight, $black_original);
+                        ImageFilledRectangle($image_compare, $WebdefacmentImageMark_checkvalue->left, $WebdefacmentImageMark_checkvalue->top, $WebdefacmentImageMark_checkvalue->width, $WebdefacmentImageMark_checkvalue->hight, $black_compare);
+                      }
+
+                      ImagePng($image_original, $dirCompare . "image_original_custom.png");
+                      ImagePng($image_compare, $dirCompare . $image_name . "_custom.png");
+                      imagedestroy($image_original);
+                      imagedestroy($image_compare);
+
+                      $compareImage = $this->compareImage2($dirCompare, 'image_original_custom.png', $image_name . "_custom.png");
+
+                      $result["image_url"] = "/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
+                      $result["image_path_original"] = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
+                      $image_path_2  = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
+                    } else {
+                      Log::warning("Original baseline not found for comparison at {$dir_folder_image_original}");
+                    }
+                  } else {
+                    $compareImage = $this->compareImage2($dirCompare, $baselineName, $image_name . ".png");
                   }
-
-                  $result["image_url"] = "/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
-                  $result["image_path_original"] = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
-                  $image_path_2  = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
+                  }
                 } else {
-
-                  $compareImage = $this->compareImage2(base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/", 'image_original.png', $image_name . ".png");
+                  Log::warning("Screenshot missing or empty, skipping image comparison: {$Path_image}");
+                  $result['image_parcent'] = 0;
                 }
-
 
                 if ($compareImage["diff"]  == 0) {
                   $result['image_parcent']  = 0;
@@ -1270,6 +1199,7 @@ class WebDefacementProccess extends Command
                 $result['image1Hash']  = $compareImage["image1Hash"];
                 $result['image2Hash']  = $compareImage["image2Hash"];
                 $result['image_diff']  =  $compareImage["diff"];
+                $result['image_highlight'] = $this->highlightPublicPath($compareImage['highlight_path'] ?? null);
 
                 $message = $message . '
             <div class="card-log">
@@ -1314,13 +1244,7 @@ class WebDefacementProccess extends Command
               // $totalConfig += 1;
 
               $pointAlert = $this->calculatePoint2($result, $totalConfig);
-
-              $status = 'Normal';
-              if ($pointAlert >= 50 && $pointAlert < 74) {
-                $status = 'Medium';
-              } else if ($pointAlert >= 75) {
-                $status = 'High';
-              }
+              $status = WebDefacementService::statusFromScore($pointAlert);
 
               \Log::info('Webdefacement process finished: ' . now());
               $WebdefacmentDataCheck_save = new WebdefacmentDataCheck;
@@ -1377,10 +1301,10 @@ class WebDefacementProccess extends Command
 
 
               $color = "#88ce4f  !important";
-              if ($status == "High") {
+              if ($status == WebDefacementService::STATUS_HIGH) {
                 $color = "#e64732 !important";
               }
-              if ($status == "Medium") {
+              if ($status == WebDefacementService::STATUS_MEDIUM) {
                 $color = "#fcc838 !important";
               }
 
@@ -1392,10 +1316,10 @@ class WebDefacementProccess extends Command
          </div>';
 
 
-              if ($status == 'Normal' || $status == 'Medium') {
+              if ($status == WebDefacementService::STATUS_NORMAL || $status == WebDefacementService::STATUS_MEDIUM) {
                 $WebdefacmentSetting_update->webdeflacement_progress = 1;
 
-                if ($status == 'Medium') {
+                if ($status == WebDefacementService::STATUS_MEDIUM) {
                   $WebdefacmentDataLog_save = new WebdefacmentDataLog;
                   $WebdefacmentDataLog_save->webdefacment_setting_id  = $webdefacment_id;
                   $WebdefacmentDataLog_save->webdefacment_data_check_id  = $WebdefacmentDataCheck_save->id;
@@ -1464,6 +1388,7 @@ class WebDefacementProccess extends Command
                   // ถ้ายังไม่มี image_original หรือต้องการ update ให้ใส่ logic เพิ่มตรงนี้ได้
                   // $WebdefacmentSetting_update->image_original = $result['image_url']; 
               }
+              $WebdefacmentSetting_update->image_highlight = $result['image_highlight'] ?? null;
 
               if (in_array($WebdefacmentSetting_update->id, [173, 174])) {
                 // Legacy check kept primarily to avoid logic breakage if relying on side effects, 
@@ -1517,7 +1442,7 @@ class WebDefacementProccess extends Command
               if ($webdefacment_id  != 173) {
                 try {
                   // หากสถานะเป็น High และยังไม่เคยส่งแจ้งเตือน
-                  if ($status === 'High' && !$WebdefacmentSetting_update->is_alert_sent) {
+                  if ($status === WebDefacementService::STATUS_HIGH && !$WebdefacmentSetting_update->is_alert_sent) {
 
                     // Log::info($status); 
 
@@ -1638,27 +1563,18 @@ class WebDefacementProccess extends Command
               WebdefacmentDataCheck::whereNotIn('id', $WebdefacmentDataCheck_delete_list)->where('webdefacment_setting_id', $webdefacment_id)->delete();
 
 
-              try {
-                DB::table('webdefacement_stat_log')->insert([
-                  'site_id' => $WebdefacmentSetting_data->site_id,
-                  'webdefacement_setting_id' => $webdefacment_id,
-                  'result_id' => $WebdefacmentDataCheck_save->id ?? null,
-                  'status' => $status,
-                  'score' => intval($pointAlert ?? 0),
-                  'diff_percent' => intval($pointAlert ?? 0),
-                  'hash_changed' => ($result['hash_parcent'] ?? 0) > 0 ? 1 : 0,
-                  'image_changed' => ($result['image_parcent'] ?? 0) > 0 ? 1 : 0,
-                  'alert_sent' => ($status === 'High') ? 1 : 0,
-                  'reason' => $result['_reason'] ?? null,
-                  'checked_at' => now(),
-                  'created_at' => now(),
-                  'updated_at' => now(),
-                ]);
-
-                // Log::info("[STAT_LOG] Saved for webdefacement_setting_id={$webdefacment_id}, status={$status}");
-              } catch (\Throwable $e) {
-                Log::error("[STAT_LOG] Failed for webdefacement_setting_id={$webdefacment_id}: " . $e->getMessage());
-              }
+              $this->writeStatLog([
+                'site_id' => $WebdefacmentSetting_data->site_id,
+                'webdefacement_setting_id' => $webdefacment_id,
+                'result_id' => $WebdefacmentDataCheck_save->id ?? null,
+                'status' => $status,
+                'score' => intval($pointAlert ?? 0),
+                'diff_percent' => intval($pointAlert ?? 0),
+                'hash_changed' => ($result['hash_parcent'] ?? 0) > 0 ? 1 : 0,
+                'image_changed' => ($result['image_parcent'] ?? 0) > 0 ? 1 : 0,
+                'alert_sent' => ($status === WebDefacementService::STATUS_HIGH) ? 1 : 0,
+                'reason' => $result['_reason'] ?? null,
+              ]);
 
               print_r($webdefacment_id);
             }
@@ -1689,6 +1605,35 @@ class WebDefacementProccess extends Command
   }
 
 
+  /**
+   * Persist one scan outcome to webdefacement_stat_log with canonical Title Case status.
+   */
+  private function writeStatLog(array $data): void
+  {
+    try {
+      $settingId = $data['webdefacement_setting_id'] ?? null;
+      $status = WebDefacementService::normalizeStatus($data['status'] ?? WebDefacementService::STATUS_NORMAL);
+
+      DB::table('webdefacement_stat_log')->insert([
+        'site_id' => $data['site_id'] ?? null,
+        'webdefacement_setting_id' => $settingId,
+        'result_id' => $data['result_id'] ?? null,
+        'status' => $status,
+        'score' => $data['score'] ?? 0,
+        'diff_percent' => $data['diff_percent'] ?? 0,
+        'hash_changed' => $data['hash_changed'] ?? 0,
+        'image_changed' => $data['image_changed'] ?? 0,
+        'alert_sent' => $data['alert_sent'] ?? 0,
+        'reason' => isset($data['reason']) ? substr((string) $data['reason'], 0, 500) : null,
+        'checked_at' => $data['checked_at'] ?? now(),
+        'created_at' => now(),
+        'updated_at' => now(),
+      ]);
+    } catch (\Throwable $e) {
+      Log::error('[STAT_LOG] Failed for webdefacement_setting_id=' . ($data['webdefacement_setting_id'] ?? 'n/a') . ': ' . $e->getMessage());
+    }
+  }
+
   private function calculatePoint2($trackList, $totalConfig)
   {
     // Reverted: Removed _score_percent from calculation as requested
@@ -1709,28 +1654,91 @@ class WebDefacementProccess extends Command
 
   private function compareImage2($dirPath, $imgSourcePath, $imgComparePath)
   {
-    $compareImage = array();
-    // $imgSourcePath = PATH_CAPTURE_SCREEN.'/'.$imgSourcePath;
-    // $imgComparePath = PATH_CAPTURE_SCREEN.'/'.$imgComparePath;
+    $compareImage = array(
+      "image1Hash" => "",
+      "image2Hash" => "",
+      "diff" => 0,
+      "similarity_percent" => null,
+      "has_diff" => false,
+      "diff_boxes_count" => 0,
+      "highlight_path" => null,
+    );
 
-    $imgSourcePath = $dirPath . $imgSourcePath;
-    $imgComparePath = $dirPath . $imgComparePath;
+    $imgSourceFull = $dirPath . $imgSourcePath;
+    $imgCompareFull = $dirPath . $imgComparePath;
 
-    // $imgSourcePath = "D:\ทดสอบรูปภาพ\\2017-06-14-02-43-01408692.jpg";
-    //$imgComparePath =  "D:\ทดสอบรูปภาพ\\2017-06-15-20-37-12458813.jpg";
+    if (!file_exists($imgSourceFull) || !is_readable($imgSourceFull)) {
+      Log::warning("compareImage2 skipped: baseline missing: {$imgSourceFull}");
+      return $compareImage;
+    }
+    if (!file_exists($imgCompareFull) || !is_readable($imgCompareFull)) {
+      Log::warning("compareImage2 skipped: current screenshot missing: {$imgCompareFull}");
+      return $compareImage;
+    }
 
-    $image1 = $imgSourcePath;
-    $compareMachine = new compareImages($image1);
-    $image1Hash = $compareMachine->getHasString();
-    $compareImage["image1Hash"] = $image1Hash;
+    try {
+      $image1 = $imgSourceFull;
+      $compareMachine = new compareImages($image1);
+      $image1Hash = $compareMachine->getHasString();
+      $compareImage["image1Hash"] = $image1Hash;
 
+      $image2 = $imgCompareFull;
+      $image2Hash = $compareMachine->hasStringImage($image2);
+      $diff = $compareMachine->compareHash($image2Hash);
+      $compareImage["image2Hash"] = $image2Hash;
+      $compareImage["diff"] = $diff;
 
-    $image2 = $imgComparePath;
-    $image2Hash = $compareMachine->hasStringImage($image2);
-    $diff = $compareMachine->compareHash($image2Hash);
-    $compareImage["image2Hash"] = $image2Hash;
-    $compareImage["diff"] = $diff;
+      // Visual highlight (red boxes) — same as Deface Now path
+      $highlightFilename = pathinfo($imgCompareFull, PATHINFO_FILENAME) . '_highlight.png';
+      $highlightFile = $dirPath . $highlightFilename;
+      $res = $compareMachine->compareAndHighlight($image2, $highlightFile);
+      $compareImage['similarity_percent'] = $res['similarity'] ?? null;
+      $compareImage['has_diff'] = $res['has_diff'] ?? false;
+      $compareImage['diff_boxes_count'] = $res['diff_boxes_count'] ?? 0;
+      $compareImage['highlight_path'] = $res['diff_image'] ?? null;
+    } catch (\Throwable $e) {
+      Log::error("compareImage2 failed: " . $e->getMessage(), [
+        'source' => $imgSourceFull,
+        'compare' => $imgCompareFull,
+      ]);
+    }
+
     return $compareImage;
+  }
+
+  /**
+   * Resolve baseline screenshot filename inside the site/url folder.
+   * Prefer DB image_original path; fall back to image_original.png.
+   */
+  private function resolveBaselineImageName($setting, $dirCompare)
+  {
+    $candidates = [];
+
+    $fromDb = $setting->image_original ?? null;
+    if (is_string($fromDb) && $fromDb !== '') {
+      $candidates[] = basename(str_replace('\\', '/', $fromDb));
+    }
+
+    $candidates[] = 'image_original.png';
+
+    foreach ($candidates as $name) {
+      if ($name && file_exists($dirCompare . $name)) {
+        return $name;
+      }
+    }
+
+    return null;
+  }
+
+  private function highlightPublicPath($absolutePath)
+  {
+    if (!$absolutePath || !is_string($absolutePath) || !file_exists($absolutePath)) {
+      return null;
+    }
+
+    $normalized = str_replace('\\', '/', $absolutePath);
+    $pos = strpos($normalized, '/images/');
+    return $pos === false ? null : substr($normalized, $pos);
   }
   function is_url($uri)
   {
@@ -2389,7 +2397,15 @@ class WebDefacementProccess extends Command
 
   private function getHtml3($url, $retryCount = 0, $options = [])
   {
-    $maxRetries = 10;
+    $maxRetries = 2;
+
+    // Reclaim disk space from leftover Puppeteer/Chrome temp profiles (bounded per call)
+    if (function_exists('cleanup_stale_chrome_tmp_profiles') && $retryCount === 0) {
+        $cleaned = cleanup_stale_chrome_tmp_profiles(3600, 50);
+        if ($cleaned > 0) {
+            \Log::info("[getHtml3] Cleaned {$cleaned} stale Chrome temp profile(s) under " . sys_get_temp_dir());
+        }
+    }
     
     $chromeHome = storage_path('app/chrome_home');
     if (!file_exists($chromeHome)) {
@@ -2409,9 +2425,10 @@ class WebDefacementProccess extends Command
     $userAgent = isset($options['userAgent']) ? $options['userAgent'] : '';
     
     // Select waitUntil strategies based on retryCount
+    // Fast first: networkidle2 often waits until ~90s timeout and blocks the schedule lock
     $waitStrategies = [
-        'load,domcontentloaded,networkidle2', // retry 0
-        'load,domcontentloaded',              // retry 1
+        'load,domcontentloaded',              // retry 0 (fast)
+        'load,domcontentloaded,networkidle2', // retry 1 (stricter)
         'load',                               // retry 2+
     ];
     $strategyIdx = min($retryCount, count($waitStrategies) - 1);

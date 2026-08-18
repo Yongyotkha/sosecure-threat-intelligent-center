@@ -27,3 +27,8 @@ vendor/squizlabs
 drivers/*.exe
 mysql/data/*
 Modules/IocFeed/Exports/*
+
+/scratch
+/app/Console/Commands/temp/
+/resources/tools/geckodriver/
+/bootstrap/cache/*.php

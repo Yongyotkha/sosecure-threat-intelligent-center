@@ -193,6 +193,160 @@ class compareImages
         return round(($differentSlices / $slices) * 100, 2);
     }
 
+    /**
+     * Compare source image ($this->source) with $targetImage using Pure PHP GD.
+     * Calculates similarity % and draws red bounding boxes around changed regions.
+     *
+     * @param string $targetImage Path to the image to compare against
+     * @param string $outputPath Path where highlighted diff image will be saved
+     * @param int $threshold Minimum RGB color distance to treat pixel as changed (default 60)
+     * @param float $similarityCutoff Similarity cutoff below which diff is flagged (default 98.0)
+     * @return array
+     */
+    public function compareAndHighlight($targetImage, $outputPath, $threshold = 60, $similarityCutoff = 98.0)
+    {
+        $basePath = $this->source;
+        if (!file_exists($basePath) || !file_exists($targetImage)) {
+            return ['similarity' => 0, 'has_diff' => false, 'diff_boxes_count' => 0, 'diff_image' => null, 'error' => 'File not found'];
+        }
 
-    
+        $img1 = $this->createImage($basePath);
+        $img2 = $this->createImage($targetImage);
+
+        if (!$img1 || !$img2) {
+            return ['similarity' => 0, 'has_diff' => false, 'diff_boxes_count' => 0, 'diff_image' => null, 'error' => 'Invalid image format'];
+        }
+
+        $w1 = imagesx($img1); $h1 = imagesy($img1);
+        $w2 = imagesx($img2); $h2 = imagesy($img2);
+
+        $width = min($w1, $w2);
+        $height = min($h1, $h2);
+
+        $diffImg = imagecreatetruecolor($width, $height);
+        imagecopy($diffImg, $img2, 0, 0, 0, 0, $width, $height);
+        $red = imagecolorallocate($diffImg, 255, 0, 0);
+
+        $blockSize = 35;
+        $gridW = (int)ceil($width / $blockSize);
+        $gridH = (int)ceil($height / $blockSize);
+        $grid = array_fill(0, $gridW, array_fill(0, $gridH, false));
+
+        $totalDiffPixels = 0;
+        $totalSampled = 0;
+        $step = 4;
+
+        for ($gx = 0; $gx < $gridW; $gx++) {
+            for ($gy = 0; $gy < $gridH; $gy++) {
+                $startX = $gx * $blockSize;
+                $startY = $gy * $blockSize;
+                $endX = min($startX + $blockSize, $width);
+                $endY = min($startY + $blockSize, $height);
+
+                $cellDiffs = 0;
+                for ($x = $startX; $x < $endX; $x += $step) {
+                    for ($y = $startY; $y < $endY; $y += $step) {
+                        $totalSampled++;
+                        $rgb1 = imagecolorat($img1, $x, $y);
+                        $rgb2 = imagecolorat($img2, $x, $y);
+
+                        $r1 = ($rgb1 >> 16) & 0xFF; $g1 = ($rgb1 >> 8) & 0xFF; $b1 = $rgb1 & 0xFF;
+                        $r2 = ($rgb2 >> 16) & 0xFF; $g2 = ($rgb2 >> 8) & 0xFF; $b2 = $rgb2 & 0xFF;
+
+                        if (abs($r1 - $r2) + abs($g1 - $g2) + abs($b1 - $b2) > $threshold) {
+                            $cellDiffs++;
+                            $totalDiffPixels++;
+                        }
+                    }
+                }
+
+                if ($cellDiffs >= 3) {
+                    $grid[$gx][$gy] = true;
+                }
+            }
+        }
+
+        $similarity = $totalSampled > 0 ? (1 - ($totalDiffPixels / $totalSampled)) * 100 : 100;
+        $similarity = max(0, min(100, $similarity));
+
+        $visited = array_fill(0, $gridW, array_fill(0, $gridH, false));
+        $boxes = [];
+
+        for ($gx = 0; $gx < $gridW; $gx++) {
+            for ($gy = 0; $gy < $gridH; $gy++) {
+                if ($grid[$gx][$gy] && !$visited[$gx][$gy]) {
+                    $queue = [[$gx, $gy]];
+                    $visited[$gx][$gy] = true;
+                    $minGx = $gx; $maxGx = $gx;
+                    $minGy = $gy; $maxGy = $gy;
+                    $cellCount = 0;
+
+                    while (!empty($queue)) {
+                        list($cx, $cy) = array_shift($queue);
+                        $cellCount++;
+                        $minGx = min($minGx, $cx); $maxGx = max($maxGx, $cx);
+                        $minGy = min($minGy, $cy); $maxGy = max($maxGy, $cy);
+
+                        for ($dx = -1; $dx <= 1; $dx++) {
+                            for ($dy = -1; $dy <= 1; $dy++) {
+                                $nx = $cx + $dx; $ny = $cy + $dy;
+                                if ($nx >= 0 && $nx < $gridW && $ny >= 0 && $ny < $gridH) {
+                                    if ($grid[$nx][$ny] && !$visited[$nx][$ny]) {
+                                        $visited[$nx][$ny] = true;
+                                        $queue[] = [$nx, $ny];
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Filter out isolated tiny noise blocks
+                    if ($cellCount >= 2) {
+                        $pxMinX = max(0, $minGx * $blockSize - 4);
+                        $pxMinY = max(0, $minGy * $blockSize - 4);
+                        $pxMaxX = min($width - 1, ($maxGx + 1) * $blockSize + 4);
+                        $pxMaxY = min($height - 1, ($maxGy + 1) * $blockSize + 4);
+
+                        $boxes[] = [$pxMinX, $pxMinY, $pxMaxX, $pxMaxY];
+                    }
+                }
+            }
+        }
+
+        imagesetthickness($diffImg, 3);
+        foreach ($boxes as $box) {
+            imagerectangle($diffImg, $box[0], $box[1], $box[2], $box[3], $red);
+        }
+
+        $diffSaved = false;
+        if (!empty($boxes) && $similarity < $similarityCutoff) {
+            $outputDir = dirname($outputPath);
+            if (!file_exists($outputDir)) {
+                @mkdir($outputDir, 0777, true);
+            }
+            $ext = strtolower(pathinfo($outputPath, PATHINFO_EXTENSION));
+            if ($ext === 'png') {
+                imagepng($diffImg, $outputPath);
+            } else {
+                imagejpeg($diffImg, $outputPath, 85);
+            }
+            $diffSaved = true;
+        } else {
+            if (file_exists($outputPath)) {
+                @unlink($outputPath);
+            }
+        }
+
+        imagedestroy($img1);
+        imagedestroy($img2);
+        imagedestroy($diffImg);
+
+        return [
+            'similarity' => round($similarity, 2),
+            'has_diff' => !empty($boxes) && $similarity < $similarityCutoff,
+            'diff_boxes_count' => count($boxes),
+            'diff_image' => $diffSaved ? $outputPath : null
+        ];
+    }
 }
+

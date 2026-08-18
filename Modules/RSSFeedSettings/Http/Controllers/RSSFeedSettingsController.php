@@ -99,7 +99,7 @@ class RSSFeedSettingsController extends Controller
         if (!$role_custom['news']) {
             check_permission403();
         }
-        $data['page'] = 'AI Intel';
+        $data['page'] = langapp('news');
         return view('rssfeedsettings::ai_intel')->with($data);
     }
 

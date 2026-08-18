@@ -395,7 +395,7 @@ select.c-tags {
                             html += `<div class="panel-body clause shadow">
                                 <div class="item-search">
                                     <div style="width: 100%;">
-                                        <a href="/indicators/detail_adversary/${element.adversary_uuid}/${element.pulse_id}" class="fz-search-20px">
+                                        <a href="/indicators/detail_adversary/${element.adversary_uuid}" class="fz-search-20px">
                                             ${element.adversary_name}
                                         </a>
                                     </div>

@@ -11,7 +11,7 @@ use MongoDB\BSON\UTCDateTime;
 class MDAdversaries extends Command
 {
     protected $signature = 'app:MDAdversaries
-                            {--database=sosecure_threatintelligent_dev : Mongo database}';
+                            {--database= : Mongo database (default: MONGO_DATABASE / config mongodb.indicator.database)}';
 
     protected $description = 'Sync OTX adversaries → Mongo (actors, auto-campaigns, pulse relations, techniques)';
 
@@ -33,7 +33,10 @@ class MDAdversaries extends Command
             return 1;
         }
 
-        $this->dbName = $this->option('database') ?: 'sosecure_threatintelligent_dev';
+        $this->dbName = $this->option('database')
+            ?: config('mongodb.indicator.database')
+            ?: env('MONGO_DATABASE', '')
+            ?: 'sosecure_threatintelligent_dev';
         $this->info('Mongo database: ' . $this->dbName);
 
         $job = TransactionBatchjob::where('mode', 'OTX_Adversaries')->first();
@@ -226,6 +229,8 @@ class MDAdversaries extends Command
                     'created_by' => 'system',
                     'created_at' => $date_now,
                     'delete_at' => null,
+                    // Same default avatar as manual create_actor (UI list).
+                    'logo' => '/asset_salepage/images/AgentBasedDetection.png',
                 ],
             ],
             ['upsert' => true]
@@ -543,13 +548,23 @@ class MDAdversaries extends Command
         $db = $clientMD->{$this->dbName};
         $date_now = new UTCDateTime(strtotime(date('Y-m-d H:i:s')) * 1000);
 
+        // Same shape as IndicatorsController insert_tag (UI reads mode+join).
+        // Re-run upgrades legacy auto-links that were saved without mode/join.
         $db->fx_otx_adversaries_related->updateOne(
-            ['adversary_uuid' => $adversaryUuid, 'pulse_id' => $pulseId],
+            [
+                'adversary_uuid' => $adversaryUuid,
+                'pulse_id' => $pulseId,
+            ],
             ['$set' => [
-                'updated_at' => $date_now,
-                'updated_by' => 'system',
                 'adversary_name' => $adversaryName,
                 'pulse_name' => $pulse['name'] ?? '',
+                'mode' => 'indicator',
+                'join' => 'actor',
+                'modified' => $date_now,
+                'updated_at' => $date_now,
+                'updated_by' => 'system',
+                'delete_at' => null,
+                'source' => 'otx.alienvault',
             ],
                 '$setOnInsert' => [
                     'created_by' => 'system',

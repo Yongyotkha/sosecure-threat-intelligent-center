@@ -20,7 +20,8 @@ class CreateWebdefacementStatLogTable extends Migration
             $table->unsignedBigInteger('site_id')->index();
             $table->unsignedBigInteger('result_id')->nullable();
 
-            $table->enum('status', ['normal', 'medium', 'high'])->default('normal');
+            // Title Case: Normal|Medium|High|Down|Skipped|Error (see WebDefacementService)
+            $table->string('status', 32)->default('Normal');
             $table->double('score')->nullable();
             $table->float('diff_percent')->nullable();
 

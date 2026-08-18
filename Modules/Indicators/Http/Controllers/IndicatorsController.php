@@ -370,6 +370,9 @@ class IndicatorsController extends Controller
         $collection = $db->fx_otx_adversaries_related;
         $where = array(
             'pulse_id' => $request->pulse_id,
+            'mode' => 'indicator',
+            'join' => 'actor',
+            'delete_at' => null,
         );
         $options = [];
         $cursor = $collection->find($where, $options);
@@ -383,7 +386,7 @@ class IndicatorsController extends Controller
     {
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $client = new \MongoDB\Client($DB_MONGO_KEY);
-        $db_name = 'sosecure_threatintelligent';
+        $db_name = 'sosecure_threatintelligent_dev';
         $db = $client->$db_name;
         $collection = $db->fx_otx_malware_related;
         $where = array(
@@ -404,7 +407,7 @@ class IndicatorsController extends Controller
             check_permission403();
         }
         // $client = new Client('mongodb://10.104.0.10:27017');
-        // $collection = $client->sosecure_threatintelligent->fx_otx_type;
+        // $collection = $client->sosecure_threatintelligent_dev->fx_otx_type;
 
         // $query = [
         //     'status' => 1,
@@ -416,7 +419,7 @@ class IndicatorsController extends Controller
         // $docs = $cursor->toArray();
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $client = new \MongoDB\Client($DB_MONGO_KEY);
-        $db_name = 'sosecure_threatintelligent';
+        $db_name = 'sosecure_threatintelligent_dev';
         $db = $client->$db_name;
         $collection = $db->fx_otx_type;
         $where = array(
@@ -458,7 +461,7 @@ class IndicatorsController extends Controller
 
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $client = new \MongoDB\Client($DB_MONGO_KEY);
-        $db_name = 'sosecure_threatintelligent';
+        $db_name = 'sosecure_threatintelligent_dev';
         $db = $client->$db_name;
         $collection = $db->fx_otx_malware;
         $where = array(
@@ -513,7 +516,7 @@ class IndicatorsController extends Controller
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
         $html = '';
-        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
 
         $options = array(
             'typeMap' => array(
@@ -582,7 +585,7 @@ class IndicatorsController extends Controller
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
         $html = '';
-        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
 
 
         $query = [
@@ -612,7 +615,7 @@ class IndicatorsController extends Controller
 
 
 
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
         $options = array(
             'typeMap' => array(
                 'root' => 'array',
@@ -668,7 +671,7 @@ class IndicatorsController extends Controller
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
         $html = '';
-        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
         $options = [
             'allowDiskUse' => TRUE
         ];
@@ -947,7 +950,7 @@ class IndicatorsController extends Controller
 
         // $DB_MONGO_KEY = "mongodb://10.104.0.7:27017";
         $clientMD = new MongoClient($DB_MONGO_KEY);
-        $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
+        $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent_dev->fx_transaction_otx_indicators_data;
 
         $cursor = $col_fx_transaction_otx_indicators_data->find();
         $documentAll = $cursor->toArray();
@@ -1241,7 +1244,7 @@ class IndicatorsController extends Controller
 
         $mongo_url = DB_MONGO_01;
         $client = new \MongoDB\Client($mongo_url);
-        $db_name = 'sosecure_threatintelligent';
+        $db_name = 'sosecure_threatintelligent_dev';
         $db = $client->$db_name;
         $collection = $db->fx_otx_events;
         // $where = array(
@@ -1889,7 +1892,7 @@ class IndicatorsController extends Controller
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
             $html = '';
-            $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
+            $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_event_ref;
 
             $query = [
                 'main_pulse_id' => $reqId,
@@ -1918,7 +1921,7 @@ class IndicatorsController extends Controller
 
             // $count_doc = count($document_all);
 
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
             $options = array(
                 'typeMap' => array(
                     'root' => 'array',
@@ -2138,7 +2141,9 @@ class IndicatorsController extends Controller
 
 
 
-            $query = \App\Services\IndicatorMongoService::activeEventsFilter();
+            $query = \App\Services\IndicatorMongoService::hasEventFilters($request->all())
+                ? \App\Services\IndicatorMongoService::activeEventsFilter()
+                : \App\Services\IndicatorMongoService::visibleEventsFilter();
 
             if ($request->count_page == -1) {
                 $cursor_count = $col_fx_otx_events->count($query);
@@ -2473,7 +2478,7 @@ class IndicatorsController extends Controller
         if (TYPE_WEB == 'center') {
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
-            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
             $options = array(
                 'typeMap' => array(
                     'root' => 'array',
@@ -2573,7 +2578,7 @@ class IndicatorsController extends Controller
         $reqId = $request->pulse_id;
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
 
         $query = array(
             'tags' => new Regex('^.*' . $request->tags . '.*$', 'i'),
@@ -2737,7 +2742,7 @@ class IndicatorsController extends Controller
         $reqId = $request->pulse_id;
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
 
         $query = array(
             'groups' => new Regex('^.*' . $request->tags . '.*$', 'i'),
@@ -2919,19 +2924,19 @@ class IndicatorsController extends Controller
             $select_actors = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
             $select_campainge = $clientMD->sosecure_threatintelligent_dev->fx_otx_campaign;
         }
-        // dd($request -> pulse_id);
 
-        $fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-        $query = [
-            'pulse_id' => $request->pulse_id,
-        ];
-        $options = [];
-        $cursor = $fx_otx_events->find($query, $options);
-        $events = $cursor->toArray();
-        $data['events'] = $events;
+        $pulse_id = $request->pulse_id;
+        // Prefer _dev for local testing; fallback to main events DB
+        $fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+        $event = $fx_otx_events->findOne(['pulse_id' => $pulse_id]);
+        if (!$event) {
+            $event = $clientMD->sosecure_threatintelligent_dev->fx_otx_events->findOne(['pulse_id' => $pulse_id]);
+        }
+        // Keep as list for existing blade ($events[0])
+        $data['events'] = $event ? [$event] : [];
 
         $query_actor = [
-            'pulse_id' => $request->pulse_id,
+            'pulse_id' => $pulse_id,
             'mode' => 'indicator',
             'join' => 'actor',
             'delete_at' => null
@@ -2947,7 +2952,7 @@ class IndicatorsController extends Controller
 
         // dd($data);
         $query_campainge = [
-            'pulse_id' => $request->pulse_id,
+            'pulse_id' => $pulse_id,
             'mode' => 'indicator',
             'join' => 'campainge',
             'delete_at' => null
@@ -2957,11 +2962,17 @@ class IndicatorsController extends Controller
         $connection_campainge = $select_actors->find($query_campainge, $option_campainge);
         $campainge = $connection_campainge->toArray();
 
+        // Pass full related docs (same shape as actors) so blade can read adversary_uuid / adversary_name
+        // OLD (broken on re-open Mapping): stored only UUID strings
+        // if (count($campainge) > 0) {
+        //     foreach ($campainge as $data_campainge) {
+        //         $data['campainge'][] = $data_campainge['adversary_uuid'];
+        //     }
+        // } else {
+        //     $data['campainge'] = null;
+        // }
         if (count($campainge) > 0) {
-            foreach ($campainge as $data_campainge) {
-                $data['campainge'][] = $data_campainge['adversary_uuid'];
-            }
-            // $data['campainge'] = $campainge;
+            $data['campainge'] = $campainge;
         } else {
             $data['campainge'] = null;
         }
@@ -3016,24 +3027,40 @@ class IndicatorsController extends Controller
 
         $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
         $clientMD = new MongoClient($DB_MONGO_KEY);
-        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
         $options = array(
             'typeMap' => array(
                 'root' => 'array',
                 'document' => 'array',
             ),
         );
+
+        // Prefer _dev for local testing; fallback to main events DB
+        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
         $document = $col_fx_otx_indicator_detail->findOne(array('pulse_id' => $request->pulse_id), $options);
-        if ($document) {
-            $update_fx_otx_events_indicator_ref = $col_fx_otx_indicator_detail->updateOne(
-                ['_id' => $document['_id']],
+        if (!$document) {
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+            $document = $col_fx_otx_indicator_detail->findOne(array('pulse_id' => $request->pulse_id), $options);
+        }
+
+        if (!$document) {
+            return ajaxResponse(
                 [
-                    '$set' => [
-                        'tags' => $request->tags_events,
-                    ]
-                ]
+                    'message' => 'Event not found for Mapping (invalid pulse_id)',
+                    'errors' => ['pulse_id' => ['Event not found']],
+                ],
+                false,
+                Response::HTTP_UNPROCESSABLE_ENTITY
             );
         }
+
+        $col_fx_otx_indicator_detail->updateOne(
+            ['_id' => $document['_id']],
+            [
+                '$set' => [
+                    'tags' => $request->tags_events,
+                ]
+            ]
+        );
 
         //---------------------------------------------------------------------------------------------------
         if (app()->environment('local')) {
@@ -3046,9 +3073,9 @@ class IndicatorsController extends Controller
 
         $query_delete = array(
             'pulse_id' => $document['pulse_id'],
-            'pulse_name' => $document['name'],
             'mode' => 'indicator',
-            'join' => 'actor'
+            'join' => 'actor',
+            'delete_at' => null,
         );
         $option_delete = [];
         $result_delete = $insert_adversaries_related->find($query_delete, $option_delete);
@@ -3083,19 +3110,23 @@ class IndicatorsController extends Controller
                 $option_actor_related = [];
 
                 $query_actor = $indicator_actor_related->findOne($query_actor_related, $option_actor_related);
+                if (!$query_actor) {
+                    continue;
+                }
                 // dd($query_actor['name']);
                 $data_actor_related = array(
                     'adversary_uuid' => $add_actor,
-                    'adversary_name' => $query_actor['name'],
+                    'adversary_name' => $query_actor['name'] ?? '',
                     'pulse_id' => $document['pulse_id'],
-                    'pulse_name' => $document['name'],
+                    'pulse_name' => $document['name'] ?? '',
                     'mode' => 'indicator',
                     'join' => 'actor',
                     'modified' => $date_now,
                     'created_at' => $date_now,
                     'created_by' => 'system',
                     'updated_at' => $date_now,
-                    'updated_by' => 'system'
+                    'updated_by' => 'system',
+                    'delete_at' => null,
                 );
 
                 $insert_adversaries_related->insertOne($data_actor_related);
@@ -3104,9 +3135,9 @@ class IndicatorsController extends Controller
 
         $query_delete_camp = array(
             'pulse_id' => $document['pulse_id'],
-            'pulse_name' => $document['name'],
             'mode' => 'indicator',
-            'join' => 'campainge'
+            'join' => 'campainge',
+            'delete_at' => null,
         );
         $option_delete_camp = [];
         $result_delete_camp = $insert_adversaries_related->find($query_delete_camp, $option_delete_camp);
@@ -3136,19 +3167,23 @@ class IndicatorsController extends Controller
                 $option_campaign_related = [];
 
                 $query_campaign = $collection_campaign->findOne($query_campaign_related, $option_campaign_related);
+                if (!$query_campaign) {
+                    continue;
+                }
 
                 $data_campaign_related = array(
                     'adversary_uuid' => $query_campaign['campainge_uuid'],
-                    'adversary_name' => $query_campaign['name'],
+                    'adversary_name' => $query_campaign['name'] ?? '',
                     'pulse_id' => $document['pulse_id'],
-                    'pulse_name' => $document['name'],
+                    'pulse_name' => $document['name'] ?? '',
                     'mode' => 'indicator',
                     'join' => 'campainge',
                     'modified' => $date_now,
                     'created_at' => $date_now,
                     'created_by' => 'system',
                     'updated_at' => $date_now,
-                    'updated_by' => 'system'
+                    'updated_by' => 'system',
+                    'delete_at' => null,
                 );
 
                 $insert_adversaries_related->insertOne($data_campaign_related);
@@ -3173,7 +3208,7 @@ class IndicatorsController extends Controller
 
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
-            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
 
 
             $options = array(
@@ -3239,7 +3274,7 @@ class IndicatorsController extends Controller
 
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
-            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
             $options = array(
                 'typeMap' => array(
                     'root' => 'array',
@@ -3427,7 +3462,7 @@ class IndicatorsController extends Controller
 
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
-            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
             $options = array(
                 'typeMap' => array(
                     'root' => 'array',
@@ -3446,7 +3481,7 @@ class IndicatorsController extends Controller
                 );
             }
 
-            $col_fx_otx_indicator_detail_2 = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+            $col_fx_otx_indicator_detail_2 = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
             $options = array(
                 'typeMap' => array(
                     'root' => 'array',
@@ -3466,7 +3501,7 @@ class IndicatorsController extends Controller
             }
 
 
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
             $options = array(
                 'typeMap' => array(
                     'root' => 'array',
@@ -3718,7 +3753,7 @@ class IndicatorsController extends Controller
 
             // $count_doc = count($document_all);
 
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
             $options = array(
                 'typeMap' => array(
                     'root' => 'array',
@@ -3816,7 +3851,7 @@ class IndicatorsController extends Controller
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
             $html = '';
-            $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_malware_related;
+            $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_malware_related;
 
             $query = [
                 'malware_uuid' => $reqId,
@@ -3845,7 +3880,7 @@ class IndicatorsController extends Controller
 
             // $count_doc = count($document_all);
 
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
             $options = array(
                 'typeMap' => array(
                     'root' => 'array',
@@ -4165,7 +4200,7 @@ class IndicatorsController extends Controller
 
         $mongoUri = config("app.DB_MONGO_DEV");
         $client = new Client($mongoUri);
-        $db = $client->sosecure_threatintelligent;
+        $db = $client->sosecure_threatintelligent_dev;
         $eventsCollection = $db->fx_otx_events;
         $attributesCollection = $db->fx_otx_events_indicator_ref;
         $options = ['typeMap' => ['root' => 'array', 'document' => 'array']];
@@ -4319,7 +4354,7 @@ class IndicatorsController extends Controller
             $now = now();
             $mongoUrl = config('app.DB_MONGO_DEV');
             $client = new Client($mongoUrl);
-            $db = $client->sosecure_threatintelligent;
+            $db = $client->sosecure_threatintelligent_dev;
 
             $tempCollection = $db->fx_events_temp;
             $dataKeyCollection = $db->fx_data_key;
@@ -4427,7 +4462,7 @@ class IndicatorsController extends Controller
             $dataKey = Str::uuid()->toString();
             $mongoUrl = config('app.DB_MONGO_DEV');
             $client = new Client($mongoUrl);
-            $db = $client->sosecure_threatintelligent;
+            $db = $client->sosecure_threatintelligent_dev;
 
             $tempCollection = $db->fx_indicators_temp;
             $dataKeyCollection = $db->fx_data_key;
@@ -4864,7 +4899,7 @@ class IndicatorsController extends Controller
         try {
             $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-            $jobsCollection = $clientMD->sosecure_threatintelligent->ioc_enrichment_jobs;
+            $jobsCollection = $clientMD->sosecure_threatintelligent_dev->ioc_enrichment_jobs;
             
             // Check for existing running job
             $existingJob = $jobsCollection->findOne([
@@ -4951,7 +4986,7 @@ class IndicatorsController extends Controller
         try {
             $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-            $jobsCollection = $clientMD->sosecure_threatintelligent->ioc_enrichment_jobs;
+            $jobsCollection = $clientMD->sosecure_threatintelligent_dev->ioc_enrichment_jobs;
             
             $job = $jobsCollection->findOne(['job_id' => $jobId]);
             
@@ -5004,7 +5039,7 @@ class IndicatorsController extends Controller
         try {
             $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-            $indicatorRefCollection = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+            $indicatorRefCollection = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
             
             // Check if already enriched
             $existing = $indicatorRefCollection->findOne([
@@ -5026,7 +5061,7 @@ class IndicatorsController extends Controller
             $httpClient = new \GuzzleHttp\Client(['verify' => false, 'timeout' => 30]);
             
             // Get event name for ThreatFox boost
-            $eventsCollection = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $eventsCollection = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
             $event = $eventsCollection->findOne(['pulse_id' => $pulseId]);
             $eventName = $event['name'] ?? null;
             
@@ -5085,7 +5120,7 @@ class IndicatorsController extends Controller
             );
             
             // Also update indicator_detail if exists
-            $indicatorDetailCollection = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+            $indicatorDetailCollection = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
             $indicatorDetailCollection->updateOne(
                 ['indicator_id' => $indicatorId],
                 ['$set' => $updateData]
@@ -5093,8 +5128,8 @@ class IndicatorsController extends Controller
             
             // Also save to temp collection for sync with other functions
             $dataKey = (string) \Illuminate\Support\Str::uuid();
-            $tempCollection = $clientMD->sosecure_threatintelligent->fx_indicators_temp;
-            $dataKeyCollection = $clientMD->sosecure_threatintelligent->fx_data_key;
+            $tempCollection = $clientMD->sosecure_threatintelligent_dev->fx_indicators_temp;
+            $dataKeyCollection = $clientMD->sosecure_threatintelligent_dev->fx_data_key;
             
             // Insert to temp collection
             $tempRecord = [

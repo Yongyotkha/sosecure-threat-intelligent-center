@@ -1372,6 +1372,7 @@ select.c-tags {
             });
 
             function load_table(page = 1) {
+                count_page = -1;
                 loading('load');
                 
                 $('#table_events').DataTable({

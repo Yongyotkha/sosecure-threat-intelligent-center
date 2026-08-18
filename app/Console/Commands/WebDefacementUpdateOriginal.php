@@ -1114,6 +1114,13 @@ class WebDefacementUpdateOriginal extends Command
   private function getHtml3($url, $retryCount = 0, $options = [])
   {
     $maxRetries = 10;
+
+    if (function_exists('cleanup_stale_chrome_tmp_profiles') && $retryCount === 0) {
+        $cleaned = cleanup_stale_chrome_tmp_profiles(3600, 50);
+        if ($cleaned > 0) {
+            \Log::info("[getHtml3] Cleaned {$cleaned} stale Chrome temp profile(s) under " . sys_get_temp_dir());
+        }
+    }
     
     $chromeHome = storage_path('app/chrome_home');
     if (!file_exists($chromeHome)) {

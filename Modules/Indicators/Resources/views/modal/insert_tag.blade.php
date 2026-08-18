@@ -10,22 +10,29 @@
         <div class="modal-body">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-md-12 m-b-xs">
-                        <h4>Event Name : {{ $events[0] -> name }}</h4>
+                    @if(empty($events) || !isset($events[0]))
+                    <div class="col-md-12">
+                        <div class="alert alert-warning">
+                            ไม่พบ Event สำหรับ Mapping (pulse_id ไม่ถูกต้องหรือไม่มีในระบบ)
+                        </div>
                     </div>
-                    <input type="hidden" id="pulse_id" value="{{ $events[0] -> pulse_id }}">
+                    @else
+                    <div class="col-md-12 m-b-xs">
+                        <h4>Event Name : {{ $events[0]->name }}</h4>
+                    </div>
+                    <input type="hidden" id="pulse_id" value="{{ $events[0]->pulse_id }}">
                     <div class="col-md-12">
                         <form action="">
                             <div class="form-group">
                                 <label for="">Input Tags :</label>
-                                <textarea class="form-control" name="tags" cols="30" rows="3" id="tags_events">{!! $events[0] -> tags !!}</textarea>
+                                <textarea class="form-control" name="tags" cols="30" rows="3" id="tags_events">{!! $events[0]->tags !!}</textarea>
                             </div>
                             <div class="form-group">
                                 <label for="">Actor :</label>
                                 <select name="category_actor[]" id="category_actor" class="select2-option form-control" multiple>
                                     @if($actors != null)
                                         @foreach ($actors as $data_actor)
-                                            <option value="{{$data_actor->adversary_uuid}}" selected>{{$data_actor->adversary_name}}</option>
+                                            <option value="{{ is_object($data_actor) ? $data_actor->adversary_uuid : ($data_actor['adversary_uuid'] ?? '') }}" selected>{{ is_object($data_actor) ? $data_actor->adversary_name : ($data_actor['adversary_name'] ?? '') }}</option>
                                         @endforeach
                                     @endif
                                 </select>                            
@@ -36,7 +43,7 @@
                                 <select name="category_campaign[]" id="category_campaign" class="select2-option form-control" multiple>
                                     @if($campainge != null)
                                         @foreach($campainge as $data_camp)
-                                            <option value="{{$data_camp->adversary_uuid}}" selected>{{$data_camp->adversary_name}}</option>
+                                            <option value="{{ is_object($data_camp) ? $data_camp->adversary_uuid : ($data_camp['adversary_uuid'] ?? $data_camp) }}" selected>{{ is_object($data_camp) ? $data_camp->adversary_name : ($data_camp['adversary_name'] ?? $data_camp) }}</option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -58,6 +65,7 @@
                             </div> --}}
                         </form>
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -66,10 +74,12 @@
                 <i class="fas fa-times"></i>
                 Close
             </button>
+            @if(!empty($events) && isset($events[0]))
             <button type="button" class="btn btn-info btn-rounded formSaving" onclick="save_assets_manual()">
                 <i class="fas fa-paper-plane"></i>
                 Save
             </button>
+            @endif
         </div>
     </div>
 

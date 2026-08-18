@@ -282,6 +282,7 @@ class MDCountIndicator extends Command
 
         $query2 = IndicatorMongoService::mergeActiveEventsFilter([
             'created_at' => ['$gt' =>  $date_now_sub1],
+            'indicator_count' => ['$gt' => 0],
         ]);
         $Attr_count_current = (int)$col_fx_otx_indicator_detail->count($query);
         $Event_count_current = (int)$col_fx_otx_events->count($query2);
@@ -306,7 +307,7 @@ class MDCountIndicator extends Command
 
         );
 
-        $query2 = $activeEventsFilter;
+        $query2 = IndicatorMongoService::visibleEventsFilter();
 
         $Attr_count_all = (int)$col_fx_otx_indicator_detail->count($query);
         $Event_count_all = (int)$col_fx_otx_events->count($query2);

@@ -123,6 +123,17 @@ class IndicatorMongoService
         return ['$and' => [self::activeEventsFilter(), $query]];
     }
 
+    /**
+     * Default listing/dashboard: active events that have at least one attribute.
+     * Search still uses activeEventsFilter() so 0-attribute events remain findable.
+     */
+    public static function visibleEventsFilter(): array
+    {
+        return self::mergeActiveEventsFilter([
+            'indicator_count' => ['$gt' => 0],
+        ]);
+    }
+
     public static function hasEventFilters(array $input): bool
     {
         if (!empty($input['keywords']) || !empty($input['keyword_search']) || !empty($input['industries'])
@@ -142,11 +153,11 @@ class IndicatorMongoService
      */
     public static function buildEventsQueryFromInput(array $input): array
     {
-        $query = self::activeEventsFilter();
-
         if (!self::hasEventFilters($input)) {
-            return $query;
+            return self::visibleEventsFilter();
         }
+
+        $query = self::activeEventsFilter();
 
         if (!empty($input['keywords'])) {
             $query['name'] = ['$regex' => $input['keywords'], '$options' => 'i'];
@@ -205,15 +216,15 @@ class IndicatorMongoService
         $hasFilters = self::hasEventFilters($filters);
 
         if (!$hasFilters) {
-            $activeEventsFilter = self::activeEventsFilter();
             $since = new UTCDateTime(Carbon::now('UTC')->subDays(1));
             $currentAttrQuery = ['created_at' => ['$gt' => $since]];
-            $currentEventQuery = self::mergeActiveEventsFilter(['created_at' => ['$gt' => $since]]);
+            $currentEventQuery = $eventQuery;
+            $currentEventQuery['created_at'] = ['$gt' => $since];
 
             $attrCurrent = (int) $colAttr->countDocuments($currentAttrQuery);
             $eventCurrent = (int) $colEvents->countDocuments($currentEventQuery);
             $attrAll = (int) $colAttr->countDocuments([]);
-            $eventAll = (int) $colEvents->countDocuments($activeEventsFilter);
+            $eventAll = (int) $colEvents->countDocuments($eventQuery);
             $attrType = $this->aggregateAttributeTypes($colAttr, [], $aggregateOptions);
 
             return [

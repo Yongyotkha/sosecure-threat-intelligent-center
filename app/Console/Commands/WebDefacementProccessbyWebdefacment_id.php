@@ -678,10 +678,18 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                 $Path_image = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
 
                 // Verify if file exists and is readable (captured by Puppeteer at start)
+                $compareImage = ["diff" => 0, "image1Hash" => "", "image2Hash" => "", "highlight_path" => null];
+                $dirCompare = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/";
+                $baselineName = $this->resolveBaselineImageName($WebdefacmentSetting_data, $dirCompare);
+
                 if (file_exists($Path_image) && filesize($Path_image) > 0) {
+                    if (!$baselineName) {
+                      Log::warning("[DefaceNow] Baseline screenshot missing for image compare: {$dirCompare}");
+                      $result['image_parcent'] = 0;
+                    } else {
                     $WebdefacmentImageMark_check = WebdefacmentImageMark::where('webdefacment_data_original_id', $webdefacment_id)->get();
                     if (count($WebdefacmentImageMark_check) > 0) {
-                      $dir_folder_image_original = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/image_original.png";
+                      $dir_folder_image_original = $dirCompare . $baselineName;
                       
                       // Check if original image exists before processing marks
                       if (file_exists($dir_folder_image_original)) {
@@ -697,27 +705,28 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                             ImageFilledRectangle($image_compare, $mark->left, $mark->top, $mark->width, $mark->hight, $black_compare);
                           }
 
-                          $custom_original = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/image_original_custom.png";
-                          $custom_compare = base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
+                          $custom_original = $dirCompare . "image_original_custom.png";
+                          $custom_compare = $dirCompare . $image_name . "_custom.png";
                           
                           ImagePng($image_original, $custom_original);
                           ImagePng($image_compare, $custom_compare);
+                          imagedestroy($image_original);
+                          imagedestroy($image_compare);
 
-                          $compareImage = $this->compareImage2(base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/", 'image_original_custom.png', $image_name . "_custom.png");
+                          $compareImage = $this->compareImage2($dirCompare, 'image_original_custom.png', $image_name . "_custom.png");
                           
                           $result["image_url"] = "/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
                           $result["image_path_original"] = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . "_custom.png";
                           $image_path_2  = "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/" . $image_name . ".png";
                       } else {
                           Log::warning("[DefaceNow] Original baseline not found for comparison at {$dir_folder_image_original}");
-                          $compareImage = ["diff" => 0, "image1Hash" => "", "image2Hash" => ""];
                       }
                     } else {
-                      $compareImage = $this->compareImage2(base_path() . "/public/images/webdefacment_mages/" . $site_id . "/" . $url_id . "/", 'image_original.png', $image_name . ".png");
+                      $compareImage = $this->compareImage2($dirCompare, $baselineName, $image_name . ".png");
+                    }
                     }
                 } else {
                     Log::warning("[DefaceNow] Screenshot missing or empty, skipping image comparison: {$Path_image}");
-                    $compareImage = ["diff" => 0, "image1Hash" => "", "image2Hash" => ""];
                     $result['image_parcent'] = 0;
                 }
 
@@ -751,6 +760,7 @@ class WebDefacementProccessbyWebdefacment_id extends Command
                 $result['image1Hash']  = $compareImage["image1Hash"];
                 $result['image2Hash']  = $compareImage["image2Hash"];
                 $result['image_diff']  =  $compareImage["diff"];
+                $result['image_highlight'] = $this->highlightPublicPath($compareImage['highlight_path'] ?? null);
 
                 $message = $message . '
             <div class="card-log">
@@ -806,13 +816,7 @@ class WebDefacementProccessbyWebdefacment_id extends Command
 
 
               $pointAlert = $this->calculatePoint2($result, $totalConfig);
-
-              $status = 'Normal';
-              if ($pointAlert >= 50 && $pointAlert < 74) {
-                $status = 'Medium';
-              } else if ($pointAlert >= 75) {
-                $status = 'High';
-              }
+              $status = \App\Services\WebDefacementService::statusFromScore($pointAlert);
 
               /* 🟩 REMOVED Force Medium Block by user request */
               $WebdefacmentDataCheck_save = new WebdefacmentDataCheck;
@@ -869,10 +873,10 @@ class WebDefacementProccessbyWebdefacment_id extends Command
 
 
               $color = "#88ce4f  !important";
-              if ($status == "High") {
+              if ($status == \App\Services\WebDefacementService::STATUS_HIGH) {
                 $color = "#e64732 !important";
               }
-              if ($status == "Medium") {
+              if ($status == \App\Services\WebDefacementService::STATUS_MEDIUM) {
                 $color = "#fcc838 !important";
               }
 
@@ -884,10 +888,10 @@ class WebDefacementProccessbyWebdefacment_id extends Command
          </div>';
 
 
-              if ($status == 'Normal' || $status == 'Medium') {
+              if ($status == \App\Services\WebDefacementService::STATUS_NORMAL || $status == \App\Services\WebDefacementService::STATUS_MEDIUM) {
                 $WebdefacmentSetting_update->webdeflacement_progress = 1;
 
-                if ($status == 'Medium' || (count($result['_assets_add'] ?? []) + count($result['_assets_del'] ?? []) > 0)) {
+                if ($status == \App\Services\WebDefacementService::STATUS_MEDIUM || (count($result['_assets_add'] ?? []) + count($result['_assets_del'] ?? []) > 0)) {
                   $WebdefacmentDataLog_save = new WebdefacmentDataLog;
                   $WebdefacmentDataLog_save->webdefacment_setting_id  = $webdefacment_id;
                   $WebdefacmentDataLog_save->webdefacment_data_check_id  = $WebdefacmentDataCheck_save->id;
@@ -927,12 +931,13 @@ class WebDefacementProccessbyWebdefacment_id extends Command
               }
 
               $WebdefacmentSetting_update->image_last = $result['image_url'];
+              $WebdefacmentSetting_update->image_highlight = $result['image_highlight'] ?? null;
               $WebdefacmentSetting_update->last_check = date("Y-m-d H:i:s");
               $WebdefacmentSetting_update->last_online = date("Y-m-d H:i:s");
               $WebdefacmentSetting_update->status_val = $status;
 
               try {
-                if ($status === 'High' && !$WebdefacmentSetting_update->is_alert_sent) {
+                if ($status === \App\Services\WebDefacementService::STATUS_HIGH && !$WebdefacmentSetting_update->is_alert_sent) {
 
                   // 1) ดึงอีเมลปลายทาง
                   $emails = DB::table('site_config_email_alert_defacement')
@@ -1060,28 +1065,85 @@ class WebDefacementProccessbyWebdefacment_id extends Command
 
   private function compareImage2($dirPath, $imgSourcePath, $imgComparePath)
   {
-    $compareImage = array();
-    // $imgSourcePath = PATH_CAPTURE_SCREEN.'/'.$imgSourcePath;
-    // $imgComparePath = PATH_CAPTURE_SCREEN.'/'.$imgComparePath;
+    $compareImage = array(
+      "image1Hash" => "",
+      "image2Hash" => "",
+      "diff" => 0,
+      "similarity_percent" => null,
+      "has_diff" => false,
+      "diff_boxes_count" => 0,
+      "highlight_path" => null,
+    );
 
-    $imgSourcePath = $dirPath . $imgSourcePath;
-    $imgComparePath = $dirPath . $imgComparePath;
+    $imgSourceFull = $dirPath . $imgSourcePath;
+    $imgCompareFull = $dirPath . $imgComparePath;
 
-    // $imgSourcePath = "D:\ทดสอบรูปภาพ\\2017-06-14-02-43-01408692.jpg";
-    //$imgComparePath =  "D:\ทดสอบรูปภาพ\\2017-06-15-20-37-12458813.jpg";
+    if (!file_exists($imgSourceFull) || !is_readable($imgSourceFull)) {
+      Log::warning("[DefaceNow] compareImage2 skipped: baseline missing: {$imgSourceFull}");
+      return $compareImage;
+    }
+    if (!file_exists($imgCompareFull) || !is_readable($imgCompareFull)) {
+      Log::warning("[DefaceNow] compareImage2 skipped: current screenshot missing: {$imgCompareFull}");
+      return $compareImage;
+    }
 
-    $image1 = $imgSourcePath;
-    $compareMachine = new compareImages($image1);
-    $image1Hash = $compareMachine->getHasString();
-    $compareImage["image1Hash"] = $image1Hash;
+    try {
+      $compareMachine = new compareImages($imgSourceFull);
+      $compareImage["image1Hash"] = $compareMachine->getHasString();
+      $compareImage["image2Hash"] = $compareMachine->hasStringImage($imgCompareFull);
+      $compareImage["diff"] = $compareMachine->compareHash($compareImage["image2Hash"]);
 
+      $highlightFilename = pathinfo($imgCompareFull, PATHINFO_FILENAME) . '_highlight.png';
+      $highlightFile = $dirPath . $highlightFilename;
+      $res = $compareMachine->compareAndHighlight($imgCompareFull, $highlightFile);
 
-    $image2 = $imgComparePath;
-    $image2Hash = $compareMachine->hasStringImage($image2);
-    $diff = $compareMachine->compareHash($image2Hash);
-    $compareImage["image2Hash"] = $image2Hash;
-    $compareImage["diff"] = $diff;
+      $compareImage['similarity_percent'] = $res['similarity'] ?? null;
+      $compareImage['has_diff'] = $res['has_diff'] ?? false;
+      $compareImage['diff_boxes_count'] = $res['diff_boxes_count'] ?? 0;
+      $compareImage['highlight_path'] = $res['diff_image'] ?? null;
+    } catch (\Throwable $e) {
+      Log::error("[DefaceNow] compareImage2 failed: " . $e->getMessage(), [
+        'source' => $imgSourceFull,
+        'compare' => $imgCompareFull,
+      ]);
+    }
+
     return $compareImage;
+  }
+
+  private function highlightPublicPath($absolutePath)
+  {
+    if (!$absolutePath || !is_string($absolutePath) || !file_exists($absolutePath)) {
+      return null;
+    }
+
+    $normalized = str_replace('\\', '/', $absolutePath);
+    $pos = strpos($normalized, '/images/');
+    return $pos === false ? null : substr($normalized, $pos);
+  }
+
+  /**
+   * Resolve baseline screenshot filename inside the site/url folder.
+   * Prefer DB image_original path; fall back to image_original.png.
+   */
+  private function resolveBaselineImageName($setting, $dirCompare)
+  {
+    $candidates = [];
+
+    $fromDb = $setting->image_original ?? null;
+    if (is_string($fromDb) && $fromDb !== '') {
+      $candidates[] = basename(str_replace('\\', '/', $fromDb));
+    }
+
+    $candidates[] = 'image_original.png';
+
+    foreach ($candidates as $name) {
+      if ($name && file_exists($dirCompare . $name)) {
+        return $name;
+      }
+    }
+
+    return null;
   }
   function is_url($uri)
   {
@@ -1586,6 +1648,13 @@ class WebDefacementProccessbyWebdefacment_id extends Command
   private function getHtml3($url, $retryCount = 0, $options = [])
   {
     $maxRetries = 10;
+
+    if (function_exists('cleanup_stale_chrome_tmp_profiles') && $retryCount === 0) {
+        $cleaned = cleanup_stale_chrome_tmp_profiles(3600, 50);
+        if ($cleaned > 0) {
+            \Log::info("[getHtml3] Cleaned {$cleaned} stale Chrome temp profile(s) under " . sys_get_temp_dir());
+        }
+    }
     
     $chromeHome = storage_path('app/chrome_home');
     if (!file_exists($chromeHome)) {
