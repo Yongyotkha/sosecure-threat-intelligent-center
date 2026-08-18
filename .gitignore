@@ -19,7 +19,7 @@ vendor/*
 /vendor/laravel/framework/src/Illuminate/Cache/FileStore.php
 /public/images/file_editor
 /public/images/webdefacment_mages/
-/puphpeteer_env
+/puphpeteer_env/node_modules
 /resources/tools/firefox
 /cache_log
 vendor/squizlabs
