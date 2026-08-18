@@ -17,14 +17,15 @@ class OTXMDFetchIndicator extends Command
 {
     protected $signature = 'app:OTXMDFetchIndicator
                             {--limit= : Limit indicators to process (testing)}
-                            {--resume : Resume latest incomplete indicator run}
+                            {--resume : Resume leftover run (default: auto if leftover exists)}
+                            {--fresh : Ignore leftover staging and start a new run}
                             {--run= : Resume a specific run_id}
                             {--timeout=180 : HTTP timeout seconds}
                             {--retries=5 : Max HTTP retries per URL}
                             {--skip-import : Fetch only; do not auto-import}
-                            {--database=sosecure_threatintelligent_dev : Mongo database}';
+                            {--database=sosecure_threatintelligent : Mongo database}';
 
-    protected $description = 'Fetch OTX indicators (modified:<12h) to staging then auto-import';
+    protected $description = 'Fetch OTX indicators (finish leftover first) then auto-import';
 
     /** @var OtxHttpClient */
     protected $http;
@@ -33,34 +34,76 @@ class OTXMDFetchIndicator extends Command
 
     public function handle()
     {
+        $lock = OtxPulseStagingStore::acquireLock('indicators');
+        if (!$lock) {
+            $this->warn('Another indicator fetch is already running. Leftover will be finished on the next run.');
+            return 0;
+        }
+
+        try {
+            return $this->handleLocked();
+        } finally {
+            OtxPulseStagingStore::releaseLock($lock);
+        }
+    }
+
+    protected function handleLocked()
+    {
         $this->http = new OtxHttpClient(
             (int) $this->option('timeout'),
             (int) $this->option('retries')
         );
-        $this->dbName = $this->option('database') ?: 'sosecure_threatintelligent_dev';
+        $this->dbName = $this->option('database') ?: 'sosecure_threatintelligent';
 
         $query = 'modified:<12h';
-        $runId = $this->option('run');
-        if (!$runId && $this->option('resume')) {
-            $runId = OtxPulseStagingStore::latestRunId(true, $this->kind);
+        $explicitRun = $this->option('run');
+        $fresh = (bool) $this->option('fresh');
+        $limit = $this->option('limit') !== null && $this->option('limit') !== ''
+            ? (int) $this->option('limit')
+            : null;
+
+        if ($explicitRun) {
+            return $this->processIndicatorRun($explicitRun, $query, $limit);
         }
 
+        if (!$fresh) {
+            $leftover = OtxPulseStagingStore::findIncompleteRunId($this->kind);
+            if ($leftover) {
+                $this->info("Leftover indicator staging found — finishing before a new window: {$leftover}");
+                $exit = $this->processIndicatorRun($leftover, $query, $limit);
+                $still = OtxPulseStagingStore::loadManifest($leftover, $this->kind);
+                if ($still && OtxPulseStagingStore::isIncomplete($still)) {
+                    $this->warn('Leftover not complete — skip new window so data is not abandoned.');
+                    return $exit;
+                }
+                $this->info('Leftover finished. Starting new modified:<12h window...');
+            }
+        } else {
+            $this->warn('--fresh: ignoring leftover staging (may leave disk garbage / missed import).');
+        }
+
+        return $this->processIndicatorRun(null, $query, $limit);
+    }
+
+    protected function processIndicatorRun($runId, $query, $limit)
+    {
         if ($runId) {
             $manifest = OtxPulseStagingStore::loadManifest($runId, $this->kind);
             if (!$manifest) {
                 $this->error("Run not found: {$runId}");
                 return 1;
             }
-            $this->info("Resuming indicator run: {$runId}");
+            OtxPulseStagingStore::stampSessionStart($manifest, true);
+            OtxPulseStagingStore::saveManifest($runId, $manifest, $this->kind);
+            $this->info("Resuming indicator run: {$runId} (resume #" . (int) ($manifest['resume_count'] ?? 0) . ')');
         } else {
             $runId = OtxPulseStagingStore::createRun($query, $this->kind);
             $manifest = OtxPulseStagingStore::loadManifest($runId, $this->kind);
+            OtxPulseStagingStore::stampSessionStart($manifest, false);
+            OtxPulseStagingStore::saveManifest($runId, $manifest, $this->kind);
             $this->info("Created indicator run: {$runId}");
         }
-
-        $limit = $this->option('limit') !== null && $this->option('limit') !== ''
-            ? (int) $this->option('limit')
-            : null;
+        $this->info('Started at          : ' . ($manifest['started_at'] ?? '-'));
 
         try {
             $this->fetchListPages($runId, $manifest, $limit);
@@ -68,8 +111,10 @@ class OTXMDFetchIndicator extends Command
         } catch (Exception $e) {
             $manifest['status'] = 'partial';
             $manifest['last_error'] = $e->getMessage();
+            $manifest['complete'] = false;
             OtxPulseStagingStore::saveManifest($runId, $manifest, $this->kind);
             $this->error('Fetch aborted: ' . $e->getMessage());
+            $this->warn('Staging kept for resume: ' . OtxPulseStagingStore::runPath($runId, $this->kind));
             return 1;
         }
 
@@ -105,32 +150,56 @@ class OTXMDFetchIndicator extends Command
             $expected = $apiTotal > 0 ? $apiTotal : $inScope;
         }
         $pct = $expected > 0 ? round(($verified / $expected) * 100, 2) : 0;
-        $complete = $failed === 0 && $pending === 0 && $verified >= $expected;
+        $fetchComplete = $failed === 0 && $pending === 0 && $verified >= $expected;
 
         $manifest['status'] = ($failed > 0 || $pending > 0) ? 'partial' : 'fetched';
-        $manifest['stats'] = compact('apiTotal', 'expected', 'fetched', 'skipped', 'failed', 'pending', 'verified', 'pct', 'complete');
+        $manifest['stats'] = compact('apiTotal', 'expected', 'fetched', 'skipped', 'failed', 'pending', 'verified', 'pct');
+        $manifest['stats']['complete'] = $fetchComplete;
+        OtxPulseStagingStore::stampFetchFinish($manifest, $fetchComplete);
         OtxPulseStagingStore::saveManifest($runId, $manifest, $this->kind);
 
         $this->info('=========================================');
         $this->info('INDICATOR FETCH SUMMARY');
         $this->info('=========================================');
         $this->info("Run ID              : {$runId}");
+        $this->info('Started at          : ' . ($manifest['started_at'] ?? '-'));
+        $this->info('Last started        : ' . ($manifest['last_started_at'] ?? '-'));
+        $this->info('Fetch finished at   : ' . ($manifest['fetch_finished_at'] ?? '-'));
+        $this->info('Resume count        : ' . (int) ($manifest['resume_count'] ?? 0));
         $this->info('API total           : ' . number_format($apiTotal));
         $this->info('Expected (this run) : ' . number_format($expected));
         $this->info('Fetched             : ' . number_format($fetched));
         $this->info('Skipped             : ' . number_format($skipped));
         $this->info('Failed              : ' . number_format($failed));
         $this->info('Verified            : ' . number_format($verified) . ' / ' . number_format($expected) . " ({$pct}%)");
-        $this->info('Complete            : ' . ($complete ? 'YES' : 'NO'));
+        $this->info('Fetch complete      : ' . ($fetchComplete ? 'YES' : 'NO'));
 
-        $exit = $failed > 0 ? 2 : 0;
-        if ($fetched > 0 || $skipped > 0) {
+        $exit = ($failed > 0 || $pending > 0) ? 2 : 0;
+        $importPending = ($manifest['import_status'] ?? 'pending') !== 'done';
+        if (($fetched > 0 || $skipped > 0) && $importPending) {
             $imp = $this->runImport($runId, $manifest);
             if ($imp !== 0 && $exit === 0) {
                 $exit = $imp;
             }
         } else {
             $this->info('Skip auto-import    : nothing to import');
+        }
+
+        $after = OtxPulseStagingStore::loadManifest($runId, $this->kind);
+        if ($after) {
+            $pipelineComplete = ($after['import_status'] ?? '') === 'done' && ($after['status'] ?? '') === 'fetched';
+            if ($this->option('skip-import')) {
+                $pipelineComplete = false;
+            }
+            OtxPulseStagingStore::stampFinish($after, $pipelineComplete);
+            OtxPulseStagingStore::saveManifest($runId, $after, $this->kind);
+            $this->info('Finished at         : ' . ($after['finished_at'] ?? '-'));
+            $this->info('Pipeline complete   : ' . ($pipelineComplete ? 'YES' : 'NO'));
+            $this->info('Duration            : ' . OtxPulseStagingStore::elapsed($after['started_at'] ?? null, $after['finished_at'] ?? null));
+        } else {
+            $this->info('Finished at         : ' . date('c') . ' (staging deleted after complete import)');
+            $this->info('Pipeline complete   : YES');
+            $this->info('Duration            : ' . OtxPulseStagingStore::elapsed($manifest['started_at'] ?? null));
         }
 
         return $exit;
@@ -334,7 +403,8 @@ class OTXMDFetchIndicator extends Command
     {
         $done = 0;
         foreach ($manifest['items'] as $id => $meta) {
-            if (($meta['status'] ?? '') !== 'pending') {
+            $status = $meta['status'] ?? 'pending';
+            if (!in_array($status, ['pending', 'failed'], true)) {
                 continue;
             }
             if ($limit !== null && $done >= $limit) {
@@ -343,7 +413,11 @@ class OTXMDFetchIndicator extends Command
 
             $type = $meta['type'] ?? '';
             $name = $meta['indicator'] ?? '';
-            $this->info("Detail: {$id} | {$type} | {$name}");
+            if ($status === 'failed') {
+                $this->info("Retry detail: {$id} | {$type} | {$name}");
+            } else {
+                $this->info("Detail: {$id} | {$type} | {$name}");
+            }
 
             $bundle = $this->buildDetailBundle($id, $type, $name);
             $dir = OtxPulseStagingStore::indicatorPath($runId, $id);
@@ -609,6 +683,10 @@ class OTXMDFetchIndicator extends Command
         $date_now = new UTCDateTime(strtotime(date('Y-m-d H:i:s')) * 1000);
 
         $stampCol = $db->fx_transaction_otx_indicator_stamp;
+        OtxPulseStagingStore::stampImportStart($manifest);
+        OtxPulseStagingStore::saveManifest($runId, $manifest, $this->kind);
+
+        $importStartedIso = date('c');
         $stamp = $stampCol->insertOne([
             'code' => generator_uuid(),
             'transaction_date' => date('Y-m-d'),
@@ -622,6 +700,10 @@ class OTXMDFetchIndicator extends Command
             'creator_org' => 'OTX',
             'staging_run_id' => $runId,
             'pipeline' => 'staging_import',
+            'started_at' => $date_now,
+            'started_at_iso' => $importStartedIso,
+            'fetch_started_at' => $manifest['started_at'] ?? null,
+            'complete' => false,
         ]);
         $stampId = $stamp->getInsertedId();
 
@@ -704,6 +786,8 @@ class OTXMDFetchIndicator extends Command
         $pct = $expected > 0 ? round(($verified / $expected) * 100, 2) : 0;
         $complete = $errors === 0 && $verified >= $expected;
 
+        $finishedIso = date('c');
+        $finishedAt = new UTCDateTime(strtotime($finishedIso) * 1000);
         $stampCol->updateOne(
             ['_id' => $stampId],
             ['$set' => [
@@ -712,10 +796,16 @@ class OTXMDFetchIndicator extends Command
                 'processed_indicators' => $saved,
                 'failed_indicators' => $errors,
                 'staging_run_id' => $runId,
+                'finished_at' => $finishedAt,
+                'finished_at_iso' => $finishedIso,
+                'complete' => $complete,
+                'duration_seconds' => max(0, strtotime($finishedIso) - strtotime($importStartedIso)),
+                'updated_at' => $finishedAt,
             ]]
         );
 
         $manifest['import_status'] = $complete ? 'done' : 'partial';
+        OtxPulseStagingStore::stampImportFinish($manifest, $complete);
         OtxPulseStagingStore::saveManifest($runId, $manifest, $this->kind);
 
         $this->info('=========================================');
@@ -726,6 +816,8 @@ class OTXMDFetchIndicator extends Command
         $this->info('Errors               : ' . $errors);
         $this->info('Verified             : ' . $verified . ' / ' . $expected . " ({$pct}%)");
         $this->info('Complete             : ' . ($complete ? 'YES' : 'NO'));
+        $this->info('Import started at    : ' . $importStartedIso);
+        $this->info('Import finished at   : ' . $finishedIso);
 
         Artisan::call('app:MDCountIndicator', [], $this->output);
         $this->output->write(Artisan::output());

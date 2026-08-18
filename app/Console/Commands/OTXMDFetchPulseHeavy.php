@@ -10,6 +10,7 @@ use Exception;
 /**
  * Slow-lane fetch for pulses skipped by main fetch due to high indicator_count.
  * Same indicator rules (created today only). Related skipped by default.
+ * Leftover heavy staging is finished before taking new queue items.
  */
 class OTXMDFetchPulseHeavy extends OTXMDFetchPulse
 {
@@ -20,9 +21,10 @@ class OTXMDFetchPulseHeavy extends OTXMDFetchPulse
                             {--retries=5 : Max HTTP retries per URL}
                             {--status : Only show heavy queue counts}
                             {--cleanup : Remove imported/failed queue entries older than 7 days}
+                            {--database=sosecure_threatintelligent : Mongo database for auto-import}
                             {--skip-import : Fetch only; do not auto-import to Mongo}';
 
-    protected $description = 'Fetch heavy OTX pulses from queue, then auto-import (unless --skip-import)';
+    protected $description = 'Fetch leftover/queued heavy OTX pulses, then auto-import (unless --skip-import)';
 
     public function handle()
     {
@@ -30,6 +32,26 @@ class OTXMDFetchPulseHeavy extends OTXMDFetchPulse
             $removed = OtxHeavyPulseQueue::cleanup(7);
             $this->info("Heavy queue cleanup removed: {$removed}");
             return 0;
+        }
+
+        $lock = OtxPulseStagingStore::acquireLock('heavy');
+        if (!$lock) {
+            $this->warn('Another heavy fetch is already running. Leftover will be finished on the next run.');
+            return 0;
+        }
+
+        try {
+            return $this->handleLocked();
+        } finally {
+            OtxPulseStagingStore::releaseLock($lock);
+        }
+    }
+
+    protected function handleLocked()
+    {
+        $reclaimed = OtxHeavyPulseQueue::reclaimStale(30);
+        if ($reclaimed > 0) {
+            $this->warn("Reclaimed stale heavy queue rows back to pending: {$reclaimed}");
         }
 
         $pending = OtxHeavyPulseQueue::countByStatus('pending');
@@ -48,25 +70,38 @@ class OTXMDFetchPulseHeavy extends OTXMDFetchPulse
             return 0;
         }
 
-        $items = OtxHeavyPulseQueue::listByStatus('pending');
-        if (empty($items)) {
-            $this->info('No pending heavy pulses.');
-            return 0;
-        }
-
-        $limit = max(1, (int) $this->option('limit'));
-        $items = array_slice($items, 0, $limit);
-
         $this->http = new OtxHttpClient(
             (int) $this->option('timeout'),
             (int) $this->option('retries')
         );
+
+        $leftover = OtxPulseStagingStore::findIncompleteRunId('pulses', 'heavy');
+        if ($leftover) {
+            $this->info("Leftover heavy staging found — finishing before new queue items: {$leftover}");
+            $exit = $this->processHeavyRun($leftover, true);
+            $still = OtxPulseStagingStore::loadManifest($leftover);
+            if ($still && OtxPulseStagingStore::isIncomplete($still)) {
+                $this->warn('Leftover heavy run not complete — skip new queue items.');
+                return $exit;
+            }
+            $this->info('Leftover heavy run finished.');
+        }
+
+        $items = OtxHeavyPulseQueue::listByStatus('pending');
+        if (empty($items)) {
+            $this->info('No pending heavy pulses.');
+            return isset($exit) ? $exit : 0;
+        }
+
+        $limit = max(1, (int) $this->option('limit'));
+        $items = array_slice($items, 0, $limit);
 
         $runId = OtxPulseStagingStore::createRun('heavy-queue');
         $manifest = OtxPulseStagingStore::loadManifest($runId);
         $manifest['queue'] = 'heavy';
         $manifest['checkpoint']['list_done'] = true;
         $manifest['api_total_pulses'] = count($items);
+        OtxPulseStagingStore::stampSessionStart($manifest, false);
 
         foreach ($items as $entry) {
             $pulseId = $entry['pulse_id'];
@@ -94,19 +129,39 @@ class OTXMDFetchPulseHeavy extends OTXMDFetchPulse
 
         OtxPulseStagingStore::saveManifest($runId, $manifest);
         $this->info("Created heavy run: {$runId}");
-        $this->info('Processing ' . count($items) . ' heavy pulse(s)...');
+        $this->info('Started at          : ' . ($manifest['started_at'] ?? '-'));
+        $this->info('Processing ' . count($manifest['pulses'] ?? []) . ' heavy pulse(s)...');
 
-        // Default: skip related (parent checks --skip-related).
-        // Heavy signature uses --with-related instead; synthesize skip-related behavior below.
+        return $this->processHeavyRun($runId, false);
+    }
+
+    /**
+     * @param bool $isResume when true, load existing manifest and retry pending/failed
+     */
+    protected function processHeavyRun($runId, $isResume)
+    {
+        $manifest = OtxPulseStagingStore::loadManifest($runId);
+        if (!$manifest) {
+            $this->error("Heavy run not found: {$runId}");
+            return 1;
+        }
+
+        if ($isResume) {
+            OtxPulseStagingStore::stampSessionStart($manifest, true);
+            OtxPulseStagingStore::saveManifest($runId, $manifest);
+            $this->info("Resuming heavy run: {$runId} (resume #" . (int) ($manifest['resume_count'] ?? 0) . ')');
+            $this->info('Started at          : ' . ($manifest['started_at'] ?? '-'));
+        }
+
         try {
             foreach ($manifest['pulses'] as $pulseId => $meta) {
-                if (($meta['status'] ?? '') !== 'pending') {
+                $status = $meta['status'] ?? 'pending';
+                if ($status === 'fetched' || $status === 'skipped') {
                     continue;
                 }
-                $this->info("Fetching heavy pulse: {$pulseId} | indicators~"
+                $this->info(($status === 'failed' ? 'Retrying' : 'Fetching') . " heavy pulse: {$pulseId} | indicators~"
                     . ($meta['indicator_count'] ?? 0) . ' | ' . ($meta['name'] ?? ''));
 
-                // Temporarily fake skip-related via option bag when not --with-related.
                 $ok = $this->fetchOnePulseHeavy($runId, $pulseId, $manifest);
                 if ($ok) {
                     $manifest['pulses'][$pulseId]['status'] = 'fetched';
@@ -121,58 +176,89 @@ class OTXMDFetchPulseHeavy extends OTXMDFetchPulse
         } catch (Exception $e) {
             $manifest['status'] = 'partial';
             $manifest['last_error'] = $e->getMessage();
+            $manifest['complete'] = false;
             OtxPulseStagingStore::saveManifest($runId, $manifest);
             $this->error('Heavy fetch aborted: ' . $e->getMessage());
+            $this->warn('Staging kept for resume: ' . OtxPulseStagingStore::runPath($runId));
             return 1;
         }
 
         $fetched = 0;
         $failedCount = 0;
+        $pending = 0;
         foreach ($manifest['pulses'] as $meta) {
-            if (($meta['status'] ?? '') === 'fetched') {
+            $st = $meta['status'] ?? '';
+            if ($st === 'fetched') {
                 $fetched++;
-            } elseif (($meta['status'] ?? '') === 'failed') {
+            } elseif ($st === 'failed') {
                 $failedCount++;
+            } else {
+                $pending++;
             }
         }
 
         $expected = count($manifest['pulses']);
         $verified = $fetched + $failedCount;
         $pct = $expected > 0 ? round(($verified / $expected) * 100, 2) : 0;
-        $complete = $failedCount === 0 && $fetched === $expected;
+        $fetchComplete = $failedCount === 0 && $pending === 0 && $fetched === $expected;
 
         $manifest['pulses_fetched'] = $fetched;
         $manifest['pulses_failed'] = $failedCount;
-        $manifest['status'] = $complete ? 'fetched' : 'partial';
+        $manifest['status'] = $fetchComplete ? 'fetched' : 'partial';
         $manifest['stats'] = [
             'expected' => $expected,
             'fetched' => $fetched,
             'failed' => $failedCount,
+            'pending' => $pending,
             'percent' => $pct,
-            'complete' => $complete,
+            'complete' => $fetchComplete,
             'queue' => 'heavy',
         ];
+        OtxPulseStagingStore::stampFetchFinish($manifest, $fetchComplete);
         OtxPulseStagingStore::saveManifest($runId, $manifest);
 
         $this->info('=========================================');
         $this->info('HEAVY FETCH SUMMARY');
         $this->info('=========================================');
         $this->info("Run ID              : {$runId}");
+        $this->info('Started at          : ' . ($manifest['started_at'] ?? '-'));
+        $this->info('Last started        : ' . ($manifest['last_started_at'] ?? '-'));
+        $this->info('Fetch finished at   : ' . ($manifest['fetch_finished_at'] ?? '-'));
+        $this->info('Resume count        : ' . (int) ($manifest['resume_count'] ?? 0));
         $this->info('Expected            : ' . $expected);
         $this->info('Successfully fetched: ' . $fetched);
         $this->info('Failed              : ' . $failedCount);
+        $this->info('Pending             : ' . $pending);
         $this->info('Verified            : ' . $verified . ' / ' . $expected . " ({$pct}%)");
-        $this->info('Complete            : ' . ($complete ? 'YES' : 'NO'));
+        $this->info('Fetch complete      : ' . ($fetchComplete ? 'YES' : 'NO'));
         $this->info('Heavy queue pending : ' . OtxHeavyPulseQueue::countByStatus('pending'));
 
-        $fetchExit = $failedCount > 0 ? 2 : 0;
-        if ($fetched > 0) {
+        $fetchExit = ($failedCount > 0 || $pending > 0) ? 2 : 0;
+        $importPending = ($manifest['import_status'] ?? 'pending') !== 'done';
+        if ($fetched > 0 && $importPending) {
             $importExit = $this->runImportAfterFetch($runId);
             if ($importExit !== 0 && $fetchExit === 0) {
                 $fetchExit = $importExit;
             }
         } else {
             $this->info('Skip auto-import    : no fetched pulses');
+        }
+
+        $after = OtxPulseStagingStore::loadManifest($runId);
+        if ($after) {
+            $pipelineComplete = ($after['import_status'] ?? '') === 'done' && ($after['status'] ?? '') === 'fetched';
+            if ($this->option('skip-import')) {
+                $pipelineComplete = false;
+            }
+            OtxPulseStagingStore::stampFinish($after, $pipelineComplete);
+            OtxPulseStagingStore::saveManifest($runId, $after);
+            $this->info('Finished at         : ' . ($after['finished_at'] ?? '-'));
+            $this->info('Pipeline complete   : ' . ($pipelineComplete ? 'YES' : 'NO'));
+            $this->info('Duration            : ' . OtxPulseStagingStore::elapsed($after['started_at'] ?? null, $after['finished_at'] ?? null));
+        } else {
+            $this->info('Finished at         : ' . date('c') . ' (staging deleted after complete import)');
+            $this->info('Pipeline complete   : YES');
+            $this->info('Duration            : ' . OtxPulseStagingStore::elapsed($manifest['started_at'] ?? null));
         }
 
         return $fetchExit;

@@ -157,11 +157,64 @@ class OtxHeavyPulseQueue
             if (!$entry) {
                 continue;
             }
-            if (($entry['staging_run_id'] ?? null) === $stagingRunId) {
+            // Only successfully staged rows — never promote failed/processing.
+            if (($entry['staging_run_id'] ?? null) === $stagingRunId
+                && ($entry['status'] ?? '') === 'staged') {
                 $entry['status'] = 'imported';
                 self::save($entry['pulse_id'], $entry);
                 $n++;
             }
+        }
+        return $n;
+    }
+
+    /**
+     * Recover queue rows left behind when a process died.
+     * Leave processing/staged alone if their staging run still exists and is incomplete
+     * (the leftover run will finish them).
+     *
+     * @return int number of rows reset to pending
+     */
+    public static function reclaimStale($maxAgeMinutes = 30)
+    {
+        $root = self::root();
+        if (!is_dir($root)) {
+            return 0;
+        }
+        $cutoff = time() - ($maxAgeMinutes * 60);
+        $n = 0;
+        foreach (scandir($root) as $file) {
+            if ($file === '.' || $file === '..' || substr($file, -5) !== '.json') {
+                continue;
+            }
+            $entry = OtxPulseStagingStore::readJson($root . DIRECTORY_SEPARATOR . $file);
+            if (!$entry) {
+                continue;
+            }
+            $status = $entry['status'] ?? '';
+            if (!in_array($status, ['processing', 'staged'], true)) {
+                continue;
+            }
+            $runId = $entry['staging_run_id'] ?? null;
+            $staging = $runId ? OtxPulseStagingStore::loadManifest($runId) : null;
+            $stagingAlive = $staging && OtxPulseStagingStore::isIncomplete($staging);
+
+            if ($stagingAlive) {
+                continue;
+            }
+
+            $updated = strtotime($entry['updated_at'] ?? $entry['enqueued_at'] ?? 'now');
+            $stale = $updated === false || $updated < $cutoff;
+            $orphan = !$staging;
+            if (!$stale && !$orphan) {
+                continue;
+            }
+
+            $entry['status'] = 'pending';
+            $entry['reclaimed_from'] = $status;
+            $entry['reclaimed_at'] = date('c');
+            self::save($entry['pulse_id'], $entry);
+            $n++;
         }
         return $n;
     }

@@ -14,18 +14,35 @@ class OTXMDFetchPulse extends Command
     protected $signature = 'app:OTXMDFetchPulse
                             {--limit= : Limit number of pulses to fetch (for testing)}
                             {--max-indicators=5000 : Skip pulses with indicator_count above this (0 = no skip)}
-                            {--resume : Resume latest incomplete run}
+                            {--resume : Resume leftover run (default: auto if leftover exists)}
+                            {--fresh : Ignore leftover staging and start a new run}
                             {--run= : Resume a specific run_id}
                             {--timeout=180 : HTTP timeout seconds}
                             {--retries=5 : Max HTTP retries per URL}
+                            {--database=sosecure_threatintelligent : Mongo database for auto-import}
                             {--skip-import : Fetch only; do not auto-import to Mongo}';
 
-    protected $description = 'Fetch OTX pulses into staging, then auto-import to Mongo (unless --skip-import)';
+    protected $description = 'Fetch OTX pulses into staging (finish leftover first), then auto-import unless --skip-import';
 
     /** @var OtxHttpClient */
     protected $http;
 
     public function handle()
+    {
+        $lock = OtxPulseStagingStore::acquireLock('pulses');
+        if (!$lock) {
+            $this->warn('Another pulse fetch is already running. Leftover will be finished on the next run.');
+            return 0;
+        }
+
+        try {
+            return $this->handleLocked();
+        } finally {
+            OtxPulseStagingStore::releaseLock($lock);
+        }
+    }
+
+    protected function handleLocked()
     {
         $this->http = new OtxHttpClient(
             (int) $this->option('timeout'),
@@ -33,26 +50,58 @@ class OTXMDFetchPulse extends Command
         );
 
         $query = 'modified:<12h';
-        $runId = $this->option('run');
-        if (!$runId && $this->option('resume')) {
-            $runId = OtxPulseStagingStore::latestRunId(true);
+        $explicitRun = $this->option('run');
+        $fresh = (bool) $this->option('fresh');
+        $limit = $this->option('limit') !== null && $this->option('limit') !== ''
+            ? (int) $this->option('limit')
+            : null;
+
+        if ($explicitRun) {
+            return $this->processPulseRun($explicitRun, true, $query, $limit);
         }
+
+        if (!$fresh) {
+            $leftover = OtxPulseStagingStore::findIncompleteRunId('pulses');
+            if ($leftover) {
+                $this->info("Leftover staging found — finishing before a new window: {$leftover}");
+                $exit = $this->processPulseRun($leftover, true, $query, $limit);
+                $still = OtxPulseStagingStore::loadManifest($leftover);
+                if ($still && OtxPulseStagingStore::isIncomplete($still)) {
+                    $this->warn('Leftover not complete — skip new window so data is not abandoned.');
+                    return $exit;
+                }
+                $this->info('Leftover finished. Starting new modified:<12h window...');
+            }
+        } else {
+            $this->warn('--fresh: ignoring leftover staging (may leave disk garbage / missed import).');
+        }
+
+        return $this->processPulseRun(null, false, $query, $limit);
+    }
+
+    /**
+     * @param string|null $runId existing run, or null to create
+     */
+    protected function processPulseRun($runId, $isResume, $query, $limit)
+    {
         if ($runId) {
             $manifest = OtxPulseStagingStore::loadManifest($runId);
             if (!$manifest) {
                 $this->error("Run not found: {$runId}");
                 return 1;
             }
-            $this->info("Resuming run: {$runId}");
+            OtxPulseStagingStore::stampSessionStart($manifest, $isResume);
+            OtxPulseStagingStore::saveManifest($runId, $manifest);
+            $this->info("Resuming run: {$runId} (resume #" . (int) ($manifest['resume_count'] ?? 0) . ')');
         } else {
             $runId = OtxPulseStagingStore::createRun($query);
             $manifest = OtxPulseStagingStore::loadManifest($runId);
+            OtxPulseStagingStore::stampSessionStart($manifest, false);
+            OtxPulseStagingStore::saveManifest($runId, $manifest);
             $this->info("Created run: {$runId}");
         }
+        $this->info('Started at          : ' . ($manifest['started_at'] ?? '-'));
 
-        $limit = $this->option('limit') !== null && $this->option('limit') !== ''
-            ? (int) $this->option('limit')
-            : null;
         $maxIndicators = (int) $this->option('max-indicators');
 
         try {
@@ -61,8 +110,10 @@ class OTXMDFetchPulse extends Command
         } catch (Exception $e) {
             $manifest['status'] = 'partial';
             $manifest['last_error'] = $e->getMessage();
+            $manifest['complete'] = false;
             OtxPulseStagingStore::saveManifest($runId, $manifest);
             $this->error('Fetch aborted: ' . $e->getMessage());
+            $this->warn('Staging kept for resume: ' . OtxPulseStagingStore::runPath($runId));
             return 1;
         }
 
@@ -102,7 +153,7 @@ class OTXMDFetchPulse extends Command
         }
 
         $pct = $expected > 0 ? round(($verified / $expected) * 100, 2) : 0;
-        $complete = $failed === 0 && $pending === 0 && $verified >= $expected;
+        $fetchComplete = $failed === 0 && $pending === 0 && $verified >= $expected;
 
         $manifest['status'] = ($failed > 0 || $pending > 0) ? 'partial' : 'fetched';
         $manifest['stats'] = [
@@ -114,14 +165,19 @@ class OTXMDFetchPulse extends Command
             'pending' => $pending,
             'verified' => $verified,
             'percent' => $pct,
-            'complete' => $complete,
+            'complete' => $fetchComplete,
         ];
+        OtxPulseStagingStore::stampFetchFinish($manifest, $fetchComplete);
         OtxPulseStagingStore::saveManifest($runId, $manifest);
 
         $this->info('=========================================');
         $this->info('FETCH SUMMARY');
         $this->info('=========================================');
         $this->info("Run ID              : {$runId}");
+        $this->info('Started at          : ' . ($manifest['started_at'] ?? '-'));
+        $this->info('Last started        : ' . ($manifest['last_started_at'] ?? '-'));
+        $this->info('Fetch finished at   : ' . ($manifest['fetch_finished_at'] ?? '-'));
+        $this->info('Resume count        : ' . (int) ($manifest['resume_count'] ?? 0));
         $this->info('API total pulses    : ' . number_format($apiTotal));
         $this->info('Expected (this run) : ' . number_format($expected) . ($limit !== null ? " (limit={$limit})" : ($isPartialList ? ' (scoped run)' : '')));
         $this->info('Successfully fetched: ' . number_format($fetched));
@@ -129,7 +185,7 @@ class OTXMDFetchPulse extends Command
         $this->info('Failed              : ' . number_format($failed));
         $this->info('Pending             : ' . number_format($pending));
         $this->info('Verified            : ' . number_format($verified) . ' / ' . number_format($expected) . " ({$pct}%)");
-        $this->info('Complete            : ' . ($complete ? 'YES' : 'NO'));
+        $this->info('Fetch complete      : ' . ($fetchComplete ? 'YES' : 'NO'));
         $this->info('Status              : ' . $manifest['status']);
         $this->info('Path                : ' . OtxPulseStagingStore::runPath($runId));
         $heavyPending = OtxHeavyPulseQueue::countByStatus('pending');
@@ -138,14 +194,37 @@ class OTXMDFetchPulse extends Command
             $this->info('Heavy next          : php artisan app:OTXMDFetchPulseHeavy --limit=1');
         }
 
-        $fetchExit = $failed > 0 ? 2 : 0;
-        if ($fetched > 0) {
+        $fetchExit = ($failed > 0 || $pending > 0) ? 2 : 0;
+        $importPending = ($manifest['import_status'] ?? 'pending') !== 'done';
+        if ($fetched > 0 && $importPending) {
             $importExit = $this->runImportAfterFetch($runId);
             if ($importExit !== 0 && $fetchExit === 0) {
                 $fetchExit = $importExit;
             }
+        } elseif ($this->option('skip-import')) {
+            $this->info('Next                : php artisan app:OTXMDImportPulse --run=' . $runId);
+            $this->info('(auto-import skipped via --skip-import)');
         } else {
             $this->info('Skip auto-import    : no fetched pulses');
+        }
+
+        $after = OtxPulseStagingStore::loadManifest($runId);
+        if ($after) {
+            $pipelineComplete = empty($after['complete'])
+                ? (($after['import_status'] ?? '') === 'done' && ($after['status'] ?? '') === 'fetched')
+                : (bool) $after['complete'];
+            if ($this->option('skip-import')) {
+                $pipelineComplete = false;
+            }
+            OtxPulseStagingStore::stampFinish($after, $pipelineComplete);
+            OtxPulseStagingStore::saveManifest($runId, $after);
+            $this->info('Finished at         : ' . ($after['finished_at'] ?? '-'));
+            $this->info('Pipeline complete   : ' . ($pipelineComplete ? 'YES' : 'NO'));
+            $this->info('Duration            : ' . OtxPulseStagingStore::elapsed($after['started_at'] ?? null, $after['finished_at'] ?? null));
+        } else {
+            $this->info('Finished at         : ' . date('c') . ' (staging deleted after complete import)');
+            $this->info('Pipeline complete   : YES');
+            $this->info('Duration            : ' . OtxPulseStagingStore::elapsed($manifest['started_at'] ?? null));
         }
 
         return $fetchExit;
@@ -156,20 +235,24 @@ class OTXMDFetchPulse extends Command
      */
     protected function runImportAfterFetch($runId)
     {
+        $dbName = $this->option('database') ?: 'sosecure_threatintelligent';
+
         if ($this->option('skip-import')) {
-            $this->info('Next                : php artisan app:OTXMDImportPulse --run=' . $runId);
+            $this->info('Next                : php artisan app:OTXMDImportPulse --run=' . $runId . ' --database=' . $dbName);
             $this->info('(auto-import skipped via --skip-import)');
             return 0;
         }
 
         $this->info('=========================================');
         $this->info('AUTO IMPORT after fetch: ' . $runId);
+        $this->info('Mongo database        : ' . $dbName);
         $this->info('=========================================');
 
         // Pass $this->output so Import streams live (and nested MDCount does not
         // wipe Artisan::output() buffer — previously only END---- was visible).
         $exit = (int) Artisan::call('app:OTXMDImportPulse', [
             '--run' => $runId,
+            '--database' => $dbName,
         ], $this->output);
 
         if ($exit === 0) {
@@ -321,7 +404,11 @@ class OTXMDFetchPulse extends Command
 
             $name = $meta['name'] ?? '';
             $count = $meta['indicator_count'] ?? 0;
-            $this->info("Fetching pulse: {$pulseId} | indicators~{$count} | {$name}");
+            if ($status === 'failed') {
+                $this->info("Retrying failed pulse: {$pulseId} | indicators~{$count} | {$name}");
+            } else {
+                $this->info("Fetching pulse: {$pulseId} | indicators~{$count} | {$name}");
+            }
             $ok = $this->fetchOnePulse($runId, $pulseId, $manifest);
             if ($ok) {
                 $fetchedThisRun++;

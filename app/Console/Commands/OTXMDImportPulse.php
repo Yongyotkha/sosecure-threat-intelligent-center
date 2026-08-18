@@ -13,12 +13,12 @@ class OTXMDImportPulse extends Command
 {
     protected $signature = 'app:OTXMDImportPulse
                             {--run= : Staging run_id to import}
-                            {--database=sosecure_threatintelligent_dev : Mongo database name}
+                            {--database=sosecure_threatintelligent : Mongo database name}
                             {--limit= : Limit pulses to import}
                             {--skip-count : Skip MDCountIndicator after import}
                             {--keep : Keep staging files after successful import (default: delete)}';
 
-    protected $description = 'Import staged OTX pulses into MongoDB (default: sosecure_threatintelligent_dev). Deletes staging after success unless --keep.';
+    protected $description = 'Import staged OTX pulses into MongoDB (default: sosecure_threatintelligent). Deletes staging after success unless --keep.';
 
     protected $dbName;
     protected $totalPulsesProcessed = 0;
@@ -32,7 +32,7 @@ class OTXMDImportPulse extends Command
 
     public function handle()
     {
-        $this->dbName = $this->option('database') ?: 'sosecure_threatintelligent_dev';
+        $this->dbName = $this->option('database') ?: 'sosecure_threatintelligent';
         $runId = $this->option('run') ?: OtxPulseStagingStore::latestFetchedRunId();
 
         if (!$runId) {
@@ -65,6 +65,9 @@ class OTXMDImportPulse extends Command
         $date_now = new UTCDateTime(strtotime(date('Y-m-d H:i:s')) * 1000);
 
         $collectionStamp = $db->fx_transaction_otx_event_stamp;
+        $startedIso = date('c');
+        OtxPulseStagingStore::stampImportStart($manifest);
+        OtxPulseStagingStore::saveManifest($runId, $manifest);
         $insertOneResult = $collectionStamp->insertOne([
             'code' => generator_uuid(),
             'transaction_date' => date('Y-m-d'),
@@ -77,6 +80,10 @@ class OTXMDImportPulse extends Command
             'source' => 'otx.alienvault',
             'staging_run_id' => $runId,
             'pipeline' => 'staging_import',
+            'started_at' => $date_now,
+            'started_at_iso' => $startedIso,
+            'fetch_started_at' => $manifest['started_at'] ?? null,
+            'complete' => false,
         ]);
         $stampId = $insertOneResult->getInsertedId();
 
@@ -98,11 +105,11 @@ class OTXMDImportPulse extends Command
                 $this->totalPulsesSkippedFilter++;
                 continue;
             }
+            if ($status === 'failed') {
+                // Fetch failed — retried on leftover resume; do not block import complete.
+                continue;
+            }
             if ($status !== 'fetched') {
-                if ($status === 'failed') {
-                    $this->totalPulsesError++;
-                    $this->failedPulses[] = $pulseId;
-                }
                 continue;
             }
             // Already imported (resume) — count as saved so Verified/Complete stay correct.
@@ -144,11 +151,11 @@ class OTXMDImportPulse extends Command
         $verified = $this->totalPulsesProcessed + $this->totalPulsesSkippedFilter + $this->totalPulsesError;
         $allOk = $this->totalPulsesError === 0;
 
-        // Expected for this import: pulses marked fetched/skipped/failed in staging (not always full API list when --limit was used on fetch).
+        // Expected for this import: pulses that were staged as fetched/skipped (failed fetches are retried on leftover, not import errors).
         $stagingExpected = 0;
         foreach ($manifest['pulses'] ?? [] as $meta) {
             $st = $meta['status'] ?? '';
-            if (in_array($st, ['fetched', 'skipped', 'failed'], true)) {
+            if (in_array($st, ['fetched', 'skipped'], true)) {
                 $stagingExpected++;
             }
         }
@@ -165,6 +172,8 @@ class OTXMDImportPulse extends Command
         $indiComplete = $indiExpected === 0 || $indiVerified >= $indiExpected;
         $complete = $allOk && $verified >= $stagingExpected && $indiComplete;
 
+        $finishedIso = date('c');
+        $finishedAt = new UTCDateTime(strtotime($finishedIso) * 1000);
         $collectionStamp->updateOne(
             ['_id' => $stampId],
             ['$set' => [
@@ -182,10 +191,16 @@ class OTXMDImportPulse extends Command
                 'failed_pulses' => $this->failedPulses,
                 'error_msg' => $complete ? '' : 'Partial failure during staging import',
                 'staging_run_id' => $runId,
+                'finished_at' => $finishedAt,
+                'finished_at_iso' => $finishedIso,
+                'complete' => $complete,
+                'duration_seconds' => max(0, strtotime($finishedIso) - strtotime($startedIso)),
+                'updated_at' => $finishedAt,
             ]]
         );
 
         $manifest['import_status'] = $complete ? 'done' : 'partial';
+        OtxPulseStagingStore::stampImportFinish($manifest, $complete);
         $manifest['import_stats'] = [
             'expected_pulses' => $stagingExpected,
             'saved_pulses' => $this->totalPulsesProcessed,
@@ -223,6 +238,8 @@ class OTXMDImportPulse extends Command
         $this->info('  - Failed/skipped  : ' . number_format($this->totalIndicatorsSkipped));
         $this->info('  - Verified        : ' . number_format($indiVerified) . ' / ' . number_format($indiExpected) . " ({$indiPct}%)");
         $this->info('Complete            : ' . ($complete ? 'YES' : 'NO'));
+        $this->info('Import started at   : ' . $startedIso);
+        $this->info('Import finished at  : ' . $finishedIso);
         $this->info('Import status       : ' . $manifest['import_status']);
 
         if (!$this->option('skip-count')) {
