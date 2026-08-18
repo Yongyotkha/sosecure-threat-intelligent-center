@@ -92,7 +92,6 @@ class Kernel extends HttpKernel
         'jwt'                => \App\Http\Middleware\JWTT::class,
         'api.token'          => \App\Http\Middleware\ApiTokenAuth::class,
         'api.token.service'  => \App\Http\Middleware\ServiceApiTokenAuth::class,
-        'honeypot.agent'     => \App\Http\Middleware\VerifyHoneypotAgent::class,
     ];
 
     /**

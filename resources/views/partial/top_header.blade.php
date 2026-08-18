@@ -55,11 +55,11 @@
                             <span class="input-group-btn icon-search">
                                 <i class="fas fa-search"></i>
                             </span>
-                                <div class="input-group-custom">
+                            <div class="input-group-custom">
                                 <input type="text" id="search_input" class="form-control form-transparent" name="keyword" placeholder="Type tag keyword" style="margin-top: 2px;margin-left: 1rem;" value="{{@$keyword}}">
                                 <div class="input-group-prepend-custom">
                                    <button class="btn btn-dark">Search</button>
-                                   <button type="button" class="btn btn-dark btn-header-lookup"><i class="fas fa-search"></i> Threat Lookup</button>
+                                   <button type="button" class="btn btn-dark lookup"><i class="fas fa-search"></i> Threat Lookup</button>
                                 </div>
                             </div>
                         </div>
@@ -125,7 +125,7 @@
 
 @push('pagescript')
     <script>
-        $('.btn-header-lookup').click(function(){
+        $('.lookup').click(function(){
             let keyword = $('#search_input').val();
             window.location.href = '/newSearch?keyword=' + keyword + '&mode=lookup';
         })

@@ -1,36 +1,36 @@
 <?php return array (
   'arrilot/laravel-widgets' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Arrilot\\Widgets\\ServiceProvider',
-    ),
     'aliases' => 
     array (
       'Widget' => 'Arrilot\\Widgets\\Facade',
       'AsyncWidget' => 'Arrilot\\Widgets\\AsyncFacade',
     ),
+    'providers' => 
+    array (
+      0 => 'Arrilot\\Widgets\\ServiceProvider',
+    ),
   ),
   'barryvdh/laravel-debugbar' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Barryvdh\\Debugbar\\ServiceProvider',
-    ),
     'aliases' => 
     array (
       'Debugbar' => 'Barryvdh\\Debugbar\\Facade',
     ),
+    'providers' => 
+    array (
+      0 => 'Barryvdh\\Debugbar\\ServiceProvider',
+    ),
   ),
   'barryvdh/laravel-dompdf' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Barryvdh\\DomPDF\\ServiceProvider',
-    ),
     'aliases' => 
     array (
       'PDF' => 'Barryvdh\\DomPDF\\Facade',
+    ),
+    'providers' => 
+    array (
+      0 => 'Barryvdh\\DomPDF\\ServiceProvider',
     ),
   ),
   'bepsvpt/secure-headers' => 
@@ -49,13 +49,13 @@
   ),
   'cartalyst/stripe-laravel' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Cartalyst\\Stripe\\Laravel\\StripeServiceProvider',
-    ),
     'aliases' => 
     array (
       'Stripe' => 'Cartalyst\\Stripe\\Laravel\\Facades\\Stripe',
+    ),
+    'providers' => 
+    array (
+      0 => 'Cartalyst\\Stripe\\Laravel\\StripeServiceProvider',
     ),
   ),
   'fideloper/proxy' => 
@@ -67,13 +67,13 @@
   ),
   'intervention/image' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Intervention\\Image\\ImageServiceProvider',
-    ),
     'aliases' => 
     array (
       'Image' => 'Intervention\\Image\\Facades\\Image',
+    ),
+    'providers' => 
+    array (
+      0 => 'Intervention\\Image\\ImageServiceProvider',
     ),
   ),
   'laravel/cashier' => 
@@ -106,13 +106,13 @@
   ),
   'laravel/socialite' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Laravel\\Socialite\\SocialiteServiceProvider',
-    ),
     'aliases' => 
     array (
       'Socialite' => 'Laravel\\Socialite\\Facades\\Socialite',
+    ),
+    'providers' => 
+    array (
+      0 => 'Laravel\\Socialite\\SocialiteServiceProvider',
     ),
   ),
   'laravel/tinker' => 
@@ -136,35 +136,35 @@
   ),
   'laravolt/avatar' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Laravolt\\Avatar\\ServiceProvider',
-    ),
     'aliases' => 
     array (
       'Avatar' => 'Laravolt\\Avatar\\Facade',
     ),
+    'providers' => 
+    array (
+      0 => 'Laravolt\\Avatar\\ServiceProvider',
+    ),
   ),
   'maatwebsite/excel' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
-    ),
     'aliases' => 
     array (
       'Excel' => 'Maatwebsite\\Excel\\Facades\\Excel',
     ),
+    'providers' => 
+    array (
+      0 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
+    ),
   ),
   'mollie/laravel-mollie' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Mollie\\Laravel\\MollieServiceProvider',
-    ),
     'aliases' => 
     array (
       'Mollie' => 'Mollie\\Laravel\\Facades\\Mollie',
+    ),
+    'providers' => 
+    array (
+      0 => 'Mollie\\Laravel\\MollieServiceProvider',
     ),
   ),
   'nesbot/carbon' => 
@@ -190,35 +190,35 @@
   ),
   'nwidart/laravel-modules' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Nwidart\\Modules\\LaravelModulesServiceProvider',
-    ),
     'aliases' => 
     array (
       'Module' => 'Nwidart\\Modules\\Facades\\Module',
     ),
+    'providers' => 
+    array (
+      0 => 'Nwidart\\Modules\\LaravelModulesServiceProvider',
+    ),
   ),
   'oriceon/oauth-5-laravel' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Artdarek\\OAuth\\OAuthServiceProvider',
-    ),
     'aliases' => 
     array (
       'OAuth' => 'Artdarek\\OAuth\\Facade\\OAuth',
     ),
+    'providers' => 
+    array (
+      0 => 'Artdarek\\OAuth\\OAuthServiceProvider',
+    ),
   ),
   'pragmarx/google2fa-laravel' => 
   array (
-    'providers' => 
-    array (
-      0 => 'PragmaRX\\Google2FALaravel\\ServiceProvider',
-    ),
     'aliases' => 
     array (
       'Google2FA' => 'PragmaRX\\Google2FALaravel\\Facade',
+    ),
+    'providers' => 
+    array (
+      0 => 'PragmaRX\\Google2FALaravel\\ServiceProvider',
     ),
   ),
   'renatomarinho/laravel-page-speed' => 
@@ -230,13 +230,13 @@
   ),
   'sentry/sentry-laravel' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Sentry\\Laravel\\ServiceProvider',
-    ),
     'aliases' => 
     array (
       'Sentry' => 'Sentry\\Laravel\\Facade',
+    ),
+    'providers' => 
+    array (
+      0 => 'Sentry\\Laravel\\ServiceProvider',
     ),
   ),
   'spatie/laravel-backup' => 
@@ -285,13 +285,13 @@
   ),
   'yajra/laravel-datatables-oracle' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Yajra\\DataTables\\DataTablesServiceProvider',
-    ),
     'aliases' => 
     array (
       'DataTables' => 'Yajra\\DataTables\\Facades\\DataTables',
+    ),
+    'providers' => 
+    array (
+      0 => 'Yajra\\DataTables\\DataTablesServiceProvider',
     ),
   ),
 );

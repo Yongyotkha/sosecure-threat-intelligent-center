@@ -68,6 +68,9 @@
                     <a id="advance-search" href="#hide-advance-search" class="btn btn-sm btn-{{ get_option('theme_color')  }}">
                         <span data-rel="tooltip" title="Filter" data-placement="bottom"><i class="fas fa-filter"></i><span class="hide-text">@langapp('Search_Advance')</span></span>
                     </a>
+                    <a href="{{ route('agentmanagement.agent_releases') }}" class="btn btn-sm btn-info">
+                        <i class="fas fa-cloud-upload-alt"></i> Agent Releases
+                    </a>
 
                 </div>
             </div>
@@ -560,7 +563,7 @@
                             <ul class="nav nav-tabs nav-tabs-highlight">
                                 <li class="active"><a href="#tab_acvt" data-toggle="tab" id="tab_acvt_click">Alert</a></li>
                                 <li><a href="#tab_agent" data-toggle="tab" id="tab_agent_click">Agent</a></li>   
-                                <li><a href="#tab_schedule" data-toggle="tab" id="tab_schedule_click">Schedule Task</a></li>   
+                                <li><a href="#tab_schedule" data-toggle="tab" id="tab_schedule_click">Scan History</a></li>   
                             </ul>
                             <div class="tab-content">
 
@@ -620,7 +623,6 @@
                                                             <th>Date Last Scan</th> --}}
                                                             <th>Channel</th>
                                                             <th>Severity</th>
-                                                            <th style="display: none;">Last Scan</th>
                                                             <th style="width:140px; max-width: 140px;">Datetime</th>
                                                             <th>Ignore</th>
                                                         </tr>
@@ -835,7 +837,7 @@
                                         <header class="panel-heading font-bold panel-header-blue">
                                             <div class="row">
                                                 <div class="col-xs-12">
-                                                    <i class="fas fa-table"></i> Table Schedule Task
+                                                    <i class="fas fa-table"></i> Table Scan History
                                                 </div>
                                             </div>
                                         </header>
@@ -844,10 +846,8 @@
                                                 <table class="table table-bordered table-striped" id="table-schedule-template" style="width: 100%">
                                                     <thead>
                                                         <tr>
+                                                            <th></th>
                                                             <th>
-                                                                {{-- <label><input name="select_all" value="1" id="select-all" type="checkbox" class="select-chk">
-                                                                    <span class="label-text"></span>
-                                                                </label> --}}
                                                                 <div class="custom-control custom-checkbox">
                                                                     <input type="checkbox" class="custom-control-input" name="selectAll" id="selectAll" value="all"/>
                                                                     <label class="custom-control-label font-weight-normal" for="selectAll"></label>
@@ -1022,16 +1022,19 @@
             dudit_log_feed();
             datachart_timeline();
 
-            tbl_alert.ajax.reload(); 
-            tbl_agent.ajax.reload();
+            tbl_alert.ajax.reload(null, false); 
+            tbl_agent.ajax.reload(null, false);
         }, 60000);
 
+        setInterval(() => {
+            if (typeof tbl_agent !== 'undefined' && tbl_agent) {
+                tbl_agent.ajax.reload(null, false);
+            }
+        }, 10000);
+
         $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
-        })
-
-
-       
+            $('[data-toggle="tooltip"]').tooltip();
+        });
 
     });
 
@@ -1573,7 +1576,7 @@
             processing: true,
             serverSide: true,
             destroy: true,
-            order: [[6, 'desc']],
+            order: [[5, 'desc']],
             ajax: 
             {
                 url: "{{route('agentmanagement.tb_alert')}}",
@@ -1605,6 +1608,7 @@
                 },
                 {
                     data: 'detail_all',
+                    "orderable": false,
                 },
                
                 {
@@ -1613,15 +1617,12 @@
                 },
                 {
                     data: 'severity_status',
-                    className: 'text-center'
+                    className: 'text-center',
+                    "orderable": false,
                 },
                 {
                     data: 'last_scan',
-                    visible: false,
-                    searchable: false
-                },
-                {
-                    data: 'agent_alerts_updated'
+                    name: 'yara_log.last_scan'
                 },
                 {
                     data: 'action',
@@ -1738,7 +1739,7 @@
     {
         let site_id = site_val;
 
-        $('#table-schedule-template').DataTable({
+        var tblSchedule = $('#table-schedule-template').DataTable({
             cache: false,
             processData: false,
             contentType: false,
@@ -1758,6 +1759,12 @@
                 }
             },
             columns: [
+                {
+                    data: 'c_expand',
+                    orderable: false,
+                    className: 'text-center',
+                    width: '36px'
+                },
                 {
                     data: 'chk',
                     "orderable": false,
@@ -1781,6 +1788,79 @@
                     data: 'description',
                 }
             ]
+        });
+
+        $('#table-schedule-template').off('click', '.btn-scan-expand').on('click', '.btn-scan-expand', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            var btn = $(this);
+            var tr = btn.closest('tr');
+            var row = tblSchedule.row(tr);
+            var scanId = btn.data('scan-id');
+            if(row.child.isShown()){
+                row.child.hide();
+                tr.removeClass('shown');
+                btn.find('i').removeClass('fa-minus').addClass('fa-plus');
+                return;
+            }
+            btn.prop('disabled', true);
+            var renderPage = function(page){
+                $.get("{{ route('agentmanagement.scan_history_files') }}", { scan_id: scanId, page: page, limit: 100 }, function(resp){
+                    btn.prop('disabled', false);
+                    var html = '<div class="scan-threat-child" style="padding:8px 12px;background:#f7f9fc;">';
+                    if(!resp || resp.status !== 'success'){
+                        html += '<div class="text-danger">'+(resp && resp.message ? resp.message : 'Load failed')+'</div>';
+                    } else if(!resp.rows || !resp.rows.length){
+                        html += '<div class="text-muted">ไม่พบไฟล์ที่สแกนใหม่ในรอบนี้ (ไฟล์ที่ข้ามเพราะไม่เปลี่ยนแปลงจะไม่แสดง)</div>';
+                    } else {
+                        html += '<table class="table table-condensed table-bordered" style="margin:0;background:#fff;"><thead><tr>'
+                            +'<th>Path</th><th>Result</th><th>Rule</th><th>Engine</th><th>Score</th><th>Time</th>'
+                            +'</tr></thead><tbody>';
+                        resp.rows.forEach(function(r){
+                            var res = (r.result || 'clean').toLowerCase();
+                            var resCls = res === 'infected' ? 'label-danger' : 'label-success';
+                            var resLabel = res === 'infected' ? 'malware' : 'clean';
+                            html += '<tr>'
+                                +'<td style="word-break:break-all;max-width:360px;" title="'+ $('<div>').text(r.path||'').html() +'">'+ $('<div>').text(r.path||'-').html() +'</td>'
+                                +'<td><span class="label '+resCls+'">'+ resLabel +'</span></td>'
+                                +'<td>'+ $('<div>').text(r.rule||'-').html() +'</td>'
+                                +'<td><span class="label label-primary">'+ $('<div>').text(r.engine||'-').html() +'</span></td>'
+                                +'<td>'+ $('<div>').text(r.score!=null?String(r.score):'-').html() +'</td>'
+                                +'<td>'+ $('<div>').text(r.scanned_at||'-').html() +'</td>'
+                                +'</tr>';
+                        });
+                        html += '</tbody></table>';
+                        var total = resp.total || resp.count || 0;
+                        var lim = resp.limit || 100;
+                        var cur = resp.page || 1;
+                        var pages = Math.max(1, Math.ceil(total / lim));
+                        html += '<div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+                        html += '<span class="text-muted" style="font-size:11px;">'+total+' file(s)'
+                            +(resp.matched_by ? ' · matched by '+resp.matched_by : '')
+                            +' · page '+cur+' / '+pages+'</span>';
+                        if(pages > 1){
+                            html += '<button type="button" class="btn btn-xs btn-default btn-scan-file-page" data-page="'+(cur-1)+'" '+(cur<=1?'disabled':'')+'>Prev</button>';
+                            html += '<button type="button" class="btn btn-xs btn-default btn-scan-file-page" data-page="'+(cur+1)+'" '+(cur>=pages?'disabled':'')+'>Next</button>';
+                        }
+                        html += '</div>';
+                    }
+                    html += '</div>';
+                    row.child(html).show();
+                    tr.addClass('shown');
+                    btn.find('i').removeClass('fa-plus').addClass('fa-minus');
+                    tr.next().off('click', '.btn-scan-file-page').on('click', '.btn-scan-file-page', function(ev){
+                        ev.preventDefault();
+                        var p = parseInt($(this).data('page'), 10) || 1;
+                        if(p < 1) return;
+                        btn.prop('disabled', true);
+                        renderPage(p);
+                    });
+                }).fail(function(){
+                    btn.prop('disabled', false);
+                    toastr.error('Failed to load scan files');
+                });
+            };
+            renderPage(1);
         });
     }
 
@@ -2013,6 +2093,117 @@
         toastr.success('Copy Success', 'Copy Path');
     }
 
+</script>
+<script>
+/* Manage Rules modal helpers - separate block so page functions always load */
+(function () {
+    function normalizeText(s) {
+        s = (s || '').toString().toLowerCase();
+        try {
+            s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        } catch (e) {}
+        return s.replace(/\s+/g, ' ').trim();
+    }
+
+    function fuzzyMatch(haystack, needle) {
+        haystack = normalizeText(haystack);
+        needle = normalizeText(needle);
+        if (!needle) return true;
+        if (haystack.indexOf(needle) !== -1) return true;
+        var hi = 0;
+        for (var i = 0; i < needle.length; i++) {
+            var ch = needle.charAt(i);
+            if (ch === ' ') continue;
+            hi = haystack.indexOf(ch, hi);
+            if (hi === -1) return false;
+            hi++;
+        }
+        return true;
+    }
+
+    function rowMatches(tr, q, typeFilter) {
+        var type = (tr.getAttribute('data-type') || '').toLowerCase();
+        if (typeFilter === 'yara' && type !== 'yara') return false;
+        if (typeFilter === 'ssdeep' && type !== 'ssdeep') return false;
+        if (!q) return true;
+        return fuzzyMatch(tr.getAttribute('data-search') || tr.textContent || '', q);
+    }
+
+    window.manageRuleApplyFilters = function () {
+        var searchEl = document.getElementById('manage_rule_search');
+        var typeEl = document.getElementById('manage_rule_type_filter');
+        var table = document.getElementById('tbl_manage_rule');
+        if (!table) return;
+        var q = searchEl ? (searchEl.value || '') : '';
+        var typeFilter = typeEl ? ((typeEl.value || 'all') + '').toLowerCase() : 'all';
+        var rows = table.querySelectorAll('tbody tr');
+        for (var i = 0; i < rows.length; i++) {
+            rows[i].style.display = rowMatches(rows[i], q, typeFilter) ? '' : 'none';
+        }
+    };
+
+    window.manageRuleIgnoreAll = function () {
+        var table = document.getElementById('tbl_manage_rule');
+        if (!table) return;
+        $(table).find('tbody .ignore-chk').prop('checked', true);
+        if (window.toastr) toastr.info('Marked Ignore on all rows');
+    };
+
+    window.manageRuleClearIgnore = function () {
+        var table = document.getElementById('tbl_manage_rule');
+        if (!table) return;
+        $(table).find('tbody .ignore-chk').prop('checked', false);
+        if (window.toastr) toastr.info('Cleared Ignore on all rows');
+    };
+
+    window.manageRuleSaveForm = function (event) {
+        if (event && event.preventDefault) event.preventDefault();
+        var form = document.getElementById('form_submit_manage_rule');
+        if (!form) return false;
+        var $form = $(form);
+        var $btn = $form.find('.formSaving');
+        $btn.html('Processing..<i class="fas fa-spin fa-spinner"><\/i>').attr('disabled', true);
+        axios.post($form.attr('action'), new FormData(form))
+            .then(function (response) {
+                toastr.success((response.data && response.data.message) ? response.data.message : 'Saved');
+                $btn.html('<i class="fas fa-paper-plane"><\/i> Save').attr('disabled', false);
+            })
+            .catch(function (error) {
+                $btn.attr('disabled', false);
+                var msg = 'Request failed';
+                if (error.response && error.response.data) {
+                    if (error.response.data.message) {
+                        msg = error.response.data.message;
+                    } else if (error.response.data.errors) {
+                        msg = '';
+                        $.each(error.response.data.errors, function (key, value) {
+                            msg += '<li>' + value[0] + '<\/li>';
+                        });
+                    }
+                }
+                toastr.error(msg, 'Error');
+                $btn.html('<i class="fas fa-sync"><\/i> Try again');
+            });
+        return false;
+    };
+
+    $(document).on('input.manageRule change.manageRule', '#manage_rule_search, #manage_rule_type_filter', function () {
+        window.manageRuleApplyFilters();
+    });
+    $(document).on('keydown.manageRule', '#manage_rule_search', function (e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            e.preventDefault();
+            window.manageRuleApplyFilters();
+            return false;
+        }
+    });
+    $(document).on('click.manageRule', '#btn_ignore_all', function () {
+        window.manageRuleIgnoreAll();
+    });
+    $(document).on('click.manageRule', '#btn_clear_ignore', function () {
+        window.manageRuleClearIgnore();
+    });
+})();
 </script>
 
 @endpush

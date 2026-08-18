@@ -43,13 +43,7 @@
                 
                 toastr.success(response.data.message, '@langapp('response_status') ');
                 $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
-                $('.btn').attr('disabled', false);
-                $('#ajaxModal').modal('hide');
-                if (typeof window.refreshDataLeakView === 'function') {
-                    window.refreshDataLeakView();
-                } else if ($.fn.DataTable.isDataTable('#table_social_datas')) {
-                    $('#table_social_datas').DataTable().ajax.reload(null, false);
-                }
+                window.location.href = response.data.redirect;
         })
         .catch(function (error) {
             if(error.response.data.exception){

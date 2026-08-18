@@ -77,7 +77,7 @@ class WebDefacementsCreenshotCheck extends Command
     // var_dump($result);
 
     $result_json_e = json_encode($result);
-    $this->output->write($result_json_e);
+    echo $result_json_e;
 
 
 

@@ -56,7 +56,6 @@ class IndicatorsController extends Controller
     protected $url_indicator_load_attributes_tb;
     protected $url_indicator_load_pulse_tb;
     protected $url_indicator_count_view;
-    protected $url_indicator_dashboard_stats;
     /**
      * Request instance
      *
@@ -80,7 +79,6 @@ class IndicatorsController extends Controller
             $this->url_indicator_load_attributes_tb = $this->base_url . '/indicator/events_load_attributes_tb';
             $this->url_indicator_load_pulse_tb = $this->base_url . '/indicator/events_load_pulse_tb';
             $this->url_indicator_count_view = $this->base_url . '/indicator/events_count_view';
-            $this->url_indicator_dashboard_stats = $this->base_url . '/indicator/dashboard_stats';
         }
     }
     /**
@@ -138,6 +136,14 @@ class IndicatorsController extends Controller
                 $SiteSettings = @$get_role_custom_first['SiteSettings'];
             }
 
+            $data["attr_all"] = IndicatorSummaryYear::where("type", 'summary_all')->first();
+            $data["attr_current"] = IndicatorSummaryYear::where("type", 'summary_current')->first();
+            // DB::raw('CONCAT("[",attribute_count, "]") as data2')
+            $dataForloop = IndicatorSummaryYear::select('type_name AS name', 'attribute_count AS data')->where("type", 'summary_attr_type')->orderBy('attribute_count', 'desc')->take(10)->get();
+            $data["attr_type"] = array();
+            foreach ($dataForloop as $document) {
+                array_push($data["attr_type"], array('name' => ucwords($document->name), 'data' => [$document->data]));
+            }
             $data['SiteSettings'] = $SiteSettings;
             $data['page'] = langapp('indicators');
             if (isset($this->request->Search_Link_All)) {
@@ -171,110 +177,6 @@ class IndicatorsController extends Controller
         }
     }
 
-    public function dashboardStats(Request $request)
-    {
-        $role_custom = @check_role_custom();
-        if (!$role_custom['indicators']) {
-            check_permission403();
-        }
-
-        if (TYPE_WEB == 'center') {
-            return response()->json($this->resolveDashboardStatsPayload($request));
-        }
-
-        $request_body_complete = [
-            'request' => 'data',
-            'filters' => $this->extractDashboardFilters($request),
-        ];
-        $body_complete = json_encode($request_body_complete);
-        $form_body_complete = encrypt_decrypt('encrypt', $body_complete, $this->header, $this->ip, $this->mac);
-        $response_complete = $this->reconnnect($this->url_indicator_dashboard_stats, $form_body_complete, $this->header);
-
-        if (($response_complete['status_code'] ?? '') === '200') {
-            return response()->json($response_complete['data']);
-        }
-
-        return response()->json([
-            'message' => 'Failed to load dashboard stats',
-            'status_code' => '01',
-            'data' => [],
-        ], 500);
-    }
-
-    protected function extractDashboardFilters(Request $request): array
-    {
-        return $request->only([
-            'keywords',
-            'keyword_search',
-            'industries',
-            'groups',
-            'check_published',
-            'isDateSearch',
-            'startDate',
-            'endDate',
-        ]);
-    }
-
-    protected function resolveDashboardStatsPayload(Request $request): array
-    {
-        $filters = $this->extractDashboardFilters($request);
-
-        try {
-            $dashboardStats = app(\App\Services\IndicatorMongoService::class)->getDashboardStats($filters);
-
-            return [
-                'message' => '',
-                'status_code' => '00',
-                'data' => [
-                    'attr_all' => json_decode(json_encode($dashboardStats['attr_all']), true),
-                    'attr_current' => json_decode(json_encode($dashboardStats['attr_current']), true),
-                    'attr_type' => $dashboardStats['attr_type'],
-                    'filtered' => $dashboardStats['filtered'] ?? false,
-                ],
-            ];
-        } catch (\Throwable $e) {
-            \Log::warning('Indicators dashboard live stats failed, using cached summary', [
-                'error' => $e->getMessage(),
-            ]);
-
-            if (\App\Services\IndicatorMongoService::hasEventFilters($filters)) {
-                return [
-                    'message' => $e->getMessage(),
-                    'status_code' => '01',
-                    'data' => [
-                        'attr_all' => ['event_count' => 0, 'attribute_count' => 0],
-                        'attr_current' => ['event_count' => 0, 'attribute_count' => 0],
-                        'attr_type' => [],
-                        'filtered' => true,
-                    ],
-                ];
-            }
-
-            $attrAll = IndicatorSummaryYear::where('type', 'summary_all')->first();
-            $attrCurrent = IndicatorSummaryYear::where('type', 'summary_current')->first();
-            $dataForloop = IndicatorSummaryYear::select('type_name AS name', 'attribute_count AS data')
-                ->where('type', 'summary_attr_type')
-                ->orderBy('attribute_count', 'desc')
-                ->take(10)
-                ->get();
-            $attrType = [];
-            foreach ($dataForloop as $document) {
-                $attrType[] = ['name' => ucwords($document->name), 'data' => [$document->data]];
-            }
-
-            return [
-                'message' => '',
-                'status_code' => '00',
-                'data' => [
-                    'attr_all' => $attrAll ? $attrAll->toArray() : ['event_count' => 0, 'attribute_count' => 0],
-                    'attr_current' => $attrCurrent ? $attrCurrent->toArray() : ['event_count' => 0, 'attribute_count' => 0],
-                    'attr_type' => $attrType,
-                    'filtered' => false,
-                ],
-            ];
-        }
-    }
-
     public function events_detail()
     {
         $role_custom = @check_role_custom();
@@ -293,20 +195,111 @@ class IndicatorsController extends Controller
             check_permission403();
         }
         if (TYPE_WEB == 'center') {
-            $mongo = app(\App\Services\IndicatorMongoService::class);
-            $detail = $mongo->resolveEventDetailPayload(
-                $id,
-                $request->query('startDate'),
-                $request->query('endDate')
-            );
+            $client = new Client(DB_MONGO_01);
+            $collection = $client->sosecure_threatintelligent->fx_otx_events;
 
-            $data = array_merge([
-                'page' => langapp('indicators'),
-                'indicator_id' => $request->id,
-                'type' => $request->type,
-                'indicator' => $request->indicator,
-                'pulse_id' => $id,
-            ], $detail);
+            $query = [
+                'pulse_id' => $id
+            ];
+
+            $options = [
+                'limit' => 1
+            ];
+
+            $cursor = $collection->find($query, $options)->toArray();
+
+            $_array = array();
+
+            $data['otx_events'] = $cursor;
+            $data['page'] = langapp('indicators');
+
+            $data['indicator_type_counts'] = isset($cursor[0]->indicator_type_counts)
+                ? count((array) $cursor[0]->indicator_type_counts)
+                : 0;
+
+            $data['count_related_pulse'] = isset($cursor[0]->count_related_pulse)
+                ? $cursor[0]->count_related_pulse
+                : 0;
+
+            $countKey = [];
+            $countVal = [];
+
+            // Check if indicator_type_counts exists and has proper type names as keys
+            $typeCounts = $cursor[0]->indicator_type_counts ?? null;
+            $hasValidKeys = false;
+            
+            if (!empty($typeCounts)) {
+                $typeCountsArray = (array)$typeCounts;
+                // Check if first key is numeric (Array) or string (Object)
+                $firstKey = array_key_first($typeCountsArray);
+                $hasValidKeys = !is_numeric($firstKey);
+                
+                if ($hasValidKeys) {
+                    // Use existing indicator_type_counts
+                    foreach ($typeCountsArray as $key => $value) {
+                        $countKey[] = ucwords($key);
+                        $countVal[] = $value;
+                    }
+                }
+            }
+
+            // Fallback: Aggregate from fx_otx_events_indicator_ref if indicator_type_counts has numeric keys
+            // Also always use aggregation when date filter is active
+            $startDate = $request->query('startDate');
+            $endDate = $request->query('endDate');
+            $hasDateFilter = $startDate && $endDate;
+            
+            if (!$hasValidKeys || $hasDateFilter) {
+                $indicatorRefCol = $client->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+                
+                $matchQuery = ['pulse_id' => $id, 'status' => 1];
+                
+                // Add date filter if provided
+                if ($hasDateFilter) {
+                    $matchQuery['updated_at'] = [
+                        '$gte' => new \MongoDB\BSON\UTCDateTime(strtotime($startDate) * 1000),
+                        '$lte' => new \MongoDB\BSON\UTCDateTime(strtotime($endDate) * 1000)
+                    ];
+                }
+                
+                $pipeline = [
+                    ['$match' => $matchQuery],
+                    ['$group' => ['_id' => '$type', 'count' => ['$sum' => 1]]],
+                    ['$sort' => ['count' => -1]]
+                ];
+                $aggregateResult = $indicatorRefCol->aggregate($pipeline)->toArray();
+                
+                // Reset arrays if using date filter
+                if ($hasDateFilter) {
+                    $countKey = [];
+                    $countVal = [];
+                }
+                
+                foreach ($aggregateResult as $item) {
+                    if (!empty($item['_id'])) {
+                        $countKey[] = ucwords($item['_id']);
+                        $countVal[] = $item['count'];
+                    }
+                }
+            }
+
+            $data['countKey'] = $countKey;
+            $data['countVal'] = $countVal;
+            
+            // Use actual count from aggregation if indicator_type_counts was recalculated or date filter active
+            if ((!$hasValidKeys || $hasDateFilter) && !empty($countVal)) {
+                $data['actual_indicator_count'] = array_sum($countVal);
+                $data['indicator_type_counts'] = count($countKey); // จำนวน types จริง
+            }
+
+
+            $data['indicator_id'] = $request->id;
+
+            $data['type'] = $request->type;
+            $data['indicator'] = $request->indicator;
+
+            $data['pulse_id'] = $id;
+
 
             if ($request->iframe) {
                 return view('indicators::events_detail_search')->withHeaders('X-Frame-Options', 'ALLOWALL')->with($data);
@@ -365,7 +358,7 @@ class IndicatorsController extends Controller
     {
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $client = new \MongoDB\Client($DB_MONGO_KEY);
-        $db_name = 'sosecure_threatintelligent_dev';
+        $db_name = 'sosecure_threatintelligent';
         $db = $client->$db_name;
         $collection = $db->fx_otx_adversaries_related;
         $where = array(
@@ -486,7 +479,7 @@ class IndicatorsController extends Controller
 
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $client = new \MongoDB\Client($DB_MONGO_KEY);
-        $db_name = 'sosecure_threatintelligent_dev';
+        $db_name = 'sosecure_threatintelligent';
         $db = $client->$db_name;
         $collection = $db->fx_otx_adversaries;
         $where = array(
@@ -1723,8 +1716,12 @@ class IndicatorsController extends Controller
             }
 
             try {
-                $mongo = app(\App\Services\IndicatorMongoService::class);
-                $col_fx_otx_events_indicator_ref = $mongo->collection('fx_otx_events_indicator_ref');
+                $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+                $clientMD = new MongoClient($DB_MONGO_KEY, [
+                    'serverSelectionTimeoutMS' => 5000,
+                    'socketTimeoutMS' => 30000, // 30 วินาที
+                ]);
+                $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
 
                 // ✅ Query แบบ optimized
                 $query = ['pulse_id' => $reqId];
@@ -1760,7 +1757,6 @@ class IndicatorsController extends Controller
                         'type' => 1,
                         'pulse_id' => 1,
                         'updated_at' => 1,
-                        'pulse_modified' => 1,
                         'tags' => 1,
                         // เพิ่มฟิลด์ที่จำเป็น
                         'name' => 1,
@@ -1770,7 +1766,6 @@ class IndicatorsController extends Controller
                         'is_active' => 1,
                         'role' => 1,
                         'title' => 1,
-                        'created' => 1,
                         'created_at' => 1
                     ],
                     'skip' => $start,
@@ -2037,9 +2032,9 @@ class IndicatorsController extends Controller
 
 
             $reqId = $request->pulse_id;
-            $mongo = app(\App\Services\IndicatorMongoService::class);
-            $col_fx_otx_events = $mongo->collection('fx_otx_events');
-            $clientMD = $mongo->getClient();
+            $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
+            $clientMD = new MongoClient($DB_MONGO_KEY);
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
 
 
             // direction
@@ -2138,7 +2133,12 @@ class IndicatorsController extends Controller
 
 
 
-            $query = \App\Services\IndicatorMongoService::activeEventsFilter();
+            $query = [
+                '$or' => [
+                    ['deleted_at' => null],
+                    ['deleted_at' => ['$exists' => false]],
+                ],
+            ];
 
             if ($request->count_page == -1) {
                 $cursor_count = $col_fx_otx_events->count($query);
@@ -2200,7 +2200,6 @@ class IndicatorsController extends Controller
                         ['source' => ['$regex' => $request->keyword_search, '$options' => 'i']],
                         ['creator_org' => ['$regex' => $request->keyword_search, '$options' => 'i']],
                         ['tags' => ['$regex' => $request->keyword_search, '$options' => 'i']],
-                        ['pulse_id' => ['$regex' => $request->keyword_search, '$options' => 'i']],
                     ];
                 }
 
@@ -2247,12 +2246,6 @@ class IndicatorsController extends Controller
                 //         ],
                 //         [
                 //             'tags' => [
-                //                 '$regex'   => $pattern,
-                //                 '$options' => 'i'
-                //             ]
-                //         ],
-                //         [
-                //             'pulse_id' => [
                 //                 '$regex'   => $pattern,
                 //                 '$options' => 'i'
                 //             ]
@@ -2313,7 +2306,7 @@ class IndicatorsController extends Controller
                     // Only count from collection when date filter is active
                     if ($request->startDate && $request->endDate) {
                         try {
-                            $indicatorRefCol = $mongo->collection('fx_otx_events_indicator_ref');
+                            $indicatorRefCol = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
                             $attrQuery = [
                                 'pulse_id' => $document_2['pulse_id'],
                                 'updated_at' => [
@@ -2342,11 +2335,11 @@ class IndicatorsController extends Controller
                     $DB_MONGO_KEY = env("DB_MONGO_DEV");
                     $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
                     if (app()->environment('local')) {
-                        $collection = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
-                        $collection_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
+                        $collection = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
+                        $collection_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
                     } else {
-                        $collection = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
-                        $collection_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
+                        $collection = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
+                        $collection_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
                     }
 
                     $query_actor = [
@@ -2913,11 +2906,11 @@ class IndicatorsController extends Controller
         $clientMD = new MongoClient($DB_MONGO_KEY);
 
         if (app()->environment('local')) {
-            $select_actors = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
-            $select_campainge = $clientMD->sosecure_threatintelligent_dev->fx_otx_campaign;
+            $select_actors = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+            $select_campainge = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
         } else {
-            $select_actors = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
-            $select_campainge = $clientMD->sosecure_threatintelligent_dev->fx_otx_campaign;
+            $select_actors = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+            $select_campainge = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
         }
         // dd($request -> pulse_id);
 
@@ -3037,11 +3030,11 @@ class IndicatorsController extends Controller
 
         //---------------------------------------------------------------------------------------------------
         if (app()->environment('local')) {
-            $insert_adversaries_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
-            $collection_campaign = $clientMD->sosecure_threatintelligent_dev->fx_otx_campaign;
+            $insert_adversaries_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
+            $collection_campaign = $clientMD->sosecure_threatintelligent->fx_otx_campaign;
         } else {
-            $insert_adversaries_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
-            $collection_campaign = $clientMD->sosecure_threatintelligent_dev->fx_otx_campaign;
+            $insert_adversaries_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries_related;
+            $collection_campaign = $clientMD->sosecure_threatintelligent_test->fx_otx_campaign;
         }
 
         $query_delete = array(
@@ -3073,9 +3066,9 @@ class IndicatorsController extends Controller
                 $add_actor = $data_actor;
                 // dd($add_actor);
                 if (app()->environment('local')) {
-                    $indicator_actor_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
+                    $indicator_actor_related = $clientMD->sosecure_threatintelligent->fx_otx_adversaries;
                 } else {
-                    $indicator_actor_related = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries;
+                    $indicator_actor_related = $clientMD->sosecure_threatintelligent_test->fx_otx_adversaries;
                 }
                 $query_actor_related = [
                     'adversary_uuid' => $add_actor
@@ -3166,6 +3159,7 @@ class IndicatorsController extends Controller
     }
     public function indicator_public(Request $request)
     {
+
         try {
             $input = $request->all();
             // dd($input);
@@ -3266,7 +3260,7 @@ class IndicatorsController extends Controller
                 $color = "#ffffff";
 
                 //ลบก่อน
-                DB::connection('mysql_misp')->table('bgs')
+                DB::connection('mysql_misp')->table('event_tags')
                     ->where('event_id', '=', $pulseId)
                     ->delete();
 
@@ -3689,7 +3683,7 @@ class IndicatorsController extends Controller
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
             $html = '';
-            $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
+            $fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_adversaries_related;
 
             $query = [
                 'adversary_uuid' => $reqId,
@@ -3944,40 +3938,51 @@ class IndicatorsController extends Controller
 
     public function export_events_indicators(Request $request)
     {
+        // Validate request
         $request->validate([
+            'start_date' => 'required|date_format:Y-m-d',
+            'end_date' => 'required|date_format:Y-m-d',
             'type' => 'required|in:1,2',
         ]);
 
-        $form_type = (int) $request->type;
 
-        $filterInput = $request->only([
-            'keywords',
-            'keyword_search',
-            'industries',
-            'groups',
-            'isDateSearch',
-            'startDate',
-            'endDate',
-            'check_published',
-        ]);
 
-        if (empty($filterInput['keywords']) && $request->filled('event_name')) {
-            $filterInput['keywords'] = trim($request->input('event_name'));
+        $form_type = (int)$request->type;
+
+        // dd($request->all());
+
+        try {
+            $tz = new \DateTimeZone('Asia/Bangkok');
+            $start = new \DateTime($request->start_date . ' 00:00:00', $tz);
+            $end = new \DateTime($request->end_date . ' 23:59:59', $tz);
+
+            $from = new \MongoDB\BSON\UTCDateTime($start->getTimestamp() * 1000);
+            $to = new \MongoDB\BSON\UTCDateTime($end->getTimestamp() * 1000);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Invalid date format.'], 422);
         }
+        // dd($from, $to ,$from->todatetime()->format('Y-m-d'));
 
-        if (empty($filterInput['check_published']) && $request->has('published') && $request->published !== '') {
-            $filterInput['check_published'] = (string) $request->published === '1' ? '1' : '2';
-        }
+        // try {
+        //     $tz = 'Asia/Bangkok';
 
-        if (
-            empty($filterInput['startDate'])
-            && $request->filled('start_date')
-            && $request->filled('end_date')
-        ) {
-            $filterInput['isDateSearch'] = true;
-            $filterInput['startDate'] = $request->start_date . ' 12:00 AM';
-            $filterInput['endDate'] = $request->end_date . ' 11:59 PM';
-        }
+        //     // parse วันที่ในรูปแบบ Y-m-d
+        //     $startBkk = Carbon::createFromFormat('Y-m-d H:i:s', $request->start_date . ' 00:00:00', $tz);
+        //     $endBkk   = Carbon::createFromFormat('Y-m-d H:i:s', $request->end_date   . ' 23:59:59', $tz);
+
+        //     $from = new UTCDateTime($startBkk->getTimestampMs());
+        //     $to   = new UTCDateTime($endBkk->getTimestampMs());
+
+        //     // ถ้าอยากตรวจสอบผลลัพธ์
+        //     dump($from->toDateTime()->setTimezone(new DateTimeZone($tz))->format('Y-m-d H:i:s'));
+        //     dump($to->toDateTime()->setTimezone(new DateTimeZone($tz))->format('Y-m-d H:i:s'));
+        // } catch (\Exception $e) {
+        //     return response()->json(['error' => 'Invalid date format.'], 422);
+        // }
+
+
+        // return response()->json(['from' => $from, 'to' => $to]);
+
 
         $pulseRaw = $request->input('pulse_id', []);
         if (is_string($pulseRaw) && str_contains($pulseRaw, ',')) {
@@ -3987,33 +3992,64 @@ class IndicatorsController extends Controller
         }
         $pulseIds = array_filter($pulseIds, fn($id) => is_string($id) && !empty($id));
 
-        $mongo = app(\App\Services\IndicatorMongoService::class);
-        $eventsCollection = $mongo->collection('fx_otx_events');
-        $attributesCollection = $mongo->collection('fx_otx_events_indicator_ref');
+        // Connect Mongo
+        $mongoUri = config("app.DB_MONGO_DEV");
+        $client = new \MongoDB\Client($mongoUri);
+        $db = $client->sosecure_threatintelligent;
+        $eventsCollection = $db->fx_otx_events;
+        $attributesCollection = $db->fx_otx_events_indicator_ref;
         $options = ['typeMap' => ['root' => 'array', 'document' => 'array']];
 
+        // Event query
         $usePulseOnly = !empty($pulseIds) && $request->has('pulse_id_only');
 
+
+
+        // return response()->json($pulseIds);
+
+        $ispublished = $request->published;
+
+        // dd($ispublished);
         if ($usePulseOnly) {
             $eventQuery = [
                 'pulse_id' => ['$in' => $pulseIds],
             ];
         } else {
-            $eventQuery = \App\Services\IndicatorMongoService::buildEventsQueryFromInput($filterInput);
-            if (!empty($pulseIds)) {
-                $eventQuery['pulse_id'] = ['$in' => $pulseIds];
+            if ($ispublished != '') {
+                $ispublished_ = (int) $ispublished;
+                $eventQuery = [
+                    'modified' => ['$gte' => $from, '$lte' => $to],
+                    'status' => 1,
+                    'deleted_at' => null,
+                    'public' => ['$in' => [$ispublished_, $ispublished]],
+                    'indicator_count' => ['$gt' => 0],
+                ];
+                if (!empty($pulseIds)) {
+                    $eventQuery['pulse_id'] = ['$in' => $pulseIds];
+                }
+            } else {
+                $eventQuery = [
+                    'modified' => ['$gte' => $from, '$lte' => $to],
+                    'status' => 1,
+                    'deleted_at' => null,
+                    'indicator_count' => ['$gt' => 0],
+                ];
+                if (!empty($pulseIds)) {
+                    $eventQuery['pulse_id'] = ['$in' => $pulseIds];
+                }
             }
+        }
+
+        // dd($eventQuery);
+
+
+        $eventName = trim($request->input('event_name'));
+        if (!empty($eventName)) {
+            $eventQuery['name'] = new \MongoDB\BSON\Regex($eventName, 'i');
         }
 
         $events = $eventsCollection->find($eventQuery, $options)->toArray();
 
-        $isDateSearch = filter_var($filterInput['isDateSearch'] ?? false, FILTER_VALIDATE_BOOLEAN);
-        $attrDateFrom = null;
-        $attrDateTo = null;
-        if ($isDateSearch && !empty($filterInput['startDate']) && !empty($filterInput['endDate'])) {
-            $attrDateFrom = new UTCDateTime(strtotime($filterInput['startDate']) * 1000);
-            $attrDateTo = new UTCDateTime(strtotime($filterInput['endDate']) * 1000);
-        }
 
         if (empty($events)) {
             return response()->json([
@@ -4064,13 +4100,8 @@ class IndicatorsController extends Controller
 
             $attrQuery = [
                 'pulse_id' => ['$in' => $eventPulseIds],
+                'updated_at' => ['$gte' => $from, '$lte' => $to]
             ];
-            if ($attrDateFrom && $attrDateTo) {
-                $attrQuery['updated_at'] = [
-                    '$gte' => $attrDateFrom,
-                    '$lte' => $attrDateTo,
-                ];
-            }
             $attributes = $attributesCollection->find($attrQuery, $options)->toArray();
 
             $attributeMap = [];

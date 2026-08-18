@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+// session_start();
 
 use App\Entities\Hook;
 use App\Entities\Language;
@@ -683,10 +683,14 @@ function get_CVSS_Severity_status($num_val, $status_id, $badg = '')
 function getSeverityFromScore($score)
 {
     if ($score) {
-        if ($score >= 9.0) return 'CRITICAL';
-        if ($score >= 7.0) return 'HIGH';
-        if ($score >= 4.0) return 'MEDIUM';
-        if ($score > 0.0) return 'LOW';
+        if ($score >= 9.0)
+            return 'CRITICAL';
+        if ($score >= 7.0)
+            return 'HIGH';
+        if ($score >= 4.0)
+            return 'MEDIUM';
+        if ($score > 0.0)
+            return 'LOW';
     }
     return 'NONE';
 }
@@ -795,11 +799,11 @@ function explode_val($val, $type = null)
             $result .= '<div>';
             foreach ($val_arr as $tag) {
                 if ($type == 'tags') {
-                    $result .=  '<a href="' . route('indicators.link_tags', ['id' => $tag]) . '">' . $tag . '</a> ,';
+                    $result .= '<a href="' . route('indicators.link_tags', ['id' => $tag]) . '">' . $tag . '</a> ,';
                 } else if ($type == 'groups') {
-                    $result .=  '<a href="' . route('indicators.link_group', ['id' => $tag]) . '">' . $tag . '</a> ,';
+                    $result .= '<a href="' . route('indicators.link_group', ['id' => $tag]) . '">' . $tag . '</a> ,';
                 } else {
-                    $result .=  '<a href="#">' . $tag . '</a> ,';
+                    $result .= '<a href="#">' . $tag . '</a> ,';
                 }
             }
             $result .= '</div>';
@@ -999,7 +1003,7 @@ function get_menu_html()
 
 
 
-                $menu_html .=    '<li class="' . $active . '">
+                $menu_html .= '<li class="' . $active . '">
                                         ' . $is_have_sub . '
                                       </li>';
             }
@@ -1109,10 +1113,6 @@ function get_word_leak_compromise($val, $type)
             $html = 'DARK WEB';
         } else if ($val == 'webserver') {
             $html = 'WEB SERVER';
-        } else if ($val == 'agent') {
-            $html = 'AGENT';
-        } else if ($val == 'network') {
-            $html = 'NETWORK';
         }
     } else {
         $html = '';

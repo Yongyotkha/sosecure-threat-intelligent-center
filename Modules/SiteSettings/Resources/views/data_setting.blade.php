@@ -215,33 +215,56 @@
                                     </div>
                                     <label class="col-lg-1 control-label">Limit : </label>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control touch_spin text-center" name="allow_agent_limit" value="{{$siteSettings->agent_count}}"> 
+                                        <input type="text" class="form-control touch_spin text-center" name="allow_agent_limit" value="{{$siteSettings->agent_count}}">
                                     </div>
-
-
-                                    <div class="col-lg-3">
-                                        <p>Download Agent: </p>
-                                    </div>
-                                   
                                 </div>
 
                                 <div class="form-group row">
-                                    <div class="col-lg-9 "></div>
-                                    <div class="col-lg-3 px-0">
-                                        @if(@$file_agent_name)
-                                            <a style="margin: 0 2px 2px;" href="../../agent/file_download/Windows/{{$file_agent_name}}" target="_black" class=""><img style="width: 40px;padding: 5px 0;" src="../../images/download/windows.png" alt=""></a>
-                                            <a style="margin: 0 2px 2px;" href="../../agent/file_download/Debian/{{$file_agent_name}}" target="_black" class=""><img style="width: 40px;padding: 5px 0;" src="../../images/download/debian.png" alt=""></a>
-                                            <a style="margin: 0 2px 2px;" href="../../agent/file_download/Ubuntu/{{$file_agent_name}}" target="_black" class=""><img style="width: 40px;padding: 5px 0;" src="../../images/download/ubuntu.png" alt=""></a>
-                                            <a style="margin: 0 2px 2px;" href="../../agent/file_download/CentOS/{{$file_agent_name}}" target="_black" class=""><img style="width: 40px;padding: 5px 0;" src="../../images/download/centos.png" alt=""></a>
-                                            <a style="margin: 0 2px 2px;" href="../../agent/file_download/Fedora/{{$file_agent_name}}" target="_black" class=""><img style="width: 40px;padding: 5px 0;" src="../../images/download/fedora.png" alt=""></a>          
-                                        @endif
-                                        
+                                    <label class="col-lg-3 control-label">First-install packages</label>
+                                    <div class="col-lg-9">
+                                        @php
+                                            $fi = isset($agent_first_install) && is_array($agent_first_install) ? $agent_first_install : [];
+                                            $osIcons = [
+                                                'windows' => 'windows.png',
+                                                'debian' => 'debian.png',
+                                                'ubuntu' => 'ubuntu.png',
+                                                'centos' => 'centos.png',
+                                                'fedora' => 'fedora.png',
+                                            ];
+                                        @endphp
+                                        @foreach($osIcons as $osKey => $iconFile)
+                                            @php
+                                                $pack = !empty($fi[$osKey]) ? $fi[$osKey] : null;
+                                                $href = null;
+                                                $title = ucfirst($osKey);
+                                                if ($pack && !empty($pack['url'])) {
+                                                    $href = $pack['url'];
+                                                    if (!empty($pack['version'])) {
+                                                        $title .= ' '.$pack['version'];
+                                                    }
+                                                } elseif (@$file_agent_name) {
+                                                    // Legacy ZIP fallback until a package is uploaded for this OS.
+                                                    $legacyFolders = [
+                                                        'windows' => 'Windows',
+                                                        'debian' => 'Debian',
+                                                        'ubuntu' => 'Ubuntu',
+                                                        'centos' => 'CentOS',
+                                                        'fedora' => 'Fedora',
+                                                    ];
+                                                    $legacyFolder = $legacyFolders[$osKey] ?? ucfirst($osKey);
+                                                    $href = '../../agent/file_download/'.$legacyFolder.'/'.$file_agent_name;
+                                                    $title .= ' (legacy ZIP)';
+                                                }
+                                            @endphp
+                                            @if($href)
+                                                <a style="margin: 0 2px 2px;" href="{{ $href }}" target="_blank" rel="noopener" title="{{ $title }}">
+                                                    <img style="width: 40px;padding: 5px 0;" src="../../images/download/{{ $iconFile }}" alt="{{ ucfirst($osKey) }}">
+                                                </a>
+                                            @endif
+                                        @endforeach
                                     </div>
                                 </div>
 
-                               
-
-                               
                                 <div class="form-group row">
                                     <label class="col-lg-3 control-label">Agent linux Allow</label>
                                     <div class="col-lg-2">

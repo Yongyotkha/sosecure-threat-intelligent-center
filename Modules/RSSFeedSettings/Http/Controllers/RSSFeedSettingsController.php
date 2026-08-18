@@ -34,10 +34,8 @@ use Modules\SiteSettings\Entities\Tags;
 use Modules\SiteSettings\Entities\site_config_email_alert;
 use Modules\SiteSettings\Entities\SiteCategory;
 use Modules\RSSFeedSettings\Entities\TransactionRssData;
-use Modules\RSSFeedSettings\Entities\AiIntelNewsLog;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Yajra\DataTables\DataTables;
-use Illuminate\Support\Facades\Artisan;
 
 
 class RSSFeedSettingsController extends Controller
@@ -91,260 +89,6 @@ class RSSFeedSettingsController extends Controller
         }
         $data['page'] = langapp('rss_data');
         return view('rssfeedsettings::rss_data')->with($data);
-    }
-
-    public function ai_intel()
-    {
-        $role_custom = @check_role_custom();
-        if (!$role_custom['news']) {
-            check_permission403();
-        }
-        $data['page'] = 'AI Intel';
-        return view('rssfeedsettings::ai_intel')->with($data);
-    }
-
-    public function tableAiIntel(Request $request)
-    {
-        $role_custom = @check_role_custom();
-        if (!$role_custom['news']) {
-            check_permission403();
-        }
-
-        $model = AiIntelNewsLog::with('get_rss_news');
-
-        if (($request->keywords || $request->isDateSearch || $request->status) && $request->search_val == true) {
-            if ($request->keywords) {
-                $model->where(function ($q) use ($request) {
-                    $q->where('title', 'LIKE', '%' . $request->keywords . '%')
-                        ->orWhere('source', 'LIKE', '%' . $request->keywords . '%')
-                        ->orWhere('executive_summary', 'LIKE', '%' . $request->keywords . '%');
-                });
-            }
-            if ($request->isDateSearch) {
-                $date_start = $request->startDate;
-                $date_end = $request->endDate;
-                $date_start_date_format = date('Y-m-d', strtotime(@explode(' ', $date_start)[0]));
-                $date_end_date_format = date('Y-m-d', strtotime(@explode(' ', $date_end)[0]));
-                $model->whereBetween('published_at', [$date_start_date_format . ' 00:00:00', $date_end_date_format . ' 23:59:59']);
-            }
-            if ($request->status) {
-                if ($request->status == '1') {
-                    $model->where(function ($q) {
-                        $q->where('status', 'promoted')
-                            ->orWhereHas('get_rss_news');
-                    });
-                } else if ($request->status == '2') {
-                    $model->where(function ($q) {
-                        $q->where('status', '!=', 'promoted')
-                            ->whereDoesntHave('get_rss_news');
-                    });
-                }
-            }
-        }
-
-        return DataTables::of($model)->toJson();
-    }
-
-    public function ai_intel_create_news($code)
-    {
-        $role_custom = @check_role_custom();
-        if (!$role_custom['news']) {
-            check_permission403();
-        }
-
-        $ai = AiIntelNewsLog::where('code', $code)->first();
-        if (!$ai) {
-            abort(404);
-        }
-
-        $transaction = null;
-        if ($ai->transaction_rss_id) {
-            $transaction = TransactionRssData::find($ai->transaction_rss_id);
-        }
-
-        if (!$transaction) {
-            $published = $ai->published_at ? Carbon::parse($ai->published_at) : Carbon::now();
-            $transaction = new TransactionRssData();
-            $transaction->code = generator_uuid();
-            $transaction->transaction_id = 2;
-            $transaction->rss_id = null;
-            $transaction->status = 1;
-            $transaction->title = $ai->title;
-            $transaction->link = $ai->source_url;
-            $transaction->description = $this->buildAiIntelPlainSummary($ai);
-            $transaction->enclosure = '';
-            $transaction->isPermaLink = $ai->source_url;
-            $transaction->pubDate = $published->format('Y-m-d');
-            $transaction->transcation_date = $published->format('Y-m-d');
-            $transaction->transcation_datetime = $published->format('Y-m-d H:i:s');
-            $transaction->save();
-
-            $ai->transaction_rss_id = $transaction->id;
-            $ai->status = $ai->status === 'new' ? 'reviewed' : $ai->status;
-            $ai->save();
-        }
-
-        $data['rss'] = $transaction;
-        $data['RSSNews'] = '';
-        $data['category'] = CategorySettings::where('active', 1)->get();
-        $data['detail_default'] = $this->buildAiIntelDetailHtml($ai);
-        $data['ai_intel_code'] = $ai->code;
-
-        return view('rssfeedsettings::modal.create_news')->with($data);
-    }
-
-    protected function buildAiIntelPlainSummary(AiIntelNewsLog $ai)
-    {
-        $summary = $ai->executive_summary;
-        if ($summary) {
-            $decoded = json_decode($summary, true);
-            if (is_array($decoded)) {
-                return implode(' ', $decoded);
-            }
-            return strip_tags($summary);
-        }
-        return $ai->title;
-    }
-
-    protected function buildAiIntelDetailHtml(AiIntelNewsLog $ai)
-    {
-        $parts = [];
-
-        $summary = $ai->executive_summary;
-        $summaryItems = json_decode($summary, true);
-        if (is_array($summaryItems)) {
-            $parts[] = '<p><strong>สรุปข่าว (AI)</strong></p><ul>';
-            foreach ($summaryItems as $item) {
-                $parts[] = '<li>' . e($item) . '</li>';
-            }
-            $parts[] = '</ul>';
-        } elseif (!empty($summary)) {
-            $parts[] = '<p><strong>สรุปข่าว (AI)</strong></p><p>' . nl2br(e($summary)) . '</p>';
-        }
-
-        $context = $ai->intelligence_context;
-        $contextData = json_decode($context, true);
-        if (is_array($contextData)) {
-            if (!empty($contextData['attacker_group'])) {
-                $parts[] = '<p><strong>Threat Actor:</strong> ' . e($contextData['attacker_group']) . '</p>';
-            }
-            if (!empty($contextData['historical_narrative'])) {
-                $parts[] = '<p><strong>บริบท:</strong> ' . e($contextData['historical_narrative']) . '</p>';
-            }
-        } elseif (!empty($context)) {
-            $parts[] = '<p><strong>บริบท:</strong> ' . nl2br(e($context)) . '</p>';
-        }
-
-        $vulns = json_decode($ai->vulnerabilities_json, true);
-        if (is_array($vulns) && count($vulns) > 0) {
-            $parts[] = '<p><strong>CVE / Vulnerabilities</strong></p><ul>';
-            foreach ($vulns as $v) {
-                $cve = e(@$v['cve'] ?: @$v['id'] ?: '-');
-                $product = e(@$v['product'] ?: '');
-                $severity = e(@$v['severity'] ?: '');
-                $parts[] = '<li>' . $cve . ($product ? ' — ' . $product : '') . ($severity ? ' (' . $severity . ')' : '') . '</li>';
-            }
-            $parts[] = '</ul>';
-        }
-
-        $iocs = json_decode($ai->indicators_json, true);
-        if (is_array($iocs) && count($iocs) > 0) {
-            $parts[] = '<p><strong>Indicators (IOC)</strong></p><ul>';
-            foreach ($iocs as $ioc) {
-                $type = e(@$ioc['type'] ?: '-');
-                $value = e(@$ioc['value'] ?: '');
-                $parts[] = '<li>[' . $type . '] ' . $value . '</li>';
-            }
-            $parts[] = '</ul>';
-        }
-
-        if ($ai->source_url) {
-            $parts[] = '<p><strong>Source:</strong> <a href="' . e($ai->source_url) . '" target="_blank">' . e($ai->source_url) . '</a></p>';
-        }
-
-        return implode('', $parts);
-    }
-
-    public function ai_intel_delete(Request $request, $id)
-    {
-        $role_custom = @check_role_custom();
-        if (!$role_custom['news']) {
-            check_permission403();
-        }
-        $model = AiIntelNewsLog::where('code', $id)->first();
-        $data['ai_intel'] = $model;
-        return view('rssfeedsettings::modal.ai_intel_delete')->with($data);
-    }
-
-    public function ai_intel_delete_process($id = null)
-    {
-        $role_custom = @check_role_custom();
-        if (!$role_custom['news']) {
-            check_permission403();
-        }
-        AiIntelNewsLog::where('code', $id)->delete();
-        return ajaxResponse(
-            [
-                'message'  => langapp('deleted_successfully'),
-                'redirect' => route('rssfeedsettings.ai_intel'),
-            ],
-            true,
-            Response::HTTP_OK
-        );
-    }
-
-    public function ai_intel_delete_checked(Request $request)
-    {
-        $role_custom = @check_role_custom();
-        if (!$role_custom['news']) {
-            check_permission403();
-        }
-        if (!empty($request->id)) {
-            foreach ($request->id as $ai_id) {
-                AiIntelNewsLog::where('id', $ai_id)->delete();
-            }
-        }
-        return ajaxResponse(
-            [
-                'message'  => langapp('deleted_successfully'),
-                'redirect' => route('rssfeedsettings.ai_intel'),
-            ],
-            true,
-            Response::HTTP_OK
-        );
-    }
-
-    public function ai_intel_sync(Request $request)
-    {
-        $role_custom = @check_role_custom();
-        if (!$role_custom['news']) {
-            check_permission403();
-        }
-
-        try {
-            $exitCode = Artisan::call('app:AI_Intel_News');
-            $output = trim(Artisan::output());
-
-            if ($exitCode !== 0) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Sync failed. Check OPENAI_API_KEY and network access to RSS/OpenAI.',
-                    'output' => $output,
-                ], 500);
-            }
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Sync Intel completed.',
-                'output' => $output,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('ai_intel_sync: ' . $e->getMessage());
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 500);
-        }
     }
 
     public function tableRssData(Request $request)
@@ -541,7 +285,7 @@ class RSSFeedSettingsController extends Controller
 
         return ajaxResponse(
             [
-                'message'  => langapp('changes_saved_successful'),
+                'message' => langapp('changes_saved_successful'),
                 'redirect' => route('rssfeedsettings.rss_data'),
             ],
             true,
@@ -558,42 +302,6 @@ class RSSFeedSettingsController extends Controller
             check_permission403();
         }
 
-        // if($request->status_news){
-        //     dd($request->status_news);
-        // }else{
-
-        // }
-        // if($request -> keywords || $request -> public_date || $request -> status !== "null" || $request -> source){
-        //     $model = TransactionRssData::where('status', 1);
-        //     if($request -> keywords){
-        //         $model -> where('title', 'LIKE' ,'%'.$request -> keywords.'%');
-        //     }
-        //     if($request -> public_date){
-        //         $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
-        //     }
-        //     if($request -> status){
-        //         if($request -> status == '2' || $request -> status == '3'){
-        //             if($request -> status == '2'){
-        //                 $RSSNews = RSSNews::where('transaction_rss_id','!=' ,null)->get();
-        //                 foreach($RSSNews as $data){
-        //                     $model -> where('id', $data -> transaction_rss_id);
-        //                 }
-        //             }else if($request -> status == '3'){
-        //                 $RSSNews = RSSNews::where('transaction_rss_id','!=' ,null)->get();
-        //                 foreach($RSSNews as $data){
-        //                     $model -> where('id', '!=' ,$data -> transaction_rss_id);
-        //                 }
-        //             }
-
-        //         }  
-        //     }
-        //     if($request -> source){
-        //         $model -> where('link', 'LIKE' ,'%'.$request -> source.'%');
-        //     }
-        //     $model -> get();
-        // }else{
-        //     $model = TransactionRssData::all();
-        // }
         $model = new RSSNews();
         if (($request->keywords || $request->startDate || $request->endDate || $request->status_news || $request->news_source || $request->news_category) && $request->search_val == 1) {
             if ($request->keywords) {
@@ -606,70 +314,36 @@ class RSSFeedSettingsController extends Controller
                 }
             }
 
-            // if($request -> start_date){
-            //     $start_date = date("Y-m-d H:i:s",strtotime($request -> start_date));
-            //     $end_date = date("Y-m-d H:i:s",strtotime($request -> end_date));
-            //     // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
-            //     $model -> whereBetween('created_at',array($start_date,$end_date));
-            // }
-
             if ($request->isDateSearch == 1) {
                 $date_start = $request->startDate;
                 $date_end = $request->endDate;
 
-                // $date_start_explode = explode(" ",$date_start);
-                // $date_start_date = @$date_start_explode[0];
-                // $date_start_time = @$date_start_explode[1].' '.@$date_start_explode[2];
-                // // dd($date_start_time);
-                // $date_start_date_format = date("Y-m-d", strtotime($date_start_date));
-                // // dd($date_start_date_format);
-                // $date_start_time_time = date("H:i", strtotime($date_start_time));
-                // $date_start_datetime_format = $date_start_date_format.' '.$date_start_time_time.':00';
-                // // dd($date_start);
-
-                // $date_end_explode = explode(" ",$date_end);
-                // $date_end_date = @$date_end_explode[0];
-                // $date_end_time = @$date_end_explode[1].' '.@$date_end_explode[2];
-                // // dd($date_end_time);
-                // $date_end_date_format = date("Y-m-d", strtotime($date_end_date));
-                // $date_end_time_time = date("H:i", strtotime($date_end_time));
-                // $date_end_datetime_format = $date_end_date_format.' '.$date_end_time_time.':00';
-                // // dd($date_end_time_time);
-
                 $date_start_datetime_format = Carbon::createFromFormat('Y-m-d h:i A', $date_start)->format('Y-m-d H:i:s');
                 $date_end_datetime_format = Carbon::createFromFormat('Y-m-d h:i A', $date_end)->format('Y-m-d H:i:s');
 
-                // $model -> whereDate('transcation_date', Carbon::parse($request -> public_date)->format('Y-m-d'));
                 $model = $model->whereBetween('created_at', array($date_start_datetime_format, $date_end_datetime_format));
             }
 
-            // dd($request -> status_news);
             if ($request->status_news) {
                 if ($request->status_news == 1 || $request->status_news == 2) {
                     if ($request->status_news == 1) {
-                        $model =  $model->where('save_draft', '=', 0);
+                        $model = $model->where('save_draft', '=', 0);
                     } else if ($request->status_news == 2) {
-                        $model =  $model->where('save_draft', 1);
-                        // dd($model);
+                        $model = $model->where('save_draft', 1);
+
                     }
                 }
             }
 
             if ($request->news_source) {
-                // $model -> where('source', 'LIKE' ,'%'.$request -> news_source.'%');
+
                 $model = $model->whereIn('source', $request->news_source);
             }
 
             if ($request->news_category) {
                 $news_cate_id = $request->news_category;
-                // CategorySettings::where("code",)->first();
-                // dd($news_cate_id);
 
-                // $model -> where('source', 'LIKE' ,'%'.$request -> news_source.'%');
-                // $model -> whereIn('source', $request -> news_source);
-
-                // dd($news_cate_id_val);
-                $model =  $model->whereHas('get_cate', function ($query) use ($news_cate_id) {
+                $model = $model->whereHas('get_cate', function ($query) use ($news_cate_id) {
                     $query->whereIn('news_category_id', $news_cate_id);
                 });
             }
@@ -678,6 +352,8 @@ class RSSFeedSettingsController extends Controller
                 $model = $model->where('serverity', $request->status_serverity);
             }
         }
+
+        return $model->orderBy('public_date', 'desc')->get();
 
         $model = $model->select(
             'id',
@@ -692,172 +368,13 @@ class RSSFeedSettingsController extends Controller
             'public_date',
             'status',
             'created_at',
-        )
-
-            // ---------------- where data client ----------------
-            // ->where(function ($query) {
-            //     $query->where('save_draft',  0)
-            //         ->orWhere('save_draft',  null);
-            // })
-            // ->where('status', 1)
-            // ->where('public_date', '<=', Carbon::now())
-            // ---------------------------------------------------
-
-            ->orderBy('public_date', 'desc');
-        // $model = $model -> get();
-
-        // dd(count($model));
-        // $count_row = count($model);
-
-        // $i = 0;
-        // foreach($model as $id)
-        // {
-        //     $check_id = $id->id;
-
-        //     $query_id_cate = RSSNewsCategory::where('rss_news_id', $check_id)->select('news_category_id')->get();
-        //     $id_cate = $query_id_cate[0]['news_category_id'];
-
-        //     $query_name_cate = FXCategories::where('id', $id_cate)->select('name')->first();
-        //     $name_cate = $query_name_cate['name'];
-
-        //     $model[$i]['category'] = $name_cate;
-
-        //     $DB_MONGO_KEY = config('app.DB_MONGO_DEV');
-        //     $client = new MongoClient($DB_MONGO_KEY);
-        //     if(app()->environment('local'))
-        //     {
-        //         $collection = $client->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
-        //     }
-        //     else
-        //     {
-        //         $collection = $client->sosecure_threatintelligent_dev_test->fx_otx_adversaries_related;
-        //     }
-
-        //     $query_actor = [
-        //         'pulse_id' => $check_id,
-        //         'mode' => 'news',
-        //         'join' => 'actor'
-        //     ];
-
-        //     $option_actor = [];
-
-        //     $final_actor = $collection->find($query_actor, $option_actor);
-        //     $result_actor = $final_actor->toArray();
-
-        //     if(count($result_actor) != 0)
-        //     {
-        //         foreach($result_actor as $data)
-        //         {
-        //             $name_actor = $data['adversary_name'];
-        //             $model[$i]['actor'] = $name_actor;
-        //         }
-        //     }
-        //     else
-        //     {
-        //         $model[$i]['actor'] = '';
-        //     }
-
-        //     $i++;
-        // }
-        // dd($model);
-        // $count_model = count($model);
-        // ---------------------------------- cve - actor ----------------------------------
-        // if($count_model != 0)
-        // {
-        //     $id = '';
-        //     $actor_id = array();
-
-        //     $DB_MONGO_KEY = config('app.DB_MONGO_DEV');
-        //     $client = new MongoClient($DB_MONGO_KEY);
-        //     if(app()->environment('local'))
-        //     {
-        //         $collection_actor = $client->sosecure_threatintelligent_dev->fx_otx_adversaries;
-        //         $conn = $client->sosecure_threatintelligent_dev->fx_otx_adversaries_related;
-        //     }
-        //     else
-        //     {
-        //         $collection_actor = $client->sosecure_threatintelligent_dev_test->fx_otx_adversaries;
-        //         $conn = $client->sosecure_threatintelligent_dev_test->fx_otx_adversaries_related;
-        //     }
-
-        //     // for($i=0;$i<$count_model;$i++)
-        //     foreach($model as $data_model)
-        //     {
-        //         // $query= [
-        //         //     'pulse_id' => $model[$i]['id'],
-        //         //     'mode' => 'news',
-        //         //     'join' => 'actor',
-        //         //     'delete_at'  => null
-        //         // ];
-        //         // $option = [];
-
-        //         // $final_test = $conn->find($query,$option);
-        //         // $result_test = $final_test->toArray();
-        //         // $count_result_test = count($result_test);
-
-        //         // $model[$i]['actor'] = $result_test;
-        //         // $model[$i]['count_result'] = $count_result_test;
-
-        //         // $logo = [];
-        //         // foreach(@$result_test as $sel_data_act)
-        //         // {
-        //         //     $query_sel_act = [
-        //         //         'adversary_uuid' => $sel_data_act['adversary_uuid']
-        //         //     ];
-        //         //     $option_sel_act = [];
-        //         //     $result_sel_act = $collection_actor->findOne($query_sel_act,$option_sel_act);
-
-        //         //     if(@$result_sel_act['logo'])
-        //         //     {
-        //         //         $logo[] = $result_sel_act['logo'];
-        //         //     }
-        //         //     else
-        //         //     {
-        //         //         $logo[] = '/asset_salepage/images/AgentBasedDetection.png';
-        //         //     }
-
-        //         // }
-        //         // $model[$i]['logo'] = $logo;
-        //         // dd($id);
-
-        //         $query_camp= [
-        //             'pulse_id' => $data_model->id,
-        //             'mode' => 'news',
-        //             'join' => 'campainge',
-        //             'delete_at'  => null
-        //         ];
-        //         $option_camp = [];
-
-        //         $final_camp = $conn->find($query_camp,$option_camp);
-        //         $result_camp = $final_camp->toArray();
-        //         $count_result_camp = count($result_camp);
-
-        //         $data_model->campainge = $result_camp;
-        //         $data_model->count_campainge = $count_result_camp;
-
-        //     }
-        // }
-        // dd($result_test);
-        // dd($model);
-
-        // $model = RSSNews::all();
+        )->orderBy('public_date', 'desc');
 
         return DataTables::of($model)
             ->editColumn('chk', function (RSSNews $model) {
                 return '<label><input type="checkbox" name="checked" class="rss_new_id" value="' . $model->code . '"><span class="label-text"></span></label>';
             })
-            // ->addColumn('site_name', function (RSSNews $model) {
-            //     $data = siteNewsRelated::where('news_id', $model -> id)->get();
-            //     $html = '';
-            //     if(empty($data)){
-            //         $html .= '-';
-            //     }else{
-            //         foreach($data as $item){
-            //             $html .= $item -> get_site -> name .' , ';
-            //         }
-            //     }
-            //     return rtrim($html, ' , ');
-            // })
+
             ->addColumn('content_detail', function (RSSNews $model) {
                 $html = '';
                 $html .= '<div>';
@@ -871,7 +388,7 @@ class RSSFeedSettingsController extends Controller
                 $html .= '</div>';
 
                 if ($model->source) {
-                    // return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'"><a href="javascript:void(0);" onclick="find_source(\''.$model -> source.'\')">'.$model -> source.'</a></div>';
+
                     $html .= '<span data-rel="tooltip" title="' . $model->source . '"><span class="m-r-5"><b>Source : </b>' . $model->source . '</span>';
                 } else {
                     $html .= '<span data-rel="tooltip" title="None"><span class="m-r-5"><b>Source : </b> None</span>';
@@ -894,15 +411,7 @@ class RSSFeedSettingsController extends Controller
                         }
                     }
                     $htmls = '';
-                    // foreach($model->get_cate as $cate_val) {
-                    //  if($cate_val->get_cate_name_news){
-                    // $html .= '<a href="javascript:void(0);" onclick="find_category(\''.$cate_val -> get_cate_name_news -> id.'\')">'.$cate_val->get_cate_name_news->name.', </a>';
-                    //     $htmls .= $cate_val->get_cate_name_news->name.',';
-                    //   }else{
-                    //      $htmls .= 'None-delete0';
-                    //   }
 
-                    //   }
                     $htmls .= $catagory_name;
                     if ($htmls == 'None-delete0') {
                         $html .= str_replace('-delete0', '', $htmls);
@@ -936,33 +445,6 @@ class RSSFeedSettingsController extends Controller
                     $html .= ' <span class="m-r-5"><b>Serverity : </b> - </span>';
                 }
 
-                // $html_th = '';
-                // $html_en = '';
-                // $html_line = '';
-                // if($model->title_th) {
-                //     $html_th = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank">TH</a>';
-
-                // }
-                // if($model->title_en) {
-                //     $html_en = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank">EN</a>';
-                //     $html_line = ' | ';
-                // }
-
-                // $html .= $html_th . $html_line . $html_en;
-
-                // $html_th_n = '';
-                // $html_en_n = '';
-                // $html_line_n = '';
-                // if($model->title_th) {
-                //     $html_th_n = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank">TH</a>';
-
-                // }
-                // if($model->title_en) {
-                //     $html_en_n = '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank">EN</a>';
-                //     $html_line_n = ' | ';
-                // }
-
-                // $html .= $html_th_n . $html_line_n . $html_en_n;
 
                 if ($model->save_draft == 1) {
                     $html .= ' <b class="m-r-5 m-l-xs">Data Status : </b> <span class="badge badge-danger" style="background-color: #ea2e49;">Darft</span>';
@@ -971,38 +453,6 @@ class RSSFeedSettingsController extends Controller
                 } else {
                     $html .= ' <b class="m-r-5 m-l-xs">Data Status : </b> <span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
                 }
-
-                // --------------------------- actor old ---------------------------
-                // if($model->count_result != 0)
-                // {
-                //     $html .= '<span class="m-r-5 m-l-xs" style="display: inline-flex;align-items: center;">
-                //             <b>Actor : </b>
-                //             <div class="m-l-xs">';
-                //             $array_row = 1;
-                //             $count_result = $model->count_result;
-                //             for($i = 0 ; $i < $model->count_result ; $i++)
-                //             {
-                //                 if($array_row == $count_result)
-                //                 {
-                //                     $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$model->logo[$i].'"><span>
-                //                             <a href="/actor/detail?_id='.$model->actor[$i]->adversary_uuid.'&mode=cve">'.$model->actor[$i]->adversary_name.'</a>';
-                //                 }
-                //                 else
-                //                 {
-                //                     $html .= '<span><img class="icon_sm_actor m-r-xs" src="'.$model->logo[$i].'"><span>
-                //                             <a href="/actor/detail?_id='.$model->actor[$i]->adversary_uuid.'&mode=cve">'.$model->actor[$i]->adversary_name.'</a> , ';
-                //                 }
-                //                 $array_row = $array_row+1;
-                //             }
-
-                //     $html .= '
-                //             </div>
-                //             </span>
-                //     ';
-                // }
-                // --------------------------- actor old ---------------------------
-
-                // ------------------------ ทกสอบความเร็ว ------------------------
 
                 $DB_MONGO_KEY = config('app.DB_MONGO_DEV');
                 $client = new MongoClient($DB_MONGO_KEY);
@@ -1018,7 +468,7 @@ class RSSFeedSettingsController extends Controller
                     'pulse_id' => $model->id,
                     'mode' => 'news',
                     'join' => 'campainge',
-                    'delete_at'  => null
+                    'delete_at' => null
                 ];
                 $option_camp = [];
 
@@ -1040,121 +490,11 @@ class RSSFeedSettingsController extends Controller
                     $html .= '</span> ';
                 }
 
-                // ------------------------ ทกสอบความเร็ว ------------------------
-
-                // --------------------------- campainge old ---------------------------
-                // if($model->count_campainge > 0)
-                // {
-                //     $html .= ' <span class="m-r-md">
-                //             <b>Campainge : </b>';
-
-                //             // $array_row = 1;
-                //             // $count_campainge = $model->count_campainge;
-                //             // for($i = 0 ; $i < @$model->count_campainge ; $i++)
-                //             // {
-                //             //     $html .= '<a href="/actor/campainge_detail?_id='.$model->campainge[$i]->adversary_uuid.'&mode=news">';
-                //             //     if($array_row == $count_campainge)
-                //             //     {
-                //             //         $html .= ''.$model->campainge[$i]->adversary_name.'';
-                //             //     }
-                //             //     else
-                //             //     {
-                //             //         $html .= ''.$model->campainge[$i]->adversary_name.' , ';
-                //             //     }
-                //             //     $html .= '</a>';
-
-                //             //     $array_row = $array_row+1;
-                //             // }
-
-                //             $a_data_campainge = [];
-                //             foreach($model->campainge as $camp_data)
-                //             {
-                //                 $a_data_campainge[] = '<a href="/actor/campainge_detail?_id='.$camp_data->adversary_uuid.'&mode=news">'.$camp_data->adversary_name.'</a>';
-                //             }
-                //             $html .= $a_data_campainge ? implode(", ", $a_data_campainge) : ' - ';
-                //             // <span> Name Campainge </span>
-
-                //     $html .='</span> ';
-                // }
-                // --------------------------- campainge old ---------------------------
 
                 $html .= '</div>';
                 return $html;
             })
-            // ->addColumn('source', function (RSSNews $model) {
-            //     if($model -> source){
-            //         // return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'"><a href="javascript:void(0);" onclick="find_source(\''.$model -> source.'\')">'.$model -> source.'</a></div>';
-            //         return '<div class="text-elip" data-rel="tooltip" title="'.$model -> source.'">'.$model -> source.'</div>';
-            //     }else{
-            //         return '<div class="text-elip" data-rel="tooltip" title="None">None</div>';
-            //     }
 
-            // })
-            // ->addColumn('title', function (RSSNews $model) {
-            //     if($model -> title_th){
-            //         return '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'th']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_th.'">'.$model -> title_th.'</a>';
-            //     }else if($model -> title_en){
-            //         return '<a href="'.route('news.public_detail_select', ['code' => $model->code , 'lang' => 'en']).'" target="_blank" class="text-elip" data-rel="tooltip" title="'.$model -> title_en.'">'.$model -> title_en.'</a>';
-            //     }else{
-            //         return '-';
-            //     }
-            // })
-            // ->addColumn('cate', function (RSSNews $model) {
-
-            //     $html = '';
-            //     $html .= '<div class="text-trucate-ovf">';
-            //     if($model->get_cate=="[]"){
-            //         $html = 'None';
-            //     }else{
-
-            //         foreach($model->get_cate as $cate_val) {
-            //             if($cate_val->get_cate_name_news){
-            //                 // $html .= '<a href="javascript:void(0);" onclick="find_category(\''.$cate_val -> get_cate_name_news -> id.'\')">'.$cate_val->get_cate_name_news->name.', </a>';
-            //                 $html .= $cate_val->get_cate_name_news->name.',';
-            //             }else{
-            //                 $html .= 'None-delete0';
-            //             }
-
-            //         }
-            //         if($html=='None-delete0'){
-            //             $html = str_replace('-delete0','', $html);
-            //         }else{
-            //             $html = str_replace('None-delete0','', $html);
-            //         }
-
-            //         $html = rtrim($html,", ");
-            //     }
-            //     $html .= '</div>';
-            //     return $html;
-            // })
-            // ->addColumn('serverity', function (RSSNews $model) {
-            //     $html = '';
-            //     if($model->serverity=='critical'){
-            //         $html = '<span class="badge" style="background-color: #b93624;">Critical</span>';
-            //     }else if($model->serverity=='high'){
-            //         $html = '<span class="badge" style="background-color: #fcc838;">High</span>';
-            //     }else if($model->serverity=='medium'){
-            //         $html = '<span class="badge" style="background-color: #f2ff15;color#333;">Medium</span>';
-            //     }else if($model->serverity=='low'){
-            //         $html = '<span class="badge" style="background-color: #88ce4f;">Low</span>';
-            //     }else if($model->serverity=='information'){
-            //         $html = '<span class="badge" style="background-color: #00dcff;">Information</span>';
-            //     }else{
-            //         $html = '-';
-            //     }
-            //     return $html;
-            // })
-            // ->addColumn('data_status', function (RSSNews $model) {
-            //     $html = '';
-            //     if($model -> save_draft == 1){
-            //         $html .= '<span class="badge badge-danger" style="background-color: #ea2e49;">Darft</span>';
-            //     }else if($model -> save_draft == 0){
-            //         $html .= '<span class="badge badge-success">Public</span>';
-            //     }else{
-            //         $html .= '<span class="badge badge-warning" style="background-color: #ffc107;">Not used</span>';
-            //     }  
-            //     return $html;
-            // })
             ->addColumn('link', function (RSSNews $model) {
                 $html = '';
                 $html_th = '';
@@ -1177,11 +517,7 @@ class RSSFeedSettingsController extends Controller
                 $html .= '<label>' . $model->category . '</label>';
                 return $html;
             })
-            // ->addColumn('actor', function (RSSNews $model) {
-            //     $html = '';
-            //     $html .= '<label>'.$model->actor.'</label>';
-            //     return $html;
-            // })
+
             ->addColumn('status', function (RSSNews $model) {
                 if ($model->status == '1') {
                     $checked_val = 'checked';
@@ -1197,9 +533,7 @@ class RSSFeedSettingsController extends Controller
             })
             ->addColumn('action', function (RSSNews $model) {
                 $html = '';
-                // <a href='". route('actor.actor_add') ."' class='btn btn-". get_option('theme_color') ." btn-xs' data-toggle='ajaxModal'>
-                //     <i class='fas fa-plus'></i> Add Actor 
-                // </a>
+
                 $html .= "
                 <a href='" . route('rssfeedsettings.rss_news_edit_news', ['code' => $model->code]) . "' class='btn btn-" . get_option('theme_color') . " btn-xs' data-toggle='ajaxModal'>
                     <svg class='svg-inline--fa' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z'></path></svg>
@@ -1212,7 +546,7 @@ class RSSFeedSettingsController extends Controller
             ->rawColumns(['chk', 'content_detail', 'category', 'serverity', 'actor', 'status', 'link', 'action'])
             ->toJson();
 
-      }
+    }
 
     public function load_top_source(Request $request)
     {
@@ -1612,7 +946,7 @@ class RSSFeedSettingsController extends Controller
         $data['public_date'] = $public_date;
         $data['savedraft'] = $RSSNews->save_draft;
 
-        
+
 
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
@@ -1698,7 +1032,7 @@ class RSSFeedSettingsController extends Controller
         // dd($data['get_source']);
         $data['category'] = CategorySettings::where('active', 1)->get();
         $data['public_date'] = $public_date;
-        
+
 
         $DB_MONGO_KEY = env("DB_MONGO_DEV", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
@@ -1797,7 +1131,7 @@ class RSSFeedSettingsController extends Controller
 
         return ajaxResponse(
             [
-                'message'  => langapp('deleted_successfully'),
+                'message' => langapp('deleted_successfully'),
                 'redirect' => route('rssfeedsettings.rss_data'),
             ],
             true,
@@ -1822,7 +1156,7 @@ class RSSFeedSettingsController extends Controller
 
         return ajaxResponse(
             [
-                'message'  => langapp('deleted_successfully'),
+                'message' => langapp('deleted_successfully'),
                 'redirect' => route('rssfeedsettings.rss_data'),
             ],
             true,
@@ -1847,7 +1181,7 @@ class RSSFeedSettingsController extends Controller
 
         return ajaxResponse(
             [
-                'message'  => langapp('deleted_successfully'),
+                'message' => langapp('deleted_successfully'),
                 'redirect' => site_url('/rssfeedsettings'),
             ],
             true,
@@ -1872,12 +1206,12 @@ class RSSFeedSettingsController extends Controller
     {
         $role_custom = @check_role_custom();
         if (!$role_custom['news']) {
-          //  check_permission403();
+            //  check_permission403();
         }
         $RSS_news = RSSNews::where("code", $id)->first();
         // dd($RSS_news->logo);
         if ($RSS_news->logo != config('app.URL_CENTER_PUBLISH') . '/images/icon/news_default.png') {
-          //  unlink($RSS_news->logo);
+            //  unlink($RSS_news->logo);
         }
 
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
@@ -1904,9 +1238,9 @@ class RSSFeedSettingsController extends Controller
                 $query_delete,
                 [
                     '$set' =>
-                    [
-                        'delete_at' => $date_now
-                    ]
+                        [
+                            'delete_at' => $date_now
+                        ]
                 ]
             );
         }
@@ -1952,7 +1286,7 @@ class RSSFeedSettingsController extends Controller
 
         return ajaxResponse(
             [
-                'message'  => langapp('deleted_successfully'),
+                'message' => langapp('deleted_successfully'),
                 'redirect' => route('rssfeedsettings.news'),
             ],
             true,
@@ -1993,7 +1327,7 @@ class RSSFeedSettingsController extends Controller
 
         return ajaxResponse(
             [
-                'message'  => langapp('deleted_successfully'),
+                'message' => langapp('deleted_successfully'),
                 'redirect' => route('rssfeedsettings.news'),
             ],
             true,
@@ -2004,10 +1338,10 @@ class RSSFeedSettingsController extends Controller
 
     public function rss_select_actor_news_create(Request $request)
     {
-        $result = [];
-        $search = $request->input('q', $request->input('term'));
 
-        if ($search !== null && $search !== '') {
+        if ($request->has('q')) {
+            $search = $request->q;
+
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $client = new MongoClient($DB_MONGO_KEY);
             if (app()->environment('local')) {
@@ -2021,8 +1355,10 @@ class RSSFeedSettingsController extends Controller
             }
 
             $query = [
-                'name' => new Regex((string) $search, 'i'),
+
+                'name' => new \MongoDB\BSON\Regex($search),
                 'delete_at' => null
+
             ];
 
             $option = [];
@@ -2046,7 +1382,7 @@ class RSSFeedSettingsController extends Controller
 
         $role_custom = @check_role_custom();
         if (!$role_custom['news']) {
-          //   check_permission403();
+            //   check_permission403();
         }
 
         $input = $request->all();
@@ -2068,7 +1404,7 @@ class RSSFeedSettingsController extends Controller
 
 
         $SiteCategory = SiteCategory::whereIn("category_id", $request->category_news)->where('active', 1)->get();
-   
+
         $email_site_a = [];
         $site_news = [];
         if ($SiteCategory) {
@@ -2093,18 +1429,18 @@ class RSSFeedSettingsController extends Controller
             // $email_site_alert_implode = implode(",",$email_site_alert);
         }
 
-  /*      return ajaxResponse(
-            [
-                'cate' => $SiteCategory,
-                'test' => $email_site_alert,
-             
-                'message'  => langapp('changes_saved_successful'),
-                'redirect' => route('rssfeedsettings.news'),
-            ],
-            true,
-            Response::HTTP_INTERNAL_SERVER_ERROR
-        );
-*/
+        /*      return ajaxResponse(
+                  [
+                      'cate' => $SiteCategory,
+                      'test' => $email_site_alert,
+
+                      'message'  => langapp('changes_saved_successful'),
+                      'redirect' => route('rssfeedsettings.news'),
+                  ],
+                  true,
+                  Response::HTTP_INTERNAL_SERVER_ERROR
+              );
+      */
         // $site_config_email_alert = site_config_email_alert::where()
 
         $RSSNews_check = RSSNews::where("code", $request->rss_code)->first();
@@ -2112,7 +1448,7 @@ class RSSFeedSettingsController extends Controller
         $output_mail = [];
         if (@$RSSNews_check) {
 
-       
+
 
             $RSSNews_check->code = generator_uuid();
             $RSSNews_check->logo = config('app.URL_CENTER_PUBLISH') . $logo;
@@ -2130,9 +1466,9 @@ class RSSFeedSettingsController extends Controller
                     $dom->loadHtml(
                         '<?xml encoding="UTF-8">' . $detail_th,
                         LIBXML_HTML_NOIMPLIED |
-                            LIBXML_HTML_NODEFDTD |
-                            LIBXML_NOERROR |
-                            LIBXML_NOWARNING
+                        LIBXML_HTML_NODEFDTD |
+                        LIBXML_NOERROR |
+                        LIBXML_NOWARNING
                     );
                     //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
                     $images = $dom->getelementsbytagname('img');
@@ -2195,9 +1531,9 @@ class RSSFeedSettingsController extends Controller
                     $dom->loadHtml(
                         '<?xml encoding="UTF-8">' . $detail_en,
                         LIBXML_HTML_NOIMPLIED |
-                            LIBXML_HTML_NODEFDTD |
-                            LIBXML_NOERROR |
-                            LIBXML_NOWARNING
+                        LIBXML_HTML_NODEFDTD |
+                        LIBXML_NOERROR |
+                        LIBXML_NOWARNING
                     );
                     //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
                     $images = $dom->getelementsbytagname('img');
@@ -2209,24 +1545,24 @@ class RSSFeedSettingsController extends Controller
                         $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                         if (preg_match($reg_exUrl, $data, $url_image)) {
                             $url = $url_image[0];
-                         
-                                // เพิ่ม context เพื่อข้าม SSL verification
-                                $contextOptions = [
-                                    "ssl" => [
-                                        "verify_peer" => false,
-                                        "verify_peer_name" => false,
-                                        "allow_self_signed" => true,
-                                    ]
-                                ];
-                                $context = stream_context_create($contextOptions);
 
-                                // ดึงภาพ
-                                $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
+                            // เพิ่ม context เพื่อข้าม SSL verification
+                            $contextOptions = [
+                                "ssl" => [
+                                    "verify_peer" => false,
+                                    "verify_peer_name" => false,
+                                    "allow_self_signed" => true,
+                                ]
+                            ];
+                            $context = stream_context_create($contextOptions);
 
-                                if ($image !== false) {
-                                    // สร้าง data URI แบบ base64
-                                    $data = 'data:image/jpg;base64,' . base64_encode($image);
-                                }
+                            // ดึงภาพ
+                            $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
+
+                            if ($image !== false) {
+                                // สร้าง data URI แบบ base64
+                                $data = 'data:image/jpg;base64,' . base64_encode($image);
+                            }
                         }
 
                         //base64
@@ -2269,8 +1605,8 @@ class RSSFeedSettingsController extends Controller
             if (!empty($request->category_news)) {
                 foreach ($request->category_news as $item) {
                     //เช็คก่อน หมวดหมู่บันทึกซ้ำกัน
-                    $RSSNewsCategory_check_count = RSSNewsCategory::where("rss_news_id", $RSSNews_check->id)->where('news_category_id',$item)->count();
-                    if( $RSSNewsCategory_check_count == 0){
+                    $RSSNewsCategory_check_count = RSSNewsCategory::where("rss_news_id", $RSSNews_check->id)->where('news_category_id', $item)->count();
+                    if ($RSSNewsCategory_check_count == 0) {
                         $RSSNewsCategory = new RSSNewsCategory();
                         $RSSNewsCategory->code = generator_uuid();
                         $RSSNewsCategory->rss_news_id = $RSSNews_check->id;
@@ -2279,7 +1615,7 @@ class RSSFeedSettingsController extends Controller
                         $RSSNewsCategory->save();
 
                     }
-                  
+
                 }
             }
 
@@ -2313,9 +1649,9 @@ class RSSFeedSettingsController extends Controller
                     $query_delete,
                     [
                         '$set' =>
-                        [
-                            'delete_at' => $date_now
-                        ]
+                            [
+                                'delete_at' => $date_now
+                            ]
                     ]
                 );
             }
@@ -2384,9 +1720,9 @@ class RSSFeedSettingsController extends Controller
                     $query_delete_camp,
                     [
                         '$set' =>
-                        [
-                            'delete_at' => $date_now
-                        ]
+                            [
+                                'delete_at' => $date_now
+                            ]
                     ]
                 );
             }
@@ -2482,18 +1818,18 @@ class RSSFeedSettingsController extends Controller
             //         } 
             //     }
             // }
-          //  $email_site_alert = ['yongyot.kamma@gmail.com', 'yongyot.kha@mtsc.co.th'];
-          
+            //  $email_site_alert = ['yongyot.kamma@gmail.com', 'yongyot.kha@mtsc.co.th'];
+
             if ($request->formsubmit !== 'formDraft') {
                 if ($request->sent_mail == 1) {
                     if (!empty($email_site_alert)) {
                         $news = [
                             'news' => $RSSNews_check,
                         ];
-                    
+
                         // ส่งอีเมลแบบกลุ่ม
                         Mail::to($email_site_alert)->send(new NewsMail($news));
-                    
+
                         // ตรวจสอบผลลัพธ์
                         if (count(Mail::failures()) === 0) {
                             foreach ($email_site_alert as $email) {
@@ -2514,29 +1850,29 @@ class RSSFeedSettingsController extends Controller
                             }
                         }
                     }
-                    
+
                 }
                 // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
-               // $mail = ['yongyot.kamma@gmail.com'];
-                 $mail = $email_site_alert;
-             /*   // dd($mail);
-                foreach ($mail as $data) {
-                    // dd($data);
-                    // $output_mail[] = $data;
-                    $this->news = [
-                        'news' => $RSSNews_check,
-                    ];
-                    Mail::to($data)->send(new NewsMail($this->news));
-                    if (Mail::failures()) {
-                        // return response showing failed emails
-                        $fail_mail[] = $data;
-                    }
-                }
-                */
+                // $mail = ['yongyot.kamma@gmail.com'];
+                $mail = $email_site_alert;
+                /*   // dd($mail);
+                   foreach ($mail as $data) {
+                       // dd($data);
+                       // $output_mail[] = $data;
+                       $this->news = [
+                           'news' => $RSSNews_check,
+                       ];
+                       Mail::to($data)->send(new NewsMail($this->news));
+                       if (Mail::failures()) {
+                           // return response showing failed emails
+                           $fail_mail[] = $data;
+                       }
+                   }
+                   */
             }
         } else {
 
-                 // dd($RSSNews_check -> id);
+            // dd($RSSNews_check -> id);
             // dd($input);
             //check ซ้ำ ถ้ามีชื่อข่าวกับวันที public ซ้ำกัน ไม่ให้สร้างได้ในวันนั้น
             $today = Carbon::today();
@@ -2544,17 +1880,17 @@ class RSSFeedSettingsController extends Controller
                 ->where("title_en", $request->title_en)
                 ->whereDate("created_at", $today)
                 ->first();
-            
+
             if ($RSSNews_check) {
                 // ห้ามสร้างซ้ำ
-            
+
                 return ajaxResponse(
                     array_filter([
-                        'mail'      => $output_mail ?? [],
+                        'mail' => $output_mail ?? [],
                         'fail_mail' => $fail_mail ?? [],
-                        'message'   => 'มีข่าวชื่อเดียวกันสร้างไว้แล้วในวันนี้',
-                        'redirect'  => route('rssfeedsettings.news'),
-                        'warning'   => 'มีข่าวชื่อเดียวกันสร้างไว้แล้วในวันนี้',
+                        'message' => 'มีข่าวชื่อเดียวกันสร้างไว้แล้วในวันนี้',
+                        'redirect' => route('rssfeedsettings.news'),
+                        'warning' => 'มีข่าวชื่อเดียวกันสร้างไว้แล้วในวันนี้',
                     ]),
                     false,
                     200
@@ -2577,9 +1913,9 @@ class RSSFeedSettingsController extends Controller
                     $dom->loadHtml(
                         '<?xml encoding="UTF-8">' . $detail_th,
                         LIBXML_HTML_NOIMPLIED |
-                            LIBXML_HTML_NODEFDTD |
-                            LIBXML_NOERROR |
-                            LIBXML_NOWARNING
+                        LIBXML_HTML_NODEFDTD |
+                        LIBXML_NOERROR |
+                        LIBXML_NOWARNING
                     );
                     //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
                     $images = $dom->getelementsbytagname('img');
@@ -2590,8 +1926,8 @@ class RSSFeedSettingsController extends Controller
                         $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                         if (preg_match($reg_exUrl, $data, $url_image)) {
                             $url = $url_image[0];
-                               // เพิ่ม context เพื่อข้าม SSL verification
-                               $contextOptions = [
+                            // เพิ่ม context เพื่อข้าม SSL verification
+                            $contextOptions = [
                                 "ssl" => [
                                     "verify_peer" => false,
                                     "verify_peer_name" => false,
@@ -2642,9 +1978,9 @@ class RSSFeedSettingsController extends Controller
                     $dom->loadHtml(
                         '<?xml encoding="UTF-8">' . $detail_en,
                         LIBXML_HTML_NOIMPLIED |
-                            LIBXML_HTML_NODEFDTD |
-                            LIBXML_NOERROR |
-                            LIBXML_NOWARNING
+                        LIBXML_HTML_NODEFDTD |
+                        LIBXML_NOERROR |
+                        LIBXML_NOWARNING
                     );
                     //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
                     $images = $dom->getelementsbytagname('img');
@@ -2655,8 +1991,8 @@ class RSSFeedSettingsController extends Controller
                         $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                         if (preg_match($reg_exUrl, $data, $url_image)) {
                             $url = $url_image[0];
-                             // เพิ่ม context เพื่อข้าม SSL verification
-                             $contextOptions = [
+                            // เพิ่ม context เพื่อข้าม SSL verification
+                            $contextOptions = [
                                 "ssl" => [
                                     "verify_peer" => false,
                                     "verify_peer_name" => false,
@@ -2707,14 +2043,14 @@ class RSSFeedSettingsController extends Controller
             $RSSNews->save();
             if (!empty($request->category_news)) {
                 foreach ($request->category_news as $item) {
-                    $RSSNewsCategory_check_count = RSSNewsCategory::where("rss_news_id", $RSSNews->id)->where('news_category_id',$item)->count();
-                    if( $RSSNewsCategory_check_count == 0){
-                                $RSSNewsCategory = new RSSNewsCategory();
-                                $RSSNewsCategory->code = generator_uuid();
-                                $RSSNewsCategory->rss_news_id = $RSSNews->id;
-                                $RSSNewsCategory->news_category_id = $item;
-                                $RSSNewsCategory->status = 1;
-                                $RSSNewsCategory->save();
+                    $RSSNewsCategory_check_count = RSSNewsCategory::where("rss_news_id", $RSSNews->id)->where('news_category_id', $item)->count();
+                    if ($RSSNewsCategory_check_count == 0) {
+                        $RSSNewsCategory = new RSSNewsCategory();
+                        $RSSNewsCategory->code = generator_uuid();
+                        $RSSNewsCategory->rss_news_id = $RSSNews->id;
+                        $RSSNewsCategory->news_category_id = $item;
+                        $RSSNewsCategory->status = 1;
+                        $RSSNewsCategory->save();
                     }
                 }
             }
@@ -2927,17 +2263,17 @@ class RSSFeedSettingsController extends Controller
             //         } 
             //     }
             // }
-          //  $email_site_alert = ['yongyot.kamma@gmail.com', 'yongyot.kha@mtsc.co.th'];
+            //  $email_site_alert = ['yongyot.kamma@gmail.com', 'yongyot.kha@mtsc.co.th'];
             if ($request->formsubmit !== 'formDraft') {
                 if ($request->sent_mail == 1) {
                     if (!empty($email_site_alert)) {
                         $news = [
                             'news' => $RSSNews,
                         ];
-                    
+
                         // ส่งอีเมลแบบกลุ่ม
                         Mail::to($email_site_alert)->send(new NewsMail($news));
-                    
+
                         // ตรวจสอบผลลัพธ์
                         if (count(Mail::failures()) === 0) {
                             foreach ($email_site_alert as $email) {
@@ -2958,25 +2294,25 @@ class RSSFeedSettingsController extends Controller
                             }
                         }
                     }
-                    
+
                 }
                 // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
-              //  $mail = ['yongyot.kamma@gmail.com'];
-                 $mail = $email_site_alert;
-            /*    // dd($mail);
-                foreach ($mail as $data) {
-                    // dd($data);
-                    // $output_mail[] = $data;
-                    $this->news = [
-                        'news' => $RSSNews,
-                    ];
-                    Mail::to($data)->send(new NewsMail($this->news));
-                    if (Mail::failures()) {
-                        // return response showing failed emails
-                        $fail_mail[] = $data;
+                //  $mail = ['yongyot.kamma@gmail.com'];
+                $mail = $email_site_alert;
+                /*    // dd($mail);
+                    foreach ($mail as $data) {
+                        // dd($data);
+                        // $output_mail[] = $data;
+                        $this->news = [
+                            'news' => $RSSNews,
+                        ];
+                        Mail::to($data)->send(new NewsMail($this->news));
+                        if (Mail::failures()) {
+                            // return response showing failed emails
+                            $fail_mail[] = $data;
+                        }
                     }
-                }
-                */
+                    */
             }
         }
 
@@ -2999,9 +2335,9 @@ class RSSFeedSettingsController extends Controller
                     $data_arr_source['None'] = 0;
                 }
 
-                $data_arr_source['None'] = $data_arr_source['None'] + (int)$value->source_count;
+                $data_arr_source['None'] = $data_arr_source['None'] + (int) $value->source_count;
             } else {
-                $data_arr_source[$value->source] = (int)$value->source_count;
+                $data_arr_source[$value->source] = (int) $value->source_count;
             }
         }
 
@@ -3079,7 +2415,7 @@ class RSSFeedSettingsController extends Controller
         foreach ($data_graph_category as $key => $value) {
             $main_arr_category[] = array(
                 'name' => empty($value->categories_name_) ? 'None' : $value->categories_name_,
-                'y' => (int)$value->categories_count,
+                'y' => (int) $value->categories_count,
                 'color' => $color[$key],
                 'data' => $value->category_id
             );
@@ -3121,9 +2457,9 @@ class RSSFeedSettingsController extends Controller
                 // 'test' => $email_site_alert,
                 'mail' => $output_mail,
                 'fail_mail' => $fail_mail,
-                'message'  => langapp('changes_saved_successful'),
+                'message' => langapp('changes_saved_successful'),
                 'redirect' => route('rssfeedsettings.news'),
-                'warning'=>''
+                'warning' => ''
             ],
             true,
             Response::HTTP_OK
@@ -3157,13 +2493,13 @@ class RSSFeedSettingsController extends Controller
             // $email_site_alert_implode = implode(",",$email_site_alert);
             // $email_site_a = ['oatnunkung@gmail.com','oatnunkung88@gmail.com'];
             $email_site_alert = array_unique($email_site_a);
-            
+
         }
 
         if ($request->formsubmit == 'formSavingAndRun') {
             return ajaxResponse(
                 [
-                    'message'  => "Successfully",
+                    'message' => "Successfully",
                     'redirect' => route('rssfeedsettings.rss_data'),
                 ],
                 true,
@@ -3195,9 +2531,9 @@ class RSSFeedSettingsController extends Controller
                             $dom->loadHtml(
                                 '<?xml encoding="UTF-8">' . $detail_th,
                                 LIBXML_HTML_NOIMPLIED |
-                                    LIBXML_HTML_NODEFDTD |
-                                    LIBXML_NOERROR |
-                                    LIBXML_NOWARNING
+                                LIBXML_HTML_NODEFDTD |
+                                LIBXML_NOERROR |
+                                LIBXML_NOWARNING
                             );
                             //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
                             $images = $dom->getelementsbytagname('img');
@@ -3208,23 +2544,23 @@ class RSSFeedSettingsController extends Controller
                                 $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                                 if (preg_match($reg_exUrl, $data, $url_image)) {
                                     $url = $url_image[0];
-                                      // เพิ่ม context เพื่อข้าม SSL verification
-                                $contextOptions = [
-                                    "ssl" => [
-                                        "verify_peer" => false,
-                                        "verify_peer_name" => false,
-                                        "allow_self_signed" => true,
-                                    ]
-                                ];
-                                $context = stream_context_create($contextOptions);
+                                    // เพิ่ม context เพื่อข้าม SSL verification
+                                    $contextOptions = [
+                                        "ssl" => [
+                                            "verify_peer" => false,
+                                            "verify_peer_name" => false,
+                                            "allow_self_signed" => true,
+                                        ]
+                                    ];
+                                    $context = stream_context_create($contextOptions);
 
-                                // ดึงภาพ
-                                $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
+                                    // ดึงภาพ
+                                    $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
 
-                                if ($image !== false) {
-                                    // สร้าง data URI แบบ base64
-                                    $data = 'data:image/jpg;base64,' . base64_encode($image);
-                                }
+                                    if ($image !== false) {
+                                        // สร้าง data URI แบบ base64
+                                        $data = 'data:image/jpg;base64,' . base64_encode($image);
+                                    }
                                 }
 
                                 //base64
@@ -3262,9 +2598,9 @@ class RSSFeedSettingsController extends Controller
                             $dom->loadHtml(
                                 '<?xml encoding="UTF-8">' . $detail_en,
                                 LIBXML_HTML_NOIMPLIED |
-                                    LIBXML_HTML_NODEFDTD |
-                                    LIBXML_NOERROR |
-                                    LIBXML_NOWARNING
+                                LIBXML_HTML_NODEFDTD |
+                                LIBXML_NOERROR |
+                                LIBXML_NOWARNING
                             );
                             //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
                             $images = $dom->getelementsbytagname('img');
@@ -3275,23 +2611,23 @@ class RSSFeedSettingsController extends Controller
                                 $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                                 if (preg_match($reg_exUrl, $data, $url_image)) {
                                     $url = $url_image[0];
-                                       // เพิ่ม context เพื่อข้าม SSL verification
-                                $contextOptions = [
-                                    "ssl" => [
-                                        "verify_peer" => false,
-                                        "verify_peer_name" => false,
-                                        "allow_self_signed" => true,
-                                    ]
-                                ];
-                                $context = stream_context_create($contextOptions);
+                                    // เพิ่ม context เพื่อข้าม SSL verification
+                                    $contextOptions = [
+                                        "ssl" => [
+                                            "verify_peer" => false,
+                                            "verify_peer_name" => false,
+                                            "allow_self_signed" => true,
+                                        ]
+                                    ];
+                                    $context = stream_context_create($contextOptions);
 
-                                // ดึงภาพ
-                                $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
+                                    // ดึงภาพ
+                                    $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
 
-                                if ($image !== false) {
-                                    // สร้าง data URI แบบ base64
-                                    $data = 'data:image/jpg;base64,' . base64_encode($image);
-                                }
+                                    if ($image !== false) {
+                                        // สร้าง data URI แบบ base64
+                                        $data = 'data:image/jpg;base64,' . base64_encode($image);
+                                    }
                                 }
 
                                 //base64
@@ -3346,7 +2682,7 @@ class RSSFeedSettingsController extends Controller
 
 
                     //$email_site_alert = ['yongyot.kamma@gmail.com', 'yongyot.kha@mtsc.co.th'];
-                    
+
                     if ($request->formsubmit !== 'formDraft') {
                         if ($request->sent_mail == 1) {
                             if ($email_site_alert) {
@@ -3374,17 +2710,17 @@ class RSSFeedSettingsController extends Controller
                         }
                         // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
                         // $mail = ['todeooooo@gmail.com', 'yongyot.kamma@gmail.com'];
-                     //   $mail = ['yongyot.kamma@gmail.com'];
-                    /*     $mail = $email_site_alert;
-                        // dd($mail);
-                        foreach ($mail as $data) {
-                            // dd($data);
-                            $this->news = [
-                                'news' => $RSSNews_check,
-                            ];
-                            Mail::to($data)->send(new NewsMail($this->news));
-                        }
-                        */
+                        //   $mail = ['yongyot.kamma@gmail.com'];
+                        /*     $mail = $email_site_alert;
+                            // dd($mail);
+                            foreach ($mail as $data) {
+                                // dd($data);
+                                $this->news = [
+                                    'news' => $RSSNews_check,
+                                ];
+                                Mail::to($data)->send(new NewsMail($this->news));
+                            }
+                            */
                         foreach ($site_news as $data) {
                             $TransactionClientNews = TransactionClientNews::where('site_id', $data)->where('transaction_id', $RSSNews_check->id)->first();
                             if ($TransactionClientNews) {
@@ -3439,9 +2775,9 @@ class RSSFeedSettingsController extends Controller
                             $dom->loadHtml(
                                 '<?xml encoding="UTF-8">' . $detail_th,
                                 LIBXML_HTML_NOIMPLIED |
-                                    LIBXML_HTML_NODEFDTD |
-                                    LIBXML_NOERROR |
-                                    LIBXML_NOWARNING
+                                LIBXML_HTML_NODEFDTD |
+                                LIBXML_NOERROR |
+                                LIBXML_NOWARNING
                             );
                             //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
                             $images = $dom->getelementsbytagname('img');
@@ -3452,23 +2788,23 @@ class RSSFeedSettingsController extends Controller
                                 $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                                 if (preg_match($reg_exUrl, $data, $url_image)) {
                                     $url = $url_image[0];
-                                      // เพิ่ม context เพื่อข้าม SSL verification
-                                $contextOptions = [
-                                    "ssl" => [
-                                        "verify_peer" => false,
-                                        "verify_peer_name" => false,
-                                        "allow_self_signed" => true,
-                                    ]
-                                ];
-                                $context = stream_context_create($contextOptions);
+                                    // เพิ่ม context เพื่อข้าม SSL verification
+                                    $contextOptions = [
+                                        "ssl" => [
+                                            "verify_peer" => false,
+                                            "verify_peer_name" => false,
+                                            "allow_self_signed" => true,
+                                        ]
+                                    ];
+                                    $context = stream_context_create($contextOptions);
 
-                                // ดึงภาพ
-                                $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
+                                    // ดึงภาพ
+                                    $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
 
-                                if ($image !== false) {
-                                    // สร้าง data URI แบบ base64
-                                    $data = 'data:image/jpg;base64,' . base64_encode($image);
-                                }
+                                    if ($image !== false) {
+                                        // สร้าง data URI แบบ base64
+                                        $data = 'data:image/jpg;base64,' . base64_encode($image);
+                                    }
                                 }
 
                                 //base64
@@ -3504,9 +2840,9 @@ class RSSFeedSettingsController extends Controller
                             $dom->loadHtml(
                                 '<?xml encoding="UTF-8">' . $detail_en,
                                 LIBXML_HTML_NOIMPLIED |
-                                    LIBXML_HTML_NODEFDTD |
-                                    LIBXML_NOERROR |
-                                    LIBXML_NOWARNING
+                                LIBXML_HTML_NODEFDTD |
+                                LIBXML_NOERROR |
+                                LIBXML_NOWARNING
                             );
                             //ดึงเอาส่วนที่เป็นรูปภาพมาจาก summernote
                             $images = $dom->getelementsbytagname('img');
@@ -3517,23 +2853,23 @@ class RSSFeedSettingsController extends Controller
                                 $reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
                                 if (preg_match($reg_exUrl, $data, $url_image)) {
                                     $url = $url_image[0];
-                                       // เพิ่ม context เพื่อข้าม SSL verification
-                                $contextOptions = [
-                                    "ssl" => [
-                                        "verify_peer" => false,
-                                        "verify_peer_name" => false,
-                                        "allow_self_signed" => true,
-                                    ]
-                                ];
-                                $context = stream_context_create($contextOptions);
+                                    // เพิ่ม context เพื่อข้าม SSL verification
+                                    $contextOptions = [
+                                        "ssl" => [
+                                            "verify_peer" => false,
+                                            "verify_peer_name" => false,
+                                            "allow_self_signed" => true,
+                                        ]
+                                    ];
+                                    $context = stream_context_create($contextOptions);
 
-                                // ดึงภาพ
-                                $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
+                                    // ดึงภาพ
+                                    $image = @file_get_contents($url, false, $context); // ใส่ @ เพื่อ suppress warning
 
-                                if ($image !== false) {
-                                    // สร้าง data URI แบบ base64
-                                    $data = 'data:image/jpg;base64,' . base64_encode($image);
-                                }
+                                    if ($image !== false) {
+                                        // สร้าง data URI แบบ base64
+                                        $data = 'data:image/jpg;base64,' . base64_encode($image);
+                                    }
                                 }
 
                                 //base64
@@ -3657,7 +2993,7 @@ class RSSFeedSettingsController extends Controller
                             }
                         }
                         // $mail = ['master_msn@msn.com', 'a.bestpad@gmail.com'];
-                       // $mail = ['yongyot.kamma@gmail.com'];
+                        // $mail = ['yongyot.kamma@gmail.com'];
                         // dd($mail);
                         /*
                         $mail = $email_site_alert;
@@ -3708,27 +3044,11 @@ class RSSFeedSettingsController extends Controller
                     }
                 }
             }
-
-            if (!empty($TransactionRssData) && !empty($TransactionRssData->id)) {
-                $promotedNews = RSSNews::where('transaction_rss_id', $TransactionRssData->id)->first();
-                if ($promotedNews) {
-                    AiIntelNewsLog::where('transaction_rss_id', $TransactionRssData->id)->update([
-                        'status' => 'promoted',
-                        'rss_news_id' => $promotedNews->id,
-                    ]);
-                }
-            }
-
-            $redirect = route('rssfeedsettings.news');
-            if ($request->ai_intel_code) {
-                $redirect = route('rssfeedsettings.ai_intel');
-            }
-
             return ajaxResponse(
                 [
                     // 'test' => $_POST['detail_th'],
-                    'message'  => "Successfully",
-                    'redirect' => $redirect,
+                    'message' => "Successfully",
+                    'redirect' => route('rssfeedsettings.news'),
                 ],
                 true,
                 Response::HTTP_OK
@@ -3823,8 +3143,8 @@ class RSSFeedSettingsController extends Controller
 
         return ajaxResponse(
             [
-                'id'       => $RSSData->id,
-                'message'  => langapp('saved_successfully'),
+                'id' => $RSSData->id,
+                'message' => langapp('saved_successfully'),
                 'redirect' => route('rssfeedsettings.index'),
             ],
             true,
@@ -3909,8 +3229,8 @@ class RSSFeedSettingsController extends Controller
         // }
         return ajaxResponse(
             [
-                'id'       => $RSSData->id,
-                'message'  => langapp('changes_saved_successful'),
+                'id' => $RSSData->id,
+                'message' => langapp('changes_saved_successful'),
                 'redirect' => route('rssfeedsettings.index'),
             ],
             true,
@@ -3969,8 +3289,8 @@ class RSSFeedSettingsController extends Controller
         // }
         return ajaxResponse(
             [
-                'id'       => $rss->id,
-                'message'  => langapp('changes_saved_successful'),
+                'id' => $rss->id,
+                'message' => langapp('changes_saved_successful'),
                 'redirect' => route('rssfeedsettings.index'),
             ],
             true,
@@ -3989,8 +3309,8 @@ class RSSFeedSettingsController extends Controller
         $RSSNews->save();
         return ajaxResponse(
             [
-                'id'       => $RSSNews->id,
-                'message'  => langapp('changes_saved_successful'),
+                'id' => $RSSNews->id,
+                'message' => langapp('changes_saved_successful'),
                 'redirect' => route('rssfeedsettings.news'),
             ],
             true,
@@ -4039,7 +3359,7 @@ class RSSFeedSettingsController extends Controller
         $model->delete();
         return ajaxResponse(
             [
-                'message'  => langapp('deleted_successfully'),
+                'message' => langapp('deleted_successfully'),
                 'redirect' => route('rssfeedsettings.index'),
             ],
             true,
@@ -4049,10 +3369,11 @@ class RSSFeedSettingsController extends Controller
 
     public function new_select_campainge(Request $request)
     {
-        $result_search = [];
-        $search = $request->input('q', $request->input('term'));
+        $input = $request->all();
 
-        if ($search !== null && $search !== '') {
+        if ($request->has('q')) {
+            $search = $request->q;
+
             $DB_MONGO_KEY = env("DB_MONGO_DEV");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
             if (app()->environment('local')) {
@@ -4066,7 +3387,7 @@ class RSSFeedSettingsController extends Controller
             }
 
             $query_search = [
-                'name' => new Regex((string) $search, 'i'),
+                'name' => new \MongoDB\BSON\Regex($search),
                 'delete_at' => null
             ];
 

@@ -998,20 +998,13 @@ return (string)$v;
                     },
                     error: function (error){
                         $('#load_status').loading('stop');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
                         stopLoader();
-                        var errorMsg = 'An error occurred';
-                        if (error.responseJSON && error.responseJSON.errors) {
-                            var errorsHtml = '';
-                            $.each(error.responseJSON.errors, function (key, value) {
-                                errorsHtml += '<li>' + value[0] + '</li>';
-                            });
-                            errorMsg = errorsHtml;
-                        } else if (error.responseJSON && error.responseJSON.message) {
-                            errorMsg = error.responseJSON.message;
-                        } else if (error.statusText) {
-                            errorMsg = error.statusText;
-                        }
-                        toastr.error(errorMsg, '@langapp('response_status') ');
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
                     }
       
                 });
@@ -1074,38 +1067,24 @@ return (string)$v;
                             },
                             error: function (error){
                                 $('#updateO').loading('stop');
-                                var errorMsg = 'An error occurred';
-                                if (error.responseJSON && error.responseJSON.errors) {
-                                    var errorsHtml = '';
-                                    $.each(error.responseJSON.errors, function (key, value) {
-                                        errorsHtml += '<li>' + value[0] + '</li>';
-                                    });
-                                    errorMsg = errorsHtml;
-                                } else if (error.responseJSON && error.responseJSON.message) {
-                                    errorMsg = error.responseJSON.message;
-                                } else if (error.statusText) {
-                                    errorMsg = error.statusText;
-                                }
-                                toastr.error(errorMsg, '@langapp('response_status') ');
+                                var errors = error.response.data.errors;
+                                var errorsHtml = '';
+                                $.each(errors, function (key, value) {
+                                    errorsHtml += '<li>' + value[0] + '</li>';
+                                });
+                                toastr.error(errorsHtml, '@langapp('response_status') ');
                             }
             
                         });
                     },
                     error: function (error){
                         $('#updateO').loading('stop');
-                        var errorMsg = 'An error occurred';
-                        if (error.responseJSON && error.responseJSON.errors) {
-                            var errorsHtml = '';
-                            $.each(error.responseJSON.errors, function (key, value) {
-                                errorsHtml += '<li>' + value[0] + '</li>';
-                            });
-                            errorMsg = errorsHtml;
-                        } else if (error.responseJSON && error.responseJSON.message) {
-                            errorMsg = error.responseJSON.message;
-                        } else if (error.statusText) {
-                            errorMsg = error.statusText;
-                        }
-                        toastr.error(errorMsg, '@langapp('response_status') ');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
                     }
     
                 });
@@ -1164,19 +1143,12 @@ return (string)$v;
                             },
                             error: function (error){
                                 $('#updateO').loading('stop');
-                                var errorMsg = 'An error occurred';
-                                if (error.responseJSON && error.responseJSON.errors) {
-                                    var errorsHtml = '';
-                                    $.each(error.responseJSON.errors, function (key, value) {
-                                        errorsHtml += '<li>' + value[0] + '</li>';
-                                    });
-                                    errorMsg = errorsHtml;
-                                } else if (error.responseJSON && error.responseJSON.message) {
-                                    errorMsg = error.responseJSON.message;
-                                } else if (error.statusText) {
-                                    errorMsg = error.statusText;
-                                }
-                                toastr.error(errorMsg, '@langapp('response_status') ');
+                                var errors = error.response.data.errors;
+                                var errorsHtml = '';
+                                $.each(errors, function (key, value) {
+                                    errorsHtml += '<li>' + value[0] + '</li>';
+                                });
+                                toastr.error(errorsHtml, '@langapp('response_status') ');
                             }
             
                         });
@@ -1184,33 +1156,25 @@ return (string)$v;
 
                     
               
-                        let data = response;
-                        if (typeof response === 'string') {
-                            try { data = JSON.parse(response); } catch (e) { console.error("JSON parse error", e); }
-                        }
+                        let data = JSON.parse(response);
         
-                        if(data.Result == 1 || (data.command_result && data.command_result.Result == 1)){
+                        if(data.Result==1){
                             toastr.success('Update Success', '@langapp('response_status')');
                             setTimeout(function() { location.reload(); }, 1000);
                         } else {
-                            toastr.error(data.message || (data.command_result ? data.command_result.message : 'Update failed'), '@langapp('response_status')');
+                            toastr.error(data.message, '@langapp('response_status')');
                         }
+                        
+                        {{--window.location.href = response.redirect;--}}
                     },
                     error: function (error){
                         $('#updateO').loading('stop');
-                        var errorMsg = 'An error occurred';
-                        if (error.responseJSON && error.responseJSON.errors) {
-                            var errorsHtml = '';
-                            $.each(error.responseJSON.errors, function (key, value) {
-                                errorsHtml += '<li>' + value[0] + '</li>';
-                            });
-                            errorMsg = errorsHtml;
-                        } else if (error.responseJSON && error.responseJSON.message) {
-                            errorMsg = error.responseJSON.message;
-                        } else if (error.statusText) {
-                            errorMsg = error.statusText;
-                        }
-                        toastr.error(errorMsg, '@langapp('response_status') ');
+                        var errors = error.response.data.errors;
+                        var errorsHtml = '';
+                        $.each(errors, function (key, value) {
+                            errorsHtml += '<li>' + value[0] + '</li>';
+                        });
+                        toastr.error(errorsHtml, '@langapp('response_status') ');
                     }
     
                 });

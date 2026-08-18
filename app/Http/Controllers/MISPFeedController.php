@@ -11,8 +11,6 @@ use Illuminate\Support\Str;
 use App\ApiToken;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Artisan;
-use App\Services\PublishedFeedsService;
 
 class MISPFeedController extends Controller
 {
@@ -190,7 +188,7 @@ class MISPFeedController extends Controller
 
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
-            $col_fx_otx_events = $clientMD->{PublishedFeedsService::mongoDatabase()}->fx_otx_events;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
             $options = [
                 'projection' => [
                     '_id' => 0,
@@ -214,15 +212,11 @@ class MISPFeedController extends Controller
             ];
 
             $query = array(
-                'status' => ['$in' => [1, "1", true]],
-                '$or' => [
-                    ['deleted_at' => null],
-                    ['deleted_at' => ['$exists' => false]],
-                ],
+                'status' => 1,
+                'deleted_at' => null,
             );
-            // วันที่เริ่มต้น: ย้อนหลัง 24 ชม. เป๊ะๆ (Rolling 24 Hours)
-            $start = strtotime('-1 day') * 1000;
-
+            // วันที่เริ่มต้น: เวลา 00:00 ของวันนี้
+            $start = strtotime(date('Y-m-d 00:00:00')) * 1000;
 
             // เวลาเริ่มของเมื่อวาน (00:00:00)
             // $start = strtotime('-3 days midnight') * 1000;
@@ -235,7 +229,7 @@ class MISPFeedController extends Controller
                 '$lte' => new UTCDateTime($end)
             ];
             $query['mips_uuid'] = $uuid;
-            $query['public'] = ['$in' => [1, "1", true]];
+            $query['public'] = 1;
             $query['indicator_count'] = ['$ne' => 0];
             $cursor = $col_fx_otx_events->find($query, $options);
             $cursor = $cursor->toArray();
@@ -301,7 +295,7 @@ class MISPFeedController extends Controller
 
 
 
-                    $col_fx_otx_events_indicator_ref = $clientMD->{PublishedFeedsService::mongoDatabase()}->fx_otx_events_indicator_ref;
+                    $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
                     $query = [
                         'pulse_id' => $document["pulse_id"],
                         'updated_at' => [
@@ -384,7 +378,7 @@ class MISPFeedController extends Controller
                                 $indicator_type = "email-src";
                             }
 
-                            // $indicator_detail = $clientMD->{PublishedFeedsService::mongoDatabase()}->fx_otx_indicator_detail->findOne(['indicator_name' => trim($cursor_indicator_data['indicator'])]);
+                            // $indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail->findOne(['indicator_name' => trim($cursor_indicator_data['indicator'])]);
                             // $indicator_score = '';
                             // $indicator_severity = '';
 
@@ -427,28 +421,11 @@ class MISPFeedController extends Controller
 
                     $event['Attribute'] = $Array_indicator;
 
-                    // --- START LOGGING OUTBOUND DATA ---
-                    try {
-                        if (count($Array_indicator) > 0) {
-                            $logCol = $clientMD->{PublishedFeedsService::mongoDatabase()}->fx_feed_published_logs;
-                            PublishedFeedsService::persistLog(
-                                $logCol,
-                                'misp_pull_event',
-                                [PublishedFeedsService::eventPullEntry((array) $document, count($Array_indicator))],
-                                'misp_controller_event'
-                            );
-                        }
-                    } catch (\Exception $e) {
-                        \Log::error("Failed to log feed access: " . $e->getMessage());
-                    }
-                    // --- END LOGGING OUTBOUND DATA ---
-
                     return response()->json([
                         'Event' => $event
                     ], 200, [], JSON_PRETTY_PRINT);
                 }
             }
-
         } catch (\Throwable $e) {
 
             return response()->json(['error' => 'Unable to load feed data'], 500);
@@ -475,29 +452,22 @@ class MISPFeedController extends Controller
 
 
 
-    public function listFeedsForManifest()
-    {
-        // บันทึก Log เป็นโหมด Manifest สำหรับ URL .json
-        Artisan::call('app:AuditPublishedFeeds', ['--mode' => 'manifest']);
-        return $this->processListFeeds();
-    }
-
     public function listFeeds()
     {
-        // บันทึก Log เป็นโหมด List สำหรับหน้าเว็บทั่วไป
-        Artisan::call('app:AuditPublishedFeeds', ['--mode' => 'list']);
-        return $this->processListFeeds();
-    }
 
-    private function processListFeeds()
-    {
+        // $siteId = (int) $request->attributes->get('site_id'); // 👈 ได้จาก token อัตโนมัติ
+        // if (!$siteId) abort(403, 'Site context required');
+
         try {
+
+
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             $clientMD = new MongoClient($DB_MONGO_KEY);
-            $col_fx_otx_events = $clientMD->{PublishedFeedsService::mongoDatabase()}->fx_otx_events;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
             $options = [
                 'projection' => [
                     '_id' => 0,
+
                     'name' => 1,
                     'groups' => 1,
                     'tags' => 1,
@@ -510,39 +480,91 @@ class MISPFeedController extends Controller
                     'pulse_id' => 1,
                     'creator_org' => 1,
                     'mips_uuid' => 1
+
                 ],
-                'sort' => ['modified' => -1],
+                //'limit' => 10,
+                'sort' => ['modified' => -1], // เรียงจากใหม่ไปเก่า (ถ้าต้องการ)
             ];
 
-            $window = PublishedFeedsService::rollingWindow();
-            $start = $window['start'];
-            $end = $window['end'];
-            $query = PublishedFeedsService::buildQuery($start, $end);
+            $query = array(
+                'status' => 1,
+                'deleted_at' => null,
+            );
+            // วันที่เริ่มต้น: เวลา 00:00 ของวันนี้
+            $start = strtotime(date('Y-m-d 00:00:00')) * 1000;
+
+            // เวลาเริ่มของเมื่อวาน (00:00:00)
+            // $start = strtotime(date('Y-m-d 00:00:00', strtotime('-1 day'))) * 1000;
+
+            // วันที่สิ้นสุด: เวลาปัจจุบัน
+            $end = round(microtime(true) * 1000);
+
+            $query['modified'] = [
+                '$gt' => new UTCDateTime($start),
+                '$lte' => new UTCDateTime($end)
+            ];
+            // $query['mips_uuid'] = 'f066e3b3-faca-4600-8ff4-c84f1c7d8e40';
+            $query['public'] = 1;
+            $query['creator_org'] = "OTX";
+            $query['indicator_count'] = ['$ne' => 0];
             $cursor = $col_fx_otx_events->find($query, $options);
             $cursor = $cursor->toArray();
 
-            $feeds = [];
-            $logEvents = [];
-            $usedUuids = [];
+            // Debug: แสดงจำนวน record และตัวอย่างข้อมูล
+            // Log::info('listFeeds DEBUG', [
+            //     'total_records' => count($cursor),
+            //     'start_timestamp' => $start,
+            //     'start_readable' => date('Y-m-d H:i:s', $start / 1000),
+            //     'end_timestamp' => $end,
+            //     'end_readable' => date('Y-m-d H:i:s', $end / 1000),
+            //     'query' => $query,
+            //     'sample_data' => !empty($cursor) ? array_slice(json_decode(json_encode($cursor), true), 0, 3) : 'No data',
+            // ]);
 
+
+            $feeds = [];
+            $data = array();
+            $order_number = $start;
             if (!empty($cursor)) {
                 foreach ($cursor as $document) {
-                    $document = (array) $document;
-                    $mips_uuid = PublishedFeedsService::ensureUniqueMipsUuid(
-                        $document,
-                        $col_fx_otx_events,
-                        $usedUuids
-                    );
-                    $logEvents[] = PublishedFeedsService::eventFromDocument($document, $mips_uuid);
+
+                    $mips_uuid = isset($document['mips_uuid']) ? $document['mips_uuid'] : null;
+                    if (!$mips_uuid) {
+                        $mips_uuid = $this->generate_uuid_v4();
+
+                        //อัพเดท mips_uuid
+                        $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_events;
+                        $options = array(
+                            'typeMap' => array(
+                                'root' => 'array',
+                                'document' => 'array',
+                            ),
+                        );
+                        $document = $col_fx_otx_indicator_detail->findOne(array('pulse_id' => $document["pulse_id"]), $options);
+                        if ($document) {
+                            $update_fx_otx_events_indicator_ref = $col_fx_otx_indicator_detail->updateOne(
+                                ['_id' => $document['_id']],
+                                [
+                                    '$set' => [
+                                        'mips_uuid' => $mips_uuid,
+                                    ]
+                                ]
+                            );
+                        }
+                    }
+
+
+                    // กำหนด default timestamp (หรือจะ parse date เป็น timestamp ก็ได้)
 
                     $timestamp = $this->change_datetime_utc_to_thai_custom($document['modified']);
+                    // จัดรูปแบบ tag ใหม่
                     $tagArray = [];
                     $tags = explode(',', $document['tags']);
 
                     foreach ($tags as $tag) {
                         if (trim($tag)) {
                             $tagArray[] = [
-                                'name' => trim($tag),
+                                'name' => trim($tag), // เผื่อมีช่องว่าง
                                 'colour' => '#004646',
                                 'local' => false,
                                 'relationship_type' => ''
@@ -558,8 +580,8 @@ class MISPFeedController extends Controller
                     ]);
 
                     $feeds[$mips_uuid] = [
-                        'Org' => ['name' => 'SOSECURE-TH'],
-                        'Orgc' => ['name' => 'SOSECURE-TH'],
+                        'Org' => $feed['Org'] ?? ['name' => 'SOSECURE-TH'],
+                        'Orgc' => $feed['Orgc'] ?? ['name' => 'SOSECURE-TH'],
                         'Tag' => $tagArray,
                         'info' =>  $document["name"] ?? '',
                         'date' => $this->change_date_utc_to_thai_custom($document['modified']),
@@ -572,15 +594,11 @@ class MISPFeedController extends Controller
                 $feeds = ['No Data'];
             }
 
-            try {
-                $logCol = $clientMD->{PublishedFeedsService::mongoDatabase()}->fx_feed_published_logs;
-                $this->persistManifestLog($logCol, $logEvents, 'misp_controller_manifest');
-            } catch (\Exception $e) {
-                \Log::error("Failed to log feed access (manifest processListFeeds): " . $e->getMessage());
-            }
+
 
             return response()->json($feeds, 200, [], JSON_PRETTY_PRINT);
         } catch (\Throwable $e) {
+
             return response()->json(['error' => 'Unable to load feed data'], 500);
         }
     }
@@ -608,12 +626,16 @@ class MISPFeedController extends Controller
     }
     function generate_uuid_v4()
     {
-        return PublishedFeedsService::generateUuidV4();
-    }
+        // สร้างค่ารandom 16 bytes
+        $data = openssl_random_pseudo_bytes(16);
 
-    private function persistManifestLog($logCol, array $newEvents, string $source = 'misp_controller_manifest')
-    {
-        PublishedFeedsService::persistLog($logCol, 'misp_pull_manifest', $newEvents, $source);
+        // Set version to 0100
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+        // Set bits 6-7 to 10
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+
+        // แปลงเป็น UUID format
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
     function change_date_utc_to_thai_custom($utcDateTime)
     {
@@ -685,8 +707,6 @@ class MISPFeedController extends Controller
 
     public function manifest(Request $request)
     {
-        Artisan::call('app:AuditPublishedFeeds', ['--mode' => 'manifest']);
-        
         try {
             $DB_MONGO_KEY = config("app.DB_MONGO_DEV");
             if (empty($DB_MONGO_KEY)) {
@@ -695,12 +715,25 @@ class MISPFeedController extends Controller
             }
 
             $client = new \MongoDB\Client($DB_MONGO_KEY);
-            $col    = $client->{PublishedFeedsService::mongoDatabase()}->fx_otx_events;
+            $col    = $client->sosecure_threatintelligent->fx_otx_events;
 
-            $window = PublishedFeedsService::rollingWindow();
-            $startMs = $window['start'];
-            $endMs = $window['end'];
-            $query = PublishedFeedsService::buildQuery($startMs, $endMs);
+            // ช่วงเวลาเอาย้อน “เมื่อวาน 00:00” → “ตอนนี้”
+            $startMs = strtotime(date('Y-m-d 00:00:00', strtotime('-1 day'))) * 1000;
+            $endMs   = (int) round(microtime(true) * 1000);
+
+            // เงื่อนไขยืดหยุ่นกัน type (1/true) และ deleted_at ไม่มีฟิลด์
+            $query = [
+                'status'          => ['$in' => [1, true]],
+                '$or'             => [['deleted_at' => null], ['deleted_at' => ['$exists' => false]]],
+                'public'          => ['$in' => [1, true]],
+                'indicator_count' => ['$gt' => 0],
+                'modified'        => [
+                    '$gte' => new \MongoDB\BSON\UTCDateTime($startMs),
+                    '$lte' => new \MongoDB\BSON\UTCDateTime($endMs),
+                ],
+                // ใส่ด้วยถ้าต้องกรอง org
+                // 'creator_org'   => 'OTX',
+            ];
 
             $options = [
                 'projection' => [
@@ -718,14 +751,11 @@ class MISPFeedController extends Controller
 
             $docs = $col->find($query, $options)->toArray();
 
+            // manifest ของ MISP: แนะนำให้เป็น object ที่ key เป็น "<uuid>.json"
             $manifest = [];
-            $logEvents = [];
-            $usedUuids = [];
-
             foreach ($docs as $d) {
-                $d = (array) $d;
-                $uuid = PublishedFeedsService::ensureUniqueMipsUuid($d, $col, $usedUuids);
-                $logEvents[] = PublishedFeedsService::eventFromDocument($d, $uuid);
+                $uuid = $d['mips_uuid'] ?? null;
+                if (!$uuid) continue;
 
                 $ts = $this->change_datetime_utc_to_thai_custom($d['modified'] ?? null) ?? time();
 
@@ -735,14 +765,8 @@ class MISPFeedController extends Controller
                     'timestamp' => $ts,
                     'info'      => (string)($d['name'] ?? ''),
                     'published' => (int)($d['public'] ?? 0),
+                    // จะใส่ sha256/size ถ้ามีที่มา ก็เพิ่มได้
                 ];
-            }
-
-            try {
-                $logCol = $client->{PublishedFeedsService::mongoDatabase()}->fx_feed_published_logs;
-                $this->persistManifestLog($logCol, $logEvents, 'misp_controller_manifest');
-            } catch (\Exception $e) {
-                \Log::error("Failed to log feed access (manifest): " . $e->getMessage());
             }
 
             return response()->json($manifest, 200, [], JSON_PRETTY_PRINT);
@@ -764,7 +788,7 @@ class MISPFeedController extends Controller
             $client = new \MongoDB\Client($DB_MONGO_KEY);
 
             // 1) ดึงหัว event ตาม uuid
-            $events = $client->{PublishedFeedsService::mongoDatabase()}->fx_otx_events;
+            $events = $client->sosecure_threatintelligent->fx_otx_events;
             $startMs = strtotime(date('Y-m-d 00:00:00', strtotime('-1 day'))) * 1000; // เผื่อย้อนหลัง 7 วัน
             $endMs   = (int) round(microtime(true) * 1000);
 
@@ -833,7 +857,7 @@ class MISPFeedController extends Controller
             ];
 
             // 3) ดึง indicators
-            $indCol = $client->{PublishedFeedsService::mongoDatabase()}->fx_otx_events_indicator_ref;
+            $indCol = $client->sosecure_threatintelligent->fx_otx_events_indicator_ref;
             $qInd = [
                 'pulse_id'   => $doc['pulse_id'] ?? null,
                 'updated_at' => [
@@ -872,7 +896,7 @@ class MISPFeedController extends Controller
                     $indTagArray[] = ['name' => 'type:' . $it, 'colour' => '#004646', 'local' => false, 'relationship_type' => ''];
                 }
 
-                $indicator_detail = $client->{PublishedFeedsService::mongoDatabase()}->fx_otx_indicator_detail->findOne(['indicator_name' => trim((string)($r['indicator'] ?? ''))]);
+                $indicator_detail = $client->sosecure_threatintelligent->fx_otx_indicator_detail->findOne(['indicator_name' => trim((string)($r['indicator'] ?? ''))]);
                 $indicator_score = '';
                 $indicator_severity = '';
 
@@ -908,24 +932,7 @@ class MISPFeedController extends Controller
 
             $event['Attribute'] = $attributes;
 
-            // --- START LOGGING OUTBOUND DATA ---
-            try {
-                if (count($attributes) > 0) {
-                    $logCol = $client->{PublishedFeedsService::mongoDatabase()}->fx_feed_published_logs;
-                    PublishedFeedsService::persistLog(
-                        $logCol,
-                        'misp_pull_event',
-                        [PublishedFeedsService::eventPullEntry((array) $doc, count($attributes))],
-                        'misp_controller_event'
-                    );
-                }
-            } catch (\Exception $e) {
-                \Log::error("Failed to log feed access (event): " . $e->getMessage());
-            }
-            // --- END LOGGING OUTBOUND DATA ---
-
             return response()->json(['Event' => $event], 200, [], JSON_PRETTY_PRINT);
-
         } catch (\Throwable $e) {
             Log::error('FEED event failed', ['uuid' => $uuid, 'msg' => $e->getMessage(), 'line' => $e->getLine()]);
             return response()->json(['error' => 'Unable to load feed data'], 500);

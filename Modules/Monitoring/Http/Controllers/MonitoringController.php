@@ -95,14 +95,9 @@ class MonitoringController extends Controller
             foreach ($SiteSettings as $key => $value) {
                 
                 if(!empty($value['transcation_date_start'])){
-                    $dateDiffMin = $dateNow->diffInMinutes($value['transcation_date_start']);
-                    if($dateDiffMin<3){
-                        $statusDotClass = 'dot low';
-                        $statusDotName = 'Online';
-                    }else{
-                        $statusDotClass = 'dot critical';
-                        $statusDotName = 'Offline';
-                    }
+                    $statusData = $this->monitoringStatusFromStart($dateNow, $value['transcation_date_start']);
+                    $statusDotClass = $statusData['statusDotClass'];
+                    $statusDotName = $statusData['statusDotName'];
         
                     $get_categorys = '';
                     if(!empty($value['get_categorys'])){
@@ -583,15 +578,17 @@ class MonitoringController extends Controller
         $SiteSettings = SiteSettings::select('id','logo','name','code')->where('active', '1')->whereNull('deleted_at')->get()->toArray();
         
         foreach ($SiteSettings as $key => $value) {
-            $TransactionBatchjob = TransactionBatchjob::select('transcation_date_start')->where('site_id', $value['id'])->where('status', 1)->orderBy('transcation_date_start','desc')->first()->toArray();
-            $dateDiffMin = $dateNow->diffInMinutes($TransactionBatchjob['transcation_date_start']);
-            if($dateDiffMin<3){
-                $dataStatus['statusDotClass'] = 'dot low';
-                $dataStatus['statusDotName'] = 'Online';
+            $TransactionBatchjob = TransactionBatchjob::select('transcation_date_start')
+                ->where('site_id', $value['id'])
+                ->where('status', 1)
+                ->orderBy('transcation_date_start','desc')
+                ->first();
+            if($TransactionBatchjob){
+                $TransactionBatchjob = $TransactionBatchjob->toArray();
             }else{
-                $dataStatus['statusDotClass'] = 'dot critical';
-                $dataStatus['statusDotName'] = 'Offline';
+                $TransactionBatchjob = ["transcation_date_start" => "0000-00-00 00:00:00"];
             }
+            $dataStatus = $this->monitoringStatusFromStart($dateNow, $TransactionBatchjob['transcation_date_start']);
             $MonitoringSystem_data= MonitoringSystem::where('site_id',$value['id'])->select('content','updated_at')->first();
             $dataStatus['MonitoringSystem'] = $MonitoringSystem_data;
             unset($SiteSettings[$key]['id']);
@@ -816,6 +813,38 @@ public function tableSocailMonitoring(){
         $data['SiteSettings'] = "";
         $data['page'] = langapp('social_feel');
         return view('monitoring::social_feel')->with($data);
+    }
+
+    private function monitoringStatusFromStart(Carbon $dateNow, $startAt)
+    {
+        $startAt = trim((string) $startAt);
+        if($startAt === '' || $startAt === '0000-00-00 00:00:00'){
+            return [
+                'statusDotClass' => 'dot critical',
+                'statusDotName'  => 'Offline',
+            ];
+        }
+
+        try {
+            $dateDiffMin = $dateNow->diffInMinutes(Carbon::parse($startAt));
+        } catch (\Exception $e) {
+            return [
+                'statusDotClass' => 'dot critical',
+                'statusDotName'  => 'Offline',
+            ];
+        }
+
+        if($dateDiffMin < 3){
+            return [
+                'statusDotClass' => 'dot low',
+                'statusDotName'  => 'Online',
+            ];
+        }
+
+        return [
+            'statusDotClass' => 'dot critical',
+            'statusDotName'  => 'Offline',
+        ];
     }
 
 

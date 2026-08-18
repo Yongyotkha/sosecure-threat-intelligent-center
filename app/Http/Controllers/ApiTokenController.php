@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\ApiToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
 
 class ApiTokenController extends Controller
 {
@@ -50,8 +49,7 @@ class ApiTokenController extends Controller
             'token'      => $plain,
             'expires_at' => $expiresAt ?: null,
             'site_id'    => $siteId ?: null,
-            'type'         => $type ?: null,
-            'whitelist_ips'=> $request->input('whitelist_ips') ?: null,
+            'type'       => $type ?: null,
         ]);
 
         return response()->json([

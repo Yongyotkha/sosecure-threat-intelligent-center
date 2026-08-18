@@ -169,7 +169,7 @@ use Carbon\Carbon;
                         </div>
                         <div class="col-lg-3 col-md-6 nopadding">
                                 <div class="card-dash-compro border-ee" style="border-left: none !important;">
-                                    <a href="javascript:void(0)" onclick="dataType('agent')">
+                                    <a href="#" onclick="">
                                         <div class="compromised-new-box" >
                                             <div class="img-icon-smm-compro" style="margin-top: -15px">
                                                 <!-- <img src="{{asset('Darkweb/Agent.png')}}" alt=""> -->
@@ -181,7 +181,7 @@ use Carbon\Carbon;
                                             </div>
                                         </div>
                                     </a>
-                                    <a href="javascript:void(0)" onclick="dataType('network')">
+                                    <a href="">
                                         <div class="compromised-new-box" >
                                             <div class="img-icon-smm-compro" style="margin-top: -15px">
                                                 <!-- <img src="{{asset('Darkweb/Network.png')}}" alt=""> -->
@@ -192,8 +192,9 @@ use Carbon\Carbon;
                                                 <h3 class="name-dash-text-compro text-dark text-upper">Network</h3>
                                             </div>
                                         </div>
-                                    </a>
+                                      </a>
                                 </div>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -607,16 +608,6 @@ use Carbon\Carbon;
                     $('#webserver-count').text(response.webserver);
                 }else{
                     $('#webserver-count').text(0);
-                }
-                if(response.agent){
-                    $('#agent-count').text(response.agent);
-                }else{
-                    $('#agent-count').text(0);
-                }
-                if(response.network){
-                    $('#network-count').text(response.network);
-                }else{
-                    $('#network-count').text(0);
                 }
 
             },

@@ -41,13 +41,14 @@ class SystemSettingsController extends Controller
     {
 
         $get_data = $this->siteSettings->get_data($id);
-        // Get IoC Feed token
+        // Get Feed Insight token (default type or null)
         $token = ApiToken::where('site_id', $get_data->id)
-            ->where('type', 'ioc_feed')
+            ->where(function($q) {
+                $q->whereNull('type')
+                  ->orWhere('type', 'feed_insight');
+            })
             ->orderBy('id', 'desc')
             ->first();
-            
-        $data['token_obj'] = $token;
         $data['token'] = $token ? $token->token : '';
 
         // Get Service Receive API token

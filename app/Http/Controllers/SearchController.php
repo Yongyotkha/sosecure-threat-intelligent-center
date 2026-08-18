@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\DataLeakFeed;
-use App\Services\IndicatorCheckService;
-use App\Services\PublishedFeedsService;
 use App\LogSearch;
 use App\R_s_s_news;
 use App\SiteLimitApi;
@@ -12,7 +10,6 @@ use App\SiteRequestLimitApi;
 use App\SystemLimitApi;
 use App\Traits\Taggable;
 use DB;
-use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Http\Request;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMapping;
 use Modules\MonitoringVulnerabilitys\Entities\CVEMappingAssets;
@@ -53,7 +50,6 @@ class SearchController extends Controller
     }
 
     public function searchAPI(){
-        set_time_limit(120);
      
         $type = $this->request->type;
         $keyword = $this->request->keyword;
@@ -840,7 +836,7 @@ class SearchController extends Controller
 
     public function search(Request $mode)
     {
-        set_time_limit(120);
+      
         // $this->request->validate(['keyword' => 'required']);
         $data['dataSearch'] = array();
         $limit = 100;//->take($limit)
@@ -1626,199 +1622,17 @@ class SearchController extends Controller
 
     public function loadSearchAPI(Request $request)
     {
-        set_time_limit(120); // Increase max execution time for multiple API calls
-        if ($request->hasSession()) {
-            $request->session()->save(); // Release session lock to allow concurrent AJAX requests
-        }
 
+      
         $role_custom = @check_role_custom();
         $source = $request->source;
-        $original_keyword = $request->keyword;
         $keyword = $request->keyword;
-        
-        // Strip port from IPv4 if present (e.g. 1.2.3.4:80 -> 1.2.3.4)
-        if (preg_match('/^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):\d+$/', $keyword, $matches)) {
-            if (filter_var($matches[1], FILTER_VALIDATE_IP)) {
-                $keyword = $matches[1]; // Use IP without port for most feeds
-            }
-        }
-
         $site_code = $request->code;
         $site_id = 0;
         $site = null;
     
        //format
        $type = $this->check_keyword_type($keyword);
-
-        if ($source === 'calculate_risk') {
-            if ($type === '') {
-                return response()->json([
-                    'status_code' => 401,
-                    'message' => 'allow only type ( IP,Domain,URL,MD5, SHA1 or SHA256 ) Please contact the system administrator.',
-                    'type' => $type,
-                ]);
-            }
-
-            try {
-                $iocType = IndicatorCheckService::normalizeIocType($type);
-                $service = new IndicatorCheckService();
-                $client = new GuzzleClient(['verify' => false, 'timeout' => 30]);
-                $result = $service->checkIocAsync($client, $keyword, $iocType, null)->wait();
-
-                return response()->json([
-                    'status_code' => 200,
-                    'data' => [
-                        'total_score' => $result['total_score'],
-                        'risk_level' => $result['risk_level'],
-                        'debug_scores' => $result['debug_scores'] ?? [],
-                        'debug_weights' => $result['debug_weights'] ?? [],
-                    ],
-                    'type' => $type,
-                ]);
-            } catch (\Exception $e) {
-                \Log::warning('Search calculate_risk failed: ' . $e->getMessage());
-
-                return response()->json([
-                    'status_code' => 500,
-                    'error' => $e->getMessage(),
-                    'type' => $type,
-                ]);
-            }
-        }
-
-        if($source == 'internal_events') {
-            try {
-                $clientMD = new \MongoDB\Client(env("DB_MONGO_STOREDATAB"));
-                $db = PublishedFeedsService::database($clientMD);
-                $queryOptions = [
-                    'maxTimeMS' => 15000,
-                    'typeMap' => ['root' => 'array', 'document' => 'array'],
-                    'hint' => ['indicator' => 1],
-                ];
-
-                $indicatorVariants = array_values(array_unique(array_filter([
-                    $keyword,
-                    $original_keyword !== $keyword ? $original_keyword : null,
-                    strtolower($keyword),
-                    strtoupper($keyword),
-                ], function ($value) {
-                    return $value !== null && $value !== '';
-                })));
-
-                $eventsList = [];
-                $refQuery = count($indicatorVariants) === 1
-                    ? ['indicator' => $indicatorVariants[0]]
-                    : ['indicator' => ['$in' => $indicatorVariants]];
-
-                $otxRefs = $db->fx_otx_events_indicator_ref->find(
-                    $refQuery,
-                    array_merge($queryOptions, [
-                        'limit' => 500,
-                        'projection' => ['pulse_id' => 1],
-                    ])
-                )->toArray();
-                
-                $pulseIds = [];
-                foreach ($otxRefs as $ref) {
-                    if (!isset($ref['pulse_id'])) {
-                        continue;
-                    }
-
-                    $rawPulseId = $ref['pulse_id'];
-                    if (is_array($rawPulseId) || $rawPulseId instanceof \Traversable) {
-                        foreach ($rawPulseId as $pid) {
-                            if (is_scalar($pid) && (string) $pid !== '') {
-                                $pulseIds[] = (string) $pid;
-                            }
-                        }
-                        continue;
-                    }
-
-                    if (is_scalar($rawPulseId) && (string) $rawPulseId !== '') {
-                        $pulseIds[] = (string) $rawPulseId;
-                    }
-                }
-
-                $pulseIds = array_values(array_unique($pulseIds));
-
-                if (count($pulseIds) > 100) {
-                    $pulseIds = array_slice($pulseIds, 0, 100);
-                }
-
-                if (count($pulseIds) > 0) {
-                    $otxEvents = $db->fx_otx_events->find(
-                        ['pulse_id' => ['$in' => $pulseIds]],
-                        array_merge($queryOptions, [
-                            'limit' => 100,
-                            'projection' => ['pulse_id' => 1, 'name' => 1, 'tags' => 1, 'created' => 1],
-                        ])
-                    )->toArray();
-                    
-                    foreach ($otxEvents as $event) {
-                        $pulseId = $event['pulse_id'] ?? 'Unknown';
-                        $sourceName = strpos($pulseId, 'misp.') === 0 ? 'MISP' : 'AlienVault OTX';
-                        
-                        $dateStr = 'N/A';
-                        if (isset($event['created'])) {
-                            if ($event['created'] instanceof \MongoDB\BSON\UTCDateTime) {
-                                $dateStr = $event['created']->toDateTime()->setTimezone(new \DateTimeZone('Asia/Bangkok'))->format('Y-m-d H:i:s');
-                            } else {
-                                $dateStr = (string)$event['created'];
-                            }
-                        }
-                        
-                        $tags = '';
-                        if (isset($event['tags']) && is_array($event['tags'])) {
-                            $tags = implode(', ', $event['tags']);
-                        }
-                        
-                        $eventsList[] = [
-                            'source' => $sourceName,
-                            'event_id' => $pulseId,
-                            'event_name' => $event['name'] ?? 'Unknown',
-                            'tags' => $tags,
-                            'date' => $dateStr
-                        ];
-                    }
-                }
-                
-                return response()->json([
-                    'status_code' => 200,
-                    'data' => $eventsList,
-                    'type' => $type
-                ]);
-            } catch (\MongoDB\Driver\Exception\ExecutionTimeoutException $e) {
-                \Log::warning('internal_events MongoDB timeout: ' . $e->getMessage(), [
-                    'keyword' => $keyword,
-                ]);
-
-                return response()->json([
-                    'status_code' => 200,
-                    'data' => [],
-                    'message' => 'Internal events search timed out. Use the exact IOC value from Indicators.',
-                    'type' => $type,
-                ]);
-            } catch (\Exception $e) {
-                if (stripos($e->getMessage(), 'exceeded time limit') !== false) {
-                    \Log::warning('internal_events MongoDB timeout: ' . $e->getMessage(), [
-                        'keyword' => $keyword,
-                    ]);
-
-                    return response()->json([
-                        'status_code' => 200,
-                        'data' => [],
-                        'message' => 'Internal events search timed out. Use the exact IOC value from Indicators.',
-                        'type' => $type,
-                    ]);
-                }
-
-                return response()->json([
-                    'status_code' => 500,
-                    'error' => $e->getMessage(),
-                    'type' => $type
-                ]);
-            }
-        }
 
         if($site_code){
             $site = SiteSettings::where('code', $site_code)->first();
@@ -1899,7 +1713,7 @@ class SearchController extends Controller
         //     $center_search_api_loookup_allow = 1;
 
         // }else{
-                if(app()->environment('local') || (int)$center_search_api_loookup_limit > $site_request_limit_api_count){
+                if((int)$center_search_api_loookup_limit > $site_request_limit_api_count){
                     $center_search_api_loookup_allow = 1;
                   
                     if($source == 'check_api_search_limit'){
@@ -1919,12 +1733,8 @@ class SearchController extends Controller
 
 
                 }else{
-                    $response_data = array(
-                        'status_code' => 400,
-                        'search_api_loookup_allow' => 0,
-                        'message' => 'Search API lookup limit exceeded. Please contact your system administrator.',
-                    );
-                    return response()->json($response_data);
+
+                
                 }
 
         // }
@@ -1940,7 +1750,6 @@ class SearchController extends Controller
         $response3 = '{}';
 
         if($source =="ibmcloud"){
-            return response()->json(['status_code' => 400, 'message' => 'IBM Cloud is disabled']);
             $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
          
             if($log_search){
@@ -1958,7 +1767,8 @@ class SearchController extends Controller
                       //  $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
                       //  $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
                 
-                      list($ibmcloud_API_Key, $ibmcloud_API_Key_Password) = IndicatorCheckService::getBasicAuthCredentials('IBMCLOUD');
+                      $ibmcloud_API_Key = "b477bcdc-90ed-4b62-ba5a-080efa2564ff";
+                      $ibmcloud_API_Key_Password = "15ee88df-635a-4f47-afc7-c856e4eb4578";
                         if($type == 'IP'){
                             $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/" . $keyword;
                         }else if($type == 'Domain' || $type == 'URL'){
@@ -2001,7 +1811,8 @@ class SearchController extends Controller
            
                // $ibmcloud_API_Key = "d4b45ba9-4a1f-4127-bb72-1a01ab26a4b9";
                // $ibmcloud_API_Key_Password = "95d8e0cd-0f34-45dc-9c6c-aa490fcb0415";
-               list($ibmcloud_API_Key, $ibmcloud_API_Key_Password) = IndicatorCheckService::getBasicAuthCredentials('IBMCLOUD');
+               $ibmcloud_API_Key = "b477bcdc-90ed-4b62-ba5a-080efa2564ff";
+               $ibmcloud_API_Key_Password = "15ee88df-635a-4f47-afc7-c856e4eb4578";
                 if($type == 'IP'){
                     $ibmcloud_url = "https://exchange.xforce.ibmcloud.com/api/ipr/" . $keyword;
                 }else if($type == 'Domain' || $type == 'URL'){
@@ -2031,52 +1842,52 @@ class SearchController extends Controller
             }
             
         }else if($source =="virustotal"){
-            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
-            if($log_search && !File::exists(storage_path() .'/app/public/'.$log_search -> path)){
-                $log_search->delete();
-                $log_search = null;
-            }
+            $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
             if($log_search){
                 $url = storage_path() .'/app/public/'.$log_search -> path;
-                $response3 = file_get_contents($url); 
-                if($response3 == '[]' || $response3 == null || $response3 == '')
-                {
-                    if(File::exists($url))
-                    {File::delete($url);}
+                if(!File::exists($url)){
+                    $response = null;
+                }else{
+                    $response3 = file_get_contents($url); 
+                    if($response3 == '[]' || $response3 == null || $response3 == '')
+                    {
+                        if(File::exists($url))
+                        {File::delete($url);}
 
-                    $virustotal_API_Key = IndicatorCheckService::getRandomKey('VT');
-                    if($type == 'IP'){
-                        $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/" . $keyword;
-                    }else if($type == 'Domain'){
-                        $virustotal_url='https://www.virustotal.com/api/v3/domains/' . $keyword;
-                    }else if($type == 'URL'){
-                        $virustotal_url='https://www.virustotal.com/api/v3/url/' . $keyword;
-                    }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
-                        $virustotal_url='https://www.virustotal.com/api/v3/files/' . $keyword;
+                        $virustotal_API_Key = "8ed71053d254aa99c9a79b73c6f3223cac762c2c77628d075e62ec506a538267";
+                        if($type == 'IP'){
+                            $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/" . $keyword;
+                        }else if($type == 'Domain'){
+                            $virustotal_url='https://www.virustotal.com/api/v3/domains/' . $keyword;
+                        }else if($type == 'URL'){
+                            $virustotal_url='https://www.virustotal.com/api/v3/url/' . $keyword;
+                        }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
+                            $virustotal_url='https://www.virustotal.com/api/v3/files/' . $keyword;
+                        }
+
+                        $headers = array(
+                            'X-Apikey: '.$virustotal_API_Key
+                        );
+                        // Send request to Server
+                        $ch = curl_init($virustotal_url);
+                        // To save response in a variable from server, set headers;
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                        // Get response
+                        $response = curl_exec($ch);
+                        curl_close($ch);  
+
+                        $path = 'search_file/'.time().'.json';
+                        if( Storage::disk('public')->put($path, $response)) {
+                            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
+                            $log_search -> path = $path;
+                            $log_search -> save();
+                        }
                     }
-
-                    $headers = array(
-                        'X-Apikey: '.$virustotal_API_Key
-                    );
-                    // Send request to Server
-                    $ch = curl_init($virustotal_url);
-                    // To save response in a variable from server, set headers;
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                    // Get response
-                    $response = curl_exec($ch);
-                    curl_close($ch);  
-
-                    $path = 'search_file/'.time().'.json';
-                    if( Storage::disk('public')->put($path, $response)) {
-                        $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
-                        $log_search -> path = $path;
-                        $log_search -> save();
+                    else
+                    {
+                        $response = file_get_contents($url); 
                     }
-                }
-                else
-                {
-                    $response = file_get_contents($url); 
                 }
             }else{
                 $check_limit_search = $this->check_limit_search($site_id, $source);
@@ -2088,7 +1899,7 @@ class SearchController extends Controller
                     );
                     return response()->json($response_data);
                 }
-                $virustotal_API_Key = IndicatorCheckService::getRandomKey('VT');
+                $virustotal_API_Key = "8ed71053d254aa99c9a79b73c6f3223cac762c2c77628d075e62ec506a538267";
                 if($type == 'IP'){
                     $virustotal_url = "https://www.virustotal.com/api/v3/ip_addresses/" . $keyword;
                 }else if($type == 'Domain'){
@@ -2127,79 +1938,79 @@ class SearchController extends Controller
             }
 
         }else if($source =="hybrid"){
-            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
-            if($log_search && !File::exists(storage_path() .'/app/public/'.$log_search -> path)){
-                $log_search->delete();
-                $log_search = null;
-            }
+            $log_search = LogSearch::select('path')->where('keyword', $keyword)->where('source', $source)->first();
             if($log_search){
                 $url = storage_path() .'/app/public/'.$log_search -> path;
-                $response3 = file_get_contents($url); 
-                if($response3 == '[]' || $response3 == null || $response3 == '')
-                {
-                    if(File::exists($url))
-                    {File::delete($url);}
-                    $hybrid_API_Key = IndicatorCheckService::getRandomKey('HYBRID');
+                if(!File::exists($url)){
+                    $response = null;
+                }else{
+                    $response3 = file_get_contents($url); 
+                    if($response3 == '[]' || $response3 == null || $response3 == '')
+                    {
+                        if(File::exists($url))
+                        {File::delete($url);}
+                        $hybrid_API_Key = "kpy0ibau846587b1lnemkw4k082be03bncw1bkz140a16b6cs64sk6uzf0498e3f";
 
-                    //$virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
-                    $headers = array(
-                        'api-key: '.$hybrid_API_Key,
-                        'accept: '.'application/json',
-                        'Content-Type: '.'application/x-www-form-urlencoded',
-                        'user-agent: '.'Falcon Sandbox',
-                    );
-                    //'host'=>'151.101.2.110','domain'=>'151.101.2.110','url'=>'151.101.2.110','url'=>'151.101.2.110','similar_to'=>'151.101.2.110','context'=>'151.101.2.110'
-                    
-                    if($type == 'IP'){
-                        $hybrid_url = "https://hybrid-analysis.com/api/v2/search/terms";
-                        $fields = array('host'=>$keyword);
-                        $postvars = '';
-                        foreach($fields as $key=>$value) {
-                            $postvars .= $key . "=" . $value . "&";
+                        //$virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
+                        $headers = array(
+                            'api-key: '.$hybrid_API_Key,
+                            'accept: '.'application/json',
+                            'Content-Type: '.'application/x-www-form-urlencoded',
+                            'user-agent: '.'Falcon Sandbox',
+                        );
+                        //'host'=>'151.101.2.110','domain'=>'151.101.2.110','url'=>'151.101.2.110','url'=>'151.101.2.110','similar_to'=>'151.101.2.110','context'=>'151.101.2.110'
+                        
+                        if($type == 'IP'){
+                            $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
+                            $fields = array('host'=>$keyword);
+                            $postvars = '';
+                            foreach($fields as $key=>$value) {
+                                $postvars .= $key . "=" . $value . "&";
+                            }
+                        }else if($type == 'Domain'){
+                            $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
+                            $fields = array('domain'=>$keyword);
+                            $postvars = '';
+                            foreach($fields as $key=>$value) {
+                                $postvars .= $key . "=" . $value . "&";
+                            }
+                        }else if($type == 'URL'){
+                            $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
+                            $fields = array('domain'=>$keyword);
+                            $postvars = '';
+                            foreach($fields as $key=>$value) {
+                                $postvars .= $key . "=" . $value . "&";
+                            }
+                        }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
+                            $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/hash";
+                            $fields = array('hash'=>$keyword);
+                            $postvars = '';
+                            foreach($fields as $key=>$value) {
+                                $postvars .= $key . "=" . $value . "&";
+                            }
                         }
-                    }else if($type == 'Domain'){
-                        $hybrid_url = "https://hybrid-analysis.com/api/v2/search/terms";
-                        $fields = array('domain'=>$keyword);
-                        $postvars = '';
-                        foreach($fields as $key=>$value) {
-                            $postvars .= $key . "=" . $value . "&";
-                        }
-                    }else if($type == 'URL'){
-                        $hybrid_url = "https://hybrid-analysis.com/api/v2/search/terms";
-                        $fields = array('domain'=>$keyword);
-                        $postvars = '';
-                        foreach($fields as $key=>$value) {
-                            $postvars .= $key . "=" . $value . "&";
-                        }
-                    }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
-                        $hybrid_url = "https://hybrid-analysis.com/api/v2/search/hash";
-                        $fields = array('hash'=>$keyword);
-                        $postvars = '';
-                        foreach($fields as $key=>$value) {
-                            $postvars .= $key . "=" . $value . "&";
+                        
+                        // Send request to Server
+                        $ch = curl_init($hybrid_url);
+                        // To save response in a variable from server, set headers;
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                        curl_setopt($ch, CURLOPT_POSTFIELDS,$postvars);
+                        // Get response
+                        $response = curl_exec($ch);
+                        curl_close($ch);  
+
+                        $path = 'search_file/'.time().'.json';
+                        if( Storage::disk('public')->put($path, $response)) {
+                            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
+                            $log_search -> path = $path;
+                            $log_search -> save();
                         }
                     }
-                    
-                    // Send request to Server
-                    $ch = curl_init($hybrid_url);
-                    // To save response in a variable from server, set headers;
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS,$postvars);
-                    // Get response
-                    $response = curl_exec($ch);
-                    curl_close($ch);  
-
-                    $path = 'search_file/'.time().'.json';
-                    if( Storage::disk('public')->put($path, $response)) {
-                        $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
-                        $log_search -> path = $path;
-                        $log_search -> save();
+                    else
+                    {
+                        $response = file_get_contents($url); 
                     }
-                }
-                else
-                {
-                    $response = file_get_contents($url); 
                 }
             }else{
                 $check_limit_search = $this->check_limit_search($site_id, $source);
@@ -2212,7 +2023,7 @@ class SearchController extends Controller
                     return response()->json($response_data);
                 }
 
-                $hybrid_API_Key = IndicatorCheckService::getRandomKey('HYBRID');
+                $hybrid_API_Key = "kpy0ibau846587b1lnemkw4k082be03bncw1bkz140a16b6cs64sk6uzf0498e3f";
 
                 //$virustotal_url='https://www.virustotal.com/api/v3/domains/xlus0222uj81bxyf.xyz';
                 $headers = array(
@@ -2224,28 +2035,28 @@ class SearchController extends Controller
                 //'host'=>'151.101.2.110','domain'=>'151.101.2.110','url'=>'151.101.2.110','url'=>'151.101.2.110','similar_to'=>'151.101.2.110','context'=>'151.101.2.110'
                 
                 if($type == 'IP'){
-                    $hybrid_url = "https://hybrid-analysis.com/api/v2/search/terms";
+                    $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
                     $fields = array('host'=>$keyword);
                     $postvars = '';
                     foreach($fields as $key=>$value) {
                         $postvars .= $key . "=" . $value . "&";
                     }
                 }else if($type == 'Domain'){
-                    $hybrid_url = "https://hybrid-analysis.com/api/v2/search/terms";
+                    $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
                     $fields = array('domain'=>$keyword);
                     $postvars = '';
                     foreach($fields as $key=>$value) {
                         $postvars .= $key . "=" . $value . "&";
                     }
                 }else if($type == 'URL'){
-                    $hybrid_url = "https://hybrid-analysis.com/api/v2/search/terms";
+                    $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/terms";
                     $fields = array('domain'=>$keyword);
                     $postvars = '';
                     foreach($fields as $key=>$value) {
                         $postvars .= $key . "=" . $value . "&";
                     }
                 }else if($type == 'SHA256' || $type == 'MD5' || $type == 'SHA1'){
-                    $hybrid_url = "https://hybrid-analysis.com/api/v2/search/hash";
+                    $hybrid_url = "https://www.hybrid-analysis.com/api/v2/search/hash";
                     $fields = array('hash'=>$keyword);
                     $postvars = '';
                     foreach($fields as $key=>$value) {
@@ -2276,7 +2087,7 @@ class SearchController extends Controller
         }else if($source =="otx_indicators"){
 
 
-            $otx_API_Key = IndicatorCheckService::getRandomKey('OTX');
+            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";
             $otx_general_url ="";
             $otx_analysis_url ="";
             if($type == 'IP'){
@@ -2316,7 +2127,6 @@ class SearchController extends Controller
             // To save response in a variable from server, set headers;
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
             // Get response
             $response = curl_exec($ch);
             curl_close($ch);  
@@ -2333,7 +2143,6 @@ class SearchController extends Controller
                     // To save response in a variable from server, set headers;
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
                     // Get response
                     $response2 = curl_exec($ch);
                     curl_close($ch);  
@@ -2344,7 +2153,7 @@ class SearchController extends Controller
 
         }else if($source =="otx_puls"){
         
-            $otx_API_Key = IndicatorCheckService::getRandomKey('OTX');  
+            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
             $otx_url = "https://otx.alienvault.com/api/v1/pulses/".$keyword;
            
             $ch = curl_init();
@@ -2358,7 +2167,6 @@ class SearchController extends Controller
             // To save response in a variable from server, set headers;
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
             // Get response
             $response = curl_exec($ch);
             curl_close($ch);  
@@ -2366,7 +2174,7 @@ class SearchController extends Controller
         
         }else if($source =="otx_puls_indicator"){
         
-            $otx_API_Key = IndicatorCheckService::getRandomKey('OTX');  
+            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
             $otx_url = "https://otx.alienvault.com/api/v1/pulses/".$keyword.'/indicators';
            
             $ch = curl_init();
@@ -2380,7 +2188,6 @@ class SearchController extends Controller
             // To save response in a variable from server, set headers;
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
             // Get response
             $response = curl_exec($ch);
             curl_close($ch);  
@@ -2389,7 +2196,7 @@ class SearchController extends Controller
         }else if($source =="otx_puls_tag"){
             $keyword =str_replace(' ', '%20', trim($keyword));
 
-            $otx_API_Key = IndicatorCheckService::getRandomKey('OTX');  
+            $otx_API_Key = "c69611682f6e13bfe36a9b3740dac840ce279d6d52b1b8c7c78eb097bee53688";  
             if(!$request->nextpage){
                 $otx_url = "https://otx.alienvault.com/otxapi/pulses/?limit=20&page=1&sort=-modified&q=tag:".$keyword;
             }else{
@@ -2408,122 +2215,11 @@ class SearchController extends Controller
             // To save response in a variable from server, set headers;
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
             // Get response
             $response = curl_exec($ch);
             curl_close($ch);  
 
         
-        }else if($source =="abuseipdb"){
-            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
-            if($log_search && !File::exists(storage_path() .'/app/public/'.$log_search -> path)){
-                $log_search->delete();
-                $log_search = null;
-            }
-            if($log_search){
-                $url = storage_path() .'/app/public/'.$log_search -> path;
-                $response3 = file_get_contents($url);
-                if(!$this->isValidAbuseIPDBResponse($response3)) {
-                    if(File::exists($url)) { File::delete($url); }
-                    $response = $this->fetchAbuseIPDB($keyword);
-                    if($this->isValidAbuseIPDBResponse($response)) {
-                        $path = 'search_file/'.time().'.json';
-                        if( Storage::disk('public')->put($path, $response)) {
-                            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
-                            $log_search -> path = $path;
-                            $log_search -> save();
-                        }
-                    }
-                } else {
-                    $response = $response3;
-                }
-            }else{
-                $response = $this->fetchAbuseIPDB($keyword);
-                if($this->isValidAbuseIPDBResponse($response)) {
-                    $path = 'search_file/'.time().'.json';
-                    if( Storage::disk('public')->put($path, $response)) {
-                        $log_search = new LogSearch();
-                        $log_search -> path = $path;
-                        $log_search -> keyword = $keyword;
-                        $log_search -> type = $type;
-                        $log_search -> source = $source;
-                        $log_search -> save();
-                    }
-                }
-            }
-        }else if($source =="threatfox"){
-            \Log::info('[ThreatFox Debug] keyword='.$keyword.', original_keyword='.$original_keyword);
-            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
-            if($log_search && !File::exists(storage_path() .'/app/public/'.$log_search -> path)){
-                $log_search->delete();
-                $log_search = null;
-            }
-            // Also clear stale cache that contains 'no_result' from previous searches without port
-            if($log_search){
-                $url = storage_path() .'/app/public/'.$log_search -> path;
-                $cachedContent = File::exists($url) ? file_get_contents($url) : '';
-                $cachedData = json_decode($cachedContent, true);
-                \Log::info('[ThreatFox Debug] Cache found, query_status=' . ($cachedData['query_status'] ?? 'N/A') . ', content_len=' . strlen($cachedContent));
-                if(empty($cachedContent) || $cachedContent == '[]' || 
-                   (is_array($cachedData) && isset($cachedData['query_status']) && $cachedData['query_status'] !== 'ok')){
-                    // Stale or no_result cache — delete and re-fetch
-                    \Log::info('[ThreatFox Debug] Clearing stale cache');
-                    if(File::exists($url)) { File::delete($url); }
-                    $log_search->delete();
-                    $log_search = null;
-                }
-            }
-            if($log_search){
-                $url = storage_path() .'/app/public/'.$log_search -> path;
-                $response = file_get_contents($url); 
-                \Log::info('[ThreatFox Debug] Using cached response');
-            }else{
-                \Log::info('[ThreatFox Debug] Fetching fresh with keyword: ' . $original_keyword);
-                $response = $this->fetchThreatFox($original_keyword);
-                \Log::info('[ThreatFox Debug] API response: ' . substr($response, 0, 500));
-                $path = 'search_file/'.time().'.json';
-                if( Storage::disk('public')->put($path, $response)) {
-                    $log_search = new LogSearch();
-                    $log_search -> path = $path;
-                    $log_search -> keyword = $keyword;
-                    $log_search -> type = $type;
-                    $log_search -> source = $source;
-                    $log_search -> save();
-                }
-            }
-        }else if($source =="rstcloud"){
-            $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
-            if($log_search && !File::exists(storage_path() .'/app/public/'.$log_search -> path)){
-                $log_search->delete();
-                $log_search = null;
-            }
-            if($log_search){
-                $url = storage_path() .'/app/public/'.$log_search -> path;
-                $response3 = file_get_contents($url); 
-                if($response3 == '[]' || $response3 == null || $response3 == '') {
-                    if(File::exists($url)) { File::delete($url); }
-                    $response = $this->fetchRSTCloud($keyword);
-                    $path = 'search_file/'.time().'.json';
-                    if( Storage::disk('public')->put($path, $response)) {
-                        $log_search = LogSearch::where('keyword', $keyword)->where('source', $source)->first();
-                        $log_search -> path = $path;
-                        $log_search -> save();
-                    }
-                } else {
-                    $response = file_get_contents($url); 
-                }
-            }else{
-                $response = $this->fetchRSTCloud($keyword);
-                $path = 'search_file/'.time().'.json';
-                if( Storage::disk('public')->put($path, $response)) {
-                    $log_search = new LogSearch();
-                    $log_search -> path = $path;
-                    $log_search -> keyword = $keyword;
-                    $log_search -> type = $type;
-                    $log_search -> source = $source;
-                    $log_search -> save();
-                }
-            }
         }else if($source =="check_api_search_limit"){
             // if($site_code){
             //     $center_search_api_loookup_limit =$site->search_api_loookup_limit;
@@ -2539,20 +2235,10 @@ class SearchController extends Controller
    
 
     
-        $decodedResponse = json_decode($response, true);
-        $statusCode = Response::HTTP_OK;
-        if ($source === 'abuseipdb' && is_array($decodedResponse)) {
-            if (!empty($decodedResponse['errors'][0]['status'])) {
-                $statusCode = (int) $decodedResponse['errors'][0]['status'];
-            } elseif (!isset($decodedResponse['data'])) {
-                $statusCode = Response::HTTP_BAD_GATEWAY;
-            }
-        }
-
         $response_data = array(
-            'status_code' => $statusCode,
+            'status_code' => Response::HTTP_OK,
             'message' => '',
-            'data' => $decodedResponse,
+            'data' => json_decode($response, true),
             'data2' => json_decode($response2, true),
             'type' => $type,
             'source' => $source,
@@ -2907,136 +2593,5 @@ class SearchController extends Controller
             'Content-Type' => 'text/plain',
             'Content-Disposition' => 'inline; filename="Md5.csv"',
         ]);
-    }
-
-    private function isValidAbuseIPDBResponse($response)
-    {
-        if ($response === null || $response === '' || $response === '[]') {
-            return false;
-        }
-
-        $decoded = json_decode($response, true);
-        if (!is_array($decoded) || isset($decoded['errors']) || !isset($decoded['data'])) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private function fetchAbuseIPDB($ip)
-    {
-        $keys = IndicatorCheckService::getProviderKeys('ABUSE');
-        if (empty($keys)) {
-            \Log::warning('AbuseIPDB: no system API keys configured');
-            return json_encode([
-                'errors' => [[
-                    'detail' => 'No AbuseIPDB API key configured. Add an APIv2 key in System API Keys.',
-                    'status' => 401,
-                ]],
-            ]);
-        }
-
-        $url = "https://api.abuseipdb.com/api/v2/check?ipAddress=" . urlencode($ip) . "&maxAgeInDays=120";
-        $lastResponse = null;
-
-        foreach ($keys as $key) {
-            $key = trim((string) $key);
-            if ($key === '') {
-                continue;
-            }
-
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Key: ' . $key,
-                'Accept: application/json',
-            ]);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-            $response = curl_exec($ch);
-            $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-
-            $lastResponse = $response;
-            if ($this->isValidAbuseIPDBResponse($response)) {
-                return $response;
-            }
-
-            if ($httpCode === 429) {
-                \Log::warning("AbuseIPDB rate limited for IP {$ip}");
-                return $response;
-            }
-        }
-
-        \Log::warning("AbuseIPDB: all configured API keys failed for IP {$ip}");
-        return $lastResponse ?: json_encode([
-            'errors' => [[
-                'detail' => 'Authentication failed. Your API key is either missing, incorrect, or revoked. Note: The APIv2 key differs from the APIv1 key.',
-                'status' => 401,
-            ]],
-        ]);
-    }
-
-    private function fetchThreatFox($keyword)
-    {
-        $postData = json_encode([
-            'query' => 'search_ioc',
-            'search_term' => $keyword
-        ]);
-
-        // Try without Auth-Key first (anonymous — avoids key-level blacklist)
-        $url = "https://threatfox-api.abuse.ch/api/v1/";
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json'
-        ]);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        $decoded = json_decode($response, true);
-        if (isset($decoded['query_status']) && $decoded['query_status'] !== 'user_blacklisted') {
-            return $response;
-        }
-
-        // Fallback: try with Auth-Key
-        \Log::info('[ThreatFox Debug] Anonymous request blacklisted, trying with Auth-Key');
-        $key = IndicatorCheckService::getRandomKey('TF');
-        
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Auth-Key: ' . $key,
-            'Content-Type: application/json'
-        ]);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        $response = curl_exec($ch);
-        curl_close($ch);
-        return $response;
-    }
-
-    private function fetchRSTCloud($keyword)
-    {
-        $key = IndicatorCheckService::getRandomKey('RST');
-        
-        $url = "https://api.rstcloud.net/v1/ioc?value=" . urlencode($keyword);
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'x-api-key: ' . $key,
-            'Accept: application/json'
-        ]);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        $response = curl_exec($ch);
-        curl_close($ch);
-        return $response;
     }
 }    

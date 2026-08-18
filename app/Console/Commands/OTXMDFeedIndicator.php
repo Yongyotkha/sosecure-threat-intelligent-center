@@ -9,8 +9,6 @@ use Artisan;
 
 class OTXMDFeedIndicator extends Command
 {
-    protected $totalIndicatorsFromApi = 0;
-    protected $totalIndicatorsProcessed = 0;
     /**
      * The name and signature of the console command.
      *
@@ -42,9 +40,6 @@ class OTXMDFeedIndicator extends Command
      */
     public function handle()
     {
-        $this->totalIndicatorsFromApi = 0;
-        $this->totalIndicatorsProcessed = 0;
-
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
         $urlLimit = 3;
         $retryLimit = 1;
@@ -64,7 +59,7 @@ class OTXMDFeedIndicator extends Command
                 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
 
                 if (!isset($insertOneResult)) {
-                    $collectionStamp = $clientMD->sosecure_threatintelligent_dev->fx_transaction_otx_indicator_stamp;
+                    $collectionStamp = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicator_stamp;
                     $insertOneResult = $collectionStamp->insertOne([
                         'code' => generator_uuid(),
                         'transaction_date' => date("Y-m-d"),
@@ -82,8 +77,6 @@ class OTXMDFeedIndicator extends Command
                 //$reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/indicators/?type=CVE&include_inactive=0&sort=-modified&q=modified:""&page=1&limit=100', $urlLimit);
                 if ($reconCall["success"]) {
                     $otxFeedData = json_decode($reconCall["result"], true);
-                    $this->totalIndicatorsFromApi = $otxFeedData['count'] ?? 0;
-                    $this->info("Total indicators from OTX API: " . $this->totalIndicatorsFromApi);
                 } else {
                     $otxFeedDataCheck = false;
                     $otxSuccessCheck = false;
@@ -93,13 +86,12 @@ class OTXMDFeedIndicator extends Command
                 while ($otxFeedDataCheck) {
                     if (!empty($otxFeedData["results"])) {
                         foreach ($otxFeedData["results"] as $value) {
-                            $this->totalIndicatorsProcessed++;
                             try {
 
                                 print_r($value);
 
 
-                                $collectionData = $clientMD->sosecure_threatintelligent_dev->fx_transaction_otx_indicators_data;
+                                $collectionData = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
                                 $updateResult = $collectionData->updateOne(
                                     ['indicator_id' => $value["id"].""],
                                     ['$set' => [
@@ -167,17 +159,8 @@ class OTXMDFeedIndicator extends Command
             if ($otxSuccessCheck && isset($insertOneResult)) {
                 $updateResult2 = $collectionStamp->updateOne(
                     ['_id' => $insertOneResult->getInsertedId()],
-                    ['$set' => [
-                        'status' => 2,
-                        'api_total_indicators' => $this->totalIndicatorsFromApi,
-                        'processed_indicators' => $this->totalIndicatorsProcessed,
-                    ]]
+                    ['$set' => ['status' => 2]]
                 );
-                $this->info("=========================================");
-                $this->info("SUMMARY REPORT (OTX INDICATOR FEED)");
-                $this->info("=========================================");
-                $this->info("INDICATORS : " . $this->totalIndicatorsProcessed . " / " . $this->totalIndicatorsFromApi . " (" . ($this->totalIndicatorsFromApi > 0 ? round(($this->totalIndicatorsProcessed/$this->totalIndicatorsFromApi)*100, 2) : 0) . "%)");
-                $this->info("=========================================");
                 $this->info("app:OTXMDFeedIndicator SUCCESS ALL CONTENT");
             } else {
                 $this->info("app:OTXMDFeedIndicator FAIL SOME CONTENT");
@@ -231,7 +214,7 @@ class OTXMDFeedIndicator extends Command
             $checkSuccess = true;
 
             try {
-                $collectionBasic = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
+                $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
                 $document = $collectionBasic->findOne(['indicator_id' => $indicatorID.""], [
                     'projection' => [
                         "updated_at" => 1,
@@ -500,7 +483,7 @@ class OTXMDFeedIndicator extends Command
                 $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
                 $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
                 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-                $collectionBasic = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
+                $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
                 $updateResult = $collectionBasic->updateOne(
                     ['indicator_id' => $indicatorID.""],
                     ['$set' => [
@@ -536,7 +519,7 @@ class OTXMDFeedIndicator extends Command
                 $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
                 $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
                 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-                $collectionBasic = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
+                $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
                 $updateResult = $collectionBasic->updateOne(
                     ['indicator_id' => $indicatorID.""],
                     ['$set' => [
@@ -574,10 +557,10 @@ class OTXMDFeedIndicator extends Command
             $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
             $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
             $checkSuccess = true;
-            $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
-            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
 
-        //$col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_event_ref;
+        //$col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
             if (!empty($pulses)) {
                 foreach ($pulses as $value) {
                     try {

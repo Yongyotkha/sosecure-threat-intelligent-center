@@ -74,13 +74,11 @@ class Kernel extends ConsoleKernel
     // $schedule->command('inspire')
     //          ->hourly();
     $delay_WebDefacementProccess = rand(1, 55);
-    $schedule->command('app:WebDefacementProccess')->everyMinute()->withoutOverlapping(30)->runInBackground();
-    $schedule->command('transaction:ssh')->everyMinute()->withoutOverlapping(30)->runInBackground();
-    $schedule->command('transaction:saveScan')->everyMinute()->withoutOverlapping(30)->runInBackground();
+    $schedule->command('app:WebDefacementProccess')->everyMinute();
+    $schedule->command('transaction:ssh')->everyMinute()->withoutOverlapping(5);
+    $schedule->command('transaction:saveScan')->everyMinute()->withoutOverlapping(5);
 
-    $schedule->command('app:RSS_Feed')->cron('0 */1 * * *')->withoutOverlapping(60)->runInBackground();
-    $schedule->command('app:AI_Intel_News')->cron('0 */2 * * *')->withoutOverlapping(120)->runInBackground()
-      ->appendOutputTo(storage_path('logs/AI_Intel_News.log'));
+    $schedule->command('app:RSS_Feed')->cron('0 */1 * * *')->withoutOverlapping(5);
     $schedule->command('app:news_permission')->cron('0 */6 * * *')->withoutOverlapping(5);
     $schedule->command('app:SendLog_Indicator')->dailyAt('10:22')->timezone('Asia/Bangkok')->withoutOverlapping(5);
     // $schedule->command('app:SendLog_Indicator')
@@ -98,40 +96,30 @@ class Kernel extends ConsoleKernel
       ->sendOutputTo(storage_path('logs/MDCVEDataYear.log'));
 
     $schedule->command('app:MDCVEBatchJob')
-      ->cron('0 */8 * * *')
+      ->cron('0 */8 * * *') // ✅ แก้รูปแบบ cron ให้ถูก
       ->name('lang.progress')
-      ->withoutOverlapping(120)->runInBackground()
+      ->withoutOverlapping(5)
       ->sendOutputTo(storage_path('logs/MDCVEBatchJob.log'));
 
-    $schedule->command('app:OTXMDFeedIndicator')->cron('0 */12 * * *')->withoutOverlapping(120)->runInBackground();
-    $schedule->command('app:OTXMDFeedPulse')->cron('0 */12 * * *')->withoutOverlapping(120)->runInBackground();
-    $schedule->command('app:OTXMDFeedType')->cron('0 0 1 * *')->withoutOverlapping(120)->runInBackground();
-    $schedule->command('app:OTXFeedType')->cron('0 */1 * * *')->withoutOverlapping(120)->runInBackground();
-    $schedule->command('app:OTXFeedData')->cron('0 */1 * * *')->withoutOverlapping(120)->runInBackground();
-
-    // Staging pipeline Pulse (Fetch auto-imports). Enable after prod cutover.
-    // $schedule->command('app:OTXMDFetchPulse')->cron('0 */12 * * *')->withoutOverlapping(180)->runInBackground()
-    //     ->appendOutputTo(storage_path('logs/otx_fetch_pulse.log'));
-    // $schedule->command('app:OTXMDFetchPulseHeavy --limit=1')->cron('0 */6 * * *')->withoutOverlapping(180)->runInBackground()
-    //     ->appendOutputTo(storage_path('logs/otx_fetch_pulse_heavy.log'));
-    // Staging pipeline Indicator (Fetch+Import in one command). Enable after verify.
-    // $schedule->command('app:OTXMDFetchIndicator')->cron('0 */12 * * *')->withoutOverlapping(180)->runInBackground()
-    //     ->appendOutputTo(storage_path('logs/otx_fetch_indicator.log'));
-    // (Import no longer scheduled separately — Fetch/Heavy call Import automatically.)
+    $schedule->command('app:OTXMDFeedIndicator')->cron('0 */12 * * *')->withoutOverlapping(5);
+    $schedule->command('app:OTXMDFeedPulse')->cron('0 */12 * * *')->withoutOverlapping(5);
+    $schedule->command('app:OTXMDFeedType')->cron('0 0 1 * *')->withoutOverlapping(5);
+    $schedule->command('app:OTXFeedType')->cron('0 */1 * * *')->withoutOverlapping(5);
+    $schedule->command('app:OTXFeedData')->cron('0 */1 * * *')->withoutOverlapping(5);
     //      $schedule->command('app:MDMISPFeedDaily')->cron('0 */12 * * *')->withoutOverlapping(5);
-    $schedule->command('app:data_leak_social')->hourly()->withoutOverlapping(60)->runInBackground();
+    $schedule->command('app:data_leak_social')->hourly()->withoutOverlapping(5);
     //      $schedule->command('app:MDMISPFeedDaily')->hourly()->withoutOverlapping(5);
-    $schedule->command('app:MDFeedDarkWeb')->dailyAt('03:45')->withoutOverlapping(120)->runInBackground();
-    $schedule->command('app:RemoveFileLogFromStorage')->cron('0 0 */2 * *')->withoutOverlapping(120)->runInBackground();
+    $schedule->command('app:MDFeedDarkWeb')->dailyAt('03:45')->withoutOverlapping(5);
+    $schedule->command('app:RemoveFileLogFromStorage')->cron('0 0 */2 * *')->withoutOverlapping(5);
     //$schedule->command('app:test_indicator_update_ref')->everyMinute()->withoutOverlapping(5);
     $schedule->command('rm -rf /var/www/html/insight.sosecure.co.th/threat-intelligent-center/public/screenshot/screen-master-v2/jobs/')->cron('0 */12 * * *')->withoutOverlapping(5);
-    $schedule->command('app:TransactionCenterReset')->cron('5 0 * * *')->withoutOverlapping(60)->runInBackground();
-    $schedule->command('app:MDAdversaries')->cron('0 */8 * * *')->withoutOverlapping(60)->runInBackground();
-    $schedule->command('app:MDMalware')->cron('0 */8 * * *')->withoutOverlapping(60)->runInBackground();
-    $schedule->command('app:SendLog_Indicator')->dailyAt('18:00')->timezone('Asia/Bangkok')->withoutOverlapping(60)->runInBackground();
-    $schedule->command('app:site_setpermission_log_transaction')->everyMinute()->withoutOverlapping(5)->runInBackground();
-    $schedule->command('app:MDMISPFeedDaily_Database')->cron('0 */6 * * *')->withoutOverlapping()->runInBackground();
-    $schedule->command('app:credentials-leak')->dailyAt('03:00')->timezone('Asia/Bangkok')->withoutOverlapping(5)->runInBackground();
+    $schedule->command('app:TransactionCenterReset')->cron('5 0 * * *')->withoutOverlapping(5);
+    $schedule->command('app:MDAdversaries')->cron('0 */8 * * *')->withoutOverlapping(5);
+    $schedule->command('app:MDMalware')->cron('0 */8 * * *')->withoutOverlapping(5);
+    $schedule->command('app:SendLog_Indicator')->dailyAt('18:00')->timezone('Asia/Bangkok')->withoutOverlapping(5);
+    $schedule->command('app:site_setpermission_log_transaction')->everyMinute()->withoutOverlapping(5);
+    $schedule->command('app:MDMISPFeedDaily_Database')->cron('0 */6 * * *')->withoutOverlapping();
+    $schedule->command('app:credentials-leak')->dailyAt('03:00')->timezone('Asia/Bangkok')->withoutOverlapping(5);
 
     $schedule->command('app:MDMISPFeedDaily_Database_Dev')
       ->dailyAt('00:00')
@@ -144,28 +132,18 @@ class Kernel extends ConsoleKernel
     $schedule->command('misp:tags:sync-insight --max-total=20000')
       ->dailyAt('04:00')
       ->timezone('Asia/Bangkok')
-      ->withoutOverlapping(120)->runInBackground()
+      ->withoutOverlapping(120)
       ->name('misp.tags.sync');
 
     $schedule->command('app:MDCVEFeedOnline')
       ->dailyAt('02:00')
       ->timezone('Asia/Bangkok')
-      ->withoutOverlapping(120)->runInBackground();
+      ->withoutOverlapping();
 
     $schedule->command('app:IOCCleanup')
       ->dailyAt('02:30')
       ->timezone('Asia/Bangkok')
-      ->withoutOverlapping(120)->runInBackground();
-
-    $schedule->command('ioc-feed:update')
-      ->cron('0 */4 * * *')
-      ->timezone('Asia/Bangkok')
-      ->withoutOverlapping(10)->runInBackground();
-
-    $schedule->command('phishing:scan')
-      ->cron('0 */4 * * *')
-      ->timezone('Asia/Bangkok')
-      ->withoutOverlapping(60)->runInBackground();
+      ->withoutOverlapping();
   }
 
   /**

@@ -267,7 +267,7 @@
 <script>
 
     $('#cpe').select2({
-        tags: true,
+        tag: true,
         tokenSeparators: [' '],
         placeholder: 'select cpe',
         minimumInputLength: 1,

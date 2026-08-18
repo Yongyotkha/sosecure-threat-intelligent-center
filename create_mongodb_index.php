@@ -36,44 +36,6 @@ try {
     // นับจำนวน documents
     echo "📈 Total documents: " . $collection->countDocuments([]) . "\n\n";
     
-    // สร้าง index สำหรับ indicator (Search internal_events)
-    echo "🔨 Creating index: idx_indicator...\n";
-    try {
-        $result0 = $collection->createIndex(
-            ['indicator' => 1],
-            [
-                'name' => 'idx_indicator',
-                'background' => true
-            ]
-        );
-        echo "✅ Created: $result0\n\n";
-    } catch (Exception $e) {
-        if (strpos($e->getMessage(), 'already exists') !== false) {
-            echo "ℹ️  Index already exists\n\n";
-        } else {
-            throw $e;
-        }
-    }
-
-    $detailCollection = $client->sosecure_threatintelligent->fx_otx_indicator_detail;
-    echo "🔨 Creating index: idx_indicator_name on fx_otx_indicator_detail...\n";
-    try {
-        $resultDetail = $detailCollection->createIndex(
-            ['indicator_name' => 1],
-            [
-                'name' => 'idx_indicator_name',
-                'background' => true
-            ]
-        );
-        echo "✅ Created: $resultDetail\n\n";
-    } catch (Exception $e) {
-        if (strpos($e->getMessage(), 'already exists') !== false) {
-            echo "ℹ️  Index already exists\n\n";
-        } else {
-            throw $e;
-        }
-    }
-
     // สร้าง index สำหรับ pulse_id
     echo "🔨 Creating index: idx_pulse_id...\n";
     try {

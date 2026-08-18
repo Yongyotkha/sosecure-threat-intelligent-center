@@ -720,10 +720,18 @@ class WebDefacementController extends Controller
         ];
 
         Artisan::call($command, $params);
-        $result_output = Artisan::output();
-        $result = json_decode($result_output, true);
+        $result = Artisan::output();
 
-        return response()->json($result);
+
+        // return ajaxResponse(
+        //     [
+        //         'html'  => $html,
+        //         'message'  => langapp('changes_saved_successful'),
+        //         // 'redirect' => route('webdefacement.detail',['code' => $webdefacement->code]),
+        //     ],
+        //     true,
+        //     Response::HTTP_OK
+        // );
     }
 
     public function deface_now(Request $request)

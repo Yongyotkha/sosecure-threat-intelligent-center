@@ -98,10 +98,7 @@ class DomainScan extends Command
 
         $this->client = new Client([
             'verify'  => false,
-            'timeout' => 60,
-            'headers' => [
-                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
-            ]
+            'timeout' => 30,
         ]);
 
         $startTime = microtime(true);
@@ -125,7 +122,7 @@ class DomainScan extends Command
         $this->printSummary($domain, $scanTime);
 
         // Export JSON
-        $this->exportJson($domain, $scanTime);
+        // $this->exportJson($domain, $scanTime);
 
         // Phase 4: Save to DB (only with --save flag)
         if ($this->option('save')) {
@@ -194,14 +191,13 @@ class DomainScan extends Command
 
         // --- Subdomains + IP ---
         foreach ($this->subdomains as $sub) {
-            $ip = $sub['ip_address'] ?? null;
             // Subdomain record
-            $r = $this->saveScanRecord($siteId, $domainId, $module, 'Subdomain', $sub['subdomain'], $sub['subdomain'], $sub['source'], null, $ip);
+            $r = $this->saveScanRecord($siteId, $domainId, $module, 'Subdomain', $sub['subdomain'], $sub['subdomain'], $sub['source']);
             $r ? $saved++ : $skipped++;
 
             // IP record (if resolved)
-            if (!empty($ip)) {
-                $r = $this->saveScanRecord($siteId, $domainId, $module, 'IP Address', $ip, $sub['subdomain'], $sub['source'], null, $ip);
+            if (!empty($sub['ip_address'])) {
+                $r = $this->saveScanRecord($siteId, $domainId, $module, 'IP Address', $sub['ip_address'], $sub['subdomain'], $sub['source']);
                 $r ? $saved++ : $skipped++;
             }
         }
@@ -209,33 +205,33 @@ class DomainScan extends Command
         // --- Ports ---
         foreach ($this->ports as $p) {
             $rawData = $p['port'];
-            $ip = $p['ip'] ?? null;
             // Save IP Address from Port info
-            if (!empty($ip)) {
-                $r = $this->saveScanRecord($siteId, $domainId, $module, 'IP Address', $ip, $p['target'], 'censys', null, $ip);
+            if (!empty($p['ip'])) {
+                $r = $this->saveScanRecord($siteId, $domainId, $module, 'IP Address', $p['ip'], $p['target'], 'censys', null, $p['ip']);
                 $r ? $saved++ : $skipped++;
             }
 
-            $r = $this->saveScanRecord($siteId, $domainId, $module, 'Port', $rawData, $p['target'], 'censys', null, $ip);
+            $r = $this->saveScanRecord($siteId, $domainId, $module, 'Port', $rawData, $p['target'], 'censys', null, $p['ip'] ?? null);
             $r ? $saved++ : $skipped++;
 
-            // SSL records
+            // SSL records (break down version, cipher, sha256)
             if (!empty($p['ssl_info'])) {
                 $referent = $p['target'];
+                $ip_address = $p['ip'] ?? null;
                 $ssl = $p['ssl_info'];
                 
                 if (!empty($ssl['version'])) {
-                    $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL Version', $ssl['version'], $referent, 'censys', null, $ip);
+                    $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL Version', $ssl['version'], $referent, 'censys', null, $ip_address);
                     $r ? $saved++ : $skipped++;
                 }
 
                 if (!empty($ssl['cipher'])) {
-                    $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL Cipher', $ssl['cipher'], $referent, 'censys', null, $ip);
+                    $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL Cipher', $ssl['cipher'], $referent, 'censys', null, $ip_address);
                     $r ? $saved++ : $skipped++;
                 }
 
                 if (!empty($ssl['sha256'])) {
-                    $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL SHA256', $ssl['sha256'], $referent, 'censys', null, $ip);
+                    $r = $this->saveScanRecord($siteId, $domainId, $module, 'SSL SHA256', $ssl['sha256'], $referent, 'censys', null, $ip_address);
                     $r ? $saved++ : $skipped++;
                 }
             }
@@ -244,11 +240,11 @@ class DomainScan extends Command
         // --- OS/Network/Geo ---
         foreach ($this->osResults as $os) {
             $referent = $os['target'];
-            $ip = $os['ip'] ?? null;
+            $ip_address = $os['ip'] ?? null;
             
             // Save IP Address from OS info if available
-            if (!empty($ip)) {
-                $r = $this->saveScanRecord($siteId, $domainId, $module, 'IP Address', $ip, $os['target'], 'censys', null, $ip);
+            if (!empty($os['ip'])) {
+                $r = $this->saveScanRecord($siteId, $domainId, $module, 'IP Address', $os['ip'], $os['target'], 'censys', null, $os['ip']);
                 $r ? $saved++ : $skipped++;
             }
 
@@ -256,14 +252,14 @@ class DomainScan extends Command
             if (!empty($os['os_name'])) {
                 $osRaw = $os['os_name'];
                 if (!empty($os['os_version'])) $osRaw .= " " . $os['os_version'];
-                $r = $this->saveScanRecord($siteId, $domainId, $module, 'OS', $osRaw, $referent, 'censys', null, $ip);
+                $r = $this->saveScanRecord($siteId, $domainId, $module, 'OS', $osRaw, $referent, 'censys', null, $ip_address);
                 $r ? $saved++ : $skipped++;
             }
 
             // ASN -> Network
             if (!empty($os['asn'])) {
                 $asnRaw = "AS{$os['asn']} {$os['asn_name']}";
-                $r = $this->saveScanRecord($siteId, $domainId, $module, 'Network', $asnRaw, $referent, 'censys', null, $ip);
+                $r = $this->saveScanRecord($siteId, $domainId, $module, 'Network', $asnRaw, $referent, 'censys');
                 $r ? $saved++ : $skipped++;
             }
         }
@@ -272,9 +268,9 @@ class DomainScan extends Command
         foreach ($this->cpeResults as $cpe) {
             $rawData = $cpe['cpe_uri'];
             $referent = $cpe['target'];
-            $ip = $cpe['ip'] ?? null;
+            $ip_address = $cpe['ip'] ?? null;
 
-            $r = $this->saveScanRecord($siteId, $domainId, $module, 'CPE', $rawData, $referent, 'censys', $cpe['code'], $ip);
+            $r = $this->saveScanRecord($siteId, $domainId, $module, 'CPE', $rawData, $referent, 'censys', $cpe['code'], $ip_address);
             $r ? $saved++ : $skipped++;
         }
 
@@ -282,52 +278,45 @@ class DomainScan extends Command
         if (!empty($this->cveResults)) {
             $cveSaved = 0;
             $cveSkipped = 0;
-            $savedCveMap = []; // To track which target+cve we've already saved pointer for
-
             foreach ($this->cveResults as $cve) {
                 $exists = TransactionScansCveTemp::where('site_id', $siteId)
                     ->where('domain_id', $domainId)
                     ->where('namecve', $cve['cve_id'])
                     ->first();
 
-                if (!$exists) {
-                    $temp = new TransactionScansCveTemp();
-                    $temp->code        = Str::uuid()->toString();
-                    $temp->site_id     = $siteId;
-                    $temp->domain_id   = $domainId;
-                    $temp->namecve     = $cve['cve_id'];
-                    $temp->severity    = $cve['severity'];
-                    $temp->cvss_score  = $cve['cvss_score'];
-                    $temp->description = $cve['description'];
-                    $temp->published   = $cve['published'];
-                    $temp->modified    = $cve['modified'];
-                    // Clean target (no port)
-                    $temp->target       = explode(':', $cve['target'])[0];
-                    $temp->affected_cpe = $cve['affected_cpe'];
-                    $temp->cpe_code     = $cve['cpe_code'];
-                    $temp->cpe_uri      = $cve['cpe_uri'];
-                    $temp->source       = 'nist_nvd';
-                    $temp->is_mapped    = 0;
-                    $temp->save();
-                    $cveSaved++;
-                } else {
+                if ($exists) {
                     $cveSkipped++;
+                    continue;
                 }
 
-                // --- CVE main pointer → transaction_scans ---
-                // We save a pointer for EACH target/IP where this CVE was found
-                $target = explode(':', $cve['target'])[0];
-                $ip = $cve['ip'] ?? null;
-                $mapIndex = $target . '_' . ($ip ?: 'noip') . '_' . $cve['cve_id'];
-                
-                if (!isset($savedCveMap[$mapIndex])) {
-                    $r = $this->saveCvePointerRecord($siteId, $domainId, $module, 'CVE', $cve['cve_id'], $target, 'nist_nvd', ($cveSaved > 0), null, $ip);
-                    if ($r) $saved++; else $skipped++;
-                    $savedCveMap[$mapIndex] = true;
-                }
+                $temp = new TransactionScansCveTemp();
+                $temp->code        = Str::uuid()->toString();
+                $temp->site_id     = $siteId;
+                $temp->domain_id   = $domainId;
+                $temp->namecve     = $cve['cve_id'];
+                $temp->severity    = $cve['severity'];
+                $temp->cvss_score  = $cve['cvss_score'];
+                $temp->description = $cve['description'];
+                $temp->published   = $cve['published'];
+                $temp->modified    = $cve['modified'];
+                // Clean target (no port)
+                $temp->target       = explode(':', $cve['target'])[0];
+                $temp->affected_cpe = $cve['affected_cpe'];
+                $temp->cpe_code     = $cve['cpe_code'];
+                $temp->cpe_uri      = $cve['cpe_uri'];
+                $temp->source       = 'nist_nvd';
+                $temp->is_mapped    = 0;
+                $temp->save();
+                $cveSaved++;
             }
 
             $this->info("  📋 CVE Temp: {$cveSaved} saved, {$cveSkipped} skipped (duplicate)");
+
+            // --- CVE main pointer → transaction_scans ---
+            // If we saved at least one NEW CVE ID, force status to 2 (New)
+            // SaveScanRecord will handle the status logic internally but we need to know if it's "New" overall
+            $r = $this->saveCvePointerRecord($siteId, $domainId, $module, 'CVE', $domain, $domain, 'nist_nvd', ($cveSaved > 0));
+            $r ? $saved++ : $skipped++;
         }
 
 
@@ -420,25 +409,22 @@ class DomainScan extends Command
         // Strip port from referent if it exists (e.g. "domain.com:80" -> "domain.com")
         $referent = explode(':', $referent)[0];
 
-        // Dedup check: same site + domain + module + data_type + raw_data + referent + ip_address
-        $query = TransactionScans::where('site_id', $siteId)
+        // Dedup check: same site + domain + module + data_type + raw_data
+        $exists = TransactionScans::where('site_id', $siteId)
             ->where('domain_id', $domainId)
+            ->where('module', $module)
             ->where('data_type', $dataType)
-            ->where('raw_data', (string)$rawData)
-            ->where('referent', $referent);
-        
-        if ($ip_address) {
-            $query->where('ip_address', $ip_address);
-        } else {
-            $query->whereNull('ip_address');
-        }
-
-        $exists = $query->first();
+            ->where('raw_data', $rawData)
+            ->first();
 
         if ($exists) {
             $exists->updated_at = Carbon::now();
-            $exists->source = $source; // Update source to latest discovery
             
+            // Always ensure referent is clean (no port)
+            if ($exists->referent !== $referent) {
+                $exists->referent = $referent;
+            }
+
             // If record is already 'Used' (status_asset_use == 1), don't revert its status to Discovered/New
             if ($exists->status_asset_use != 1) {
                 $exists->status = $forceNew ? 2 : 1;
@@ -474,13 +460,10 @@ class DomainScan extends Command
         // 1b. DNS Enumeration
         $this->dnsEnumeration($domain);
 
-        // 1c. Dictionary Discovery (Common subdomains)
-        $this->dictionaryDiscovery($domain);
-
-        // 1d. VirusTotal (if API key available)
+        // 1c. VirusTotal (if API key available)
         $this->virusTotalDiscovery($domain);
 
-        // 1e. Resolve IPs for all subdomains
+        // 1d. Resolve IPs for all subdomains
         $this->resolveIPs();
 
         $this->info("  ✅ Total subdomains found: " . count($this->subdomains));
@@ -492,7 +475,7 @@ class DomainScan extends Command
 
         try {
             $response = $this->client->get("https://crt.sh/?q=%25.{$domain}&output=json", [
-                'timeout' => 45, // Increased timeout for stability
+                'timeout' => 15,
             ]);
 
             $data = json_decode($response->getBody(), true);
@@ -528,35 +511,6 @@ class DomainScan extends Command
         } catch (Exception $e) {
             $this->warn("     crt.sh error: " . $e->getMessage());
         }
-    }
-
-    private function dictionaryDiscovery($domain)
-    {
-        $this->info("  📖 Dictionary Discovery (Common)...");
-        
-        $common = [
-            'www', 'mail', 'remote', 'blog', 'webmail', 'server', 'ns1', 'ns2', 'smtp', 
-            'secure', 'vpn', 'm', 'shop', 'ftp', 'dev', 'api', 'portal', 'test', 
-            'staging', 'app', 'internal', 'cloud', 'admin', 'autodiscover'
-        ];
-
-        $found = 0;
-        foreach ($common as $prefix) {
-            $sub = "{$prefix}.{$domain}";
-            if ($this->isSubdomainKnown($sub)) continue;
-
-            $ip = @gethostbyname($sub);
-            if ($ip && $ip !== $sub) {
-                $this->subdomains[] = [
-                    'subdomain'  => $sub,
-                    'ip_address' => $ip,
-                    'source'     => 'dictionary',
-                ];
-                $found++;
-            }
-        }
-
-        $this->info("     Found {$found} subdomains from dictionary");
     }
 
     private function dnsEnumeration($domain)
@@ -781,7 +735,7 @@ class DomainScan extends Command
             // --- Extract Autonomous System + Location + OS → OS record ---
             $asn      = $resource['autonomous_system'] ?? null;
             $location = $resource['location'] ?? null;
-            $os       = $resource['operating_system'] ?? [];
+            $os       = $data['result']['operating_system'] ?? [];
 
             if ($asn || $location || $os) {
                 $osName    = $os['product'] ?? ($os['name'] ?? null);

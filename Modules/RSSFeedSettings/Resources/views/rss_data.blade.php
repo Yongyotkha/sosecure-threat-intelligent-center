@@ -21,20 +21,12 @@
                         <ul class="nav nav-pills nav-stacked no-radius">
                             <li>
                                 <a href="{{route('rssfeedsettings.news')}}">
-                                    @icon('solid/angle-right', 'text-' . get_option('theme_color'))
                                     News
                                 </a>
                             </li>
                             <li class="active">
                                 <a href="{{route('rssfeedsettings.rss_data')}}">
-                                    @icon('solid/angle-right', 'text-' . get_option('theme_color'))
                                     RSS Data
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{route('rssfeedsettings.ai_intel')}}">
-                                    @icon('solid/angle-right', 'text-' . get_option('theme_color'))
-                                    AI Intel
                                 </a>
                             </li>
                             {{-- <li>

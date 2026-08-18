@@ -393,12 +393,22 @@ class MDCVEFeedOnline extends Command
         $this->info("🔁 generateSummary(site_id={$site_id}, code={$site_code}) ...");
         Log::info('🔁 generateSummary(site_id=' . $site_id . ', code=' . $site_code . ') ...');
 
-        // ✅ Optimized: Use JOIN instead of pluck + whereIn to avoid massive SQL string and long execution time
+        // ดึง namecve ทั้งหมดของ site (distinct)
+        $mappedCve = DB::table('data_datacve_mapping_assets')
+            ->where('site_id', $site_id)
+            ->distinct()
+            ->pluck('namecve');
+
+        if ($mappedCve->isEmpty()) {
+            $this->info("ℹ️ No CVE mapping for site={$site_code}");
+            return;
+        }
+
+        // ดึง severity ตาม CVE แบบ DISTINCT
         $severityList = DB::table('data_datacve_mapping')
-            ->join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve')
-            ->where('data_datacve_mapping_assets.site_id', $site_id)
-            ->select('data_datacve_mapping.namecve', 'data_datacve_mapping.severity')
-            ->groupBy('data_datacve_mapping.namecve', 'data_datacve_mapping.severity')
+            ->whereIn('namecve', $mappedCve)
+            ->select('namecve', 'severity')
+            ->groupBy('namecve', 'severity')
             ->get();
 
         // เคลียร์ summary เดิม

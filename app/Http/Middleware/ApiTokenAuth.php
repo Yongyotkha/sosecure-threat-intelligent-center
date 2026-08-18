@@ -62,6 +62,11 @@ class ApiTokenAuth
         }
 
         // 4) ล็อก token ให้ใช้ได้เฉพาะ site ที่กำหนด
+        // วิธีระบุ site ปลายทางของคำขอ:
+        // - query: ?site_id=123
+        // - header: X-Site-Id: 123
+        // - route param: /sites/{site_id}/...
+        // - (ทางเลือก) จาก code ใน route แล้ว map เป็น id
         $requestSiteId = $request->query('site_id')
             ?? $request->header('X-Site-Id')
             ?? $request->route('site_id');
@@ -71,35 +76,24 @@ class ApiTokenAuth
             $requestSiteId = (int) $token->site_id;
         }
 
+        // (ทางเลือก) map จาก code -> id ถ้าเส้นทางคุณเป็น /sites/{code}/...
+        // if (is_null($requestSiteId) && ($code = $request->route('code'))) {
+        //     $requestSiteId = \Modules\SiteSettings\Entities\SiteSettings::where('code', $code)->value('id');
+        // }
+
         // ถ้ามีทั้งสองฝั่ง และไม่ตรงกัน → ห้าม
         if (!is_null($token->site_id) && !is_null($requestSiteId) && (int)$token->site_id !== (int)$requestSiteId) {
             return response()->json(['message' => 'Token not allowed for this site'], 403);
         }
 
-        // 5) ตรวจสอบ IP Whitelist
-        $clientIp = $request->ip();
-        if (!empty($token->whitelist_ips)) {
-            $allowedIps = array_map('trim', explode(',', $token->whitelist_ips));
-            if (!in_array($clientIp, $allowedIps)) {
-                Log::warning("API Token IP Auth Failed", [
-                    'token_name' => $token->name,
-                    'client_ip'  => $clientIp,
-                    'allowed'    => $allowedIps
-                ]);
-                return response()->json(['message' => 'IP address not authorized.'], 403);
-            }
-        }
-
-        // 6) อัปเดตการใช้งานล่าสุดและ IP ล่าสุด
-        $token->last_used_at = now();
-        $token->last_ip = $clientIp;
-        $token->save();
-
-        // ปักข้อมูลให้ Controller ใช้งานต่อได้ทันที
-        $request->attributes->set('api_token', $token);
+        // ปัก site_id ให้ Controller ใช้งานต่อได้ทันที
         if (!is_null($requestSiteId)) {
             $request->attributes->set('site_id', (int)$requestSiteId);
         }
+
+        // 5) อัปเดตการใช้งานล่าสุด
+        $token->last_used_at = now();
+        $token->save();
 
         return $next($request);
     }

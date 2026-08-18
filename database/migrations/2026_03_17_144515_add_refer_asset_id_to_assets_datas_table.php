@@ -13,12 +13,10 @@ class AddReferAssetIdToAssetsDatasTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('assets_datas', 'refer_asset_id')) {
-            Schema::table('assets_datas', function (Blueprint $table) {
-                $table->unsignedBigInteger('refer_asset_id')->nullable()->after('asset_id');
-                $table->index('refer_asset_id');
-            });
-        }
+        Schema::table('fx_assets_datas', function (Blueprint $table) {
+            $table->unsignedBigInteger('refer_asset_id')->nullable()->after('asset_id');
+            $table->index('refer_asset_id');
+        });
     }
 
     /**
@@ -28,11 +26,9 @@ class AddReferAssetIdToAssetsDatasTable extends Migration
      */
     public function down()
     {
-        if (Schema::hasColumn('assets_datas', 'refer_asset_id')) {
-            Schema::table('assets_datas', function (Blueprint $table) {
-                $table->dropIndex(['refer_asset_id']);
-                $table->dropColumn('refer_asset_id');
-            });
-        }
+        Schema::table('fx_assets_datas', function (Blueprint $table) {
+            $table->dropIndex(['refer_asset_id']);
+            $table->dropColumn('refer_asset_id');
+        });
     }
 }

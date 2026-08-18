@@ -9,42 +9,12 @@ use Artisan;
 
 class OTXMDFeedPulse extends Command
 {
-    protected $totalPulsesFromApi = 0;
-    protected $totalPulsesProcessed = 0;
-    protected $totalPulsesSkippedFilter = 0;
-    protected $totalPulsesError = 0;
-    protected $totalIndicatorsProcessed = 0;
-    protected $totalIndicatorsSkipped = 0;
-    protected $totalExpectedIndicators = 0;
-    private $failedPulses = [];
-    private $processedPulseIds = [];
-
-    private function logToFile($message, $level = 'info')
-    {
-        $timestamp = date('Y-m-d H:i:s');
-        $logMessage = "[$timestamp] [$level] $message" . PHP_EOL;
-        $logPath = storage_path('logs/otx_sync.log');
-        
-        // Ensure directory exists
-        if (!file_exists(dirname($logPath))) {
-            mkdir(dirname($logPath), 0755, true);
-        }
-        
-        file_put_contents($logPath, $logMessage, FILE_APPEND);
-        
-        if ($level === 'error') {
-            $this->error($message);
-        } else {
-            $this->info($message);
-        }
-    }
-
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:OTXMDFeedPulse {--limit= : Limit the number of pulses to process} {--quick : Skip indicators and related pulses for faster testing}';
+    protected $signature = 'app:OTXMDFeedPulse';
 
     /**
      * The console command description.
@@ -70,20 +40,12 @@ class OTXMDFeedPulse extends Command
      */
     public function handle()
     {
-        $this->totalPulsesFromApi = 0;
-        $this->totalPulsesProcessed = 0;
-        $this->totalIndicatorsProcessed = 0;
-        $this->totalExpectedIndicators = 0;
-        $this->processedPulseIds = [];
 
         $urlLimit = 3;
         $retryLimit = 1;
 
         $roundRetry = 0;
         $loop = 0;
-        $limitPulses = $this->option('limit');
-        $this->logToFile("=== OTX SYNC STARTED ===");
-
 
         do {
             try {
@@ -96,7 +58,7 @@ class OTXMDFeedPulse extends Command
                 $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
                 $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
                 if (!isset($insertOneResult)) {
-                    $collectionStamp = $clientMD->sosecure_threatintelligent->fx_transaction_otx_event_stamp;
+                    $collectionStamp = $clientMD->sosecure_threatintelligent_dev->fx_transaction_otx_event_stamp;
                     $insertOneResult = $collectionStamp->insertOne([
                         'code' => generator_uuid(),
                         'transaction_date' => date("Y-m-d"),
@@ -109,16 +71,14 @@ class OTXMDFeedPulse extends Command
                         'source' => "otx.alienvault",
                     ]);
                 }//modified:%3C1d
-                $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/?limit=100&page=1&sort=-modified&q=modified:<12h', $urlLimit);
+                $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/?limit=10&page=1&sort=-modified&q=modified:<12h', $urlLimit);
                 if ($reconCall["success"]) {
                     $otxFeedData = json_decode($reconCall["result"], true);
-                    $this->totalPulsesFromApi = $otxFeedData['count'] ?? 0;
-                    $this->info("Total pulses from OTX API: " . $this->totalPulsesFromApi);
                 } else {
 
                     $otxFeedDataCheck = false;
                     $otxSuccessCheck = false;
-                    $this->info("FAIL1: Initial pulses list fetch failed.");
+                    // $this->info("FAIL1");
                 }
 
                 while ($otxFeedDataCheck) {
@@ -126,14 +86,8 @@ class OTXMDFeedPulse extends Command
                     if (!empty($otxFeedData["results"])) {
                         $checkSuccessDummy = $this->savePulseRef($otxFeedData["results"],$insertOneResult->getInsertedId(), $urlLimit)["success"];
                         if(!$checkSuccessDummy){
-                            $otxSuccessCheck = false;
+                            $checkSuccess = false;
                         }
-                    }
-
-                    if ($limitPulses && $this->totalPulsesProcessed >= $limitPulses) {
-                        $this->info("Limit reached: " . $limitPulses . " pulses processed. Stopping...");
-                        $otxFeedDataCheck = false;
-                        break;
                     }
                     if (isset($otxFeedData["next"])) {
                         $this->info($otxFeedData["next"]);
@@ -143,7 +97,7 @@ class OTXMDFeedPulse extends Command
                         } else {
                             $otxSuccessCheck = false;
                             $otxFeedDataCheck = false;
-                            $this->info("FAIL2: Next page fetch failed.");
+                            // $this->info("FAIL2");
                         }
                     } else {
                         $otxFeedDataCheck = false;
@@ -153,65 +107,19 @@ class OTXMDFeedPulse extends Command
             } catch (Exception $e) {
                 $error["Exception"] = $e->getMessage();
                 $otxSuccessCheck = false;
-                $this->info("FAIL3: Exception - " . $e->getMessage());
+                // $this->info("FAIL3");
             }
             $roundRetry++;
         } while ($roundRetry < $retryLimit && !$otxSuccessCheck);
-        
-        $totalPulseVerified = $this->totalPulsesProcessed + $this->totalPulsesSkippedFilter + $this->totalPulsesError;
-
-        // Always update the log in database if we have a log entry started
-        if (isset($insertOneResult)) {
+        if ($otxSuccessCheck && isset($insertOneResult)) {
             $updateResult2 = $collectionStamp->updateOne(
                 ['_id' => $insertOneResult->getInsertedId()],
-                ['$set' => [
-                    'status' => ($otxSuccessCheck && ($totalPulseVerified >= $this->totalPulsesFromApi || ($limitPulses && $totalPulseVerified >= $limitPulses))) ? 2 : 3,
-                    'api_total_pulses' => $this->totalPulsesFromApi,
-                    'processed_pulses' => $this->totalPulsesProcessed,
-                    'processed_indicators' => $this->totalIndicatorsProcessed,
-                    'skipped_indicators' => $this->totalIndicatorsSkipped,
-                    'api_expected_indicators' => $this->totalExpectedIndicators,
-                    'failed_pulses' => $this->failedPulses,
-                    'error_msg' => ($otxSuccessCheck && ($totalPulseVerified >= $this->totalPulsesFromApi || ($limitPulses && $totalPulseVerified >= $limitPulses))) ? '' : ($error["Exception"] ?? 'Partial Failure during sync'),
-                ]]
+                ['$set' => ['status' => 2]]
             );
-        }
-
-        // Always show the summary report
-        $this->info("=========================================");
-        $this->info("SUMMARY REPORT (OTX FEED)");
-        $this->info("=========================================");
-        $this->info("PULSES STATUS:");
-        $this->info("  - Total from OTX API  : " . number_format($this->totalPulsesFromApi));
-        $this->info("  - Successfully Saved : " . number_format($this->totalPulsesProcessed));
-        $this->info("  - Skipped (Filter)   : " . number_format($this->totalPulsesSkippedFilter) . " (e.g. Public DNS)");
-        $this->info("  - Errors (Network)   : " . number_format($this->totalPulsesError));
-        $this->info("  - Total Verified     : " . number_format($totalPulseVerified) . " / " . number_format($this->totalPulsesFromApi) . " (" . ($this->totalPulsesFromApi > 0 ? round(($totalPulseVerified/$this->totalPulsesFromApi)*100, 2) : 0) . "%)");
-        
-        if (!empty($this->failedPulses)) {
-            $this->info("  - Failed Pulse IDs   : " . implode(', ', array_slice($this->failedPulses, 0, 5)) . (count($this->failedPulses) > 5 ? '...' : ''));
-        }
-
-        $this->info("-----------------------------------------");
-        $this->info("INDICATORS STATUS:");
-        $this->info("  - Expected from API  : " . number_format($this->totalExpectedIndicators));
-        $this->info("  - Newly Saved (Today): " . number_format($this->totalIndicatorsProcessed));
-        $this->info("  - Skipped (Old Data) : " . number_format($this->totalIndicatorsSkipped));
-        $totalIndiVerified = $this->totalIndicatorsProcessed + $this->totalIndicatorsSkipped;
-        $this->info("  - Total Verified     : " . number_format($totalIndiVerified) . " / " . number_format($this->totalExpectedIndicators) . " (" . ($this->totalExpectedIndicators > 0 ? round(($totalIndiVerified/$this->totalExpectedIndicators)*100, 2) : 0) . "%)");
-        $this->info("=========================================");
-
-        $isAllProcessed = ($totalPulseVerified >= $this->totalPulsesFromApi);
-        $isLimitReached = ($limitPulses && $totalPulseVerified >= $limitPulses);
-        
-        if ($otxSuccessCheck && ($isAllProcessed || $isLimitReached)) {
-            $this->logToFile("app:OTXMDFeedPulse SUCCESS ALL CONTENT");
+            $this->info("app:OTXMDFeedIndicator SUCCESS ALL CONTENT");
         } else {
-            $reason = !$otxSuccessCheck ? "Internal Error occurred" : "Counts mismatch (API:{$this->totalPulsesFromApi}, Verified:{$totalPulseVerified}, Limit:{$limitPulses})";
-            $this->logToFile("app:OTXMDFeedPulse FAIL SOME CONTENT - Reason: $reason", 'error');
+            $this->info("app:OTXMDFeedIndicator FAIL SOME CONTENT");
         }
-
-
 
         $commandArtisan = 'app:MDCountIndicator';
         Artisan::call($commandArtisan);
@@ -225,7 +133,7 @@ class OTXMDFeedPulse extends Command
         $_otxReconnect = true;
         $_dataOut["result"] = "";
         $_dataOut["success"] = false;
-        $_sleeptime = ($this->option('limit') || $this->option('quick')) ? 0 : rand(0,2000); 
+        $_sleeptime = rand(0,2000); 
         while ($_otxReconnect && $_reconnect < $limit) {
             try {
                 $_bodyData = $_clientHttp->request(
@@ -238,7 +146,7 @@ class OTXMDFeedPulse extends Command
                             'X-OTX-API-KEY' => $_OTX_KEY,
                         ],
                         'delay' => $_sleeptime, //millisec == 1sec
-                        'timeout' => 120, //sec == 100sec (เพิ่มเป็น 120 เพราะ OTX API บางตัวตอบกลับช้ามาก)
+                        'timeout' => 59, //sec == 100sec
                     ]
                 )->getBody();
                 $_dataOut["result"] = $_bodyData;
@@ -258,36 +166,21 @@ class OTXMDFeedPulse extends Command
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
         $checkSuccess = true;
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
         $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s"))*1000);
         $loop = 0;
-        $limitPulses = $this->option('limit');
-        foreach ($pulses as $value) {
-                if ($limitPulses && ($this->totalPulsesProcessed + $this->totalPulsesSkippedFilter + $this->totalPulsesError) >= $limitPulses) {
-                    break;
-                }
-
-                if (isset($value["id"]) && in_array($value["id"], $this->processedPulseIds)) {
-                    continue; // Skip if already processed in previous pages
-                }
-                if (isset($value["id"])) {
-                    $this->processedPulseIds[] = $value["id"];
-                }
-
-                if (isset($value["indicator_count"])) {
-                    $this->totalExpectedIndicators += (int) $value["indicator_count"];
-                }
+        if (!empty($pulses)) {
+            foreach ($pulses as $value) {
                 try {
 
                    $modified = $value["modified"]; 
                    $created = $value["created"]; 
                 if(strpos($value["name"], 'Public DNS') !== false){
-                    $this->totalPulsesSkippedFilter++;
+
                 }else{
-                    $this->totalPulsesProcessed++;
                //  $this->info("created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
-                   if (true) { // Process all pulses returned by the API (filtered by <12h)
+                   if (explode("T", $modified)[0] == date('Y-m-d') || explode("T", $created)[0] == date('Y-m-d') || 1==1) {
                     $this->info("Insert created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
 
 
@@ -297,12 +190,8 @@ class OTXMDFeedPulse extends Command
                         $otxPulseDetail = json_decode($reconCall["result"], true);
                         $groups = implode(', ', array_column(isset($otxPulseDetail["groups"])?$otxPulseDetail["groups"]:[] , 'name'));
                     } else {
-                        $this->totalPulsesError++;
-                        $this->failedPulses[] = $value["id"] ?? 'unknown';
-                        $this->logToFile("Error fetching pulse detail: " . ($value["id"] ?? 'unknown'), 'error');
-                        $checkSuccess = false;
-                    }
-
+                     $checkSuccess = false;
+                 }
                  $references = implode(', ', isset($value["references"]) ? $value["references"] : []);
                  $tags = implode(', ', isset($value["tags"]) ? $value["tags"] : []);
                  $industries = implode(', ', isset($value["industries"]) ? $value["industries"] : []);
@@ -315,7 +204,7 @@ class OTXMDFeedPulse extends Command
                         'description' => isset($value["description"]) ? $value["description"] : "",
                         'modified' => isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null,
                         'created' => isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null,
-                        'public' => 0,
+                        'public' => isset($value["public"]) ? $value["public"] : "",
                         'TLP' => isset($value["TLP"]) ? $value["TLP"] : "",
 
                         'is_modified' => isset($value["is_modified"]) ? $value["is_modified"] : "",
@@ -350,21 +239,15 @@ class OTXMDFeedPulse extends Command
 
                     echo "Indi : ".$value["id"];
                     $dateModified = isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null;
-                    
-                    if (!$this->option('quick')) {
-                        $checkSuccessIndi = $this->saveIndicator_ref($value["id"],$urlLimit,$dateModified, ($value["indicator_count"] ?? 0))["success"];
-                        $this->countAttr($value["id"],$clientMD);
-                        if(!$checkSuccessIndi){
-                            // Don't set checkSuccess = false for indicator/related failures to allow partial success
-                            $this->logToFile("Notice: Some indicators failed for pulse " . $value["id"], 'warning');
-                        }
-
-                        echo "  Pulse : ".$value["id"];
-                        $checkSuccessRel = $this->savePulse_related($value["id"],$urlLimit)["success"];
-                        if(!$checkSuccessRel){
-                             // Don't set checkSuccess = false for indicator/related failures to allow partial success
-                             $this->logToFile("Notice: Some related pulses failed for pulse " . $value["id"], 'warning');
-                        }
+                    $checkSuccessDummy = $this->saveIndicator_ref($value["id"],$urlLimit,$dateModified)["success"];
+                    $this->countAttr($value["id"],$clientMD);
+                    if(!$checkSuccessDummy){
+                        $checkSuccess = false;
+                    }
+                    echo "  Pulse : ".$value["id"];
+                    $checkSuccessDummy = $this->savePulse_related($value["id"],$urlLimit)["success"];
+                    if(!$checkSuccessDummy){
+                        $checkSuccess = false;
                     }
 
 
@@ -381,19 +264,20 @@ class OTXMDFeedPulse extends Command
         }
 
       } catch (Exception $e) {
-        $this->totalPulsesError++;
         $checkSuccess = false;
     }
 }
-    $dataOut["success"] = $checkSuccess;
-    return $dataOut;
+
+}
+$dataOut["success"] = $checkSuccess;
+return $dataOut;
 }
 
 public function countAttr($pulseID_,$clientMD){
     $pulseID = $pulseID_."";
-    $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-    $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
-    $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+    $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+    $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
+    $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
     $findOne_col_fx_otx_events = $col_fx_otx_events->findOne(array('pulse_id' => $pulseID));
     $query2 = [
         '$and' =>   
@@ -482,7 +366,7 @@ public function countAttr($pulseID_,$clientMD){
     }
 }
 
-public function saveIndicator_ref($pulseID,$urlLimit,$dateModified, $expectedCount = 0)
+public function saveIndicator_ref($pulseID,$urlLimit,$dateModified)
 {
     $allRow = (object) array();
     $dayMoreThan = 6;
@@ -492,8 +376,8 @@ public function saveIndicator_ref($pulseID,$urlLimit,$dateModified, $expectedCou
         $otxFeedDataCheck = true;
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $collectionBasic = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
-        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+        $collectionBasic = $clientMD->sosecure_threatintelligent_dev->fx_otx_indicator_detail;
+        $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_indicator_ref;
         $loop = 0;
         $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/indicators/?sort=-created&limit=1000&page=1', $urlLimit);
         if ($reconCall["success"]) {
@@ -501,9 +385,9 @@ public function saveIndicator_ref($pulseID,$urlLimit,$dateModified, $expectedCou
         } else {
             $otxFeedDataCheck = false;
             $otxSuccessCheck = false;
-            $this->logToFile("Error fetching indicators for pulse $pulseID: API call failed", 'error');
+                // $this->info("FAIL41");
+                // echo 'https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/indicators/?sort=-created&limit=5000&page=1';
         }
-        $pulseIndicatorProcessed = 0;
         while ($otxFeedDataCheck) {
             $loop++;
             if (!empty($otxFeedData["results"])) {
@@ -514,9 +398,8 @@ public function saveIndicator_ref($pulseID,$urlLimit,$dateModified, $expectedCou
                     $diff = date_diff($date1, $date2);
 
                     $created = $value["created"]; 
+               //  $this->info("created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
                     if (explode("T", $created)[0] == date('Y-m-d')) {
-                        $this->totalIndicatorsProcessed++;
-                        $pulseIndicatorProcessed++;
                         $this->info("saveIndicator_ref-Insert created:". explode("T", $created)[0]);
 
 
@@ -582,19 +465,16 @@ public function saveIndicator_ref($pulseID,$urlLimit,$dateModified, $expectedCou
 
                         } catch (Exception $e) {
                             $otxFeedDataCheck = false;
-                            $errorMsg = $e->getMessage();
+                            $error["Exception"] = $e->getMessage();
                             $otxSuccessCheck = false;
-                            $this->logToFile("Error saving indicator: " . ($value["indicator"] ?? 'unknown') . " in pulse $pulseID. Error: $errorMsg", 'error');
+                            // $this->info("FAIL5");
+                            // echo json_encode($error["Exception"]);
+                            // echo json_encode($value);
                             break;
                         }
 
 
-
                     }else{
-                       $remaining = $expectedCount - $pulseIndicatorProcessed;
-                       if ($remaining > 0) {
-                           $this->totalIndicatorsSkipped += $remaining;
-                       }
                        $otxFeedDataCheck = false;
                        break;
                    }
@@ -612,16 +492,13 @@ public function saveIndicator_ref($pulseID,$urlLimit,$dateModified, $expectedCou
             } else {
                 $otxSuccessCheck = false;
                 $otxFeedDataCheck = false;
-                $this->logToFile("Error fetching next page of indicators for pulse $pulseID", 'error');
+                        // $this->info("FAIL6");
             }
-
         } else {
             $otxFeedDataCheck = false;
         }
     }
 } catch (Exception $e) {
-    $errorMsg = $e->getMessage();
-    $this->logToFile("Exception in saveIndicator_ref for pulse $pulseID: $errorMsg", 'error');
     $otxSuccessCheck = false;
 }
 $dataOut["success"] = $otxSuccessCheck;
@@ -638,8 +515,8 @@ public function savePulse_related($pulseID,$urlLimit)
         $otxFeedDataCheck = true;
         $DB_MONGO_KEY = env("DB_MONGO_STOREDATA", "");
         $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-        $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
-        $col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_event_ref;
+        $col_fx_otx_events = $clientMD->sosecure_threatintelligent_dev->fx_otx_events;
+        $col_fx_otx_events_event_ref = $clientMD->sosecure_threatintelligent_dev->fx_otx_events_event_ref;
         $loop = 0;
         $reconCall = $this->reconnnect('https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/related?limit=100&sort=-modified', $urlLimit);
         if ($reconCall["success"]) {
@@ -648,7 +525,8 @@ public function savePulse_related($pulseID,$urlLimit)
         } else {
             $otxFeedDataCheck = false;
             $otxSuccessCheck = false;
-            $this->logToFile("Error fetching related pulses for pulse $pulseID: API call failed", 'error');
+                // $this->info("FAIL42");
+                // echo 'https://otx.alienvault.com/otxapi/pulses/'.$pulseID.'/related?limit=100';
         }
         while ($otxFeedDataCheck) {
             $loop++;
@@ -658,7 +536,6 @@ public function savePulse_related($pulseID,$urlLimit)
                     $date2 = date_create(date("Y-m-d H:i:s"));
 
                     $modified = $value["modified"]; 
-                    $created = $value["created"] ?? $modified;
                //  $this->info("created:". explode("T", $created)[0].'-modified:'. explode("T",$modified)[0]);
                     if (explode("T", $modified)[0] == date('Y-m-d')) {
                      $this->info("savePulse_related-Insert created:". explode("T", $created)[0]);
@@ -686,7 +563,7 @@ public function savePulse_related($pulseID,$urlLimit)
                                 'description' => isset($value["description"]) ? $value["description"] : "",
                                 'modified' => isset($value["modified"]) ? new UTCDateTime(strtotime($value["modified"])*1000) : null,
                                 'created' => isset($value["created"]) ? new UTCDateTime(strtotime($value["created"])*1000) : null,
-                                'public' => 0,
+                                'public' => isset($value["public"]) ? $value["public"] : "",
                                 'TLP' => isset($value["TLP"]) ? $value["TLP"] : "",
 
                                 'is_modified' => isset($value["is_modified"]) ? $value["is_modified"] : "",
@@ -784,8 +661,6 @@ public function savePulse_related($pulseID,$urlLimit)
     ]
 );
 } catch (Exception $e) {
-    $errorMsg = $e->getMessage();
-    $this->logToFile("Exception in savePulse_related for pulse $pulseID: $errorMsg", 'error');
     $otxSuccessCheck = false;
 }
 $dataOut["success"] = $otxSuccessCheck;

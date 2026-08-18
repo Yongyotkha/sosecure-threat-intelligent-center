@@ -181,7 +181,6 @@ if ($model_has_roles) {
                                                 $active = '';
                                                 $url = '#';
                                                 $check_menu_active = '';
-                                                $check_menu_active_arr = '';
                                                 $name_val = '';
                                                 
                                                 if($menu_val->url) {// url

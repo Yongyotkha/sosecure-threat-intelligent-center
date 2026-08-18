@@ -24,27 +24,21 @@
                         <span data-rel="tooltip" title="Add Category" data-placement="top">@icon('solid/plus')<span class="hide-text">Add Category</span></span>
                     </button>
 
-                    <button id="add_category" data-toggle="modal" data-target="#add_extension_modal"
-                        class="btn btn-sm btn-{{ get_option('theme_color')  }}">
-                        <span data-rel="tooltip" title="Add Category" data-placement="top">@icon('solid/plus')<span class="hide-text">Add Extension</span></span>
-                    </button>
-                    
-                    {{-- <button type="button" id="btn_del_select" class="btn btn-sm btn-danger"
-                    value="bulk-delete" disabled>
-                    <span data-rel="tooltip" title="Delete" data-placement="top">@icon('solid/trash-alt')<span class="hide-text">@langapp('delete')</span></span>
+                    {{-- Extension catalog superseded by Control Agent → Scan extensions --}}
+                    <button id="btn_add_extension" data-toggle="modal" data-target="#add_extension_modal"
+                        class="btn btn-sm btn-{{ get_option('theme_color')  }} hide" style="display:none;">
+                        <span data-rel="tooltip" title="Add Extension" data-placement="top">@icon('solid/plus')<span class="hide-text">Add Extension</span></span>
                     </button>
 
-                    <button id="btn-change-status" class="btn btn-sm btn-{{ get_option('theme_color')  }}"
-                        data-toggle="modal" data-target="#change_status" disabled>
-                        <span data-rel="tooltip" title="Change Status" data-placement="bottom"><i class="fas fa-exchange-alt"></i><span class="hide-text">Change Status</span></span>
-                    </button> --}}
-     
+                    <button id="add_ssdeep_pack" data-toggle="modal" data-target="#add_ssdeep_pack_modal"
+                        class="btn btn-sm btn-{{ get_option('theme_color')  }}">
+                        <span data-rel="tooltip" title="Add Master Ssdeep" data-placement="top">@icon('solid/plus')<span class="hide-text">Add Master Ssdeep</span></span>
+                    </button>
 
                 </div>     
             </div>
         </header>
 
-        {{-- Tab Content --}}
         <section class="scrollable wrapper">
             
             <section class="m-b-10">
@@ -71,9 +65,12 @@
                     <div class="tabbable">
                         <ul class="nav nav-tabs nav-tabs-highlight">
                             <li class="active"><a href="#tab_rule_site" data-toggle="tab" id="tab_rule_site_click">Rule Site</a></li>
-                            <li><a href="#tab_agent" data-toggle="tab" id="tab_agent_click">All Rule</a></li>   
-                            <li><a href="#tab_category" data-toggle="tab" id="tab_category_click">Category</a></li>   
-                            <li><a href="#tab_extention" data-toggle="tab" id="tab_extention_click">Extension</a></li>   
+                            <li><a href="#tab_agent" data-toggle="tab" id="tab_agent_click">Master Rule</a></li>
+                            <li><a href="#tab_ssdeep_site" data-toggle="tab" id="tab_ssdeep_site_click">Ssdeep Site</a></li>
+                            <li><a href="#tab_ssdeep_pack" data-toggle="tab" id="tab_ssdeep_pack_click">Master Ssdeep</a></li>
+                            <li><a href="#tab_ssdeep_candidate" data-toggle="tab" id="tab_ssdeep_candidate_click">Ssdeep Candidates</a></li>
+                            <li><a href="#tab_category" data-toggle="tab" id="tab_category_click">Category</a></li>
+                            <li class="hide" style="display:none;"><a href="#tab_extention" data-toggle="tab" id="tab_extention_click">Extension</a></li>
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane active" id="tab_rule_site">
@@ -136,7 +133,6 @@
                                             </div>
                                         </div>
 
-
                                         <div class="row">
                                             <div class="col-lg-6">
                                                 <div class="row">
@@ -156,7 +152,7 @@
                                                                 <span class="text-keyword">{{@$rule->get_name_category->name}} - {{$rule->rule_name}}</span>
                                                             </div>
                                                             <div class="action-keyword">
-                                                                {{-- <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a> --}}
+                                                                
                                                                 <a href="#" class="text-white delete_rule_site_master" data-delete_rule_site_master="{{$rule->id}}" data-mode_delete="master"><i class="fas fa-trash-alt"></i></a>
                                                             </div>
                                                         </li>
@@ -176,26 +172,6 @@
                                                 <input type="hidden" name="hd_site_id" id="hd_site_id" value="">
                                                 <div class="box-item-keyword">
                                                     <ul id="site_rule" class="main-list site-list" height="100%">
-                                                        {{-- <li class="item-list item--keyword">
-                                                            <div class="left-side-item">
-                                                                <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
-                                                                <span class="text-keyword"></span>
-                                                            </div>
-                                                            <div class="action-keyword">
-                                                                <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
-                                                                <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
-                                                            </div>
-                                                        </li>
-                                                        <li class="item-list item--keyword">
-                                                            <div class="left-side-item">
-                                                                <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
-                                                                <span class="text-keyword"></span>
-                                                            </div>
-                                                            <div class="action-keyword">
-                                                                <a href="#" class="text-white m-r-xs edit-keyword" data-target="#edit_keyword" data-toggle="modal"><i class="fas fa-ellipsis-v"></i></a>
-                                                                <a href="#" class="text-white delete-item-keyword"><i class="fas fa-trash-alt"></i></a>
-                                                            </div>
-                                                        </li> --}}
                                                     </ul>
                                                 </div>
                                             </div>
@@ -210,7 +186,7 @@
                                     <header class="panel-heading font-bold panel-header-blue">
                                         <div class="row">
                                             <div class="col-xs-12">
-                                                <i class="fas fa-table"></i> Table All Rule
+                                                <i class="fas fa-table"></i> Table Master Rule
                                             </div>
                                         </div>
                                     </header>
@@ -258,7 +234,7 @@
                                     <header class="panel-heading font-bold panel-header-blue">
                                         <div class="row">
                                             <div class="col-xs-12">
-                                                <i class="fas fa-table"></i> Table Category
+                                                <i class="fas fa-table"></i> Table Category (YARA + Ssdeep)
                                             </div>
                                         </div>
                                     </header>
@@ -269,6 +245,8 @@
                                                     <tr>
                                                         <th>No.</th>
                                                         <th>Name</th>
+                                                        <th>YARA rules</th>
+                                                        <th>Ssdeep packs</th>
                                                         <th>Update</th>
                                                         <th>Status</th>
                                                         <th class="text-center">Action</th>
@@ -283,7 +261,7 @@
                                 </section>
                             </div>
 
-                            <div class="tab-pane" id="tab_extention">
+                            <div class="tab-pane hide" id="tab_extention" style="display:none;">
                                 <section class="panel panel-default">
                                     <header class="panel-heading font-bold panel-header-blue">
                                         <div class="row">
@@ -307,6 +285,220 @@
                                                 <tbody>                                                  
                                                     
                                                 </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+
+                            <div class="tab-pane" id="tab_ssdeep_site">
+                                <section class="panel panel-default">
+                                    <header class="panel-heading font-bold panel-header-blue">
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <i class="fas fa-table"></i> Ssdeep Site
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-4">
+                                                <div class="form-group m-b-md">
+                                                    <label for="" class="">Site</label>
+                                                    <select name="search_ssdeep_site" id="search_ssdeep_site" class="tselect2-option form-control">
+                                                        <option value="" disabled selected>Select Site</option>
+                                                        @if (!empty($sites_list))
+                                                            @foreach ($sites_list as $ssSite)
+                                                                <option value="{{ $ssSite->id }}">{{ $ssSite->name }}</option>
+                                                            @endforeach
+                                                        @endif
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="form-group m-b-md">
+                                                    <label for="" class="">Keyword</label>
+                                                    <input type="text" class="form-control" name="keyword_ssdeep_search" id="keyword_ssdeep_search" placeholder="Search version / title / category">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2">
+                                                <button type="button" id="btn_search_ssdeep" class="btn btn-info btn-responsive btn-fz-13" style="margin-top: 22px;">
+                                                    <i class="fas fa-search"></i>
+                                                    @langapp('apply')
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <h5 class="font-weight-bold">Master Packs</h5>
+                                                    </div>
+                                                    <div class="col-lg-6 text-right">
+                                                        <button type="button" id="btn_select_all_ssdeep_master" class="btn btn-info btn-responsive">เลือกทั้งหมด</button>
+                                                    </div>
+                                                </div>
+                                                <div class="box-item-keyword">
+                                                    <ul id="keyword_ssdeep" class="main-list keyword-list">
+                                                        @foreach(($master_ssdeep ?? []) as $pack)
+                                                        <li class="item-list item--keyword" data-id="{{ $pack->id }}">
+                                                            <div class="left-side-item">
+                                                                <span class="drag-handle m-r-xs"><i class="fa fa-arrows-alt"></i></span>
+                                                                <span class="text-keyword">{{ $pack->version }}@if($pack->file_name) — {{ $pack->file_name }}@endif</span>
+                                                            </div>
+                                                            <div class="action-keyword">
+                                                                <a href="#" class="text-white delete_ssdeep_site_master" data-delete_ssdeep_id="{{ $pack->id }}" data-mode_delete="master"><i class="fas fa-trash-alt"></i></a>
+                                                            </div>
+                                                        </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <h5 class="font-weight-bold" id="txt_name_ssdeep_site">&nbsp;</h5>
+                                                    </div>
+                                                    <div class="col-lg-6 text-right">
+                                                        <button type="button" id="btn_delete_all_ssdeep_site" class="btn btn-danger btn-responsive">ลบทั้งหมด</button>
+                                                    </div>
+                                                </div>
+                                                <input type="hidden" name="hd_ssdeep_site_id" id="hd_ssdeep_site_id" value="">
+                                                <div class="box-item-keyword">
+                                                    <ul id="site_ssdeep" class="main-list site-list" height="100%">
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+
+                            <div class="tab-pane" id="tab_ssdeep_pack">
+                                <section class="panel panel-default">
+                                    <header class="panel-heading font-bold panel-header-blue">
+                                        <div class="row">
+                                            <div class="col-xs-6">
+                                                <i class="fas fa-table"></i> Table Master Ssdeep
+                                            </div>
+                                            <div class="col-xs-6 text-right">
+                                                @php $ssdeepAutoDistOn = !empty($ssdeep_auto_distribute); @endphp
+                                                <button type="button"
+                                                    id="btn_ssdeep_auto_distribute"
+                                                    class="btn btn-xs {{ $ssdeepAutoDistOn ? 'btn-success' : 'btn-default' }}"
+                                                    data-enabled="{{ $ssdeepAutoDistOn ? '1' : '0' }}"
+                                                    title="เมื่อเปิด: pack ใหม่จาก Candidates จะถูกแจกเข้าทุก Site อัตโนมัติ">
+                                                    <i class="fas {{ $ssdeepAutoDistOn ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
+                                                    Auto แจกจ่ายเข้า Site
+                                                    <span class="badge" id="ssdeep_auto_dist_badge">{{ $ssdeepAutoDistOn ? 'ON' : 'OFF' }}</span>
+                                                </button>
+                                                <button type="button"
+                                                    id="btn_ssdeep_cleanup_duplicates"
+                                                    class="btn btn-danger btn-xs"
+                                                    title="ปิด pack Auto ที่ซ้ำต่อ category / sha256 ซ้ำ และลบไฟล์ที่ไม่ใช้แล้ว">
+                                                    <i class="fas fa-trash-alt"></i> ลบไฟล์ซ้ำ
+                                                </button>
+                                                <button type="button" id="btn_bulk_edit_ssdeep_site" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#bulk_edit_ssdeep_pack_modal">
+                                                    <i class="fas fa-layer-group"></i> เปลี่ยนทุกไฟล์ให้เป็น Site เดียวกันหมด
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <div class="panel-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped" id="table-ssdeep-pack" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No.</th>
+                                                        <th>Category</th>
+                                                        <th>Title</th>
+                                                        <th>Version</th>
+                                                        <th>File Name</th>
+                                                        <th>Format</th>
+                                                        <th>SHA256</th>
+                                                        <th>Signatures</th>
+                                                        <th>Source</th>
+                                                        <th>Status</th>
+                                                        <th>Last Update</th>
+                                                        <th class="text-center">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+
+                            <div class="tab-pane" id="tab_ssdeep_candidate">
+                                <section class="panel panel-default">
+                                    <header class="panel-heading font-bold panel-header-blue">
+                                        <div class="row">
+                                            <div class="col-xs-6">
+                                                <i class="fas fa-fingerprint"></i> Ssdeep Candidates
+                                                <small class="text-muted">(detections → auto pack; hash ซ้ำจะถูกลบทิ้ง)</small>
+                                            </div>
+                                            <div class="col-xs-6 text-right">
+                                                <button type="button"
+                                                    id="btn_ssdeep_candidate_cleanup_duplicates"
+                                                    class="btn btn-danger btn-xs"
+                                                    title="ลบ candidate ที่ hash ซ้ำ หรือมีใน Master pack แล้ว ออกจากตารางทั้งหมด">
+                                                    <i class="fas fa-trash-alt"></i> ลบไฟล์ซ้ำทั้งหมด
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <div class="panel-body">
+                                        <div class="row" style="margin-bottom:12px;">
+                                            <div class="col-lg-3">
+                                                <label>Site</label>
+                                                <select id="cand_filter_site" class="form-control">
+                                                    <option value="">All sites</option>
+                                                    @foreach(($sites_list ?? []) as $s)
+                                                        <option value="{{ $s->id }}">{{ $s->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <label>Status</label>
+                                                <select id="cand_filter_status" class="form-control">
+                                                    <option value="">All</option>
+                                                    <option value="promoted">promoted</option>
+                                                    <option value="queued">queued</option>
+                                                    <option value="failed">failed</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <label>Keyword</label>
+                                                <input type="text" id="cand_filter_keyword" class="form-control" placeholder="file / rule / ssdeep / hash">
+                                            </div>
+                                            <div class="col-lg-2">
+                                                <label>&nbsp;</label>
+                                                <button type="button" id="btn_search_ssdeep_candidate" class="btn btn-info btn-block">
+                                                    <i class="fas fa-search"></i> Apply
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped" id="table-ssdeep-candidate" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No.</th>
+                                                        <th>Site</th>
+                                                        <th>Agent</th>
+                                                        <th>File</th>
+                                                        <th>Rule</th>
+                                                        <th>Engine</th>
+                                                        <th>Ssdeep</th>
+                                                        <th>Source</th>
+                                                        <th>Status</th>
+                                                        <th>Note</th>
+                                                        <th>Detected</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
                                             </table>
                                         </div>
                                     </div>
@@ -337,6 +529,9 @@
                 </div>
                 <form id='form_add_category' enctype="multipart/form-data">
                     <div class="modal-body">
+                        <p class="text-muted" style="margin-top:0;">
+                            Shared category for <strong>Master Rule (YARA)</strong> and <strong>Master Ssdeep</strong> packs.
+                        </p>
 
                         <div class="form-group row">
                             <label style="padding-top: 7px" class="col-lg-3 control-label">
@@ -452,7 +647,6 @@
                 <form id='form_add_rule' enctype="multipart/form-data">
                     <div class="modal-body">
 
-
                         <div class="form-group row">
                             <label style="padding-top: 7px" class="col-lg-3 control-label">
                                 Rule Category <span class="text-danger">*</span>
@@ -461,12 +655,10 @@
                                 <div class="row">
                                     <div class="form-group">
                                         <div class="col-lg-8 mb-1">
-                                            {{-- <input type="text" name="name" id="name" class="form-control"> --}}
+                                            
                                             <select name="name" id="name" class="form-control check_test_select">
                                                 <option value="">Choose an Category</option>
-                                                {{-- @foreach ($select_category as $category)
-                                                <option value="{{$category['id']}}">{{$category['name']}}</option>
-                                                @endforeach --}}
+                                                
                                             </select>
                                             <span id="error_name" style="color:red;"></span>
                                         </div>
@@ -539,28 +731,11 @@
                                                 <span> Select file for data.. </span>
                                             </td>
                                         </tr>
-                                        {{-- <tr>
-                                            <td style="width: 33.33%">
-                                                <select class="select-2--rule form-control" id="">
-                                                    <option value=""></option>
-                                                </select>
-                                            </td>
-                                            <td  style="width: 33.33%">
-                                                <input type="text" id="" class="form-control">
-                                            </td>
-                                            <td  style="width: 33.33%">
-                                                <select class="select-2--rule form-control" id="">
-                                                    <option value=""></option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <button ype="button" class="btn btn-sm btn-danger delete_rule"><i class="fas fa-trash"></i></button>
-                                            </td>
-                                        </tr> --}}
+                                        
                                     </tbody>
                                 </table>
                                 <span id="error_detail" style="color:red;"></span>
-                                {{-- <button type="button" class="btn btn-sm btn-info btn-block" onclick="add_rule();">Add</button> --}}
+                                
                             </div>
                         </div>
 
@@ -576,10 +751,7 @@
                                     </label>
                                 </span>
                                 @foreach ($select_site as $key => $name)
-                                {{-- <label>
-                                    <input type="checkbox" id="site_{{@$key}}" name="site[]" value="{{@$key}}">
-                                    <span>{{@$name}}</span>
-                                </label> --}}
+                                
                                 <span class="checkbox">
                                     <label>
                                         <input type="checkbox" name="site[]" value="{{@$key}}">
@@ -641,6 +813,317 @@
         </div>
     </div>
 
+    <div class="modal in fixed-left" id="add_ssdeep_pack_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-blue">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" data-rel="tooltip"
+                            title="Fullscreen" data-placement="right"></i>
+                        Add Ssdeep Pack
+                    </h4>
+                </div>
+                <form id="form_add_ssdeep_pack" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="form-group row">
+                            <label style="padding-top: 7px" class="col-lg-3 control-label">
+                                Category <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-lg-9">
+                                <select name="category" id="ssdeep_category" class="form-control">
+                                    <option value="">Select category</option>
+                                    @foreach(($select_category ?? []) as $cat)
+                                        <option value="{{ strtolower($cat['name']) }}">{{ $cat['name'] }}</option>
+                                    @endforeach
+                                </select>
+                                <span id="error_ssdeep_category" style="color:red;"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label style="padding-top: 7px" class="col-lg-3 control-label">
+                                Title <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-lg-9">
+                                <input type="text" name="title" id="ssdeep_title" class="form-control" placeholder="e.g. Webshell fuzzy hashes Aug 2026">
+                                <span id="error_ssdeep_title" style="color:red;"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label style="padding-top: 7px" class="col-lg-3 control-label">
+                                Version <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-lg-9">
+                                <input type="text" name="version" id="ssdeep_version" class="form-control" placeholder="e.g. webshells-2026.08.03">
+                                <span id="error_ssdeep_version" style="color:red;"></span>
+                                <small class="text-muted">Use &lt;category&gt;-&lt;YYYY.MM.DD&gt;</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label style="padding-top: 7px" class="col-lg-3 control-label">
+                                Description
+                            </label>
+                            <div class="col-lg-9">
+                                <textarea name="description" id="ssdeep_description" class="form-control" rows="2" placeholder="What this pack covers (optional)"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label style="padding-top: 7px" class="col-lg-3 control-label">
+                                Format
+                            </label>
+                            <div class="col-lg-9">
+                                <select name="format" id="ssdeep_format" class="form-control">
+                                    <option value="">Auto detect</option>
+                                    <option value="sqlite_zip">sqlite_zip (.zip)</option>
+                                    <option value="sqlite">sqlite (.db)</option>
+                                    <option value="json">json</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label style="padding-top: 7px" class="col-lg-3 control-label">
+                                Pack File <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-lg-9">
+                                <input type="file" name="file_ssdeep" id="file_ssdeep" class="form-control" accept=".db,.zip,.json,application/zip,application/json">
+                                <span id="error_ssdeep_file" style="color:red;"></span>
+                                <span class="text-muted">Prefer ssdeep_&lt;category&gt;_&lt;YYYYMMDD&gt;.zip · รองรับ .db / .zip / .json</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" style="padding-top: 7px">
+                            <label class="col-lg-3 control-label">Site </label>
+                            <div class="col-lg-8">
+                                <span class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="site[]" value="all">
+                                        <span class="label-text">All Site</span>
+                                    </label>
+                                </span>
+                                @if (!empty($sites_list))
+                                    @foreach ($sites_list as $ssSite)
+                                    <span class="checkbox">
+                                        <label>
+                                            <input type="checkbox" name="site[]" value="{{ $ssSite->id }}">
+                                            <span class="label-text">{{ $ssSite->name }}</span>
+                                        </label>
+                                    </span>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="form-group row" style="padding-top: 7px">
+                            <label class="col-lg-3 control-label">Status </label>
+                            <div class="col-lg-8">
+                                <label class="switch">
+                                    <input type="checkbox" id="ssdeep_status" name="status" checked value="1">
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                            <i class="fas fa-times"></i>
+                            Close
+                        </button>
+                        <button type="button" class="btn btn-info btn-rounded" id="btn_save_ssdeep_pack">
+                            <i class="fas fa-paper-plane"></i>
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal in fixed-left" id="edit_ssdeep_pack_modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-edit text-white"></i> Edit Ssdeep Pack & Site Assignments
+                    </h4>
+                </div>
+                <form id="form_edit_ssdeep_pack">
+                    {{ csrf_field() }}
+                    <input type="hidden" name="id" id="edit_ssdeep_id">
+                    <div class="modal-body">
+                        <div class="form-group row">
+                            <label style="padding-top: 7px" class="col-lg-3 control-label">
+                                Version
+                            </label>
+                            <div class="col-lg-9">
+                                <input type="text" name="version" id="edit_ssdeep_version" class="form-control" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label style="padding-top: 7px" class="col-lg-3 control-label">
+                                Category
+                            </label>
+                            <div class="col-lg-9">
+                                <select name="category" id="edit_ssdeep_category" class="form-control">
+                                    <option value="">-</option>
+                                    @foreach(($select_category ?? []) as $cat)
+                                        <option value="{{ strtolower($cat['name']) }}">{{ $cat['name'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label style="padding-top: 7px" class="col-lg-3 control-label">
+                                Title
+                            </label>
+                            <div class="col-lg-9">
+                                <input type="text" name="title" id="edit_ssdeep_title" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label style="padding-top: 7px" class="col-lg-3 control-label">
+                                Description
+                            </label>
+                            <div class="col-lg-9">
+                                <textarea name="description" id="edit_ssdeep_description" class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label style="padding-top: 7px" class="col-lg-3 control-label">
+                                File Name
+                            </label>
+                            <div class="col-lg-9" style="padding-top: 7px">
+                                <strong id="edit_ssdeep_file_name">-</strong>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" style="padding-top: 7px">
+                            <label class="col-lg-3 control-label">Site (เลือก Site ที่ต้องการ)</label>
+                            <div class="col-lg-8">
+                                <span class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="site[]" value="all" id="edit_ssdeep_site_all">
+                                        <span class="label-text">All Site</span>
+                                    </label>
+                                </span>
+                                @if (!empty($sites_list))
+                                    @foreach ($sites_list as $ssSite)
+                                    <span class="checkbox">
+                                        <label>
+                                            <input type="checkbox" name="site[]" value="{{ $ssSite->id }}" class="edit_ssdeep_site_item">
+                                            <span class="label-text">{{ $ssSite->name }}</span>
+                                        </label>
+                                    </span>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="form-group row" style="padding-top: 7px">
+                            <label class="col-lg-3 control-label">Status </label>
+                            <div class="col-lg-8">
+                                <label class="switch">
+                                    <input type="checkbox" id="edit_ssdeep_status" name="status" value="1">
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                            <i class="fas fa-times"></i> Close
+                        </button>
+                        <button type="button" class="btn btn-warning btn-rounded" id="btn_update_ssdeep_pack">
+                            <i class="fas fa-paper-plane"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal in fixed-left" id="bulk_edit_ssdeep_pack_modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title text-white">
+                        <i class="fas fa-layer-group text-white"></i> จัดการ Site ให้กับ Ssdeep Pack ทั้งหมด
+                    </h4>
+                </div>
+                <form id="form_bulk_edit_ssdeep_pack">
+                    {{ csrf_field() }}
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> การตั้งค่าในหน้านี้จะมีผลกับ <strong>Ssdeep Pack ทั้งหมดที่เปิดใช้งานในระบบ</strong>
+                        </div>
+                        <div class="form-group row" style="padding-top: 7px">
+                            <label class="col-lg-3 control-label">Site ที่ต้องการใช้</label>
+                            <div class="col-lg-8">
+                                <span class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="site[]" value="all" id="bulk_ssdeep_site_all">
+                                        <span class="label-text">All Site (ทุก Site)</span>
+                                    </label>
+                                </span>
+                                @if (!empty($sites_list))
+                                    @foreach ($sites_list as $ssSite)
+                                    <span class="checkbox">
+                                        <label>
+                                            <input type="checkbox" name="site[]" value="{{ $ssSite->id }}" class="bulk_ssdeep_site_item">
+                                            <span class="label-text">{{ $ssSite->name }}</span>
+                                        </label>
+                                    </span>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default btn-rounded" data-dismiss="modal">
+                            <i class="fas fa-times"></i> Close
+                        </button>
+                        <button type="button" class="btn btn-warning btn-rounded" id="btn_save_bulk_ssdeep_site">
+                            <i class="fas fa-paper-plane"></i> บันทึกข้อมูลทั้งหมด
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="delete_ssdeep_select" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" style="left: unset">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">@langapp('delete')</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <p class="text-danger">@langapp('delete_warning')</p>
+                    </div>
+                    <input type="hidden" id="delete_ssdeep_id" name="delete_ssdeep_id">
+                    <input type="hidden" id="delete_ssdeep_mode" name="delete_ssdeep_mode">
+                    <input type="hidden" id="delete_ssdeep_site" name="delete_ssdeep_site">
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default btn-rounded" data-dismiss="modal"><i class="fas fa-times text-muted"></i> Close</a>
+                    <button type="button" id="btn_delete_ssdeep_site" class="btn btn-info submit btn-rounded"><i class="fas fa-paper-plane"></i> OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </section>
 
 @push('pagestyle')
@@ -674,8 +1157,128 @@
 
 <script>
 
+    function delete_rule_site_master()
+    {
+        $('.delete_rule_site_master').off('click').on('click', function(){
+            let rule_id = $(this).data('delete_rule_site_master');
+            let mode = $(this).data('mode_delete');
+            let site_id = $('#hd_site_id').val();
+            $('#delete_site').val(site_id);
+            $('#delete_mode').val(mode);
+            $('#delete_rule_id').val(rule_id);
+            $("#delete_select").modal("show");
+        });
+    }
+
+    function bind_delete_ssdeep_site_master(){
+        $('.delete_ssdeep_site_master').off('click').on('click', function(e){
+            e.preventDefault();
+            $('#delete_ssdeep_id').val($(this).data('delete_ssdeep_id'));
+            $('#delete_ssdeep_mode').val($(this).data('mode_delete'));
+            $('#delete_ssdeep_site').val($('#hd_ssdeep_site_id').val());
+            $('#delete_ssdeep_select').modal('show');
+        });
+    }
+    var tbl_ssdeep_pack = null;
+
+    function reload_ssdeep_pack_table(){
+        if(tbl_ssdeep_pack){
+            tbl_ssdeep_pack.ajax.reload(null, false);
+        }
+    }
+
+    function saveSsdeepPack(){
+        var category = String($('#ssdeep_category').val() || '').trim();
+        var title = String($('#ssdeep_title').val() || '').trim();
+        var version = String($('#ssdeep_version').val() || '').trim();
+        var fileInput = document.getElementById('file_ssdeep');
+        $('#error_ssdeep_category').empty();
+        $('#error_ssdeep_title').empty();
+        $('#error_ssdeep_version').empty();
+        $('#error_ssdeep_file').empty();
+
+        if(!category){
+            $('#error_ssdeep_category').text('Category is required.');
+            toastr.error('กรุณาเลือก Category');
+            return false;
+        }
+        if(!title){
+            $('#error_ssdeep_title').text('Title is required.');
+            toastr.error('กรุณากรอก Title');
+            return false;
+        }
+        if(!version){
+            $('#error_ssdeep_version').text('Version is required.');
+            toastr.error('กรุณากรอก Version');
+            return false;
+        }
+        if(!fileInput || !fileInput.files || !fileInput.files.length){
+            $('#error_ssdeep_file').text('Please select a pack file.');
+            toastr.error('กรุณาเลือกไฟล์ pack');
+            return false;
+        }
+
+        var formData = new FormData(document.getElementById('form_add_ssdeep_pack'));
+        formData.set('status', $('#ssdeep_status').is(':checked') ? '1' : '0');
+
+        $('#btn_save_ssdeep_pack').html('<i class="fas fa-spinner fa-spin"></i> Saving...').attr('disabled', true);
+
+        $.ajax({
+            url: "{{ route('agentmanagement.ssdeep_pack_insert') }}",
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response){
+                $('#btn_save_ssdeep_pack').html('<i class="fas fa-paper-plane"></i> Save').attr('disabled', false);
+                if(response.status === 'success'){
+                    toastr.success(response.message);
+                    $('#add_ssdeep_pack_modal').modal('hide');
+                    reload_ssdeep_pack_table();
+                } else if(response.status === '422'){
+                    if(response.errors && response.errors.version){
+                        $('#error_ssdeep_version').text(response.errors.version[0]);
+                    }
+                    if(response.errors && response.errors.file_ssdeep){
+                        $('#error_ssdeep_file').text(response.errors.file_ssdeep[0]);
+                    }
+                    toastr.error(response.message || 'Validation failed');
+                } else {
+                    toastr.error(response.message || 'Upload failed');
+                }
+            },
+            error: function(xhr){
+                $('#btn_save_ssdeep_pack').html('<i class="fas fa-paper-plane"></i> Save').attr('disabled', false);
+                var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : ('Upload failed (' + xhr.status + ')');
+                toastr.error(msg);
+            }
+        });
+        return false;
+    }
+
     $(document).ready(function(){
         delete_rule_site_master();
+        bind_delete_ssdeep_site_master();
+
+        $('#btn_save_ssdeep_pack').on('click', function(e){
+            e.preventDefault();
+            saveSsdeepPack();
+        });
+
+        $('#file_ssdeep').on('change', function(){
+            var file = this.files && this.files[0] ? this.files[0] : null;
+            if(!file){ return; }
+            if(!$('#ssdeep_version').val()){
+                var base = file.name.replace(/\.[^.]+$/, '');
+                $('#ssdeep_version').val(base);
+            }
+            var ext = (file.name.split('.').pop() || '').toLowerCase();
+            if(!$('#ssdeep_format').val()){
+                if(ext === 'json'){ $('#ssdeep_format').val('json'); }
+                else if(ext === 'db'){ $('#ssdeep_format').val('sqlite'); }
+                else if(ext === 'zip'){ $('#ssdeep_format').val('sqlite_zip'); }
+            }
+        });
     });
 
     $('.select-2--rule').select2();
@@ -712,6 +1315,8 @@
         columns:[
             { data: 'DT_Row_Index' },
             { data: 'name' },
+            { data: 'c_yara_count' },
+            { data: 'c_ssdeep_count' },
             { data: 'updated_at' },
             { data: 'c_status' },
             { data: 'c_action' }
@@ -733,6 +1338,115 @@
             { data: 'c_status' },
             { data: 'c_action' }
         ]
+    });
+
+    function ensure_ssdeep_pack_table(){
+        if(tbl_ssdeep_pack){
+            tbl_ssdeep_pack.ajax.reload(null, false);
+            return;
+        }
+        tbl_ssdeep_pack = $('#table-ssdeep-pack').DataTable({
+            ajax:{
+                url: "{{ route('agentmanagement.ssdeep_pack_tbl') }}",
+                type: "get",
+            },
+            columns:[
+                { data: 'DT_Row_Index' },
+                { data: 'c_category' },
+                { data: 'c_title' },
+                { data: 'c_version' },
+                { data: 'c_file_name' },
+                { data: 'c_format' },
+                { data: 'c_sha256' },
+                { data: 'c_signature_count' },
+                { data: 'c_source' },
+                { data: 'c_status' },
+                { data: 'updated_at' },
+                { data: 'c_action' }
+            ]
+        });
+    }
+
+    $('#tab_ssdeep_pack_click').on('shown.bs.tab click', function(){
+        ensure_ssdeep_pack_table();
+    });
+
+    var tbl_ssdeep_candidate = null;
+    function ensure_ssdeep_candidate_table(){
+        if(tbl_ssdeep_candidate){
+            tbl_ssdeep_candidate.ajax.reload(null, false);
+            return;
+        }
+        tbl_ssdeep_candidate = $('#table-ssdeep-candidate').DataTable({
+            ajax:{
+                url: "{{ route('agentmanagement.ssdeep_candidate_tbl') }}",
+                type: "get",
+                data: function(d){
+                    d.site_id = $('#cand_filter_site').val() || '';
+                    d.status = $('#cand_filter_status').val() || '';
+                    d.keyword = $('#cand_filter_keyword').val() || '';
+                }
+            },
+            order: [[10, 'desc']],
+            columns:[
+                { data: 'DT_Row_Index' },
+                { data: 'c_site' },
+                { data: 'c_agent' },
+                { data: 'c_file' },
+                { data: 'c_rule' },
+                { data: 'c_engine' },
+                { data: 'c_ssdeep' },
+                { data: 'c_source' },
+                { data: 'c_status' },
+                { data: 'c_note' },
+                { data: 'c_detected' }
+            ]
+        });
+    }
+
+    $('#tab_ssdeep_candidate_click').on('shown.bs.tab click', function(){
+        ensure_ssdeep_candidate_table();
+    });
+    $('#btn_search_ssdeep_candidate').on('click', function(){
+        ensure_ssdeep_candidate_table();
+        if(tbl_ssdeep_candidate){
+            tbl_ssdeep_candidate.ajax.reload();
+        }
+    });
+
+    $('#btn_ssdeep_candidate_cleanup_duplicates').off('click').on('click', function(){
+        if(!confirm('ลบ candidate ที่ซ้ำออกทั้งหมดจากแท็บนี้?\n\n- hash ซ้ำในตาราง (เหลือ 1 ถ้ายังไม่ได้อยู่ใน pack)\n- hash ที่มีใน Master Ssdeep แล้ว → ลบออกหมด\n- status เก่าแบบ duplicate/skipped')){
+            return;
+        }
+        var $btn = $(this);
+        $btn.prop('disabled', true);
+        $.ajax({
+            url: "{{ route('agentmanagement.ssdeep_candidate_cleanup_duplicates') }}",
+            type: "POST",
+            data: {},
+            success: function(response){
+                $btn.prop('disabled', false);
+                if(response.status === 'success'){
+                    toastr.success(response.message);
+                    ensure_ssdeep_candidate_table();
+                    if(tbl_ssdeep_candidate){
+                        tbl_ssdeep_candidate.ajax.reload();
+                    }
+                } else {
+                    toastr.error(response.message || 'Cleanup failed');
+                }
+            },
+            error: function(xhr){
+                $btn.prop('disabled', false);
+                var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Cleanup failed';
+                toastr.error(msg);
+            }
+        });
+    });
+    $('#cand_filter_keyword').on('keypress', function(e){
+        if(e.which === 13){
+            $('#btn_search_ssdeep_candidate').trigger('click');
+        }
     });
 
     $('#add_rule_modal').on('hidden.bs.modal', function () {
@@ -805,6 +1519,38 @@
 
     });
 
+    function refresh_shared_category_selects() {
+        $.ajax({
+            url: "{{ route('agentmanagement.get_select_category_rule') }}",
+            type: "get",
+            success: function (response) {
+                const cats = response.select_category || [];
+                let yaraHtml = '<option value="">Choose an Category</option>';
+                let ssdeepHtml = '<option value="">Select category</option>';
+                let ssdeepEditHtml = '<option value="">-</option>';
+                for (let i in cats) {
+                    const id = cats[i].id;
+                    const name = cats[i].name;
+                    const val = String(name || '').toLowerCase();
+                    yaraHtml += '<option value="' + id + '">' + name + '</option>';
+                    ssdeepHtml += '<option value="' + val + '">' + name + '</option>';
+                    ssdeepEditHtml += '<option value="' + val + '">' + name + '</option>';
+                }
+                if ($('#name').length) {
+                    $('#name').empty().append(yaraHtml);
+                }
+                if ($('#ssdeep_category').length) {
+                    const cur = $('#ssdeep_category').val();
+                    $('#ssdeep_category').empty().append(ssdeepHtml).val(cur);
+                }
+                if ($('#edit_ssdeep_category').length) {
+                    const curEdit = $('#edit_ssdeep_category').val();
+                    $('#edit_ssdeep_category').empty().append(ssdeepEditHtml).val(curEdit);
+                }
+            }
+        });
+    }
+
     function update_status_rule(id)
     {
         let chk_status = $("#status_rule_" + id).is(":checked") ? 1 : 0;
@@ -857,9 +1603,10 @@
 
                         tbl_category_rule.ajax.reload();
                         tbl_all_rule.ajax.reload();
+                        refresh_shared_category_selects();
 
                         setTimeout(function(){
-                            {{-- window.location.href = response.route; --}}
+                            
                         }, 3000);
                     }
                     else
@@ -878,7 +1625,6 @@
             input_check_err('#category_name', '#error_category_name')
         }
 
-        
     });
 
     $('#btn_save_extension').click(function(e){
@@ -916,7 +1662,7 @@
                         tbl_extention_rule.ajax.reload();
 
                         setTimeout(function(){
-                            {{-- window.location.href = response.route; --}}
+                            
                         }, 3000);
                     }
                     else
@@ -935,7 +1681,6 @@
             input_check_err('#extension_name', '#error_extension_name')
         }
 
-        
     });
 
     function update_status_category(id)
@@ -1004,7 +1749,7 @@
                     $('#add_rule_modal').modal("hide");
 
                     setTimeout(function(){
-                        {{-- window.location.href = response.route; --}}
+                        
                     }, 3000);
                 }
                 else if(response.status == '422')
@@ -1117,7 +1862,6 @@
 
                     $('#error_detail').empty();
 
-                    {{-- delete_row(); --}}
                 }
                 else
                 {
@@ -1132,7 +1876,7 @@
                 }
 
                 $('#tr_no_data').remove();
-                {{-- $('#rule_item tbody').empty(); --}}
+                
                 $('#rule_item tbody').append(html);
             }
         });
@@ -1274,7 +2018,6 @@
                     let type_extension = (response.extension_all == 1 ? 'all' : 'custom');
 
                     $('#extension_rule_site').val(type_extension).trigger('change');
-                    
 
                 }
             });
@@ -1396,25 +2139,7 @@
                     {
                         toastr.error(response.message);
                     }
-    
-                    {{-- if(response.status == 1) {
-                        console.log(response);
-                        result = 1;
-                        if(response && response.message) {
-                            $("#delete_select").modal("hide");
-                            get_keyword_main();
-                            get_keyword_sub('social');
-                            get_keyword_sub('darkweb');
-                            toastr.success(response.message, '@langapp('response_status')');
-                            
-                        }
-                    } else {
-                        console.log(response);
-                        toastr.error('@langapp('request_failed')', '@langapp('response_status')');
-                        get_keyword_main();
-                        get_keyword_sub('social');
-                        get_keyword_sub('darkweb');
-                    } --}}
+
                 },
                 error: function (error){
                     console.log(error);
@@ -1435,21 +2160,6 @@
             toastr.error('Please select site.');
         }
 
-    }
-
-    function delete_rule_site_master() 
-    {
-        $('.delete_rule_site_master').on("click",function(){
-            let rule_id = $(this).data('delete_rule_site_master');
-            let mode = $(this).data('mode_delete');
-            let site_id = $('#hd_site_id').val();
-            console.log(rule_id, mode);
-            $('#delete_site').val(site_id);
-            $('#delete_mode').val(mode);
-            $('#delete_rule_id').val(rule_id);
-            $("#delete_select").modal("show");
-            {{--$(this).closest('li').remove();--}}
-        });
     }
 
     $('#btn_delete_rule_site').click(function(){
@@ -1527,7 +2237,6 @@
             toastr.error('Please select site.');
         }
 
-
     });
 
     $('#btn_delete_all_site').click(function(){
@@ -1571,7 +2280,6 @@
     var keyword_rule = document.getElementById('keyword_rule'),
 	site_rule = document.getElementById('site_rule');
 
-
     new Sortable(keyword_rule, {
         group: {
             name: 'shared',
@@ -1593,11 +2301,6 @@
         animation: 150,
         dataIdAttr: 'data-id',
         onAdd: function (evt) {
-            console.log(evt.from.id);
-            console.log(evt.to.id);
-            console.log(evt.item.attributes['data-id'].value);
-            console.log(evt);
-            console.log(evt);
             let from_id = evt.from.id;
             let to_id = evt.to.id;
             let attributes_id = evt.item.attributes['data-id'].value;
@@ -1677,16 +2380,410 @@
         });
     }
 
-    function delete_row(id)
+        function delete_row(id)
     {
-        {{-- var whichtr = $(this).closest('tr');
-        alert('1'); --}}
         $(id).remove();     
     }
+
+    $('#add_ssdeep_pack_modal').on('hidden.bs.modal', function () {
+        $('#form_add_ssdeep_pack')[0].reset();
+        $('#error_ssdeep_version').empty();
+        $('#error_ssdeep_category').empty();
+        $('#error_ssdeep_title').empty();
+        $('#error_ssdeep_file').empty();
+        $('#btn_save_ssdeep_pack').html('<i class="fas fa-paper-plane"></i> Save').attr('disabled', false);
+    });
+
+    $('#btn_search_ssdeep').off('click').on('click', function(){
+        let search_site = $('#search_ssdeep_site').val();
+        let keyword_search = $('#keyword_ssdeep_search').val();
+
+        if(!search_site){
+            toastr.error('Please select site.');
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('agentmanagement.get_ssdeep_site') }}",
+            type: "get",
+            data: {
+                search_site: search_site,
+                keyword_search: keyword_search
+            },
+            success: function(response){
+                if(response.data_site){
+                    $('#txt_name_ssdeep_site').empty().append(response.data_site.name);
+                    $('#hd_ssdeep_site_id').val(response.data_site.id);
+                }
+                $('#keyword_ssdeep').empty().append(response.html_master || '');
+                $('#site_ssdeep').empty().append(response.html || '');
+                bind_delete_ssdeep_site_master();
+            },
+            error: function(xhr){
+                var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Failed to load ssdeep packs';
+                toastr.error(msg);
+            }
+        });
+    });
+
+    function ssdeep_assign_site(attributes_id){
+        let site_id = $('#hd_ssdeep_site_id').val();
+        if(!site_id){
+            toastr.error('Please select site.');
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "{{ route('agentmanagement.ssdeep_assign_site') }}",
+            data: {
+                site_id: site_id,
+                ssdeep_file_id: attributes_id
+            },
+            beforeSend: function(){ loading('load'); },
+            success: function(response){
+                loading('stop_load');
+                if(response.status == 'success'){
+                    $('#btn_search_ssdeep').trigger('click');
+                    reload_ssdeep_pack_table();
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function(){
+                loading('stop_load');
+                toastr.error('Assign failed');
+            }
+        });
+    }
+
+    $('#btn_delete_ssdeep_site').off('click').on('click', function(){
+        $.ajax({
+            url: "{{ route('agentmanagement.ssdeep_unassign_site') }}",
+            type: "POST",
+            data: {
+                site_id: $('#delete_ssdeep_site').val(),
+                ssdeep_file_id: $('#delete_ssdeep_id').val(),
+                delete_mode: $('#delete_ssdeep_mode').val()
+            },
+            success: function(response){
+                if(response.status == 'success'){
+                    $('#delete_ssdeep_select').modal('hide');
+                    $('#btn_search_ssdeep').trigger('click');
+                    reload_ssdeep_pack_table();
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            }
+        });
+    });
+
+    $('#btn_select_all_ssdeep_master').off('click').on('click', function(){
+        let site_id = $('#hd_ssdeep_site_id').val();
+        if(!site_id){
+            toastr.error('Please select site.');
+            return;
+        }
+        $.ajax({
+            url: "{{ route('agentmanagement.ssdeep_assign_all_master') }}",
+            type: "POST",
+            data: { site_id: site_id },
+            beforeSend: function(){ loading('load'); },
+            success: function(response){
+                loading('stop_load');
+                if(response.status == 'success'){
+                    $('#btn_search_ssdeep').trigger('click');
+                    reload_ssdeep_pack_table();
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function(){
+                loading('stop_load');
+                toastr.error('Assign all failed');
+            }
+        });
+    });
+
+    $('#btn_delete_all_ssdeep_site').off('click').on('click', function(){
+        let site_id = $('#hd_ssdeep_site_id').val();
+        if(!site_id){
+            toastr.error('Please select site.');
+            return;
+        }
+        if(!confirm('Remove all ssdeep packs from this site?')){
+            return;
+        }
+        $.ajax({
+            url: "{{ route('agentmanagement.ssdeep_delete_all_site') }}",
+            type: "POST",
+            data: { site_id: site_id },
+            beforeSend: function(){ loading('load'); },
+            success: function(response){
+                loading('stop_load');
+                if(response.status == 'success'){
+                    $('#btn_search_ssdeep').trigger('click');
+                    reload_ssdeep_pack_table();
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function(){
+                loading('stop_load');
+                toastr.error('Delete all failed');
+            }
+        });
+    });
+
+    function update_ssdeep_pack_status(id){
+        let chk = $('#ssdeep_status_'+id).is(':checked') ? 1 : 0;
+        $.ajax({
+            url: "{{ route('agentmanagement.ssdeep_pack_status') }}",
+            type: "POST",
+            data: { id: id, chk_status: chk },
+            success: function(response){
+                toastr.success(response.message);
+                if($('#hd_ssdeep_site_id').val()){
+                    $('#btn_search_ssdeep').trigger('click');
+                }
+            }
+        });
+    }
+
+    function apply_ssdeep_auto_distribute_ui(enabled){
+        var $btn = $('#btn_ssdeep_auto_distribute');
+        $btn.attr('data-enabled', enabled ? '1' : '0');
+        $btn.removeClass('btn-success btn-default').addClass(enabled ? 'btn-success' : 'btn-default');
+        $btn.find('i').removeClass('fa-toggle-on fa-toggle-off').addClass(enabled ? 'fa-toggle-on' : 'fa-toggle-off');
+        $('#ssdeep_auto_dist_badge').text(enabled ? 'ON' : 'OFF');
+    }
+
+    $('#btn_ssdeep_auto_distribute').off('click').on('click', function(){
+        var $btn = $(this);
+        var currentlyOn = $btn.attr('data-enabled') === '1';
+        var nextOn = currentlyOn ? 0 : 1;
+        $btn.prop('disabled', true);
+        $.ajax({
+            url: "{{ route('agentmanagement.ssdeep_pack_auto_distribute') }}",
+            type: "POST",
+            data: { chk_status: nextOn },
+            success: function(response){
+                $btn.prop('disabled', false);
+                if(response.status === 'success'){
+                    apply_ssdeep_auto_distribute_ui(typeof response.enabled !== 'undefined' ? !!response.enabled : nextOn === 1);
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message || 'Update failed');
+                }
+            },
+            error: function(xhr){
+                $btn.prop('disabled', false);
+                var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Update failed';
+                toastr.error(msg);
+            }
+        });
+    });
+
+    $('#btn_ssdeep_cleanup_duplicates').off('click').on('click', function(){
+        if(!confirm('ลบถาวร pack/candidate ที่ซ้ำ?\n\n- Master Ssdeep Auto: เหลือ 1 ต่อ category (ลบแถว+ไฟล์จริง)\n- sha256 ซ้ำ: เหลือ 1\n- Candidates: ลบ hash ซ้ำออกจากตาราง\n- รวมตัวที่เคยปิด active ไว้ด้วย')){
+            return;
+        }
+        var $btn = $(this);
+        $btn.prop('disabled', true);
+        $.ajax({
+            url: "{{ route('agentmanagement.ssdeep_pack_cleanup_duplicates') }}",
+            type: "POST",
+            data: {},
+            success: function(response){
+                $btn.prop('disabled', false);
+                if(response.status === 'success'){
+                    toastr.success(response.message);
+                    reload_ssdeep_pack_table();
+                    if(typeof tbl_ssdeep_candidate !== 'undefined' && tbl_ssdeep_candidate){
+                        tbl_ssdeep_candidate.ajax.reload(null, false);
+                    }
+                } else {
+                    toastr.error(response.message || 'Cleanup failed');
+                }
+            },
+            error: function(xhr){
+                $btn.prop('disabled', false);
+                var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Cleanup failed';
+                toastr.error(msg);
+            }
+        });
+    });
+
+    function delete_ssdeep_pack(id){
+        if(!confirm('Delete this ssdeep pack permanently (row + file)?')){
+            return;
+        }
+        $.ajax({
+            url: "{{ route('agentmanagement.ssdeep_pack_delete') }}",
+            type: "POST",
+            data: { id: id },
+            success: function(response){
+                toastr.success(response.message);
+                reload_ssdeep_pack_table();
+                if($('#hd_ssdeep_site_id').val()){
+                    $('#btn_search_ssdeep').trigger('click');
+                }
+            }
+        });
+    }
+
+    function edit_ssdeep_pack(id) {
+        $.ajax({
+            url: "{{ route('agentmanagement.ssdeep_pack_get') }}",
+            type: "GET",
+            data: { id: id },
+            success: function(res) {
+                if (res.status === 'success') {
+                    var pack = res.pack;
+                    var siteIds = res.site_ids || [];
+                    $('#edit_ssdeep_id').val(pack.id);
+                    $('#edit_ssdeep_version').val(pack.version);
+                    $('#edit_ssdeep_category').val(pack.category || '');
+                    $('#edit_ssdeep_title').val(pack.title || '');
+                    $('#edit_ssdeep_description').val(pack.description || '');
+                    $('#edit_ssdeep_file_name').text(pack.file_name || '-');
+                    $('#edit_ssdeep_status').prop('checked', pack.status === 'Y');
+
+                    $('input[name="site[]"].edit_ssdeep_site_item').prop('checked', false);
+                    $('#edit_ssdeep_site_all').prop('checked', false);
+
+                    siteIds.forEach(function(sId) {
+                        $('input[name="site[]"].edit_ssdeep_site_item[value="' + sId + '"]').prop('checked', true);
+                    });
+
+                    $('#edit_ssdeep_pack_modal').modal('show');
+                } else {
+                    toastr.error(res.message || 'Failed to load pack details');
+                }
+            },
+            error: function() {
+                toastr.error('Failed to load pack details');
+            }
+        });
+    }
+    window.edit_ssdeep_pack = edit_ssdeep_pack;
+    window.delete_ssdeep_pack = delete_ssdeep_pack;
+
+    $(document).off('click', '.btn-edit-ssdeep-pack').on('click', '.btn-edit-ssdeep-pack', function(e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        if (id) {
+            edit_ssdeep_pack(id);
+        }
+    });
+
+    $(document).off('click', '.btn-delete-ssdeep-pack').on('click', '.btn-delete-ssdeep-pack', function(e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        if (id) {
+            delete_ssdeep_pack(id);
+        }
+    });
+
+    $('#btn_update_ssdeep_pack').off('click').on('click', function() {
+        var formData = $('#form_edit_ssdeep_pack').serialize();
+        $.ajax({
+            url: "{{ route('agentmanagement.ssdeep_pack_update') }}",
+            type: "POST",
+            data: formData,
+            beforeSend: function() {
+                $('#btn_update_ssdeep_pack').html('<i class="fas fa-spinner fa-spin"></i> Saving...').attr('disabled', true);
+            },
+            success: function(res) {
+                $('#btn_update_ssdeep_pack').html('<i class="fas fa-paper-plane"></i> Save Changes').attr('disabled', false);
+                if (res.status === 'success') {
+                    $('#edit_ssdeep_pack_modal').modal('hide');
+                    reload_ssdeep_pack_table();
+                    if ($('#hd_ssdeep_site_id').val()) {
+                        $('#btn_search_ssdeep').trigger('click');
+                    }
+                    toastr.success(res.message);
+                } else {
+                    toastr.error(res.message);
+                }
+            },
+            error: function() {
+                $('#btn_update_ssdeep_pack').html('<i class="fas fa-paper-plane"></i> Save Changes').attr('disabled', false);
+                toastr.error('Update failed');
+            }
+        });
+    });
+
+    $('#btn_save_bulk_ssdeep_site').off('click').on('click', function() {
+        var formData = $('#form_bulk_edit_ssdeep_pack').serialize();
+        $.ajax({
+            url: "{{ route('agentmanagement.ssdeep_pack_bulk_update_sites') }}",
+            type: "POST",
+            data: formData,
+            beforeSend: function() {
+                $('#btn_save_bulk_ssdeep_site').html('<i class="fas fa-spinner fa-spin"></i> Saving...').attr('disabled', true);
+            },
+            success: function(res) {
+                $('#btn_save_bulk_ssdeep_site').html('<i class="fas fa-paper-plane"></i> บันทึกข้อมูลทั้งหมด').attr('disabled', false);
+                if (res.status === 'success') {
+                    $('#bulk_edit_ssdeep_pack_modal').modal('hide');
+                    reload_ssdeep_pack_table();
+                    if ($('#hd_ssdeep_site_id').val()) {
+                        $('#btn_search_ssdeep').trigger('click');
+                    }
+                    toastr.success(res.message);
+                } else {
+                    toastr.error(res.message);
+                }
+            },
+            error: function() {
+                $('#btn_save_bulk_ssdeep_site').html('<i class="fas fa-paper-plane"></i> บันทึกข้อมูลทั้งหมด').attr('disabled', false);
+                toastr.error('Bulk update failed');
+            }
+        });
+    });
+
+    var keyword_ssdeep = document.getElementById('keyword_ssdeep'),
+        site_ssdeep = document.getElementById('site_ssdeep');
+
+    new Sortable(keyword_ssdeep, {
+        group: {
+            name: 'ssdeep_shared',
+            pull: 'clone',
+            put: false,
+            revertClone: true
+        },
+        animation: 150,
+        sort: false,
+        dataIdAttr: 'data-id',
+        removeCloneOnHide: true
+    });
+
+    new Sortable(site_ssdeep, {
+        group: {
+            name: 'ssdeep_shared'
+        },
+        sort: false,
+        animation: 150,
+        dataIdAttr: 'data-id',
+        onAdd: function (evt) {
+            let site_id = $('#hd_ssdeep_site_id').val();
+            if(!site_id){
+                toastr.error('Please select site.');
+                if(evt.item && evt.item.parentNode){
+                    evt.item.parentNode.removeChild(evt.item);
+                }
+                return;
+            }
+            let attributes_id = evt.item.attributes['data-id'].value;
+            ssdeep_assign_site(attributes_id);
+        },
+    });
 
 </script>
 
 @endpush
 @endsection
-
-

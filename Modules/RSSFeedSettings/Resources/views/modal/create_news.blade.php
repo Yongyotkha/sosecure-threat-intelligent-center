@@ -36,9 +36,6 @@
                             </div>
                          </div>
                          <input type="hidden" name="rss_code" value="{{ $rss -> code }}">
-                         @if(!empty($ai_intel_code))
-                         <input type="hidden" name="ai_intel_code" value="{{ $ai_intel_code }}">
-                         @endif
                          <div class="row">
                              <label for="" class="col-md-12 control-label" id="label_category">Category <span class="text-danger">*</span></label>
                              <div class="col-md-12">
@@ -271,9 +268,6 @@ $('#detail_th').summernote('destroy');
             fontNames: ['TH SarabunPSK'],
             fontNamesIgnoreCheck: ['TH SarabunPSK']
         });
-        @if(!empty($detail_default))
-        $('#detail_th').summernote('code', {!! json_encode($detail_default) !!});
-        @endif
 
      var form_save = '.formSaving';
     $('.formPreview').click(function() {

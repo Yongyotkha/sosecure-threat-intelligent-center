@@ -330,37 +330,18 @@
                                                 <div class="col-lg-12">
                                                     <div class="input-group">
                                                         <input type="input" class="form-control"
-                                                            id="token" data-ioc-feed="true"
+                                                            id="token"
                                                             value="{{ $token ?? ''}}" readonly>
                                                         <span class="input-group-btn">
                                                             <button type="button" class="btn btn-info" onclick="copy_token('token')">Copy</button>
                                                         </span>
                                                     </div>
-                                                    <div id="feed_url_preview_container" style="margin-top: 5px; {{ empty($token) ? 'display:none;' : '' }}">
-                                                        <small class="text-muted">
-                                                            <strong>API URL:</strong> <code id="feed_url_preview">{{ url('/api/v1/ioc-feed/all.csv') }}?token={{ $token ?? '' }}</code>
-                                                        </small>
-                                                    </div>
-                                                    <div style="margin-top: 10px;">
-                                                        <label class="control-label" style="font-weight: normal; margin-bottom: 2px;">IP Whitelist (Optional)</label>
-                                                        <input type="text" name="ioc_feed_whitelist_ips" class="form-control input-sm" 
-                                                               placeholder="e.g. 1.2.3.4, 5.6.7.8" 
-                                                               value="{{ $token_obj->whitelist_ips ?? '' }}">
-                                                        <small class="text-muted">Comma-separated list of allowed IPs. Leave empty to allow all.</small>
-                                                     </div>
-                                                     @if($token_obj && $token_obj->last_used_at)
-                                                     <div style="margin-top: 5px;">
-                                                        <small class="text-success">
-                                                            <i class="fas fa-check-circle"></i> Last used: {{ $token_obj->last_used_at->diffForHumans() }} (IP: {{ $token_obj->last_ip }})
-                                                        </small>
-                                                     </div>
-                                                     @endif
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-lg-3" style="padding: 0; align-self: center" >
                                             <span>
-                                                <button id="btn-gen" type="button" class="btn btn-info" style="height: 30px;" onclick="generate_token('ioc_feed')">Generate</button>
+                                                <button id="btn-gen" type="button" class="btn btn-info" style="height: 30px;" onclick="generate_token('feed_insight')">Generate</button>
                                             </span>
                                             
                                         </div>
@@ -1035,10 +1016,11 @@
         btn = document.getElementById('btn-gen-service');
         inputId = 'token_service_receive';
         tokenName = 'Service Receive API Token';
-    } else if (type === 'ioc_feed') {
+    } else {
         btn = document.getElementById('btn-gen');
         inputId = 'token';
         tokenName = (document.getElementById('tok-name')?.value || 'Feed Token').trim();
+        type = 'feed_insight';
     }
     
     const days  = document.getElementById('tok-days')?.value;
@@ -1065,11 +1047,6 @@
 
       const data = await res.json(); 
       document.getElementById(inputId).value = data.token;
-      if (type === 'ioc_feed') {
-          const baseUrl = "{{ url('/api/v1/ioc-feed/all.csv') }}";
-          document.getElementById('feed_url_preview').innerText = baseUrl + '?token=' + data.token;
-          document.getElementById('feed_url_preview_container').style.display = 'block';
-      }
       toastr.success('Token generated successfully', '@langapp("response_status")');
     } catch (e) {
       toastr.error('Failed to generate token', '@langapp("response_status")');

@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\ApiToken;
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise;
 use GuzzleHttp\Promise\Utils;
@@ -10,14 +9,42 @@ use Illuminate\Support\Facades\Log;
 
 class IndicatorCheckService
 {
-    const PROVIDER_TYPES = [
-        'VT' => 'virustotal',
-        'OTX' => 'otx',
-        'ABUSE' => 'abuseipdb',
-        'TF' => 'threatfox',
-        'RST' => 'rstcloud',
-        'HYBRID' => 'hybrid',
-        'IBMCLOUD' => 'ibmcloud',
+    // API Keys Configuration
+    // API Keys Configuration
+    const VT_KEYS = [
+        "8d1a95435a78ada270e1a4ee4abb8a87d69870b725b0ca9d92bf8ce314e0d953",
+        "0c2ff4706b911810baaa4548c625c6b2d94c640faa5b99226069cbd7be2f329e",
+        "2686458ccb2477cbb4a439950b59a3207c409fb7ad49704db212c215bc783faf",
+        "1f28be66c766cb6a1f44d4e5b5e56a0eda63bc648028ef669ec0186e096bb9d4",
+        "e5639402525b6e101e4a0a303684b3f094c9e01bb109b7d8fd5a9d8fc63aa66d",
+    ];
+
+    const OTX_KEYS = [
+        "8d1a9f623e1698c37cf276712cec4c861f2323de2f8f27be5a53c6c5aa5890f3c",
+        "ff67d575f75f39192f7b0b810f145a863860ffc9f2141587be8f76cb7d9e5fd4",
+        "9c0f0f8849040301996c9041b9ebbf3a3ce7c1d6c4017769ee205b4505a67d3f",
+        "ed575d32392769a5269d68e2bfd72e33ce1b5a8f865743f5c762a36c88030915",
+        "3dde890f24a4668e4449e63b90cc40dc97597d92aa513c2998dee4a22f53ff91",
+    ];
+
+    const ABUSE_KEYS = [
+        "718e46e84705145f16f57f5cd6c8cc9c3512e4aacbbc8ba0f1a010f7d8f10b97453d7c039c9180fe",
+        "9db7f656bdc477ee447dabea6b3238c55c36cdf7b91e801bf80f2893cd2b1c3d21deae8bb711e081",
+        "e6b0d45966d397554001d1ee222f78ac8b8298a1ef5c615d58bcdb040aafbd8df2e1a70279054ab2",
+        "b97b0e5c7358a6f4d9d73fb0936997ee9145dea1646bc165d3de4658245bed918e69a74edff7aa2b",
+        "f8444b91ac2a18e2ebd3124bb417b3e700c515b1fb86669d38b52a4d4012f5b05168dc81d13aa510",
+    ];
+
+    const TF_KEYS = [
+        "d349c3c727f4beb4077dc31bac1fad81c0fd283749e5d0ff",
+        "909914accb7ab0d1ac0536e2146535262dbda1bee66aa601",
+        "f79a27568e2c280ac98e5ab17eaa46c50dc90164c30fa4d7",
+    ];
+
+    const RST_KEYS = [
+        "dRe8o8bAfInJ5Bne6NtPmjR8UF1HCsNKESF5s-XBB_LOVZOOcHrgxw",
+        "9TllfBoGN9b6Oy96e9RKqGWU5k3VAUh2KJiEO4unV7uCTlMbLbbN1A",
+        "U-fmKoXw7tT-m85-4cnO_qcXAE8iYYwaDve3PF4yuke6DSFoZD78Xw",
     ];
 
     // Risk Scoring Configuration
@@ -43,26 +70,6 @@ class IndicatorCheckService
     const WEIGHTS = [
         "vt" => 0.35, "abuse" => 0.20, "tf" => 0.10, "otx" => 0.25, "rst" => 0.10
     ];
-
-    public static function normalizeIocType($type)
-    {
-        $map = [
-            'IP' => 'ip',
-            'Domain' => 'domain',
-            'URL' => 'url',
-            'MD5' => 'md5',
-            'SHA1' => 'sha1',
-            'SHA256' => 'sha256',
-        ];
-
-        if (isset($map[$type])) {
-            return $map[$type];
-        }
-
-        $normalized = strtolower((string) $type);
-
-        return $normalized !== '' ? $normalized : 'unknown';
-    }
 
     /**
      * Check a single IOC asynchronously
@@ -161,7 +168,7 @@ class IndicatorCheckService
             },
             function ($exception) use ($ioc) {
                 Log::warning("VT API Error for {$ioc}: " . $exception->getMessage());
-                return ["error" => true, "unique_results" => []];
+                return ["malicious" => 0, "unique_results" => [], "suspicious" => 0];
             }
         );
     }
@@ -184,7 +191,7 @@ class IndicatorCheckService
             },
             function ($exception) use ($ip) {
                 Log::warning("AbuseIPDB Error for {$ip}: " . $exception->getMessage());
-                return ["error" => true];
+                return ["score" => "-", "total_reports" => 0];
             }
         );
     }
@@ -210,14 +217,10 @@ class IndicatorCheckService
         return $client->getAsync($url, ['headers' => ['X-OTX-API-KEY' => $key], 'timeout' => 30, 'connect_timeout' => 15])->then(
             function ($response) {
                 $data = json_decode($response->getBody(), true);
-                $count = $data['pulse_info']['count'] ?? 0;
-                if ($count > 0) {
-                    return ["pulse_count" => $count];
-                }
-                return ["error" => true];
+                return ["pulse_count" => $data['pulse_info']['count'] ?? 0];
             },
             function ($exception) {
-                return ["error" => true];
+                return ["pulse_count" => 0];
             }
         );
     }
@@ -257,10 +260,10 @@ class IndicatorCheckService
                         "tags" => array_unique($tags)
                     ];
                 }
-                return ["error" => true];
+                return ["confidence_level" => 0];
             },
             function ($exception) use ($ioc) {
-                return ["error" => true];
+                return ["confidence_level" => 0];
             }
         );
     }
@@ -290,86 +293,12 @@ class IndicatorCheckService
 
     // Static counters for round-robin rotation
     protected static $keyCounters = [
-        'VT' => 0, 'OTX' => 0, 'ABUSE' => 0, 'TF' => 0, 'RST' => 0,
-        'HYBRID' => 0, 'IBMCLOUD' => 0,
+        'VT' => 0, 'OTX' => 0, 'ABUSE' => 0, 'TF' => 0, 'RST' => 0
     ];
-
-    protected static $keysCache = [];
-
-    public static function getProviderKeys($service)
-    {
-        return (new static())->loadKeysForService($service);
-    }
-
-    public static function getRandomKey($service)
-    {
-        $keys = static::getProviderKeys($service);
-
-        if (empty($keys)) {
-            return '';
-        }
-
-        return $keys[array_rand($keys)];
-    }
-
-    /**
-     * For providers that use HTTP Basic Auth (e.g. IBM X-Force).
-     * Store credentials in token as "api_key:password".
-     */
-    public static function getBasicAuthCredentials($service)
-    {
-        $token = static::getRandomKey($service);
-
-        if ($token === '' || strpos($token, ':') === false) {
-            Log::warning('No valid basic-auth credentials configured for indicator check service', [
-                'service' => $service,
-                'provider' => self::PROVIDER_TYPES[$service] ?? null,
-            ]);
-            return ['', ''];
-        }
-
-        $parts = explode(':', $token, 2);
-
-        return [$parts[0], $parts[1] ?? ''];
-    }
-
-    protected function loadKeysForService($service)
-    {
-        if (array_key_exists($service, self::$keysCache)) {
-            return self::$keysCache[$service];
-        }
-
-        $providerType = self::PROVIDER_TYPES[$service] ?? null;
-        if (!$providerType) {
-            self::$keysCache[$service] = [];
-            return [];
-        }
-
-        $keys = ApiToken::getProviderTokens($providerType, null, ApiToken::SCOPE_SYSTEM)
-            ->filter(function ($token) {
-                return !$token->isExpired() && trim((string) $token->token) !== '';
-            })
-            ->pluck('token')
-            ->values()
-            ->all();
-
-        self::$keysCache[$service] = $keys;
-
-        return $keys;
-    }
 
     protected function getKey($service)
     {
-        $keys = $this->loadKeysForService($service);
-
-        if (empty($keys)) {
-            Log::warning('No active system API keys configured for indicator check service', [
-                'service' => $service,
-                'provider' => self::PROVIDER_TYPES[$service] ?? null,
-            ]);
-            return '';
-        }
-
+        $keys = constant("self::{$service}_KEYS");
         // Round-robin rotation (much better than random for avoiding rate limits)
         $index = self::$keyCounters[$service] % count($keys);
         self::$keyCounters[$service]++;

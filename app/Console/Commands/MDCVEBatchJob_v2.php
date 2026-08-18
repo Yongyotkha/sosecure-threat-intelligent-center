@@ -740,12 +740,8 @@ foreach($site_id_m as $site_data){
     }
 
     
-    // ✅ Optimized: Use JOIN instead of fetch + whereIn to avoid long connection duration
-    $CVEMapping = CVEMapping::select('data_datacve_mapping.namecve', 'data_datacve_mapping.severity')
-        ->join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve')
-        ->where('data_datacve_mapping_assets.site_id', $site_data->id)
-        ->groupBy('data_datacve_mapping.severity','data_datacve_mapping.namecve')
-        ->get();
+    $CVEMappingAssets_name = CVEMappingAssets::where('site_id', $site_data->id)->select('namecve')->get();
+    $CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $CVEMappingAssets_name)->groupBy('severity','namecve')->get();
     foreach($CVEMapping as $data){
         foreach($check_total_namecve as $item){
             if($data -> namecve == $item['namecve']){
@@ -862,12 +858,8 @@ foreach($DataCveven as $data){
 }
 
 
-// ✅ Optimized: Use JOIN instead of fetch + whereIn for All Site summary
-$CVEMapping = CVEMapping::select('data_datacve_mapping.namecve', 'data_datacve_mapping.severity')
-    ->join('data_datacve_mapping_assets', 'data_datacve_mapping.namecve', '=', 'data_datacve_mapping_assets.namecve')
-    ->whereIn('data_datacve_mapping_assets.site_id', $site_id_list)
-    ->groupBy('data_datacve_mapping.severity','data_datacve_mapping.namecve')
-    ->get();
+$CVEMappingAssets_name = CVEMappingAssets::whereIn('site_id', $site_id_list)->select('namecve')->get();
+$CVEMapping = CVEMapping::select('namecve', 'severity')->whereIn('namecve', $CVEMappingAssets_name)->groupBy('severity','namecve')->get();
 foreach($CVEMapping as $data){
     foreach($check_total_namecve as $item){
         if($data -> namecve == $item['namecve']){

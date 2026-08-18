@@ -356,50 +356,6 @@
                     });
                 }
 
-                function parseMongoDateValue(dateVal) {
-                    if (!dateVal) return null;
-
-                    if (dateVal.$date && dateVal.$date.$numberLong) {
-                        return parseInt(dateVal.$date.$numberLong, 10);
-                    }
-
-                    if (dateVal.$date) {
-                        return new Date(dateVal.$date).getTime();
-                    }
-
-                    if (dateVal.milliseconds !== undefined && dateVal.milliseconds !== null) {
-                        return parseInt(dateVal.milliseconds, 10);
-                    }
-
-                    if (typeof dateVal === 'number') {
-                        return dateVal;
-                    }
-
-                    if (typeof dateVal === 'string' && dateVal.trim() !== '') {
-                        return new Date(dateVal).getTime();
-                    }
-
-                    return null;
-                }
-
-                function formatAttributeDate(row) {
-                    var dateVal = row.created || row.updated_at || row.pulse_modified || row.created_at;
-                    var v = parseMongoDateValue(dateVal);
-
-                    if (!v || isNaN(v)) {
-                        return '-';
-                    }
-
-                    var created_date = new Date(v);
-                    var year = created_date.getFullYear();
-                    var month = created_date.getMonth();
-                    var date = created_date.getDate();
-                    var hour = created_date.getHours();
-                    var min = created_date.getMinutes();
-
-                    return year + '-' + (month + 1) + '-' + date + ' ' + hour + ':' + (min < 10 ? '0' : '') + min;
-                }
-
                 function load_table_attributes(){
 
 
@@ -473,7 +429,18 @@
                     {
                         targets: 3,
                         render: function (data, type, row) {
-                            return formatAttributeDate(row);
+                            var inner = '';
+                            var v = parseInt(row.updated_at.$date.$numberLong);
+                            var created_date =  new Date(v);
+                            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                            var year = created_date.getFullYear();
+                            var month = created_date.getMonth();
+                            var date = created_date.getDate();
+                            var hour = created_date.getHours();
+                            var min = created_date.getMinutes();
+                            var sec = created_date.getSeconds();
+                            inner =  year + '-' + (month+1) + '-' + date + ' ' + hour + ':' + min;
+                            return inner;
                         }
 
                     }

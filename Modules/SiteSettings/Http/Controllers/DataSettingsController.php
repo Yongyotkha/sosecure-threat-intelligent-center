@@ -17,6 +17,9 @@ use App\Entities\Logs_setting;
 use Illuminate\Support\Facades\Log;
 use Modules\SiteSettings\Entities\site_config_email_alert_defacement;
 use Modules\SiteSettings\Entities\site_config_email_alert_defacement_customer;
+use App\AgentReleaseTarget;
+use App\AgentReleasePackage;
+use Illuminate\Support\Facades\Schema;
 
 class DataSettingsController extends Controller
 {
@@ -78,7 +81,85 @@ class DataSettingsController extends Controller
 
         $data['file_agent_name'] = $data['siteSettings']['name'].'_Agent-'.$data['siteSettings']['id'].'.zip';
 
+        // OTA target for this site (site-specific first, else global). Used to link data-setting → Agent Releases.
+        $data['agent_ota_ready'] = Schema::hasTable('agent_release_targets') && Schema::hasTable('agent_release_packages');
+        $data['agent_ota_version'] = null;
+        $data['agent_ota_scope'] = null;
+        $data['agent_setup_download_url'] = null;
+        $data['agent_setup_version'] = null;
+        $data['agent_first_install'] = [
+            'windows' => null,
+            'debian' => null,
+            'ubuntu' => null,
+            'centos' => null,
+            'fedora' => null,
+        ];
+        if ($data['agent_ota_ready']) {
+            $siteId = (int) $get_data->id;
+            $siteTarget = AgentReleaseTarget::where('site_id', $siteId)
+                ->where('status', 'Y')
+                ->orderBy('id', 'desc')
+                ->first();
+            if ($siteTarget && !empty($siteTarget->target_version)) {
+                $data['agent_ota_version'] = $siteTarget->target_version;
+                $data['agent_ota_scope'] = 'site';
+            } else {
+                $globalTarget = AgentReleaseTarget::whereNull('site_id')
+                    ->where('status', 'Y')
+                    ->orderBy('id', 'desc')
+                    ->first();
+                if ($globalTarget && !empty($globalTarget->target_version)) {
+                    $data['agent_ota_version'] = $globalTarget->target_version;
+                    $data['agent_ota_scope'] = 'global';
+                }
+            }
 
+            // Latest active first-install package per OS (Agent Releases).
+            $data['agent_first_install'] = [
+                'windows' => null,
+                'debian' => null,
+                'ubuntu' => null,
+                'centos' => null,
+                'fedora' => null,
+            ];
+            $setupQuery = AgentReleasePackage::where('status', 'Y')->orderBy('id', 'desc');
+            if (Schema::hasColumn('agent_release_packages', 'kind')) {
+                $setupQuery->where('kind', 'installer');
+            } else {
+                $setupQuery->where(function ($q) {
+                    $q->where('file_name', 'like', '%setup%')
+                        ->orWhere('file_name', 'like', '%Setup%');
+                });
+            }
+            $setupPacks = $setupQuery->get();
+            foreach ($setupPacks as $setupPack) {
+                if (empty($setupPack->path)) {
+                    continue;
+                }
+                $packOs = Schema::hasColumn('agent_release_packages', 'os')
+                    ? strtolower(trim((string) ($setupPack->os ?: 'windows')))
+                    : 'windows';
+                if ($packOs === '' || $packOs === null) {
+                    $packOs = 'windows';
+                }
+                if (!array_key_exists($packOs, $data['agent_first_install'])) {
+                    continue;
+                }
+                // First match is newest (orderBy id desc).
+                if ($data['agent_first_install'][$packOs] === null) {
+                    $data['agent_first_install'][$packOs] = [
+                        'url' => $setupPack->path,
+                        'version' => $setupPack->version,
+                        'file_name' => $setupPack->file_name,
+                    ];
+                }
+            }
+            // Back-compat single Windows fields used elsewhere.
+            if (!empty($data['agent_first_install']['windows'])) {
+                $data['agent_setup_download_url'] = $data['agent_first_install']['windows']['url'];
+                $data['agent_setup_version'] = $data['agent_first_install']['windows']['version'];
+            }
+        }
 
         $Logs_setting_data =  Logs_setting::where('type', 'indicator')
         ->where('site_id', $get_data->id)->select('content')->first();

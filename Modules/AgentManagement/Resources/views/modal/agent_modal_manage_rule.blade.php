@@ -3,133 +3,127 @@
         <div class="modal-header bg-info">
             <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
             <h4 class="modal-title text-white">
-                <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" datdata-rel="tooltip"
+                <i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" data-rel="tooltip"
                     title="Fullscreen" data-placement="right"></i>
                 Manage Rules
+                <small class="text-white" style="opacity:.85; margin-left:8px;">{{ $agent_label ?? '' }}</small>
             </h4>
         </div>
-        {{-- {!! Form::open() !!} --}}
-        <form id="form_submit_manage_rule" class="modal-body" action="{{ route('agentmanagement.updateManageRule') }}" method="POST">
-            @csrf
-            <input type="hidden" name="site_id" value="{{ $id }}">
-            <input type="hidden" name="agent_id" value="{{ $agent_id }}">
 
-            <div class="form-group row">
-                <label class="col-lg-2 control-label">Extension<span class="text-danger">*</span> </label>
-                <div class="col-lg-10">
-                    <select name="" id="extentions" class="select2-option form-control">
-                        <option value="" disabled selected>Choose Select</option>
-                        <option value="all">All</option>
-                        <option value="custom">Custom</option>
+        <div class="modal-body">
+            {{-- Search/filter outside <form> so Enter never POSTs updateManageRule --}}
+            <div class="row" style="margin-bottom:10px;">
+                <div class="col-sm-5">
+                    <input type="text" id="manage_rule_search" class="form-control"
+                        placeholder="Search name / file / category"
+                        autocomplete="off"
+                        oninput="window.manageRuleApplyFilters && window.manageRuleApplyFilters()"
+                        onkeydown="if(event.key==='Enter'||event.keyCode===13){event.preventDefault();return false;}">
+                </div>
+                <div class="col-sm-3">
+                    <select id="manage_rule_type_filter" class="form-control"
+                        onchange="window.manageRuleApplyFilters && window.manageRuleApplyFilters()">
+                        <option value="all">All (YARA + Ssdeep)</option>
+                        <option value="yara">YARA only</option>
+                        <option value="ssdeep">Ssdeep only</option>
                     </select>
+                </div>
+                <div class="col-sm-4 text-right">
+                    <button type="button" class="btn btn-default btn-sm" id="btn_ignore_all"
+                        onclick="window.manageRuleIgnoreAll && window.manageRuleIgnoreAll()">Ignore all</button>
+                    <button type="button" class="btn btn-default btn-sm" id="btn_clear_ignore"
+                        onclick="window.manageRuleClearIgnore && window.manageRuleClearIgnore()">Clear ignore</button>
                 </div>
             </div>
 
-            <div id="custom_select" class="form-group row" style="display: none">
-                <label class="col-lg-2 control-label">Custom<span class="text-danger">*</span> </label>
-                <div class="col-lg-10">
-                    <select name="" id="scan_interval" class="select2-option form-control">
-                        <option value="1" disabled selected>Choose Select</option>
-                    </select>
-                </div>
-            </div>
+            <form id="form_submit_manage_rule" action="{{ route('agentmanagement.updateManageRule') }}" method="POST"
+                onsubmit="return window.manageRuleSaveForm ? window.manageRuleSaveForm(event) : false;">
+                @csrf
+                <input type="hidden" name="site_id" value="{{ $site_id }}">
+                <input type="hidden" name="agent_id" value="{{ $agent_id }}">
 
-            <div class="table-responsive">
-                <table id="tbl_manage_rule" class="table table-striped table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Category Rule</th>
-                            <th>Rule Name</th>
-                            <th>Description</th>
-                            <th>Serverity</th>
-                            <th>Ignore</th>
-                            <th>Update Date</th>
-                            <th>Update By</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($ruleNameSite as $key => $item)
+                <div class="table-responsive">
+                    <table id="tbl_manage_rule" class="table table-striped table-bordered" style="width:100%;">
+                        <thead>
                             <tr>
-                                <td>{{ $item -> category_name }}</td>
-                                <td>{{ $item -> rule_name }}</td>
-                                <td>
-                                    {{ $item -> description }}
-                                </td>
-                                <td>{{  $item -> severity }}</td>
-                                <td>
-                                    <label>
-                                        <input type="hidden" name="rule_id[{{$key}}]" value="{{ $item -> rule_id }}">
-                                        <input name="ignore[{{$key}}]" value="1" id="-all" type="checkbox" class="">
-                                        <span class="label-text"></span>
-                                    </label>
-                                </td>
-                                <td>{{  $item -> created_at }}</td>
-                                <td>-</td>
+                                <th>Type</th>
+                                <th>Category</th>
+                                <th>Name</th>
+                                <th>File / Version</th>
+                                <th>Severity / Sigs</th>
+                                <th>Ignore</th>
+                                <th>Updated</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            @foreach ($ruleNameSite as $item)
+                                @php $rid = (int) $item->rule_id; @endphp
+                                <tr data-type="yara"
+                                    data-search="{{ strtolower(($item->category_name ?? '').' '.($item->rule_name ?? '').' '.($item->file_name ?? '').' '.($item->description ?? '').' yara') }}">
+                                    <td><span class="label label-primary">YARA</span></td>
+                                    <td>{{ $item->category_name }}</td>
+                                    <td>{{ $item->rule_name }}</td>
+                                    <td><small>{{ $item->file_name }}</small></td>
+                                    <td>{{ $item->severity }}</td>
+                                    <td>
+                                        <input type="hidden" name="rule_ids[]" value="{{ $rid }}">
+                                        <label style="font-weight:normal; margin:0;">
+                                            <input class="ignore-chk" name="ignore[{{ $rid }}]" value="1" type="checkbox"
+                                                data-kind="yara"
+                                                {{ in_array($rid, $ignoredIds ?? [], true) ? 'checked' : '' }}>
+                                            <span class="label-text">Off</span>
+                                        </label>
+                                    </td>
+                                    <td>{{ $item->created_at }}</td>
+                                </tr>
+                            @endforeach
 
-            <div class="modal-footer">
-                {!! closeModalButton() !!}
-                <button type="submit" class="btn btn-info formSaving btn-rounded"><i class="fas fa-paper-plane"></i>Submit</button>
-            </div>
-        </form>
-      
-        {{-- {!! Form::close() !!} --}}
+                            @if(!empty($ssdeep_ready))
+                                @forelse(($ssdeep_site_packs ?? collect()) as $pack)
+                                    @php
+                                        $pid = (int) $pack->id;
+                                        $label = method_exists($pack, 'displayLabel') ? $pack->displayLabel() : (($pack->version ?? '').' — '.($pack->file_name ?: ''));
+                                    @endphp
+                                    <tr data-type="ssdeep"
+                                        data-search="{{ strtolower(($pack->category ?? '').' '.$label.' '.($pack->file_name ?? '').' '.($pack->version ?? '').' ssdeep') }}">
+                                        <td><span class="label label-warning">Ssdeep</span></td>
+                                        <td>{{ $pack->category ?: '-' }}</td>
+                                        <td>{{ $label }}</td>
+                                        <td><small>{{ $pack->file_name ?: ($pack->version ?: '-') }}</small></td>
+                                        <td>{{ (int) $pack->signature_count }} sigs</td>
+                                        <td>
+                                            <input type="hidden" name="ssdeep_pack_ids[]" value="{{ $pid }}">
+                                            <label style="font-weight:normal; margin:0;">
+                                                <input class="ignore-chk" name="ssdeep_ignore[{{ $pid }}]" value="1" type="checkbox"
+                                                    data-kind="ssdeep"
+                                                    {{ in_array($pid, $ignoredSsdeepIds ?? [], true) ? 'checked' : '' }}>
+                                                <span class="label-text">Off</span>
+                                            </label>
+                                        </td>
+                                        <td>-</td>
+                                    </tr>
+                                @empty
+                                    <tr data-type="ssdeep" data-search="ssdeep" class="manage-rule-empty-ssdeep">
+                                        <td colspan="7" class="text-muted">No ssdeep packs assigned to this site.</td>
+                                    </tr>
+                                @endforelse
+                            @else
+                                <tr data-type="ssdeep" data-search="ssdeep" class="manage-rule-empty-ssdeep">
+                                    <td colspan="7" class="text-muted">Ssdeep is not available on this Center.</td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="modal-footer" style="padding-left:0; padding-right:0;">
+                    {!! closeModalButton() !!}
+                    <button type="button" class="btn btn-info formSaving btn-rounded"
+                        onclick="window.manageRuleSaveForm && window.manageRuleSaveForm(event)">
+                        <i class="fas fa-paper-plane"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-
-
-<script>
-    $('#extentions').change(function(){
-        if($(this).val() == 'Y'){
-            $('#custom_select').hide();
-        }else{
-            $('#custom_select').show();
-        }
-    });
-
-    $('#tbl_manage_rule').DataTable({
-        paging: false
-    });
-
-    var form_save = '.formSaving';
-    $('#form_submit_manage_rule').submit(function (event) {
-        event.preventDefault();
-
-        $(form_save).html('Processing..<i class="fas fa-spin fa-spinner"></i>');
-        $('.formSaving').attr('disabled',true);
-    
-        var data = new FormData(this);
-        
-        axios.post($(this).attr("action"), data)
-            .then(function (response) {
-                toastr.success('Successfully');
-                $(form_save).html('<i class="fas fa-paper-plane"></i>  @langapp('save') </span>');
-                window.location.href = response.data.redirect;
-            })
-            .catch(function (error) {
-                if(error.response.data.exception)
-                {
-                    $('.formSaving').attr('disabled',false);
-                    toastr.error('@langapp('request_failed')' , '@langapp('response_status') ');
-                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
-                }
-                else
-                {
-                    $('.formSaving').attr('disabled',false);
-                    var errors = error.response.data.errors;
-                    var errorsHtml= '';
-                    $.each( errors, function( key, value ) {
-                        errorsHtml += '<li>' + value[0] + '</li>'; 
-                    });
-                    toastr.error( errorsHtml , '@langapp('response_status') ');
-                    $(form_save).html('<i class="fas fa-sync"></i> @langapp('try_again')</span>');
-                }
-            }); 
-
-    });
-</script>
-

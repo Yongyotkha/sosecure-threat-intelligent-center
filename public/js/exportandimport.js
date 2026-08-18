@@ -1,46 +1,37 @@
 const exportCSV = (type) => {
-    const type_ = type.value;
-    const picker = $('#event_date').data('daterangepicker');
     const eventName = document.getElementById('event_name').value.trim();
-    const keywordSearch = document.getElementById('keyword_search').value.trim();
+    const type_ = type.value;
+
+    const dateRange = $('#event_date').data('daterangepicker');
+    const startDate = dateRange.startDate.format('YYYY-MM-DD');
+    const endDate = dateRange.endDate.format('YYYY-MM-DD');
 
     const publishedBtn = document.querySelector('#groupby-published .btn.active');
-    const checkPublished = publishedBtn ? publishedBtn.value : "";
+    const published_ = publishedBtn ? publishedBtn.value : "";
+    const published = published_ == 1 ? 1 : published_ == 2 ? 0 : "";
+
+    // alert(published);
 
     const checkedInputs = document.querySelectorAll('.check_rss_new_id:checked');
     const selectedPulseIds = Array.from(checkedInputs).map(input => input.value);
 
-    const dateFilterActive = typeof isDateSearch !== 'undefined' && isDateSearch;
+    // alert(published);
 
     const queryParams = new URLSearchParams();
-    queryParams.append('type', type_);
-    if (eventName) queryParams.append('keywords', eventName);
-    if (keywordSearch) queryParams.append('keyword_search', keywordSearch);
-    if (checkPublished) queryParams.append('check_published', checkPublished);
-    if (typeof industries !== 'undefined' && industries) queryParams.append('industries', industries);
-    if (typeof group !== 'undefined' && group) queryParams.append('groups', group);
+    if (eventName) queryParams.append('event_name', eventName);
+    if (published !== "") queryParams.append('published', published);
     if (selectedPulseIds.length > 0) queryParams.append('pulse_id', selectedPulseIds.join(','));
-    if (dateFilterActive && picker) {
-        queryParams.append('isDateSearch', '1');
-        queryParams.append('startDate', picker.startDate.format('YYYY-MM-DD hh:mm A'));
-        queryParams.append('endDate', picker.endDate.format('YYYY-MM-DD hh:mm A'));
-    }
+    queryParams.append('start_date', startDate);
+    queryParams.append('end_date', endDate);
+    queryParams.append('type', type_);
+    // queryParams.append('ispublished', published);
 
     const fullUrl = `${exportBaseUrl}?${queryParams.toString()}`;
 
-    let dateRangeLabel = '';
-    if (dateFilterActive && picker) {
-        dateRangeLabel = moment(picker.startDate).format('DD-MM-YYYY HH:mm')
-            + ' to '
-            + moment(picker.endDate).format('DD-MM-YYYY HH:mm');
-    } else {
-        dateRangeLabel = 'current filters';
-    }
-
     $show_status_pubished = '';
-    if (checkPublished == '1') {
+    if (published_ == '1') {
         $show_status_pubished = 'Published';
-    } else if (checkPublished == '2') {
+    } else if (published_ == '2') {
         $show_status_pubished = 'Unpublished';
     } else {
         $show_status_pubished = 'All';
@@ -53,7 +44,9 @@ const exportCSV = (type) => {
             title: 'Do you want to export ?',
             html: 'Do you want to export Events <br> from '
                 + '<strong>'
-                + dateRangeLabel
+                + moment(startDate, 'YYYY-MM-DD').format('DD-MM-YYYY')
+                + ' to '
+                + moment(endDate, 'YYYY-MM-DD').format('DD-MM-YYYY')
                 + ' ?'
                 + '</strong>'
                 + '<br>'
@@ -153,7 +146,9 @@ const exportCSV = (type) => {
             title: 'Do you want to export?',
             html: 'Do you want to export Event and Attributes <br> from '
                 + '<strong>'
-                + dateRangeLabel
+                + moment(startDate, 'YYYY-MM-DD').format('DD-MM-YYYY')
+                + ' to '
+                + moment(endDate, 'YYYY-MM-DD').format('DD-MM-YYYY')
                 + ' ?'
                 + '</strong>'
                 + '<br>'

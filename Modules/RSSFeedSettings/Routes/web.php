@@ -19,14 +19,6 @@ Route::group(
         Route::get('/rss_data', 'RSSFeedSettingsController@rss_data')->name('rssfeedsettings.rss_data')->middleware('can:menu_items');
         Route::post('rss_data_table', 'RSSFeedSettingsController@tableRssData')->name('rssfeedsettings.rss_data_table')->middleware('can:menu_items');
 
-        Route::get('/ai_intel', 'RSSFeedSettingsController@ai_intel')->name('rssfeedsettings.ai_intel')->middleware('can:menu_items');
-        Route::post('ai_intel_table', 'RSSFeedSettingsController@tableAiIntel')->name('rssfeedsettings.ai_intel_table')->middleware('can:menu_items');
-        Route::post('ai_intel_sync', 'RSSFeedSettingsController@ai_intel_sync')->name('rssfeedsettings.ai_intel_sync')->middleware('can:menu_items');
-        Route::get('/ai_intel/news/create/{code}', 'RSSFeedSettingsController@ai_intel_create_news')->name('rssfeedsettings.ai_intel_create_news');
-        Route::get('delete-ai_intel/{id}', 'RSSFeedSettingsController@ai_intel_delete')->name('rssfeedsettings.ai_intel_delete')->middleware('can:menu_items');
-        Route::delete('ai_intel_delete_process/{id}', 'RSSFeedSettingsController@ai_intel_delete_process')->name('rssfeedsettings.ai_intel_delete_process')->middleware('can:menu_items');
-        Route::post('ai_intel_delete_checked', 'RSSFeedSettingsController@ai_intel_delete_checked')->name('rssfeedsettings.ai_intel_delete_checked')->middleware('can:menu_items');
-
         Route::post('rss_setting_table', 'RSSFeedSettingsController@tableRssSetting')->name('rssfeedsettings.rss_setting_table')->middleware('can:menu_items');
         
         Route::get('delete-rss_data/{id}', 'RSSFeedSettingsController@rss_data_delete')->name('rssfeedsettings.rss_data_delete')->middleware('can:menu_items');

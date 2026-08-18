@@ -6,10 +6,6 @@ use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 use Modules\Settings\Entities\Options;
-use App\Services\HoneypotDashboardService;
-use App\Services\HoneypotIndicatorPublishService;
-use App\Services\HoneypotIngestService;
-use App\Services\HoneypotMongoService;
 use App\Services\SSHTunnelService;
 
 class AppServiceProvider extends ServiceProvider
@@ -95,22 +91,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(HoneypotMongoService::class, function () {
-            return new HoneypotMongoService();
-        });
-
-        $this->app->singleton(HoneypotIngestService::class, function ($app) {
-            return new HoneypotIngestService($app->make(HoneypotMongoService::class));
-        });
-
-        $this->app->singleton(HoneypotDashboardService::class, function ($app) {
-            return new HoneypotDashboardService($app->make(HoneypotMongoService::class));
-        });
-
-        $this->app->singleton(HoneypotIndicatorPublishService::class, function ($app) {
-            return new HoneypotIndicatorPublishService($app->make(HoneypotMongoService::class));
-        });
-
         // if ($this->app->isLocal()) {
         //     $this->app->register(TelescopeServiceProvider::class);
         // }

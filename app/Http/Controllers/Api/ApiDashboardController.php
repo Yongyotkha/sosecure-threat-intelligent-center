@@ -22,7 +22,6 @@ use Modules\SiteSettings\Entities\DataCveven;
 use Modules\SiteSettings\Entities\SiteSettings;
 use Modules\Users\Entities\UserSite;
 use Modules\WebDefacement\Entities\WebdefacmentSetting;
-use Illuminate\Support\Facades\Log;
 
 class ApiDashboardController extends ApiController
 {
@@ -43,17 +42,12 @@ class ApiDashboardController extends ApiController
                     if ($auth_site['status_code'] !== '200') {
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
-                    $get_role_custom = $data['data']['get_role_custom'] ?? null;
+                    $get_role_custom = $data['data']['get_role_custom'];
                     $site = $request -> code;
-                    $user_id = $data['data']['user_id'] ?? null;
                     
                     $site_id_active = SiteSettings::select('id')->where('active', 1)->whereNull('deleted_at')->pluck('id')->toArray();
                     $isSuperAdmin = @$get_role_custom['superadmin'] == 1;
-                    $site_id_arr = $isSuperAdmin ? null : ($data['data']['site_id_arr'] ?? []);
-
-                    if (empty($site_id_arr) && !$isSuperAdmin && $user_id) {
-                        $site_id_arr = UserSite::where('user_id', $user_id)->where('active', 1)->pluck('site_id')->toArray();
-                    }
+                    $site_id_arr = $isSuperAdmin ? null : $data['data']['site_id_arr'];
                     $targetSiteId = null;
                     
                     $dataOut = ["countAssets" => 0, "assetLimit" => 0];
@@ -141,15 +135,12 @@ class ApiDashboardController extends ApiController
                     if ($auth_site['status_code'] !== '200') {
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
-                    $get_role_custom = $data['data']['get_role_custom'] ?? null;
-                    $site = $data['data']['site'] ?? null;
-                    $user_id = $data['data']['user_id'] ?? null;
-                    $site_id_arr = $data['data']['site_id_arr'] ?? [];
-
+                    $get_role_custom = $data['data']['get_role_custom'];
+                    $site = $data['data']['site'];
+                    $user_id = $data['data']['user_id'];
+                    $site_id_arr = $data['data']['site_id_arr'];
+                    
                     $isSuperAdmin = @$get_role_custom['superadmin'] == 1;
-                    if (empty($site_id_arr) && !$isSuperAdmin && $user_id) {
-                        $site_id_arr = UserSite::where('user_id', $user_id)->where('active', 1)->pluck('site_id')->toArray();
-                    }
                     $CVEMapping = 0;
 
                     if ($isSuperAdmin) {
@@ -287,15 +278,9 @@ class ApiDashboardController extends ApiController
                     if ($auth_site['status_code'] !== '200') {
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
-                    $get_role_custom = $data['data']['get_role_custom'] ?? null;
-                    $site = $data['data']['site'] ?? null;
-                    $user_id = $data['data']['user_id'] ?? null;
-                    $site_id_arr = $data['data']['site_id_arr'] ?? [];
-
-                    $isSuperAdmin = @$get_role_custom['superadmin'] == 1;
-                    if (empty($site_id_arr) && !$isSuperAdmin && $user_id) {
-                        $site_id_arr = UserSite::where('user_id', $user_id)->where('active', 1)->pluck('site_id')->toArray();
-                    }
+                    $get_role_custom = $data['data']['get_role_custom'];
+                    $site = $data['data']['site'];
+                    $site_id_arr = $data['data']['site_id_arr'];
 
                     if (@$get_role_custom['superadmin'] == 1) {
                         if (!$site) {
@@ -351,9 +336,9 @@ class ApiDashboardController extends ApiController
                     if ($auth_site['status_code'] !== '200') {
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
-                    $get_role_custom = $data['data']['get_role_custom'] ?? null;
-                    $site = $data['data']['site'] ?? null;
-                    $user_id = $data['data']['user_id'] ?? null;
+                    $get_role_custom = $data['data']['get_role_custom'];
+                    $site = $data['data']['site'];
+                    $user_id = $data['data']['user_id'];
 
                 $is_superadmin = is_array($get_role_custom) ? (@$get_role_custom['superadmin'] == 1) : ($get_role_custom == 1);
 
@@ -440,7 +425,7 @@ class ApiDashboardController extends ApiController
                     if ($auth_site['status_code'] !== '200') {
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
-                    $displayType = $data['data']['displayType'] ?? null;
+                    $displayType = $data['data']['displayType'];
                     if ($displayType == 'mon') {
                         $currentMonth = 2; //year - current is 2 old is 1
                         $IndicatorSummaryYear = IndicatorSummaryYear::where("status", '=', 1)->where('year', $currentMonth)->where('type', 'summary_month')->get();
@@ -554,9 +539,9 @@ class ApiDashboardController extends ApiController
                     if ($auth_site['status_code'] !== '200') {
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
-                    $site = $data['data']['site'] ?? null;
-                    $user_id = $data['data']['user_id'] ?? null;
-                    $get_role_custom = $data['data']['get_role_custom'] ?? null;
+                    $site = $data['data']['site'];
+                    $user_id = $data['data']['user_id'];
+                    $get_role_custom = $data['data']['get_role_custom'];
                     $model = new CVEMapping;
 
                     // $site_id_arr = UserSite::select('site_id')->where('user_id', $user_id)->get();
@@ -737,7 +722,6 @@ class ApiDashboardController extends ApiController
     public function table_dashboard(Request $request)
     {
         try {
-
             $header = $request->bearerToken();
             $mode = $request->mode;
             $data_request = $request->data;
@@ -753,18 +737,14 @@ class ApiDashboardController extends ApiController
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
 
-                    $startDate = $data['data']['startDate'] ?? '';
-                    $endDate = $data['data']['endDate'] ?? '';
-                    $sitecode = $data['data']['sitecode'] ?? '';
-                    $pagename = $data['data']['pagename'] ?? '';
-                $get_role_custom = $data['data']['get_role_custom'] ?? null;
-                $user_id = $data['data']['user_id'] ?? null;
-                $site_id_arr = $data['data']['site_id_arr'] ?? [];
+                    $startDate = $data['data']['startDate'];
+                    $endDate = $data['data']['endDate'];
+                    $sitecode = $data['data']['sitecode'];
+                    $pagename = $data['data']['pagename'];
+                $get_role_custom = $data['data']['get_role_custom'];
+                $site_id_arr = $data['data']['site_id_arr'];
 
                 $is_superadmin = is_array($get_role_custom) ? (@$get_role_custom['superadmin'] == 1) : ($get_role_custom == 1);
-                if (empty($site_id_arr) && !$is_superadmin && $user_id) {
-                    $site_id_arr = UserSite::where('user_id', $user_id)->where('active', 1)->pluck('site_id')->toArray();
-                }
 
                 $site_1 = null;
 
@@ -1140,49 +1120,8 @@ class ApiDashboardController extends ApiController
 
                     // }
 
-                    $DataCredentials = array();
-                    if (!$pagename || $pagename == 'Credential Leak') {
-                        if (@check_permission_site_custom_api($data['data']['user_id'], 'data_leak') || @check_permission_site_custom_api($data['data']['user_id'], 'compromised')) {
-                            $query = DB::table('credential_leak_ref')
-                                ->select('credential_leak_ref.content', 'credential_leak_ref.created_at as datetime', 'site.name as sitename', DB::raw('CONCAT("/credentialleak") AS link , "Credential Leak" AS pagename'))
-                                ->join('site', 'credential_leak_ref.site_id', '=', 'site.id')
-                                ->where('site.deleted_at', null)
-                                ->where('site.active', 1)
-                                ->where('credential_leak_ref.status', 1)
-                                ->whereBetween('credential_leak_ref.created_at', array($date_start_datetime_format, $date_end_datetime_format))
-                                ->orderBy('credential_leak_ref.created_at', 'desc');
-
-                            if ($is_superadmin) {
-                                if ($sitecode) {
-                                    $query->where('site.id', $SiteSettings->id);
-                                }
-                            } else {
-                                if (!$sitecode) {
-                                    $query->whereIn('site.id', $site_id_arr);
-                                } else {
-                                    $query->where('site.id', $SiteSettings->id)->whereIn('site.id', $site_id_arr);
-                                }
-                            }
-
-                            $DataCredentials = $query->take(50)->get();
-                            
-                            $DataCredentials = $DataCredentials->map(function ($item) {
-                                $decoded = json_decode($item->content, true);
-                                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                                    $email = strip_tags($decoded['email'] ?? '-');
-                                    $password = strip_tags($decoded['password'] ?? '-');
-                                    $item->content = "Email: " . $email . " | Password: " . $password;
-                                } else {
-                                    $item->content = strip_tags($item->content);
-                                    $item->content = str_replace(array("\r", "\n"), '', $item->content);
-                                }
-                                return (array) $item;
-                            })->toArray();
-                        }
-                    }
-
                     // $model = [];
-                    $model = array_merge(@$dataCVEMapping, @$dataR_s_s_news, @$DataLeakFeed_social, @$DataLeakFeed_compromised, @$DataCredentials, @$WebdefacmentSetting, @$TransactionScans);
+                    $model = array_merge(@$dataCVEMapping, @$dataR_s_s_news, @$DataLeakFeed_social, @$DataLeakFeed_compromised, @$WebdefacmentSetting, @$TransactionScans);
                     $dataOut = array();
                     usort($model, function ($a, $b) {
                         $t1 = strtotime($a['datetime']);
@@ -1230,9 +1169,9 @@ class ApiDashboardController extends ApiController
                     if ($auth_site['status_code'] !== '200') {
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
-                    $get_role_custom = $data['data']['get_role_custom'] ?? null;
-                    $site = $data['data']['site'] ?? null;
-                    $user_id = $data['data']['user_id'] ?? null;
+                    $get_role_custom = $data['data']['get_role_custom'];
+                    $site = $data['data']['site'];
+                    $user_id = $data['data']['user_id'];
 
                     $site_id_active = SiteSettings::select('id')->where('active', 1)->whereNull('deleted_at')->pluck('id')->toArray();
                     

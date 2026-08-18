@@ -17,7 +17,7 @@
 
 @push('pagescript')
     <script>
-        $('.btn-header-lookup').click(function(){
+        $('.lookup').click(function(){
             let keyword = $('#search_input').val();
             window.location.href = '/search?keyword=' + keyword + '&mode=lookup';
         })

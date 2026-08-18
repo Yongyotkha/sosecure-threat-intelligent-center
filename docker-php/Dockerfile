@@ -25,6 +25,9 @@ RUN docker-php-ext-install pdo pdo_mysql zip bcmath imap
 
 RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
+# Raise upload limits for Agent Releases OTA (.exe ~30MB+)
+COPY uploads.ini $PHP_INI_DIR/conf.d/99-uploads.ini
+
 RUN pear config-set php_ini "$PHP_INI_DIR"
 
 RUN apk add --no-cache pcre-dev ${PHPIZE_DEPS}

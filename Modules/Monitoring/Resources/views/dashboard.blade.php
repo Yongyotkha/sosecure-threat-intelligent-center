@@ -517,6 +517,7 @@
         setInterval(function(){ load_card(); }, 30000);
     });
 
+    if (document.getElementById('status1')) {
     Highcharts.chart('status1', {
             chart: {
                 plotBackgroundColor: null,
@@ -563,7 +564,9 @@
                 }]
             }]
     });
+    }
 
+    if (document.getElementById('category')) {
     Highcharts.chart('category', {
             chart: {
                 plotBackgroundColor: null,
@@ -610,6 +613,7 @@
                 }]
             }]
     });
+    }
 
 
 
@@ -646,7 +650,12 @@
 
 <script>
     $(document).ready(function () {
-        $('#scan_interval').select2();
+        // This dashboard does not render the scan interval selector itself.
+        // Guard the legacy init so Select2 does not error when copied scripts
+        // from settings/domain pages are included here.
+        if ($('#scan_interval').length && $.fn.select2) {
+            $('#scan_interval').select2();
+        }
     });
     
     $('ul.role-group-sub').hide();
@@ -862,31 +871,6 @@
 
 
 <script>
-    $(document).ready(function () {
-        $('#keywords').select2({
-            tags: true,
-            tokenSeparators: [' ']
-        });
-
-        $('#interval').select2({
-            tags: true,
-            tokenSeparators: [' ']
-        });
-
-        $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });
-
-        $('#show_end_exp_date').hide();
-
-        $('#set_exp').on('change',function(){
-            if($(this).prop('checked')){
-                $('#show_end_exp_date').show();
-            }else{
-                $('#show_end_exp_date').hide();
-            }
-        });
-    });
-
-    
     $('#table-rss-setting-template-rss').on('click', '.select-chk', function () {
         if ($(this).is(':checked')) {
 
@@ -973,33 +957,7 @@
 </script>
 
 
-
 <script>
-    $(document).ready(function () {
-        $('#keywords').select2({
-            tags: true,
-            tokenSeparators: [' ']
-        });
-
-        $('#interval').select2({
-            tags: true,
-            tokenSeparators: [' ']
-        });
-
-        $('.datetimepicker-input').datetimepicker({showClose: true, showClear: true, minDate: moment().add(-1, 'days') });
-
-        $('#show_end_exp_date').hide();
-
-        $('#set_exp').on('change',function(){
-            if($(this).prop('checked')){
-                $('#show_end_exp_date').show();
-            }else{
-                $('#show_end_exp_date').hide();
-            }
-        });
-    });
-
-    
     $('#table-rss-setting-template-social').on('click', '.select-chk', function () {
         if ($(this).is(':checked')) {
 

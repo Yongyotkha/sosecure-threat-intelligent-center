@@ -160,13 +160,13 @@
                                             <img src="{{asset('images/bar-chart.png')}}" alt="" height="30px">
                                             <h1 class="text-blue bold-500">Timeline</h1>
                                         </div>
-                                        <div id="filter-chart-btn" class="btn-group pull-right" style="margin-top: -25px; position: relative; z-index: 1;">
-                                            <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil active" onclick="load_timeline_displayType('day')">
-                                                <i class="far fa-calendar"></i> Day
-                                            </a>
-                                            <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil" onclick="load_timeline_displayType('month')">
-                                                <i class="far fa-calendar"></i> Month
-                                            </a>
+                                        <div id="filter-chart-btn" class="btn-group pull-right" style="margin-top: -25px;">
+                                            <a href="javascript:void(0)" class="btn btn-xs btn-chart-fil active">
+                                                <i  class="far fa-calendar"></i> Day
+                                             </a>
+                                            <a href="javascript:void(0)"  class="btn btn-xs btn-chart-fil"><i class="far fa-calendar"></i>
+                                                Month
+                                             </a>
                                         </div>
                                     </div>
 
@@ -391,15 +391,7 @@ var chk_role_id = $('#chk_role_id').val();
 
 active_btn('#btngroup_sort_by .btn-grey');
 active_btn('#filter-type .btn-grey');
-active_btn('#filter-chart-btn .btn-chart-fil');
 datatable();
-
-var timeline_displayType = 'day';
-
-function load_timeline_displayType(displayType) {
-    timeline_displayType = displayType;
-    datachart_timeline();
-}
 
 if($('.filter_agent_agent').hasClass('active')){
     $('#filter_alert_main').hide();
@@ -560,8 +552,7 @@ function datachart_timeline()
             filter_url:$('#filter_url').val(),
             filter_ip:$('#filter_ip').val(),
             filter_serverity:check_serverity,
-            filter_type:check_type,
-            displayType:timeline_displayType
+            filter_type:check_type
         },
         beforesend:function(){
             {{-- $('.loadder-timeline').show(); --}}

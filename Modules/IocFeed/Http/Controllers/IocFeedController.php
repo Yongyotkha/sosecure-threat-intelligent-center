@@ -7,9 +7,6 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use MongoDB\Client;
 use Illuminate\Support\Facades\Config;
-use MongoDB\BSON\UTCDateTime;
-use MongoDB\BSON\ObjectId;
-use Illuminate\Support\Facades\Log;
 
 class IocFeedController extends Controller
 {
@@ -18,31 +15,9 @@ class IocFeedController extends Controller
 
     public function __construct()
     {
-        $mongo_uri = config('app.DB_MONGO'); // ใช้ URI จาก .env เดิมของระบบ
+        $mongo_uri = config('app.DB_MONGO_DEV'); // ใช้ URI จาก .env เดิมของระบบ
         $this->mongo = new Client($mongo_uri);
         $this->database = config('iocfeed.mongodb.database');
-    }
-
-    /**
-     * Display the IoC Feed Dashboard
-     */
-    public function index()
-    {
-        $data['page'] = 'IoC Feed Dashboard';
-        
-        // Stats from MongoDB
-        $data['stats'] = [
-            'total_feeds'     => $this->collection('feeds')->countDocuments(['status' => 1]),
-            'ip_count'        => $this->collection('feeds')->countDocuments(['type' => 'ip_address', 'status' => 1]),
-            'domain_count'    => $this->collection('feeds')->countDocuments(['type' => 'domain', 'status' => 1]),
-            'hash_count'      => $this->collection('feeds')->countDocuments(['type' => 'hashfile', 'status' => 1]),
-            'whitelist_count' => $this->collection('whitelists')->countDocuments([]),
-        ];
-        
-        // Active API tokens
-        $data['tokens'] = \App\ApiToken::where('type', 'ioc_feed')->get();
-
-        return view('iocfeed::index', $data);
     }
 
     /**
@@ -58,131 +33,90 @@ class IocFeedController extends Controller
      */
     public function exportCsv(Request $request, $category)
     {
-        // 0. ตรวจสอบ Token & IP Whitelist
-        $tokenStr = $request->input('token');
-        if (!$tokenStr) {
-            return response()->json(['error' => 'API Token is required'], 401);
-        }
-
-        $token = \App\ApiToken::where('token', $tokenStr)
-            ->where('type', 'ioc_feed')
-            ->first();
-
-        if (!$token) {
-            return response()->json(['error' => 'Invalid or expired API Token'], 401);
-        }
-
-        // ตรวจสอบ IP Whitelist (ต้องมีการระบุไว้เสมอ)
-        if (empty($token->whitelist_ips)) {
-            Log::channel('ioc_feed')->warning("IoC Feed Access Blocked: No IP Whitelist configured for token [{$token->name}]");
-            return response()->json(['error' => 'Forbidden: No Permission'], 403);
-        }
-
-        $allowedIps = array_filter(array_map('trim', explode(',', str_replace(["\r\n", "\n"], ',', $token->whitelist_ips))));
-        $clientIp = $request->ip();
-        
-        if (!in_array($clientIp, $allowedIps)) {
-            Log::channel('ioc_feed')->warning("IoC Feed Access Blocked: IP {$clientIp} not whitelisted for token [{$token->name}]");
-            return response()->json(['error' => 'Forbidden: No Permission'], 403);
-        }
-
-        // บันทึกข้อมูลการใช้งานล่าสุด
-        $token->update([
-            'last_used_at' => now(),
-            'last_ip' => $request->ip()
-        ]);
-
-        // 1. ตรวจสอบหมวดหมู่ (IP, Domain, Hash, All)
-        $validCategories = ['ip_address', 'domain', 'hashfile', 'all'];
+        // 1. ตรวจสอบหมวดหมู่ (IP, Domain, Hash)
+        $validCategories = ['ip_address', 'domain', 'hashfile'];
         if (!in_array($category, $validCategories)) {
             return response()->json(['error' => 'Invalid category'], 400);
         }
 
-        // 🚀 Optimization: หากไม่มี Filter พิเศษ ให้ดึงไฟล์ Static ที่เตรียมไว้มาส่งออกทันที
-        $hasFilters = $request->has('timeframe') || 
-                      $request->has('is_public') || 
-                      ($request->has('with_whitelist') && $request->input('with_whitelist') == '1');
+        // 2. ดึงข้อมูล Whitelist เพื่อนำมากรองออก
+        $whitelists = $this->collection('whitelists')->find(['type' => $category])->toArray();
+        $excludeList = array_column($whitelists, 'indicator');
 
-        if (!$hasFilters) {
-            $staticFile = base_path("Modules/IocFeed/Exports/{$category}.csv");
-            if (file_exists($staticFile)) {
-                Log::channel('ioc_feed')->info("IoC Feed Export: [{$category}] served from STATIC FILE. Client IP: " . $request->ip());
-                return response()->download($staticFile, $category . '.csv', [
-                    'Content-Type' => 'text/plain; charset=utf-8',
-                ]);
-            }
-        }
-
-        Log::channel('ioc_feed')->info("IoC Feed Export: [{$category}] generated from DATABASE. Client IP: " . $request->ip());
-
-        // 2. ดึงข้อมูลจาก MongoDB โดยใช้ Flag 'is_whitelisted' ในการกรองขยะออก (Fallback)
+        // 3. ดึงข้อมูลจาก MongoDB โดยกรอง Whitelist ออก ($nin)
         $query = [
+            'type' => $category,
             'status' => 1
         ];
-
-        // ถ้าไม่ใช่ 'all' ให้ระบุประเภทที่ต้องการดึง
-        if ($category !== 'all') {
-            $query['type'] = $category;
-        }
-
-        // 3. กรองตามสถานะ Public/Private ของ Event (ถ้าระบุมา)
-        if ($request->has('is_public')) {
-            $isPublic = $request->input('is_public');
-            if ($isPublic !== 'all') {
-                $query['is_public'] = (int)$isPublic;
-            }
-        }
-
-        // 4. ถ้า User ไม่ได้ส่ง ?with_whitelist=1 มา ระบบจะกรองไอพีที่ติดธง Whitelist ทิ้งไปโดยอัตโนมัติ (Default Behavior)
-        if (!$request->has('with_whitelist') || $request->input('with_whitelist') != '1') {
-            $query['is_whitelisted'] = ['$ne' => true];
-        }
-
-        // รองรับ parameter ?timeframe=6h, 1d, 1w
-        if ($request->has('timeframe')) {
-            $tf = $request->input('timeframe');
-            $seconds = 0;
-            if (preg_match('/^(\d+)(h|d|w|m)$/', $tf, $matches)) {
-                $val = (int)$matches[1];
-                $unit = $matches[2];
-                if ($unit === 'h') $seconds = $val * 3600;
-                elseif ($unit === 'd') $seconds = $val * 86400;
-                elseif ($unit === 'w') $seconds = $val * 604800;
-                elseif ($unit === 'm') $seconds = $val * 2592000;
-            }
-            if ($seconds > 0) {
-                // หาค่า timestamp จุดตัดเวลา (ปัจจุบันลบจำนวนวินาที)
-                $cutoff = time() - $seconds;
-                $query['timestamp_val'] = ['$gte' => $cutoff];
-            }
-        }
         
-        $cursor = $this->collection('feeds')->find($query, ['sort' => ['timestamp_val' => -1]]);
+        if (!empty($excludeList)) {
+            $query['indicator'] = ['$nin' => $excludeList];
+        }
+
+        $cursor = $this->collection('feeds')->find($query);
         $results = $cursor->toArray();
 
-        // 5. สร้างไฟล์ CSV ชั่วคราว (กรณีกรองแบบพิเศษ)
+        // 4. Batch lookup event names: indicator_id → ref(pulse_id) → event(name)
+        $sourceDb = 'sosecure_threatintelligent';
+        $refColl = $this->mongo->{$sourceDb}->selectCollection('fx_otx_events_indicator_ref');
+        $eventsColl = $this->mongo->{$sourceDb}->selectCollection('fx_otx_events');
+
+        // รวบรวม indicator_ids ที่ต้องหา
+        $indicatorIds = array_filter(array_map(function($r) {
+            return $r['indicator_id'] ?? null;
+        }, $results));
+
+        // Batch query: indicator_id → pulse_id
+        $refMap = [];
+        if (!empty($indicatorIds)) {
+            $refs = $refColl->find(
+                ['indicator_id' => ['$in' => array_values(array_unique((array) $indicatorIds))]],
+                ['projection' => ['indicator_id' => 1, 'pulse_id' => 1]]
+            );
+            foreach ($refs as $ref) {
+                $refMap[(string)$ref['indicator_id']] = $ref['pulse_id'] ?? '';
+            }
+        }
+
+        // Batch query: pulse_id → name
+        $pulseMap = [];
+        $pulseIds = array_filter(array_unique(array_values($refMap)));
+        if (!empty($pulseIds)) {
+            $events = $eventsColl->find(
+                ['pulse_id' => ['$in' => array_values($pulseIds)]],
+                ['projection' => ['pulse_id' => 1, 'name' => 1]]
+            );
+            foreach ($events as $ev) {
+                $pulseMap[$ev['pulse_id']] = $ev['name'] ?? '';
+            }
+        }
+
+        // 5. สร้าง PSV โดยเขียนลงไฟล์ temp
         $tmpFile = tempnam(sys_get_temp_dir(), 'ioc_');
         $handle = fopen($tmpFile, 'w');
 
-        $count = 1;
         foreach ($results as $row) {
-            $ip = trim($row['indicator'] ?? '');
-            $score = $row['score'] ?? 0;
             $startTime = $this->formatToIso($row['ioc_timestamp'] ?? '');
             $endTime = $this->formatToIso($row['sending_timestamp'] ?? '');
-            $cat = trim($row['category'] ?? ($row['type'] ?? '-'));
+
+            $ip = trim($row['indicator']);
+            $score = $row['score'] ?? 0;
+            $cat = trim($row['category'] ?? '-');
             $sev = trim($row['severity'] ?? 'Low');
             $indId = trim($row['indicator_id'] ?? '');
             $evId = trim($row['event_id'] ?? '');
-            $evName = str_replace(['|', "\r", "\n"], [' ', '', ''], $row['event_name'] ?? '');
 
-            // รูปแบบ: Count,IP,score|start_time|end_time|category|severity|indicator_id|event_id|event_name
-            $line = "{$count},{$ip},{$score}|{$startTime}|{$endTime}|{$cat}|{$sev}|{$indId}|{$evId}|{$evName}";
+            // Lookup event name: indicator_id → pulse_id → event name
+            $pulseId = $refMap[$indId] ?? '';
+            $evName = str_replace(['|', "\r", "\n"], [' ', '', ''], $pulseMap[$pulseId] ?? '');
+
+            // รูปแบบ: IP,score|start_time|end_time|category|severity|indicator_id|event_id|event_name
+            $line = "{$ip},{$score}|{$startTime}|{$endTime}|{$cat}|{$sev}|{$indId}|{$evId}|{$evName}";
             $line = str_replace(["\r", "\n"], ["", ""], $line);
 
             fwrite($handle, $line . PHP_EOL);
-            $count++;
         }
+
 
         fclose($handle);
 
@@ -218,28 +152,20 @@ class IocFeedController extends Controller
         $request->validate([
             'indicator' => 'required',
             'type' => 'required|in:ip_address,domain,hashfile',
-            'score' => 'required_without:severity',
-            'severity' => 'required_without:score',
         ]);
 
         $data = $request->only(['indicator', 'type', 'score', 'category', 'severity']);
         $data['status'] = 1;
-        $data['score'] = $request->has('score') ? (int)$request->score : 0;
         $data['ioc_timestamp'] = $request->ioc_timestamp ?? date('d/m/Y H:i');
         $data['sending_timestamp'] = date('d/m/Y H:i');
-        $data['timestamp_val'] = time();
-        $data['updated_at'] = new UTCDateTime();
+        $data['created_at'] = new \MongoDB\BSON\UTCDateTime();
+        $data['updated_at'] = new \MongoDB\BSON\UTCDateTime();
 
-        // Use upsert to maintain uniqueness on indicator field
-        $this->collection('feeds')->updateOne(
-            ['indicator' => $data['indicator']],
-            ['$set' => $data, '$setOnInsert' => ['created_at' => new UTCDateTime()]],
-            ['upsert' => true]
-        );
+        $result = $this->collection('feeds')->insertOne($data);
         
         $this->auditLog('ADD_IOC', $data);
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'id' => (string) $result->getInsertedId()]);
     }
 
     /**
@@ -248,14 +174,10 @@ class IocFeedController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->only(['score', 'category', 'severity', 'status']);
-        $data['updated_at'] = new UTCDateTime();
-        
-        // Update timestamps so it appears in recently active feeds (timeframe filter)
-        $data['timestamp_val'] = time();
-        $data['sending_timestamp'] = date('d/m/Y H:i');
+        $data['updated_at'] = new \MongoDB\BSON\UTCDateTime();
 
         $this->collection('feeds')->updateOne(
-            ['_id' => new ObjectId($id)],
+            ['_id' => new \MongoDB\BSON\ObjectId($id)],
             ['$set' => $data]
         );
 
@@ -269,8 +191,8 @@ class IocFeedController extends Controller
      */
     public function destroy($id)
     {
-        $doc = $this->collection('feeds')->findOne(['_id' => new ObjectId($id)]);
-        $this->collection('feeds')->deleteOne(['_id' => new ObjectId($id)]);
+        $doc = $this->collection('feeds')->findOne(['_id' => new \MongoDB\BSON\ObjectId($id)]);
+        $this->collection('feeds')->deleteOne(['_id' => new \MongoDB\BSON\ObjectId($id)]);
 
         $this->auditLog('DELETE_IOC', (array) $doc);
 
@@ -282,88 +204,23 @@ class IocFeedController extends Controller
      */
     public function storeWhitelist(Request $request)
     {
-        $hasItems = $request->has('items') && is_array($request->input('items'));
-        
-        if ($hasItems) {
-            $request->validate([
-                'items.*.indicator' => 'required',
-                'items.*.type' => 'required|in:ip_address,domain,hashfile',
-            ]);
-            $items = $request->input('items');
-        } else {
-            $request->validate([
-                'indicator' => 'required',
-                'type' => 'required|in:ip_address,domain,hashfile',
-            ]);
-            $items = [$request->only(['indicator', 'type'])];
-        }
+        $request->validate([
+            'indicator' => 'required',
+            'type' => 'required|in:ip_address,domain,hashfile',
+        ]);
 
-        $now = new UTCDateTime();
-        $insertedCount = 0;
-        $bulkOps = [];
+        $data = $request->only(['indicator', 'type']);
+        $data['created_at'] = new \MongoDB\BSON\UTCDateTime();
 
-        foreach ($items as $item) {
-            $item['created_at'] = $now;
-            
-            $bulkOps[] = [
-                'updateOne' => [
-                    ['indicator' => $item['indicator'], 'type' => $item['type']],
-                    ['$set' => $item],
-                    ['upsert' => true]
-                ]
-            ];
-            $insertedCount++;
-        }
+        $this->collection('whitelists')->updateOne(
+            ['indicator' => $data['indicator'], 'type' => $data['type']],
+            ['$set' => $data],
+            ['upsert' => true]
+        );
 
-        if (!empty($bulkOps)) {
-            $this->collection('whitelists')->bulkWrite($bulkOps);
-        }
+        $this->auditLog('ADD_WHITELIST', $data);
 
-        $this->auditLog('ADD_WHITELIST', $hasItems ? ['count' => $insertedCount] : $items[0]);
-
-        return response()->json(['success' => true, 'message' => "Added/Updated {$insertedCount} items in whitelist."]);
-    }
-
-    /**
-     * Remove from Whitelist
-     */
-    public function destroyWhitelist(Request $request)
-    {
-        $hasItems = $request->has('items') && is_array($request->input('items'));
-        
-        if ($hasItems) {
-            $request->validate([
-                'items.*.indicator' => 'required',
-                'items.*.type' => 'required|in:ip_address,domain,hashfile',
-            ]);
-            $items = $request->input('items');
-        } else {
-            $request->validate([
-                'indicator' => 'required',
-                'type' => 'required|in:ip_address,domain,hashfile',
-            ]);
-            $items = [$request->only(['indicator', 'type'])];
-        }
-
-        $bulkOps = [];
-
-        foreach ($items as $item) {
-            $bulkOps[] = [
-                'deleteOne' => [
-                    ['indicator' => $item['indicator'], 'type' => $item['type']]
-                ]
-            ];
-        }
-
-        $deletedCount = 0;
-        if (!empty($bulkOps)) {
-            $result = $this->collection('whitelists')->bulkWrite($bulkOps);
-            $deletedCount = $result->getDeletedCount();
-        }
-
-        $this->auditLog('DELETE_WHITELIST', $hasItems ? ['count' => $deletedCount] : $items[0]);
-
-        return response()->json(['success' => true, 'message' => "Deleted {$deletedCount} items from whitelist."]);
+        return response()->json(['success' => true]);
     }
 
     /**
@@ -376,7 +233,7 @@ class IocFeedController extends Controller
             'data' => $data,
             'user' => auth()->user()->username ?? 'system',
             'ip' => request()->ip(),
-            'created_at' => new UTCDateTime()
+            'created_at' => new \MongoDB\BSON\UTCDateTime()
         ]);
     }
 }

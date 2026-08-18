@@ -1,0 +1,13 @@
+Deploy on Center (e.g. 192.168.10.222):
+
+1. Upload:
+   - cleanup_missing_rule_packs.php
+   - reset_all_ti_queues.php (existing)
+   - app/Http/Controllers/Api/ApiAgentController.php
+   - Modules/AgentManagement/Resources/views/modal/agent_modal_control_agent.blade.php
+
+2. On Center host:
+   php cleanup_missing_rule_packs.php --delete-orphan-rows
+   php reset_all_ti_queues.php
+
+3. On agent: Sync threat intelligence once, then check /v1/rules/info and history for rules-webshells 404 (should be gone).

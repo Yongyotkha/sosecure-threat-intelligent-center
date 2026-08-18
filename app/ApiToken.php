@@ -2,18 +2,24 @@
 
 namespace App;
 
-use Modules\ApiKey\Entities\ApiToken as ApiTokenEntity;
+use Cartalyst\Stripe\Api\Api;
+use Illuminate\Database\Eloquent\Model;
 
-class ApiToken extends ApiTokenEntity
+class ApiToken extends Model
 {
+    protected $table = 'api_tokens';
+
+    protected $fillable = ['name', 'token', 'expires_at', 'last_used_at', 'site_id', 'type'];
+
+    protected $dates = ['expires_at', 'last_used_at', 'created_at', 'updated_at']; // รองรับ Laravel เก่า
+
     public function isExpired()
     {
         return $this->expires_at && $this->expires_at->isPast();
     }
-
     public static function getToken($id)
     {
-        $latest = static::where('site_id', $id)
+        $latest = ApiToken::where('site_id', $id)
             ->orderBy('id', 'desc')
             ->first();
 

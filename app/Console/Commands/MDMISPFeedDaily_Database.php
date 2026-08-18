@@ -27,7 +27,7 @@ class MDMISPFeedDaily_Database extends Command
      *
      * @var string
      */
-    protected $signature = 'app:MDMISPFeedDaily_Database {--limit= : Limit the number of events to process}';
+    protected $signature = 'app:MDMISPFeedDaily_Database';
 
     /**
      * The console command description.
@@ -35,14 +35,6 @@ class MDMISPFeedDaily_Database extends Command
      * @var string
      */
     protected $description = 'Attr Feed';
-
-    protected $orgNames = [];
-    protected $totalEventsFromMysql = 0;
-    protected $totalEventsProcessed = 0;
-    protected $totalIndicatorsFromMysql = 0;
-    protected $totalIndicatorsProcessed = 0;
-    protected $totalIndicatorsSkipped = 0;
-    protected $failedEvents = [];
 
     /**
      * Create a new command instance.
@@ -65,14 +57,6 @@ class MDMISPFeedDaily_Database extends Command
         ini_set('memory_limit', '-1');
         $this->info("=== Job started at " . now() . " ===");
 
-        // Reset counters
-        $this->totalEventsFromMysql = 0;
-        $this->totalEventsProcessed = 0;
-        $this->totalIndicatorsFromMysql = 0;
-        $this->totalIndicatorsProcessed = 0;
-        $this->totalIndicatorsSkipped = 0;
-        $this->failedEvents = [];
-
         // ✅ ตรวจสอบ MySQL ถ้า DB ล่มจะ retry ภายใน
         if (!$this->checkDbConnection()) {
             $this->info("DB connection failed after retries, job stop.");
@@ -88,12 +72,9 @@ class MDMISPFeedDaily_Database extends Command
 
         // ✅ อ่าน progress ล่าสุด — เพื่อ resume ถ้า job ล่มไปกลางทาง
         $progress = $progressCol->findOne(['job' => 'daily_misp_feed']);
-
         if ($progress && isset($progress['last_ts'])) {
-            // ✅ แปลง timestamp เป็นเวลาไทย “โดยไม่ให้บวกซ้ำ”
-            $start = (new \DateTime('@' . $progress['last_ts']))   // ตีความ timestamp เป็น UTC ก่อน
-                ->setTimezone(new \DateTimeZone('UTC'));   // ⚠️ ใช้ UTC เพราะตอนนี้มันถูกบวกเกินไปแล้ว
-
+            // 🟢 resume จาก last_ts
+            $start = (new \DateTime())->setTimestamp($progress['last_ts']);
             $this->info("➡️ Resume from: " . $start->format('Y-m-d H:i:s'));
         } else {
             // 🟢 ถ้าไม่เคยมี progress ให้เริ่มย้อนหลัง 6 ชม.
@@ -139,47 +120,10 @@ class MDMISPFeedDaily_Database extends Command
             $stamp_indicator_id = $insIndicator->getInsertedId();
             $this->info("Inserted Indicator ID: " . $stamp_indicator_id);
 
-            $limit = $this->option('limit');
-
             // ✅ saveJson จะต้องอัปเดต progress ภายในเองทุกครั้งที่ดึงเสร็จ
-            $this->queryWithRetry(function () use ($stamp_event_id, $stamp_indicator_id, $start, $end, $progressCol, $limit, $db) {
-                $this->saveJson($stamp_event_id, $stamp_indicator_id, $start, $end, $progressCol, $limit, $db);
+            $this->queryWithRetry(function () use ($stamp_event_id, $stamp_indicator_id, $start, $end, $progressCol) {
+                $this->saveJson($stamp_event_id, $stamp_indicator_id, $start, $end, $progressCol);
             });
-
-            // Final update for daily stats count
-            $today = date("Y-m-d");
-            $daily = $db->fx_events_daily_stats->findOne(['date' => $today], ['projection' => ['pulse_ids' => 1]]);
-            if ($daily && isset($daily['pulse_ids'])) {
-                $db->fx_events_daily_stats->updateOne(
-                    ['date' => $today],
-                    ['$set' => ['count' => count($daily['pulse_ids'])]]
-                );
-            }
-
-            // Update stamps with counts
-            $db->fx_transaction_otx_event_stamp->updateOne(
-                ['_id' => $stamp_event_id],
-                ['$set' => [
-                    'status' => 2,
-                    'api_total_pulses' => $this->totalEventsFromMysql,
-                    'processed_pulses' => $this->totalEventsProcessed,
-                    'processed_indicators' => $this->totalIndicatorsProcessed,
-                    'skipped_indicators' => $this->totalIndicatorsSkipped,
-                    'api_expected_indicators' => $this->totalIndicatorsFromMysql,
-                    'updated_at' => new \MongoDB\BSON\UTCDateTime(strtotime(now()) * 1000)
-                ]]
-            );
-
-            $db->fx_transaction_otx_indicator_stamp->updateOne(
-                ['_id' => $stamp_indicator_id],
-                ['$set' => [
-                    'status' => 2,
-                    'processed_indicators' => $this->totalIndicatorsProcessed,
-                    'skipped_indicators' => $this->totalIndicatorsSkipped,
-                    'api_expected_indicators' => $this->totalIndicatorsFromMysql,
-                    'updated_at' => new \MongoDB\BSON\UTCDateTime(strtotime(now()) * 1000)
-                ]]
-            );
 
             // ✅ เรียก Artisan อื่นต่อได้ (เช่นนับจำนวน indicator)
             $this->queryWithRetry(function () {
@@ -187,26 +131,7 @@ class MDMISPFeedDaily_Database extends Command
             });
         } catch (\Throwable $e) {
             \Log::error("Job failed: " . $e->getMessage());
-            $this->error("Job failed: " . $e->getMessage());
         }
-
-        // Summary Report
-        $this->info("\n=========================================");
-        $this->info("SUMMARY REPORT (MISP FEED DAILY)");
-        $this->info("=========================================");
-        $this->info("EVENTS STATUS:");
-        $this->info("  - Total from MySQL   : " . number_format($this->totalEventsFromMysql));
-        $this->info("  - Successfully Saved : " . number_format($this->totalEventsProcessed));
-        $this->info("  - Total Verified     : " . number_format($this->totalEventsProcessed) . " / " . number_format($this->totalEventsFromMysql) . " (" . ($this->totalEventsFromMysql > 0 ? round(($this->totalEventsProcessed / $this->totalEventsFromMysql) * 100, 2) : 0) . "%)");
-        
-        $this->info("-----------------------------------------");
-        $this->info("INDICATORS STATUS:");
-        $this->info("  - Total from MySQL   : " . number_format($this->totalIndicatorsFromMysql));
-        $this->info("  - Newly Saved (Today): " . number_format($this->totalIndicatorsProcessed));
-        $this->info("  - Skipped (Old Data) : " . number_format($this->totalIndicatorsSkipped));
-        $totalIndiVerified = $this->totalIndicatorsProcessed + $this->totalIndicatorsSkipped;
-        $this->info("  - Total Verified     : " . number_format($totalIndiVerified) . " / " . number_format($this->totalIndicatorsFromMysql) . " (" . ($this->totalIndicatorsFromMysql > 0 ? round(($totalIndiVerified / $this->totalIndicatorsFromMysql) * 100, 2) : 0) . "%)");
-        $this->info("=========================================");
 
         $this->info("=== Job finished at " . now() . " ===");
         Log::info("=== Job finished at " . now() . " ===");
@@ -486,7 +411,7 @@ class MDMISPFeedDaily_Database extends Command
     // }
 
 
-    public function saveJson($stamp_event_id, $stamp_indicator_id, $start, $end, $progressCol, $limit = null, $db = null)
+    public function saveJson($stamp_event_id, $stamp_indicator_id, $start, $end, $progressCol)
     {
         $this->info('Preparing DATA ...');
 
@@ -503,8 +428,8 @@ class MDMISPFeedDaily_Database extends Command
         $endTs   = $end->getTimestamp();
 
         // ✅ ดึง Event ในช่วงเวลา start - end
-        $mysqlEvents = $this->queryWithRetry(function () use ($chk_tag, $startTs, $endTs, $limit) {
-            $query = DB::connection('mysql_misp')->table('events')
+        $mysqlEvents = $this->queryWithRetry(function () use ($chk_tag, $startTs, $endTs) {
+            return DB::connection('mysql_misp')->table('events')
                 ->select('id', 'info', 'date', 'published', 'publish_timestamp', 'timestamp', 'orgc_id', 'org_id')
                 ->whereBetween('timestamp', [$startTs, $endTs])
                 ->whereNotExists(function ($query) use ($chk_tag) {
@@ -512,20 +437,13 @@ class MDMISPFeedDaily_Database extends Command
                         ->from('event_tags')
                         ->whereColumn('event_tags.event_id', 'events.id')
                         ->whereIn('event_tags.tag_id', $chk_tag);
-                });
-
-            if ($limit) {
-                $query->limit((int)$limit);
-            }
-
-            return $query->get();
+                })
+                ->get();
         });
 
-        $this->totalEventsFromMysql = $mysqlEvents->count();
-        $this->info("Total events to process: " . $this->totalEventsFromMysql);
+        $insertedCount = 0;
 
         foreach ($mysqlEvents as $event) {
-            $startTime = microtime(true);
 
             // ✅ ดึง attributes ของ event
             $attributes = $this->queryWithRetry(function () use ($event, $startTs, $endTs) {
@@ -545,8 +463,7 @@ class MDMISPFeedDaily_Database extends Command
                     })->toArray();
             });
 
-            $attrCount = count($attributes);
-            $this->totalIndicatorsFromMysql += $attrCount;
+            // if (empty($attributes)) continue;
 
             // ✅ ดึง tags ของ event
             $tag = $this->queryWithRetry(function () use ($event) {
@@ -582,35 +499,33 @@ class MDMISPFeedDaily_Database extends Command
                 'org_id' => $this->findOrgName($event->org_id),
                 'created_at' => $event->date,
                 'updated_at' => $event->timestamp,
-                'attribute_count' => $attrCount,
+                'attribute_count' => count($attributes),
                 'Tag' => $tags_list,
                 'Attribute' => $attributes,
             ];
 
             // ✅ บันทึก Indicator & Event
-            $countAttr = $this->saveRelatedIndicator($item, $stamp_event_id, $stamp_indicator_id, $db);
-            $this->saveEvent($item, $stamp_event_id, $stamp_indicator_id, $countAttr, 0, $db);
+            $countAttr = $this->saveRelatedIndicator($item, $stamp_event_id, $stamp_indicator_id);
+            $this->saveEvent($item, $stamp_event_id, $stamp_indicator_id, $countAttr, 0);
 
-            $this->totalEventsProcessed++;
+            $insertedCount++;
 
             // ✅ อัปเดต progress ระหว่างทาง
             $progressCol->updateOne(
                 ['job' => 'daily_misp_feed'],
                 [
                     '$set' => [
-                        'last_ts' => $event->timestamp, 
+                        'last_ts' => $event->timestamp, // ดึงล่าสุดเท่าที่ทำไปแล้ว
                         'updated_at' => new \MongoDB\BSON\UTCDateTime(strtotime(now()) * 1000)
                     ]
                 ],
                 ['upsert' => true]
             );
 
-            $endTime = microtime(true);
-            $duration = round($endTime - $startTime, 2);
-            $this->info("Completed {$this->totalEventsProcessed} / {$this->totalEventsFromMysql} events (ID: {$event->id}, Indicators: {$attrCount}, Time: {$duration}s)");
+            $this->info("Completed $insertedCount events.");
         }
 
-        $this->info("Saved {$this->totalEventsProcessed} events to MongoDB.");
+        $this->info("Saved $insertedCount events to MongoDB.");
     }
 
 
@@ -649,47 +564,43 @@ class MDMISPFeedDaily_Database extends Command
 
     public function findOrgName($org_id)
     {
-        if ($org_id == null) return '';
-        
-        if (isset($this->orgNames[$org_id])) {
-            return $this->orgNames[$org_id];
+        $orgc_name = '';
+        if ($org_id != null) {
+            $orgc_name = DB::connection('mysql_misp')->table('organisations')
+                ->select('name')
+                ->where('id', '=', $org_id)
+                ->get();
         }
-
-        $org = DB::connection('mysql_misp')->table('organisations')
-            ->select('name')
-            ->where('id', '=', $org_id)
-            ->first();
-            
-        $name = $org ? $org->name : 'Unknown';
-        $this->orgNames[$org_id] = $name;
-        
-        return $name;
+        return $orgc_name[0]->name;
     }
 
     // public function saveEvent($valueEvent, $stamp_event_id, $stamp_indicator_id)
 
 
-    public function saveEvent($valueEvent, $stamp_event_id, $stamp_indicator_id, $countAttr, $countEvent, $db = null)
+    public function saveEvent($valueEvent, $stamp_event_id, $stamp_indicator_id, $countAttr, $countEvent)
     {
         try {
-            if (!$db) {
-                $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
-                $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-                $db = $clientMD->sosecure_threatintelligent;
-            }
-            
-            $col_fx_otx_events = $db->fx_otx_events;
-            $no_Indicator = $db->fx_otx_events_indicator_ref;
-            
-            $pulse_id = 'misp.' . $valueEvent["id"];
-            
+
+            $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
+            $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+            $col_fx_otx_events = $clientMD->sosecure_threatintelligent->fx_otx_events;
+            $no_Indicator = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
             $countPulse = $no_Indicator->countDocuments([
-                'pulse_id' => $pulse_id
+                'pulse_id' => 'misp.' . $valueEvent["id"]
             ]);
-            
             $tlpcolor = null;
             $tags = null;
             $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
+            $today = date("Y-m-d"); // ใช้เป็น key ของวัน
+
+            // $indicatorTypeCounts = isset($countAttr['byType']) ? $countAttr['byType'] : [];
+            // $indicatorCount = isset($countAttr['all']) ? $countAttr['all'] : 0;
+
+
+            // print_r($indicatorTypeCounts);
+            // return;
+
+
 
             $incData = [];
             if (!empty($countAttr['byType'])) {
@@ -700,6 +611,9 @@ class MDMISPFeedDaily_Database extends Command
 
             if (!empty($valueEvent["Tag"])) {
                 foreach ($valueEvent["Tag"] as $key => $value) {
+                    // print_r($value->name);
+                    // return;
+                    // $this->info($value["name"]);
                     if (strpos($value->name, "tlp:") === false) {
                         $tags .= $value->name . ", ";
                     } else {
@@ -709,65 +623,120 @@ class MDMISPFeedDaily_Database extends Command
                 $tags = rtrim($tags, ", ");
             }
 
-            $updateData = [
-                '$set' => [
-                    'name' => @$valueEvent["info"],
-                    'description' => @$valueEvent["info"],
-                    'modified' => isset($valueEvent["publish_timestamp"]) ? new UTCDateTime($valueEvent["publish_timestamp"] * 1000) : null,
-                    'created' => isset($valueEvent["date"]) ? new UTCDateTime(strtotime($valueEvent["date"]) * 1000) : null,
-                    'public' => ($valueEvent["published"] == true) ? 1 : 0,
-                    'TLP' => @$tlpcolor,
-                    'indicator_count' => $countPulse,
-                    'count_related_pulse' => @$countEvent["all"],
-                    'is_modified' => ($valueEvent["timestamp"] == $valueEvent["publish_timestamp"]) ? false : true,
-                    'tags' => @$tags,
-                    'updated_at' => $date_now,
-                    'updated_by' => "system",
-                ],
-                '$setOnInsert' => [
-                    'author_username' => null,
-                    'groups' => null,
-                    'malware_families' => null,
-                    'industries' => null,
-                    'references' => null,
-                    'transcation_id' => $stamp_event_id,
-                    'status' => 1,
-                    'created_at' => $date_now,
-                    'created_by' => "system",
-                    'deleted_at' => null,
-                    'transaction_date' => date("Y-m-d"),
-                    'count_view' => 0,
-                    'source' => "misp",
-                    'creator_org' => @$valueEvent["orgc_id"],
-                ],
-            ];
-
             if (!empty($incData)) {
-                $updateData['$inc'] = $incData;
+
+                $update_fx_otx_events = $col_fx_otx_events->updateOne(
+                    ['pulse_id' => "misp." . @$valueEvent["id"]],
+                    [
+                        '$inc' => $incData,
+                        '$set' => [
+                            'name' => @$valueEvent["info"],
+                            'description' => @$valueEvent["info"],
+                            'modified' => isset($valueEvent["publish_timestamp"]) ? new UTCDateTime($valueEvent["publish_timestamp"] * 1000) : null,
+                            'created' => isset($valueEvent["date"]) ? new UTCDateTime(strtotime($valueEvent["date"]) * 1000) : null,
+                            'public' => ($valueEvent["published"] == true) ? 1 : 0,
+                            // 'public' => 0,
+                            'TLP' => @$tlpcolor,
+                            'indicator_count' => $countPulse,
+                            'count_related_pulse' => @$countEvent["all"],
+                            'is_modified' => ($valueEvent["timestamp"] == $valueEvent["publish_timestamp"]) ? false : true,
+                            // 'indicator_type_counts' => [],
+                            'tags' => @$tags,
+                            'updated_at' => $date_now,
+                            'updated_by' => "system",
+                        ],
+                        '$setOnInsert' => [
+                            'author_username' => null,
+                            'groups' => null,
+                            'malware_families' => null,
+                            'industries' => null,
+                            'references' => null,
+                            'transcation_id' => $stamp_event_id,
+                            'status' => 1,
+                            'created_at' => $date_now,
+                            'created_by' => "system",
+                            'deleted_at' => null,
+                            'transaction_date' => date("Y-m-d"),
+                            'count_view' => 0,
+                            'source' => "misp",
+                            'creator_org' => @$valueEvent["orgc_id"],
+                        ],
+                    ],
+                    ['upsert' => true]
+                );
+            } else {
+                $update_fx_otx_events = $col_fx_otx_events->updateOne(
+                    ['pulse_id' => "misp." . @$valueEvent["id"]],
+                    [
+                        // '$inc' => $incData,
+                        '$set' => [
+                            'name' => @$valueEvent["info"],
+                            'description' => @$valueEvent["info"],
+                            'modified' => isset($valueEvent["publish_timestamp"]) ? new UTCDateTime($valueEvent["publish_timestamp"] * 1000) : null,
+                            'created' => isset($valueEvent["date"]) ? new UTCDateTime(strtotime($valueEvent["date"]) * 1000) : null,
+                            'public' => ($valueEvent["published"] == true) ? 1 : 0,
+                            // 'public' => 0,
+                            'TLP' => @$tlpcolor,
+                            'indicator_count' => $countPulse,
+                            'count_related_pulse' => @$countEvent["all"],
+                            'is_modified' => ($valueEvent["timestamp"] == $valueEvent["publish_timestamp"]) ? false : true,
+                            // 'indicator_type_counts' => [],
+                            'tags' => @$tags,
+                            'updated_at' => $date_now,
+                            'updated_by' => "system",
+                        ],
+                        '$setOnInsert' => [
+                            'author_username' => null,
+                            'groups' => null,
+                            'malware_families' => null,
+                            'industries' => null,
+                            'references' => null,
+                            'transcation_id' => $stamp_event_id,
+                            'status' => 1,
+                            'created_at' => $date_now,
+                            'created_by' => "system",
+                            'deleted_at' => null,
+                            'transaction_date' => date("Y-m-d"),
+                            'count_view' => 0,
+                            'source' => "misp",
+                            'creator_org' => @$valueEvent["orgc_id"],
+                        ],
+                    ],
+                    ['upsert' => true]
+                );
             }
-
-            $col_fx_otx_events->updateOne(['pulse_id' => $pulse_id], $updateData, ['upsert' => true]);
-
-            // ✅ นับ Event ต่อวัน (แบบสะสม pulse_ids)
+            
+            // ✅ นับ Event ต่อวัน ไม่ให้นับซ้ำ
             $today = date("Y-m-d");
-            $col_daily_stats = $db->fx_events_daily_stats;
+            $col_daily_stats = $clientMD->sosecure_threatintelligent->fx_events_daily_stats;
 
+            // เพิ่ม pulse_id แบบไม่ซ้ำ
             $col_daily_stats->updateOne(
                 ['date' => $today],
                 [
-                    '$addToSet' => ['pulse_ids' => $pulse_id],
+                    '$addToSet' => ['pulse_ids' => "misp." . @$valueEvent["id"]],
                     '$setOnInsert' => [
                         'date' => $today,
                         'created_at' => $date_now,
-                        'count' => 0
+                        'count' => 0 // ค่าเริ่มต้นสำหรับ count
                     ]
                 ],
                 ['upsert' => true]
             );
 
+            // นับจำนวน pulse_ids จริง แล้วอัปเดต count ให้ตรง
+            $daily = $col_daily_stats->findOne(['date' => $today], ['projection' => ['pulse_ids' => 1]]);
+            if ($daily && isset($daily['pulse_ids'])) {
+                $col_daily_stats->updateOne(
+                    ['date' => $today],
+                    ['$set' => ['count' => count($daily['pulse_ids'])]]
+                );
+            }
+
+
+            // print_r($update_fx_otx_events);
         } catch (Exception $e) {
             echo 'Caught exception: ',  $e->getMessage(), "\n";
-            \Log::error("saveEvent error: " . $e->getMessage());
         }
         return 0;
     }
@@ -950,152 +919,143 @@ class MDMISPFeedDaily_Database extends Command
         return $data;
     }
 
-    public function saveRelatedIndicator($valueEvent, $stamp_event_id, $stamp_indicator_id, $db = null)
+    public function saveRelatedIndicator($valueEvent, $stamp_event_id, $stamp_indicator_id)
     {
         try {
-            if (!$db) {
-                $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
-                $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
-                $db = $clientMD->sosecure_threatintelligent;
-            }
-            
-            $col_fx_otx_indicator_detail = $db->fx_otx_indicator_detail;
-            $col_fx_otx_events_indicator_ref = $db->fx_otx_events_indicator_ref;
-            $col_fx_transaction_otx_indicators_data = $db->fx_transaction_otx_indicators_data;
-            $col_fx_otx_type = $db->fx_otx_type;
-            
+
+            $DB_MONGO_KEY = env("DB_MONGO_STOREDATAB", "");
+            $clientMD = new \MongoDB\Client($DB_MONGO_KEY);
+            $col_fx_otx_indicator_detail = $clientMD->sosecure_threatintelligent->fx_otx_indicator_detail;
+            $col_fx_otx_events_indicator_ref = $clientMD->sosecure_threatintelligent->fx_otx_events_indicator_ref;
+            $col_fx_transaction_otx_indicators_data = $clientMD->sosecure_threatintelligent->fx_transaction_otx_indicators_data;
+            $col_fx_otx_type = $clientMD->sosecure_threatintelligent->fx_otx_type;
             $date_now = new UTCDateTime(strtotime(date("Y-m-d H:i:s")) * 1000);
             $data["all"] = 0;
             $data["byType"] = array();
 
-            if (empty($valueEvent["Attribute"])) {
-                return $data;
-            }
 
-            $pulse_id = "misp." . $valueEvent["id"];
-            
-            // Batch fetch existing indicators for this pulse to avoid findOne inside loop
-            $existingRefs = $col_fx_otx_events_indicator_ref->find([
-                'pulse_id' => $pulse_id,
-                'is_count_attr' => ['$exists' => true]
-            ])->toArray();
-            $existingIndicatorIds = array_column($existingRefs, 'indicator_id');
+            if (!empty($valueEvent["Attribute"])) {
+                foreach ($valueEvent["Attribute"] as $key => $value) {
 
-            $opsDetail = [];
-            $opsData = [];
-            $opsType = [];
-            $opsRef = [];
+                    $pulse_id = "misp." . $valueEvent["id"];
+                    $indicator_id = "misp." . $value["id"];
 
-            $batchSize = 1000;
-            $count = 0;
-
-            foreach ($valueEvent["Attribute"] as $key => $value) {
-                $indicator_id = "misp." . $value["id"];
-                $isAlreadyCounted = in_array($indicator_id, $existingIndicatorIds);
-
-                $allRow = [];
-                if (!$isAlreadyCounted) {
-                    $data["all"]++;
-                    $this->totalIndicatorsProcessed++;
-                    if (isset($data["byType"][$value["type"]])) {
-                        $data["byType"][$value["type"]] = $data["byType"][$value["type"]] + 1;
-                    } else {
-                        $data["byType"][$value["type"]] = 1;
+                    $isAlreadyCounted = $col_fx_otx_events_indicator_ref->findOne([
+                        'indicator_id' => $indicator_id,
+                        'pulse_id' => $pulse_id,
+                        'is_count_attr' => ['$exists' => true]
+                    ]);
+                    $allRow = [];
+                    if (!$isAlreadyCounted) {
+                        $data["all"]++;
+                        if (isset($data["byType"][$value["type"]])) {
+                            $data["byType"][$value["type"]] = $data["byType"][$value["type"]] + 1;
+                        } else {
+                            $data["byType"][$value["type"]] = 1;
+                        }
+                        $allRow = array();
+                        if (isset($value["value"])) {
+                            $allRow["detail"] = @$value["value"];
+                        }
                     }
-                    if (isset($value["value"])) {
-                        $allRow["detail"] = @$value["value"];
+
+                    // $document = $col_fx_otx_indicator_detail->findOne(['indicator_id' => "misp_".@$value["id"]],
+                    //     [
+                    //         'projection' => [
+                    //             "_id" => 1,
+                    //         ]
+                    //     ]
+                    // );
+
+
+
+                    if (true) {
+                        $update_fx_otx_indicator_detail = $col_fx_otx_indicator_detail->updateOne(
+                            ['indicator_id' => "misp." . @$value["id"]],
+                            [
+                                '$set' => [
+                                    'indicator_name' => @$value["value"],
+                                    'type' => @$value["type"],
+                                    'updated_by' => "system",
+                                    'updated_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now,
+                                    'created_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now, //
+                                ],
+                                '$setOnInsert' => [
+                                    'transcation_id' => $stamp_indicator_id,
+                                    'allrow' => $allRow,
+                                    'status' => 1,
+                                    'created_by' => "system",
+                                    'deleted_at' => null,
+                                    'transaction_date' => date("Y-m-d"),
+                                    'source' => "misp",
+                                    'creator_org' => $valueEvent["orgc_id"]
+                                ],
+                            ],
+                            ['upsert' => true]
+                        );
+
+                        $update_fx_transaction_otx_indicators_data = $col_fx_transaction_otx_indicators_data->updateOne(
+                            ['indicator_id' => "misp." . @$value["id"]],
+                            [
+                                '$set' => [
+                                    'indicator' => @$value["value"],
+                                    'type' => @$value["type"],
+                                    'tile' => null,
+                                    'desciption' => null,
+                                    'slug' => null,
+                                    'name' => null,
+                                    'updated_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now,
+                                    'updated_by' => "system",
+                                    'transcation_id' => $stamp_indicator_id,
+                                    'created_at' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now, //
+                                ],
+                                '$setOnInsert' => [
+                                    'status' => 1,
+
+                                    'created_by' => "system",
+                                    'deleted_at' => null,
+                                    'transaction_date' => date("Y-m-d"),
+                                    'source' => "misp",
+                                ],
+                            ],
+                            ['upsert' => true]
+                        );
+
+                        $update_fx_otx_type = $col_fx_otx_type->updateOne(
+                            [
+                                'name' => @$value["type"],
+                            ],
+                            [
+                                '$setOnInsert' => [
+                                    'transcation_id' => null,
+                                    'updated_at' => $date_now,
+                                    'updated_by' => "system",
+                                    'slug' => null,
+                                    'description' => null,
+                                    'code' => generator_uuid(),
+                                    'remark' => "system",
+                                    'element_count' => 0,
+                                    'status' => 1,
+                                    'created_at' => $date_now,
+                                    'created_by' => "system",
+                                    'deleted_at' => null,
+                                    'source' => 'misp',
+                                ],
+                            ],
+                            ['upsert' => true]
+                        );
                     }
-                } else {
-                    $this->totalIndicatorsSkipped++;
-                }
-
-                $attrTimestamp = isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : $date_now;
-
-                // Operations for fx_otx_indicator_detail
-                $opsDetail[] = [
-                    'updateOne' => [
-                        ['indicator_id' => $indicator_id],
+                    //   print_r($value);
+                    echo  'indicator_id:' . "misp." . @$value["id"] . '|' . "misp." . @$valueEvent["id"] . '|indicator:' . @$value["value"];
+                    //   break;
+                    $pulse_id  = "misp." . $valueEvent["id"];
+                    $indicator_id  =  "misp." . $value["id"];
+                    $update_fx_otx_events_indicator_ref = $col_fx_otx_events_indicator_ref->updateOne(
                         [
-                            '$set' => [
-                                'indicator_name' => @$value["value"],
-                                'type' => @$value["type"],
-                                'updated_by' => "system",
-                                'updated_at' => $attrTimestamp,
-                                'created_at' => $attrTimestamp,
-                            ],
-                            '$setOnInsert' => [
-                                'transcation_id' => $stamp_indicator_id,
-                                'allrow' => $allRow,
-                                'status' => 1,
-                                'created_by' => "system",
-                                'deleted_at' => null,
-                                'transaction_date' => date("Y-m-d"),
-                                'source' => "misp",
-                                'creator_org' => $valueEvent["orgc_id"]
-                            ],
-                        ],
-                        ['upsert' => true]
-                    ]
-                ];
+                            'indicator_id' => $indicator_id,
+                            'pulse_id' =>  $pulse_id,
 
-                // Operations for fx_transaction_otx_indicators_data
-                $opsData[] = [
-                    'updateOne' => [
-                        ['indicator_id' => $indicator_id],
-                        [
-                            '$set' => [
-                                'indicator' => @$value["value"],
-                                'type' => @$value["type"],
-                                'tile' => null,
-                                'desciption' => null,
-                                'slug' => null,
-                                'name' => null,
-                                'updated_at' => $attrTimestamp,
-                                'updated_by' => "system",
-                                'transcation_id' => $stamp_indicator_id,
-                                'created_at' => $attrTimestamp,
-                            ],
-                            '$setOnInsert' => [
-                                'status' => 1,
-                                'created_by' => "system",
-                                'deleted_at' => null,
-                                'transaction_date' => date("Y-m-d"),
-                                'source' => "misp",
-                            ],
                         ],
-                        ['upsert' => true]
-                    ]
-                ];
-
-                // Operations for fx_otx_type
-                $opsType[] = [
-                    'updateOne' => [
-                        ['name' => @$value["type"]],
-                        [
-                            '$setOnInsert' => [
-                                'transcation_id' => null,
-                                'updated_at' => $date_now,
-                                'updated_by' => "system",
-                                'slug' => null,
-                                'description' => null,
-                                'code' => generator_uuid(),
-                                'remark' => "system",
-                                'element_count' => 0,
-                                'status' => 1,
-                                'created_at' => $date_now,
-                                'created_by' => "system",
-                                'deleted_at' => null,
-                                'source' => 'misp',
-                            ],
-                        ],
-                        ['upsert' => true]
-                    ]
-                ];
-
-                // Operations for fx_otx_events_indicator_ref
-                $opsRef[] = [
-                    'updateOne' => [
-                        ['indicator_id' => $indicator_id, 'pulse_id' => $pulse_id],
                         [
                             '$set' => [
                                 'pulse_modified' => isset($valueEvent["date"]) ? new UTCDateTime($valueEvent["publish_timestamp"] * 1000) : null,
@@ -1103,6 +1063,8 @@ class MDMISPFeedDaily_Database extends Command
                                 'created' => isset($value["timestamp"]) ? new UTCDateTime($value["timestamp"] * 1000) : null,
                                 'expiration' => null,
                                 'is_active' => 1,
+                                // 'indicator' => $value["value"],
+                                //'type' => $value["type"],
                             ],
                             '$setOnInsert' => [
                                 'status' => 1,
@@ -1120,28 +1082,16 @@ class MDMISPFeedDaily_Database extends Command
                             ],
                         ],
                         ['upsert' => true]
-                    ]
-                ];
+                    );
+                    //  print_r($value);
+                    //  echo  'indicator_id:'.@$value["id"].'|'. "misp." . @$valueEvent["id"].'|indicator:'.@$value["value"];
+                    //   break;
 
-                $count++;
-                if ($count % $batchSize == 0) {
-                    $col_fx_otx_indicator_detail->bulkWrite($opsDetail);
-                    $col_fx_transaction_otx_indicators_data->bulkWrite($opsData);
-                    $col_fx_otx_type->bulkWrite($opsType);
-                    $col_fx_otx_events_indicator_ref->bulkWrite($opsRef);
-                    $opsDetail = []; $opsData = []; $opsType = []; $opsRef = [];
+                    $this->info("Saving.....");
                 }
             }
-
-            // Execute remaining Bulk Writes
-            if (!empty($opsDetail)) $col_fx_otx_indicator_detail->bulkWrite($opsDetail);
-            if (!empty($opsData)) $col_fx_transaction_otx_indicators_data->bulkWrite($opsData);
-            if (!empty($opsType)) $col_fx_otx_type->bulkWrite($opsType);
-            if (!empty($opsRef)) $col_fx_otx_events_indicator_ref->bulkWrite($opsRef);
-
         } catch (Exception $e) {
             echo 'Caught exception: ',  $e->getMessage(), "\n";
-            \Log::error("saveRelatedIndicator error: " . $e->getMessage());
         }
 
         return $data;

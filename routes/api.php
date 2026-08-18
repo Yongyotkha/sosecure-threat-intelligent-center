@@ -41,7 +41,6 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('indicator/events_table', 'Api\ApiIndicatorController@events_table');
     Route::post('indicator/events_detail_select', 'Api\ApiIndicatorController@events_detail_select');
     Route::post('indicator/events', 'Api\ApiIndicatorController@events');
-    Route::post('indicator/dashboard_stats', 'Api\ApiIndicatorController@dashboard_stats');
     Route::post('indicator/events_load_attributes_tb', 'Api\ApiIndicatorController@events_load_attributes_tb');
     Route::post('indicator/events_load_pulse_tb', 'Api\ApiIndicatorController@events_load_pulse_tb');
     Route::post('indicator/events_count_view', 'Api\ApiIndicatorController@events_count_view');
@@ -82,9 +81,6 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('news/url_news_detail_code', 'Api\ApiNewsController@url_news_detail_code');
     Route::post('news/news_load_top_source', 'Api\ApiNewsController@news_load_top_source');
     Route::post('news/news_load_top_category', 'Api\ApiNewsController@news_load_top_category');
-    Route::post('news/rss_news_table', 'Api\ApiNewsController@rss_news_table');
-    Route::post('news/rss_data_table', 'Api\ApiNewsController@rss_data_table');
-    Route::post('news/rss_setting_table', 'Api\ApiNewsController@rss_setting_table');
 
     Route::post('vulnerabilitys/vulnerabilitys_table', 'Api\ApiCVEController@vulnerabilitys_table');
     Route::post('vulnerabilitys/index', 'Api\ApiCVEController@vulnerabilitys_index');
@@ -99,15 +95,6 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('vulnerabilitys/cve_table', 'Api\ApiCVEController@vulnerabilitys_cve_table');
     Route::post('vulnerabilitys/load_cve', 'Api\ApiCVEController@vulnerabilitys_load_cve');
     Route::post('vulnerabilitys/load_cve_assets', 'Api\ApiCVEController@vulnerabilitys_load_cve_assets');
-    Route::post('vulnerabilitys/loadbyip', 'Api\ApiCVEController@vulnerabilitys_loadbyip');
-    Route::post('vulnerabilitys/load_cve_by_cpe', 'Api\ApiCVEController@vulnerabilitys_load_cve_by_cpe');
-    Route::post('vulnerabilitys/load_cpe_by_asset', 'Api\ApiCVEController@vulnerabilitys_load_cpe_by_asset');
-    Route::post('vulnerabilitys/get_sites_by_cve', 'Api\ApiCVEController@vulnerabilitys_get_sites_by_cve');
-    Route::post('vulnerabilitys/get_assets_by_site', 'Api\ApiCVEController@vulnerabilitys_get_assets_by_site');
-    Route::post('vulnerabilitys/change_isFix', 'Api\ApiCVEController@vulnerabilitys_change_isFix');
-    Route::post('vulnerabilitys/change_isFix_detail', 'Api\ApiCVEController@vulnerabilitys_change_isFix_detail');
-    Route::post('vulnerabilitys/export', 'Api\ApiCVEController@vulnerabilitys_export');
-
 
     Route::post('compromised/count_val', 'Api\ApiCompromisedController@compromised_count_val');
     Route::post('compromised/table', 'Api\ApiCompromisedController@compromised_table');
@@ -120,18 +107,11 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('data_leak/table', 'Api\ApiDataLeakController@data_leak_table');
     Route::post('data_leak/view', 'Api\ApiDataLeakController@data_leak_view');
     Route::post('data_leak/count_val', 'Api\ApiDataLeakController@data_leak_count_val');
-    Route::post('data_leak/count_val_dataleak', 'Api\ApiDataLeakController@data_leak_count_val_dataleak');
-    Route::post('data_leak/count_icon', 'Api\ApiDataLeakController@count_icon');
-    Route::post('data_leak/count_icon_dataleak', 'Api\ApiDataLeakController@count_icon_dataleak');
-    Route::post('data_leak/credentialdatas_count_icon', 'Api\ApiDataLeakController@credentialdatas_count_icon');
-    Route::post('data_leak/credentialdatas_count_val', 'Api\ApiDataLeakController@credentialdatas_count_val');
-    Route::post('data_leak/dataleak_count_icon', 'Api\ApiDataLeakController@dataleak_count_icon');
-    Route::post('data_leak/dataleak_count_val', 'Api\ApiDataLeakController@dataleak_count_val');
-    Route::post('data_leak/count_keyword', 'Api\ApiDataLeakController@data_leak_count_keyword');
     Route::post('data_leak/delete', 'Api\ApiDataLeakController@data_leak_delete');
     Route::post('data_leak/delete_select', 'Api\ApiDataLeakController@data_leak_delete_select');
     Route::post('data_leak/delete_change', 'Api\ApiDataLeakController@data_leak_delete_change');
-    Route::post('data_leak/change_status_monitoring', 'Api\ApiDataLeakController@change_status_monitoring');
+    Route::post('data_leak/count_keyword', 'Api\ApiDataLeakController@count_keyword');
+    Route::post('data_leak/count_icon', 'Api\ApiDataLeakController@count_icon');
     Route::post('data_leak/getDataLeakSocial', 'Api\ApiDataLeakController@getDataLeakSocial');
 
     Route::post('data_leak/activity_dataleak_modal', 'Api\ApiDataLeakController@activity_dataleak_modal');
@@ -177,13 +157,20 @@ Route::group(['prefix' => 'v1/{mode}/{code}'], function () {
     Route::post('agentCenter/downloadRule', 'Api\ApiAgentController@downloadRule');
     Route::post('agentCenter/downloadRuleComplete', 'Api\ApiAgentController@downloadRuleComplete');
     Route::post('agentCenter/sendLogYara', 'Api\ApiAgentController@sendLogYara');
-    Route::post('agentCenter/sendLogSsdeep', 'Api\ApiAgentSsdeepController@sendLogSsdeep');
-    Route::post('agentCenter/getSsdeep', 'Api\ApiAgentSsdeepController@getSsdeep');
-    Route::post('agentCenter/downloadSsdeepSite', 'Api\ApiAgentSsdeepController@downloadSsdeepSite');
-    Route::post('agentCenter/downloadSsdeepSiteComplete', 'Api\ApiAgentSsdeepController@downloadSsdeepSiteComplete');
-    Route::post('agentCenter/updateSsdeepDownload', 'Api\ApiAgentSsdeepController@updateSsdeepDownload');
-    Route::post('agentCenter/sendSsdeepCandidate', 'Api\ApiAgentSsdeepController@sendSsdeepCandidate');
     Route::post('agentCenter/sendAgentScanLog', 'Api\ApiAgentController@sendAgentScanLog');
+    Route::post('agentCenter/sendScanFileLog', 'Api\ApiAgentController@sendScanFileLog');
+    Route::post('agentCenter/sendLogSsdeep', 'Api\ApiAgentController@sendLogSsdeep');
+    Route::post('agentCenter/sendSsdeepCandidate', 'Api\ApiAgentController@sendSsdeepCandidate');
+    Route::post('agentCenter/getSsdeep', 'Api\ApiAgentController@getSsdeep');
+    Route::post('agentCenter/downloadSsdeepSite', 'Api\ApiAgentController@downloadSsdeepSite');
+    Route::post('agentCenter/downloadSsdeepSiteComplete', 'Api\ApiAgentController@downloadSsdeepSiteComplete');
+    Route::post('agentCenter/updateSsdeepDownload', 'Api\ApiAgentController@updateSsdeepDownload');
+    Route::post('agentCenter/resetRuleDownload', 'Api\ApiAgentController@resetRuleDownload');
+    Route::post('agentCenter/downloadProtectedFile', 'Api\ApiAgentController@downloadProtectedFile');
+    Route::post('agentCenter/reportAgentVersion', 'Api\ApiAgentController@reportAgentVersion');
+    Route::post('agentCenter/checkAgentUpdate', 'Api\ApiAgentController@checkAgentUpdate');
+    Route::post('agentCenter/downloadAgentPackage', 'Api\ApiAgentController@downloadAgentPackage');
+    Route::post('agentCenter/reportAgentUpdateStatus', 'Api\ApiAgentController@reportAgentUpdateStatus');
 
     Route::post('agentCenter/downloadRuleSite', 'Api\ApiAgentController@downloadRuleSite');
     Route::post('agentCenter/downloadRuleSiteComplete', 'Api\ApiAgentController@downloadRuleSiteComplete');
@@ -343,16 +330,10 @@ Route::group(['prefix' => 'v1/service', 'middleware' => 'api.token.service'], fu
 });
 
 // IoC Feed (Graylog Integration)
-Route::group(['prefix' => 'v1/ioc-feed', 'namespace' => '\Modules\IocFeed\Http\Controllers', 'middleware' => 'api.token'], function () {
-    // Whitelist APIs
-    Route::get('whitelist', 'IocWhitelistController@index');
-    Route::post('whitelist', 'IocWhitelistController@store');
-    Route::post('whitelist/upload', 'IocWhitelistController@upload');
-    Route::delete('whitelist', 'IocWhitelistController@bulkDestroy');
-    Route::delete('whitelist/{id}', 'IocWhitelistController@destroy');
-
+Route::group(['prefix' => 'v1/ioc-feed', 'namespace' => '\Modules\IocFeed\Http\Controllers'], function () {
     Route::get('{category}.csv', 'IocFeedController@exportCsv');
     Route::post('ioc', 'IocFeedController@store');
     Route::put('ioc/{id}', 'IocFeedController@update');
     Route::delete('ioc/{id}', 'IocFeedController@destroy');
+    Route::post('whitelist', 'IocFeedController@storeWhitelist');
 });

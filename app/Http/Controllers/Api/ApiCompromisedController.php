@@ -60,16 +60,15 @@ class ApiCompromisedController extends ApiController
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
 
-                    $date_start = $data['data']['date_start'] ?? null;
-                    $date_end = $data['data']['date_end'] ?? null;
-                    $site_code = $data['data']['site_code'] ?? null;
-                    $title = $data['data']['title'] ?? null;
-                    $social = $data['data']['social'] ?? null;
-                    $keywords = $data['data']['keywords'] ?? null;
-                    $f_search = $data['data']['f_search'] ?? null;
-                    $isDateSearch = $data['data']['isDateSearch'] ?? null;
-                    $check_type = $data['data']['check_type'] ?? null;
-                    $check_serverity = isset($data['data']['check_serverity']) ? strtolower(trim($data['data']['check_serverity'])) : (isset($data['data']['level']) ? strtolower(trim($data['data']['level'])) : null);
+                    $date_start = $data['data']['date_start'];
+                    $date_end = $data['data']['date_end'];
+                    $site_code = $data['data']['site_code'];
+                    $title = $data['data']['title'];
+                    $social = $data['data']['social'];
+                    $keywords = $data['data']['keywords'];
+                    $f_search = $data['data']['f_search'];
+                    $isDateSearch = $data['data']['isDateSearch'];
+                    $check_type = $data['data']['check_type'];
 
                     $user = User::where('id', $data['data']['user_id'])->first();
 
@@ -162,17 +161,12 @@ class ApiCompromisedController extends ApiController
                             $countGroupBy = $countGroupBy -> where('feel_type', '=' ,$check_type);
             
                         }
-
-                        if ($check_serverity) {
-                            $model = $model->where('serverity', '=', $check_serverity);
-                            $countGroupBy = $countGroupBy->where('serverity', '=', $check_serverity);
-                        }
             
             
-                        if($site_id) {
-                            $model = $model->where('site_id', $site_id);
-                            $countGroupBy = $countGroupBy->where('site_id', $site_id);
-                        }
+                        // if($site_id) {
+                        //     $model = $model->where('site_id', $site_id);
+                        //     $countGroupBy = $countGroupBy->where('site_id', $site_id);
+                        // }
                         $get_role_custom_first = $data['data']['get_role_custom_first'];
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];
                         if(@$get_role_custom_first['superadmin'] == 1) {
@@ -220,16 +214,10 @@ class ApiCompromisedController extends ApiController
                         //     }           
                         
             
-                        if($site_id) {
-                            $Data_leak_feed_all = $Data_leak_feed_all->where('site_id', $site_id);
-                            $countGroupBy = $countGroupBy->where('site_id', $site_id);
-                        }
-
-                        if ($check_serverity) {
-                            $Data_leak_feed_all = $Data_leak_feed_all->where('serverity', '=', $check_serverity);
-                            $countGroupBy = $countGroupBy->where('serverity', '=', $check_serverity);
-                        }
-
+                        // if($site_id) {
+                        //     $news = $news->where('site_id', $site_id);
+                        //     $countGroupBy = $countGroupBy->where('site_id', $site_id);
+                        // }
                         $get_role_custom_first = $data['data']['get_role_custom_first'];
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];
                         if(@$get_role_custom_first['superadmin'] == 1) {
@@ -362,21 +350,20 @@ class ApiCompromisedController extends ApiController
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
 
-                    $startDate = $data['data']['startDate'] ?? null;
-                    $endDate = $data['data']['endDate'] ?? null;
-                    $search_val = $data['data']['search_val'] ?? null;
-                    $site = $data['data']['site'] ?? null;
-                    $get_role_custom_first = $data['data']['get_role_custom_first'] ?? null;
-                    $keywords = $data['data']['keywords'] ?? null;
-                    $assets = $data['data']['assets'] ?? null;
-                    $isDateSearch = $data['data']['isDateSearch'] ?? null;
-                    $check = $data['data']['check'] ?? null;
-                    $level = $data['data']['level'] ?? null;
-                    $source = $data['data']['source'] ?? null;
-                    $click_type = $data['data']['click_type'] ?? null;
-                    $check_type = $data['data']['check_type'] ?? null;
-                    $click_key = $data['data']['click_key'] ?? null;
-                    $check_serverity = isset($data['data']['check_serverity']) ? strtolower(trim($data['data']['check_serverity'])) : (isset($data['data']['level']) ? strtolower(trim($data['data']['level'])) : null);
+                    $startDate = $data['data']['startDate'];
+                    $endDate = $data['data']['endDate'];
+                    $search_val = $data['data']['search_val'];
+                    $site = $data['data']['site'];
+                    $get_role_custom_first = $data['data']['get_role_custom_first'];
+                    $keywords = $data['data']['keywords'];
+                    $assets = $data['data']['assets'];
+                    $isDateSearch = $data['data']['isDateSearch'];
+                    $check = $data['data']['check'];
+                    $level = $data['data']['level'];
+                    $source = $data['data']['source'];
+                    $click_type = $data['data']['click_type'];
+                    $check_type = $data['data']['check_type'];
+                    $click_key = $data['data']['click_key'];
 
                     
                     $where1 = ['deleted_at' => null, 'feel_type' => 'darkweb'];
@@ -407,11 +394,10 @@ class ApiCompromisedController extends ApiController
 
                             $model = $model-> where('feel_type', '=' ,$check_type);
 
+
                         }
 
-                        if ($check_serverity) {
-                            $model = $model->where('serverity', '=', $check_serverity);
-                        }
+
 
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];
                         if(@$get_role_custom_first['superadmin'] == 1) {
@@ -437,7 +423,7 @@ class ApiCompromisedController extends ApiController
                             $model = $model->where('site_id', $SiteSettings->id);
                         }
 
-                        if ($isDateSearch == 1 && $startDate) {
+                        if ($startDate) {
                             $date_start = $startDate;
                             $date_end = $endDate;
 
@@ -491,10 +477,6 @@ class ApiCompromisedController extends ApiController
     
                             }
 
-                            if ($check_serverity) {
-                                $model = $model->where('serverity', '=', $check_serverity);
-                            }
-
                         $site_id_arr = @$get_role_custom_first['site_id_arr'];
                         if(@$get_role_custom_first['superadmin'] == 1) {
 
@@ -524,12 +506,11 @@ class ApiCompromisedController extends ApiController
                         $model->orderBy('created_at','desc')->get();
                     }
 
-                    \Log::info('Compromised Query SQL: ' . $model->toSql());
-                    \Log::info('Compromised Query Bindings: ' . json_encode($model->getBindings()));
-                    $res = DataTables::of($model)->make(true)->getData();
-                    $res->draw = (int)($data['data']['draw'] ?? 0);
+                    $res = DataTables::of($model)->toJson();
 
-                    $response = $res;
+                    $response = [
+                        "data" => $res,
+                    ];
 
                     $data_transcation = json_encode($response);
                     $datas = encrypt_decrypt('encrypt', $data_transcation, $header, $data['site']['data']['ip_key'],  $data['site']['data']['mac_address_key']);
@@ -746,17 +727,12 @@ class ApiCompromisedController extends ApiController
                         return $this->AuthorizationSite($header, $request->mode, $data['data']['user_id'], $data['data']['menu']);
                     }
 
-                    $get_role_custom_first = $data['data']['get_role_custom_first'] ?? null;
-                    $check_serverity = isset($data['data']['check_serverity']) ? strtolower(trim($data['data']['check_serverity'])) : (isset($data['data']['level']) ? strtolower(trim($data['data']['level'])) : null);
+                    $get_role_custom_first = $data['data']['get_role_custom_first'];
 
                     $model = DataLeakSocialRef::select('keyword',DB::raw('count(*)  as count_keyword'))
                             ->where('status',1)->where('deleted_at',null)
                             ->whereIn('feel_type', ['darkweb', 'compromise', 'webserver', 'server'])
                             ->groupBy('keyword');
-
-                    if ($check_serverity) {
-                        $model = $model->where('serverity', '=', $check_serverity);
-                    }
 
                     $site_id_arr = @$get_role_custom_first['site_id_arr'];
                     if(@$get_role_custom_first['superadmin'] == 1) {
