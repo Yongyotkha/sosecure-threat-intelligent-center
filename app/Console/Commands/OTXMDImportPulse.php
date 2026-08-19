@@ -29,6 +29,10 @@ class OTXMDImportPulse extends Command
     protected $totalExpectedIndicators = 0; // staged indicators we intend to import (today-only)
     protected $totalApiListedIndicators = 0; // sum of indicator_count from OTX list
     protected $failedPulses = [];
+    /** @var array<int, array{pulse_id:string,name:string,indicator_count:int,skip_reason:string}> */
+    protected $skippedHeavy = [];
+    /** @var array<int, array{pulse_id:string,name:string,indicator_count:int,skip_reason:string}> */
+    protected $skippedFilter = [];
 
     public function handle()
     {
@@ -68,6 +72,13 @@ class OTXMDImportPulse extends Command
         $startedIso = date('c');
         OtxPulseStagingStore::stampImportStart($manifest);
         OtxPulseStagingStore::saveManifest($runId, $manifest);
+        $saveIntendedAtStart = 0;
+        foreach ($manifest['pulses'] ?? [] as $meta) {
+            if (($meta['status'] ?? '') === 'fetched') {
+                $saveIntendedAtStart++;
+            }
+        }
+
         $insertOneResult = $collectionStamp->insertOne([
             'code' => generator_uuid(),
             'transaction_date' => date('Y-m-d'),
@@ -83,6 +94,10 @@ class OTXMDImportPulse extends Command
             'started_at' => $date_now,
             'started_at_iso' => $startedIso,
             'fetch_started_at' => $manifest['started_at'] ?? null,
+            'api_total_pulses' => (int) ($manifest['api_total_pulses'] ?? 0),
+            'limit' => $manifest['limit'] ?? null,
+            'save_intended_pulses' => $saveIntendedAtStart,
+            'save_actual_pulses' => 0,
             'complete' => false,
         ]);
         $stampId = $insertOneResult->getInsertedId();
@@ -103,6 +118,20 @@ class OTXMDImportPulse extends Command
             $status = $meta['status'] ?? '';
             if ($status === 'skipped') {
                 $this->totalPulsesSkippedFilter++;
+                $skipEntry = [
+                    'pulse_id' => (string) $pulseId,
+                    'name' => $meta['name'] ?? '',
+                    'indicator_count' => (int) ($meta['indicator_count'] ?? 0),
+                    'skip_reason' => $meta['skip_reason'] ?? '',
+                ];
+                $reason = (string) ($meta['skip_reason'] ?? '');
+                if (stripos($reason, 'max-indicators') !== false || stripos($reason, 'indicator_count') !== false) {
+                    $this->skippedHeavy[] = $skipEntry;
+                    $this->info("Skip pulse (heavy queue): {$pulseId} | {$skipEntry['name']} | indicators={$skipEntry['indicator_count']}");
+                } else {
+                    $this->skippedFilter[] = $skipEntry;
+                    $this->info("Skip pulse (filter): {$pulseId} | {$skipEntry['name']} | {$reason}");
+                }
                 continue;
             }
             if ($status === 'failed') {
@@ -151,18 +180,27 @@ class OTXMDImportPulse extends Command
         $verified = $this->totalPulsesProcessed + $this->totalPulsesSkippedFilter + $this->totalPulsesError;
         $allOk = $this->totalPulsesError === 0;
 
-        // Expected for this import: pulses that were staged as fetched/skipped (failed fetches are retried on leftover, not import errors).
-        $stagingExpected = 0;
+        // Handled = fetched + skipped (audit of everything this run touched).
+        $handledPulses = 0;
+        $saveIntended = 0;
         foreach ($manifest['pulses'] ?? [] as $meta) {
             $st = $meta['status'] ?? '';
             if (in_array($st, ['fetched', 'skipped'], true)) {
-                $stagingExpected++;
+                $handledPulses++;
+            }
+            if ($st === 'fetched') {
+                $saveIntended++;
             }
         }
-        if ($stagingExpected === 0) {
-            $stagingExpected = $verified;
+        if ($limit !== null) {
+            $saveIntended = min($saveIntended, $limit);
         }
-        $pulsePct = $stagingExpected > 0 ? round(($verified / $stagingExpected) * 100, 2) : 0;
+        if ($handledPulses === 0) {
+            $handledPulses = $verified;
+        }
+        $pulsePct = $saveIntended > 0
+            ? round(($this->totalPulsesProcessed / $saveIntended) * 100, 2)
+            : ($this->totalPulsesError === 0 ? 100 : 0);
 
         // Indicators: % vs staged today-only set (fair). API listed count shown separately.
         $notInScope = max(0, $this->totalApiListedIndicators - $this->totalExpectedIndicators);
@@ -170,7 +208,12 @@ class OTXMDImportPulse extends Command
         $indiExpected = (int) $this->totalExpectedIndicators;
         $indiPct = $indiExpected > 0 ? round(($indiVerified / $indiExpected) * 100, 2) : ($this->totalApiListedIndicators === 0 ? 100 : 0);
         $indiComplete = $indiExpected === 0 || $indiVerified >= $indiExpected;
-        $complete = $allOk && $verified >= $stagingExpected && $indiComplete;
+        $complete = $allOk && $this->totalPulsesProcessed >= $saveIntended && $indiComplete;
+
+        $skippedHeavyIds = array_column($this->skippedHeavy, 'pulse_id');
+        $skippedFilterIds = array_column($this->skippedFilter, 'pulse_id');
+        $importLimit = $limit;
+        $fetchLimit = array_key_exists('limit', $manifest) ? $manifest['limit'] : null;
 
         $finishedIso = date('c');
         $finishedAt = new UTCDateTime(strtotime($finishedIso) * 1000);
@@ -178,9 +221,39 @@ class OTXMDImportPulse extends Command
             ['_id' => $stampId],
             ['$set' => [
                 'status' => $complete ? 2 : 3,
+                'audit_note' => OtxPulseStagingStore::AUDIT_NOTE,
+                'audit' => OtxPulseStagingStore::mongoAudit($manifest, [
+                    'api_total' => $apiTotal,
+                    'limit' => $importLimit !== null ? $importLimit : $fetchLimit,
+                    'intended' => $saveIntended,
+                    'saved' => $this->totalPulsesProcessed,
+                    'skipped' => $this->totalPulsesSkippedFilter,
+                    'failed' => $this->totalPulsesError,
+                ], [
+                    'indicators' => [
+                        'api_listed' => $this->totalApiListedIndicators,
+                        'save_intended' => $indiExpected,
+                        'save_actual' => $this->totalIndicatorsProcessed,
+                        'skipped' => $this->totalIndicatorsSkipped,
+                        'not_in_scope' => $notInScope,
+                    ],
+                ]),
                 'api_total_pulses' => $apiTotal,
-                'expected_pulses' => $stagingExpected,
+                'limit' => $importLimit !== null ? $importLimit : $fetchLimit,
+                'save_intended_pulses' => $saveIntended,
+                'save_actual_pulses' => $this->totalPulsesProcessed,
+                'expected_pulses' => $saveIntended,
+                'handled_pulses' => $handledPulses,
                 'processed_pulses' => $this->totalPulsesProcessed,
+                'skipped_pulses' => $this->totalPulsesSkippedFilter,
+                'skipped_heavy_pulses' => count($this->skippedHeavy),
+                'skipped_heavy_ids' => $skippedHeavyIds,
+                'skipped_heavy' => $this->skippedHeavy,
+                'skipped_filter_pulses' => count($this->skippedFilter),
+                'skipped_filter_ids' => $skippedFilterIds,
+                'skipped_filter' => $this->skippedFilter,
+                'save_intended_indicators' => $indiExpected,
+                'save_actual_indicators' => $this->totalIndicatorsProcessed,
                 'processed_indicators' => $this->totalIndicatorsProcessed,
                 'skipped_indicators' => $this->totalIndicatorsSkipped,
                 'api_listed_indicators' => $this->totalApiListedIndicators,
@@ -202,13 +275,22 @@ class OTXMDImportPulse extends Command
         $manifest['import_status'] = $complete ? 'done' : 'partial';
         OtxPulseStagingStore::stampImportFinish($manifest, $complete);
         $manifest['import_stats'] = [
-            'expected_pulses' => $stagingExpected,
+            'save_intended_pulses' => $saveIntended,
+            'save_actual_pulses' => $this->totalPulsesProcessed,
+            'expected_pulses' => $saveIntended,
+            'handled_pulses' => $handledPulses,
             'saved_pulses' => $this->totalPulsesProcessed,
             'skipped_pulses' => $this->totalPulsesSkippedFilter,
+            'skipped_heavy_pulses' => count($this->skippedHeavy),
+            'skipped_heavy' => $this->skippedHeavy,
+            'skipped_filter_pulses' => count($this->skippedFilter),
+            'skipped_filter' => $this->skippedFilter,
             'failed_pulses' => $this->totalPulsesError,
             'verified_pulses' => $verified,
             'pulse_percent' => $pulsePct,
             'api_listed_indicators' => $this->totalApiListedIndicators,
+            'save_intended_indicators' => $indiExpected,
+            'save_actual_indicators' => $this->totalIndicatorsProcessed,
             'expected_indicators' => $indiExpected,
             'saved_indicators' => $this->totalIndicatorsProcessed,
             'skipped_indicators' => $this->totalIndicatorsSkipped,
@@ -224,18 +306,28 @@ class OTXMDImportPulse extends Command
         $this->info('=========================================');
         $this->info('Run ID              : ' . $runId);
         $this->info('PULSES:');
-        $this->info('  - API total       : ' . number_format($apiTotal));
-        $this->info('  - Expected        : ' . number_format($stagingExpected));
-        $this->info('  - Saved           : ' . number_format($this->totalPulsesProcessed));
-        $this->info('  - Skipped         : ' . number_format($this->totalPulsesSkippedFilter));
+        $this->info('  - API total (OTX catalog, not this run) : ' . number_format($apiTotal));
+        $this->info('  - Save intended (this run)              : ' . number_format($saveIntended) . ($importLimit !== null ? " (limit={$importLimit})" : ''));
+        $this->info('  - Save actual                           : ' . number_format($this->totalPulsesProcessed));
+        $this->info('  - Skipped         : ' . number_format($this->totalPulsesSkippedFilter)
+            . ' (heavy=' . count($this->skippedHeavy) . ', filter=' . count($this->skippedFilter) . ')');
+        foreach ($this->skippedHeavy as $row) {
+            $this->info('      heavy         : ' . $row['pulse_id'] . ' | ' . $row['name']
+                . ' | indicators=' . $row['indicator_count'] . ' | ' . $row['skip_reason']);
+        }
+        foreach ($this->skippedFilter as $row) {
+            $this->info('      filter        : ' . $row['pulse_id'] . ' | ' . $row['name']
+                . ' | ' . $row['skip_reason']);
+        }
         $this->info('  - Errors          : ' . number_format($this->totalPulsesError));
-        $this->info('  - Verified        : ' . number_format($verified) . ' / ' . number_format($stagingExpected) . " ({$pulsePct}%)");
+        $this->info('  - Verified        : ' . number_format($this->totalPulsesProcessed) . ' / ' . number_format($saveIntended) . " ({$pulsePct}%)");
+        $this->info('  - Handled         : ' . number_format($verified) . ' / ' . number_format($handledPulses) . ' (includes skipped)');
         $this->info('INDICATORS:');
-        $this->info('  - API listed      : ' . number_format($this->totalApiListedIndicators) . ' (full pulse count from OTX)');
-        $this->info('  - Expected (today): ' . number_format($indiExpected) . ' (staged / in-scope)');
-        $this->info('  - Not in scope    : ' . number_format($notInScope) . ' (older than today, not fetched)');
-        $this->info('  - Saved           : ' . number_format($this->totalIndicatorsProcessed));
-        $this->info('  - Failed/skipped  : ' . number_format($this->totalIndicatorsSkipped));
+        $this->info('  - API listed (full pulse count from OTX, not this run) : ' . number_format($this->totalApiListedIndicators));
+        $this->info('  - Save intended (today / in-scope)                     : ' . number_format($indiExpected));
+        $this->info('  - Save actual                                          : ' . number_format($this->totalIndicatorsProcessed));
+        $this->info('  - Not in scope (older than today, not fetched)         : ' . number_format($notInScope));
+        $this->info('  - Skipped / failed rows                                : ' . number_format($this->totalIndicatorsSkipped));
         $this->info('  - Verified        : ' . number_format($indiVerified) . ' / ' . number_format($indiExpected) . " ({$indiPct}%)");
         $this->info('Complete            : ' . ($complete ? 'YES' : 'NO'));
         $this->info('Import started at   : ' . $startedIso);

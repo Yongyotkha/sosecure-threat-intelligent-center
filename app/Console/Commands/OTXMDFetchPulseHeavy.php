@@ -20,6 +20,7 @@ class OTXMDFetchPulseHeavy extends OTXMDFetchPulse
                             {--timeout=180 : HTTP timeout seconds}
                             {--retries=5 : Max HTTP retries per URL}
                             {--status : Only show heavy queue counts}
+                            {--mark-failed= : Park pulse id(s) as failed (comma-separated). Does not fetch}
                             {--cleanup : Remove imported/failed queue entries older than 7 days}
                             {--database=sosecure_threatintelligent : Mongo database for auto-import}
                             {--skip-import : Fetch only; do not auto-import to Mongo}';
@@ -31,6 +32,21 @@ class OTXMDFetchPulseHeavy extends OTXMDFetchPulse
         if ($this->option('cleanup')) {
             $removed = OtxHeavyPulseQueue::cleanup(7);
             $this->info("Heavy queue cleanup removed: {$removed}");
+            return 0;
+        }
+
+        $markFailed = $this->option('mark-failed');
+        if ($markFailed !== null && $markFailed !== '') {
+            foreach (preg_split('/\s*,\s*/', (string) $markFailed) as $pulseId) {
+                if ($pulseId === '') {
+                    continue;
+                }
+                OtxHeavyPulseQueue::markFailed($pulseId, 'parked: do not auto-retry');
+                $this->info("Marked failed: {$pulseId}");
+            }
+            $this->info('Heavy queue: pending=' . OtxHeavyPulseQueue::countByStatus('pending')
+                . ' failed=' . OtxHeavyPulseQueue::countByStatus('failed')
+                . ' imported=' . OtxHeavyPulseQueue::countByStatus('imported'));
             return 0;
         }
 
@@ -96,9 +112,10 @@ class OTXMDFetchPulseHeavy extends OTXMDFetchPulse
         $limit = max(1, (int) $this->option('limit'));
         $items = array_slice($items, 0, $limit);
 
-        $runId = OtxPulseStagingStore::createRun('heavy-queue');
+        $runId = OtxPulseStagingStore::createRun('heavy-queue', 'pulses', $limit);
         $manifest = OtxPulseStagingStore::loadManifest($runId);
         $manifest['queue'] = 'heavy';
+        $manifest['limit'] = $limit;
         $manifest['checkpoint']['list_done'] = true;
         $manifest['api_total_pulses'] = count($items);
         OtxPulseStagingStore::stampSessionStart($manifest, false);
@@ -156,7 +173,10 @@ class OTXMDFetchPulseHeavy extends OTXMDFetchPulse
         try {
             foreach ($manifest['pulses'] as $pulseId => $meta) {
                 $status = $meta['status'] ?? 'pending';
-                if ($status === 'fetched' || $status === 'skipped') {
+                if ($status === 'skipped') {
+                    continue;
+                }
+                if ($status === 'fetched' && !$this->pulseNeedsRefetch($runId, $pulseId)) {
                     continue;
                 }
                 $this->info(($status === 'failed' ? 'Retrying' : 'Fetching') . " heavy pulse: {$pulseId} | indicators~"
@@ -206,6 +226,8 @@ class OTXMDFetchPulseHeavy extends OTXMDFetchPulse
         $manifest['pulses_failed'] = $failedCount;
         $manifest['status'] = $fetchComplete ? 'fetched' : 'partial';
         $manifest['stats'] = [
+            'api_total' => $expected,
+            'limit' => $manifest['limit'] ?? $expected,
             'expected' => $expected,
             'fetched' => $fetched,
             'failed' => $failedCount,
@@ -225,8 +247,8 @@ class OTXMDFetchPulseHeavy extends OTXMDFetchPulse
         $this->info('Last started        : ' . ($manifest['last_started_at'] ?? '-'));
         $this->info('Fetch finished at   : ' . ($manifest['fetch_finished_at'] ?? '-'));
         $this->info('Resume count        : ' . (int) ($manifest['resume_count'] ?? 0));
-        $this->info('Expected            : ' . $expected);
-        $this->info('Successfully fetched: ' . $fetched);
+        $this->info('Intended this run    : ' . $expected . ' (heavy queue batch, not OTX catalog)');
+        $this->info('Fetched to staging   : ' . $fetched);
         $this->info('Failed              : ' . $failedCount);
         $this->info('Pending             : ' . $pending);
         $this->info('Verified            : ' . $verified . ' / ' . $expected . " ({$pct}%)");
@@ -283,6 +305,14 @@ class OTXMDFetchPulseHeavy extends OTXMDFetchPulse
             }
         }
 
-        return $this->fetchOnePulse($runId, $pulseId, $manifest);
+        $ok = $this->fetchOnePulse($runId, $pulseId, $manifest);
+        $ind = OtxPulseStagingStore::readJson($pulseDir . '/indicators.json');
+        if (!empty($ind['fetch_failed']) && empty($ind['results'])) {
+            $this->error("  heavy pulse has no indicators after fetch failure: {$pulseId}");
+            $manifest['pulses'][$pulseId]['error'] = 'indicators empty after OTX failure';
+            return false;
+        }
+
+        return $ok;
     }
 }

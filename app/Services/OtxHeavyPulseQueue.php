@@ -26,8 +26,8 @@ class OtxHeavyPulseQueue
         }
 
         $existing = self::get($pulseId);
-        // Do not re-queue if already staged/imported or actively processing.
-        if ($existing && in_array($existing['status'] ?? '', ['pending', 'processing', 'staged', 'imported'], true)) {
+        // Do not reset failed/imported/in-flight rows back to pending.
+        if ($existing && in_array($existing['status'] ?? '', ['pending', 'processing', 'staged', 'imported', 'failed'], true)) {
             return false;
         }
 

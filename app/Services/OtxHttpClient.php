@@ -23,12 +23,15 @@ class OtxHttpClient
     /**
      * GET JSON from OTX with retry + exponential backoff.
      *
+     * @param string $url
+     * @param int|null $timeout Override constructor timeout (seconds)
      * @return array{success:bool,result:?string,error:?string,attempts:int}
      */
-    public function get($url)
+    public function get($url, $timeout = null)
     {
         $attempt = 0;
         $lastError = null;
+        $timeout = $timeout !== null ? (int) $timeout : $this->timeout;
 
         while ($attempt < $this->maxRetries) {
             $attempt++;
@@ -39,7 +42,7 @@ class OtxHttpClient
                         'Content-type' => 'application/json',
                         'X-OTX-API-KEY' => $this->apiKey,
                     ],
-                    'timeout' => $this->timeout,
+                    'timeout' => $timeout,
                     'connect_timeout' => 30,
                 ])->getBody()->getContents();
 
@@ -55,8 +58,13 @@ class OtxHttpClient
                 if (preg_match('/\b(404|401|403)\b/', $lastError)) {
                     break;
                 }
+                // Gateway timeouts rarely recover on the 3rd–5th wait; cap extra attempts.
+                $isGateway = (bool) preg_match('/\b(502|503|504)\b/', $lastError);
+                if ($isGateway && $attempt >= 2) {
+                    break;
+                }
                 if ($attempt < $this->maxRetries) {
-                    sleep(min(30, 2 ** $attempt));
+                    sleep($isGateway ? 2 : min(30, 2 ** $attempt));
                 }
             }
         }

@@ -94,7 +94,7 @@ class OTXMDFetchPulse extends Command
             OtxPulseStagingStore::saveManifest($runId, $manifest);
             $this->info("Resuming run: {$runId} (resume #" . (int) ($manifest['resume_count'] ?? 0) . ')');
         } else {
-            $runId = OtxPulseStagingStore::createRun($query);
+            $runId = OtxPulseStagingStore::createRun($query, 'pulses', $limit);
             $manifest = OtxPulseStagingStore::loadManifest($runId);
             OtxPulseStagingStore::stampSessionStart($manifest, false);
             OtxPulseStagingStore::saveManifest($runId, $manifest);
@@ -155,9 +155,13 @@ class OTXMDFetchPulse extends Command
         $pct = $expected > 0 ? round(($verified / $expected) * 100, 2) : 0;
         $fetchComplete = $failed === 0 && $pending === 0 && $verified >= $expected;
 
+        if ($limit !== null) {
+            $manifest['limit'] = $limit;
+        }
         $manifest['status'] = ($failed > 0 || $pending > 0) ? 'partial' : 'fetched';
         $manifest['stats'] = [
             'api_total' => $apiTotal,
+            'limit' => $limit,
             'expected' => $expected,
             'fetched' => $fetched,
             'skipped' => $skipped,
@@ -178,9 +182,9 @@ class OTXMDFetchPulse extends Command
         $this->info('Last started        : ' . ($manifest['last_started_at'] ?? '-'));
         $this->info('Fetch finished at   : ' . ($manifest['fetch_finished_at'] ?? '-'));
         $this->info('Resume count        : ' . (int) ($manifest['resume_count'] ?? 0));
-        $this->info('API total pulses    : ' . number_format($apiTotal));
-        $this->info('Expected (this run) : ' . number_format($expected) . ($limit !== null ? " (limit={$limit})" : ($isPartialList ? ' (scoped run)' : '')));
-        $this->info('Successfully fetched: ' . number_format($fetched));
+        $this->info('API total (OTX catalog, not this run) : ' . number_format($apiTotal));
+        $this->info('Save intended (will import)           : ' . number_format($fetched) . ($limit !== null ? " (limit={$limit})" : ($isPartialList ? ' (scoped run)' : '')));
+        $this->info('Fetched to staging                    : ' . number_format($fetched));
         $this->info('Skipped (filter)    : ' . number_format($skipped));
         $this->info('Failed              : ' . number_format($failed));
         $this->info('Pending             : ' . number_format($pending));
@@ -341,6 +345,10 @@ class OTXMDFetchPulse extends Command
                     if ($isTooHeavy && !$isPublicDns) {
                         if (OtxHeavyPulseQueue::enqueue($item, $runId, $reason)) {
                             $this->info("  → queued for heavy: {$pulseId}");
+                        } else {
+                            $q = OtxHeavyPulseQueue::get($pulseId);
+                            $qStatus = $q['status'] ?? 'unknown';
+                            $this->info("  → already in heavy queue ({$qStatus}): {$pulseId}");
                         }
                     }
                 } else {
@@ -394,7 +402,10 @@ class OTXMDFetchPulse extends Command
 
         foreach ($manifest['pulses'] as $pulseId => $meta) {
             $status = $meta['status'] ?? 'pending';
-            if ($status === 'skipped' || $status === 'fetched') {
+            if ($status === 'skipped') {
+                continue;
+            }
+            if ($status === 'fetched' && !$this->pulseNeedsRefetch($runId, $pulseId)) {
                 continue;
             }
             if ($limit !== null && $fetchedThisRun >= $limit) {
@@ -426,7 +437,9 @@ class OTXMDFetchPulse extends Command
         $pulseDir = OtxPulseStagingStore::pulsePath($runId, $pulseId);
 
         try {
-            if (!file_exists($pulseDir . '/detail.json')) {
+            $detailPath = $pulseDir . '/detail.json';
+            $detailCached = OtxPulseStagingStore::readJson($detailPath);
+            if (!$detailCached || !empty($detailCached['fetch_failed'])) {
                 $t0 = microtime(true);
                 $this->info('  → detail ...');
                 $detailResp = $this->http->get('https://otx.alienvault.com/otxapi/pulses/' . $pulseId . '/');
@@ -435,23 +448,39 @@ class OTXMDFetchPulse extends Command
                     // Non-fatal: list_item.json is enough for import; groups may be empty.
                     $this->warn("  detail failed (non-fatal): {$pulseId} — saving empty detail");
                     $manifest['pulses'][$pulseId]['detail_warning'] = 'detail fetch failed: ' . ($detailResp['error'] ?? 'fail');
-                    OtxPulseStagingStore::writeJson($pulseDir . '/detail.json', [
+                    OtxPulseStagingStore::writeJson($detailPath, [
                         'groups' => [],
                         'fetch_failed' => true,
                     ]);
                 } else {
-                    OtxPulseStagingStore::writeJson($pulseDir . '/detail.json', json_decode($detailResp['result'], true));
+                    unset($manifest['pulses'][$pulseId]['detail_warning']);
+                    OtxPulseStagingStore::writeJson($detailPath, json_decode($detailResp['result'], true));
                 }
             } else {
                 $this->info('  → detail (cached)');
             }
 
             // Only indicators created today (same rule as OTXMDFeedPulse) — do NOT download entire history.
-            if (!file_exists($pulseDir . '/indicators.json')) {
+            $indPath = $pulseDir . '/indicators.json';
+            $indCached = OtxPulseStagingStore::readJson($indPath);
+            $indDone = $indCached && empty($indCached['fetch_failed']);
+            if ($indDone) {
+                $this->info('  → indicators (cached)');
+            } else {
                 $t0 = microtime(true);
-                $this->info('  → indicators (today only) ...');
+                $seed = [];
+                $seedCount = 0;
+                $startUrl = 'https://otx.alienvault.com/otxapi/pulses/' . $pulseId . '/indicators/?sort=-created&limit=100&page=1';
+                if ($indCached && !empty($indCached['results']) && !empty($indCached['next_url'])) {
+                    $seed = $indCached['results'];
+                    $seedCount = (int) ($indCached['count'] ?? 0);
+                    $startUrl = $indCached['next_url'];
+                    $this->info('  → indicators (resume today-only, already ' . count($seed) . ' rows) ...');
+                } else {
+                    $this->info('  → indicators (today only) ...');
+                }
                 $indicators = $this->fetchPagesUntil(
-                    'https://otx.alienvault.com/otxapi/pulses/' . $pulseId . '/indicators/?sort=-created&limit=100&page=1',
+                    $startUrl,
                     function ($row) {
                         $created = $row['created'] ?? null;
                         if (!$created) {
@@ -459,27 +488,36 @@ class OTXMDFetchPulse extends Command
                         }
                         return explode('T', $created)[0] === date('Y-m-d');
                     },
-                    'indicators'
+                    'indicators',
+                    $seed,
+                    $seedCount
                 );
                 if ($indicators === null) {
-                    // Non-fatal: pulse may be deleted/404 on OTX; still import event from list_item.
-                    $this->warn("  indicators failed (non-fatal): {$pulseId} — saving empty indicators");
+                    $this->warn("  indicators failed: {$pulseId} — no rows kept");
                     $indicators = ['count' => 0, 'results' => [], 'truncated_mode' => 'today_only', 'fetch_failed' => true];
                     $manifest['pulses'][$pulseId]['indicators_warning'] = 'indicators fetch failed';
+                } elseif (!empty($indicators['fetch_failed'])) {
+                    $n = count($indicators['results'] ?? []);
+                    $this->warn("  indicators partial: {$pulseId} — kept {$n} row(s), will retry remaining pages on resume");
+                    $manifest['pulses'][$pulseId]['indicators_warning'] = 'indicators partial after page failure';
+                } else {
+                    unset($manifest['pulses'][$pulseId]['indicators_warning']);
                 }
                 $this->info(sprintf(
                     '  → indicators done in %.1fs (%d rows)',
                     microtime(true) - $t0,
                     count($indicators['results'] ?? [])
                 ));
-                OtxPulseStagingStore::writeJson($pulseDir . '/indicators.json', $indicators);
-            } else {
-                $this->info('  → indicators (cached)');
+                OtxPulseStagingStore::writeJson($indPath, $indicators);
             }
 
             // Related (today only). Non-fatal like original OTXMDFeedPulse — empty on failure.
             // Heavy queue can skip related (--skip-related) because OTX often 504s on large pulses.
-            if (!file_exists($pulseDir . '/related.json')) {
+            $relatedPath = $pulseDir . '/related.json';
+            $relatedCached = OtxPulseStagingStore::readJson($relatedPath);
+            if ($relatedCached && (empty($relatedCached['fetch_failed']) || !empty($relatedCached['skipped']))) {
+                $this->info('  → related (cached)');
+            } elseif (!file_exists($relatedPath) || !empty($relatedCached['fetch_failed'])) {
                 $skipRelated = $this->hasOption('skip-related') && $this->option('skip-related');
                 if ($skipRelated) {
                     $this->info('  → related skipped (--skip-related)');
@@ -507,6 +545,10 @@ class OTXMDFetchPulse extends Command
                         $this->warn("  related failed (non-fatal): {$pulseId} — saving empty related");
                         $related = ['count' => 0, 'results' => [], 'truncated_mode' => 'today_only', 'fetch_failed' => true];
                         $manifest['pulses'][$pulseId]['related_warning'] = 'related fetch failed';
+                    } elseif (!empty($related['fetch_failed'])) {
+                        $manifest['pulses'][$pulseId]['related_warning'] = 'related partial after page failure';
+                    } else {
+                        unset($manifest['pulses'][$pulseId]['related_warning']);
                     }
                     $this->info(sprintf(
                         '  → related done in %.1fs (%d rows)',
@@ -532,13 +574,14 @@ class OTXMDFetchPulse extends Command
     /**
      * Paginate while keepRow(row) is true. Stop at first row that fails the predicate
      * (API is sorted newest-first, same as original feed command).
+     * If a later page fails, keep rows already fetched instead of discarding them.
      *
      * @return array|null
      */
-    protected function fetchPagesUntil($startUrl, callable $keepRow, $label = 'page')
+    protected function fetchPagesUntil($startUrl, callable $keepRow, $label = 'page', array $seed = [], $seedCount = 0)
     {
-        $all = [];
-        $count = 0;
+        $all = $seed;
+        $count = $seedCount;
         $url = $startUrl;
         $page = 0;
 
@@ -548,13 +591,32 @@ class OTXMDFetchPulse extends Command
             $resp = $this->http->get($url);
             if (!$resp['success']) {
                 $this->error("  {$label} page {$page} failed: " . ($resp['error'] ?? ''));
+                if (!empty($all)) {
+                    $this->warn('  keeping ' . count($all) . " {$label} row(s) already fetched");
+                    return [
+                        'count' => $count,
+                        'results' => $all,
+                        'truncated_mode' => 'today_only',
+                        'fetch_failed' => true,
+                        'next_url' => $url,
+                    ];
+                }
                 return null;
             }
             $payload = json_decode($resp['result'], true);
             if (!is_array($payload)) {
+                if (!empty($all)) {
+                    return [
+                        'count' => $count,
+                        'results' => $all,
+                        'truncated_mode' => 'today_only',
+                        'fetch_failed' => true,
+                        'next_url' => $url,
+                    ];
+                }
                 return null;
             }
-            if ($page === 1) {
+            if ($page === 1 && $seedCount === 0) {
                 $count = $payload['count'] ?? 0;
             }
 
@@ -587,7 +649,26 @@ class OTXMDFetchPulse extends Command
             'count' => $count,
             'results' => $all,
             'truncated_mode' => 'today_only',
+            'fetch_failed' => false,
+            'next_url' => null,
         ];
+    }
+
+    /**
+     * Resume should retry pulses whose indicator/detail files are empty or partial after OTX 504.
+     */
+    protected function pulseNeedsRefetch($runId, $pulseId)
+    {
+        $pulseDir = OtxPulseStagingStore::pulsePath($runId, $pulseId);
+        $ind = OtxPulseStagingStore::readJson($pulseDir . '/indicators.json');
+        if (!$ind || !empty($ind['fetch_failed'])) {
+            return true;
+        }
+        $detail = OtxPulseStagingStore::readJson($pulseDir . '/detail.json');
+        if ($detail && !empty($detail['fetch_failed'])) {
+            return true;
+        }
+        return false;
     }
 
     protected function countPendingPulses(array $manifest)

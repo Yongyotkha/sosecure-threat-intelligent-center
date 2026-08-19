@@ -8,6 +8,8 @@ namespace App\Services;
  */
 class OtxPulseStagingStore
 {
+    const AUDIT_NOTE = 'api_total = OTX catalog size (not this run). save_intended = planned this run. save_actual = written to Mongo.';
+
     public static function root($kind = 'pulses')
     {
         return storage_path('app/otx/' . $kind);
@@ -28,7 +30,7 @@ class OtxPulseStagingStore
         return self::runPath($runId, 'indicators') . DIRECTORY_SEPARATOR . 'items' . DIRECTORY_SEPARATOR . $indicatorId;
     }
 
-    public static function createRun($query = 'modified:<12h', $kind = 'pulses')
+    public static function createRun($query = 'modified:<12h', $kind = 'pulses', $limit = null)
     {
         $runId = date('Ymd_His') . '_' . substr(md5(uniqid('', true)), 0, 8);
         $path = self::runPath($runId, $kind);
@@ -45,6 +47,7 @@ class OtxPulseStagingStore
             'run_id' => $runId,
             'kind' => $kind,
             'query' => $query,
+            'limit' => $limit,
             'status' => 'fetching',
             'created_at' => $now,
             'updated_at' => $now,
@@ -355,6 +358,47 @@ class OtxPulseStagingStore
             flock($fp, LOCK_UN);
             fclose($fp);
         }
+    }
+
+    /**
+     * Fetch-phase counts from staging manifest (OTX catalog vs this run).
+     */
+    public static function fetchAudit(array $manifest)
+    {
+        $s = $manifest['stats'] ?? [];
+        return [
+            'api_total' => (int) ($s['api_total'] ?? $s['apiTotal'] ?? $manifest['api_total'] ?? $manifest['api_total_pulses'] ?? 0),
+            'limit' => array_key_exists('limit', $manifest) ? $manifest['limit'] : null,
+            'intended' => (int) ($s['expected'] ?? 0),
+            'fetched' => (int) ($s['fetched'] ?? 0),
+            'skipped' => (int) ($s['skipped'] ?? 0),
+            'failed' => (int) ($s['failed'] ?? 0),
+        ];
+    }
+
+    /**
+     * Mongo stamp audit block — same shape on pulse + indicator stamps.
+     *
+     * @param array $import [api_total, limit, intended, saved, skipped, failed]
+     */
+    public static function mongoAudit(array $manifest, array $import, array $extra = [])
+    {
+        $audit = [
+            'note' => self::AUDIT_NOTE,
+            'fetch' => self::fetchAudit($manifest),
+            'import' => [
+                'api_total' => (int) ($import['api_total'] ?? 0),
+                'limit' => array_key_exists('limit', $import) ? $import['limit'] : ($manifest['limit'] ?? null),
+                'save_intended' => (int) ($import['intended'] ?? 0),
+                'save_actual' => (int) ($import['saved'] ?? 0),
+                'skipped' => (int) ($import['skipped'] ?? 0),
+                'failed' => (int) ($import['failed'] ?? 0),
+            ],
+        ];
+        foreach ($extra as $key => $value) {
+            $audit[$key] = $value;
+        }
+        return $audit;
     }
 
     protected static function deleteDirectory($dir)
