@@ -539,7 +539,11 @@ class OTXMDFetchPulse extends Command
                             }
                             return explode('T', $modified)[0] === date('Y-m-d');
                         },
-                        'related'
+                        'related',
+                        [],
+                        0,
+                        20,
+                        1
                     );
                     if ($related === null) {
                         $this->warn("  related failed (non-fatal): {$pulseId} — saving empty related");
@@ -578,7 +582,7 @@ class OTXMDFetchPulse extends Command
      *
      * @return array|null
      */
-    protected function fetchPagesUntil($startUrl, callable $keepRow, $label = 'page', array $seed = [], $seedCount = 0)
+    protected function fetchPagesUntil($startUrl, callable $keepRow, $label = 'page', array $seed = [], $seedCount = 0, $timeout = null, $retries = null)
     {
         $all = $seed;
         $count = $seedCount;
@@ -588,7 +592,7 @@ class OTXMDFetchPulse extends Command
         while ($url) {
             $page++;
             $t0 = microtime(true);
-            $resp = $this->http->get($url);
+            $resp = $this->http->get($url, $timeout, $retries);
             if (!$resp['success']) {
                 $this->error("  {$label} page {$page} failed: " . ($resp['error'] ?? ''));
                 if (!empty($all)) {

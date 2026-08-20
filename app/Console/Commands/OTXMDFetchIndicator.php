@@ -23,6 +23,7 @@ class OTXMDFetchIndicator extends Command
                             {--timeout=45 : HTTP timeout seconds for indicator detail}
                             {--list-timeout=180 : HTTP timeout seconds for indicator list pages}
                             {--retries=2 : Max HTTP retries per URL}
+                            {--concurrency=4 : Parallel indicator detail fetches}
                             {--skip-import : Fetch only; do not auto-import}
                             {--database=sosecure_threatintelligent : Mongo database}';
 
@@ -32,6 +33,7 @@ class OTXMDFetchIndicator extends Command
     protected $http;
     protected $dbName;
     protected $kind = 'indicators';
+    protected $detailDb;
 
     public function handle()
     {
@@ -105,7 +107,7 @@ class OTXMDFetchIndicator extends Command
         $this->info("Created indicator run: {$runId}");
         }
         $this->info('Started at          : ' . ($manifest['started_at'] ?? '-'));
-        $this->info('HTTP detail timeout : ' . (int) $this->option('timeout') . 's / list timeout: ' . (int) $this->option('list-timeout') . 's');
+        $this->info('HTTP detail timeout : ' . (int) $this->option('timeout') . 's / list timeout: ' . (int) $this->option('list-timeout') . 's / concurrency: ' . max(1, (int) $this->option('concurrency')));
 
         try {
             $this->fetchListPages($runId, $manifest, $limit);
@@ -423,48 +425,101 @@ class OTXMDFetchIndicator extends Command
 
     protected function fetchDetails($runId, array &$manifest, $limit)
     {
-        $done = 0;
+        $jobs = [];
         foreach ($manifest['items'] as $id => $meta) {
             $status = $meta['status'] ?? 'pending';
             if (!in_array($status, ['pending', 'failed'], true)) {
                 continue;
             }
-            if ($limit !== null && $done >= $limit) {
+            $jobs[] = [
+                'id' => $id,
+                'type' => $meta['type'] ?? '',
+                'name' => $meta['indicator'] ?? '',
+                'status' => $status,
+            ];
+            if ($limit !== null && count($jobs) >= $limit) {
                 break;
             }
-
-            $type = $meta['type'] ?? '';
-            $name = $meta['indicator'] ?? '';
-            if ($status === 'failed') {
-                $this->info("Retry detail: {$id} | {$type} | {$name}");
-            } else {
-                $this->info("Detail: {$id} | {$type} | {$name}");
-            }
-
-            $t0 = microtime(true);
-            $bundle = $this->buildDetailBundle($id, $type, $name);
-            $this->info(sprintf('  detail done in %.1fs%s', microtime(true) - $t0, !empty($bundle['failed']) ? ' (failed)' : ''));
-            $dir = OtxPulseStagingStore::indicatorPath($runId, $id);
-            OtxPulseStagingStore::writeJson($dir . '/detail_bundle.json', $bundle);
-
-            if (!empty($bundle['failed'])) {
-                $manifest['items'][$id]['status'] = 'failed';
-                $manifest['items'][$id]['error'] = $bundle['error'] ?? 'detail failed';
-            } elseif (!empty($bundle['skipped_fresh'])) {
-                $manifest['items'][$id]['status'] = 'skipped';
-                $manifest['items'][$id]['skip_reason'] = 'detail fresh (<=5d)';
-            } else {
-                $manifest['items'][$id]['status'] = 'fetched';
-            }
-            $done++;
-            OtxPulseStagingStore::saveManifest($runId, $manifest, $this->kind);
         }
+
+        $concurrency = max(1, (int) $this->option('concurrency'));
+        $chunks = array_chunk($jobs, $concurrency);
+        foreach ($chunks as $chunk) {
+            $this->fetchDetailChunk($runId, $manifest, $chunk);
+        }
+    }
+
+    protected function fetchDetailChunk($runId, array &$manifest, array $chunk)
+    {
+        $plans = [];
+        $allUrls = [];
+        foreach ($chunk as $job) {
+            $id = $job['id'];
+            if ($job['status'] === 'failed') {
+                $this->info("Retry detail: {$id} | {$job['type']} | {$job['name']}");
+            } else {
+                $this->info("Detail: {$id} | {$job['type']} | {$job['name']}");
+            }
+            $bundle = $this->preflightDetail($id, $job['type'], $job['name']);
+            if (!empty($bundle['skipped_fresh']) || !empty($bundle['no_detail'])) {
+                $this->commitDetail($runId, $manifest, $id, $bundle, microtime(true));
+                continue;
+            }
+            $urls = $this->detailUrls($job['type'], $job['name']);
+            if (empty($urls)) {
+                $bundle['no_detail'] = true;
+                $this->commitDetail($runId, $manifest, $id, $this->stringifyAllrow($bundle), microtime(true));
+                continue;
+            }
+            foreach ($urls as $key => $url) {
+                $allUrls[$id . '|' . $key] = $url;
+            }
+            $plans[$id] = [
+                'job' => $job,
+                'bundle' => $bundle,
+                'url_keys' => array_keys($urls),
+                't0' => microtime(true),
+            ];
+        }
+
+        $responses = $this->http->getMany($allUrls);
+        foreach ($plans as $id => $plan) {
+            $res = [];
+            foreach ($plan['url_keys'] as $key) {
+                $res[$key] = $responses[$id . '|' . $key] ?? [
+                    'success' => false,
+                    'result' => null,
+                    'error' => 'missing parallel response',
+                    'attempts' => 0,
+                ];
+            }
+            $bundle = $this->assembleDetail($plan['bundle'], $plan['job']['type'], $res);
+            $this->commitDetail($runId, $manifest, $id, $bundle, $plan['t0']);
+        }
+    }
+
+    protected function commitDetail($runId, array &$manifest, $id, array $bundle, $t0)
+    {
+        $this->info(sprintf('  detail done in %.1fs%s', microtime(true) - $t0, !empty($bundle['failed']) ? ' (failed)' : (!empty($bundle['analysis_missing']) ? ' (no analysis)' : '')));
+        $dir = OtxPulseStagingStore::indicatorPath($runId, $id);
+        OtxPulseStagingStore::writeJson($dir . '/detail_bundle.json', $bundle);
+
+        if (!empty($bundle['failed'])) {
+            $manifest['items'][$id]['status'] = 'failed';
+            $manifest['items'][$id]['error'] = $bundle['error'] ?? 'detail failed';
+        } elseif (!empty($bundle['skipped_fresh'])) {
+            $manifest['items'][$id]['status'] = 'skipped';
+            $manifest['items'][$id]['skip_reason'] = 'detail fresh (<=5d)';
+        } else {
+            $manifest['items'][$id]['status'] = 'fetched';
+        }
+        OtxPulseStagingStore::saveManifest($runId, $manifest, $this->kind);
     }
 
     /**
      * Port of OTXMDFeedIndicator::caseByType — fetch only, write bundle (no DB write).
      */
-    protected function buildDetailBundle($indicatorID, $type, $indicatorName)
+    protected function preflightDetail($indicatorID, $type, $indicatorName)
     {
         $bundle = [
             'indicator_id' => $indicatorID . '',
@@ -478,9 +533,9 @@ class OTXMDFetchIndicator extends Command
             'skipped_fresh' => false,
             'failed' => false,
             'error' => null,
+            'analysis_missing' => false,
         ];
 
-        // Types with no useful detail (same as original).
         $noDetail = [
             'CIDR', 'FileHash-IMPHASH', 'FileHash-PEHASH', 'FilePath', 'Mutex', 'URI',
             'JA3', 'osquery', 'SSLCertFingerprint', 'BitcoinAddress',
@@ -490,10 +545,11 @@ class OTXMDFetchIndicator extends Command
             return $this->stringifyAllrow($bundle);
         }
 
-        // Fresh detail skip (same 5-day rule).
         try {
-            $clientMD = new \MongoDB\Client(env('DB_MONGO_STOREDATA', ''));
-            $doc = $clientMD->{$this->dbName}->fx_otx_indicator_detail->findOne(
+            if (!$this->detailDb) {
+                $this->detailDb = (new \MongoDB\Client(env('DB_MONGO_STOREDATA', '')))->{$this->dbName};
+            }
+            $doc = $this->detailDb->fx_otx_indicator_detail->findOne(
                 ['indicator_id' => $indicatorID . ''],
                 ['projection' => ['updated_at' => 1, 'transcation_id' => 1]]
             );
@@ -509,133 +565,167 @@ class OTXMDFetchIndicator extends Command
             // continue fetch
         }
 
-        try {
-            if ($type === 'CVE') {
-                $r = $this->http->get('https://otx.alienvault.com/otxapi/indicators/cve/general/' . rawurlencode($indicatorName));
-                if (!$r['success']) {
-                    return $this->failBundle($bundle, $r['error']);
-                }
-                $d = json_decode($r['result'], true) ?: [];
-                $bundle['allrow'] = [
-                    'description' => $d['description'] ?? '',
-                    'CWE' => $d['cwe'] ?? '',
-                    'CVE' => $d['cve'] ?? '',
-                    'CREATION DATE' => $d['date_created'] ?? '',
-                    'LAST MODIFIED DATE' => $d['date_modified'] ?? '',
-                ];
-                $bundle['pulses'] = $d['pulse_info']['pulses'] ?? [];
-            } elseif ($type === 'domain') {
-                $r1 = $this->http->get('https://otx.alienvault.com/otxapi/indicators/domain/general/' . rawurlencode($indicatorName));
-                $r2 = $this->http->get('https://otx.alienvault.com/otxapi/indicators/domain/url_list/' . rawurlencode($indicatorName));
-                if (!$r2['success']) {
-                    return $this->failBundle($bundle, $r2['error']);
-                }
-                $d1 = json_decode($r1['result'] ?? '[]', true) ?: [];
-                $d2 = json_decode($r2['result'], true) ?: [];
-                $bundle['allrow'] = [
-                    'IP ADDRESS' => $d2['url_list'][0]['result']['urlworker']['ip'] ?? '',
-                ];
-                $bundle['pulses'] = $d1['pulse_info']['pulses'] ?? [];
-            } elseif ($type === 'email') {
-                $r1 = $this->http->get('https://otx.alienvault.com/otxapi/indicators/email/general/' . rawurlencode($indicatorName));
-                if (!$r1['success']) {
-                    return $this->failBundle($bundle, $r1['error']);
-                }
-                $d1 = json_decode($r1['result'], true) ?: [];
-                $bundle['allrow'] = [];
-                $bundle['pulses'] = $d1['pulse_info']['pulses'] ?? [];
-            } elseif (in_array($type, ['FileHash-MD5', 'FileHash-SHA1', 'FileHash-SHA256'], true)) {
-                $r1 = $this->http->get('https://otx.alienvault.com/otxapi/indicator/file/general/' . rawurlencode($indicatorName));
-                $r2 = $this->http->get('https://otx.alienvault.com/otxapi/indicator/file/analysis/' . rawurlencode($indicatorName));
-                if (!$r2['success']) {
-                    return $this->failBundle($bundle, $r2['error']);
-                }
-                $d1 = json_decode($r1['result'] ?? '[]', true) ?: [];
-                $d2 = json_decode($r2['result'], true) ?: [];
-                $bundle['allrow'] = $this->mapFileAnalysis($d2);
-                $bundle['pulses'] = $d1['pulse_info']['pulses'] ?? [];
-            } elseif ($type === 'hostname') {
-                $r1 = $this->http->get('https://otx.alienvault.com/otxapi/indicator/hostname/general/' . rawurlencode($indicatorName));
-                $r2 = $this->http->get('https://otx.alienvault.com/otxapi/indicator/hostname/url_list/' . rawurlencode($indicatorName));
-                if (!$r2['success']) {
-                    return $this->failBundle($bundle, $r2['error']);
-                }
-                $d1 = json_decode($r1['result'] ?? '[]', true) ?: [];
-                $d2 = json_decode($r2['result'], true) ?: [];
-                $bundle['allrow'] = [
-                    'IP ADDRESS' => $d2['url_list'][0]['result']['urlworker']['ip'] ?? '',
-                    'DOMAIN' => $d2['url_list'][0]['domain'] ?? '',
-                ];
-                $bundle['pulses'] = $d1['pulse_info']['pulses'] ?? [];
-            } elseif ($type === 'IPv4' || $type === 'IPv6') {
-                $r1 = $this->http->get('https://otx.alienvault.com/otxapi/indicator/' . $type . '/general/' . rawurlencode($indicatorName));
-                $r2 = $this->http->get('https://otx.alienvault.com/otxapi/indicator/' . $type . '/geo/' . rawurlencode($indicatorName));
-                if (!$r2['success']) {
-                    return $this->failBundle($bundle, $r2['error']);
-                }
-                $d1 = json_decode($r1['result'] ?? '[]', true) ?: [];
-                $d2 = json_decode($r2['result'], true) ?: [];
-                $location = (isset($d2['city']) ? $d2['city'] . ', ' : '')
-                    . ($d2['country_name'] ?? '')
-                    . (isset($d2['country_code']) ? ' --' . $d2['country_code'] : '');
-                $bundle['allrow'] = [
-                    'LOCATION' => $location,
-                    'ASN/OWNER' => $d2['asn'] ?? '',
-                ];
-                $bundle['pulses'] = $d1['pulse_info']['pulses'] ?? [];
-            } elseif ($type === 'NIDS') {
-                $r1 = $this->http->get('https://otx.alienvault.com/otxapi/indicator/nids/general/' . rawurlencode($indicatorName));
-                if (!$r1['success']) {
-                    return $this->failBundle($bundle, $r1['error']);
-                }
-                $d1 = json_decode($r1['result'], true) ?: [];
-                $bundle['allrow'] = [
-                    'CATEGORY' => $d1['category'] ?? '',
-                    'SUBCATION' => $d1['subcategory'] ?? '',
-                    'ACTIVITY' => $d1['event_activity'] ?? '',
-                    'MALWARE NAME' => $d1['malware_name'] ?? '',
-                ];
-                $bundle['description_key'] = 'rowDescription';
-                $bundle['description_value'] = $d1['base_indicator']['description'] ?? '';
-                $bundle['pulses'] = $d1['pulse_info']['pulses'] ?? [];
-            } elseif ($type === 'URL') {
-                $r1 = $this->http->get('https://otx.alienvault.com/otxapi/indicator/url/general/' . rawurlencode($indicatorName));
-                $r2 = $this->http->get('https://otx.alienvault.com/otxapi/indicator/url/url_list/' . rawurlencode($indicatorName) . '?limit=10&page=1');
-                if (!$r2['success']) {
-                    return $this->failBundle($bundle, $r2['error']);
-                }
-                $d1 = json_decode($r1['result'] ?? '[]', true) ?: [];
-                $d2 = json_decode($r2['result'], true) ?: [];
-                $location = (isset($d2['city']) ? $d2['city'] . ', ' : '')
-                    . ($d2['country_name'] ?? '')
-                    . (isset($d2['country_code']) ? ' --' . $d2['country_code'] : '');
-                $bundle['allrow'] = [
-                    'IP ADDRESS' => $d2['url_list'][0]['result']['urlworker']['ip'] ?? '',
-                    'LOCATION' => $location,
-                    'HOSTNAME' => $d1['hostname'] ?? '',
-                    'DOMAIN' => $d1['domain'] ?? '',
-                    'LAST ANALYZED DATE' => $d2['url_list'][0]['date'] ?? '',
-                ];
-                $bundle['pulses'] = $d1['pulse_info']['pulses'] ?? [];
-            } elseif ($type === 'YARA') {
-                $r1 = $this->http->get('https://otx.alienvault.com/otxapi/indicator/yara/general/' . rawurlencode($indicatorName));
-                $r2 = $this->http->get('https://otx.alienvault.com/otxapi/indicator/yara/raw/' . rawurlencode($indicatorName));
-                if (!$r2['success']) {
-                    return $this->failBundle($bundle, $r2['error']);
-                }
-                $d1 = json_decode($r1['result'] ?? '[]', true) ?: [];
-                $bundle['allrow'] = [];
-                $bundle['description_key'] = 'ruleRow';
-                $bundle['description_value'] = (string) ($r2['result'] ?? '');
-                $bundle['pulses'] = $d1['pulse_info']['pulses'] ?? [];
+        return $bundle;
+    }
+
+    protected function detailUrls($type, $indicatorName)
+    {
+        $e = rawurlencode($indicatorName);
+        if ($type === 'CVE') {
+            return ['general' => 'https://otx.alienvault.com/otxapi/indicators/cve/general/' . $e];
+        }
+        if ($type === 'domain') {
+            return [
+                'general' => 'https://otx.alienvault.com/otxapi/indicators/domain/general/' . $e,
+                'url_list' => 'https://otx.alienvault.com/otxapi/indicators/domain/url_list/' . $e,
+            ];
+        }
+        if ($type === 'email') {
+            return ['general' => 'https://otx.alienvault.com/otxapi/indicators/email/general/' . $e];
+        }
+        if (in_array($type, ['FileHash-MD5', 'FileHash-SHA1', 'FileHash-SHA256'], true)) {
+            return [
+                'general' => 'https://otx.alienvault.com/otxapi/indicator/file/general/' . $e,
+                'analysis' => 'https://otx.alienvault.com/otxapi/indicator/file/analysis/' . $e,
+            ];
+        }
+        if ($type === 'hostname') {
+            return [
+                'general' => 'https://otx.alienvault.com/otxapi/indicator/hostname/general/' . $e,
+                'url_list' => 'https://otx.alienvault.com/otxapi/indicator/hostname/url_list/' . $e,
+            ];
+        }
+        if ($type === 'IPv4' || $type === 'IPv6') {
+            return [
+                'general' => 'https://otx.alienvault.com/otxapi/indicator/' . $type . '/general/' . $e,
+                'geo' => 'https://otx.alienvault.com/otxapi/indicator/' . $type . '/geo/' . $e,
+            ];
+        }
+        if ($type === 'NIDS') {
+            return ['general' => 'https://otx.alienvault.com/otxapi/indicator/nids/general/' . $e];
+        }
+        if ($type === 'URL') {
+            return [
+                'general' => 'https://otx.alienvault.com/otxapi/indicator/url/general/' . $e,
+                'url_list' => 'https://otx.alienvault.com/otxapi/indicator/url/url_list/' . $e . '?limit=10&page=1',
+            ];
+        }
+        if ($type === 'YARA') {
+            return [
+                'general' => 'https://otx.alienvault.com/otxapi/indicator/yara/general/' . $e,
+                'raw' => 'https://otx.alienvault.com/otxapi/indicator/yara/raw/' . $e,
+            ];
+        }
+        return [];
+    }
+
+    protected function assembleDetail(array $bundle, $type, array $res)
+    {
+        if (!$this->anyHttpSuccess($res)) {
+            return $this->failBundle($bundle, $this->firstHttpError($res));
+        }
+
+        $d1 = $this->jsonBody($res['general'] ?? []);
+        $bundle['pulses'] = $d1['pulse_info']['pulses'] ?? [];
+
+        if ($type === 'CVE') {
+            $bundle['allrow'] = [
+                'description' => $d1['description'] ?? '',
+                'CWE' => $d1['cwe'] ?? '',
+                'CVE' => $d1['cve'] ?? '',
+                'CREATION DATE' => $d1['date_created'] ?? '',
+                'LAST MODIFIED DATE' => $d1['date_modified'] ?? '',
+            ];
+        } elseif ($type === 'domain') {
+            $d2 = $this->jsonBody($res['url_list'] ?? []);
+            $bundle['allrow'] = [
+                'IP ADDRESS' => $d2['url_list'][0]['result']['urlworker']['ip'] ?? '',
+            ];
+        } elseif ($type === 'email') {
+            $bundle['allrow'] = [];
+        } elseif (in_array($type, ['FileHash-MD5', 'FileHash-SHA1', 'FileHash-SHA256'], true)) {
+            $r2 = $res['analysis'] ?? [];
+            if (!empty($r2['success'])) {
+                $bundle['allrow'] = $this->mapFileAnalysis($this->jsonBody($r2));
             } else {
-                $bundle['no_detail'] = true;
+                $bundle['allrow'] = [];
+                $bundle['analysis_missing'] = true;
             }
-        } catch (Exception $e) {
-            return $this->failBundle($bundle, $e->getMessage());
+        } elseif ($type === 'hostname') {
+            $d2 = $this->jsonBody($res['url_list'] ?? []);
+            $bundle['allrow'] = [
+                'IP ADDRESS' => $d2['url_list'][0]['result']['urlworker']['ip'] ?? '',
+                'DOMAIN' => $d2['url_list'][0]['domain'] ?? '',
+            ];
+        } elseif ($type === 'IPv4' || $type === 'IPv6') {
+            $d2 = $this->jsonBody($res['geo'] ?? []);
+            $location = (isset($d2['city']) ? $d2['city'] . ', ' : '')
+                . ($d2['country_name'] ?? '')
+                . (isset($d2['country_code']) ? ' --' . $d2['country_code'] : '');
+            $bundle['allrow'] = [
+                'LOCATION' => $location,
+                'ASN/OWNER' => $d2['asn'] ?? '',
+            ];
+        } elseif ($type === 'NIDS') {
+            $bundle['allrow'] = [
+                'CATEGORY' => $d1['category'] ?? '',
+                'SUBCATION' => $d1['subcategory'] ?? '',
+                'ACTIVITY' => $d1['event_activity'] ?? '',
+                'MALWARE NAME' => $d1['malware_name'] ?? '',
+            ];
+            $bundle['description_key'] = 'rowDescription';
+            $bundle['description_value'] = $d1['base_indicator']['description'] ?? '';
+        } elseif ($type === 'URL') {
+            $d2 = $this->jsonBody($res['url_list'] ?? []);
+            $location = (isset($d2['city']) ? $d2['city'] . ', ' : '')
+                . ($d2['country_name'] ?? '')
+                . (isset($d2['country_code']) ? ' --' . $d2['country_code'] : '');
+            $bundle['allrow'] = [
+                'IP ADDRESS' => $d2['url_list'][0]['result']['urlworker']['ip'] ?? '',
+                'LOCATION' => $location,
+                'HOSTNAME' => $d1['hostname'] ?? '',
+                'DOMAIN' => $d1['domain'] ?? '',
+                'LAST ANALYZED DATE' => $d2['url_list'][0]['date'] ?? '',
+            ];
+        } elseif ($type === 'YARA') {
+            $r2 = $res['raw'] ?? [];
+            $bundle['allrow'] = [];
+            $bundle['description_key'] = 'ruleRow';
+            $bundle['description_value'] = !empty($r2['success']) ? (string) ($r2['result'] ?? '') : '';
+        } else {
+            $bundle['no_detail'] = true;
         }
 
         return $this->stringifyAllrow($bundle);
+    }
+
+    protected function jsonBody(array $resp)
+    {
+        if (empty($resp['success']) || empty($resp['result'])) {
+            return [];
+        }
+        $d = json_decode($resp['result'], true);
+        return is_array($d) ? $d : [];
+    }
+
+    protected function anyHttpSuccess(array $res)
+    {
+        foreach ($res as $r) {
+            if (!empty($r['success'])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function firstHttpError(array $res)
+    {
+        foreach ($res as $r) {
+            if (empty($r['success']) && !empty($r['error'])) {
+                return $r['error'];
+            }
+        }
+        return 'detail failed';
     }
 
     protected function mapFileAnalysis(array $d2)
