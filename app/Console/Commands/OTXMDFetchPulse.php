@@ -278,23 +278,42 @@ class OTXMDFetchPulse extends Command
 
         $page = (int) ($manifest['checkpoint']['list_page'] ?? 0);
         $nextUrl = $manifest['checkpoint']['list_next_url'] ?? null;
-        $pageSize = ($limit !== null && $limit > 0 && $limit < 100) ? max($limit, 10) : 100;
+        // Old FeedPulse uses limit=10; larger search pages 504 when OTX is slow.
+        $pageSize = 10;
+        $listMode = $manifest['checkpoint']['list_mode'] ?? 'search';
+        if ($nextUrl) {
+            $rewritten = preg_replace('/([?&]limit=)\d+/', '${1}' . $pageSize, $nextUrl);
+            if (is_string($rewritten) && $rewritten !== '') {
+                $nextUrl = $rewritten;
+            }
+            if ($listMode === 'browse') {
+                $nextUrl = $this->pulseListBrowseUrl($nextUrl);
+            }
+        }
 
         if (!$nextUrl && $page === 0) {
-            $nextUrl = 'https://otx.alienvault.com/otxapi/pulses/?limit=' . $pageSize
-                . '&page=1&sort=-modified&q=' . rawurlencode($query);
+            $nextUrl = $this->pulseListSearchUrl($pageSize, $query);
         }
 
         while ($nextUrl) {
             $page++;
-            $t0 = microtime(true);
-            $this->info("Fetching list page {$page} ...");
-            $resp = $this->http->get($nextUrl);
-            $this->info(sprintf('  list page %d done in %.1fs', $page, microtime(true) - $t0));
+            $this->info("Fetching list page {$page} ({$listMode}) ...");
+            $resp = $this->getPulseListPage($nextUrl, $listMode === 'search' ? 1 : 2);
+
+            if (!$resp['success'] && $listMode === 'search' && $this->isOtxGatewayError($resp['error'] ?? '')) {
+                $this->warn('OTX search list 504 — fallback to sort=-modified (filter modified:<12h locally).');
+                $listMode = 'browse';
+                $manifest['checkpoint']['list_mode'] = 'browse';
+                $page = 0;
+                $nextUrl = $this->pulseListBrowseUrl($this->pulseListSearchUrl($pageSize, $query));
+                OtxPulseStagingStore::saveManifest($runId, $manifest);
+                continue;
+            }
 
             if (!$resp['success']) {
                 $manifest['checkpoint']['list_next_url'] = $nextUrl;
                 $manifest['checkpoint']['list_page'] = $page - 1;
+                $manifest['checkpoint']['list_mode'] = $listMode;
                 $manifest['status'] = 'partial';
                 $manifest['last_error'] = 'List page failed: ' . ($resp['error'] ?? 'unknown');
                 OtxPulseStagingStore::saveManifest($runId, $manifest);
@@ -317,6 +336,12 @@ class OTXMDFetchPulse extends Command
 
             $stopList = false;
             foreach ($payload['results'] ?? [] as $item) {
+                if ($listMode === 'browse' && !$this->pulseModifiedWithinHours($item, 12)) {
+                    $this->info('Reached pulses older than 12h. Stopping list fetch.');
+                    $stopList = true;
+                    break;
+                }
+
                 $pulseId = $item['id'] ?? null;
                 if (!$pulseId || isset($manifest['pulses'][$pulseId])) {
                     continue;
@@ -373,10 +398,14 @@ class OTXMDFetchPulse extends Command
             $manifest['pages_fetched'] = $page;
             $manifest['checkpoint']['list_page'] = $page;
             $manifest['checkpoint']['list_next_url'] = $payload['next'] ?? null;
+            $manifest['checkpoint']['list_mode'] = $listMode;
             OtxPulseStagingStore::saveManifest($runId, $manifest);
 
-            if ($stopList || ($limit !== null && $this->countPendingPulses($manifest) >= $limit)) {
+            if ($limit !== null && $this->countPendingPulses($manifest) >= $limit) {
                 $this->info("Limit reached for pending pulses ({$limit}). Stopping list fetch.");
+                break;
+            }
+            if ($stopList) {
                 break;
             }
 
@@ -684,5 +713,101 @@ class OTXMDFetchPulse extends Command
             }
         }
         return $n;
+    }
+
+    protected function pulseListSearchUrl($pageSize, $query)
+    {
+        return 'https://otx.alienvault.com/otxapi/pulses/?limit=' . (int) $pageSize
+            . '&page=1&sort=-modified&q=' . rawurlencode($query);
+    }
+
+    /**
+     * Drop q= so OTX serves newest pulses from the modified index instead of search.
+     */
+    protected function pulseListBrowseUrl($url)
+    {
+        $parts = parse_url($url);
+        if (!is_array($parts) || empty($parts['query'])) {
+            return 'https://otx.alienvault.com/otxapi/pulses/?limit=10&page=1&sort=-modified';
+        }
+        parse_str($parts['query'], $query);
+        unset($query['q']);
+        if (empty($query['limit'])) {
+            $query['limit'] = 10;
+        }
+        if (empty($query['sort'])) {
+            $query['sort'] = '-modified';
+        }
+        if (empty($query['page'])) {
+            $query['page'] = 1;
+        }
+        $base = ($parts['scheme'] ?? 'https') . '://' . ($parts['host'] ?? 'otx.alienvault.com')
+            . ($parts['path'] ?? '/otxapi/pulses/');
+
+        return $base . '?' . http_build_query($query);
+    }
+
+    protected function getPulseListPage($url, $attempts)
+    {
+        $attempts = max(1, (int) $attempts);
+        $last = [
+            'success' => false,
+            'result' => null,
+            'error' => 'no attempts',
+            'attempts' => 0,
+        ];
+        for ($i = 1; $i <= $attempts; $i++) {
+            $t0 = microtime(true);
+            $resp = $this->http->get($url, null, 1);
+            $elapsed = microtime(true) - $t0;
+            $last = $resp;
+            if (!empty($resp['success'])) {
+                $this->info(sprintf('  list page done in %.1fs (attempt %d/%d)', $elapsed, $i, $attempts));
+                return $resp;
+            }
+            $err = (string) ($resp['error'] ?? 'unknown');
+            $this->warn(sprintf(
+                '  list page failed in %.1fs (attempt %d/%d): %s',
+                $elapsed,
+                $i,
+                $attempts,
+                $this->shortOtxError($err)
+            ));
+            if ($i < $attempts) {
+                $wait = $this->isOtxGatewayError($err) ? 20 : min(30, 2 ** $i);
+                $this->warn("  waiting {$wait}s before retry...");
+                sleep($wait);
+            }
+        }
+
+        return $last;
+    }
+
+    protected function isOtxGatewayError($error)
+    {
+        return (bool) preg_match('/\b(502|503|504)\b/', (string) $error);
+    }
+
+    protected function shortOtxError($error)
+    {
+        $line = trim(preg_split("/\r\n|\n|\r/", (string) $error)[0]);
+        if (strlen($line) > 180) {
+            return substr($line, 0, 177) . '...';
+        }
+        return $line;
+    }
+
+    protected function pulseModifiedWithinHours(array $item, $hours)
+    {
+        $raw = $item['modified'] ?? '';
+        if ($raw === '') {
+            return true;
+        }
+        try {
+            $dt = new \DateTime((string) $raw);
+            return $dt->getTimestamp() >= (time() - ((int) $hours * 3600));
+        } catch (Exception $e) {
+            return true;
+        }
     }
 }
