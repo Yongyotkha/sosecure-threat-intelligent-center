@@ -20,9 +20,11 @@ use MongoDB\Client as MongoClient;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use App\Services\AiIntelNewsService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Modules\RSSFeedSettings\Entities\AiIntelNewsLog;
 use Modules\RSSFeedSettings\Entities\NewsCategory;
 use Modules\CategorySettings\Entities\CategorySettings;
 use Modules\RSSFeedSettings\Entities\NewsTag;
@@ -227,7 +229,11 @@ class RSSFeedSettingsController extends Controller
                 $parts[] = '<p><strong>Threat Actor:</strong> ' . e($contextData['attacker_group']) . '</p>';
             }
             if (!empty($contextData['historical_narrative'])) {
-                $parts[] = '<p><strong>บริบท:</strong> ' . e($contextData['historical_narrative']) . '</p>';
+                $narrative = $contextData['historical_narrative'];
+                if (is_array($narrative)) {
+                    $narrative = implode(' ', array_filter($narrative, 'is_string'));
+                }
+                $parts[] = '<p><strong>บริบท:</strong> ' . e((string) $narrative) . '</p>';
             }
         } elseif (!empty($context)) {
             $parts[] = '<p><strong>บริบท:</strong> ' . nl2br(e($context)) . '</p>';
@@ -320,29 +326,85 @@ class RSSFeedSettingsController extends Controller
         }
 
         try {
-            $exitCode = Artisan::call('app:AI_Intel_News');
-            $output = trim(Artisan::output());
+            $lines = [];
+            $service = new AiIntelNewsService();
+            $stats = $service->sync(1, function ($level, $message) use (&$lines) {
+                $lines[] = $message;
+            });
 
-            if ($exitCode !== 0) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Sync failed. Check OPENAI_API_KEY and network access to RSS/OpenAI.',
-                    'output' => $output,
-                ], 500);
+            $payload = [
+                'status' => 'success',
+                'message' => $this->summarizeAiIntelSync($stats, $lines),
+                'stats' => $stats,
+                'output' => implode("\n", $lines),
+            ];
+
+            if ($stats['failed'] > 0 && $stats['created'] === 0 && $stats['updated'] === 0) {
+                $payload['status'] = 'error';
+            } elseif ($stats['failed'] > 0) {
+                $payload['status'] = 'warning';
             }
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Sync Intel completed.',
-                'output' => $output,
-            ]);
-        } catch (\Exception $e) {
+            return response()->json($payload);
+        } catch (\Throwable $e) {
             Log::error('ai_intel_sync: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 500);
+                'message' => $this->friendlyAiIntelError($e->getMessage()),
+            ]);
         }
+    }
+
+    protected function summarizeAiIntelSync(array $stats, array $lines)
+    {
+        $text = implode("\n", $lines);
+        $friendly = $this->friendlyAiIntelError($text);
+        if ($friendly !== $text && $friendly !== '') {
+            return $friendly;
+        }
+
+        return sprintf(
+            'Sync Intel completed. created=%d updated=%d skipped=%d failed=%d',
+            $stats['created'],
+            $stats['updated'],
+            $stats['skipped'],
+            $stats['failed']
+        );
+    }
+
+    protected function friendlyAiIntelError($text)
+    {
+        $raw = (string) $text;
+        $lower = mb_strtolower($raw);
+
+        if (strpos($lower, 'no credits remaining') !== false
+            || strpos($lower, 'insufficient_quota') !== false
+            || strpos($lower, 'credit_balance_exhausted') !== false) {
+            return 'OpenAI ไม่มีเครดิตเหลือ กรุณาเติมเครดิตที่ Billing แล้วกด Sync อีกครั้ง';
+        }
+        if (strpos($lower, 'openai_api_key is not set') !== false) {
+            return 'ยังไม่ได้ตั้ง OPENAI_API_KEY ใน .env';
+        }
+        if (strpos($lower, 'incorrect api key') !== false || strpos($lower, 'invalid_api_key') !== false) {
+            return 'OPENAI_API_KEY ไม่ถูกต้อง กรุณาตรวจคีย์ใน .env';
+        }
+        if (strpos($lower, 'rate limit') !== false || strpos($lower, 'http 429') !== false) {
+            return 'OpenAI จำกัดจำนวนครั้ง กรุณารอสักครู่แล้วลองใหม่';
+        }
+
+        if (preg_match('/OpenAI HTTP \d+:\s*(.+)/i', $raw, $m)) {
+            return 'OpenAI: ' . trim($m[1]);
+        }
+
+        $lines = preg_split('/\r\n|\r|\n/', $raw);
+        $errors = array_filter($lines, function ($line) {
+            return stripos($line, 'error') !== false || stripos($line, 'failed') !== false;
+        });
+        if (!empty($errors)) {
+            return trim(end($errors));
+        }
+
+        return trim($raw) !== '' ? trim($raw) : 'Sync Intel ล้มเหลว';
     }
 
     public function tableRssData(Request $request)

@@ -30,6 +30,12 @@
                                         RSS Data
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="{{ route('rssfeedsettings.ai_intel') }}">
+                                        @icon('solid/angle-right', 'text-' . get_option('theme_color'))
+                                        AI Intel
+                                    </a>
+                                </li>
 
                             </ul>
                         </section>

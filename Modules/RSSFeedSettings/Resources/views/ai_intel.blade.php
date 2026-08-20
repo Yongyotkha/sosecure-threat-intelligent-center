@@ -271,6 +271,33 @@
         $('#delete_ai_intel_modal').modal('show');
     });
 
+    function aiIntelToastOptions() {
+        return { closeButton: true, timeOut: 12000, extendedTimeOut: 4000, progressBar: true };
+    }
+
+    function parseAiIntelSyncError(xhr) {
+        if (xhr.responseJSON && xhr.responseJSON.message) {
+            return xhr.responseJSON.message;
+        }
+        var text = xhr.responseText || '';
+        try {
+            var parsed = JSON.parse(text);
+            if (parsed && parsed.message) {
+                return parsed.message;
+            }
+        } catch (e) {}
+        if (xhr.status === 419) {
+            return 'Session หมดอายุ กรุณา refresh หน้าแล้วลองใหม่';
+        }
+        if (xhr.status === 0) {
+            return 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้';
+        }
+        if (text && text.indexOf('<') === -1 && text.length < 400) {
+            return text;
+        }
+        return 'Sync Intel ล้มเหลว (HTTP ' + (xhr.status || '?') + ')';
+    }
+
     $('#btn_sync_intel').click(function () {
         var $btn = $(this);
         var originalHtml = $btn.html();
@@ -279,18 +306,29 @@
         $.ajax({
             type: 'POST',
             url: '{{ route('rssfeedsettings.ai_intel_sync') }}',
+            dataType: 'json',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             data: {},
             success: function (response) {
-                toastr.success(response.message || 'Sync Intel completed.', '@langapp('response_status')');
+                var msg = (response && response.message) ? response.message : 'Sync Intel completed.';
+                if (response && response.status === 'error') {
+                    toastr.error(msg, '@langapp('response_status')', aiIntelToastOptions());
+                    return;
+                }
+                if (response && response.status === 'warning') {
+                    toastr.warning(msg, '@langapp('response_status')', aiIntelToastOptions());
+                } else {
+                    toastr.success(msg, '@langapp('response_status')', aiIntelToastOptions());
+                }
                 if (typeof datatable === 'function') {
                     datatable();
                 }
             },
             error: function (xhr) {
-                var msg = (xhr.responseJSON && xhr.responseJSON.message)
-                    ? xhr.responseJSON.message
-                    : 'Sync failed';
-                toastr.error(msg, '@langapp('response_status')');
+                toastr.error(parseAiIntelSyncError(xhr), '@langapp('response_status')', aiIntelToastOptions());
             },
             complete: function () {
                 $btn.prop('disabled', false).html(originalHtml);

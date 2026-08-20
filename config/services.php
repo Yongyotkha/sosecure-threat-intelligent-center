@@ -94,4 +94,14 @@ return [
         'accessToken' => env('WEPAY_ACCESS_TOKEN', ''),
     ],
 
+    'openai'    => [
+        'api_key' => env('OPENAI_API_KEY'),
+        'model'   => env('OPENAI_MODEL', 'gpt-4o-mini'),
+    ],
+
+    'google_cse' => [
+        'api_key' => env('GOOGLE_SEARCH_API_KEY'),
+        'cx'      => env('GOOGLE_CSE_ID'),
+    ],
+
 ];

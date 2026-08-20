@@ -59,5 +59,14 @@ Route::group(
 
         Route::post('rss_data/load_top_source', 'RSSFeedSettingsController@load_top_source')->name('rssfeedsettings.load_top_source')->middleware('can:menu_items');
         Route::post('rss_data/load_top_category', 'RSSFeedSettingsController@load_top_category')->name('rssfeedsettings.load_top_category')->middleware('can:menu_items');
+
+        // AI Intel
+        Route::get('/ai_intel', 'RSSFeedSettingsController@ai_intel')->name('rssfeedsettings.ai_intel')->middleware('can:menu_items');
+        Route::post('ai_intel_table', 'RSSFeedSettingsController@tableAiIntel')->name('rssfeedsettings.ai_intel_table')->middleware('can:menu_items');
+        Route::post('ai_intel/sync', 'RSSFeedSettingsController@ai_intel_sync')->name('rssfeedsettings.ai_intel_sync')->middleware('can:menu_items');
+        Route::get('/ai_intel/news/create/{code}', 'RSSFeedSettingsController@ai_intel_create_news')->name('rssfeedsettings.ai_intel_create_news');
+        Route::get('delete-ai_intel/{id}', 'RSSFeedSettingsController@ai_intel_delete')->name('rssfeedsettings.ai_intel_delete')->middleware('can:menu_items');
+        Route::delete('ai_intel_delete_process/{id}', 'RSSFeedSettingsController@ai_intel_delete_process')->name('rssfeedsettings.ai_intel_delete_process')->middleware('can:menu_items');
+        Route::post('ai_intel_delete_checked', 'RSSFeedSettingsController@ai_intel_delete_checked')->name('rssfeedsettings.ai_intel_delete_checked')->middleware('can:menu_items');
     }
 );

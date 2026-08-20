@@ -59,6 +59,8 @@ PROMPT;
             'verify' => false,
             'headers' => [
                 'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept' => 'application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.7',
+                'Accept-Language' => 'en-US,en;q=0.9',
             ],
         ]);
     }
@@ -79,7 +81,7 @@ PROMPT;
             }
         };
 
-        if (!env('OPENAI_API_KEY')) {
+        if (!config('services.openai.api_key')) {
             throw new Exception('OPENAI_API_KEY is not set in .env');
         }
 
@@ -93,6 +95,10 @@ PROMPT;
                 $stats['failed']++;
                 $log('error', $e->getMessage());
                 Log::error('AiIntelNewsService: ' . $e->getMessage());
+                if ($this->isOpenAiQuotaError($e->getMessage())) {
+                    $log('error', 'Stopping sync: OpenAI quota/credits exhausted.');
+                    break;
+                }
             }
         }
 
@@ -288,13 +294,13 @@ PROMPT;
 
     protected function extractCtiData($content, $title = '')
     {
-        $apiKey = env('OPENAI_API_KEY');
+        $apiKey = config('services.openai.api_key');
         if (!$apiKey) {
             return null;
         }
 
         $searchResults = '';
-        if ($title && env('GOOGLE_SEARCH_API_KEY') && env('GOOGLE_CSE_ID')) {
+        if ($title && config('services.google_cse.api_key') && config('services.google_cse.cx')) {
             $attribution = $this->searchThreatIntel("'" . $title . "' threat actor attribution hacker group history");
             $iocs = $this->searchThreatIntel("'" . $title . "' IOCs indicators domains IPs hashes");
             $parts = array_filter([$attribution, $iocs]);
@@ -309,7 +315,7 @@ PROMPT;
             $userPrompt .= 'INSTRUCTION: วิเคราะห์จากเนื้อหาต้นฉบับเพื่อหา IOC และสรุปข่าวภาษาไทย';
         }
 
-        $model = env('OPENAI_MODEL', 'gpt-4o-mini');
+        $model = config('services.openai.model', 'gpt-4o-mini');
         $response = $this->http->post('https://api.openai.com/v1/chat/completions', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $apiKey,
@@ -330,23 +336,37 @@ PROMPT;
         $body = (string) $response->getBody();
         if ($status !== 200) {
             Log::warning("OpenAI CTI extract HTTP {$status}: " . mb_substr($body, 0, 500));
-            return null;
+            $decoded = json_decode($body, true);
+            $err = @$decoded['error']['message'] ?: mb_substr($body, 0, 180);
+            throw new Exception("OpenAI HTTP {$status}: {$err}");
         }
 
         $json = json_decode($body, true);
         $contentJson = @$json['choices'][0]['message']['content'];
         if (!$contentJson) {
-            return null;
+            throw new Exception('OpenAI returned an empty analysis payload');
         }
 
         $parsed = json_decode($contentJson, true);
-        return is_array($parsed) ? $parsed : null;
+        if (!is_array($parsed)) {
+            throw new Exception('OpenAI returned invalid JSON analysis');
+        }
+
+        return $parsed;
+    }
+
+    protected function isOpenAiQuotaError($message)
+    {
+        $needle = mb_strtolower((string) $message);
+        return strpos($needle, 'insufficient_quota') !== false
+            || strpos($needle, 'credit_balance_exhausted') !== false
+            || strpos($needle, 'no credits remaining') !== false;
     }
 
     protected function searchThreatIntel($query)
     {
-        $apiKey = env('GOOGLE_SEARCH_API_KEY');
-        $cseId = env('GOOGLE_CSE_ID');
+        $apiKey = config('services.google_cse.api_key');
+        $cseId = config('services.google_cse.cx');
         if (!$apiKey || !$cseId || strpos($cseId, 'YOUR_CUSTOM') !== false) {
             return '';
         }
