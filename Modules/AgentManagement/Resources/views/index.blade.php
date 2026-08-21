@@ -56,8 +56,8 @@
                             <option value="">All Site</option>
                             @if ($site_settings)
 
-                            @foreach ($site_settings as $site_settings)
-                            <option value="{{$site_settings->id}}">{{$site_settings->name}}
+                            @foreach ($site_settings as $site_row)
+                            <option value="{{$site_row->id}}">{{$site_row->name}}
                             </option>
                             @endforeach
 
@@ -731,7 +731,18 @@
                                         </header>
                                         <div class="panel-body">
                                             <div class="row m-b-10">
-                                                <div class="col-md-12 text-right">
+                                                <div class="col-md-4">
+                                                    <label class="control-label m-b-xs">Filter by Site</label>
+                                                    <select id="site_agent_filter" class="select2-option form-control">
+                                                        <option value="">All Site</option>
+                                                        @if ($site_settings)
+                                                            @foreach ($site_settings as $site_row)
+                                                                <option value="{{ $site_row->id }}">{{ $site_row->name }}</option>
+                                                            @endforeach
+                                                        @endif
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-8 text-right" style="padding-top:24px;">
                                                     <button type="button" class="btn btn-primary btn-flat" onclick="f_export_tb_agent()">
                                                         <i class="fas fa-solid fa-file-export"></i> Export Excel
                                                     </button>
@@ -1013,7 +1024,17 @@
         datatable_agent();
         datatable_schedule();
 
-        setInterval(() => {   
+        $('#site_agent_filter').select2({
+            placeholder: 'All Site',
+            allowClear: true,
+            width: '100%',
+        });
+
+        $('#site_agent_filter').change(function () {
+            datatable_agent($(this).val());
+        });
+
+        setInterval(() => {
             count_head();
             datachart_Incident();
             datachart_platform();
@@ -1090,7 +1111,7 @@
     function f_export_tb_agent()
     {
         let params = [];
-        let site_val = $('#site').val();
+        let site_val = $('#site_agent_filter').val() || $('#site').val();
         if(site_val) {
             params.push('site=' + encodeURIComponent(site_val));
         }
@@ -1640,6 +1661,12 @@
     function datatable_agent(site_val)
     {
         var site_id = site_val;
+        if (site_id === undefined || site_id === null) {
+            site_id = $('#site_agent_filter').length ? $('#site_agent_filter').val() : '';
+        }
+        if (site_id === undefined || site_id === null) {
+            site_id = $('#site').val();
+        }
 
         tbl_agent = $('#table-agent-template').DataTable({
             cache: false,
@@ -1811,15 +1838,22 @@
                     if(!resp || resp.status !== 'success'){
                         html += '<div class="text-danger">'+(resp && resp.message ? resp.message : 'Load failed')+'</div>';
                     } else if(!resp.rows || !resp.rows.length){
-                        html += '<div class="text-muted">ไม่พบไฟล์ที่สแกนใหม่ในรอบนี้ (ไฟล์ที่ข้ามเพราะไม่เปลี่ยนแปลงจะไม่แสดง)</div>';
+                        html += '<div class="text-muted">ไม่พบไฟล์ในรอบนี้</div>';
                     } else {
                         html += '<table class="table table-condensed table-bordered" style="margin:0;background:#fff;"><thead><tr>'
                             +'<th>Path</th><th>Result</th><th>Rule</th><th>Engine</th><th>Score</th><th>Time</th>'
                             +'</tr></thead><tbody>';
                         resp.rows.forEach(function(r){
                             var res = (r.result || 'clean').toLowerCase();
-                            var resCls = res === 'infected' ? 'label-danger' : 'label-success';
-                            var resLabel = res === 'infected' ? 'malware' : 'clean';
+                            var resCls = 'label-success';
+                            var resLabel = 'clean';
+                            if (res === 'infected') {
+                                resCls = 'label-danger';
+                                resLabel = 'malware';
+                            } else if (res === 'skip' || res === 'skipped') {
+                                resCls = 'label-warning';
+                                resLabel = 'SKIP';
+                            }
                             html += '<tr>'
                                 +'<td style="word-break:break-all;max-width:360px;" title="'+ $('<div>').text(r.path||'').html() +'">'+ $('<div>').text(r.path||'-').html() +'</td>'
                                 +'<td><span class="label '+resCls+'">'+ resLabel +'</span></td>'
@@ -2057,6 +2091,9 @@
         $('.loadder-timeline').show();
         site_val = $('#site').val();
         {{-- console.log(site_val); --}}
+        if ($('#site_agent_filter').length) {
+            $('#site_agent_filter').val(site_val || '').trigger('change.select2');
+        }
         count_head(site_val);
         datachart_Incident(site_val);
         datachart_platform(site_val);
@@ -2069,16 +2106,30 @@
         datatable_schedule(site_val);
     });
 
-    function change_status_agent(id) 
+    function change_status_agent(id)
     {
-        let checkState = $("#agent-status-" + id).is(":checked") ? 1 : 0;
+        let $cb = $("#agent-status-" + id);
+        let checkState = $cb.is(":checked") ? 1 : 0;
+        let previousChecked = ! $cb.is(":checked");
+
         axios.post('{{route('agentmanagement.update_status_agent')}}', {
             status: checkState,
             id: id,
         }).then(function (response) {
-            toastr.success('Update Status Success!!');
+            if (response.data && String(response.data.status_code) === '200') {
+                toastr.success('Update Status Success!!');
+                return;
+            }
+            $cb.prop('checked', previousChecked);
+            var msg = (response.data && response.data.message_th) ? response.data.message_th : 'Update failed';
+            toastr.warning(msg);
         }).catch(function (error) {
-            toastr.error('error!!');
+            $cb.prop('checked', previousChecked);
+            let msg = 'ไม่สามารถเปิด status ได้ กรุณาปิด agent อื่นก่อน';
+            if (error.response && error.response.data) {
+                msg = error.response.data.message_th || error.response.data.message || msg;
+            }
+            toastr.warning(msg, 'License Quota');
         });
     }
 
