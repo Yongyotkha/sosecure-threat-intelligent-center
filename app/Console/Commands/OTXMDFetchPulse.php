@@ -181,6 +181,7 @@ class OTXMDFetchPulse extends Command
         $this->info('Started at          : ' . ($manifest['started_at'] ?? '-'));
         $this->info('Last started        : ' . ($manifest['last_started_at'] ?? '-'));
         $this->info('Fetch finished at   : ' . ($manifest['fetch_finished_at'] ?? '-'));
+        $this->info('Fetch duration      : ' . OtxPulseStagingStore::elapsed($manifest['last_started_at'] ?? $manifest['started_at'] ?? null, $manifest['fetch_finished_at'] ?? null));
         $this->info('Resume count        : ' . (int) ($manifest['resume_count'] ?? 0));
         $this->info('API total (OTX catalog, not this run) : ' . number_format($apiTotal));
         $this->info('Save intended (will import)           : ' . number_format($fetched) . ($limit !== null ? " (limit={$limit})" : ($isPartialList ? ' (scoped run)' : '')));
@@ -224,11 +225,11 @@ class OTXMDFetchPulse extends Command
             OtxPulseStagingStore::saveManifest($runId, $after);
             $this->info('Finished at         : ' . ($after['finished_at'] ?? '-'));
             $this->info('Pipeline complete   : ' . ($pipelineComplete ? 'YES' : 'NO'));
-            $this->info('Duration            : ' . OtxPulseStagingStore::elapsed($after['started_at'] ?? null, $after['finished_at'] ?? null));
+            $this->info('Duration            : ' . OtxPulseStagingStore::elapsed($after['last_started_at'] ?? $after['started_at'] ?? null, $after['finished_at'] ?? null));
         } else {
             $this->info('Finished at         : ' . date('c') . ' (staging deleted after complete import)');
             $this->info('Pipeline complete   : YES');
-            $this->info('Duration            : ' . OtxPulseStagingStore::elapsed($manifest['started_at'] ?? null));
+            $this->info('Duration            : ' . OtxPulseStagingStore::elapsed($manifest['last_started_at'] ?? $manifest['started_at'] ?? null));
         }
 
         return $fetchExit;

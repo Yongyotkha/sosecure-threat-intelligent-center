@@ -182,6 +182,7 @@ class OTXMDFetchIndicator extends Command
         $this->info('Started at          : ' . ($manifest['started_at'] ?? '-'));
         $this->info('Last started        : ' . ($manifest['last_started_at'] ?? '-'));
         $this->info('Fetch finished at   : ' . ($manifest['fetch_finished_at'] ?? '-'));
+        $this->info('Fetch duration      : ' . OtxPulseStagingStore::elapsed($manifest['last_started_at'] ?? $manifest['started_at'] ?? null, $manifest['fetch_finished_at'] ?? null));
         $this->info('Resume count        : ' . (int) ($manifest['resume_count'] ?? 0));
         $this->info('API total (OTX catalog, not this run) : ' . number_format($apiTotal));
         $this->info('Intended this run                     : ' . number_format($expected) . ($limit !== null ? " (limit={$limit})" : ''));
@@ -212,11 +213,11 @@ class OTXMDFetchIndicator extends Command
             OtxPulseStagingStore::saveManifest($runId, $after, $this->kind);
             $this->info('Finished at         : ' . ($after['finished_at'] ?? '-'));
             $this->info('Pipeline complete   : ' . ($pipelineComplete ? 'YES' : 'NO'));
-            $this->info('Duration            : ' . OtxPulseStagingStore::elapsed($after['started_at'] ?? null, $after['finished_at'] ?? null));
+            $this->info('Duration            : ' . OtxPulseStagingStore::elapsed($after['last_started_at'] ?? $after['started_at'] ?? null, $after['finished_at'] ?? null));
         } else {
             $this->info('Finished at         : ' . date('c') . ' (staging deleted after complete import)');
             $this->info('Pipeline complete   : YES');
-            $this->info('Duration            : ' . OtxPulseStagingStore::elapsed($manifest['started_at'] ?? null));
+            $this->info('Duration            : ' . OtxPulseStagingStore::elapsed($manifest['last_started_at'] ?? $manifest['started_at'] ?? null));
         }
 
         return $exit;
@@ -937,7 +938,6 @@ class OTXMDFetchIndicator extends Command
                 'finished_at' => $finishedAt,
                 'finished_at_iso' => $finishedIso,
                 'complete' => $complete,
-                'duration_seconds' => max(0, strtotime($finishedIso) - strtotime($importStartedIso)),
                 'updated_at' => $finishedAt,
             ]]
         );
@@ -958,9 +958,22 @@ class OTXMDFetchIndicator extends Command
         $this->info('Complete             : ' . ($complete ? 'YES' : 'NO'));
         $this->info('Import started at    : ' . $importStartedIso);
         $this->info('Import finished at   : ' . $finishedIso);
+        $this->info('Fetch duration       : ' . OtxPulseStagingStore::elapsed($manifest['last_started_at'] ?? $manifest['started_at'] ?? null, $manifest['fetch_finished_at'] ?? null));
+        $this->info('Import duration      : ' . OtxPulseStagingStore::elapsed($importStartedIso, $finishedIso));
 
         Artisan::call('app:MDCountIndicator', [], $this->output);
         $this->output->write(Artisan::output());
+
+        $endIso = date('c');
+        $durFields = OtxPulseStagingStore::stampDurationFields($manifest, $endIso);
+        $stampCol->updateOne(
+            ['_id' => $stampId],
+            ['$set' => $durFields]
+        );
+        $this->info('Total duration       : ' . $durFields['duration_human']
+            . ' (fetch ' . $durFields['fetch_duration_human']
+            . ', import ' . $durFields['import_duration_human']
+            . ', count ' . $durFields['count_duration_human'] . ')');
 
         if ($complete && !$this->option('skip-import')) {
             // always delete on complete (no --keep on this command)

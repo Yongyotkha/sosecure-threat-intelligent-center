@@ -237,6 +237,9 @@ class OTXMDImportPulse extends Command
                         'skipped' => $this->totalIndicatorsSkipped,
                         'not_in_scope' => $notInScope,
                     ],
+                    'duration' => [
+                        'note' => 'duration_seconds = this session (fetch + import + MDCount). import_duration_seconds is Mongo write only.',
+                    ],
                 ]),
                 'api_total_pulses' => $apiTotal,
                 'limit' => $importLimit !== null ? $importLimit : $fetchLimit,
@@ -267,7 +270,6 @@ class OTXMDImportPulse extends Command
                 'finished_at' => $finishedAt,
                 'finished_at_iso' => $finishedIso,
                 'complete' => $complete,
-                'duration_seconds' => max(0, strtotime($finishedIso) - strtotime($startedIso)),
                 'updated_at' => $finishedAt,
             ]]
         );
@@ -332,11 +334,24 @@ class OTXMDImportPulse extends Command
         $this->info('Complete            : ' . ($complete ? 'YES' : 'NO'));
         $this->info('Import started at   : ' . $startedIso);
         $this->info('Import finished at  : ' . $finishedIso);
+        $this->info('Fetch duration      : ' . OtxPulseStagingStore::elapsed($manifest['last_started_at'] ?? $manifest['started_at'] ?? null, $manifest['fetch_finished_at'] ?? null));
+        $this->info('Import duration     : ' . OtxPulseStagingStore::elapsed($startedIso, $finishedIso));
         $this->info('Import status       : ' . $manifest['import_status']);
 
         if (!$this->option('skip-count')) {
             Artisan::call('app:MDCountIndicator', [], $this->output);
         }
+
+        $endIso = date('c');
+        $durFields = OtxPulseStagingStore::stampDurationFields($manifest, $endIso);
+        $collectionStamp->updateOne(
+            ['_id' => $stampId],
+            ['$set' => $durFields]
+        );
+        $this->info('Total duration      : ' . $durFields['duration_human']
+            . ' (fetch ' . $durFields['fetch_duration_human']
+            . ', import ' . $durFields['import_duration_human']
+            . ', count ' . $durFields['count_duration_human'] . ')');
 
         $markedHeavy = OtxHeavyPulseQueue::markImportedByRun($runId);
         if ($markedHeavy > 0) {

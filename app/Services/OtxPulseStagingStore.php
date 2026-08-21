@@ -309,12 +309,25 @@ class OtxPulseStagingStore
 
     public static function elapsed($start, $end = null)
     {
+        if (!$start) {
+            return '-';
+        }
+        return self::formatDuration(self::secondsBetween($start, $end));
+    }
+
+    public static function secondsBetween($start, $end = null)
+    {
         $t0 = $start ? strtotime($start) : false;
         $t1 = $end ? strtotime($end) : time();
         if ($t0 === false || $t1 === false) {
-            return '-';
+            return 0;
         }
-        $sec = max(0, $t1 - $t0);
+        return max(0, $t1 - $t0);
+    }
+
+    public static function formatDuration($seconds)
+    {
+        $sec = max(0, (int) $seconds);
         $h = intdiv($sec, 3600);
         $m = intdiv($sec % 3600, 60);
         $s = $sec % 60;
@@ -325,6 +338,47 @@ class OtxPulseStagingStore
             return sprintf('%dm %ds', $m, $s);
         }
         return sprintf('%ds', $s);
+    }
+
+    /**
+     * Fetch / import / total for this command session (last_started_at).
+     * total uses $endIso so it can include MDCount after import.
+     */
+    public static function durationParts(array $manifest, $endIso = null)
+    {
+        $endIso = $endIso ?: date('c');
+        $runStart = $manifest['started_at'] ?? null;
+        $sessionStart = $manifest['last_started_at'] ?? $runStart;
+        $fetchEnd = $manifest['fetch_finished_at'] ?? $endIso;
+        $importStart = $manifest['import_started_at'] ?? null;
+        $importEnd = $manifest['import_finished_at'] ?? $endIso;
+
+        $fetchSec = self::secondsBetween($sessionStart, $fetchEnd);
+        if ($sessionStart && $fetchEnd && strtotime((string) $sessionStart) > strtotime((string) $fetchEnd)) {
+            $fetchSec = self::secondsBetween($runStart, $fetchEnd);
+        }
+
+        return [
+            'fetch_seconds' => $fetchSec,
+            'import_seconds' => $importStart ? self::secondsBetween($importStart, $importEnd) : 0,
+            'count_seconds' => $importStart ? self::secondsBetween($importEnd, $endIso) : 0,
+            'total_seconds' => self::secondsBetween($sessionStart, $endIso),
+        ];
+    }
+
+    public static function stampDurationFields(array $manifest, $endIso = null)
+    {
+        $p = self::durationParts($manifest, $endIso);
+        return [
+            'duration_seconds' => $p['total_seconds'],
+            'duration_human' => self::formatDuration($p['total_seconds']),
+            'fetch_duration_seconds' => $p['fetch_seconds'],
+            'fetch_duration_human' => self::formatDuration($p['fetch_seconds']),
+            'import_duration_seconds' => $p['import_seconds'],
+            'import_duration_human' => self::formatDuration($p['import_seconds']),
+            'count_duration_seconds' => $p['count_seconds'],
+            'count_duration_human' => self::formatDuration($p['count_seconds']),
+        ];
     }
 
     /**
