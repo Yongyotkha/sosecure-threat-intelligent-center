@@ -56,6 +56,14 @@ class ApiKeyController extends Controller
 
         $data['systemProviders'] = ApiToken::systemProviderOptions();
 
+        $data['siteProviders'] = ApiToken::siteProviderOptions();
+
+        $data['siteProviderEndpoints'] = ApiToken::siteProviderEndpointUrls();
+
+        $data['honeypotTokenType'] = ApiToken::honeypotTokenType();
+
+        $data['generatableSiteTypes'] = ApiToken::typesWithGeneratedKeys();
+
 
 
         return view('apikey::index')->with($data);
@@ -421,7 +429,19 @@ class ApiKeyController extends Controller
 
         $keys = $request->input('keys', []);
 
-        $keyErrors = ApiToken::validateProviderKeys($keys);
+        if (ApiToken::isHoneypotType($type)) {
+
+            $honeypotErrors = ApiToken::validateHoneypotKeys($keys);
+
+            if (!empty($honeypotErrors)) {
+
+                return $this->validationErrorResponse('Honeypot Agent key validation failed.', $honeypotErrors);
+
+            }
+
+        }
+
+        $keyErrors = ApiToken::validateProviderKeys($keys, $type);
 
 
 
@@ -467,11 +487,23 @@ class ApiKeyController extends Controller
 
 
 
+        $message = langapp('changes_saved_successful');
+
+        if (ApiToken::isHoneypotType($type)) {
+
+            $message .= ' Copy the honeypot API key now if you generated a new one — only the hash is stored.';
+
+        }
+
+
+
         return ajaxResponse([
 
-            'message' => langapp('changes_saved_successful'),
+            'message' => $message,
 
             'redirect' => route('apikey.index'),
+
+            'honeypot' => ApiToken::isHoneypotType($type),
 
         ], true, Response::HTTP_OK);
 
@@ -543,7 +575,19 @@ class ApiKeyController extends Controller
 
         $keys = $request->input('keys', []);
 
-        $keyErrors = ApiToken::validateProviderKeys($keys);
+        if (ApiToken::isHoneypotType($newType)) {
+
+            $honeypotErrors = ApiToken::validateHoneypotKeys($keys);
+
+            if (!empty($honeypotErrors)) {
+
+                return $this->validationErrorResponse('Honeypot Agent key validation failed.', $honeypotErrors);
+
+            }
+
+        }
+
+        $keyErrors = ApiToken::validateProviderKeys($keys, $newType);
 
 
 

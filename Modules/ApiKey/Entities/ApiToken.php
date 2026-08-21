@@ -100,6 +100,166 @@ class ApiToken extends Model
 
 
 
+    public static function siteProviderOptions()
+
+    {
+
+        return [
+
+            'honeypot_agent' => 'Honeypot Agent',
+
+            'ioc_feed' => 'IoC Feed',
+
+            'service_receive_api' => 'Service Receive API',
+
+            'feed_insight' => 'Feed Insight',
+
+        ];
+
+    }
+
+
+
+    /**
+
+     * Default API endpoint path (relative) for each site key type.
+
+     */
+
+    public static function siteProviderEndpointPaths()
+
+    {
+
+        return [
+
+            'honeypot_agent' => '/api/v1/honeypot/ingest',
+
+            'ioc_feed' => '/api/v1/ioc-feed/ip_address.csv',
+
+            'service_receive_api' => '/api/v1/service/events',
+
+            'feed_insight' => '/api/v1/public/events',
+
+        ];
+
+    }
+
+
+
+    public static function siteProviderEndpointUrls()
+
+    {
+
+        $base = rtrim(url('/'), '/');
+
+        $urls = [];
+
+
+
+        foreach (static::siteProviderEndpointPaths() as $type => $path) {
+
+            $urls[$type] = $base . $path;
+
+        }
+
+
+
+        return $urls;
+
+    }
+
+
+
+    public static function typesWithGeneratedKeys()
+
+    {
+
+        return [
+
+            static::honeypotTokenType(),
+
+            'ioc_feed',
+
+            'service_receive_api',
+
+            'feed_insight',
+
+        ];
+
+    }
+
+
+
+    public static function supportsGeneratedKey($type)
+
+    {
+
+        return in_array(trim((string) $type), static::typesWithGeneratedKeys(), true);
+
+    }
+
+
+
+    public static function honeypotTokenType()
+
+    {
+
+        return (string) config('honeypot.api.token_type', 'honeypot_agent');
+
+    }
+
+
+
+    public static function isHoneypotType($type)
+
+    {
+
+        return trim((string) $type) === static::honeypotTokenType();
+
+    }
+
+
+
+    public static function hashHoneypotToken($plain)
+
+    {
+
+        return hash('sha256', (string) $plain);
+
+    }
+
+
+
+    public static function prepareStoredToken($type, $value, $existingToken = null)
+
+    {
+
+        $value = trim((string) $value);
+
+
+
+        if ($value === '' || !static::isHoneypotType($type)) {
+
+            return $value;
+
+        }
+
+
+
+        if ($existingToken && $value === $existingToken->token) {
+
+            return $value;
+
+        }
+
+
+
+        return static::hashHoneypotToken($value);
+
+    }
+
+
+
     public function site()
 
     {
@@ -310,13 +470,15 @@ class ApiToken extends Model
 
 
 
-    public static function validateProviderKeys(array $keys)
+    public static function validateProviderKeys(array $keys, $type = null)
 
     {
 
         $errors = [];
 
         $seenTokens = [];
+
+        $isHoneypot = static::isHoneypotType($type);
 
 
 
@@ -336,11 +498,21 @@ class ApiToken extends Model
 
             $keyLabel = trim($keyData['name'] ?? '') ?: ('Key #' . ($index + 1));
 
+            $id = !empty($keyData['id']) ? (int) $keyData['id'] : null;
+
+            $existingRow = $id ? static::find($id) : null;
+
+            $lookupValue = ($isHoneypot && !($existingRow && $value === $existingRow->token))
+
+                ? static::hashHoneypotToken($value)
+
+                : $value;
 
 
-            if (isset($seenTokens[$value])) {
 
-                $errors["keys.{$index}.key_value"][] = 'Duplicate API key: "' . $keyLabel . '" has the same value as "' . $seenTokens[$value] . '".';
+            if (isset($seenTokens[$lookupValue])) {
+
+                $errors["keys.{$index}.key_value"][] = 'Duplicate API key: "' . $keyLabel . '" has the same value as "' . $seenTokens[$lookupValue] . '".';
 
                 continue;
 
@@ -348,13 +520,11 @@ class ApiToken extends Model
 
 
 
-            $seenTokens[$value] = $keyLabel;
+            $seenTokens[$lookupValue] = $keyLabel;
 
 
 
-            $id = !empty($keyData['id']) ? (int) $keyData['id'] : null;
-
-            $query = static::where('token', $value);
+            $query = static::where('token', $lookupValue);
 
 
 
@@ -375,6 +545,56 @@ class ApiToken extends Model
                 $providerName = $existing->type ?: $existing->name ?: 'another provider';
 
                 $errors["keys.{$index}.key_value"][] = 'Duplicate API key: "' . $keyLabel . '" is already registered under provider "' . $providerName . '".';
+
+            }
+
+        }
+
+
+
+        return $errors;
+
+    }
+
+
+
+    public static function validateHoneypotKeys(array $keys)
+
+    {
+
+        $errors = [];
+
+
+
+        foreach ($keys as $index => $keyData) {
+
+            $name = trim($keyData['name'] ?? '');
+
+            $value = trim($keyData['key_value'] ?? '');
+
+            $whitelist = trim($keyData['whitelist_ips'] ?? '');
+
+
+
+            if ($name === '' && $value === '') {
+
+                continue;
+
+            }
+
+
+
+            if ($whitelist === '') {
+
+                $errors["keys.{$index}.whitelist_ips"][] = 'Whitelist IP is required for Honeypot Agent keys.';
+
+            }
+
+
+
+            if ($value === '' && empty($keyData['id'])) {
+
+                $errors["keys.{$index}.key_value"][] = 'API key is required. Use Generate Key or paste a value.';
 
             }
 
@@ -436,7 +656,7 @@ class ApiToken extends Model
 
                 'name' => $name,
 
-                'token' => $value,
+                'token' => static::prepareStoredToken($type, $value),
 
                 'url' => $url,
 
@@ -522,13 +742,21 @@ class ApiToken extends Model
 
 
 
+            $existingToken = (!empty($keyData['id']) && $existing->has($keyData['id']))
+
+                ? $existing->get($keyData['id'])
+
+                : null;
+
+
+
             $payload = [
 
                 'type' => $type,
 
                 'name' => $name,
 
-                'token' => $value,
+                'token' => static::prepareStoredToken($type, $value, $existingToken),
 
                 'url' => $url,
 
@@ -546,13 +774,11 @@ class ApiToken extends Model
 
 
 
-            if (!empty($keyData['id']) && $existing->has($keyData['id'])) {
+            if ($existingToken) {
 
-                $token = $existing->get($keyData['id']);
+                $existingToken->update($payload);
 
-                $token->update($payload);
-
-                $keptIds[] = $token->id;
+                $keptIds[] = $existingToken->id;
 
                 continue;
 

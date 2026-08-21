@@ -227,6 +227,10 @@
 
 
 
+                        <div class="alert alert-info m-b-md" id="api-key-existing-status" style="display:none;"></div>
+
+
+
                         <div class="form-group row" id="api-key-site-row">
 
                             <label class="col-lg-3 control-label">Site <span class="text-danger">*</span></label>
@@ -289,11 +293,41 @@
 
                         <div class="form-group row" id="api-key-site-name-row">
 
-                            <label class="col-lg-3 control-label">Name <span class="text-danger">*</span></label>
+                            <label class="col-lg-3 control-label">Type <span class="text-danger">*</span></label>
 
                             <div class="col-lg-9">
 
-                                <input type="text" class="form-control" id="api_key_name" placeholder="Provider name">
+                                <select class="form-control" id="api_key_site_type_select">
+
+                                    <option value="">Select Type</option>
+
+                                    @if(!empty($siteProviders))
+
+                                        @foreach($siteProviders as $providerKey => $providerLabel)
+
+                                            <option value="{{ $providerKey }}">{{ $providerLabel }}</option>
+
+                                        @endforeach
+
+                                    @endif
+
+                                    <option value="_custom">Other (Custom)</option>
+
+                                </select>
+
+                                <input type="text" class="form-control m-t-sm" id="api_key_name" placeholder="Custom type (e.g. my_integration)" style="display:none;">
+
+                                <p class="help-block m-b-none m-t-xs text-muted" id="api-key-honeypot-hint" style="display:none;">
+
+                                    Honeypot Agent keys are hashed (SHA-256). Use <strong>Generate</strong>, set Whitelist IP, then copy the plain key before saving. URL is filled to the ingest endpoint.
+
+                                </p>
+
+                                <p class="help-block m-b-none m-t-xs text-muted" id="api-key-generate-hint" style="display:none;">
+
+                                    Use <strong>Generate</strong> to create an API key, then copy it before saving. URL is filled to this service endpoint.
+
+                                </p>
 
                             </div>
 
@@ -549,6 +583,12 @@
         border-radius: 0 4px 4px 0;
         line-height: 1;
     }
+    #api-key-modal .api-key-input-group .btn-generate-honeypot-key {
+        flex: 0 0 auto;
+        margin: 0 0 0 6px !important;
+        white-space: nowrap;
+        border-radius: 4px;
+    }
     #api-key-modal .api-key-input-group .btn-unlock-key i {
         line-height: 1;
         font-size: 14px;
@@ -722,6 +762,15 @@
 
 
 
+    var honeypotTokenType = @json($honeypotTokenType ?? 'honeypot_agent');
+    var siteProviderEndpoints = @json($siteProviderEndpoints ?? []);
+    var generatableSiteTypes = @json($generatableSiteTypes ?? null);
+    var apiKeyModalMode = 'add';
+    var existingProviderLoadSeq = 0;
+    if (!generatableSiteTypes || !generatableSiteTypes.length) {
+        generatableSiteTypes = ['honeypot_agent', 'ioc_feed', 'service_receive_api', 'feed_insight'];
+    }
+
     function getCurrentScope() {
 
         return currentScope;
@@ -729,6 +778,98 @@
     }
 
 
+
+    function setExistingProviderStatus(message, tone) {
+        var $el = $('#api-key-existing-status');
+        if (!message) {
+            $el.hide().removeClass('alert-info alert-success alert-warning').text('');
+            return;
+        }
+        $el
+            .removeClass('alert-info alert-success alert-warning')
+            .addClass(tone || 'alert-info')
+            .html(message)
+            .show();
+    }
+
+    function updateApiKeyModalTitle(mode, scope, hasExisting) {
+        var label = mode === 'edit' || hasExisting ? 'Edit' : 'Add';
+        $('#api-key-modal-title').html(
+            '<i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" data-rel="tooltip" title="Fullscreen" data-placement="right"></i> '
+            + label
+            + (scope === 'system' ? ' System Feed' : ' Site Key')
+        );
+    }
+
+    function loadExistingSiteProvider() {
+        if (getCurrentScope() !== 'site' || apiKeyModalMode === 'edit') {
+            return;
+        }
+
+        var type = getProviderNameValue();
+        var siteId = $('#api_key_site_id').val() || $('#api_key_site_select').val();
+        var seq = ++existingProviderLoadSeq;
+
+        if (!type || type === '_custom' || !siteId) {
+            $('#api_key_type').val('');
+            setExistingProviderStatus('');
+            if (type && type !== '_custom') {
+                applyEndpointUrlForType(type, true);
+            }
+            resetKeyRows([]);
+            updateApiKeyModalTitle('add', 'site', false);
+            syncHoneypotUi();
+            return;
+        }
+
+        setExistingProviderStatus('<i class="fas fa-spinner fa-spin m-r-xs"></i> Loading existing keys for this site + type...', 'alert-info');
+
+        axios.get(providerUrl(type, siteId, 'site'))
+            .then(function (response) {
+                if (seq !== existingProviderLoadSeq) {
+                    return;
+                }
+
+                var data = response.data || {};
+                var keys = data.keys || [];
+                $('#api_key_type').val(data.type || type);
+                if (data.url) {
+                    $('#api_key_url').val(data.url);
+                } else {
+                    applyEndpointUrlForType(type, true);
+                }
+                resetKeyRows(keys);
+                updateApiKeyModalTitle('add', 'site', true);
+                setExistingProviderStatus(
+                    '<i class="fas fa-database m-r-xs"></i> Found <strong>' + keys.length + '</strong> existing key(s) for this site + type. You can edit them or add more with <strong>+ Add Key</strong>.',
+                    'alert-success'
+                );
+                syncHoneypotUi();
+            })
+            .catch(function (error) {
+                if (seq !== existingProviderLoadSeq) {
+                    return;
+                }
+
+                $('#api_key_type').val('');
+                applyEndpointUrlForType(type, true);
+                resetKeyRows([]);
+                updateApiKeyModalTitle('add', 'site', false);
+
+                if (error.response && error.response.status === 404) {
+                    setExistingProviderStatus(
+                        '<i class="fas fa-plus-circle m-r-xs"></i> No existing keys for this site + type yet. Generate a new key below.',
+                        'alert-info'
+                    );
+                } else {
+                    setExistingProviderStatus(
+                        '<i class="fas fa-exclamation-triangle m-r-xs"></i> Could not load existing keys. You can still create a new one.',
+                        'alert-warning'
+                    );
+                }
+                syncHoneypotUi();
+            });
+    }
 
     function getSelectedSiteId() {
 
@@ -764,7 +905,121 @@
 
         }
 
-        return $('#api_key_name').val();
+        var siteType = $('#api_key_site_type_select').val();
+
+        if (siteType === '_custom') {
+
+            return $('#api_key_name').val();
+
+        }
+
+        return siteType;
+
+    }
+
+
+
+    function isHoneypotProviderSelected() {
+
+        return getProviderNameValue() === honeypotTokenType;
+
+    }
+
+
+
+    function isGeneratableProviderSelected() {
+
+        return generatableSiteTypes.indexOf(getProviderNameValue()) !== -1;
+
+    }
+
+
+
+    function applyEndpointUrlForType(type, force) {
+
+        if (getCurrentScope() !== 'site') {
+
+            return;
+
+        }
+
+        var endpoint = siteProviderEndpoints[type] || '';
+
+        var $url = $('#api_key_url');
+
+        var current = $.trim($url.val() || '');
+
+        var knownEndpoints = Object.keys(siteProviderEndpoints).map(function (key) {
+
+            return siteProviderEndpoints[key];
+
+        });
+
+        if (force || current === '' || knownEndpoints.indexOf(current) !== -1) {
+
+            $url.val(endpoint);
+
+        }
+
+    }
+
+
+
+    function syncHoneypotUi() {
+
+        var isHoneypot = getCurrentScope() === 'site' && isHoneypotProviderSelected();
+
+        var canGenerate = getCurrentScope() === 'site' && isGeneratableProviderSelected();
+
+        $('#api-key-honeypot-hint').toggle(isHoneypot);
+
+        $('#api-key-generate-hint').toggle(canGenerate && !isHoneypot);
+
+        $('.btn-generate-honeypot-key').toggle(canGenerate);
+
+        $('.api-key-whitelist-required').toggle(isHoneypot);
+
+        if (canGenerate) {
+
+            $('.btn-generate-honeypot-key').attr('title', isHoneypot ? 'Generate honeypot API key' : 'Generate API key');
+
+        }
+
+    }
+
+
+
+    function generateSiteApiKeyValue(type) {
+
+        if (type === honeypotTokenType) {
+
+            var bytes = new Uint8Array(32);
+
+            window.crypto.getRandomValues(bytes);
+
+            return Array.from(bytes).map(function (b) {
+
+                return ('0' + b.toString(16)).slice(-2);
+
+            }).join('');
+
+        }
+
+        var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+        var out = '';
+
+        var rand = new Uint8Array(60);
+
+        window.crypto.getRandomValues(rand);
+
+        for (var i = 0; i < rand.length; i++) {
+
+            out += alphabet.charAt(rand[i] % alphabet.length);
+
+        }
+
+        return out;
 
     }
 
@@ -798,7 +1053,29 @@
 
         } else {
 
-            $('#api_key_name').val(value);
+            if ($('#api_key_site_type_select option[value="' + value + '"]').length) {
+
+                $('#api_key_site_type_select').val(value);
+
+                $('#api_key_name').hide().val('');
+
+            } else if (value) {
+
+                $('#api_key_site_type_select').val('_custom');
+
+                $('#api_key_name').show().val(value);
+
+            } else {
+
+                $('#api_key_site_type_select').val('');
+
+                $('#api_key_name').hide().val('');
+
+            }
+
+            syncHoneypotUi();
+
+            applyEndpointUrlForType(value, false);
 
         }
 
@@ -836,6 +1113,8 @@
 
             $('#api-key-site-name-row').hide();
 
+            setExistingProviderStatus('');
+
         } else {
 
             $('#site-filter-wrap').show();
@@ -844,13 +1123,15 @@
 
             $('#th-site-col').text('Site');
 
-            $('#api-key-scope-hint').show().text('API keys specific to each site (e.g. IoC Feed, Service Receive API).');
+            $('#api-key-scope-hint').show().text('API keys specific to each site (e.g. Honeypot Agent, IoC Feed, Service Receive API).');
 
             $('#api-key-site-row').show();
 
             $('#api-key-system-provider-row').hide();
 
             $('#api-key-site-name-row').show();
+
+            syncHoneypotUi();
 
         }
 
@@ -996,7 +1277,7 @@
 
         return ''
             + '      <div class="form-group row">'
-            + '        <label class="col-lg-3 control-label">Whitelist IP</label>'
+            + '        <label class="col-lg-3 control-label">Whitelist IP <span class="text-danger api-key-whitelist-required" style="display:none;">*</span></label>'
             + '        <div class="col-lg-9"><textarea class="form-control api-key-whitelist" rows="2" placeholder="1.2.3.4, 5.6.7.8">' + escAttr(item.whitelist_ips) + '</textarea></div>'
             + '      </div>';
     }
@@ -1080,8 +1361,13 @@
                 + '        <div class="api-key-input-group">'
                 + '          <input type="text" class="form-control api-key-value api-key-value-locked" value="' + escAttr(item.key_value) + '" placeholder="API key" readonly data-locked="1">'
                 + '          <button type="button" class="btn btn-default btn-unlock-key" title="Click to edit key"><i class="fas fa-lock"></i></button>'
+                + '          <button type="button" class="btn btn-info btn-generate-honeypot-key" title="Generate honeypot API key" style="display:none;"><i class="fas fa-key"></i> Generate</button>'
                 + '        </div>'
-            : '<input type="text" class="form-control api-key-value" value="" placeholder="API key">';
+            : ''
+                + '        <div class="api-key-input-group">'
+                + '          <input type="text" class="form-control api-key-value" value="" placeholder="API key">'
+                + '          <button type="button" class="btn btn-info btn-generate-honeypot-key" title="Generate honeypot API key" style="display:none;"><i class="fas fa-key"></i> Generate</button>'
+                + '        </div>';
 
 
 
@@ -1168,6 +1454,7 @@
         }
 
         initExpiresDatePickers();
+        syncHoneypotUi();
 
     }
 
@@ -1215,6 +1502,8 @@
 
         var scope = data && data.scope ? data.scope : getCurrentScope();
 
+        apiKeyModalMode = mode === 'edit' ? 'edit' : 'add';
+
         applyScopeUi(scope);
 
 
@@ -1235,7 +1524,14 @@
 
             $('#api_key_name_custom').prop('readonly', true);
 
+            $('#api_key_site_type_select').prop('disabled', true);
+
             $('#api_key_name').prop('readonly', true);
+
+            setExistingProviderStatus(
+                '<i class="fas fa-database m-r-xs"></i> Editing existing provider keys.',
+                'alert-success'
+            );
 
         } else {
 
@@ -1243,25 +1539,25 @@
 
             $('#api_key_name_custom').prop('readonly', false);
 
+            $('#api_key_site_type_select').prop('disabled', false);
+
             $('#api_key_name').prop('readonly', false);
+
+            setExistingProviderStatus('');
 
         }
 
 
 
-        $('#api-key-modal-title').html(
-
-            '<i class="fas fa-compress fullscreen-btn text-white" onclick="fullscreen();" data-rel="tooltip" title="Fullscreen" data-placement="right"></i> '
-
-            + (mode === 'edit' ? 'Edit' : 'Add')
-
-            + (scope === 'system' ? ' System Feed' : ' Site Key')
-
-        );
+        updateApiKeyModalTitle(mode, scope, mode === 'edit');
 
         resetKeyRows(data && data.keys ? data.keys : []);
 
         $('#api-key-modal').modal('show');
+
+        if (mode === 'add' && scope === 'site') {
+            loadExistingSiteProvider();
+        }
 
     }
 
@@ -1443,6 +1739,80 @@
 
 
 
+        $('#api_key_site_type_select').on('change', function () {
+
+            if ($(this).val() === '_custom') {
+
+                $('#api_key_name').show().focus();
+
+                $('#api_key_type').val('');
+
+                setExistingProviderStatus('');
+
+                resetKeyRows([]);
+
+                updateApiKeyModalTitle(apiKeyModalMode, 'site', false);
+
+            } else {
+
+                $('#api_key_name').hide().val('');
+
+                applyEndpointUrlForType($(this).val(), true);
+
+            }
+
+            syncHoneypotUi();
+
+            loadExistingSiteProvider();
+
+        });
+
+
+
+        $('#api_key_site_select').on('change', function () {
+
+            $('#api_key_site_id').val($(this).val());
+
+            loadExistingSiteProvider();
+
+        });
+
+
+
+        $(document).on('click', '.btn-generate-honeypot-key', function (e) {
+
+            e.preventDefault();
+
+            e.stopPropagation();
+
+            var type = getProviderNameValue();
+
+            var group = $(this).closest('.api-key-input-group');
+
+            var input = group.find('.api-key-value');
+
+            var plain = generateSiteApiKeyValue(type);
+
+            input.prop('readonly', false).removeClass('api-key-value-locked').val(plain).trigger('input').focus().select();
+
+            group.find('.btn-unlock-key i').removeClass('fa-lock').addClass('fa-lock-open');
+
+            applyEndpointUrlForType(type, false);
+
+            if (type === honeypotTokenType) {
+
+                toastr.info('Copy this honeypot API key now. After save only the hash is stored.', '@langapp('response_status')');
+
+            } else {
+
+                toastr.info('Copy this API key now before saving.', '@langapp('response_status')');
+
+            }
+
+        });
+
+
+
         $('#btn-add-api-key').on('click', function (e) {
 
             e.preventDefault();
@@ -1459,6 +1829,7 @@
 
             $('#api-key-rows').append(buildKeyRow({}, true));
             initExpiresDatePickers($('#api-key-rows .api-key-row').last());
+            syncHoneypotUi();
         });
 
 
@@ -1668,14 +2039,6 @@
 
 
 
-        $('#api_key_site_select').on('change', function () {
-
-            $('#api_key_site_id').val($(this).val());
-
-        });
-
-
-
         $('#form-api-key').on('submit', function (e) {
 
             e.preventDefault();
@@ -1687,6 +2050,11 @@
             var scope = getCurrentScope();
 
             var providerName = getProviderNameValue();
+
+            if (!providerName) {
+                toastr.error(getCurrentScope() === 'site' ? 'Please select a Type.' : 'Please select a Provider.', '@langapp('response_status')');
+                return;
+            }
 
             var url = type
 
@@ -1735,6 +2103,28 @@
                 payload.keys.push(keyItem);
 
             });
+
+
+
+            if (providerName === honeypotTokenType) {
+                var honeypotInvalid = false;
+                payload.keys.forEach(function (keyItem, index) {
+                    if (!String(keyItem.name || '').trim() && !String(keyItem.key_value || '').trim()) {
+                        return;
+                    }
+                    if (!String(keyItem.whitelist_ips || '').trim()) {
+                        honeypotInvalid = true;
+                        toastr.error('Whitelist IP is required for Honeypot Agent key #' + (index + 1) + '.', '@langapp('response_status')');
+                    }
+                    if (!String(keyItem.key_value || '').trim() && !keyItem.id) {
+                        honeypotInvalid = true;
+                        toastr.error('Generate or paste an API key for Honeypot Agent key #' + (index + 1) + '.', '@langapp('response_status')');
+                    }
+                });
+                if (honeypotInvalid) {
+                    return;
+                }
+            }
 
 
 
